@@ -19,13 +19,7 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.HttpUnitTest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebForm;
-import com.meterware.httpunit.WebLink;
-import com.meterware.httpunit.WebImage;
-import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.*;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -215,6 +209,25 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
         link.click();
         assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
+    }
+
+
+    public void testScriptDisabled() throws Exception {
+        HttpUnitOptions.setScriptingEnabled( false );
+        defineResource( "nothing.html", "Should get here" );
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='realform'><input name='color' value='blue'></form>" +
+                                            "<a href='nothing.html' onClick=\"document.realform.color.value='green';return false;\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        WebLink link = response.getLinks()[0];
+        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
+        link.click();
+        assertEquals( "unchanged parameter value", "blue", form.getParameterValue( "color" ) );
+        assertEquals( "Expected result", "Should get here", wc.getCurrentPage().getText() );
     }
 
 

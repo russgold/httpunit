@@ -30,14 +30,21 @@ abstract public class ScriptableDelegate {
 
     private ScriptingEngine _scriptEngine;
 
+    private static final ScriptingEngine NULL_SCRIPT_ENGINE = new ScriptingEngine() {
+        public void executeScript( String script ) {
+        }
+        public boolean performEvent( String eventScript ) {
+            return true;
+        }
+    };
+
 
     /**
      * Executes the specified scripted event.
      **/
     public boolean doEvent( String eventScript ) {
-        if (_scriptEngine == null) throw new IllegalStateException( "Script engine must be defined before running an event" );
         if (eventScript.length() == 0) return true;
-        return _scriptEngine.performEvent( eventScript );
+        return getScriptEngine().performEvent( eventScript );
     }
 
 
@@ -45,8 +52,7 @@ abstract public class ScriptableDelegate {
      * Executes the specified script.
      **/
     public void runScript( String script ) {
-        if (_scriptEngine == null) throw new IllegalStateException( "Script engine must be defined before running an event" );
-        _scriptEngine.executeScript( script );
+        if (script.length() != 0) getScriptEngine().executeScript( script );
     }
 
 
@@ -80,6 +86,11 @@ abstract public class ScriptableDelegate {
      */
     public void setScriptEngine( ScriptingEngine scriptEngine ) {
         _scriptEngine = scriptEngine;
+    }
+
+
+    private ScriptingEngine getScriptEngine() {
+        return _scriptEngine != null ? _scriptEngine : NULL_SCRIPT_ENGINE;
     }
 
 }

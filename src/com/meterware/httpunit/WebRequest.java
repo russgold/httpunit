@@ -70,12 +70,20 @@ public class WebRequest {
     public URL getURL() throws MalformedURLException {
         if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) validateProtocol( getURLString() );
         if (getURLBase() == null || getURLBase().toString().indexOf( "?" ) < 0) {
-            return new URL( getURLBase(), getURLString() );
+            return newURL( getURLBase(), getURLString() );
         } else {
             final String urlBaseString = getURLBase().toString();
             URL newurlbase = new URL( urlBaseString.substring( 0, urlBaseString.indexOf( "?" ) ) );
-            return new URL( newurlbase, getURLString() );
+            return newURL( newurlbase, getURLString() );
         }
+    }
+
+
+    /**
+     * Creates a new URL, handling the case where the relative URL begins with a '?'
+     */
+    private URL newURL( final URL base, final String spec ) throws MalformedURLException {
+        return spec.startsWith( "?" ) ? new URL( base + spec ) : new URL( base, spec );
     }
 
 

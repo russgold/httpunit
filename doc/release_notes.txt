@@ -12,6 +12,15 @@ Limitations:
 
 
 Revision History:
+16-Aug-2002
+Acknowledgements:
+   Thanks to PeterRoyal for fixing the handling of query-only relative URLs and the IllegalStateException when
+       scripting is disable.
+
+Problems fixes:
+   1. Relative URLs beginning with "?" were not being handled properly.
+   2. Disabling scripting result in IllegalStateException being thrown.
+
 14-Aug-2002
 Additions:
    1. The focus() method is now defined as a no-op for all controls
