@@ -532,7 +532,8 @@ public class JavaScript {
 
 
         public Object jsFunction_getElementById( String id ) {
-            return toScriptable( getDelegate().getElementWithID( id ) );
+            ScriptableDelegate elementWithID = getDelegate().getElementWithID( id );
+            return elementWithID == null ? null : toScriptable( elementWithID );
         }
 
 

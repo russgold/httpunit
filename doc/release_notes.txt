@@ -1,4 +1,4 @@
-HttpUnit release notes
+﻿HttpUnit release notes
 
 Known problems:
     1. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
@@ -16,6 +16,7 @@ Revision History:
 24-Jun-2004
    Problems fixed:
        1. bug #978770 Clicking on a button outside of a form is now supported
+       2. bug #838947 Document.getElementById now returns null if no such element exists
 
 23-Jun-2004
    Problems fixed:

@@ -71,6 +71,24 @@ public class HTMLElementTest  extends HttpUnitTest {
     }
 
 
+    public void testElementByIdReturnsNull() throws Exception {
+        defineResource( "start.html",
+                       "<html><head><script language='JavaScript'>" +
+                       "function showNone() {" +
+                       "    alert( 'It returned ' + document.getElementById( 'zork' ) )" +
+                       "}</script>" +
+                       "</head><body onLoad='showNone();'>" +
+                       "<div id=myDiv title=first><a href='somewhere' id='there' title=second>here</a>" +
+                       "<table id=grouping title=third><tr><td id='aCell' title=fourth>" +
+                       "<form id='perform' title=fifth><input type='submit' id='doIt' title=sixth></form>" +
+                       "</td></tr></table></div>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/start.html" );
+
+        assertEquals( "Null test alert", "It returned null", wc.popNextAlert() );
+    }
+
+
     public void testNameProperty() throws Exception {
         defineResource( "start.html",
                        "<html><head><script language='JavaScript'>" +
