@@ -101,6 +101,7 @@ abstract class FormControl extends HTMLElementBase {
         _onClickEvent   = NodeUtils.getNodeAttribute( node, "onclick" );
 
         supportAttribute( "tabindex" );
+        supportAttribute( "disabled" );
     }
 
 
@@ -384,6 +385,8 @@ abstract class FormControl extends HTMLElementBase {
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "value" )) {
                 _valueAttribute = value.toString();
+            } else if (propertyName.equalsIgnoreCase( "disabled" )) {
+                setDisabled( value instanceof Boolean && ((Boolean) value).booleanValue() );
             } else {
                 super.set( propertyName, value );
             }

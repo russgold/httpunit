@@ -53,8 +53,6 @@ public class Button extends FormControl {
     Button( WebForm form, Node node ) {
         super( form, node );
         _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
-
-        supportAttribute( "disabled" );
     }
 
 
@@ -120,15 +118,6 @@ public class Button extends FormControl {
 
         public void click() throws IOException, SAXException {
             doButtonAction();
-        }
-
-
-        public void set( String propertyName, Object value ) {
-            if (propertyName.equalsIgnoreCase( "disabled" )) {
-                setDisabled( value instanceof Boolean && ((Boolean) value).booleanValue() );
-            } else {
-                super.set( propertyName, value );
-            }
         }
     }
 

@@ -298,6 +298,33 @@ public class FormScriptingTest extends HttpUnitTest {
         }
          }
 
+    public void testEnablingDisabledRadioButtonViaScript() throws Exception {
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "<input type='radio' name='color' value='red' checked>" +
+                                          "<input type='radio' name='color' value='green' disabled>" +
+                                          "<input type=button name=enableChange id=enableChange value=Hello onClick='document.spectrum.color[1].disabled=false;'>" +
+                                          "<input type=submit name=change value=success>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "spectrum" );
+
+        assertMatchingSet( "Color choices", new String[] { "red" }, form.getOptionValues( "color" ) );
+        try {
+            form.setParameter( "color", "green" );
+            fail( "Should not have been able to set color" );
+        } catch (Exception e) {}
+
+        form.getScriptableObject().doEvent( "document.spectrum.color[1].disabled=false" );
+
+        assertMatchingSet( "Color choices", new String[] { "red", "green" }, form.getOptionValues( "color" ) );
+        form.setParameter( "color", "green" );
+    }
+
+
     public void testSubmitViaScriptWithPostParams() throws Exception {
         defineResource( "/servlet/TestServlet?param3=value3&param4=value4", new PseudoServlet() {
             public WebResource getPostResponse() throws IOException {
