@@ -24,6 +24,7 @@ import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.WebForm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -157,6 +158,20 @@ public class StatelessTest extends TestCase {
     }
 
 
+    public void testParameterHandling() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "/testForm", FormSubmissionServlet.class.getName() );
+
+        ServletUnitClient client = sr.newClient();
+        WebResponse wr = client.getResponse( "http://localhost/testForm" );
+        WebForm form = wr.getForms()[0];
+        form.setParameter( "login", "me" );
+        form.setParameter( "password", "haha" );
+        form.submit();
+        assertEquals( "Resultant response", "You posted me,haha", client.getCurrentPage().getText() );
+    }
+
+
     public void testSimplePost() throws Exception {
         final String resourceName = "something/interesting";
 
@@ -234,6 +249,32 @@ public class StatelessTest extends TestCase {
             resp.setContentType( "text/plain" );
             PrintWriter pw = resp.getWriter();
             pw.print( "You posted " + req.getParameter( "color" ) );
+            pw.close();
+        }
+
+    }
+
+
+    static class FormSubmissionServlet extends HttpServlet {
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
+            resp.setContentType( "text/html" );
+
+            PrintWriter pw = resp.getWriter();
+            pw.println( "<html><head></head><body>" );
+            pw.println( "<FORM ACTION='/testForm?submission=act' METHOD='POST'>" );
+            pw.println( "<INPUT NAME='login' TYPE='TEXT'>" );
+            pw.println( "<INPUT NAME='password' TYPE='PASSWORD'>" );
+            pw.println( "<INPUT TYPE='SUBMIT'>" );
+            pw.println( "</FORM></body></html>" );
+            pw.close();
+        }
+
+
+        protected void doPost( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
+            resp.setContentType( "text/plain" );
+            PrintWriter pw = resp.getWriter();
+            pw.print( "You posted " + req.getParameter( "login" ) + "," + req.getParameter( "password" ) );
             pw.close();
         }
 

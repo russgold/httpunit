@@ -15,6 +15,7 @@ Revision History:
 
 Acknowledgements:
     Thanks to Michael Reardon for implementing the ServletUnit header method handling code and session.getAttributeNames
+    Thanks to Geert Bevin for finding and fixing the ServletUnit POST parameters bug.
 
 Additions:
     1. ServletUnit now supports HttpServletResponse header methods: setHeader, addHeader, setIntHeader, addIntHeader,
@@ -22,6 +23,9 @@ Additions:
     2. ServletUnit now supports HttpSession.getAttributeNames.
     3. WebImage now supports a read-only 'altText' property.
     4. WebResponse and TableCell now support getImageWithAltText to find an image with a specified value in its 'alt' attribute.
+
+Problems fixed:
+    1. ServletUnit was not recognizing form parameters on a POST request which contained a query string in the URL.
 
 21-Aug-2002
 

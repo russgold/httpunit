@@ -4,12 +4,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -69,19 +69,16 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
         String file = request.getURL().getFile();
-        if (file.indexOf( '?' ) >= 0) {
-            loadParameters( file.substring( file.indexOf( '?' )+1 ) );
-        } else {
-            if (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 ) {
-                loadParameters( request.getQueryString() );
-                loadParameters( new String( _messageBody ) );
-            }
+        if (file.indexOf( '?' ) >= 0) loadParameters( file.substring( file.indexOf( '?' )+1 ) );
+        if (_messageBody == null) return;
+        if (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 ) {
+            loadParameters( new String( _messageBody ) );
         }
     }
 
 
 //----------------------------------------- HttpServletRequest methods --------------------------
-    
+
 
     /**
      * Returns the name of the authentication scheme used to protect the servlet, for example, "BASIC" or "SSL,"
@@ -101,7 +98,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns an array containing all of the Cookie objects the client sent with this request. 
+     * Returns an array containing all of the Cookie objects the client sent with this request.
      * This method returns null if no cookies were sent.
      **/
     public Cookie[] getCookies() {
@@ -116,9 +113,9 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns the value of the specified request header as an int. If the request does not have a header 
-     * of the specified name, this method returns -1. If the header cannot be converted to an integer, 
-     * this method throws a NumberFormatException. 
+     * Returns the value of the specified request header as an int. If the request does not have a header
+     * of the specified name, this method returns -1. If the header cannot be converted to an integer,
+     * this method throws a NumberFormatException.
      **/
     public int getIntHeader( String name ) {
         return -1;
@@ -126,12 +123,12 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns the value of the specified request header as a long value that represents a Date object. 
-     * Use this method with headers that contain dates, such as If-Modified-Since. 
+     * Returns the value of the specified request header as a long value that represents a Date object.
+     * Use this method with headers that contain dates, such as If-Modified-Since.
      * <br>
-     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name is case insensitive. 
+     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name is case insensitive.
      *
-     * If the request did not have a header of the specified name, this method returns -1. 
+     * If the request did not have a header of the specified name, this method returns -1.
      * If the header can't be converted to a date, the method throws an IllegalArgumentException.
      **/
     public long getDateHeader( String name ) {
@@ -140,8 +137,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns the value of the specified request header as a String. If the request did not include 
-     * a header of the specified name, this method returns null. The header name is case insensitive. 
+     * Returns the value of the specified request header as a String. If the request did not include
+     * a header of the specified name, this method returns null. The header name is case insensitive.
      * You can use this method with any request header.
      **/
     public String getHeader( String name ) {
@@ -150,10 +147,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns an enumeration of all the header names this request contains. If the request has no headers, 
-     * this method returns an empty enumeration. 
+     * Returns an enumeration of all the header names this request contains. If the request has no headers,
+     * this method returns an empty enumeration.
      *
-     * Some servlet containers do not allow do not allow servlets to access headers using this method, 
+     * Some servlet containers do not allow do not allow servlets to access headers using this method,
      * in which case this method returns null.
      **/
     public Enumeration getHeaderNames() {
@@ -162,8 +159,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns the part of this request's URL that calls the servlet. This includes either the servlet name 
-     * or a path to the servlet, but does not include any extra path information or a query string. 
+     * Returns the part of this request's URL that calls the servlet. This includes either the servlet name
+     * or a path to the servlet, but does not include any extra path information or a query string.
      **/
     public String getServletPath() {
         return _servletRequest.getServletPath();
@@ -179,17 +176,17 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns any extra path information associated with the URL the client sent when it made this request. 
-     * The extra path information follows the servlet path but precedes the query string. 
+     * Returns any extra path information associated with the URL the client sent when it made this request.
+     * The extra path information follows the servlet path but precedes the query string.
      * This method returns null if there was no extra path information.
-     **/ 
+     **/
     public String getPathInfo() {
         return _servletRequest.getPathInfo();
     }
 
 
     /**
-     * Returns any extra path information after the servlet name but before the query string, 
+     * Returns any extra path information after the servlet name but before the query string,
      * and translates it to a real path. If the URL does not have any extra path information, this method returns null.
      **/
     public String getPathTranslated() {
@@ -206,18 +203,18 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns the login of the user making this request, if the user has been authenticated, 
+     * Returns the login of the user making this request, if the user has been authenticated,
      * or null if the user has not been authenticated.
      * Whether the user name is sent with each subsequent request depends on the browser and type of authentication.
-     **/ 
+     **/
     public String getRemoteUser() {
         return _userName;
     }
 
 
     /**
-     * Returns the session ID specified by the client. This may not be the same as the ID of the actual session in use. 
-     * For example, if the request specified an old (expired) session ID and the server has started a new session, 
+     * Returns the session ID specified by the client. This may not be the same as the ID of the actual session in use.
+     * For example, if the request specified an old (expired) session ID and the server has started a new session,
      * this method gets a new session with a new ID. If the request did not specify a session ID, this method returns null.
      **/
     public String getRequestedSessionId() {
@@ -237,11 +234,11 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
     /**
-     * Returns the current HttpSession associated with this request or, if there is no current session 
-     * and create is true, returns a new session. 
+     * Returns the current HttpSession associated with this request or, if there is no current session
+     * and create is true, returns a new session.
      * <br>
      * If create is false and the request has no valid HttpSession, this method returns null.
-     **/ 
+     **/
     public HttpSession getSession( boolean create ) {
         if (_session == null && getRequestedSessionId() != null) {
             _session = _context.getSession( getRequestedSessionId() );
@@ -506,17 +503,17 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     /**
-     * Returns the preferred Locale that the client will accept content in, based on the Accept-Language header. 
+     * Returns the preferred Locale that the client will accept content in, based on the Accept-Language header.
      * If the client request doesn't provide an Accept-Language header, this method returns the default locale for the server.
      **/
     public java.util.Locale getLocale() {
         throw new RuntimeException( "getLocale not implemented" );
     }
 
-     
+
     /**
-     * Returns an Enumeration of Locale objects indicating, in decreasing order starting with the preferred locale, 
-     * the locales that are acceptable to the client based on the Accept-Language header. 
+     * Returns an Enumeration of Locale objects indicating, in decreasing order starting with the preferred locale,
+     * the locales that are acceptable to the client based on the Accept-Language header.
      * If the client request doesn't provide an Accept-Language header, this
      * method returns an Enumeration containing one Locale, the default locale for the server.
      **/
@@ -524,49 +521,49 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         throw new RuntimeException( "getLocales not implemented" );
     }
 
-     
+
     /**
-     * Removes an attribute from this request. This method is not generally needed 
+     * Removes an attribute from this request. This method is not generally needed
      * as attributes only persist as long as the request is being handled.
-     **/ 
+     **/
     public void removeAttribute( String name ) {
         _attributes.remove( name );
     }
 
 
     /**
-     * Returns a RequestDispatcher object that acts as a wrapper for the resource located at the given path. 
-     * A RequestDispatcher object can be used to forward a request to the resource or to include the 
-     * resource in a response. The resource can be dynamic or static. 
+     * Returns a RequestDispatcher object that acts as a wrapper for the resource located at the given path.
+     * A RequestDispatcher object can be used to forward a request to the resource or to include the
+     * resource in a response. The resource can be dynamic or static.
      *
-     * The pathname specified may be relative, although it cannot extend outside the current servlet 
-     * context. If the path begins with a "/" it is interpreted as relative to the current context root. 
-     * This method returns null if the servlet container cannot return a RequestDispatcher. 
+     * The pathname specified may be relative, although it cannot extend outside the current servlet
+     * context. If the path begins with a "/" it is interpreted as relative to the current context root.
+     * This method returns null if the servlet container cannot return a RequestDispatcher.
      *
-     * The difference between this method and ServletContext.getRequestDispatcher(java.lang.String) 
+     * The difference between this method and ServletContext.getRequestDispatcher(java.lang.String)
      * is that this method can take a relative path.
-     **/ 
+     **/
     public RequestDispatcher getRequestDispatcher( String path ) {
         throw new RuntimeException( "getRequestDispatcher not implemented" );
     }
 
-         
+
 
 //--------------------------------- methods added to HttpServletRequest in JSDK 2.2 ------------------------------------------------
 
 
     /**
-     * Returns a java.security.Principal object containing the name of the current authenticated user. 
+     * Returns a java.security.Principal object containing the name of the current authenticated user.
      * If the user has not been authenticated, the method returns null.
      **/
     public java.security.Principal getUserPrincipal() {
         return null;
     }
 
-          
+
     /**
-     * Returns a boolean indicating whether the authenticated user is included in the specified 
-     * logical "role". Roles and role membership can be defined using deployment descriptors. 
+     * Returns a boolean indicating whether the authenticated user is included in the specified
+     * logical "role". Roles and role membership can be defined using deployment descriptors.
      * If the user has not been authenticated, the method returns false.
      **/
     public boolean isUserInRole( String role ) {
@@ -577,7 +574,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         return false;
     }
 
-               
+
     /**
      * Returns all the values of the specified request header as an Enumeration of String objects.
      **/
@@ -585,11 +582,11 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         throw new RuntimeException( "getHeaders not implemented" );
     }
 
-      
+
     /**
-     * Returns the portion of the request URI that indicates the context of the request. 
-     * The context path always comes first in a request URI. The path starts with a "/" character 
-     * but does not end with a "/" character. For servlets in the default (root) context, 
+     * Returns the portion of the request URI that indicates the context of the request.
+     * The context path always comes first in a request URI. The path starts with a "/" character
+     * but does not end with a "/" character. For servlets in the default (root) context,
      * this method returns "".
      **/
     public java.lang.String getContextPath() {
