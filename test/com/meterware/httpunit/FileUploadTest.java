@@ -372,7 +372,7 @@ class MimeEcho extends PseudoServlet {
 
 
     private void appendFieldValue( String parameterName, StringBuffer sb, MimeBodyPart mbp ) throws IOException, MessagingException {
-        sb.append( parameterName ).append( "=" ).append( URLEncoder.encode( mbp.getContent().toString(), "iso-8859-1" ) );
+        sb.append( parameterName ).append( "=" ).append( URLEncoder.encode( mbp.getContent().toString() ) );
     }
 
 
