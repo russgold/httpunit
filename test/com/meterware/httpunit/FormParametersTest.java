@@ -148,7 +148,22 @@ public class FormParametersTest extends HttpUnitTest {
         assertEquals( "New hidden value", "new", form.getParameterValue( "secret" ) );
     }
 
-    public void testMultipleTextParameterValidation() throws Exception {
+
+    public void testUnknownParameter() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = '/ask'>" +
+                                  "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebRequest request = page.getForms()[0].getRequest();
+        HttpUnitOptions.setParameterValuesValidated( true );
+        try {
+            request.setParameter( "secret", "zork" );
+            fail( "Should have rejected set of unknown parameter" );
+        } catch (NoSuchParameterException e) {
+        }
+    }
+
+
+     public void testMultipleTextParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
@@ -266,27 +281,27 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-public void testFileParameterValue() throws Exception {
-    defineWebPage( "Default", "<form method=POST action='/ask'>" +
-                              "<Input type=file name=File>" +
-                              "<Input type=submit value=Upload></form>" );
-    WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
-    WebForm form = page.getForms()[0];
-    String[] values = form.getParameterValues( "File" );
-    assertEquals( "Number of file parameter values", 1, values.length );
-    assertEquals( "Default selected filename", "", values[0] );
+    public void testFileParameterValue() throws Exception {
+        defineWebPage( "Default", "<form method=POST action='/ask'>" +
+                                  "<Input type=file name=File>" +
+                                  "<Input type=submit value=Upload></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        String[] values = form.getParameterValues( "File" );
+        assertEquals( "Number of file parameter values", 1, values.length );
+        assertEquals( "Default selected filename", "", values[0] );
 
-    final File file = new File( "dummy.txt" );
-    form.setParameter( "File", new UploadFileSpec[] { new UploadFileSpec( file ) } );
-    assertEquals( "Selected filename", file.getAbsolutePath(), form.getParameterValue( "File" ) );
+        final File file = new File( "dummy.txt" );
+        form.setParameter( "File", new UploadFileSpec[] { new UploadFileSpec( file ) } );
+        assertEquals( "Selected filename", file.getAbsolutePath(), form.getParameterValue( "File" ) );
 
-    WebRequest wr = form.getRequest();
-    assertEquals( "File from validated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
+        WebRequest wr = form.getRequest();
+        assertEquals( "File from validated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
 
-    HttpUnitOptions.setParameterValuesValidated( false );
-    wr = form.getRequest();
-    assertEquals( "File from unvalidated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
-}
+        HttpUnitOptions.setParameterValuesValidated( false );
+        wr = form.getRequest();
+        assertEquals( "File from unvalidated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
+    }
 
 
 //---------------------------------------------- private members ------------------------------------------------

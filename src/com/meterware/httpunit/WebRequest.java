@@ -34,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.net.URLStreamHandler;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -48,6 +49,8 @@ import java.util.HashSet;
  **/
 abstract
 public class WebRequest {
+
+    private static URLStreamHandler JAVASCRIPT_STREAM_HANDLER = new JavascriptURLStreamHandler();
     private SubmitButton _button;
 
     /**
@@ -85,7 +88,11 @@ public class WebRequest {
      * Creates a new URL, handling the case where the relative URL begins with a '?'
      */
     private URL newURL( final URL base, final String spec ) throws MalformedURLException {
-        return spec.startsWith( "?" ) ? new URL( base + spec ) : new URL( base, spec );
+        if (spec.toLowerCase().startsWith( "javascript:" )) {
+            return new URL( "javascript", null, -1, spec.substring( "javascript:".length() ), JAVASCRIPT_STREAM_HANDLER );
+        } else {
+            return spec.startsWith( "?" ) ? new URL( base + spec ) : new URL( base, spec );
+        }
     }
 
 
@@ -595,6 +602,20 @@ class URLEncodedString implements ParameterProcessor {
         }
     }
 
+}
+
+
+
+
+
+//======================================== class JavaScriptURLStreamHandler ============================================
+
+
+class JavascriptURLStreamHandler extends URLStreamHandler {
+
+    protected URLConnection openConnection( URL u ) throws IOException {
+        return null;
+    }
 }
 
 

@@ -105,8 +105,7 @@ public class WebClient {
                                           : wrs.getScriptableDelegate().evaluateURL( urlString );
             if (result == null) return null;
 
-            URL url = new URL( "javascript", null, -1, urlString.substring( "javascript:".length() ), JAVASCRIPT_STREAM_HANDLER );
-            return new DefaultWebResponse( this, request.getTarget(), url, result );
+            return new DefaultWebResponse( this, request.getTarget(), request.getURL(), result );
         }
     }
 
@@ -424,8 +423,6 @@ public class WebClient {
 
     private DialogResponder _dialogResponder = new DialogAdapter();
 
-    private static URLStreamHandler JAVASCRIPT_STREAM_HANDLER = new JavascriptURLStreamHandler();
-
 
     /**
      * Examines the headers in the response and throws an exception if appropriate.
@@ -537,18 +534,6 @@ class RedirectWebRequest extends WebRequest {
     }
 }
 
-
-
-
-//==================================================================================================
-
-
-class JavascriptURLStreamHandler extends URLStreamHandler {
-
-    protected URLConnection openConnection( URL u ) throws IOException {
-        return null;
-    }
-}
 
 
 

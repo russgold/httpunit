@@ -74,7 +74,9 @@ public class ScriptingTest extends HttpUnitTest {
 
     public void testInitialJavaScriptURL() throws Exception {
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( "javascript:alert( 'Hi there!' )" );
+        GetMethodWebRequest request = new GetMethodWebRequest( "javascript:alert( 'Hi there!' )" );
+        assertEquals( "Javascript URL", "javascript:alert( 'Hi there!' )", request.getURL().toExternalForm() );
+        WebResponse response = wc.getResponse( request );
         assertEquals( "Alert message", "Hi there!", wc.popNextAlert() );
     }
 

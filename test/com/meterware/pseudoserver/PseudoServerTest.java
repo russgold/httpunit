@@ -56,6 +56,7 @@ public class PseudoServerTest extends HttpUserAgentTest {
         try {
             WebResponse response = wc.getResponse( "http://no.such.host" );
         } catch (HttpNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

@@ -16,6 +16,7 @@
 <LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
 <LI><A HREF="#badPost">Why doesn't my servlet see parameters on a POST request?</A></LI>
 <LI><A HREF="#hidden">Why can't I change hidden parameters?</A></LI>
+<LI><A HREF="#badType">The server is not sending a valid content type. How do I test HTML pages anyway?</A></LI>
 </OL>
 
 
@@ -99,6 +100,13 @@ the order of parameters in the request is not guaranteed, in case your server ca
 the underlying value in the form. This will behave the way JavaScript does - resetting the form will now restore this value,
 rather than the original one.
 </ul>
+
+<A name="#badType"><h2>The server is not sending a valid content type. How do I test HTML pages anyway?</h2></A>
+By default, HttpUnit assumes a content type of "text/plain" unless the server sends the Content-Type header to override
+it, as most servers do. If yours is not, you can
+call<blockquote><code>HttpUnitOptions.setDefaultContentType( "text/html" );</code></blockquote>before running your tests.
+If you are using JUnit, call this method in your <code>setUp()</code> method.
+
 
 </BODY></HTML>
 

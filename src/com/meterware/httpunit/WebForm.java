@@ -477,7 +477,7 @@ public class WebForm extends WebRequestSource {
 
     public void setParameter( String name, final String[] values ) {
         FormParameter parameter = getParameter( name );
-        if (parameter == null) throw new NoSuchParameterException( name );
+        if (parameter == UNKNOWN_PARAMETER) throw new NoSuchParameterException( name );
         parameter.setValues( values );
     }
 

@@ -151,6 +151,23 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitButtonlessFormViaScript() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='document.spectrum.submit(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
     public void testSubmitViaScriptButton() throws Exception {
         defineResource( "DoIt?color=green", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +

@@ -265,7 +265,7 @@ abstract class FormControl {
             return new TextAreaFormControl( node );
         } else if (node.getNodeName().equals( "select" )) {
             return new SelectionFormControl( node );
-        } else if (node.getNodeName().equals( "button" )) {
+        } else if (node.getNodeName().equalsIgnoreCase( "button" )) {
             final String type = NodeUtils.getNodeAttribute( node, "type", "submit" );
             if (type.equalsIgnoreCase( "submit" )) {
                 return new SubmitButton( form, node );

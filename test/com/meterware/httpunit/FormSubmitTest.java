@@ -471,6 +471,22 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testPostActionParametersAfterSetAction() throws Exception {
+        defineWebPage( "abc/form", "<form name=\"test\" method='POST' action='stop?ready=yes'>" +
+                               "  <input type=\"text\" name=\"aTextField\">" +
+                               "  <input type=\"submit\" name=\"apply\" value=\"Apply\">" +
+                               "</form>" );
+
+        WebResponse wr  = _wc.getResponse( getHostPath() + "/abc/form.html" );
+        WebForm form    = wr.getForms()[0];
+        form.getScriptableObject().setAction( "go?size=3&time=now" );
+        WebRequest req  = form.getRequest( "apply" );
+        req.setParameter( "aTextField", "test" );
+        assertEquals( getHostPath() + "/abc/go?size=3&time=now",
+                            req.getURL().toExternalForm() );
+    }
+
+
 //---------------------------------------------- private members ------------------------------------------------
 
 

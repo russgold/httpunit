@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+ 5-Sep-2002
+
+Problems fixed:
+    1. An attempt to set a non-existent parameter now correctly throws NoSuchParameterException rather
+       than UnusedParameterValueException.
+    2. Obtaining the URL from a javascript: request no longer throws MalformedURLException.
+
 30-Aug-2002 1.4.5
 Acknowledgements:
     Thanks to Steve Heath for an example on how to make JSPs work with ServletUnit.
