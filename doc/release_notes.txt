@@ -25,6 +25,7 @@ Acknowledgements:
     Thanks to Daniel Sheppard for correcting the return status for HttpServletResponse.sendRedirect
     Thanks to Daniel Sheppard, Navid Vahdat, and Ron Hanson for help in adding capabilities to the RequestDispatcher implementation.
     Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
+    Thanks to Raphael Corre for improving logger of transmitted headers
 
 Problems Fixed:
     Packaging
@@ -34,13 +35,13 @@ Problems Fixed:
            the ID attribute is defined.
         3. Forms prematurely closed because of improper nesting will now contain any controls defined before the next form.
         4. Quotes in refresh URL meta tags are now recognized and stripped.
+        5. Headers defined per request were not being logged
     JavaScript
-        5. Scripts marked as something besides JavaScript are now ignored.
         6. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
         7. Bug #680695: Button.click() is now supported.
         8. Bug #680695: Form control ids are now usable to locate components.
+        9. Scripts marked as something besides JavaScript are now ignored.
     ServletUnit
-        9. ServletUnit now creates a new session if the requested session exists but is marked invalid
        10. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
            as relative to the context root.
        11. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
@@ -50,6 +51,7 @@ Problems Fixed:
        14. Forwarded servlets now have access to their path information from the standard request methods, as required.
        15. All servlets within a web application now share the same instance of ServletContext, permitting attributes
            set by one servlet to be visible to other servlets.
+       16. ServletUnit now creates a new session if the requested session exists but is marked invalid
 
 Additions:
     Content and Parsing
