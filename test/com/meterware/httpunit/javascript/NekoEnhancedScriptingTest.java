@@ -65,6 +65,24 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testEmbeddedDocumentWriteWithClose() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><title>something</title></head>" +
+                                            "<body>" +
+                                            "<script language='JavaScript'>" +
+                                            "document.write( '<a id=here href=about:blank>' );" +
+                                            "document.writeln( document.title );" +
+                                            "document.write( '</a>' );" +
+                                            "document.close();" +
+                                            "</script>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebLink link = response.getLinkWithID( "here" );
+        assertNotNull( "The link was not found", link );
+        assertEquals( "Link contents", "something", link.asText() );
+    }
+
+
     public void testUnknownScript() throws Exception {
         defineWebPage( "FunkyScript",
                        "<SCRIPT>" +

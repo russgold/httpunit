@@ -13,7 +13,7 @@ Limitations:
 
 
 Revision History:
- 14-Feb-2003 1.5.2 release candidate
+ 23-Feb-2003 1.5.2 release candidate
 Acknowledgements:
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
     Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
@@ -41,9 +41,8 @@ Problems Fixed:
         7. Bug #680695: Button.click() is now supported.
         8. Bug #680695: Form control ids are now usable to locate components.
         9. Scripts marked as something besides JavaScript are now ignored.
+       10. Calling document.close() in the middle of an immediate script no longer replaces the current page.
     ServletUnit
-       10. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
-           as relative to the context root.
        11. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
            had previously been defined.
        12. Included and forwarded servlets now inherit parameters from their calling servlet.
@@ -52,6 +51,8 @@ Problems Fixed:
        15. All servlets within a web application now share the same instance of ServletContext, permitting attributes
            set by one servlet to be visible to other servlets.
        16. ServletUnit now creates a new session if the requested session exists but is marked invalid
+       17. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
+           as relative to the context root.
 
 Additions:
     Content and Parsing

@@ -52,6 +52,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private boolean _hasSubframes;
     private URL     _baseURL;
     private String  _baseTarget;
+    private boolean _parsingPage;
 
 
     /**
@@ -730,6 +731,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     void replaceText( String text, String contentType ) {
+        if (_parsingPage) return;
         _responseText = text;
         _inputStream = null;
         _page = null;
@@ -937,12 +939,16 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private HTMLPage getReceivedPage() throws SAXException {
         if (_page == null) {
             try {
+                _parsingPage = true;
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
                 _page = new HTMLPage( this, _frameName, _baseURL, _baseTarget, getCharacterSet() );
                 _page.parse( getText(), _pageURL );
+                if (_page == null) throw new IllegalStateException( "replaceText called in the middle of getReceivedPage()" );
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException( e.toString() );
+            } finally {
+                _parsingPage = false;
             }
         }
         return _page;
