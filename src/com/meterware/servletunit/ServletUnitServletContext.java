@@ -33,9 +33,9 @@ import javax.servlet.*;
 
 
 /**
- * This class acts as a test environment for servlets.
+ * This class is a private implementation of the ServletContext class.
  **/
-public class ServletUnitServletContext implements ServletContext {
+class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns a ServletContext object that corresponds to a specified URL on the server. 
