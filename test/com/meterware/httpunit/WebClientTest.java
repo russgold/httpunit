@@ -53,6 +53,19 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    public void testGZIPDisabled() throws Exception {
+        String expectedResponse = "Here is my answer";
+        defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
+        HttpUnitOptions.setAcceptGzip( false );
+
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/Compressed.html" );
+        assertNull( "Should not have received a Content-Encoding header", wr.getHeaderField( "Content-encoding" ) );
+        assertEquals( "Content-Type", "text/plain", wr.getContentType() );
+        assertEquals( "Content", expectedResponse, wr.getText().trim() );
+    }
+
+
     public void testGZIPHandling() throws Exception {
         String expectedResponse = "Here is my answer";
         defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
@@ -76,9 +89,20 @@ public class WebClientTest extends HttpUnitTest {
 
 
         public WebResource getGetResponse() throws IOException {
-            WebResource result = new WebResource( getCompressedContents(), "text/plain" );
-            result.addHeader( "Content-Encoding: gzip" );
-            return result;
+            if (!userAcceptsGZIP()) {
+                return new WebResource( _responseText.getBytes(), "text/plain" );
+            } else {
+                WebResource result = new WebResource( getCompressedContents(), "text/plain" );
+                result.addHeader( "Content-Encoding: gzip" );
+                return result;
+            }
+        }
+
+
+        private boolean userAcceptsGZIP() {
+            String header = getHeader( "Accept-Encoding" );
+            if (header == null) return false;
+            return header.toLowerCase().indexOf( "gzip" ) >= 0;
         }
 
 

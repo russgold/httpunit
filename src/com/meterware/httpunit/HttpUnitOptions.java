@@ -47,6 +47,24 @@ public abstract class HttpUnitOptions {
         _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
+        _acceptGzip = true;
+    }
+
+
+
+    /**
+     * Returns true if any WebClient created will accept GZIP encoding of responses. The default is to accept GZIP encoding.
+     **/
+    public static boolean isAcceptGzip() {
+        return _acceptGzip;
+    }
+
+
+    /**
+     * Specifies whether a WebClient will be initialized to accept GZIP encoded responses. The default is true.
+     */
+    public static void setAcceptGzip( boolean acceptGzip ) {
+        _acceptGzip = acceptGzip;
     }
 
 
@@ -303,6 +321,8 @@ public abstract class HttpUnitOptions {
 
     private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
     private static final String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
+
+    private static boolean _acceptGzip = true;
 
     private static boolean _parserWarningsEnabled;
 

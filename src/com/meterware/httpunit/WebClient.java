@@ -247,6 +247,13 @@ public class WebClient implements FrameHolder {
 //------------------------------------------ protected members -----------------------------------
 
 
+    protected WebClient() {
+        if (HttpUnitOptions.isAcceptGzip()) {
+            setHeaderField( "Accept-Encoding", "gzip" );
+        }
+    }
+
+
     /**
      * Creates a web response object which represents the response to the specified web request.
      **/

@@ -11,6 +11,15 @@ Limitations:
 
 
 Revision History:
+11-Mar-2002
+
+Additions:
+    1. HttpUnit now sends Accept-encoding: gzip unless disabled by a call to HttpUnitOptions.setAcceptGzip( false )
+
+Notes:
+    1. Hidden fields may not be modified if parameter validation is enabled, since they cannot be modified through
+       normal user interaction (in the absence of JavaScript).
+
 
  6-Mar-2002 1.4
 Acknowledgements:
