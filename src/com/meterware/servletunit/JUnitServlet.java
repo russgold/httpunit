@@ -423,7 +423,7 @@ public class JUnitServlet extends HttpServlet {
 
 
         private boolean displayException( TestFailure failure ) {
-            return !failure.isFailure();
+            return true;
         }
 
 
