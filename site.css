@@ -39,7 +39,18 @@ pre { font-family: "courier new", courier; font-size: 8pt;
 .developers dd { margin-top: 0; margin-left: 0 }
 .story-list dt { margin: 1em 0 0 2em; font-weight: bold }
 .story-list dd { margin-left: 2em; margin-top: 0 }
-.sourceforge { text-align: right; position: absolute; top:0; right: 70px }
+.sourceforge { text-align: right;
+               position: absolute;
+               top:0;
+               right: 70px;
+/* Again, the ugly brilliant hack. */
+	           voice-family: "\"}\"";
+	           voice-family:inherit;
+	           right:0px;
+	           }
+/* Again, "be nice to Opera 5". */
+body>.sourceforge {right:0px;}
+               }
 td.news { border-color: white; background-color: #ccc; padding:0px 2px 2px 2px }
 td.summaries { padding: 2px 2px 2px 2px }
 
