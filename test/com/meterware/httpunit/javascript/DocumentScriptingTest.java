@@ -280,6 +280,8 @@ public class DocumentScriptingTest extends HttpUnitTest {
         WebWindow ww = wc.getOpenWindow( "sample");
         assertEquals( "Generated page", "You made it!", ww.getCurrentPage().getText() );
         assertEquals( "Content Type", "text/plain", ww.getCurrentPage().getContentType() );
+        link.click();
+        assertEquals( "Generated page", "You made it!", ww.getCurrentPage().getText() );
     }
 
 

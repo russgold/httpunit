@@ -16,8 +16,12 @@ Revision History:
  19-Mar-2003
 Acknowledgements:
     Thanks to Brendan Boesen for correcting the session invalidation problem.
+    Thanks to Andrew Bickerton for correcting the document.write append problem.
+
 Problems fixed:
     1. ServletUnit was creating a new session if the current one was not valid, even if "create" was not specified.
+    2. calling document.write on a closed document was appending to rather than replacing its contents.
+
 Additions:
     1. PseudoServer now handles persistent connections.
 
