@@ -2,6 +2,14 @@ HttpUnit release notes
 
 Known issues: none
 
+7-Aug-00
+Problems corrected:
+    1. Parsing a response would crash if there were no nodes inside a form
+Additions:
+    1. WebResponse.getOptions and getOptionValues now return the displayed and parameter value options
+       available to the user in a <select>
+
+
 4-Aug-00 0.9.5
 General:
     1. Nested tables are now supported (examples to follow) by using WebTable.getTableCell
@@ -17,6 +25,7 @@ Additions:
     4. Added WebTable.purgeEmptyCells to eliminate meaningless spacing information
     5. Added copyright notices to most source files
     6. Added support for checkboxes, radio buttons, text areas, and selects
+
     
 29-Jun-00 0.9.1
 Additions:
@@ -30,6 +39,7 @@ Additions:
 
     2. WebResponse now can return an array of the top-level tables in the HTML response.
        Each table may now be asked for its size and the contents of each of its cells.
+
 
 5-Jun-00   0.8.2
 Additions:

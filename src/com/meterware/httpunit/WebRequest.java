@@ -20,11 +20,35 @@ public class WebRequest {
 
 
     /**
+     * Sets the multiple values of a parameter in a web request.
+     **/
+    public void setParameter( String name, String[] values ) {
+        _parameters.put( name, values );
+    }
+
+
+    /**
      * Returns the value of a parameter in this web request.
      * @return the value of the named parameter, or null if it is not set.
      **/
     public String getParameter( String name ) {
-        return (String) _parameters.get( name );
+        Object value = _parameters.get( name );
+        if (value instanceof String[]) {
+            return ((String[]) value)[0];
+        } else {
+            return (String) value;
+        }
+    }
+
+
+    /**
+     * Returns the multiple default values of the named parameter.
+     **/
+    public String[] getParameterValues( String name ) {
+        Object result = _parameters.get( name );
+        if (result instanceof String) return new String[] { (String) result };
+        if (result instanceof String[]) return (String[]) result;
+        return new String[0];
     }
 
 
@@ -103,10 +127,12 @@ public class WebRequest {
         StringBuffer sb = new StringBuffer();
         for (Enumeration e = _parameters.keys(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
-            String value = (String) _parameters.get( name );
-            sb.append( name ).append( '=' );
-            sb.append( URLEncoder.encode( value ) );
-            if (e.hasMoreElements()) sb.append( '&' );
+            Object value = _parameters.get( name );
+            if (value instanceof String) {
+                appendParameter( sb, name, (String) value, e.hasMoreElements() );
+            } else {
+                appendParameters( sb, name, (String[]) value, e.hasMoreElements() );
+            }
         }
         return sb.toString();
     }
@@ -117,6 +143,20 @@ public class WebRequest {
     private URL       _urlBase;
     private String    _urlString;
     private Hashtable _parameters = new Hashtable();
+
+
+    private void appendParameters( StringBuffer sb, String name, String[] values, boolean moreToCome ) {
+        for (int i = 0; i < values.length; i++) {
+            appendParameter( sb, name, values[i], (i < values.length-1 || moreToCome ) );
+        }
+    }
+
+
+    private void appendParameter( StringBuffer sb, String name, String value, boolean moreToCome ) {
+        sb.append( name ).append( '=' );
+        sb.append( URLEncoder.encode( value ) );
+        if (moreToCome) sb.append( '&' );
+    }
 
 
 }

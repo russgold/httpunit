@@ -79,7 +79,12 @@ public class WebForm {
         String[] parameterNames = getParameterNames();
         for (int i = 0; i < parameterNames.length; i++) {
             if (getParameterDefaults().get( parameterNames[i] ) != null) {
-                result.setParameter( parameterNames[i], (String) getParameterDefaults().get( parameterNames[i] ) );
+                Object value = getParameterDefaults().get( parameterNames[i] );
+                if (value instanceof String) {
+                    result.setParameter( parameterNames[i], (String) value);
+                } else {
+                    result.setParameter( parameterNames[i], (String[]) value);
+                }
             }
         }
         return result;
@@ -91,9 +96,41 @@ public class WebForm {
      * Returns the default value of the named parameter.
      **/
     public String getParameterValue( String name ) {
-        String result = (String) getParameterDefaults().get( name );
-        if (result == null) result = "";
-        return result;
+        Object result = getParameterDefaults().get( name );
+        if (result instanceof String) return (String) result;
+        if (result instanceof String[]) return ((String[]) result)[0];
+        return "";
+    }
+
+
+    /**
+     * Returns the multiple default values of the named parameter.
+     **/
+    public String[] getParameterValues( String name ) {
+        Object result = getParameterDefaults().get( name );
+        if (result instanceof String) return new String[] { (String) result };
+        if (result instanceof String[]) return (String[]) result;
+        return new String[0];
+    }
+
+
+    /**
+     * Returns the displayed options defined for the specified parameter name.
+     **/
+    public String[] getOptions( String name ) {
+        Object result = getParameterOptions().get( name );
+        if (result instanceof String[]) return (String[]) result;
+        return new String[0];
+    }
+
+
+    /**
+     * Returns the option values defined for the specified parameter name.
+     **/
+    public String[] getOptionValues( String name ) {
+        Object result = getParameterOptionValues().get( name );
+        if (result instanceof String[]) return (String[]) result;
+        return new String[0];
     }
 
 
@@ -131,6 +168,12 @@ public class WebForm {
 
     /** The parameters with their default values. **/
     private Hashtable      _defaults;
+
+    /** The parameters with their displayed options. **/
+    private Hashtable      _options;
+
+    /** The parameters with their options. **/
+    private Hashtable      _optionValues;
 
     /** The selections in this form. **/
     private HTMLSelectElement[] _selections;
@@ -171,9 +214,35 @@ public class WebForm {
             for (int i = 0; i < textAreas.length; i++) {
                 defaults.put( textAreas[i].getName(), textAreas[i].getValue() );
             }
-        _defaults = defaults;
+            _defaults = defaults;
         }
         return _defaults;
+    }
+
+
+    private Hashtable getParameterOptions() {
+        if (_options == null) {
+            Hashtable options = new Hashtable();
+            HTMLSelectElement[] selections = getSelections();
+            for (int i = 0; i < selections.length; i++) {
+                options.put( selections[i].getName(), selections[i].getOptions() );
+            }
+            _options = options;
+        }
+        return _options;
+    }
+
+
+    private Hashtable getParameterOptionValues() {
+        if (_optionValues == null) {
+            Hashtable options = new Hashtable();
+            HTMLSelectElement[] selections = getSelections();
+            for (int i = 0; i < selections.length; i++) {
+                options.put( selections[i].getName(), selections[i].getOptionValues() );
+            }
+            _optionValues = options;
+        }
+        return _optionValues;
     }
 
 
@@ -213,7 +282,7 @@ public class WebForm {
     private NamedNodeMap[] getParameters() {
         if (_parameters == null) {
             Vector list = new Vector();
-            addFormParametersToList( _node.getChildNodes(), list );
+            if (_node.hasChildNodes()) addFormParametersToList( _node.getChildNodes(), list );
             _parameters = new NamedNodeMap[ list.size() ];
             list.copyInto( _parameters );
         }
@@ -277,19 +346,51 @@ public class WebForm {
         }
 
 
-        String getSelected() {
+        String[] getSelected() {
+            Vector selected = new Vector();
             NodeList nl = ((Element) _node).getElementsByTagName( "option" );
             for (int i = 0; i < nl.getLength(); i++) {
                 NamedNodeMap nnm = nl.item(i).getAttributes();
                 if (nnm.getNamedItem( "selected" ) != null) {
                     if (nnm.getNamedItem( "value" ) != null) {
-                        return getValue( nnm.getNamedItem( "value" ) );
+                        selected.addElement( getValue( nnm.getNamedItem( "value" ) ) );
                     } else {
-                        return getValue( nl.item(i).getFirstChild() );
+                        selected.addElement( getValue( nl.item(i).getFirstChild() ) );
                     }
                 }
             }
-            return "";
+            String[] result = new String[ selected.size() ];
+            selected.copyInto( result );
+            return result;
+        }
+
+
+        String[] getOptions() {
+            Vector options = new Vector();
+            NodeList nl = ((Element) _node).getElementsByTagName( "option" );
+            for (int i = 0; i < nl.getLength(); i++) {
+                options.addElement( getValue( nl.item(i).getFirstChild() ) );
+            }
+            String[] result = new String[ options.size() ];
+            options.copyInto( result );
+            return result;
+        }
+
+
+        String[] getOptionValues() {
+            Vector options = new Vector();
+            NodeList nl = ((Element) _node).getElementsByTagName( "option" );
+            for (int i = 0; i < nl.getLength(); i++) {
+                NamedNodeMap nnm = nl.item(i).getAttributes();
+                if (nnm.getNamedItem( "value" ) != null) {
+                    options.addElement( getValue( nnm.getNamedItem( "value" ) ) );
+                } else {
+                    options.addElement( getValue( nl.item(i).getFirstChild() ) );
+                }
+            }
+            String[] result = new String[ options.size() ];
+            options.copyInto( result );
+            return result;
         }
     }
 

@@ -6,6 +6,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.Vector;
+
 
 /**
  * A unit test of the httpunit parsing classes.
@@ -28,26 +30,25 @@ public class HttpUnitTest extends TestCase {
 
 
     public void setUp() throws Exception {
-        URL baseURL = new URL( "http://www.meterware.com" );
-        _noForms = new ReceivedPage( baseURL, HEADER + "<body>This has no forms but it does" +
+        _noForms = new ReceivedPage( _baseURL, HEADER + "<body>This has no forms but it does" +
                                        "have <a href=\"/other.html\">an active link</A>" +
                                        " and <a name=here>an anchor</a>" +
                                        "</body></html>" );
-        _oneForm = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
+        _oneForm = new ReceivedPage( _baseURL, HEADER + "<body><h2>Login required</h2>" +
                                      "<form method=POST action = \"/servlet/Login\"><B>" +
                                      "Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                      "<input type=\"checkbox\" name=first>Disabled" +
                                      "<input type=\"checkbox\" name=second checked>Enabled" +
                                      "<br><Input type=submit value = \"Log in\">" +
                                      "</form></body></html>" );
-        _hidden  = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
+        _hidden  = new ReceivedPage( _baseURL, HEADER + "<body><h2>Login required</h2>" +
                                      "<form method=POST action = \"/servlet/Login\">" +
                                      "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
                                      "<br><Input name=typeless>" +
                                      "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                      "<br><Input type=submit value = \"Log in\">" +
                                      "</form></body></html>" );
-        _tableForm = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
+        _tableForm = new ReceivedPage( _baseURL, HEADER + "<body><h2>Login required</h2>" +
                                        "<form method=POST action = \"/servlet/Login\">" +
                                        "<table summary=\"\"><tr><td>" +
                                        "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
@@ -56,7 +57,7 @@ public class HttpUnitTest extends TestCase {
                                        "</td><td><Input type=Radio name=sex value=neuter>Neither" +
                                        "<Input type=submit value = \"Log in\"></tr></table>" +
                                        "</form></body></html>" );
-        _selectForm = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
+        _selectForm = new ReceivedPage( _baseURL, HEADER + "<body><h2>Login required</h2>" +
                                        "<form method=POST action = \"/servlet/Login\">" +
                                        "<Select name=color><Option>blue<Option selected>red \n" +
                                        "<Option>green</select>" +
@@ -144,10 +145,75 @@ public class HttpUnitTest extends TestCase {
     }
 
 
+    public void testMultiSelect() throws Exception {
+        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+                                       "<Select multiple size=4 name=colors>" +
+                                       "<Option>blue<Option selected>red \n" +
+                                       "<Option>green<Option value=\"pink\" selected>salmon</select>" +
+                                       "</form></body></html>" );
+        WebForm form = page.getForms()[0];
+        String[] parameterNames = form.getParameterNames();
+        assertEquals( "num parameters", 1, parameterNames.length );
+        assertEquals( "parameter name", "colors", parameterNames[0] );
+        assertMatchingSet( "Select defaults", new String[] { "red", "pink" }, form.getParameterValues( "colors" ) );
+        assertMatchingSet( "Select options", new String[] { "blue", "red", "green", "salmon" }, form.getOptions( "colors" ) );
+        assertMatchingSet( "Select values", new String[] { "blue", "red", "green", "pink" }, form.getOptionValues( "colors" ) );
+        WebRequest request = form.getRequest();
+        assertMatchingSet( "Request defaults", new String[] { "red", "pink" }, request.getParameterValues( "colors" ) );
+        assertEquals( "URL", "http://www.meterware.com/ask?colors=red&colors=pink", request.getURL().toExternalForm() );
+    }                         
+                              
+    private static URL _baseURL;
+     
+    static {
+        try {
+            _baseURL = new URL( "http://www.meterware.com" );
+        } catch (java.net.MalformedURLException e ) {}  // ignore
+    }
+
     private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
     private ReceivedPage _noForms;
     private ReceivedPage _oneForm;
     private ReceivedPage _hidden;
     private ReceivedPage _tableForm;
     private ReceivedPage _selectForm;
+
+
+    private void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
+        Vector expectedItems = new Vector();
+        Vector foundItems    = new Vector();
+
+        for (int i = 0; i < expected.length; i++) expectedItems.addElement( expected[i] );
+        for (int i = 0; i < found.length; i++) foundItems.addElement( found[i] );
+
+        for (int i = 0; i < expected.length; i++) {
+            if (!foundItems.contains( expected[i] )) {
+                fail( comment + ": expected " + asText( expected ) + " but found " + asText( found ) );
+            } else {
+                foundItems.removeElement( expected[i] );
+            }
+        }
+
+        for (int i = 0; i < found.length; i++) {
+            if (!expectedItems.contains( found[i] )) {
+                fail( comment + ": expected " + asText( expected ) + " but found " + asText( found ) );
+            } else {
+                expectedItems.removeElement( found[i] );
+            }
+        }
+
+        if (!foundItems.isEmpty()) fail( comment + ": expected " + asText( expected ) + " but found " + asText( found ) );
+    }
+
+
+    private String asText( Object[] args ) {
+        StringBuffer sb = new StringBuffer( "{" );
+        for (int i = 0; i < args.length; i++) {
+            if (i != 0) sb.append( "," );
+            sb.append( '"' ).append( args[i] ).append( '"' );
+        }
+        sb.append( "}" );
+        return sb.toString();
+    }
+
 }
