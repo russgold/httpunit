@@ -1,0 +1,57 @@
+<HTML><BODY>
+Classes for testing http server systems. Each test session should begin by creating a 
+{@link com.meterware.httpunit.WebConversation WebConversation} to which it should submit an 
+initial {@link com.meterware.httpunit.GetMethodWebRequest http request} using the 
+{@link com.meterware.httpunit.WebConversation#getResponse getResponse} method. With each 
+subsequent step,
+it will typically examine the response either textually or as a DOM, and create new
+requests based on either submitting a form or clicking on a link.
+
+<H2>Installation</H2>
+The package depends on <A HREF="http://www3.sympatico.ca/ac.quick/jtidy.html">JTidy</A> by Andy Quick.
+The jtidy.jar must be in the class path ahead of any other implementation of the DOM classes. In addition,
+unit tests will require <A HREF=http://www.xprogramming.com/ftp/TestingFramework/JUnit/junit32.zip>JUnit</A> 
+as well.
+
+
+<H2>Example</H2>
+In the following code, a web conversation is started and an initial request sent. The program
+then prints out the response and extracts the first form (the login form) from it. After
+setting the <TT>name</TT> parameter to the desired value, it submits the form and prints the response.
+<PRE>
+import com.meterware.httpunit.*;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.xml.sax.*;
+
+public class Example {
+
+
+    public static void main( String[] params ) {
+        try {
+            WebRequest          request;
+            WebResponse         response;
+            WebConversation     conversation = new WebConversation();
+            
+            request = new GetMethodWebRequest( "http://www.meterware.com/servlet/TopSecret" );
+            response = conversation.getResponse( request );
+            System.out.println( response );
+
+            WebForm loginForm = response.getForms()[0];
+
+            request = loginForm.getRequest();
+            request.setParameter( "name", "master" );
+            response = conversation.getResponse( request );
+            System.out.println( response );
+
+        } catch (Exception e) {
+            System.err.println( "Exception: " + e );
+        }
+    }
+}
+</PRE>
+
+Please direct any questions to <A HREF="mailto:russgold@acm.org">Russell Gold</A>.
+</BODY></HTML>

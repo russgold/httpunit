@@ -1,0 +1,16 @@
+HttpUnit release notes
+
+03-May-00  0.8 
+Initial public release
+
+1-Jun-00   0.8.1
+Problems corrected:
+    Default parameter values are ignored
+    Parameter values without explicit types were being ignored, rather than defaulting to TEXT
+Additions:
+    ExampleTest now demonstrates the use of httpunit and JUnit to test servlets
+    NearWords demonstrates the use of httpunit to access web site functionality
+
+5-Jun-00   0.8.2
+Additions:
+    WebResponse now has a getDOM method which permits examination of the DOM equivalent of the response.

@@ -1,0 +1,130 @@
+<?xml version="1.0" ?> 
+<!--  ======================================================================= --> 
+<!--  httpunit build file                                                     --> 
+<!--  ======================================================================= --> 
+<project name="httpunit" default="jar" basedir=".">
+    <property name="name" value="httpunit" /> 
+    <property name="Name" value="HttpUnit" /> 
+    <property name="version" value="0.8.2" />
+    <property name="zip_version" value="0_8" /> 
+    <property name="src.dir" value="src" /> 
+    <property name="examples.dir" value="examples" /> 
+    <property name="lib.dir" value="lib" /> 
+    <property name="docs.dir" value="doc" /> 
+    <property name="build.dir" value="build" /> 
+    <property name="build.classes" value="${build.dir}/classes" /> 
+    <property name="build.javadocs" value="${build.dir}/javadocs" /> 
+    <property name="dist.dir" value="dist" /> 
+    <property name="classpath" value="" /> 
+    <property name="packages" value="com.meterware.*" /> 
+    <property name="build.compiler" value="classic" /> 
+    
+ 
+<!--  ===================================================================  --> 
+<!--  Prepares the build directory                                         --> 
+<!--  ===================================================================  --> 
+<target name="prepare">
+    <mkdir dir="${build.dir}" /> 
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Compiles the source code                                             --> 
+<!--  ===================================================================  --> 
+<target name="compile" depends="prepare">
+    <mkdir dir="${build.classes}" /> 
+    <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
+           debug="on" deprecation="off" optimize="on">
+    </javac>
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Compiles the test code                                               -->
+<!--  ===================================================================  --> 
+<target name="testcompile" depends="compile">
+    <javac srcdir="${src.dir}/test" destdir="${build.classes}" classpath="${classpath}" 
+           debug="on" deprecation="off" optimize="on">
+    </javac>
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Runs the test code                                                   -->
+<!--  ===================================================================  -->
+<target name="test" depends="testcompile">
+    <java classname="com.meterware.httpunit.HttpUnitTest"
+          args="-classpath ${build.classes};${classpath}" >
+    </java>
+</target>
+
+ 
+<!--  ===================================================================  --> 
+<!--  Creates the jar archive                                              --> 
+<!--  ===================================================================  --> 
+<target name="jar" depends="compile">
+    <mkdir dir="${lib.dir}" /> 
+    <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.classes}" includes="com/**" /> 
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Creates the API documentation                                        --> 
+<!--  ===================================================================  --> 
+<target name="javadocs" depends="prepare">
+    <mkdir dir="${build.javadocs}" /> 
+    <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}" 
+             destdir="${build.javadocs}" author="true" version="true" 
+             windowtitle="${Name} API" doctitle="${Name}" 
+             bottom="Copyright © 2000 Russell Gold and meterware.com. All Rights Reserved." /> 
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Creates the distribution                                             --> 
+<!--  ===================================================================  --> 
+<target name="dist" depends="jar,javadocs">
+    <mkdir dir="${dist.dir}" /> 
+    <mkdir dir="${dist.dir}/lib" /> 
+    <mkdir dir="${dist.dir}/doc" /> 
+    <mkdir dir="${dist.dir}/doc/api" /> 
+    <mkdir dir="${dist.dir}/src" />
+    <mkdir dir="${dist.dir}/src/test" />
+    <mkdir dir="${dist.dir}/examples" /> 
+    <copydir src="${src.dir}" dest="${dist.dir}/src" /> 
+    <copydir src="${src.dir}/test" dest="${dist.dir}/src/test" /> 
+    <copydir src="${examples.dir}" dest="${dist.dir}/examples" /> 
+    <copydir src="${lib.dir}" dest="${dist.dir}/lib" /> 
+    <copyfile src="build.xml" dest="${dist.dir}/build.xml" /> 
+    <copydir src="${docs.dir}" dest="${dist.dir}/doc" /> 
+    <copydir src="${build.javadocs}" dest="${dist.dir}/doc/api" /> 
+    <copyfile src="readme.txt" dest="${dist.dir}/readme.txt" /> 
+  </target>
+
+
+<!--  ===================================================================  --> 
+<!--  Packages the distribution with ZIP                                   --> 
+<!--  ===================================================================  --> 
+<target name="dist-zip" depends="dist">
+    <zip zipfile="${name}_${zip_version}.zip" basedir="${dist.dir}" includes="**" /> 
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Cleans up generated stuff                                            --> 
+<!--  ===================================================================  --> 
+<target name="clean">
+    <deltree dir="${build.dir}" /> 
+    <deltree dir="${dist.dir}" /> 
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Total cleanup                                                        --> 
+<!--  ===================================================================  --> 
+<target name="total-clean" depends="clean">
+    <delete file="${lib.dir}/${name}.jar" /> 
+    <delete file="${name}-${zip_version}.zip" /> 
+</target>
+ 
+</project>
