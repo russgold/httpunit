@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+ 9-Jan-2003
+ Acknolwedgements:
+    1. Thanks to James Howe for noting the mispelling of the getElementById method
+
+Problems fixed:
+    1. Corrected spelling of getElementById
+
  3-Jan-2003
 Additions:
     1. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked

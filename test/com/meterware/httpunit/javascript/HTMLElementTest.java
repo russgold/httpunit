@@ -48,7 +48,7 @@ public class HTMLElementTest  extends HttpUnitTest {
         defineResource( "start.html",
                        "<html><head><script language='JavaScript'>" +
                        "function showTitle( id ) {" +
-                       "   alert( 'element with id ' + id + ' has title ' + document.getElementWithID( id ).title );" +
+                       "   alert( 'element with id ' + id + ' has title ' + document.getElementById( id ).title );" +
                        "}" +
                        "function showAll() {" +
                        "    showTitle( 'there' ); showTitle( 'perform' ); showTitle( 'doIt' );" +
@@ -60,7 +60,7 @@ public class HTMLElementTest  extends HttpUnitTest {
                        "<form id='perform' title=fifth><input type='submit' id='doIt' title=sixth></form>" +
                        "</td></tr></table></div>" );
         WebConversation wc = new WebConversation();
-        WebResponse wr = wc.getResponse( getHostPath() + "/start.html" );
+        wc.getResponse( getHostPath() + "/start.html" );
 
         assertElementTitle( wc, "there", "second" );
         assertElementTitle( wc, "perform", "fifth" );

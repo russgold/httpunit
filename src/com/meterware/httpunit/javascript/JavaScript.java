@@ -492,7 +492,7 @@ public class JavaScript {
         }
 
 
-        public Object jsFunction_getElementWithID( String id ) {
+        public Object jsFunction_getElementById( String id ) {
             return toScriptable( getDelegate().getElementWithID( id ) );
         }
 
