@@ -10,6 +10,10 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+13-Sep-2001
+   Problems corrected:
+       1. The refresh handling now recognizes requests with content syntax "<seconds>;<location>" or "<seconds>; URL=<location>"
+
 21-Aug-2001
 Acknowledgements:
     Thanks to Richard Scothern for identiying the cause of problems with POST requests and older servlet engines.

@@ -229,6 +229,23 @@ public class WebPageTest extends HttpUnitTest {
      }
 
 
+    public void testMetaRefreshURLRequest() throws Exception {
+        String refreshURL = getHostPath() + "/NextPage.html";
+        String page = "<html><head><title>Sample</title>" +
+                      "<meta Http_equiv=refresh content='2;URL=" + refreshURL + "'></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Refresh URL", refreshURL, simplePage.getRefreshRequest().getURL().toExternalForm() );
+        assertEquals( "Refresh delay", 2, simplePage.getRefreshDelay() );
+     }
+
+
     public void testAutoRefresh() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +

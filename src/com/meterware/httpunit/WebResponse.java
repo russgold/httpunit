@@ -382,9 +382,20 @@ public class WebResponse implements HTMLSegment {
         if (splitIndex < 0) splitIndex = 0;
         try {
             _refreshDelay = Integer.parseInt( contentTypeHeader.substring( 0, splitIndex ) );
-            _refreshRequest = new GetMethodWebRequest( contentTypeHeader.substring( splitIndex+1 ) );
+            _refreshRequest = new GetMethodWebRequest( getRefreshURL( contentTypeHeader.substring( splitIndex+1 ) ) );
         } catch (NumberFormatException e) {
             System.out.println( "Unable to interpret refresh tag: \"" + contentTypeHeader + '"' );
+        }
+    }
+
+
+    private String getRefreshURL( String text ) {
+        text = text.trim();
+        if (!text.toUpperCase().startsWith( "URL" )) {
+            return text;
+        } else {
+            int splitIndex = text.indexOf( '=' );
+            return text.substring( splitIndex+1 ).trim();
         }
     }
 
