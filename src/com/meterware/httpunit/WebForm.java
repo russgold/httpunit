@@ -145,18 +145,34 @@ public class WebForm {
     }
 
 
+    private SubmitButton getDefaultButton() {
+        if (getSubmitButtons().length == 1) {
+            return getSubmitButtons()[0];
+        } else if (getSubmitButtonVector().contains( SubmitButton.UNNAMED_BUTTON )) {
+            return getSubmitButton( "" );
+        } else {
+            return null;
+        }
+    }
+
+
     /**
      * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
-     * If the button is null, simulates the pressing of an unnamed button.
+     * If the button is null, simulates the pressing of the default button.
+     **/
+    public WebRequest getRequest( SubmitButton button, int x, int y ) {
+        WebRequest request = getRequest( button );
+        request.setSubmitPosition( x, y );
+        return request;
+    }
+
+
+    /**
+     * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
+     * If the button is null, simulates the pressing of the default button.
      **/
     public WebRequest getRequest( SubmitButton button ) {
-        if (button == null) {
-            if (getSubmitButtons().length == 1) {
-                button = getSubmitButtons()[0];
-            } else if (getSubmitButtonVector().contains( SubmitButton.UNNAMED_BUTTON )) {
-                button = getSubmitButton( "" );
-            }
-        }
+        if (button == null) button = getDefaultButton();
 
         if (HttpUnitOptions.getParameterValuesValidated()) {
             if (button == null) {

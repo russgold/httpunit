@@ -6,18 +6,12 @@ Known problems:
 
 Limitations: HttpUnit does not support JavaScript
 
-Acknowledgements:
-Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
-Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink,
-                        and for correcting the set up of the https protocol handling.
-Thanks to Perry Doell for the methods to examine cookies on WebConversation
-Thanks to Ken Hygh for the proper handling of parameters with no specified type
-Thanks to Gabriel Hauser for finding a bug in the handling of parameter defaults 
 
 Revision History:
 25-Oct-00
 Additions:
     1. Forms with multiple buttons are now supported, using the SubmitButton class.
+    2. WebResponse now supports finding a table via its summary text, using getTableWithSummary()
         
 Problems corrected:
     1. Unnamed parameters are no longer submitted as part of a form request
@@ -25,68 +19,41 @@ Problems corrected:
     3. A problem which caused WebResponse.java to fail compilation under JDK 1.1 has been corrected
 
 17-Oct-00 1.1
-Additions:
-    1. It is now possible to set a delay in the handling of redirect requests, if necessary
-    2. The WebResponse now can return the response code associated with it (2xx)
-    3. An exception (HttpException or a subclass) is now thrown on all client and server errors (4xx or 5xx)
+Acknowledgements:
+    Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
+    Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink,
+                            and for correcting the set up of the https protocol handling.
+    Thanks to Perry Doell for the methods to examine cookies on WebConversation
+    Thanks to Ken Hygh for the proper handling of parameters with no specified type
+    Thanks to Gabriel Hauser for finding a bug in the handling of parameter defaults
      
 Problems corrected:
-    1. Unnamed frames are now handled
-    2. Empty parameter values are now handled
+    1. The value parameter for checkboxes is no longer ignored
+    2. Previously, getTableStartingWith[Prefix] only checked the nested tables in cell (0,0) of each outer table
+    3. Parameters with no type specified are now properly handled as text
+    4. Base tag is now handled to override defaults for page URL and target
+    5. Empty parameter values are now handled
 
- 6-Oct-00
-Problems corrected:
-    1. Base tag is now handled to override defaults for page URL and target
-    
- 5-Oct-00
-Problems corrected:
-    1. Blank "src" attributes in FRAME nodes now correctly result in a blank page
-    2. The "_self" target is now handled as the default target
-    
- 4-Oct-00
 Additions:
-    1. Frames are now supported. The WebConversation method has two methods: getFrameNames and getFrameContents which
-       allow manipulation of frames.
-    2. Calling HttpUnitOptions.setImagesTreatedAsAltText( true ) will cause the ALT text in images to be treated as ordinary
-       text
-       
-Problems corrected:
-    1. It is no longer necessary to edit the java.security file to enable HTTPS support. Just install the JSSE jars
-       in your classpath.
-    2. Parameters with no type specified are now properly handled as text
-    
-
-28-Sep-00
-Additions:
-    1. PseudoServer class is now used by unit tests to handle requests. This will enable development of frames capability
+    1. The license agreement is now available from the home page and javadoc
     2. Https support is now built in; however, it depends on the JSSE extension (not included). 
-       See http://java.sun.com/products/jsse and be careful to follow the installation instructions
-    
-25-Sep-00
-Problems corrected:
-    1. In the 15-Sep build, the value parameter for checkboxes was ignored in computing defaults and validating
-       parameter values - all checkboxes were assumed to have the value 'on' only
-    2. getTableStartingWith[Prefix] only checked the nested tables in cell (0,0) of each outer table
-
-Additions:
-    3. WebConversation now supports getCookieNames and getCookieValue to return the current cookies  
-
-15-Sep-00
-
-General:
-    1. Non-breaking spaces are converted to spaces on any conversion to text
-    2. WebConversation.getResponse() can now throw HttpInternalErrorException and HttpNotFoundException
-       in response to 501 and 404 codes, respectively
-    3. By default, parser warnings are no longer displayed. They may be enabled by a call to
-       HttpUnitOptions.setParserWarningsEnabled( true )
+       See http://java.sun.com/products/jsse.
+    3. Frames are now supported. The WebConversation method has two methods: getFrameNames and getFrameContents which
+       allow manipulation of frames.
     4. By default, WebRequest.setParameter will now throw IllegalRequestParameterException on any attempt
-       to set a form parameter to a value not normally available from the browser. This checking can be
-       disabled via a call to HttpUnitOptions.setParameterValuesValidated( false )
-Additions:
-    1. WebResponse.getTitle() returns the HTML title of the page
-    2. WebLink.getURLString() returns the URL string specified by the link in its href attribute
-    3. The license agreement is now available from the home page and javadoc
-    4. WebResponse.getURL() return the URL used to retrieve the page
+       to set a form parameter to a value not normally available from the browser.
+    5. It is possible to modify the behavior of HttpUnit via static methods on HttpUnitOptions. This includes:
+       o enabling parser warnings (disabled by default)
+       o disabling parameter validation (enabled by default)
+    6. WebConversation.getResponse now throws HttpException if any 4xx or 5xx code is returned. The exact code is
+       available from the exception
+    7. WebResponse.getTitle() returns the HTML title of the page
+    8. WebLink.getURLString() returns the URL string specified by the link in its href attribute
+    9. WebResponse.getURL() return the URL used to retrieve the page
+   10. WebConversation now supports getCookieNames and getCookieValue to return the current cookies  
+   11. The WebResponse now can return the response code associated with it (2xx)
+   12. Non-breaking spaces are converted to spaces on any conversion to text
+   
 
 1-Sep-00 1.0
 

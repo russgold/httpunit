@@ -104,6 +104,30 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
                               
+    public void testImageButtonDefaultSubmit() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=image name=update value=name src=\"\">" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = form.getRequest();
+        assertEquals( getHostPath() + "/ask?update=name&update.x=0&update.y=0&age=12", request.getURL().toExternalForm() );
+    }
+
+                              
+    public void testImageButtonPositionalSubmit() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=image name=update value=name src=\"\">" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = form.getRequest( form.getSubmitButton( "update" ), 10, 15 );
+        assertEquals( getHostPath() + "/ask?update=name&update.x=10&update.y=15&age=12", request.getURL().toExternalForm() );
+    }
+
+                              
     public void testSubmitButtonAttributes() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +

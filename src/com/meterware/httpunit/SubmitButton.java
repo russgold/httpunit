@@ -49,6 +49,17 @@ public class SubmitButton {
     }
 
 
+    /**
+     * Returns true if this submit button is an image map.
+     **/
+    public boolean isImageButton() {
+        return _isImageButton;
+    }
+
+
+//------------------------------------ Object methods ----------------------------------------
+
+
     public String toString() {
         return "Submit with " + getName() + "=" + getValue();
     }
@@ -71,6 +82,7 @@ public class SubmitButton {
         _node  = node;
         _name  = NodeUtils.getNodeAttribute( node, "name" );
         _value = NodeUtils.getNodeAttribute( _node, "value" );
+        _isImageButton = NodeUtils.getNodeAttribute( _node, "type" ).equalsIgnoreCase( "image" );
     }
 
 
@@ -79,6 +91,7 @@ public class SubmitButton {
     Node    _node;
     String  _name;
     String  _value;
+    boolean _isImageButton;
 
 
     private SubmitButton() {

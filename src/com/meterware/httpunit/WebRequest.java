@@ -161,7 +161,11 @@ public class WebRequest {
         Enumeration e = _parameters.keys();
 
         if (_submitButton != null && _submitButton.getName().length() > 0) {
-            appendParameter( sb, _submitButton.getName(), _submitButton.getValue(), e.hasMoreElements() );
+            appendParameter( sb, _submitButton.getName(), _submitButton.getValue(), e.hasMoreElements() || _submitButton.isImageButton() );
+            if (_submitButton.isImageButton()) {
+                appendParameter( sb, _submitButton.getName() + ".x", Integer.toString( _submitX ), true );
+                appendParameter( sb, _submitButton.getName() + ".y", Integer.toString( _submitY ), e.hasMoreElements() );
+            }
         }
 
         while (e.hasMoreElements()) {
@@ -183,6 +187,12 @@ public class WebRequest {
     final static String TOP_FRAME = "_top";
 
 
+    void setSubmitPosition( int x, int y ) {
+        _submitX = x;
+        _submitY = y;
+    }
+
+
 //--------------------------------------- private members ------------------------------------
 
     /** The name of the system parameter used by java.net to locate protocol handlers. **/
@@ -201,6 +211,8 @@ public class WebRequest {
     private WebForm      _sourceForm;
     private SubmitButton _submitButton;
     private String       _target = TOP_FRAME;
+    private int          _submitX;
+    private int          _submitY;
 
     private boolean      _httpsProtocolSupportEnabled;
 
