@@ -171,7 +171,6 @@ public class JUnitServletTest extends TestCase {
 
         WebResponse wr = client.getResponse( "http://localhost/JUnit?format=xml&test=" + ErrorTests.class.getName() );
         assertEquals( "Content type", "text/xml", wr.getContentType() );
-        System.out.println( "REG-> " + wr.getText() );      // TODO remove this line
         DocumentBuilder builder = HttpUnitUtils.newParser();
         Document document = builder.parse( wr.getInputStream() );
         Element element = document.getDocumentElement();
