@@ -674,18 +674,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
         public Scriptable open( String urlString, String name, String features, boolean replace )
                 throws IOException, SAXException {
             if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
-            GetMethodWebRequest request = new GetMethodWebRequest( getURL(), urlString );
-
-            // TODO this logic is so close to that used for regular links (except that it ignores subframe names), isn't there a way to combine them?
-
-            WebWindow[] windows = _client.getOpenWindows();
-            for (int i = 0; i < windows.length; i++) {
-                WebWindow window = windows[i];
-                if (window.getName().equals( name )) return window.getResponse( request ).getScriptableObject();
-            }
-            if (WebRequest.SAME_FRAME.equalsIgnoreCase( name )) return WebResponse.this.getWindow().getResponse( request ).getScriptableObject();
-
-            return _client.openInNewWindow( request, name, WebResponse.this ).getScriptableObject();
+            GetMethodWebRequest request = new GetMethodWebRequest( getURL(), urlString, _frame, name );
+            return _window.getResponse( request ).getScriptableObject();
         }
 
 

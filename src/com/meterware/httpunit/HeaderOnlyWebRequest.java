@@ -49,6 +49,11 @@ public abstract class HeaderOnlyWebRequest extends WebRequest {
 //-------------------------------- protected members ---------------------------
 
 
+    protected HeaderOnlyWebRequest( URL urlBase, String urlString, FrameSelector frame, String target ) {
+        super( urlBase, urlString, frame, target );
+    }
+
+
     protected HeaderOnlyWebRequest( URL urlBase, String urlString, String target ) {
         super( urlBase, urlString, target );
     }

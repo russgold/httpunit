@@ -159,7 +159,7 @@ public class WebWindow {
         WebResponse response = null;
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
-            response = WebResponse.createBlankResponse();
+            response = new DefaultWebResponse( _client, _frameContents.getTargetFrame( request ), null, "" );
         } else if (!HttpUnitUtils.isJavaScriptURL( urlString )) {
             response = _client.newResponse( request, _frameContents.getTargetFrame( request ) );
         } else {

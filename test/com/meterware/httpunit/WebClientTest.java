@@ -27,10 +27,7 @@ import junit.framework.TestSuite;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-import java.net.ConnectException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -500,7 +497,9 @@ public class WebClientTest extends HttpUnitTest {
 
         try {
             wc.getResponse( "http://meterware.com" );
-        } catch (ConnectException e) {}
+        } catch (ConnectException e) {
+        } catch (SocketException e) {
+        }
 
         assertEquals( "Submitted host header", "meterware.com", wc.getHeaderField( "Host" ) );
     }

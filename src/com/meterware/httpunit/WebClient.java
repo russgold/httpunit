@@ -460,7 +460,7 @@ public class WebClient {
 
     void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         if (response.getFrame() == FrameSelector.NEW_FRAME) {
-            WebWindow window = new WebWindow( this );
+            WebWindow window = new WebWindow( this, requestWindow.getCurrentPage() );
             if (!WebRequest.NEW_WINDOW.equalsIgnoreCase( requestTarget )) window.setName( requestTarget );
             response.setFrame( window.getTopFrame() );
             window.updateFrameContents( response, requestContext );
@@ -472,16 +472,6 @@ public class WebClient {
             if (response.getFrame() == FrameSelector.TOP_FRAME) response.setFrame( requestWindow.getTopFrame() );
             requestWindow.updateFrameContents( response, requestContext );
         }
-    }
-
-
-    WebResponse openInNewWindow( WebRequest request, String windowName, WebResponse opener ) throws IOException, SAXException {
-        WebWindow window = new WebWindow( this, opener );
-        window.setName( windowName );
-        WebResponse response = window.getResponse( request );
-        _openWindows.add( window );
-        reportWindowOpened( window );
-        return response;
     }
 
 

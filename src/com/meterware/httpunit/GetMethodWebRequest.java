@@ -87,6 +87,14 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
 
 
     /**
+     * Constructs a web request for a javascript open call.
+     **/
+    GetMethodWebRequest( URL urlBase, String urlString, FrameSelector frame, String target ) {
+        super( urlBase, urlString, frame, target );
+    }
+
+
+    /**
      * Constructs a web request for a form.
      **/
     GetMethodWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
