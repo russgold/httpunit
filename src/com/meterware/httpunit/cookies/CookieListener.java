@@ -1,5 +1,4 @@
 package com.meterware.httpunit.cookies;
-
 /********************************************************************************************************************
  * $Id$
  *
@@ -20,6 +19,12 @@ package com.meterware.httpunit.cookies;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+
+/**
+ * An interface for classes which can listen for cookies being rejected and the reason.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ */
 public interface CookieListener {
 
 

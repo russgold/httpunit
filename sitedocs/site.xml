@@ -1,6 +1,6 @@
 <?xml version='1.0' ?>
 <site project="HttpUnit" group-id="6550" logo="doc/images/HttpUnit.jpg">
-    <copyright owner="Russell Gold" dates="2000-2003"/>
+    <copyright owner="Russell Gold" dates="2000-2004"/>
 
     <page location="index.html" title="Home" mainPage="true">
         <fragment source="sitedocs/welcome.html"/>
@@ -51,4 +51,6 @@
     <space/>
     <project-page type="bugs" item="Bug Database" />
     <project-page type="enhancements" item="Feature Requests" />
+    <space/>
+    <project-page type="donations" item="Support HttpUnit"/>
 </site>

@@ -22,19 +22,12 @@ package com.meterware.website;
 import com.meterware.website.*;
 import com.meterware.xml.DocumentSemantics;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 
 
 /**
@@ -160,6 +153,8 @@ public class Site {
                 super.setLocation( getBugEntryURL() );
             } else if (type.equalsIgnoreCase( "enhancements" )) {
                 super.setLocation( getFeatureEntryURL() );
+            } else if (type.equalsIgnoreCase( "donations" )) {
+                super.setLocation( "http://sourceforge.net/project/project_donations.php?group_id=" + _groupId );
             } else if (type.equalsIgnoreCase( "cvs" )) {
                 super.setLocation( "http://sourceforge.net/cvs/?group_id=" + _groupId );
             }

@@ -30,6 +30,29 @@
             <answer><![CDATA[Yes. Call <a href="api/com/meterware/httpunit/WebClient.html#setProxyServer(java.lang.String, int)">
                     <code>WebClient.setProxyServer( host, port )</code></a>before sending your request.]]></answer>
         </faq>
+        <faq id="masquerade">
+            <question>How can I handle certificates from a test machine?</question>
+            <answer><![CDATA[Often you will need to run your secure website - complete with certificates - from a test
+                    server. Under most conditions, this will cause a validation problem, as the JSSE detects that the
+                    certificate does not match the requested server. You can "trick" HttpUnit into accepting the certificate
+                    as follows:<p>
+                    Assume that your certificate is for your real machine at <code>realserver.domain.com</code> and your
+                    test machine is at the IP address: 192.168.1.23. You want your tests to send requests to
+                    <code>realserver.domain.com</code> (since that is what your certificates expect), but to actually
+                    go to the test machine.<p>
+                    First, create a <a href="api/com/meterware/httpunit/DNSListener.html"><code>DNSListener</code></a>:
+                    <pre>DNSListener aListener = <b>new</b> DNSListener() {
+    <b>public</b> String getIpAddress( String hostName ) {
+        if (hostName.equals( "realserver.domain.com" )) <b>return</b> "192.168.1.23";
+        <b>return</b> hostName;
+    }
+};</pre>This listener substitutes the test IP address for the specified server name. Now specify this listener
+                    for your client by calling
+                    <a href="api/com/meterware/httpunit/ClientProperties.html#setDnsListener(com.meterware.httpunit.DNSListener)">
+                    <code>wc.getClientProperties().setDnsListener( aListener )</code></a>.
+                    All subsequent requests will be rerouted as you specify, but the security layer should think it is coming
+                    from the named server.]]></answer>
+        </faq>
         <faq id="charset">
             <question>Why isn't HttpUnit handling my non-English pages?</question>
             <answer><![CDATA[When no Content-Type header is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1.
@@ -40,9 +63,9 @@
                     This setting will not apply to those pages for which the server specifies the character set.</p>
                     <p>Non-English form handling is supported as well. Any parameter values entered into a form will be encoded as the same
                     character set as the document containing the form. The server code will then have to handle those characters
-                    appropriately. In Java, that would be converting them to Unicode with statements such as<blockquote><code>
-String rawName = request.getParameter( "name" );<br>
-String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</code></blockquote>
+                    appropriately. In Java, that would be converting them to Unicode with statements such as
+                    <pre>String rawName = request.getParameter( "name" );
+String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</pre>
                     where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract
                     the raw bytes from the parameter string.]]></answer>
         </faq>
@@ -53,7 +76,7 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
         </faq>
         <faq id="rejected cookies">
             <question>Why isn't HttpUnit seeing cookies from my site?</question>
-            <answer><![CDATA[According to the <a href="http://www.faqs.org/rfcs/rfc2965.html">Cookie specification>/a>,
+            <answer><![CDATA[According to the <a href="http://www.faqs.org/rfcs/rfc2965.html">Cookie specification</a>,
                     sites may specify a domain and path to restrict the scope of their cookies. These specifications
                     must follow certain rules, and the vast majority of sites do. Unfortunately, there are some
                     popular sites (such as Yahoo.com) which do not. By default, HttpUnit is very strict about
@@ -61,7 +84,7 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
                     <a href="api/com/meterware/httpunit/cookies/CookieProperties.html">CookieProperties</a> class.
                     If you suspect that this is happening, you can also register a
                     <a href="api/com/meterware/httpunit/cookies/CookieListener.html">CookieListener</a> to watch for cookies
-                    being rejected.]]</answer>
+                    being rejected.]]></answer>
         </faq>
     </section>
 
@@ -97,7 +120,7 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
                     Unfortunately, it is then impossible to predict what, if any, response is relevant. The method therefore
                     does not return WebResponse. In most cases, it is the main window of your browser that you care about
                     and you can always obtain that by calling
-                    <a href="api/com/meterware/httpunit/WebClient.html#getCurrentPage()"><code>client.getCurrentPage()</code></a>.]]</answer>
+                    <a href="api/com/meterware/httpunit/WebClient.html#getCurrentPage()"><code>client.getCurrentPage()</code></a>.]]></answer>
         </faq>
     </section>
 
@@ -111,6 +134,11 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
             <question>JavaScript is not being executed at all. Why not?</question>
             <answer>If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.</answer>
         </faq>
+        <faq id="disable scripting">
+            <question>How do I turn off scripting for certain tests?</question>
+            <answer><![CDATA[If you call <a href="api/com/meterware/httpunit/HttpUnitOptions.html#setScriptingEnabled(boolean)"><code>HttpUnitOptions.setScriptingEnabled( false );</code></a>
+                    JavaScript will not be interpreted.]]></answer>
+        </faq>
         <faq id="nofunction">
             <question>My JavaScript works in a browser, but HttpUnit says "ReferenceError: ... is not defined"</question>
             <answer>This usually indicates that you are calling a function which contains statements that HttpUnit does not understand.
@@ -119,9 +147,13 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
         </faq>
         <faq id="unsupported">
             <question>How do I handle a page that uses JavaScript features that HttpUnit does not support?</question>
-            <answer><![CDATA[If you call<blockquote><code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></blockquote>
+            <answer><![CDATA[If you call
+                    <a href="api/com/meterware/httpunit/HttpUnitOptions.html#setExceptionsThrownOnScriptError(boolean)">
+                        <code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></a>
                     problems will be recorded but will not throw exceptions. You can see the list of problems detected by calling
-                    <blockquote><code>HttpUnitOptions.getScriptErrorMessages();</code></blockquote>]]></answer>
+                    <a href="api/com/meterware/httpunit/HttpUnitOptions.html#getScriptErrorMessages()">
+                        <code>HttpUnitOptions.getScriptErrorMessages();</code>
+                    </a>]]></answer>
         </faq>
         <faq id="text">
             <question>I called document.write() in my page, but getText() does not show the results! Why not?</question>

@@ -13,14 +13,24 @@
     </section>
 
     <section title="Articles">
-        <citation name="Black Box Web Testing with HttpUnit" url="http://www.onjava.com/pub/a/onjava/2003/05/07/blackboxwebtest.html">
+        <citation name="Build a Java Web App Using HttpUnit and the Test-driven Methodology, Part II"
+                  url="http://www.devx.com/Java/Article/17991">
+            4 December 2003: Wellie Chao, DevX.com
+        </citation>
+        <citation name="Build a Java Web App Using HttpUnit and the Test-driven Methodology, Part I"
+                  url="http://www.devx.com/Java/Article/17908">
+            25 November 2003: Wellie Chao, DevX.com
+        </citation>
+        <citation name="Black Box Web Testing with HttpUnit"
+                  url="http://www.onjava.com/pub/a/onjava/2003/05/07/blackboxwebtest.html">
             7 May 2003: Giora Katz-Lichtenstein, ONJava.com
         </citation>
         <citation name="HttpUnit: A Civilized Way to Test Web Applications in WebSphere Studio"
                   url="http://www7b.software.ibm.com/wsdd/library/techarticles/0303_bhogal/bhogal.html">
             March 2003: Kulvir Singh Bhogal, IBM Software Services for WebSphere
         </citation>
-        <citation name="Test entire Web applications with HttpUnit" url="http://www.zdnet.com.au/builder/program/java/story/0,2000034779,20264830,00.htm">
+        <citation name="Test entire Web applications with HttpUnit"
+                  url="http://www.zdnet.com.au/builder/program/java/story/0,2000034779,20264830,00.htm">
             26 April 2002: Jamie Scheinblum, ZDNet Australia
         </citation>
     </section>
@@ -42,4 +52,12 @@
             Contains a simple example using HttpUnit and describes the API. Covers HttpUnit 1.4
         </citation>
     </section>
+
+    <section title="Blog Postings">
+        <citation name="Testing Web Applications with HttpUnit (Don't worry, it's not boring!)"
+                  url="http://fb2.hu/x10/Articles/HttpUnit.html">
+            22 February 2004: Balazs Fejes, 10x More Productive Blog!
+        </citation>
+    </section>
+
 </citations>
