@@ -26,7 +26,7 @@ Problems fixed:
     3. When setting a selection control, HttpUnit would always select a value matching its first option if possible,
        rather than taking the first valid value.
 
- 4-Apr-2003
+ 4-Apr-2003 1.5.3
 Acknowledgements:
     Thanks to Andrew Bickerton for:
           correcting the handling of document.open for non-HTML pages and new pages with base tags,
@@ -105,7 +105,7 @@ Acknowledgements:
     Thanks to Daniel Sheppard for correcting the return status for HttpServletResponse.sendRedirect
     Thanks to Daniel Sheppard, Navid Vahdat, and Ron Hanson for help in adding capabilities to the RequestDispatcher implementation.
     Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
-    Thanks to Raphael Corre for improving logger of transmitted headers
+    Thanks to Raphael Corre for improving logging of transmitted headers
     Thanks to Jason Bedell for supplying an implementation for HttpSession.getValueNames.
     Thanks to Jianqin Qu for finding the getTableStartingWithPrefix bug when using NekoHTML
     Thanks to Scott Fleischman for providing tests for missing frame handling functionality

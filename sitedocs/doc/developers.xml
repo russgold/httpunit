@@ -1,0 +1,33 @@
+<?xml version='1.0' ?>
+<developers>
+    <group type="Maintainers">
+        <developer username="russgold" name="Russell Gold" email="russgold@httpunit.org">
+            The author and maintainer of HttpUnit, Russell has been developing software for over 20 years, and has been
+            programming in Java since 1996.  He is currently working for Oracle in Moorestown, NJ on the OC4J application
+            server.
+        </developer>
+    </group>
+    <group type="Contributors (partial list)">
+        <developer name="Andrew Bickerton" email="andrewb@pwd.hp.com"/>
+        <developer name="Artashes Aghajanyan" email="Artashes.Aghajanyan@lycos-europe.com"/>
+        <developer name="Bernhard Wagner" email="bw@xmlizer.biz"/>
+        <developer name="Brendan Boesen" email="bboesen@tpg.com.au"/>
+        <developer name="David D. Kilzer" email="ddkilzer@users.sourceforge.net"/>
+        <developer name="Daniel Jasmin" email="djasmin@rational.com"/>
+        <developer name="Daniel Sheppard" email="daniels@pronto.com.au"/>
+        <developer name="Geert Bevin" email="gbevin@uwyn.com" />
+        <developer name="George Murnock" email="gmurnock@bea.com"/>
+        <developer name="Jason Bedell" email="jason.bedell@digitalevergreen.com"/>
+        <developer name="Ken Corbin" email="Ken.Corbin@Summit.Fiserv.com"/>
+        <developer name="Larry Hamel" email="httpunit@codeguild.com"/>
+        <developer name="Navid Vahdat" email="navid@vahdat.de" />
+        <developer name="Mark Luty" email="mluty@pace2020.com"/>
+        <developer name="Michael McCallum" email="michael@gholam.net"/>
+        <developer name="Raphael Corre" email="raphael_corre@yahoo.com"/>
+        <developer name="Richard Harris" email="richard.harris@mckesson.com" />
+        <developer name="Ron Webster" email="ron.webster@genclr.com"/>
+        <developer name="Sergey Bondarenko" email="bond@supportwizard.com"/>
+        <developer name="Troy Waldrep" email="twaldrep@datajunction.com"/>
+        <developer name="Ville Skytt&amp;auml;"/>
+    </group>
+</developers>

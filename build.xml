@@ -14,6 +14,7 @@
     <property name="src.dir" value="src" />
     <property name="tstsrc.dir" value="test" />
     <property name="examples.dir" value="examples" />
+    <property name="website.dir" value="site" />
     <property name="lib.dir" value="lib" />
     <property name="jars.dir" value="jars" />
 
@@ -21,6 +22,7 @@
     <property name="build.dir" value="build" />
     <property name="build.classes" value="${build.dir}/classes" />
     <property name="test.classes" value="${build.dir}/testclasses" />
+    <property name="website.classes" value="${build.dir}/siteclasses" />
     <property name="example.classes" value="${build.dir}/examples" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
 
@@ -192,7 +194,7 @@ Build-Time: ${TSTAMP}
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}"
              destdir="${javadoc.dir}" author="true" version="true"
              windowtitle="${Name} ${version} API" doctitle="${Name}"
-             footer="Copyright &amp;copy; 2000-2003 Russell Gold. See &lt;a href=&quot;http://www.httpunit.org/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
+             footer="Copyright &amp;copy; 2000-2003 Russell Gold. See &lt;a target=&quot;_top&quot; href=&quot;../license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
         <classpath refid="base.classpath"/>
     </javadoc>
 </target>
@@ -225,6 +227,8 @@ Build-Time: ${TSTAMP}
             <include name="build.xml" />
             <include name="readme.txt" />
             <include name="index.html" />
+            <include name="site.css" />
+            <include name="favicon.ico" />
             <include name="src/**" />
             <include name="test/**" />
             <include name="examples/**" />
@@ -254,11 +258,37 @@ Build-Time: ${TSTAMP}
 <target name="publish" depends="dist-zip">
     <mkdir dir="${web.dir}" />
     <copy todir="${web.dir}" >
-        <fileset dir="." includes="*.zip,index.html,doc/**"/>
+        <fileset dir="." includes="site.css,favicon.ico,index.html,doc/**"/>
     </copy>
-    <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " />
-    <replace file="${web.dir}/index.html" token="var:publish " value="var:publish&gt;" />
-    <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${version}" />
+    <antcall target="update-website" />
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Compiles the website generator                                             -->
+<!--  ===================================================================  -->
+<target name="compile-site">
+    <mkdir dir="${website.classes}" />
+    <javac srcdir="${website.dir}" destdir="${website.classes}"
+           debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+         <classpath>
+             <path refid="base.classpath" />
+         </classpath>
+    </javac>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Updates the web site                                              -->
+<!--  ===================================================================  -->
+<target name="update-website" depends="compile-site">
+    <java classname="com.meterware.httpunit.site.WebSite" fork="yes" >
+        <classpath>
+            <path refid="base.classpath" />
+            <pathelement location="${website.classes}" />
+        </classpath>
+        <arg path="${web.dir}"/>
+    </java>
 </target>
 
 

@@ -5,8 +5,6 @@ PRE { font-family: "courier new", courier; font-size: 8pt;
 PRE.test-code { background-color: #cccccc }
 PRE.servlet-code { background-color: #cceeee }
 OL { margin-top: 0 }
-P.story-name { margin-left: 3em; margin-bottom: 0; font-weight: bold }
-P.story-contents { margin-left: 3em; margin-top: 0 }
 P.goals { font-family: helvetica, ariel, sans-serif; font-size: x-small;
           background-color: #ffffdd; border-color: black; border-style: solid;
           border-top-width: 2px; border-bottom-width: 2px; border-left-width: 0px; border-right-width: 0px }
