@@ -604,7 +604,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * @since 1.3
      **/
     public Map getParameterMap() {
-        return null;    // XXX implement me!
+        return _parameters;
     }
 
 

@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+28-Aug-2002
+Acknolwedgements:
+    Thanks to Geert Bevin for implementing ServletUnit support for HttpServletRequest.getParameterMap
+
+Additions:
+    1. ServletUnit now supports HttpServletRequest.getParameterMap
+
 27-Aug-2002
 Additions:
     1. Reset buttons may now be clicked to reset the form

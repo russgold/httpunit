@@ -21,6 +21,7 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -84,6 +85,19 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertMatchingSet( "age parameter", new String[] { "12" }, request.getParameterValues( "age" ) );
         assertMatchingSet( "color parameter", new String[] { "red", "blue" }, request.getParameterValues( "color" ) );
         assertNull( "unset parameter should be null", request.getParameterValues( "unset" ) );
+    }
+
+
+    public void testParameterMap() throws Exception {
+        WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
+        wr.setParameter( "age", "12" );
+        wr.setParameter( "color", new String[] { "red", "blue" } );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+
+        Map map = request.getParameterMap();
+        assertMatchingSet( "age parameter", new String[] { "12" }, (Object[]) map.get( "age" ) );
+        assertMatchingSet( "color parameter", new String[] { "red", "blue" }, (Object[]) map.get( "color" ) );
+        assertNull( "unset parameter should be null", map.get( "unset" ) );
     }
 
 
