@@ -195,6 +195,7 @@ public class FormScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
+        response.getLinkWithName( "report" ).mouseOver();
         verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "good" );
 
         assertEquals( "initial parameter value", null, form.getParameterValue( "ready" ) );
@@ -204,13 +205,35 @@ public class FormScriptingTest extends HttpUnitTest {
         assertEquals( "final parameter value", null, form.getParameterValue( "ready" ) );
         response.getLinkWithName( "change" ).mouseOver();
         assertEquals( "final parameter value", null, form.getParameterValue( "ready" ) );
+        response.getLinkWithName( "report" ).mouseOver();
         verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "waiting" );
         form.setParameter( "ready", "waiting" );
     }
 
 
+    public void testIndexedCheckboxProperties() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewCheckbox( checkbox ) { \n" +
+                                            "  alert( 'checkbox ' + checkbox.name + ' default = ' + checkbox.defaultChecked )\n;" +
+                                            "  alert( 'checkbox ' + checkbox.name + ' checked = ' + checkbox.checked )\n;" +
+                                            "  alert( 'checkbox ' + checkbox.name + ' value = ' + checkbox.value )\n;" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                            "<body onload='viewCheckbox( document.realform.ready[0] ); viewCheckbox( document.realform.ready[1] );'>" +
+                                            "<form name='realform'>" +
+                                            "<input type='checkbox' name='ready' value='good' checked>" +
+                                            "<input type='checkbox' name='ready' value='bad'>" +
+                                            "</form>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        verifyCheckbox( response, /* default */ true,  /* checked */ true,  /* value */ "good" );
+        verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "bad" );
+    }
+
+
     private void verifyCheckbox( WebResponse response, boolean defaultChecked, boolean checked, String value ) throws SAXException {
-        response.getLinkWithName( "report" ).mouseOver();
         assertEquals( "Message " + 1 + "-1", "checkbox ready default = " + defaultChecked, response.popNextAlert() );
         assertEquals( "Message " + 1 + "-2", "checkbox ready checked = " + checked, response.popNextAlert() );
         assertEquals( "Message " + 1 + "-3", "checkbox ready value = " + value, response.popNextAlert() );
@@ -240,6 +263,66 @@ public class FormScriptingTest extends HttpUnitTest {
         assertEquals( "Alert after change", "color-blue is now false", response.popNextAlert() );
 
         assertEquals( "Changed state", null, form.getParameterValue( "color" ) );
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
+        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
+    }
+
+
+    public void testIndexedRadioProperties() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewRadio( radio ) { \n" +
+                                            "  alert( 'radio ' + radio.name + ' default = ' + radio.defaultChecked )\n;" +
+                                            "  alert( 'radio ' + radio.name + ' checked = ' + radio.checked )\n;" +
+                                            "  alert( 'radio ' + radio.name + ' value = ' + radio.value )\n;" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                            "<body onload='viewRadio( document.realform.ready[0] ); viewRadio( document.realform.ready[1] );'>" +
+                                            "<form name='realform'>" +
+                                            "<input type='radio' name='ready' value='good' checked>" +
+                                            "<input type='radio' name='ready' value='bad'>" +
+                                            "</form>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        verifyRadio( response, /* default */ true,  /* checked */ true,  /* value */ "good" );
+        verifyRadio( response, /* default */ false, /* checked */ false, /* value */ "bad" );
+    }
+
+
+    private void verifyRadio( WebResponse response, boolean defaultChecked, boolean checked, String value ) throws SAXException {
+        assertEquals( "Message " + 1 + "-1", "radio ready default = " + defaultChecked, response.popNextAlert() );
+        assertEquals( "Message " + 1 + "-2", "radio ready checked = " + checked, response.popNextAlert() );
+        assertEquals( "Message " + 1 + "-3", "radio ready value = " + value, response.popNextAlert() );
+    }
+
+
+    public void testRadioOnClickEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <input type='radio' name='color' value='blue' " +
+                                            "         onClick='alert( \"color is now blue\" );'>" +
+                                            "  <input type='radio' name='color' value='red' checked" +
+                                            "         onClick='alert( \"color is now red\" );'>" +
+                                            "</form>" +
+                                            "<a href='#' onClick='document.the_form.color[1].checked=false; document.the_form.color[0].checked=true;'>blue</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        assertEquals( "Initial state", "red", form.getParameterValue( "color" ) );
+
+        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        form.setParameter( "color", "red" );
+        assertEquals( "Alert message w/o change", null, response.getNextAlert() );
+        form.setParameter( "color", "blue" );
+        assertEquals( "Alert after change", "color is now blue", response.popNextAlert() );
+        form.setParameter( "color", "red" );
+        assertEquals( "Alert after change", "color is now red", response.popNextAlert() );
+
+        assertEquals( "Changed state", "red", form.getParameterValue( "color" ) );
         response.getLinks()[ 0 ].click();
         assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
         assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );

@@ -100,6 +100,11 @@ abstract class FormControl {
     abstract String[] getValues();
 
 
+    Object getDelegate() {
+        return getScriptableObject();
+    }
+
+
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
@@ -325,10 +330,17 @@ class BooleanFormControl extends FormControl {
 
     private final boolean _isCheckedDefault;
 
+    protected FormControl.Scriptable newScriptable() {
+        return new Scriptable();
+    }
+
+
     class Scriptable extends FormControl.Scriptable {
 
         public Object get( String propertyName ) {
-            if (propertyName.equalsIgnoreCase( "checked" )) {
+            if (propertyName.equalsIgnoreCase( "value" )) {
+                return getQueryValue();
+            } else if (propertyName.equalsIgnoreCase( "checked" )) {
                 return isChecked() ? Boolean.TRUE : Boolean.FALSE;
             } else if (propertyName.equalsIgnoreCase( "defaultchecked" )) {
                 return _isCheckedDefault ? Boolean.TRUE : Boolean.FALSE;
@@ -445,6 +457,7 @@ class RadioGroupFormControl extends FormControl {
     public RadioGroupFormControl() {
     }
 
+
     void addRadioButton( RadioButtonFormControl control ) {
         _buttonList.add( control );
         _buttons = null;
@@ -473,6 +486,15 @@ class RadioGroupFormControl extends FormControl {
     }
 
 
+    Object getDelegate() {
+        ScriptableDelegate[] delegates = new ScriptableDelegate[ getButtons().length ];
+        for (int i = 0; i < delegates.length; i++) {
+            delegates[i] = getButtons()[i].getScriptableObject();
+        }
+        return delegates;
+    }
+
+
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
         for (int i = 0; i < getButtons().length; i++) getButtons()[i].addValues( processor, characterSet );
     }
@@ -495,10 +517,12 @@ class RadioGroupFormControl extends FormControl {
         }
         if (matchingButtonIndex <0) throw new IllegalParameterValueException( getButtons()[0].getName(), (String) values.get(0), getAllowedValues() );
 
+        boolean wasChecked = getButtons()[ matchingButtonIndex ].isChecked();
         for (int i = 0; i < getButtons().length; i++) {
             if (!getButtons()[i].isReadOnly()) getButtons()[i].setChecked( i == matchingButtonIndex );
         }
         values.remove( getButtons()[ matchingButtonIndex ].getQueryValue() );
+        if (!wasChecked) getButtons()[ matchingButtonIndex ].sendOnClickEvent();
     }
 
 
@@ -539,32 +563,6 @@ class CheckboxFormControl extends BooleanFormControl {
         setChecked( values.contains( getQueryValue() ) );
         if (isChecked()) values.remove( getQueryValue() );
         if (isChecked() != wasChecked) sendOnClickEvent();
-    }
-
-
-    protected FormControl.Scriptable newScriptable() {
-        return new Scriptable();
-    }
-
-
-    class Scriptable extends BooleanFormControl.Scriptable {
-
-        public Object get( String propertyName ) {
-            if (propertyName.equalsIgnoreCase( "value" )) {
-                return getQueryValue();
-            } else {
-                return super.get( propertyName );
-            }
-        }
-
-
-        public void set( String propertyName, Object value ) {
-            if (propertyName.equalsIgnoreCase( "checked" )) {
-                setChecked( value instanceof Boolean && ((Boolean) value).booleanValue() );
-            } else {
-                super.set( propertyName, value );
-            }
-        }
     }
 
 

@@ -319,7 +319,7 @@ public class WebForm extends WebRequestSource {
      * Resets all parameters to their initial values.
      */
     public void reset() {
-        FormControl controls[] = getFormControls();
+        FormControl[] controls = getFormControls();
         for (int i = 0; i < controls.length; i++) {
             controls[i].reset();
         }
@@ -471,11 +471,16 @@ public class WebForm extends WebRequestSource {
 
 
         public void setParameterValue( String name, String value ) {
-            getParameter( name ).getScriptableObject().set( "value", value );
+            final Object scriptableObject = getParameter( name ).getScriptableObject();
+            if (scriptableObject instanceof ScriptableDelegate) {
+                ((ScriptableDelegate) scriptableObject).set( "value", value );
+            } else if (scriptableObject instanceof ScriptableDelegate[]) {
+                ((ScriptableDelegate[]) scriptableObject)[0].set( "value", value );
+            }
         }
 
 
-        public ScriptableDelegate[] getControls() {
+        public ScriptableDelegate[] getElementDelegates() {
             FormControl[] controls = getFormControls();
             ScriptableDelegate[] result = new ScriptableDelegate[ controls.length ];
             for (int i = 0; i < result.length; i++) {
@@ -649,8 +654,19 @@ class FormParameter {
     }
 
 
-    ScriptableDelegate getScriptableObject() {
-        return getControls()[0].getScriptableObject();
+    Object getScriptableObject() {
+        if (getControls().length == 1) {
+            return getControls()[0].getDelegate();
+        } else {
+            ArrayList list = new ArrayList();
+            for (int i = 0; i < _controls.length; i++) {
+                FormControl control = _controls[i];
+                if (control instanceof CheckboxFormControl) {
+                    list.add( control.getScriptableObject() );
+                }
+            }
+            return list.toArray( new ScriptableDelegate[ list.size() ] );
+        }
     }
 
 

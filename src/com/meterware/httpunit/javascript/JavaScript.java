@@ -140,9 +140,10 @@ public class JavaScript {
 
         private Object convertIfNeeded( final Object property ) {
             if (property == null) return NOT_FOUND;
-            if (!(property instanceof ScriptableDelegate)) return property;
 
             try {
+                if (property instanceof ScriptableDelegate[]) return toScriptable( (ScriptableDelegate[]) property );
+                if (!(property instanceof ScriptableDelegate)) return property;
                 return toScriptable( (ScriptableDelegate) property );
             } catch (PropertyException e) {
                 throw new RuntimeException( e.toString() );
@@ -153,6 +154,16 @@ public class JavaScript {
             } catch (SAXException e) {
                 throw new RuntimeException( e.toString() );
             }
+        }
+
+
+        private Object toScriptable( ScriptableDelegate[] list )
+                throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+            Object[] delegates = new Object[ list.length ];
+            for (int i = 0; i < delegates.length; i++) {
+                delegates[i] = toScriptable( list[i] );
+            }
+            return Context.getCurrentContext().newArray( this, delegates );
         }
 
 
@@ -412,7 +423,7 @@ public class JavaScript {
 
 
         private void initializeControls() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
-            ScriptableDelegate scriptables[] = getDelegate().getControls();
+            ScriptableDelegate scriptables[] = getDelegate().getElementDelegates();
             Control[] controls = new Control[ scriptables.length ];
             for (int i = 0; i < controls.length; i++) {
                 controls[ i ] = (Control) toScriptable( scriptables[ i ] );
