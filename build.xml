@@ -80,7 +80,7 @@
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}" 
              destdir="${javadoc.dir}" author="true" version="true" 
              windowtitle="${Name} ${version} API" doctitle="${Name}" 
-             footer="Copyright © 2000 Russell Gold and meterware.com. All Rights Reserved." /> 
+             footer="Copyright &amp;copy; 2000 Russell Gold. See &lt;a href=&quot;http://httpunit.sourceforge.net/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." /> 
 </target>
 
 
@@ -93,11 +93,10 @@
     <mkdir dir="${dist.dir}/doc" /> 
     <mkdir dir="${dist.dir}/doc/api" /> 
     <mkdir dir="${dist.dir}/src" />
-    <mkdir dir="${dist.dir}/src/test" />
     <mkdir dir="${dist.dir}/test" />
     <mkdir dir="${dist.dir}/examples" /> 
     <copydir src="${src.dir}" dest="${dist.dir}/src" /> 
-    <copydir src="${tstsrc.dir}" dest="${dist.dir}/test" /> 
+    <copydir src="${tstsrc.dir}" dest="${dist.dir}/test" includes="**/httpunit/*" /> 
     <copydir src="${examples.dir}" dest="${dist.dir}/examples" /> 
     <copydir src="${lib.dir}" dest="${dist.dir}/lib" /> 
     <copyfile src="build.xml" dest="${dist.dir}/build.xml" /> 

@@ -43,6 +43,15 @@ class ReceivedPage extends ParsedHTML {
     }
 
 
+    /**
+     * Returns the title of the page.
+     **/
+    public String getTitle() throws SAXException {
+        NodeList nl = ((Document) getDOM()).getElementsByTagName( "title" );
+        return nl.item(0).getFirstChild().getNodeValue();
+    }
+
+
 //---------------------------------- private members --------------------------------
 
 

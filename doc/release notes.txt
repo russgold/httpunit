@@ -2,10 +2,21 @@ HttpUnit release notes
 
 Known issues: none
 
-1-Sep-00 1.0
+Acknowledgements:
+Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink
+Thanks to Jan Ohrstrom for his additions to Web Conversation
 
-Acknowledgements: 
-Thanks to Jan Ohrstrom <Jan.Ohrstrom@edt.ericsson.se> for his additions to Web Conversation
+Revision History:
+11-Sep-00
+
+General:
+    1. Non-breaking spaces are converted to spaces on any conversion to text
+Additions:
+    1. WebResponse.getTitle() returns the HTML title of the page
+    2. WebLink.getURLString() return the URL string specified by the link in its href attribute
+    3. The license agreement is now available from the home page and javadoc
+
+1-Sep-00 1.0
 
 
 Problems corrected:

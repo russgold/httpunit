@@ -20,14 +20,19 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import java.net.URL;
+
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import java.util.Vector;
 
 
 /**
- * Tests for the package.
+ * A unit test of the httpunit parsing classes.
  **/
-public class HttpUnitSuite {
+public class WebPageTest extends HttpUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -35,15 +40,41 @@ public class HttpUnitSuite {
 	
 	
     public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( WebPageTest.suite() );
-        suite.addTest( WebLinkTest.suite() );
-        suite.addTest( HtmlTablesTest.suite() );
-        suite.addTest( WebFormTest.suite() );
-        suite.addTest( Base64Test.suite() );
-        return suite;
+        return new TestSuite( WebPageTest.class );
     }
 
 
-}
+    public WebPageTest( String name ) {
+        super( name );
+    }
 
+
+    public void setUp() throws Exception {
+        _simplePage = new ReceivedPage( _baseURL, HEADER + 
+                                         "<body>This has no forms but it does" +
+                                         "have <a href=\"/other.html\">an <b>active</b> link</A>" +
+                                         " and <a name=here>an anchor</a>" +
+                                         "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>" +
+                                         "</body></html>" );
+    }
+	
+	
+    public void testTitle() throws Exception {
+        assertEquals( "Title", "A Sample Page", _simplePage.getTitle() );
+    }
+
+
+                              
+    private static URL _baseURL;
+     
+    static {
+        try {
+            _baseURL = new URL( "http://www.meterware.com" );
+        } catch (java.net.MalformedURLException e ) {}  // ignore
+    }
+
+    private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
+    private ReceivedPage _simplePage;
+
+
+}

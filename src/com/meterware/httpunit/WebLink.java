@@ -20,9 +20,15 @@ public class WebLink {
      * Creates and returns a web request which will simulate clicking on this link.
      **/
     public WebRequest getRequest() {
-        NamedNodeMap nnm = _node.getAttributes();
-        String action = getValue( nnm.getNamedItem( "href" ) );
-        return new GetMethodWebRequest( _baseURL, action );
+        return new GetMethodWebRequest( _baseURL, getURLString() );
+    }
+
+
+    /**
+     * Returns the URL referenced by this link. This may be a relative URL.
+     **/
+    public String getURLString() {
+        return getValue( _node.getAttributes().getNamedItem( "href" ) );
     }
 
 
@@ -38,9 +44,7 @@ public class WebLink {
      * Returns the text value of this link.
      **/
     public String asText() {
-        if (_node == null) {
-            return "";
-        } else if (!_node.hasChildNodes()) {
+        if (!_node.hasChildNodes()) {
             return "";
         } else {
             return NodeUtils.asText( _node.getChildNodes() );
@@ -56,6 +60,7 @@ public class WebLink {
      * from that page.
      **/
     WebLink( URL baseURL, Node node ) {
+        if (node == null) throw new IllegalArgumentException( "node must not be null" );
         _node    = node;
         _baseURL = baseURL;
     }

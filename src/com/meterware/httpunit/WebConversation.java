@@ -51,13 +51,13 @@ public class WebConversation {
         URLConnection connection = openConnection( request.getURL() );
         request.completeRequest( connection );
         updateCookies( connection );
-        
+
         if (connection.getHeaderField( "Location" ) != null) {
             return getResponse( new RedirectWebRequest( request, connection.getHeaderField( "Location" ) ) );
         } else if (connection.getHeaderField( "WWW-Authenticate" ) != null) {
             throw new AuthorizationRequiredException( connection.getHeaderField( "WWW-Authenticate" ) );
         } else {
-            WebResponse result = new WebResponse( this, request.getURL(), connection.getInputStream() );
+            WebResponse result = new WebResponse( this, request.getURL(), connection );
             return result;
         }
     }

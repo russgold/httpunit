@@ -97,7 +97,7 @@ public class WebTable {
         // look for rows and columns with any text in a non-spanning cell
         for (int i = 0; i < rowHasText.length; i++) {
             for (int j = 0; j < columnHasText.length; j++) {
-                if (getTrimmedText( getCellAsText(i,j) ).length() == 0) continue;
+                if (getCellAsText(i,j).trim().length() == 0) continue;
                 if (getTableCell(i,j).getColSpan() == 1 && getTableCell(i,j).getRowSpan() == 1) {
                     if (!rowHasText[i]) numRowsWithText++;
                     if (!columnHasText[j]) numColumnsWithText++;
@@ -146,12 +146,6 @@ public class WebTable {
 
         _cells = remainingCells;
 
-    }
-
-
-    private static String getTrimmedText( String text ) {
-        text = text.replace( NBSP, ' ' );
-        return text.trim();
     }
 
 
@@ -361,9 +355,6 @@ public class WebTable {
             }
         }
     }
-
-
-    final static private char NBSP = (char) 160;   // non-breaking space, defined by JTidy
 
 
 }

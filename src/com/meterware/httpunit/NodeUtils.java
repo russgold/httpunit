@@ -71,7 +71,7 @@ class NodeUtils {
                 Node node = (Node) pending;
 
                 if (node.getNodeType() == Node.TEXT_NODE) {
-                    sb.append( node.getNodeValue() );
+                    sb.append( convertNBSP( node.getNodeValue() ) );
                 } else if (node.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 } else if (node.getNodeName().equalsIgnoreCase( "p" )) {
@@ -89,6 +89,14 @@ class NodeUtils {
             }
         }
         return sb.toString();
+    }
+
+
+    final static private char NBSP = (char) 160;   // non-breaking space, defined by JTidy
+
+
+    private static String convertNBSP( String text ) {
+        return text.replace( NBSP, ' ' );
     }
 
 

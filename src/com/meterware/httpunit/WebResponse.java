@@ -22,6 +22,7 @@ package com.meterware.httpunit;
 
 import java.io.*;
 import java.net.*;
+import java.util.StringTokenizer;
 import org.xml.sax.*;
 import org.w3c.dom.*;
 
@@ -29,6 +30,30 @@ import org.w3c.dom.*;
  * A response from a web server to an Http request.
  **/
 public class WebResponse {
+
+
+    /**
+     * Returns the content type of this response.
+     **/
+    public String getContentType() {
+        return _contentType;
+    }
+
+
+    /**
+     * Returns the character set used in this response.
+     **/
+    public String getCharacterSet() {
+        return _characterSet;
+    }
+
+
+    /**
+     * Returns the title of the page.
+     **/
+    public String getTitle() throws SAXException {
+        return getReceivedPage().getTitle();
+    }
 
 
     /**
@@ -106,6 +131,15 @@ public class WebResponse {
     public WebTable getTableStartingWithPrefix( String text ) throws SAXException {
         return getReceivedPage().getTableStartingWithPrefix( text );
     }
+
+
+    /**
+     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
+     * which may be used to represent internal state of this object.
+     **/
+    public String getText() {
+        return _responseText;
+    }
     
     
     public String toString() {
@@ -122,12 +156,12 @@ public class WebResponse {
      * @param url the url from which the response was received
      * @param inputStream the input stream from which the response can be read
      **/
-    WebResponse( WebConversation conversation, URL url, InputStream inputStream ) {
+    WebResponse( WebConversation conversation, URL url, URLConnection connection ) {
         _conversation = conversation;
         _url = url;
         StringBuffer sb = new StringBuffer();
         try {
-            BufferedReader input = new BufferedReader( new InputStreamReader( inputStream ) );
+            BufferedReader input = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
 
             String str;
             while (null != ((str = input.readLine()))) {
@@ -135,6 +169,7 @@ public class WebResponse {
             }
             input.close ();
             _responseText = sb.toString();
+            readHeaders( connection );
         } catch (IOException e) {
             throw new RuntimeException( "Unable to retrieve URL: " + _url.toExternalForm() );
         }
@@ -163,12 +198,38 @@ public class WebResponse {
 
     private WebConversation _conversation;
 
+    private String _contentType = "text/plain";
+
+    private String _characterSet = "us-ascii";
+
 
     private ReceivedPage getReceivedPage() throws SAXException {
         if (_page == null) {
+            if (!_contentType.equals( "text/html" )) throw new RuntimeException( "Response is not HTML" );
             _page = new ReceivedPage( _url, _responseText );
         }
         return _page;
+    }
+
+
+    private void readHeaders( URLConnection connection ) {
+        readContentTypeHeader( connection );
+    }
+
+
+    private void readContentTypeHeader( URLConnection connection ) {
+        String contentHeader = connection.getContentType();
+        if (contentHeader != null) {
+            StringTokenizer st = new StringTokenizer( contentHeader, ";=" );
+            _contentType = st.nextToken();
+            while (st.hasMoreTokens()) {
+                String parameter = st.nextToken();
+                if (st.hasMoreTokens()) {
+                    String value = st.nextToken();
+                    if (parameter.equalsIgnoreCase( "charset" )) _characterSet = value;
+                }
+            }
+        }
     }
 
 }
