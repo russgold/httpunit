@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -481,4 +482,99 @@ public class WebPageTest extends HttpUnitTest {
         assertImplement( "elements with id 'link1'", simplePage.getElementsWithAttribute( "id", "link1" ), WebLink.class );
         assertImplement( "elements with src '/images/arrow.gif'", simplePage.getElementsWithAttribute( "src", "/images/arrow.gif" ), WebImage.class );
     }
+
+    /**
+     * Test the {@link WebResponse.ByteTagParser} to ensure that embedded JavaScript is skipped.
+     */
+    public void testByteTagParser() throws Exception {
+        final URL mainBaseURL = new URL(getHostPath() + "/Main/Base");
+        final URL targetBaseURL = new URL(getHostPath() + "/Target/Base");
+        final String targetWindow = "target";
+        final String document = "<html><head><title>main</title>\n"
+                        + scriptToWriteAnotherDocument(simpleDocument(targetBaseURL), targetWindow)
+                        + "<base href=\"" + mainBaseURL.toExternalForm() + "\">\n"
+                        + "</head>\n<body>\nThis is a <a href=\"Link\">relative link</a>.\n"
+                        + "</body>\n</html>\n";
+        WebResponse.ByteTagParser parser = new WebResponse.ByteTagParser(document.getBytes());
+
+        String[] expectedTags = {"html", "head", "title", "/title", "script", "/script", "base", "/head",
+                                 "body", "a", "/a", "/body", "/html"};
+        for (int i = 0; i < expectedTags.length; i++) {
+            final String tagName = parser.getNextTag().getName();
+            final String expectedTag = expectedTags[i];
+            assertEquals("Tag number "+i, expectedTag, tagName);
+        }
+        final WebResponse.ByteTag nextTag = parser.getNextTag();
+        assertNull("More tags than expected: " + nextTag + "...?", nextTag);
+    }
+
+    /**
+     * Test whether a base tag embedded within JavaScript in the header of a page confuses the parser.
+     */
+    public void testBaseTagWithinJavaScriptInHeader() throws Exception {
+        final URL mainBaseURL = new URL(getHostPath() + "/Main/Base");
+        final URL targetBaseURL = new URL(getHostPath() + "/Target/Base");
+        final String targetWindow = "target";
+        defineResource("main.html", "<html><head><title>main</title>\n"
+                + scriptToWriteAnotherDocument(simpleDocument(targetBaseURL), targetWindow)
+                + "<base href=\"" + mainBaseURL.toExternalForm() + "\">\n"
+                + "</head>\n<body>\nThis is a <a href=\"Link\">relative link</a>.\n"
+                + "</body>\n</html>\n");
+
+        WebConversation wc = new WebConversation();
+        final WebResponse response = wc.getResponse(getHostPath() + "/main.html");
+        assertEquals("Base URL of link in main document", mainBaseURL, response.getLinkWith("relative link").getBaseURL());
+
+        final WebResponse targetResponse = wc.getOpenWindow(targetWindow).getCurrentPage();
+        assertEquals("Base URL of link in target document", targetBaseURL, targetResponse.getLinkWith("relative link").getBaseURL());
+    }
+
+    /**
+     * Test whether a base tag embedded within JavaScript in the body of a page confuses the parser.
+     */
+    public void testBaseTagWithinJavaScriptInBody() throws Exception {
+        final URL mainBaseURL = new URL(getHostPath() + "/Main/Base");
+        final URL targetBaseURL = new URL(getHostPath() + "/Target/Base");
+        final String targetWindow = "target";
+        defineResource("main.html", "<html><head><title>main</title>\n"
+                + "<base href=\"" + mainBaseURL.toExternalForm() + "\">\n"
+                + "</head>\n<body>\nThis is a <a href=\"Link\">relative link</a>.\n"
+                + scriptToWriteAnotherDocument(simpleDocument(targetBaseURL), targetWindow)
+                + "</body>\n</html>\n");
+
+        WebConversation wc = new WebConversation();
+        final WebResponse response = wc.getResponse(getHostPath() + "/main.html");
+        assertEquals("Base URL of link in main document", mainBaseURL, response.getLinkWith("relative link").getBaseURL());
+
+        final WebResponse targetResponse = wc.getOpenWindow(targetWindow).getCurrentPage();
+        assertEquals("Base URL of link in target document", targetBaseURL, targetResponse.getLinkWith("relative link").getBaseURL());
+    }
+
+    /**
+     * Create a fragment of HTML defining JavaScript that writes a document into a different window.
+     * @param document the document to be written
+     * @param targetWindow the name of the target window to open
+     * @return a fragment of HTML text
+     */
+    private String scriptToWriteAnotherDocument(String document, String targetWindow) {
+        StringBuffer buff = new StringBuffer();
+        buff.append("<script language=\"JavaScript\">\n");
+        buff.append("target = window.open('', '" + targetWindow + "');\n");
+        buff.append("target.document.write('" + document + "');\n");
+        buff.append("target.document.close();\n");
+        buff.append("</script>\n");
+        return buff.toString();
+    }
+
+    /**
+     * Create a simple document with or without a 'base' tag and containing a relative link.
+     * @param baseUrl the base URL to insert, or null for no base tag
+     * @return the text of a very simple document
+     */
+    private String simpleDocument(final URL baseUrl) {
+        return "<html><head><title>Simple Page</title>"
+                + (baseUrl == null ? "" : "<base href=\"" + baseUrl.toExternalForm() + "\"></base>")
+                + "</head><body>This is a simple page with a <a href=\"Link\">relative link</a>.</body></html>";
+    }
+
 }

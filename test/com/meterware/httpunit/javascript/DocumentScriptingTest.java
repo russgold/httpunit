@@ -273,7 +273,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
 
 
     public void testWriteToNewDocument() throws Exception {
-        defineWebPage( "OnCommand", "<a href='#' onclick=\"w = window.open( '', 'sample' );w.document.open( 'text/plain' ); w.document.write( 'You made it!' );w.document.close()\" >" );
+        defineWebPage( "OnCommand", "<a href='#' onclick=\"window.open( '', 'empty' );w = window.open( '', 'sample' );w.document.open( 'text/plain' ); w.document.write( 'You made it!' );w.document.close()\" >" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebLink link = response.getLinks()[0];
@@ -283,6 +283,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
         assertEquals( "Content Type", "text/plain", ww.getCurrentPage().getContentType() );
         link.click();
         assertEquals( "Generated page", "You made it!", ww.getCurrentPage().getText() );
+        assertEquals( "Empty page", "", wc.getOpenWindow("empty").getCurrentPage().getText() );
     }
 
 

@@ -13,6 +13,18 @@ Limitations:
 
 
 Revision History:
+ 4-Dec-2003
+Acknowledgements:
+    Thanks to Andrew Bickerton for adding the following JavaScript support:
+        Form.length          - returns the number of controls in a form
+        Control.type         - returns a test description of the control type
+        Control.defaultValue - returns the default value for text controls
+        Initial page tokenizing now skips JavaScript while looking for header tags
+        Writing into an empty frame no longer corrupts all empty frames
+
+Problems fixed:
+    1. Using JavaScript to write into an empty frame could change all empty frames to the same value
+
 17-Oct-2003
 Problems fixed:
     1. Bug #823433: document.cookie now defaults to the empty string, like IE and Mozilla, rather than null

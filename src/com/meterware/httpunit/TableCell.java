@@ -66,6 +66,12 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
         return super.getDOM();
     }
 
+    /**
+     * Returns the underlying HTML Element.
+     */
+    public Element getElement() {
+        return _element;
+    }
 
 //-------------------------------- HTMLElement methods ---------------------------------------
 

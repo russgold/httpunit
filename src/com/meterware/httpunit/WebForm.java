@@ -584,6 +584,8 @@ public class WebForm extends WebRequestSource {
         public Object get( String propertyName ) {
             if (propertyName.equals( "target" )) {
                 return getTarget();
+            } else if (propertyName.equals( "length" )) {
+                return new Integer(getFormControls().length);
             } else {
                 final FormParameter parameter = getParameter( propertyName );
                 if (parameter != UNKNOWN_PARAMETER) return parameter.getScriptableObject();
@@ -937,6 +939,10 @@ public class WebForm extends WebRequestSource {
             if (_value != null) claimValueIsRequired( values, _value );
         }
 
+
+        public String getType() {
+            return UNDEFINED_TYPE;
+        }
 
         /**
          * Returns the current value(s) associated with this control. These values will be transmitted to the server

@@ -157,7 +157,7 @@ public class WebWindow {
         final String frameName = getTargetFrame( request );
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
-            response = WebResponse.BLANK_RESPONSE;
+            response = WebResponse.createBlankResponse();
         } else if (!HttpUnitUtils.isJavaScriptURL( urlString )) {
             response = _client.newResponse( request, frameName );
         } else {

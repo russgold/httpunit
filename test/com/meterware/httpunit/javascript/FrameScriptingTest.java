@@ -196,5 +196,27 @@ public class FrameScriptingTest extends HttpUnitTest {
         assertEquals( "Result of click", "You made it!", result.getText() );
     }
 
+    /**
+     * Verifies that when JavaScript overwrites an empty frame, other empty frames stay empty.
+     */
+    public void testJavaScriptOverwritingBlankFrame() throws Exception {
+        defineResource("Frames.html",
+                "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                "<FRAMESET>" +
+                "    <FRAME src='Writer.html' name='red'>" +
+                "    <FRAME name=green>" +
+                "    <FRAME name=blue>" +
+                "</FRAMESET></HTML>");
+        defineWebPage("Writer", "This page overwrites an empty frame. <script language=\"JavaScript\">"
+                + "  window.parent.green.document.open(\"text/html\")\n"
+                + "  window.parent.green.document.write(\"Generated <a href=\\\"#\\\">link</a>\")\n"
+                + "  window.parent.green.document.close()\n"
+                + "</script>");
+
+        _wc.getResponse(getHostPath() + "/Frames.html");
+        assertEquals("Links in green frame", 1, _wc.getFrameContents("green").getLinks().length);
+        assertEquals("Links in blue frame", 0, _wc.getFrameContents("blue").getLinks().length);
+    }
+
     private WebConversation _wc;
 }

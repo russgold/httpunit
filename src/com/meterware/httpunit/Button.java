@@ -40,6 +40,10 @@ public class Button extends FormControl {
     private String _onClickEvent = "";
 
 
+    public String getType() {
+        return BUTTON_TYPE;
+    }
+
     Button( WebForm form ) {
         super( form );
     }

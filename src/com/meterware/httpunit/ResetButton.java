@@ -29,6 +29,9 @@ import org.w3c.dom.Node;
  **/
 public class ResetButton extends Button {
 
+    public String getType() {
+        return RESET_BUTTON_TYPE;
+    }
 
     ResetButton( WebForm form, Node node ) {
         super( form, node );

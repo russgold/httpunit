@@ -29,6 +29,10 @@ import org.xml.sax.SAXException;
  **/
 public class SubmitButton extends Button {
 
+    public String getType() {
+        return (isImageButton()?IMAGE_BUTTON_TYPE:SUBMIT_BUTTON_TYPE);
+    }
+
     /**
      * Returns true if this submit button is an image map.
      **/
@@ -71,7 +75,7 @@ public class SubmitButton extends Button {
 
     SubmitButton( WebForm form, Node node ) {
         super( form, node );
-        _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( "image" );
+        _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( IMAGE_BUTTON_TYPE );
     }
 
 

@@ -25,6 +25,8 @@ import com.meterware.pseudoserver.WebResource;
 
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
@@ -839,6 +841,149 @@ public class FormScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/index.html" );
         WebForm form = response.getFormWithName( "formName" );
         assertEquals( "Changed value", "Hello World!", form.getParameterValue( "inputName" ) );
+    }
+
+    /**
+     * Test that JavaScript can correctly access the 'type' property for every kind of form control.
+     * @throws Exception
+     */
+    public void testElementTypeAccess() throws Exception {
+        defineWebPage( "Default", "<script language=JavaScript>\n" +
+                                  "function CheckForm() {\n" +
+                                  "  var len = document.myForm.elements.length;\n" +
+                                  "  for (var index = 0; index < len; index++) {\n" +
+                                  "    var control = document.myForm.elements[index];\n" +
+                                  "    confirm(control.type);\n" +
+                                  "  }\n" +
+                                  "  return true;\n" +
+                                  "}\n" +
+                                  "</script>" +
+                                  "<form name=myForm method=POST>" +
+                                  "  <input type=\"text\" name=\"textfield\">" +
+                                  "  <textarea name=\"textarea\"></textarea>" +
+                                  "  <input type=\"password\" name=\"password\">" +
+                                  "  <input type=\"submit\" name=\"submit\" value=\"Submit\" onClick=\"return Check()\">" +
+                                  "  <input type=\"reset\" name=\"reset\" value=\"Reset\">" +
+                                  "  <input type=\"button\" name=\"button\" value=\"Button\">" +
+                                  "  <input type=\"checkbox\" name=\"checkbox\" value=\"checkbox\">" +
+                                  "  <input type=\"radio\" name=\"radiobutton\" value=\"radiobutton\">" +
+                                  "  <select name=\"select\">" +
+                                  "    <option value=\"1\">One</option>" +
+                                  "    <option value=\"2\">Two</option>" +
+                                  "  </select>" +
+                                  "  <select name=\"select2\" size=\"2\" multiple>" +
+                                  "    <option value=\"1\">One</option>" +
+                                  "    <option value=\"2\">Two</option>" +
+                                  "  </select>" +
+                                  "  <input type=\"file\" name=\"fileField\">" +
+                                  "  <input type=\"image\" name=\"imageField\" src=\"img.gif\">" +
+                                  "  <input type=\"hidden\" name=\"hiddenField\">" +
+                                  "  <button name=\"html4-button\" type=\"button\">html4-button</button>" +
+                                  "  <button name=\"html4-submit\" type=\"submit\">html4-submit</button>" +
+                                  "  <button name=\"html4-reset\" type=\"reset\">html4-reset</button>" +
+                                  "  <button name=\"html4-default\">html4-default</button>" +
+                                  "</form>" +
+                                  "<script language=JavaScript>\n" +
+                                  "  CheckForm();\n" +
+                                  "</script>\n");
+
+        String[] expectedTypes = new String[]{
+            "text", "textarea", "password", "submit", "reset", "button",
+            "checkbox", "radio", "select-one", "select-multiple", "file",
+            "image", "hidden", "button", "submit", "reset", "submit"
+        };
+
+        final PromptCollector collector = new PromptCollector();
+        WebConversation wc = new WebConversation();
+        wc.setDialogResponder(collector);
+        wc.getResponse( getHostPath() + "/Default.html" );
+        assertMatchingSet("Set of types on form", expectedTypes, collector.confirmPromptsSeen.toArray());
+    }
+
+    static class PromptCollector implements DialogResponder {
+        public List confirmPromptsSeen = new ArrayList();
+        public List responsePromptSeen = new ArrayList();
+        public boolean getConfirmation(String confirmationPrompt) {
+            confirmPromptsSeen.add(confirmationPrompt);
+            return true;
+        }
+
+        public String getUserResponse(String prompt, String defaultResponse) {
+            responsePromptSeen.add(prompt);
+            return null;
+        }
+    }
+
+    /**
+     * Test that the length (number of controls) of a form can be accessed from JavaScript.
+     * @throws Exception
+     */
+    public void testFormLength () throws Exception {
+        defineWebPage("Default", "<script language=JavaScript>\n" +
+                                 "function CheckForm()\n"+
+	                             "{\n"+
+                                    "confirm (document.myForm.length);\n" +
+                                    "return true;\n" +
+		                        "}\n" +
+                                "</script>" +
+                                  "<form name=myForm method=POST>" +
+                                  "  <input type=\"text\" name=\"first_name\" value=\"Fred\">" +
+                                  "  <input type=\"text\" name=\"last_name\" value=\"Bloggs\">" +
+                                   "</form>" +
+                                  "<script language=JavaScript>\n" +
+                                  "  CheckForm();\n" +
+                                  "</script>\n");
+
+         String[] expectedPrompts = new String[]{"2"};
+
+        final PromptCollector collector = new PromptCollector();
+        WebConversation wc = new WebConversation();
+        wc.setDialogResponder(collector);
+        wc.getResponse( getHostPath() + "/Default.html" );
+        assertMatchingSet("Length of form", expectedPrompts, collector.confirmPromptsSeen.toArray());
+    }
+
+    /**
+     * Test that the JavaScript 'value' and 'defaultValue' properties of a text input are distinct.
+     * 'defaultValue' should represent the 'value' attribute of the input element.
+     * 'value' should initially match 'defaultValue', but setting it should not affect the 'defaultValue'.
+     * @throws Exception
+     */
+    public void testElementDefaultValue () throws Exception {
+        defineWebPage("Default", "<script language=JavaScript>\n" +
+                "function CheckForm()\n"+
+                "{\n"+
+                "var i;\n" +
+                "var form_length=document.myForm.elements.length;\n" +
+                "for ( i=0 ; i< form_length; i++ )\n" +
+                "{\n"+
+                "  confirm (document.myForm.elements[i].value);\n " +
+                "}\n"+
+                "document.myForm.elements[2].value = \"Charles\"\n" +
+                "for ( i=0 ; i< form_length; i++ )\n" +
+                "{\n"+
+                "  confirm (document.myForm.elements[i].defaultValue);\n " +
+                "}\n"+
+                "confirm(document.myForm.elements[2].value);\n" +
+                "return true;\n" +
+                "}\n" +
+                "</script>" +
+                "<form name=myForm method=POST>" +
+                "  <input type=\"text\" name=\"first_name\" value=\"Alpha\">" +
+                "  <input type=\"text\" name=\"last_name\" value=\"Bravo\">" +
+                "  <input type=\"text\" name=\"last_name\" value=\"Charlie\">" +
+                "</form>" +
+                "<script language=JavaScript>\n" +
+                "  CheckForm();\n" +
+                "</script>\n");
+
+        String[] expectedValues = new String[]{"Alpha", "Bravo", "Charlie", "Alpha", "Bravo", "Charlie", "Charles"};
+
+        final PromptCollector collector = new PromptCollector();
+        WebConversation wc = new WebConversation();
+        wc.setDialogResponder(collector);
+        wc.getResponse( getHostPath() + "/Default.html" );
+        assertMatchingSet("Values seen by JavaScript", expectedValues, collector.confirmPromptsSeen.toArray());
     }
 
 }

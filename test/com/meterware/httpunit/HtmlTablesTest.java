@@ -294,6 +294,15 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "value of cell found from page", "value1", cell.asText() );
     }
 
+    /**
+     * Test that the tag name can be extracted for a cell.
+     */
+    public void testCellTagName() throws Exception {
+        WebTable table = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables()[0];
+        assertEquals("Tag name of header cell", table.getTableCell(0,0).getElement().getTagName().toUpperCase(), "TH");
+        assertEquals("Tag name of non-header cell", table.getTableCell(0,1).getElement().getTagName().toUpperCase(), "TD");
+    }
+
     private WebConversation _wc;
 }
 

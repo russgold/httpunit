@@ -768,8 +768,10 @@ public class WebResponse implements HTMLSegment, CookieSource {
 //------------------------------------------ package members ------------------------------------------------
 
     final static String      BLANK_HTML     = "";
-    final static WebResponse BLANK_RESPONSE = new DefaultWebResponse( BLANK_HTML );
 
+    final static WebResponse createBlankResponse() {
+        return new DefaultWebResponse(BLANK_HTML);
+    }
 
     WebWindow getWindow() {
         return _window;
@@ -900,7 +902,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private void readTags( byte[] rawMessage ) throws UnsupportedEncodingException, MalformedURLException {
         ByteTagParser parser = new ByteTagParser( rawMessage );
         ByteTag tag = parser.getNextTag();
-        while (tag != null) {
+        while (tag != null ) {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
             if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
             if (tag.getName().equalsIgnoreCase( "frameset" )) _hasSubframes = true;
@@ -1081,7 +1083,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 //=======================================================================================
 
-    class ByteTag {
+    static class ByteTag {
 
         ByteTag( byte[] buffer, int start, int length ) throws UnsupportedEncodingException {
             _buffer = new String( buffer, start, length, WebResponse.getDefaultEncoding() ).toCharArray();
@@ -1155,22 +1157,31 @@ public class WebResponse implements HTMLSegment, CookieSource {
 //=======================================================================================
 
 
-    class ByteTagParser {
-
+    static class ByteTagParser {
         ByteTagParser( byte[] buffer ) {
             _buffer = buffer;
         }
 
 
         ByteTag getNextTag() throws UnsupportedEncodingException {
-            _start = _end+1;
-            while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
-            for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
-            if (_end >= _buffer.length || _end < _start) return null;
-            return new ByteTag( _buffer, _start+1, _end-_start-1 );
+            ByteTag byteTag = null;
+            do {
+                _start = _end+1;
+                while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
+                for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
+                if (_end >= _buffer.length || _end < _start) return null;
+                byteTag = new ByteTag( _buffer, _start+1, _end-_start-1 );
+                if (byteTag.getName().equalsIgnoreCase("script")) {
+                    _scriptDepth++;
+                    return byteTag;
+                }
+                if (byteTag.getName().equalsIgnoreCase("/script")) _scriptDepth--;
+            } while (_scriptDepth > 0);
+            return byteTag;
         }
 
 
+        private int _scriptDepth = 0;
         private int _start = 0;
         private int _end   = -1;
 

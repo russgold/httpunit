@@ -125,7 +125,7 @@ class FrameHolder {
     private void createSubFrames( String targetName, String[] frameNames ) {
         _subFrames.put( targetName, frameNames );
         for (int i = 0; i < frameNames.length; i++) {
-            _contents.put( frameNames[ i ], WebResponse.BLANK_RESPONSE );
+            _contents.put( frameNames[ i ], WebResponse.createBlankResponse() );
         }
     }
 
