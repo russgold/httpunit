@@ -28,7 +28,12 @@
     <section title="Book References">
         <citation name="Java Extreme Programming Cookbook" url="http://www.oreilly.com/catalog/jextprockbk/">
             March 2003: Eric M. Burke and Brian M. Coyner, O'Reilly &amp; Associates.
-            Detailed examples of XP development includes use of HttpUnit to develop web applications.
+            Detailed examples of XP development includes use of HttpUnit to develop web applications. Covers HttpUnit 1.4
+        </citation>
+
+        <citation name="Java Development with Ant" url="http://www.manning.com/hatcher/">
+            August 2002: Erik Hatcher and Steve Loughran, Manning Publications.
+            An excellant text on using ant for development. Also includes a chapter on HttpUnit. Covers HttpUnit 1.4
         </citation>
 
         <citation name="Java Tools for Extreme Programming: Mastering Open Source Tools, including Ant, JUnit, and Cactus"
