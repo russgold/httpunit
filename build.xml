@@ -173,11 +173,12 @@
 <!--  ===================================================================  -->
 <target name="jar" depends="compile">
     <mkdir dir="${lib.dir}" />
-    <echo file="${build.dir}/info.txt" message="Manifest-Version: 1.0" />
-    <echo file="${build.dir}/info.txt" message="Sealed: false" append="yes" />
-    <echo file="${build.dir}/info.txt" message="HttpUnit-Version: ${version}" append="yes" />
-    <echo file="${build.dir}/info.txt" message="Build-Date: ${TODAY}" append="yes" />
-    <echo file="${build.dir}/info.txt" message="Build-Time: ${TSTAMP}" append="yes" />
+    <echo file="${build.dir}/info.txt">Manifest-Version: 1.0
+Sealed: false
+HttpUnit-Version: ${version}
+Build-Date: ${TODAY}
+Build-Time: ${TSTAMP}
+</echo>
     <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.classes}" includes="com/**" manifest="${build.dir}/info.txt" />
 </target>
 
