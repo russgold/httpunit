@@ -494,7 +494,23 @@ public class JavaScript {
 
 
         public void jsSet_location( String urlString ) throws IOException, SAXException {
+            if (urlString.startsWith( "color" )) return;
             getWindow().setLocation( urlString );
+        }
+
+
+        public String jsGet_cookie() {
+            return getDelegate().getCookie();
+        }
+
+
+        public void jsSet_cookie( String cookieSpec ) {
+            final int equalsIndex = cookieSpec.indexOf( '=' );
+            int endIndex = cookieSpec.indexOf( ";", equalsIndex );
+            if (endIndex < 0) endIndex = cookieSpec.length();
+            String name = cookieSpec.substring( 0, equalsIndex );
+            String value = cookieSpec.substring( equalsIndex+1, endIndex );
+            getDelegate().setCookie( name, value );
         }
 
 

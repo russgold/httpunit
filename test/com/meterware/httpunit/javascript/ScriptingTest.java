@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class ScriptingTest extends HttpUnitTest {
 
@@ -540,5 +540,31 @@ public class ScriptingTest extends HttpUnitTest {
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
 
+
+    public void testSimpleSetCookie() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>\n" +
+                                            "<body onLoad='document.cookie=\"color=red;path=/\"'>\n" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Cookie 'color'", "red", wc.getCookieValue( "color" ) );
+    }
+
+
+    public void testReadCookies() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewCookies() { \n" +
+                                            "  alert( 'cookies: ' + document.cookie );\n" +
+                                            "}" +
+                                            "</script></head>\n" +
+                                            "<body onLoad='viewCookies()'>\n" +
+                                            "</body></html>" );
+        addResourceHeader( "OnCommand.html", "Set-Cookie: age=12");
+        WebConversation wc = new WebConversation();
+        wc.addCookie( "height", "tall" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Alert message 1", "cookies: age=12;height=tall", wc.popNextAlert() );
+        assertNull( "Alert should have been removed", wc.getNextAlert() );
+    }
 
 }

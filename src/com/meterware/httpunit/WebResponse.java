@@ -1016,6 +1016,16 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+    void setCookie( String name, String value ) {
+        _client.addCookie( name, value );
+    }
+
+
+    String getCookieHeader() {
+        return _client.getCookieJar().getCookieHeaderField( getURL() );
+    }
+
+
 
 //=======================================================================================
 

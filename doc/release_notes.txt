@@ -7,9 +7,14 @@ Known problems:
 Limitations:
     1. JDK 1.3.1 or higher is required
     2. JavaScript support does not include some DOM properties
+    3. Document.cookie= does not restrict the cookie by path and domain
 
 
 Revision History:
+12-Dec-2002
+Additions:
+    1. Added support for Document.cookie
+
 29-Nov-2002
 Additions:
     1. Added support for most subproperties of the Location object - mostly r/o, but some read/write

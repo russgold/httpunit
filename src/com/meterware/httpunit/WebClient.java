@@ -434,6 +434,11 @@ public class WebClient {
     }
 
 
+    CookieJar getCookieJar() {
+        return _cookieJar;
+    }
+
+
     void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         WebWindow window = getTargetWindow( requestWindow, requestTarget );
         if (window != null) {

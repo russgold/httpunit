@@ -236,6 +236,16 @@ public class HTMLPage extends ParsedHTML {
         public void replaceText( String text, String contentType ) {
             getResponse().replaceText( text, contentType );
         }
+
+
+        public void setCookie( String name, String value ) {
+            getResponse().setCookie( name, value );
+        }
+
+
+        public String getCookie() {
+            return getResponse().getCookieHeader();
+        }
     }
 
 
