@@ -4,12 +4,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -39,13 +39,14 @@ import javax.servlet.*;
  **/
 class ServletUnitServletContext implements ServletContext {
 
-    public ServletUnitServletContext( WebApplication application ) {
+    ServletUnitServletContext( WebApplication application, Hashtable contextParams ) {
         _application = application;
+        _contextParams = contextParams;
     }
 
 
     /**
-     * Returns a ServletContext object that corresponds to a specified URL on the server. 
+     * Returns a ServletContext object that corresponds to a specified URL on the server.
      * <p>
      * This method allows servlets to gain access to the context for various parts of the server,
      * and as needed obtain RequestDispatcher objects from the context. The given path must be
@@ -59,7 +60,7 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns the major version of the Java Servlet API that this servlet container supports. 
+     * Returns the major version of the Java Servlet API that this servlet container supports.
      * All implementations that comply with Version 2.3 must have this method return the integer 2.
      **/
     public int getMajorVersion() {
@@ -68,7 +69,7 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns the minor version of the Servlet API that this servlet container supports. 
+     * Returns the minor version of the Servlet API that this servlet container supports.
      * All implementations that comply with Version 2.3 must have this method return the integer 3.
      **/
     public int getMinorVersion() {
@@ -77,8 +78,8 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns the MIME type of the specified file, or null if the MIME type is not known. 
-     * The MIME type is determined by the configuration of the servlet container, and 
+     * Returns the MIME type of the specified file, or null if the MIME type is not known.
+     * The MIME type is determined by the configuration of the servlet container, and
      * may be specified in a web application deployment descriptor. Common MIME types are
      * "text/html" and "image/gif".
      **/
@@ -88,20 +89,20 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns a URL to the resource that is mapped to a specified path. The path must begin 
-     * with a "/" and is interpreted as relative to the current context root. 
+     * Returns a URL to the resource that is mapped to a specified path. The path must begin
+     * with a "/" and is interpreted as relative to the current context root.
      * <p>
-     * This method allows the servlet container to make a resource available to servlets from any source. 
-     * Resources can be located on a local or remote file system, in a database, or in a .war file. 
+     * This method allows the servlet container to make a resource available to servlets from any source.
+     * Resources can be located on a local or remote file system, in a database, or in a .war file.
      * <p>
-     * The servlet container must implement the URL handlers and URLConnection objects that are necessary to access the resource. 
+     * The servlet container must implement the URL handlers and URLConnection objects that are necessary to access the resource.
      * <p>
-     * This method returns null if no resource is mapped to the pathname. 
+     * This method returns null if no resource is mapped to the pathname.
      *
-     * Some containers may allow writing to the URL returned by this method using the methods of the URL class. 
+     * Some containers may allow writing to the URL returned by this method using the methods of the URL class.
      *
      * The resource content is returned directly, so be aware that requesting a .jsp page returns the JSP source code. Use a
-     * RequestDispatcher instead to include results of an execution. 
+     * RequestDispatcher instead to include results of an execution.
      *
      * This method has a different purpose than java.lang.Class.getResource, which looks up resources based on a class loader. This
      * method does not use class loaders.
@@ -112,14 +113,14 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns the resource located at the named path as an InputStream object. 
+     * Returns the resource located at the named path as an InputStream object.
      *
      * The data in the InputStream can be of any type or length. The path must be specified according to the rules given in getResource.
-     * This method returns null if no resource exists at the specified path. 
+     * This method returns null if no resource exists at the specified path.
 
-     * Meta-information such as content length and content type that is available via getResource method is lost when using this method. 
+     * Meta-information such as content length and content type that is available via getResource method is lost when using this method.
 
-     * The servlet container must implement the URL handlers and URLConnection objects necessary to access the resource. 
+     * The servlet container must implement the URL handlers and URLConnection objects necessary to access the resource.
 
      * This method is different from java.lang.Class.getResourceAsStream, which uses a class loader. This method allows servlet
      * containers to make a resource available to a servlet from any location, without using a class loader.
@@ -149,10 +150,10 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns a RequestDispatcher object that acts as a wrapper for the named servlet. 
-     * 
+     * Returns a RequestDispatcher object that acts as a wrapper for the named servlet.
+     *
      * Servlets (and JSP pages also) may be given names via server administration or via a web application deployment descriptor. A servlet
-     * instance can determine its name using ServletConfig.getServletName(). 
+     * instance can determine its name using ServletConfig.getServletName().
      *
      * This method returns null if the ServletContext cannot return a RequestDispatcher for any reason.
      **/
@@ -186,7 +187,7 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Writes the specified message to a servlet log file, usually an event log. 
+     * Writes the specified message to a servlet log file, usually an event log.
      * The name and type of the servlet log file is specific to the servlet container.
      **/
     public void log( String message ) {  // XXX change this to use something testable
@@ -202,7 +203,7 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Writes an explanatory message and a stack trace for a given Throwable exception to the servlet log file. 
+     * Writes an explanatory message and a stack trace for a given Throwable exception to the servlet log file.
      * The name and type of the servlet log file is specific to the servlet container, usually an event log.
      **/
     public void log( String message, Throwable t ) {
@@ -213,7 +214,7 @@ class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns a String containing the real path for a given virtual path. For example, the virtual path "/index.html" has a real path of
-     * whatever file on the server's filesystem would be served by a request for "/index.html". 
+     * whatever file on the server's filesystem would be served by a request for "/index.html".
      *
      * The real path returned will be in a form appropriate to the computer and operating system on which the servlet container is running,
      * including the proper path separators. This method returns null if the servlet container cannot translate the virtual path to a real path for
@@ -225,10 +226,10 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns the name and version of the servlet container on which the servlet is running. 
+     * Returns the name and version of the servlet container on which the servlet is running.
 
      * The form of the returned string is servername/versionnumber. For example, the JavaServer Web Development Kit may return the
-     * string JavaServer Web Dev Kit/1.0. 
+     * string JavaServer Web Dev Kit/1.0.
 
      * The servlet container may return other optional information after the primary string in parentheses, for example, JavaServer Web
      * Dev Kit/1.0 (JDK 1.1.6; Windows NT 4.0 x86).
@@ -239,31 +240,31 @@ class ServletUnitServletContext implements ServletContext {
 
 
     /**
-     * Returns a String containing the value of the named context-wide initialization parameter, or null if the parameter does not exist. 
+     * Returns a String containing the value of the named context-wide initialization parameter, or null if the parameter does not exist.
      *
      * This method can make available configuration information useful to an entire "web application". For example, it can provide a
      * webmaster's email address or the name of a system that holds critical data.
      **/
     public java.lang.String getInitParameter( String name ) {
-        return null;  // XXX not implemented
-    }                                       
-
-
-    /**
-     * Returns the names of the context's initialization parameters as an Enumeration of String objects, 
-     * or an empty Enumeration if the context has no initialization parameters.
-     **/
-    public java.util.Enumeration getInitParameterNames() {
-        return EMPTY_VECTOR.elements();   // XXX not implemented
+        return (String) _contextParams.get( name );
     }
 
 
     /**
-     * Returns the servlet container attribute with the given name, or null if there is no attribute by that name. 
-     * An attribute allows a servlet container to give the servlet additional information not already 
+     * Returns the names of the context's initialization parameters as an Enumeration of String objects,
+     * or an empty Enumeration if the context has no initialization parameters.
+     **/
+    public java.util.Enumeration getInitParameterNames() {
+            return _contextParams.keys();
+        }
+
+
+    /**
+     * Returns the servlet container attribute with the given name, or null if there is no attribute by that name.
+     * An attribute allows a servlet container to give the servlet additional information not already
      * provided by this interface. See your server documentation for information
      * about its attributes. A list of supported attributes can be retrieved using getAttributeNames.
-     **/ 
+     **/
     public Object getAttribute( String name ) {
         return _attributes.get( name );
     }
@@ -325,6 +326,18 @@ class ServletUnitServletContext implements ServletContext {
         return null;
     }
 
+//------------------------------------------- package members ----------------------------------------------------
+
+
+    void setInitParameter( String name, Object initParameter ) {
+        _contextParams.put( name, initParameter );
+    }
+
+
+    void removeInitParameter( String name ) {
+        _contextParams.remove( name );
+    }
+
 
 //------------------------------------------- private members ----------------------------------------------------
 
@@ -332,4 +345,5 @@ class ServletUnitServletContext implements ServletContext {
 
     private Hashtable      _attributes = new Hashtable();
     private WebApplication _application;
+    private Hashtable      _contextParams = new Hashtable();
 }

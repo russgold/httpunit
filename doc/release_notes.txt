@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+30-Jan-2002
+Acknkowledgements:
+    Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit
+
+Additions:
+    1. ServletUnit now supports the <context-param> tag.
+
 24-Jan-2002
 Additions:
     1. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.

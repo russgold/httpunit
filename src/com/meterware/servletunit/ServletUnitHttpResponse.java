@@ -5,12 +5,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -110,6 +110,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Relative URLs are not permitted here.
      */
     public void sendRedirect( String location ) throws IOException {
+        setStatus( HttpServletResponse.SC_MOVED_PERMANENTLY );
         setHeader( "Location", location );
     }
 
@@ -162,8 +163,8 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
 
     /**
-     * @deprecated As of version 2.1, due to ambiguous meaning of the message parameter. 
-     * To set a status code use setStatus(int), to send an error with a description 
+     * @deprecated As of version 2.1, due to ambiguous meaning of the message parameter.
+     * To set a status code use setStatus(int), to send an error with a description
      * use sendError(int, String). Sets the status code and message for this response.
      **/
     public void setStatus( int sc, String msg ) {
@@ -325,10 +326,10 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         throw new RuntimeException( "addDateHeader not implemented" );
     }
 
-    
+
     /**
-     * Sets the preferred buffer size for the body of the response. The servlet container 
-     * will use a buffer at least as large as the size requested. The actual buffer size 
+     * Sets the preferred buffer size for the body of the response. The servlet container
+     * will use a buffer at least as large as the size requested. The actual buffer size
      * used can be found using getBufferSize.
      **/
     public void setBufferSize( int size ) {   // XXX throw IllegalStateException if anything has been written
@@ -338,32 +339,32 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     /**
      * Returns the actual buffer size used for the response. If no buffering is used, this method returns 0.
-     **/ 
+     **/
     public int getBufferSize() {
         return 0;
     }
 
 
     /**
-     * Returns a boolean indicating if the response has been committed. A commited response has 
+     * Returns a boolean indicating if the response has been committed. A commited response has
      * already had its status code and headers written.
      **/
     public boolean isCommitted() {
         return false;    // XXX set true if flushBuffer has been called
     }
-     
-     
+
+
     /**
-     * Forces any content in the buffer to be written to the client. A call to this method automatically 
+     * Forces any content in the buffer to be written to the client. A call to this method automatically
      * commits the response, meaning the status code and headers will be written.
      **/
     public void flushBuffer() throws IOException {
         throw new RuntimeException( "flushBuffer not implemented" );
     }
 
-    
+
     /**
-     * Clears any data that exists in the buffer as well as the status code and headers. 
+     * Clears any data that exists in the buffer as well as the status code and headers.
      * If the response has been committed, this method throws an IllegalStateException.
      **/
     public void reset() {
@@ -372,15 +373,15 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
 
     /**
-     * Sets the locale of the response, setting the headers (including the Content-Type's charset) 
-     * as appropriate. This method should be called before a call to getWriter(). 
+     * Sets the locale of the response, setting the headers (including the Content-Type's charset)
+     * as appropriate. This method should be called before a call to getWriter().
      * By default, the response locale is the default locale for the server.
      **/
     public void setLocale( Locale locale ) {
         throw new RuntimeException( "setLocale not implemented" );
     }
 
-     
+
     /**
      * Returns the locale assigned to the response.
      **/
@@ -388,7 +389,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         throw new RuntimeException( "getLocale not implemented" );
     }
 
-     
+
 //----------------------------- methods added to ServletResponse in JSDK 2.3 --------------------------------------
 
 

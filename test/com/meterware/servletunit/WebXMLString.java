@@ -42,6 +42,12 @@ class WebXMLString {
 
     String asText() {
         StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n<web-app>\n" );
+
+        for (Iterator i = _contextParams.entrySet().iterator(); i.hasNext();) {
+            Map.Entry entry = (Map.Entry) i.next();
+            result.append( "  <context-param>\n    <param-name>" ).append( entry.getKey() );
+            result.append( "</param-name>\n    <param-value>" ).append( entry.getValue() ).append( "</param-value>\n  </context-param>\n" );
+        }
         for (int i = _servlets.size() - 1; i >= 0; i--) {
             result.append( "  <servlet>\n    <servlet-name>servlet_" ).append( i ).append( "</servlet-name>\n" );
             result.append( "    <servlet-class>" ).append( ((Class) _servlets.get( i )).getName() ).append( "</servlet-class>\n" );
@@ -69,6 +75,11 @@ class WebXMLString {
             result.append( "</param-name>\n      <param-value>" ).append( entry.getValue() ).append( "</param-value>\n    </" );
             result.append( tagName ).append( ">\n" );
         }
+    }
+
+
+    void addContextParam( String name, String value ) {
+        _contextParams.put( name, value );
     }
 
 
@@ -127,6 +138,7 @@ class WebXMLString {
     private String _loginConfig = "";
     private Hashtable _resources = new Hashtable();
     private Hashtable _initParams = new Hashtable();
+    private Hashtable _contextParams = new Hashtable();
 
 
     private WebResourceSpec getWebResource( String resourceName ) {

@@ -70,6 +70,7 @@ class WebApplication {
             _securityConstraints.add( new SecurityConstraintImpl( (Element) nl.item(i) ) );
         }
 
+        extractContextParameters( document );
         extractLoginConfiguration( document );
     }
 
@@ -98,7 +99,7 @@ class WebApplication {
             if (!Servlet.class.isAssignableFrom( servletClass )) throw new HttpInternalErrorException( url );
 
             Servlet servlet = (Servlet) servletClass.newInstance();    // XXX cache instances - by class?
-            servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams() ) );
+            servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams(), _contextParameters ) );
             return servlet;
         } catch (ClassNotFoundException e) {
             throw new HttpNotFoundException( url, e );
@@ -201,6 +202,7 @@ class WebApplication {
 
     private URL _errorURL;
 
+    private Hashtable _contextParameters = new Hashtable();
 
     final static private SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
 
@@ -243,6 +245,17 @@ class WebApplication {
     private void registerServlet( Dictionary mapping, Element servletElement ) throws SAXException {
         registerServlet( getChildNodeValue( servletElement, "url-pattern" ),
                          (ServletConfiguration) mapping.get( getChildNodeValue( servletElement, "servlet-name" ) ) );
+    }
+
+
+    private void extractContextParameters( Document document ) throws SAXException {
+       NodeList nl = document.getElementsByTagName( "context-param" );
+       for (int i = 0; i < nl.getLength(); i++) {
+           Element param = (Element)nl.item(i);
+           String name = getChildNodeValue(param, "param-name");
+           String value = getChildNodeValue(param, "param-value");
+           _contextParameters.put(name, value);
+       }
     }
 
 

@@ -124,6 +124,25 @@ public class WebXMLTest extends TestCase {
     }
 
 
+    public void testContextParameters() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        wxs.addContextParam( "icecream", "vanilla" );
+        wxs.addContextParam( "cone", "waffle" );
+
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+        ServletUnitClient client = sr.newClient();
+        InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+
+        javax.servlet.ServletContext sc = ((HttpServlet) ic.getServlet()).getServletContext();
+        assertNotNull( "ServletContext should not be null", sc );
+        assertEquals( "ServletContext.getInitParameter()", "vanilla", sc.getInitParameter( "icecream" ) );
+        assertEquals( "init parameter: cone", "waffle", sc.getInitParameter( "cone" ) );
+        assertNull( "ServletContext.getInitParameter() should be null", sc.getInitParameter( "shoesize" ) );
+
+    }
+
+
     private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException {
         DOMParser parser = new DOMParser();
         parser.parse( new InputSource( toInputStream( contents ) ) );
