@@ -81,7 +81,7 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testJavaScriptURLWithParameters() throws Exception {
+    public void testJavaScriptURLWithVariables() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
                                             "<a href='javascript:\"Our winner is... \" + document.the_form.winner.value'>go</a>" +
@@ -92,6 +92,22 @@ public class ScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         response.getLinks()[0].click();
         assertEquals( "New page", "Our winner is... George of the Jungle", wc.getCurrentPage().getText() );
+    }
+
+
+    public void testJavaScriptURLWithQuestionMark() throws Exception {
+        defineResource( "/appname/HandleAction/report?type=C", "You made it!" );
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<a href=\"javascript:redirect('/appname/HandleAction/report?type=C')\">go</a>" +
+                                            "<script language='JavaScript'>" +
+                                            "  function redirect( url ) { window.location=url; }" +
+                                            "</script>" +
+                                            "</form></body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+        assertEquals( "New page", "You made it!", wc.getCurrentPage().getText() );
     }
 
 

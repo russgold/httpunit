@@ -18,6 +18,7 @@
     <fileset dir="${jars.dir}">
         <include name="*.jar"/>
     </fileset>
+    <pathelement location="${classpath}" />
 </path>
 
 

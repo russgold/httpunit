@@ -101,8 +101,9 @@ public class WebRequestSource extends ParameterHolder {
     /**
      * Returns the URL relative to the current page which will handle the request.
      */
-    String getRelativeURL() {
-        final String url = getDestinationPage();
+    String getRelativePage() {
+        final String url = getRelativeURL();
+        if (url.startsWith( "javascript:" )) return url;
         final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
             return url.substring(0, questionMarkIndex);
@@ -111,7 +112,7 @@ public class WebRequestSource extends ParameterHolder {
     }
 
 
-    private String getDestinationPage() {
+    private String getRelativeURL() {
         String result = trimFragment( getDestination() );
         if (result.trim().length() == 0) result = getBaseURL().getFile();
         return result;
@@ -245,6 +246,7 @@ public class WebRequestSource extends ParameterHolder {
      **/
     private String getParametersString() {
         final String url = trimFragment( getDestination() );
+        if (url.startsWith( "javascript:" )) return "";
         final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
             return url.substring( questionMarkIndex + 1 );

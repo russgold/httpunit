@@ -311,7 +311,7 @@ public class WebRequest {
 
 
     protected WebRequest( WebRequestSource requestSource ) {
-        this( requestSource.getBaseURL(), requestSource.getRelativeURL(), requestSource.getTarget(), newParameterHolder( requestSource ) );
+        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getTarget(), newParameterHolder( requestSource ) );
         _webRequestSource = requestSource;
         setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
     }
