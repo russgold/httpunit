@@ -515,8 +515,61 @@ class ServerSocketFactory {
     }
 
     static synchronized void release( ServerSocket serverSocket ) throws IOException {
-        _sockets.add( serverSocket );
-        _outstandingSockets--;
-        synchronized (_releaseSemaphore) { _releaseSemaphore.notify(); }
+        if (_sockets.size() >= 2 * PseudoServer.getWaitThreshhold()) {
+            serverSocket.close();
+        } else {
+            _sockets.add( serverSocket );
+            _outstandingSockets--;
+            synchronized (_releaseSemaphore) { _releaseSemaphore.notify(); }
+        }
+    }
+}
+
+
+class RecordingOutputStream extends OutputStream {
+
+    private OutputStream _nestedStream;
+    private PrintStream _log;
+
+
+    public RecordingOutputStream( OutputStream nestedStream, PrintStream log ) {
+        _nestedStream = nestedStream;
+        _log = log;
+    }
+
+
+    public void write( int b ) throws IOException {
+        _nestedStream.write( b );
+        _log.println( "sending " + Integer.toHexString( b ) );
+    }
+
+
+    public void write( byte b[], int offset, int len ) throws IOException {
+        _nestedStream.write( b, offset, len );
+        _log.print( "sending" );
+        for (int i = offset; i < offset+len; i++) {
+            _log.print( ' ' + Integer.toHexString( b[i] ) );
+        }
+        _log.println();
+    }
+}
+
+
+class RecordingInputStream extends InputStream {
+
+    private InputStream _nestedStream;
+    private PrintStream _log;
+
+
+    public RecordingInputStream( InputStream nestedStream, PrintStream log ) {
+        _nestedStream = nestedStream;
+        _log = log;
+    }
+
+
+    public int read() throws IOException {
+        int value = _nestedStream.read();
+        if (value != -1) _log.print( ' ' + Integer.toHexString( value ) );
+        return value;
     }
 }

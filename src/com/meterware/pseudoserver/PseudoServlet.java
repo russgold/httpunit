@@ -107,7 +107,13 @@ public class PseudoServlet {
     }
 
 
+    protected HttpRequest getRequest() {
+        return _requestStream;
+    }
+
+
     private HttpRequest _requestStream;
+
 }
 
 

@@ -21,48 +21,41 @@ package com.meterware.pseudoserver;
 *******************************************************************************************************************/
 import com.meterware.httpunit.HttpUnitUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Reader;
 
 import java.util.StringTokenizer;
 import java.util.Hashtable;
-import java.util.Enumeration;
 
 
 /**
  * Represents a single HTTP request, extracted from the input stream.
  */
-class HttpRequest {
+class HttpRequest extends ReceivedHttpMessage {
 
-    private static final int CR = 13;
-    private static final int LF = 10;
-
-    private Reader         _reader;
     private String         _protocol;
     private String         _command;
     private String         _uri;
-    private Hashtable      _headers = new Hashtable();
     private Hashtable      _parameters;
-    private byte[]         _requestBody;
 
 
     HttpRequest( InputStream inputStream ) throws IOException {
-        StringTokenizer st = new StringTokenizer( readHeaderLine( inputStream ) );
+        super( inputStream );
+    }
+
+
+    protected void interpretMessageHeader( String messageHeader ) {
+        StringTokenizer st = new StringTokenizer( messageHeader );
         _command  = st.nextToken();
         _uri      = st.nextToken();
         _protocol = st.nextToken();
-
-        readHeaders( inputStream );
-        readContent( inputStream );
     }
 
 
-    Reader getReader() {
-        return _reader;
+    protected void appendMessageHeader( StringBuffer sb ) {
+        sb.append( _command ).append( ' ' ).append( _uri ).append( ' ' ).append( _protocol );
     }
+
 
     String getCommand() {
         return _command;
@@ -78,85 +71,26 @@ class HttpRequest {
     }
 
 
-    String getHeader( String name ) {
-        return (String) _headers.get( name.toUpperCase() );
-    }
-
-
-    byte[] getBody() {
-        return _requestBody;
-    }
-
-
     /**
      * Returns the parameter with the specified name. If no such parameter exists, will
      * return null.
      **/
     String[] getParameter( String name ) {
         if (_parameters == null) {
-            _parameters = readParameters( new String( _requestBody ) );
+            _parameters = readParameters( new String( getBody() ) );
         }
         return (String[]) _parameters.get( name );
     }
 
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer( "HttpRequest[ ");
-        sb.append( _command ).append( ' ' ).append( _uri ).append( ' ' ).append( _protocol ).append( "\n" );
-        for (Enumeration e = _headers.keys(); e.hasMoreElements();) {
-            Object key = e.nextElement();
-            sb.append( "      " ).append( key ).append( ": " ).append( _headers.get( key ) ).append( "\n" );
+    boolean wantsKeepAlive() {
+        if ("Keep-alive".equalsIgnoreCase( getConnectionHeader() )) {
+            return true;
+        } else if (_protocol.equals( "HTTP/1.1" )) {
+            return !"Close".equalsIgnoreCase( getConnectionHeader() );
+        } else {
+            return false;
         }
-        sb.append( "   body contains " ).append( getBody().length ).append( " byte(s) ]" );
-        return sb.toString();
-    }
-
-
-    private void readContent( InputStream inputStream ) throws IOException {
-        _requestBody = new byte[ getContentLength() ];
-        inputStream.read( _requestBody );
-        _reader = new InputStreamReader( new ByteArrayInputStream( _requestBody ) );
-    }
-
-
-    private int getContentLength() {
-        try {
-            return Integer.parseInt( getHeader( "Content-Length" ) );
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-
-    private void readHeaders( InputStream inputStream ) throws IOException {
-        String lastHeader = null;
-
-        String header = readHeaderLine( inputStream );
-        while (header.length() > 0) {
-    	    if (header.charAt(0) <= ' ') {
-    	        if (lastHeader == null) continue;
-    		    _headers.put( lastHeader, _headers.get( lastHeader ) + header.trim() );
-    	    } else {
-    	        lastHeader = header.substring( 0, header.indexOf(':') ).toUpperCase();
-                _headers.put( lastHeader, header.substring( header.indexOf(':')+1 ).trim() );
-    	    }
-            header = readHeaderLine( inputStream );
-        }
-    }
-
-
-    private String readHeaderLine( InputStream inputStream ) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        int b = inputStream.read();
-        while (b != CR) {
-            sb.append( (char) b );
-            b = inputStream.read();
-        }
-
-        b = inputStream.read();
-        if (b != LF) throw new IOException( "Bad header line termination: " + b );
-
-        return sb.toString();
     }
 
 
@@ -188,20 +122,10 @@ class HttpRequest {
     }
 
 
-    boolean wantsKeepAlive() {
-        if ("Keep-alive".equalsIgnoreCase( getConnectionHeader() )) {
-            return true;
-        } else if (_protocol.equals( "HTTP/1.1" )) {
-            return !"Close".equalsIgnoreCase( getConnectionHeader() );
-        } else {
-            return false;
-        }
-    }
-
-
     private String getConnectionHeader() {
         return getHeader( "Connection" );
     }
+
 
 }
 

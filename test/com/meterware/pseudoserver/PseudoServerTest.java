@@ -19,19 +19,14 @@ package com.meterware.pseudoserver;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.*;
-
 import junit.framework.TestSuite;
 
 import java.net.HttpURLConnection;
-import java.net.UnknownHostException;
 import java.net.Socket;
 import java.io.OutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.BufferedInputStream;
-
-import org.xml.sax.SAXException;
 
 
 public class PseudoServerTest extends HttpUserAgentTest {
@@ -51,93 +46,19 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
-    public void testNoSuchServer() throws Exception {
-        WebConversation wc = new WebConversation();
-
-        try {
-            wc.getResponse( "http://no.such.host" );
-            fail( "Should have rejected the request" );
-        } catch (UnknownHostException e) {
-        }
+    public void testNotFoundStatus() throws Exception {
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "GET", "/nothing.htm" );
+        assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, response.getResponseCode() );
     }
 
 
-    public void testNotFound() throws Exception {
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/nothing.htm" );
-        try {
-            wc.getResponse( request );
-            fail( "Should have rejected the request" );
-        } catch (HttpNotFoundException e) {
-            assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
-            assertEquals( "Response message", "unable to find /nothing.htm", e.getResponseMessage() );
-        }
-    }
-
-
-    public void testNotModifiedResponse() throws Exception {
+    public void testStatusSpecification() throws Exception {
         defineResource( "error.htm", "Not Modified", 304 );
 
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
-        WebResponse response = wc.getResponse( request );
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "GET", "/error.htm" );
         assertEquals( "Response code", 304, response.getResponseCode() );
-        response.getText();
-        response.getInputStream().read();
-    }
-
-
-    public void testInternalErrorException() throws Exception {
-        defineResource( "error.htm", "Internal error", 501 );
-
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
-        try {
-            wc.getResponse( request );
-            fail( "Should have rejected the request" );
-        } catch (HttpException e) {
-            assertEquals( "Response code", 501, e.getResponseCode() );
-        }
-    }
-
-
-    public void testInternalErrorDisplay() throws Exception {
-        defineResource( "error.htm", "Internal error", 501 );
-
-        WebConversation wc = new WebConversation();
-        wc.setExceptionsThrownOnErrorStatus( false );
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "Response code", 501, response.getResponseCode() );
-        assertEquals( "Message contents", "Internal error", response.getText().trim() );
-    }
-
-
-    public void testSimpleGet() throws Exception {
-        String resourceName = "something/interesting";
-        String resourceValue = "the desired content";
-
-        defineResource( resourceName, resourceValue );
-
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "requested resource", resourceValue, response.getText().trim() );
-        assertEquals( "content type", "text/html", response.getContentType() );
-    }
-
-
-    public void testFunkyGet() throws Exception {
-        String resourceName = "ID=03.019c010101010001.00000001.a202000000000019. 0d09/login/";
-        String resourceValue = "the desired content";
-
-        defineResource( resourceName, resourceValue );
-
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "requested resource", resourceValue, response.getText().trim() );
-        assertEquals( "content type", "text/html", response.getContentType() );
     }
 
 
@@ -192,8 +113,6 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
-
-
     /**
      * This verifies that the PseudoServer can be restricted to a HTTP/1.0.
      */
@@ -225,21 +144,87 @@ public class PseudoServerTest extends HttpUserAgentTest {
         String expectedResponse = prefix + name;
 
         defineResource( resourceName, new PseudoServlet() {
-
             public WebResource getPostResponse() {
                 return new WebResource( prefix + getParameter( "name" )[0], "text/plain" );
             }
         } );
 
-        WebConversation wc = new WebConversation();
-        WebRequest request = new PostMethodWebRequest( getHostPath() + '/' + resourceName );
-        request.setParameter( "name", name );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "Content type", "text/plain", response.getContentType() );
-        assertEquals( "Response", expectedResponse, response.getText().trim() );
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "POST", '/' + resourceName, "name=" + name );
+        assertEquals( "Content type", "text/plain", response.getHeader( "Content-Type" ) );
+        assertEquals( "Response", expectedResponse, new String( response.getBody() ) );
     }
 
 
+    public void testChunkedRequest() throws Exception {
+        super.defineResource( "/chunkedServlet", new PseudoServlet() {
+            public WebResource getPostResponse() {
+                return new WebResource( super.getBody(), "text/plain" );
+            }
+        } );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        conn.startChunkedResponse( "POST", "/chunkedServlet" );
+        conn.sendChunk( "This " );
+        conn.sendChunk( "is " );
+        conn.sendChunk( "chunked.");
+        SocketConnection.SocketResponse response = conn.getResponse();
+        assertEquals( "retrieved body", "This is chunked.", new String( response.getBody() ) );
+    }
+
+
+    public void testChunkedResponse() throws Exception {
+        defineResource( "/chunkedServlet", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                WebResource webResource = new WebResource( "5\r\nSent \r\n3\r\nin \r\n07\r\nchunks.\r\n0\r\n", "text/plain" );
+                webResource.addHeader( "Transfer-Encoding: chunked" );
+                return webResource;
+            }
+        } );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "GET", "/chunkedServlet" );
+        assertEquals( "retrieved body", "Sent in chunks.", new String( response.getBody() ) );
+        assertNull( "No Content-Length header should have been sent", response.getHeader( "Content-Length" ) );
+    }
+
+
+    public void testPersistentConnection() throws Exception {
+        super.defineResource( "/testServlet", new TestMethodServlet() );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse resp1 = conn.getResponse( "HEAD", "/testServlet" );
+        assertEquals( "test-header", "test-value1", resp1.getHeader( "test-header1") );
+
+        SocketConnection.SocketResponse resp2 = conn.getResponse( "GET", "/testServlet" );
+        assertEquals( "retrieved body", TestMethodServlet.GET_DATA, new String( resp2.getBody() ) );
+
+        SocketConnection.SocketResponse resp3 = conn.getResponse( "OPTIONS", "/testServlet" );
+        assertEquals( "allow header", "GET", resp3.getHeader( "Allow") );
+    }
+
+
+    private class TestMethodServlet extends PseudoServlet {
+
+        private static final String GET_DATA = "This is from the TestMethodServlet - GET";
+
+        public WebResource getResponse( String method ) throws IOException {
+            if (method.equals( "GET" )) {
+                return new WebResource( GET_DATA );
+            } else if (method.equals( "HEAD" )) {
+                WebResource headResource = new WebResource( "" );
+                headResource.addHeader( "test-header1:test-value1" );
+                return headResource;
+            } else if (method.equals( "OPTIONS" )) {
+                WebResource optionsResource = new WebResource( GET_DATA );
+                optionsResource.addHeader( "Allow:GET" );
+                optionsResource.addHeader( "test-header1:test-value1" );
+                return optionsResource;
+            } else {
+                return super.getResponse( method );
+            }
+        }
+    }
 
 
     public void testBadMethodUsingPseudoServlet() throws Exception {
@@ -247,21 +232,30 @@ public class PseudoServerTest extends HttpUserAgentTest {
 
         defineResource( resourceName, new PseudoServlet() {} );
 
-        try {
-            WebConversation wc = new WebConversation();
-            WebRequest request = new HeadMethodWebRequest( getHostPath() + '/' + resourceName );
-            wc.getResponse( request );
-            fail( "Should have rejected HEAD request" );
-        } catch (HttpException e) {
-            assertEquals( "Status code returned", HttpURLConnection.HTTP_BAD_METHOD, e.getResponseCode() );
-        }
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "HEAD", '/' + resourceName );
+        assertEquals( "Status code returned", HttpURLConnection.HTTP_BAD_METHOD, response.getResponseCode() );
     }
 
 
     public void testClasspathDirectory() throws Exception {
-        WebConversation wc = new WebConversation();
         mapToClasspath( "/some/classes" );
-        wc.getResponse( getHostPath() + "/some/classes/" + PseudoServerTest.class.getName().replace('.','/') + ".class" );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        conn.getResponse( "GET", "/some/classes/" + SocketConnection.SocketResponse.class.getName().replace('.','/') + ".class" );
+    }
+
+
+    public void testPseudoServletRequestAccess() throws Exception {
+        defineResource( "/properties", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                return new WebResource( super.getRequest().getURI(), "text/plain" );
+            }
+        } );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "GET", "/properties" );
+        assertEquals( "retrieved body", "/properties", new String( response.getBody() ) );
     }
 
 

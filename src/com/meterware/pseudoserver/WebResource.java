@@ -62,6 +62,8 @@ public class WebResource {
         if (header.toLowerCase().startsWith( "content-length" )) _hasExplicitContentLengthHeader = true;
         if (header.trim().toLowerCase().startsWith( "connection" ) &&
             header.trim().toLowerCase().endsWith( "close") ) _closesConnection = true;
+        if (header.trim().toLowerCase().startsWith( "transfer-encoding" ) &&
+            header.trim().toLowerCase().endsWith( "chunked") ) _isChunked = true;
     }
 
 
@@ -105,10 +107,15 @@ public class WebResource {
     String[] getHeaders() throws UnsupportedEncodingException {
         final Vector effectiveHeaders = (Vector) _headers.clone();
         if (!_hasExplicitContentTypeHeader) effectiveHeaders.add( getContentTypeHeader() );
-        if (_stream == null && !_hasExplicitContentLengthHeader) effectiveHeaders.add( getContentLengthHeader() );
+        if (_stream == null && !_hasExplicitContentLengthHeader && !isChunked()) effectiveHeaders.add( getContentLengthHeader() );
         String[] headers = new String[ effectiveHeaders.size() ];
         effectiveHeaders.copyInto( headers );
         return headers;
+    }
+
+
+    private boolean isChunked() {
+        return _isChunked;
     }
 
 
@@ -206,6 +213,7 @@ public class WebResource {
     private boolean _hasExplicitContentTypeHeader;
     private boolean _hasExplicitContentLengthHeader;
     private Vector  _headers = new Vector();
+    private boolean _isChunked;
 }
 
 

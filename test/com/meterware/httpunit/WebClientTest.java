@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -53,6 +54,96 @@ public class WebClientTest extends HttpUnitTest {
     public WebClientTest( String name ) {
         super( name );
     }
+
+    public void testNoSuchServer() throws Exception {
+        WebConversation wc = new WebConversation();
+
+        try {
+            wc.getResponse( "http://no.such.host" );
+            fail( "Should have rejected the request" );
+        } catch (UnknownHostException e) {
+        }
+    }
+
+
+    public void testNotFound() throws Exception {
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/nothing.htm" );
+        try {
+            wc.getResponse( request );
+            fail( "Should have rejected the request" );
+        } catch (HttpNotFoundException e) {
+            assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
+            assertEquals( "Response message", "unable to find /nothing.htm", e.getResponseMessage() );
+        }
+    }
+
+
+    public void testNotModifiedResponse() throws Exception {
+        defineResource( "error.htm", "Not Modified", 304 );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "Response code", 304, response.getResponseCode() );
+        response.getText();
+        response.getInputStream().read();
+    }
+
+
+    public void testInternalErrorException() throws Exception {
+        defineResource( "error.htm", "Internal error", 501 );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
+        try {
+            wc.getResponse( request );
+            fail( "Should have rejected the request" );
+        } catch (HttpException e) {
+            assertEquals( "Response code", 501, e.getResponseCode() );
+        }
+    }
+
+
+    public void testInternalErrorDisplay() throws Exception {
+        defineResource( "error.htm", "Internal error", 501 );
+
+        WebConversation wc = new WebConversation();
+        wc.setExceptionsThrownOnErrorStatus( false );
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "Response code", 501, response.getResponseCode() );
+        assertEquals( "Message contents", "Internal error", response.getText().trim() );
+    }
+
+
+    public void testSimpleGet() throws Exception {
+        String resourceName = "something/interesting";
+        String resourceValue = "the desired content";
+
+        defineResource( resourceName, resourceValue );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
+
+    public void testFunkyGet() throws Exception {
+        String resourceName = "ID=03.019c010101010001.00000001.a202000000000019. 0d09/login/";
+        String resourceValue = "the desired content";
+
+        defineResource( resourceName, resourceValue );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
 
     public void testCookies() throws Exception {
         String resourceName = "something/baking";
