@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -46,12 +46,13 @@ class ServletUnitWebResponse extends WebResponse {
 
     /**
      * Constructs a response object from a servlet response.
+     * @param target the target frame on which the response will be displayed
      * @param url the url from which the response was received
-     * @param inputStream the input stream from which the response can be read
+     * @param response the response populated by the servlet
      **/
-    ServletUnitWebResponse( String target, URL url, ServletUnitHttpResponse response ) {
+    ServletUnitWebResponse( String target, URL url, HttpServletResponse response ) {
         super( target, url );
-        _response = response;
+        _response = (ServletUnitHttpResponse) response;
     }
 
 

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -34,6 +34,8 @@ import javax.servlet.ServletException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.meterware.httpunit.*;
 
@@ -71,7 +73,10 @@ public class ServletRunner {
     }
 
 
-    private Servlet getServlet( URL url ) {
+//-------------------------------- package methods -------------------------------------
+
+
+    Servlet getServlet( URL url ) {
         String className = (String) _servlets.get( getServletName( url.getFile() ) );
         if (className == null) throw new HttpNotFoundException( url.toExternalForm() );
 
@@ -91,6 +96,21 @@ public class ServletRunner {
     }
 
 
+    ServletUnitContext getContext() {
+        return _context;
+    }
+
+
+//---------------------------- private members ------------------------------------
+
+
+    /** A mapping of resource names to servlet class names. **/
+    Hashtable _servlets = new Hashtable();
+
+    ServletUnitClient  _client = new ServletUnitClient( this );
+    ServletUnitContext _context = new ServletUnitContext();
+
+
     private String getServletName( String urlFile ) {
         if (urlFile.indexOf( '?' ) < 0) {
             return urlFile;
@@ -98,36 +118,6 @@ public class ServletRunner {
             return urlFile.substring( 0, urlFile.indexOf( '?' ) );
         }
     }
-
-
-    ServletUnitHttpResponse getServletResponse( WebRequest request, Cookie[] cookies ) throws MalformedURLException, IOException {
-        ServletUnitHttpRequest  servletRequest  = new ServletUnitHttpRequest( request, _context );
-        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
-        for (int i = 0; i < cookies.length; i++) servletRequest.addCookie( cookies[i] );
-
-        try {
-            HttpSession session = servletRequest.getSession( /* create */ false );
-            if (session != null) ((ServletUnitHttpSession) session).access();
-
-            Servlet servlet = getServlet( request.getURL() );
-            servlet.init( new ServletUnitServletConfig( servlet ) );
-            servlet.service( servletRequest, servletResponse );
-            session = servletRequest.getSession( /* create */ false );
-            if (session != null && session.isNew()) {
-                servletResponse.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, session.getId() ) );
-            }
-        } catch (ServletException e) {
-            throw new HttpInternalErrorException( request.getURL().toExternalForm() );
-        }
-        return servletResponse;
-    }
-
-
-//-------------------------------------- private members --------------------------------------------
-
-
-    /** A mapping of resource names to servlet class names. **/
-    Hashtable _servlets = new Hashtable();
 
 
     private String asResourceName( String rawName ) {
@@ -139,50 +129,4 @@ public class ServletRunner {
     }
 
 
-    ServletUnitClient  _client = new ServletUnitClient( this );
-    ServletUnitContext _context = new ServletUnitContext();
-
-
-
-}
-
-
-class ServletUnitClient extends WebClient {
-
-
-    ServletUnitClient( ServletRunner runner ) {
-        _runner = runner;
-    }
-
-
-    /**
-     * Creates a web response object which represents the response to the specified web request.
-     **/
-    protected WebResponse newResponse( WebRequest request ) throws MalformedURLException,IOException {
-        return new ServletUnitWebResponse( request.getTarget(), request.getURL(), _runner.getServletResponse( request, getCookies() ) );
-    }
-
-
-    private Cookie[] getCookies() {
-        String cookieHeader = (String) getHeaderFields().get( "Cookie" );
-        if (cookieHeader == null) return NO_COOKIES;
-        Vector cookies = new Vector();
-
-        StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
-        while (st.hasMoreTokens()) {
-            String name = st.nextToken();
-            if (st.hasMoreTokens()) {
-                String value = st.nextToken();
-                cookies.addElement( new Cookie( name, value ) );
-            }
-        }
-        Cookie[] results = new Cookie[ cookies.size() ];
-        cookies.copyInto( results );
-        return results;
-    }
-
-
-    private ServletRunner _runner;
-
-    final private static Cookie[] NO_COOKIES = new Cookie[0]; 
 }

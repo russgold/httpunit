@@ -76,9 +76,8 @@ public class WebResponse implements HTMLSegment {
 
     /**
      * Returns the target of the page.
-     * @exception SAXException thrown if there is an error parsing this response
      **/
-    public String getTarget() throws SAXException {
+    public String getTarget() {
         return _target;
     }
 
@@ -389,8 +388,8 @@ public class WebResponse implements HTMLSegment {
         if (i > -1) {
             String name = token.substring(0, i).trim();
             String value = stripQuote( token.substring( i+1, token.length() ).trim() );
-	    _newCookies.put( name, value );
-	}
+    	    _newCookies.put( name, value );
+    	}
     }
 
 
@@ -400,7 +399,7 @@ public class WebResponse implements HTMLSegment {
             return value.substring(1,value.length()-1);
         }
         return value;
-   }
+    }
 
 
     private void readContentTypeHeader() {

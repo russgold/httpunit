@@ -63,18 +63,8 @@ public class WebClient {
         if (request.getURLString().startsWith( "about:" )) return WebResponse.BLANK_RESPONSE;
 
         WebResponse response = newResponse( request );
-
-        validateHeaders( response );
-        updateCookies( response );
-        if (response.getHeaderField( "Location" ) != null) {
-            delay( HttpUnitOptions.getRedirectDelay() );
-            return getResponse( new RedirectWebRequest( request, 
-                                                        response.getHeaderField( "Location" ),
-                                                        request.getTarget() ) );
-        } else {
-            updateFrames( response );
-            return response;
-        }
+        updateClient( response );
+        return getFrameContents( request.getTarget() );
     }
 
 
@@ -220,6 +210,23 @@ public class WebClient {
     }
 
 
+    /**
+     * Updates this web client based on a received response. This includes updating
+     * cookies and frames.
+     **/
+    final
+    protected void updateClient( WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        validateHeaders( response );
+        updateCookies( response );
+        if (response.getHeaderField( "Location" ) == null) {
+            updateFrames( response );
+        } else {
+            delay( HttpUnitOptions.getRedirectDelay() );
+            getResponse( new RedirectWebRequest( response ) );
+        }
+    }
+
+
 //------------------------------------------ private members -------------------------------------
 
 
@@ -279,9 +286,10 @@ public class WebClient {
     }
 
     private void updateFrames( WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        removeSubFrames( response.getTarget() );
+        _frameContents.put( response.getTarget(), response );
+
         if (response.isHTML()) {
-            removeSubFrames( response.getTarget() );
-            _frameContents.put( response.getTarget(), response );
             createSubFrames( response.getTarget(), response.getFrameNames() );
             WebRequest[] requests = response.getFrameRequests();
             for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
@@ -316,8 +324,8 @@ public class WebClient {
 class RedirectWebRequest extends WebRequest {
 
 
-    RedirectWebRequest( WebRequest baseRequest, String relativeURL, String target ) throws MalformedURLException {
-        super( baseRequest, relativeURL, target );
+    RedirectWebRequest( WebResponse response ) throws MalformedURLException {
+        super( response.getURL(), response.getHeaderField( "Location" ), response.getTarget() );
     }
 
 
