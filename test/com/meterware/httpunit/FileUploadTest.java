@@ -75,7 +75,7 @@ public class FileUploadTest extends HttpUnitTest {
         WebResponse simplePage = wc.getResponse( request );
         WebRequest formSubmit = simplePage.getForms()[0].getRequest();
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "Parameters", "update=age&age=12", encoding.getText().trim() );
+        assertEqualQueries( "http://dummy?update=age&age=12", "http://dummy?" + encoding.getText().trim() );
     }
 
 

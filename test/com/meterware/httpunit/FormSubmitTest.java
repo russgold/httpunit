@@ -77,7 +77,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
-        assertEquals( getHostPath() + "/ask?age=12", request.getURL().toExternalForm() );
+        assertEqualQueries( getHostPath() + "/ask?age=12", request.getURL().toExternalForm() );
     }
 
 
@@ -226,13 +226,13 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest( form.getSubmitButton( "update", "name" ) );
-        assertEquals( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
+        assertEqualQueries( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
 
         request = form.getRequest( "update", "name" );
-        assertEquals( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
+        assertEqualQueries( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
 
         request = form.getRequest( "update" );
-        assertEquals( getHostPath() + "/ask?update=age&age=12", request.getURL().toExternalForm() );
+        assertEqualQueries( getHostPath() + "/ask?update=age&age=12", request.getURL().toExternalForm() );
     }
 
                               
@@ -290,50 +290,7 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
-    protected void assertEqualQueries( String query1, String query2 ) {
-        assertEquals( new QuerySpec( query1 ), new QuerySpec( query2 ) );
-    }
 
-
-    static class QuerySpec {
-        QuerySpec( String urlString ) {
-            if (urlString.indexOf( '?' ) < 0) {
-                _path = urlString;
-            } else {
-                _path = urlString.substring( 0, urlString.indexOf( '?' ) );
-            }
-            _fullString = urlString;
-            
-            StringTokenizer st = new StringTokenizer( urlString.substring( urlString.indexOf( '?' )+1 ), "&" );
-            while (st.hasMoreTokens()) _parameters.addElement( st.nextToken() );
-        }
-
-        public String toString() {
-            return _fullString;
-        }
-
-        public boolean equals( Object o ) {
-            return getClass().equals( o.getClass() ) && equals( (QuerySpec) o );
-        }
-
-        private String _path;
-        private String _fullString;
-        private Vector _parameters = new Vector();
-
-        private boolean equals( QuerySpec o ) {
-            if (!_path.equals( o._path )) {
-                return false;
-            } else if (_parameters.size() != o._parameters.size() ) {
-                return false;
-            } else {
-                for (Enumeration e = o._parameters.elements(); e.hasMoreElements();) {
-                    if (!_parameters.contains( e.nextElement() )) return false;
-                }
-                return true;
-            }
-        }
-    }
-                              
 //---------------------------------------------- private members ------------------------------------------------
 
 

@@ -6,6 +6,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.Enumeration;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 
@@ -66,6 +68,12 @@ class HttpUnitTest extends TestCase {
     }
 
 
+    protected void assertEqualQueries( String query1, String query2 ) {
+        assertEquals( new QuerySpec( query1 ), new QuerySpec( query2 ) );
+    }
+
+
+
     protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
         Vector expectedItems = new Vector();
         Vector foundItems    = new Vector();
@@ -109,5 +117,45 @@ class HttpUnitTest extends TestCase {
     private String _hostPath;
 
     private PseudoServer _server;
+
+    static class QuerySpec {
+        QuerySpec( String urlString ) {
+            if (urlString.indexOf( '?' ) < 0) {
+                _path = urlString;
+            } else {
+                _path = urlString.substring( 0, urlString.indexOf( '?' ) );
+            }
+            _fullString = urlString;
+
+            StringTokenizer st = new StringTokenizer( urlString.substring( urlString.indexOf( '?' )+ 1 ), "&" );
+            while (st.hasMoreTokens()) _parameters.addElement( st.nextToken() );
+	}
+
+	public String toString() {
+	    return _fullString;
+	}
+
+	public boolean equals( Object o ) {
+	    return getClass().equals( o.getClass() ) && equals( (QuerySpec) o );
+	}
+
+	private String _path;
+	private String _fullString;
+	private Vector _parameters = new Vector();
+
+	private boolean equals( QuerySpec o ) {
+	    if (!_path.equals( o._path )) {
+	        return false;
+	    } else if (_parameters.size() != o._parameters.size() ) {
+	        return false;
+	    } else {
+	        for (Enumeration e = o._parameters.elements(); e.hasMoreElements();) {
+	            if (!_parameters.contains( e.nextElement() )) return false;
+	        }
+	        return true;
+	    }
+	}
+    }
+
 
 }

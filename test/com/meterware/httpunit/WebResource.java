@@ -109,6 +109,12 @@ class WebResource {
     }
 
 
+    public String toString() {
+        return "WebResource [code=" + _responseCode + "; type = " + _contentType 
+	     + "; charset = " + _characterSet + "]\n" + _contents;
+    }
+
+
     private int     _responseCode;
     private boolean _sendCharacterSet;
     private String  _contents;

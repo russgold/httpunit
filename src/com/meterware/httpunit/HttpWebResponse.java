@@ -48,7 +48,10 @@ class HttpWebResponse extends WebResponse {
     HttpWebResponse( String target, URL url, URLConnection connection ) throws IOException {
         super( target, url );
         readHeaders( connection );
-        if (((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_OK) loadResponseText( url, connection );
+
+
+        if (_responseCode == HttpURLConnection.HTTP_OK) loadResponseText( url, connection );
+	if (connection instanceof HttpURLConnection) ((HttpURLConnection) connection).disconnect();
     }
 
 
@@ -115,18 +118,28 @@ class HttpWebResponse extends WebResponse {
     }
 
 
+    private int getResponseCode( String statusHeader ) {
+        StringTokenizer st = new StringTokenizer( statusHeader );
+	st.nextToken();
+	if (!st.hasMoreTokens()) {
+	    return HttpURLConnection.HTTP_OK;
+	} else try {
+	    return Integer.parseInt( st.nextToken() );
+	} catch (NumberFormatException e) {
+	    return HttpURLConnection.HTTP_INTERNAL_ERROR;
+	}
+    }
+
+
     private void readHeaders( URLConnection connection ) {
         loadHeaders( connection );
-        try {
-            if (connection instanceof HttpURLConnection) {
-                _responseCode = ((HttpURLConnection) connection).getResponseCode();
-            } else {
-                _responseCode = HttpURLConnection.HTTP_OK;
-                if (getContentType().startsWith( "text" )) {
-                    _headers.put( "Content-type".toUpperCase(), getContentType() + "; charset=" + _fileEncoding );
-                }
+        if (connection instanceof HttpURLConnection) {
+            _responseCode = getResponseCode( connection.getHeaderField(0) );
+        } else {
+            _responseCode = HttpURLConnection.HTTP_OK;
+            if (getContentType().startsWith( "text" )) {
+                _headers.put( "Content-type".toUpperCase(), getContentType() + "; charset=" + _fileEncoding );
             }
-        } catch (IOException e) {
         }
     }
 

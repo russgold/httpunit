@@ -46,6 +46,11 @@ public class PseudoServer {
                         _active = false;
                     }
                 }
+		try {
+                    if (_serverSocket != null) _serverSocket.close();
+                    _serverSocket = null;
+                } catch (IOException e) {
+                }
             }
         };
         t.start();
@@ -178,7 +183,9 @@ public class PseudoServer {
                     sendResponse( pw, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
                 } else if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     sendResponse( pw, resource.getResponseCode(), resource.getContents() );
-                } else {
+                    sendLine( pw, "" );
+	            pw.flush();
+		} else {
                     sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
                     sendLine( pw, "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
                     String[] headers = resource.getHeaders();
@@ -220,11 +227,17 @@ public class PseudoServer {
 
     private Dictionary readRequest( BufferedReader br ) throws IOException {
         Hashtable headers = new Hashtable();
+        String lastHeader = null;
 
         String header = br.readLine();
         while (header.length() > 0) {
-            headers.put( header.substring( 0, header.indexOf(':') ).toUpperCase(),
-                         header.substring( header.indexOf(':')+1 ).trim() );
+	    if (header.charAt(0) <= ' ') {
+	        if (lastHeader == null) continue;
+		headers.put( lastHeader, headers.get( lastHeader ) + header.trim() );
+	    } else {
+	        lastHeader = header.substring( 0, header.indexOf(':') ).toUpperCase();
+                headers.put( lastHeader, header.substring( header.indexOf(':')+1 ).trim() );
+	    }
             header = br.readLine();
         }
 
