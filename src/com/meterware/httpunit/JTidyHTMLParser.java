@@ -36,9 +36,9 @@ import java.io.UnsupportedEncodingException;
 class JTidyHTMLParser implements HTMLParser {
 
 
-    public void parse( HTMLPage page, URL baseURL, String pageText ) throws IOException, SAXException {
+    public void parse( HTMLPage page, URL pageURL, String pageText ) throws IOException, SAXException {
         try {
-            page.setRootNode( getParser( baseURL ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null ) );
+            page.setRootNode( getParser( pageURL ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null ) );
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException( "UTF-8 encoding failed" );
         }

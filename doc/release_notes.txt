@@ -20,6 +20,7 @@ Additions:
 
 Problems fixed:
     1. Table <th> elements were being handled *after* <td> elements in the same row
+    2. The <base> tag was not being used to find included scripts
 
 22-Nov-2002
 Notes:

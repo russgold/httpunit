@@ -28,7 +28,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -45,8 +44,8 @@ public class HTMLPage extends ParsedHTML {
     private Scriptable _scriptable;
 
 
-    HTMLPage( WebResponse response, URL url, String parentTarget, String characterSet ) throws IOException, SAXException {
-        super( response, url, parentTarget, null, characterSet );
+    HTMLPage( WebResponse response, URL baseURL, String baseTarget, String characterSet ) throws IOException, SAXException {
+        super( response, baseURL, baseTarget, null, characterSet );
     }
 
 
@@ -250,34 +249,8 @@ public class HTMLPage extends ParsedHTML {
 
 
 
-    public void parse( String text ) throws SAXException, IOException {
-        HttpUnitOptions.getHTMLParser().parse( this, getBaseURL(), text );
-        setBaseAttributes();
-    }
-
-
-//---------------------------------- private members --------------------------------
-
-
-    private void setBaseAttributes() {
-        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "base" );
-        if (nl.getLength() == 0) return;
-        try {
-            applyBaseAttributes( NodeUtils.getNodeAttribute( nl.item(0), "href" ),
-                                 NodeUtils.getNodeAttribute( nl.item(0), "target" ) );
-        } catch (MalformedURLException e) {
-            throw new RuntimeException( "Unable to set document base: " + e );
-        }
-    }
-
-
-    private void applyBaseAttributes( String baseURLString, String baseTarget ) throws MalformedURLException {
-        if (baseURLString.length() > 0) {
-            this.setBaseURL( new URL( baseURLString ) );
-        }
-        if (baseTarget.length() > 0) {
-            this.setBaseTarget( baseTarget );
-        }
+    public void parse( String text, URL pageURL ) throws SAXException, IOException {
+        HttpUnitOptions.getHTMLParser().parse( this, pageURL, text );
     }
 
 

@@ -21,24 +21,15 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.pseudoserver.HttpUserAgentTest;
 
-import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import java.util.Enumeration;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-
 /**
  * a base class for HttpUnit regression tests.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 abstract
 public class HttpUnitTest extends HttpUserAgentTest {
+
+    private boolean _showTestName;
 
 
     public HttpUnitTest( String name ) {
@@ -46,9 +37,16 @@ public class HttpUnitTest extends HttpUserAgentTest {
     }
 
 
+    public HttpUnitTest( String name, boolean showTestName ) {
+        super( name );
+        _showTestName = showTestName;
+    }
+
+
     public void setUp() throws Exception {
         super.setUp();
         HttpUnitOptions.reset();
+        if (_showTestName) System.out.println( "----------------------- " + getName() + " ------------------------");
     }
 
     static {

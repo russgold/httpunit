@@ -233,6 +233,17 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testIncludedFunctionWithBaseTag() throws Exception {
+        defineResource( "scripts/saycheese.js", "function sayCheese() { alert( \"Cheese!\" ); }" );
+        defineResource( "OnCommand.html", "<html><head><base href='" + getHostPath() + "/scripts/OnCommand.html'><script language='JavaScript' src='saycheese.js'>" +
+                                          "</script></head>" +
+                                          "<body onLoad='sayCheese()'></body>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
+    }
+
+
     public void testWindowOpen() throws Exception {
         defineResource( "Target.html", "You made it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +

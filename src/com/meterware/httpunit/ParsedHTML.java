@@ -331,32 +331,6 @@ class ParsedHTML {
     }
 
 
-//---------------------------------- protected members ------------------------------
-
-
-    /**
-     * Overrides the base URL for this HTML segment.
-     **/
-    protected void setBaseURL( URL baseURL ) {
-        _baseURL = baseURL;
-    }
-
-
-    /**
-     * Overrides the base target for this HTML segment.
-     **/
-    protected void setBaseTarget( String baseTarget ) {
-        _baseTarget = baseTarget;
-    }
-
-
-
-    protected Node getRootNode() {
-        if (_rootNode == null) throw new IllegalStateException( "The root node has not been specified" );
-        return _rootNode;
-    }
-
-
 //---------------------------------- package members --------------------------------
 
 
@@ -396,6 +370,14 @@ class ParsedHTML {
 
 
 //---------------------------------- private members --------------------------------
+
+
+    private Node getRootNode() {
+        if (_rootNode == null) throw new IllegalStateException( "The root node has not been specified" );
+        return _rootNode;
+    }
+
+
 
     /**
      * Returns true if the node is a link anchor node.

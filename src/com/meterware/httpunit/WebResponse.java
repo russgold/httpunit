@@ -28,6 +28,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
@@ -48,8 +49,11 @@ import org.xml.sax.SAXException;
  **/
 abstract
 public class WebResponse implements HTMLSegment, CookieSource {
-    private String _refreshHeader;
+
+    private String  _refreshHeader;
     private boolean _hasSubframes;
+    private URL     _baseURL;
+    private String  _baseTarget;
 
 
     /**
@@ -73,7 +77,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * Returns the URL which invoked this response.
      **/
     public URL getURL() {
-        return _url;
+        return _pageURL;
     }
 
 
@@ -655,12 +659,12 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
         public void setLocation( String relativeURL ) throws IOException, SAXException {
-            getWindow().getResponse( new GetMethodWebRequest( _url, relativeURL, _frameName ) );
+            getWindow().getResponse( new GetMethodWebRequest( _pageURL, relativeURL, _frameName ) );
         }
 
 
         public URL getURL() {
-            return WebResponse.this._url;
+            return WebResponse.this._pageURL;
         }
     }
 
@@ -681,8 +685,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
      **/
     protected WebResponse( WebClient client, String frameName, URL url ) {
         _client = client;
-        _url = url;
-        _frameName = frameName;
+        _baseURL = _pageURL = url;
+        _baseTarget = _frameName = frameName;
     }
 
 
@@ -800,7 +804,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
     // the following variables are essentially final; however, the JDK 1.1 compiler does not handle blank final variables properly with
     // multiple constructors that call each other, so the final qualifiers have been removed.
 
-    private URL    _url;
+    private URL    _pageURL;
 
     private String _frameName;
 
@@ -838,14 +842,21 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    private void readTags( byte[] rawMessage ) throws UnsupportedEncodingException {
+    private void readTags( byte[] rawMessage ) throws UnsupportedEncodingException, MalformedURLException {
         ByteTagParser parser = new ByteTagParser( rawMessage );
         ByteTag tag = parser.getNextTag();
         while (tag != null && !tag.getName().equalsIgnoreCase( "body" )) {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
+            if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
             if (tag.getName().equalsIgnoreCase( "frameset" )) _hasSubframes = true;
             tag = parser.getNextTag();
         }
+    }
+
+
+    private void processBaseTag( ByteTag tag ) throws MalformedURLException {
+        if (tag.getAttribute( "href" ) != null) _baseURL = new URL( tag.getAttribute( "href" ) );
+        if (tag.getAttribute( "target" ) != null) _baseTarget = tag.getAttribute( "target" );
     }
 
 
@@ -883,7 +894,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         if (splitIndex < 0) splitIndex = 0;
         try {
             _refreshDelay = Integer.parseInt( refreshHeader.substring( 0, splitIndex ) );
-            _refreshRequest = new GetMethodWebRequest( _url, getRefreshURL( refreshHeader.substring( splitIndex+1 ) ), _frameName );
+            _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( refreshHeader.substring( splitIndex+1 ) ), _frameName );
         } catch (NumberFormatException e) {
             _refreshDelay = 0;
             System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
@@ -958,8 +969,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
         if (_page == null) {
             try {
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
-                _page = new HTMLPage( this, _url, _frameName, getCharacterSet() );
-                _page.parse( getText() );
+                _page = new HTMLPage( this, _baseURL, _baseTarget, getCharacterSet() );
+                _page.parse( getText(), _pageURL );
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException( e.toString() );

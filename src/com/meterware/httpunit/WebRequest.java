@@ -252,7 +252,7 @@ public class WebRequest {
 
 
     public String toString() {
-        return getMethod() + " request for " + getURLString();
+        return getMethod() + " request for (" + getURLBase() + ") " + getURLString();
     }
 
 

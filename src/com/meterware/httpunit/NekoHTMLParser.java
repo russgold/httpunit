@@ -43,7 +43,7 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
 class NekoHTMLParser implements HTMLParser {
 
 
-    public void parse( HTMLPage page, URL baseURL, String pageText ) throws IOException, SAXException {
+    public void parse( HTMLPage page, URL pageURL, String pageText ) throws IOException, SAXException {
         try {
             DOMParser parser = DOMParser.newParser(page);
             parser.parse( new InputSource( new StringReader( pageText ) ) );
