@@ -571,7 +571,7 @@ public class WebClient {
     /**
      * Examines the headers in the response and throws an exception if appropriate.
      **/
-    private void validateHeaders( WebResponse response ) throws HttpException, IOException {
+    private void validateHeaders( WebResponse response ) throws HttpException {
         if (!getExceptionsThrownOnErrorStatus()) return;
 
         if (response.getHeaderField( "WWW-Authenticate" ) != null) {

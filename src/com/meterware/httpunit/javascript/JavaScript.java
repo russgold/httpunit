@@ -26,6 +26,7 @@ import com.meterware.httpunit.scripting.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.net.URL;
 
 import org.mozilla.javascript.*;
 import org.xml.sax.SAXException;
@@ -84,6 +85,7 @@ public class JavaScript {
             InvocationTargetException, ClassDefinitionException, PropertyException {
         ScriptableObject.defineClass( scope, Window.class );
         ScriptableObject.defineClass( scope, Document.class );
+        ScriptableObject.defineClass( scope, Location.class );
         ScriptableObject.defineClass( scope, Navigator.class );
         ScriptableObject.defineClass( scope, Screen.class );
         ScriptableObject.defineClass( scope, Link.class );
@@ -301,9 +303,10 @@ public class JavaScript {
 
     static public class Window extends JavaScriptEngine {
 
-        private Document  _document;
-        private Navigator _navigator;
-        private Screen    _screen;
+        private Document     _document;
+        private Navigator    _navigator;
+        private Location     _location;
+        private Screen       _screen;
         private ElementArray _frames;
 
 
@@ -354,9 +357,17 @@ public class JavaScript {
         }
 
 
+        public Location jsGet_location() {
+            return _location;
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
+
+            _location = (Location) Context.getCurrentContext().newObject( this, "Location" );
+            _location.setURL( ((WebResponse.Scriptable) scriptable).getURL() );
 
             _navigator = (Navigator) Context.getCurrentContext().newObject( this, "Navigator" );
             _navigator.setClientProperties( getDelegate().getClientProperties() );
@@ -499,6 +510,27 @@ public class JavaScript {
 
         private HTMLPage.Scriptable getDelegate() {
             return (HTMLPage.Scriptable) _scriptable;
+        }
+
+    }
+
+
+    static public class Location extends JavaScriptEngine {
+
+        private URL _url;
+
+        public String getClassName() {
+            return "Location";
+        }
+
+
+        public void setURL( URL url ) {
+            _url = url;
+        }
+
+
+        public String toString() {
+            return _url.toExternalForm();
         }
 
     }

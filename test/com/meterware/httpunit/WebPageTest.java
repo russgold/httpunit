@@ -26,6 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import java.io.*;
+import java.net.MalformedURLException;
 
 
 
@@ -43,6 +44,9 @@ public class WebPageTest extends HttpUnitTest {
 
 
     public static Test suite() {
+//        DefaultWebResponse blankResponse = new DefaultWebResponse( null, null, WebResponse.BLANK_HTML );
+//        HttpUnitOptions.getScriptingEngine().associate( blankResponse );
+
         return new TestSuite( WebPageTest.class );
     }
 

@@ -609,7 +609,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? null
                         : _window.getFrameContents( WebFrame.getParentFrameName( getFrameName() ) ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "location" )) {
-                return WebResponse.this._url.toExternalForm();
+                return getURL().toExternalForm();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
             } else if (propertyName.equalsIgnoreCase( "closed" )) {
@@ -650,6 +650,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
             } else {
                 super.set( propertyName, value );
             }
+        }
+
+
+        public URL getURL() {
+            return WebResponse.this._url;
         }
     }
 

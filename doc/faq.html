@@ -27,6 +27,10 @@
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
 <li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
+</ol><ol start=14>
+
+<LI><A HREF="#session">How can I see the servlet session between calls?</A></LI>
+<li><a href="#JSP">Can I use JSPs with ServletUnit?</a></li>
 </OL>
 
 
@@ -129,6 +133,31 @@ If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features
 If you call<blockquote><code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></blockquote>problems will
 recorded but will not throw exceptions.
 You can see the list of problems detected by calling<blockquote><code>HttpUnitOptions.getScriptErrorMessages();</code></blockquote>
+
+
+<h2>ServletUnit usage</h2>
+
+<A NAME="session"><h3>How can I see the servlet session between calls?</h3></A>
+Servlet session is maintained on the server. Therefore, if you want to do this, you must be using <a href="servletunit-intro.html">ServletUnit</a>.
+Once you have that working, you can get take advantage of the power of ServletUnit to get at internal values,
+using the <a href="api/com/meterware/servletunit/InvocationContext.html"><code>InvocationContext</code></a> object. For example,
+<pre><code>
+ServletUnitClient client = ...          // the client you have been using
+client.getResponse( servlet-url );      // invoke your servlet normally
+
+// now get an invocation context using the <i>same</i> URL used to invoke the servlet
+InvocationContext ic = client.newInvocationContext( servlet-url );
+// obain the session just used. Note: pass false to avoid creating it if it does not already exist
+HttpSession session = ic.getRequest().getSession( false );</code></pre>
+
+Now you can examine the contents of the session to see what the servlet left in it.
+
+<a name="JSP"><h3>Can I use JSPs with ServletUnit?</h3></a>
+Absolutely! But since you are now emulating the servlet environment, you will need to make sure that you have access
+to the relevant classes. By default, ServletUnit is configured to use Jasper, the JSP engine which is part of Tomcat.
+You will therefore need the Jasper jar in your classpath, along with any on which it depends.  Once you have done that,
+your JSPs should run, just as they would in Tomcat.
+
 
 </BODY></HTML>
 
