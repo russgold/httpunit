@@ -355,7 +355,11 @@ public class WebResponse implements HTMLSegment {
         if (isHTML()) {
             return (Document) getReceivedPage().getDOM();
         } else {
-            return getXMLDOM();
+            try {
+                return HttpUnitUtils.newParser().parse( new InputSource( new StringReader( getText() ) ) );
+            } catch (IOException e) {
+                throw new SAXException( e );
+            }
         }
     }
 
@@ -797,45 +801,6 @@ public class WebResponse implements HTMLSegment {
         return _page;
     }
 
-
-    private Document getXMLDOM() throws SAXException {
-        Document doc = null;
-
-        try {
-            Class parserClass = Class.forName("org.apache.xerces.parsers.DOMParser");
-            Constructor constructor = parserClass.getConstructor( null );
-            Object parser = constructor.newInstance( null );
-
-            Class[] parseMethodArgTypes = { InputSource.class };
-            Object[] parseMethodArgs = { new InputSource( new StringReader( getText() ) ) };
-            Method parseMethod = parserClass.getMethod( "parse", parseMethodArgTypes );
-            parseMethod.invoke( parser, parseMethodArgs );
-
-            Method getDocumentMethod = parserClass.getMethod( "getDocument", null );
-            doc = (Document)getDocumentMethod.invoke( parser, null );
-        } catch (IOException e) {
-            throw new SAXException( e );
-        } catch (InvocationTargetException ex) {
-            Throwable tex = ex.getTargetException();
-            if (tex  instanceof SAXException) {
-                throw (SAXException)tex;
-            } else if (tex instanceof IOException) {
-                throw new RuntimeException( tex.toString() );
-            } else {
-                throw new IllegalStateException( "unexpected exception" );
-            }
-        } catch (NoSuchMethodException ex) {
-            throw new IllegalStateException( "parse method not found" );
-        } catch (IllegalAccessException ex) {
-            throw new IllegalStateException( "parse method not public" );
-        } catch (InstantiationException ex) {
-            throw new IllegalStateException( "error instantiating parser" );
-        } catch (ClassNotFoundException ex) {
-            throw new IllegalStateException( "parser class not found" );
-        }
-
-        return doc;
-   }
 
     private static String _defaultEncoding;
 

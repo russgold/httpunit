@@ -16,7 +16,7 @@ Acknowledgements:
     Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces
 
 Additions:
-    1. ServletUnit can now use any jaxp-compliant parser
+    1. HttpUnit can now use any jaxp-compliant parser, rather than just xerces.
 
 30-Jan-2002
 Acknkowledgements:

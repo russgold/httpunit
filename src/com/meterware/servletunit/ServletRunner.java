@@ -35,10 +35,6 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.w3c.dom.Document;
@@ -61,8 +57,7 @@ public class ServletRunner {
      * Constructor which expects the full path to the web.xml for the application.
      **/
     public ServletRunner( String webXMLFileSpec ) throws IOException, SAXException {
-        DocumentBuilder parser = HttpUnitUtils.newParser();
-        _application = new WebApplication( parser.parse( webXMLFileSpec ) );
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ) );
     }
 
 
@@ -70,8 +65,7 @@ public class ServletRunner {
      * Constructor which expects an input stream containing the web.xml for the application.
      **/
     public ServletRunner( InputStream webXML ) throws IOException, SAXException {
-        DocumentBuilder parser = HttpUnitUtils.newParser();
-        _application = new WebApplication( parser.parse( new InputSource( webXML ) ) );
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( new InputSource( webXML ) ) );
     }
 
 
