@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001, Russell Gold.
+* Copyright (c) 2001-2002, Russell Gold.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,22 +19,25 @@ package com.meterware.httpunit.parsing;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.HttpUnitTest;
+import com.meterware.httpunit.HttpUnitOptions;
+import com.meterware.httpunit.WebConversation;
+import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.GetMethodWebRequest;
 
 import java.net.URL;
 import java.io.PrintWriter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import com.meterware.httpunit.parsing.JTidyPrintWriter;
-import com.meterware.httpunit.*;
 
 /**
  * Unit tests for valid HTML test.  This is using the JTidy callback feature.
  *
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class JTidyPrintWriterTest extends HttpUnitTest implements HtmlErrorListener {
+public class JTidyPrintWriterTest extends HttpUnitTest implements HTMLParserListener {
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run( suite() );
@@ -52,14 +55,14 @@ public class JTidyPrintWriterTest extends HttpUnitTest implements HtmlErrorListe
 
     public void setUp() throws Exception {
         super.setUp();
-        HttpUnitOptions.setParserWarningsEnabled(true);
-        HttpUnitOptions.addHtmlErrorListener(this);
+        HTMLParserFactory.setParserWarningsEnabled(true);
+        HTMLParserFactory.addHTMLParserListener(this);
     }
 
     public void tearDown() throws Exception {
         HttpUnitOptions.resetDefaultCharacterSet();
         HttpUnitOptions.setAutoRefresh( false );
-        HttpUnitOptions.removeHtmlErrorListener(this);
+        HTMLParserFactory.removeHTMLParserListener(this);
         super.tearDown();
     }
 

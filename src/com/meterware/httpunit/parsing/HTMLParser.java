@@ -56,4 +56,10 @@ public interface HTMLParser {
      * Returns true if this parser can return an HTMLDocument object.
      */
     public boolean supportsReturnHTMLDocument();
+
+
+    /**
+     * Returns true if this parser can display parser warnings.
+     */
+    public boolean supportsParserWarnings();
 }

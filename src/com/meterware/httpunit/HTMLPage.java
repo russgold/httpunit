@@ -260,12 +260,11 @@ public class HTMLPage extends ParsedHTML {
     }
 
 
-
     public void parse( String text, URL pageURL ) throws SAXException, IOException {
         HTMLParserFactory.getHTMLParser().parse( pageURL, text, new DocumentAdapter() {
             public void setRootNode( Node rootNode ) { HTMLPage.this.setRootNode( rootNode ); }
             public String getIncludedScript( String srcAttribute ) throws IOException { return HTMLPage.this.getIncludedScript( srcAttribute ); }
-            public Scriptable getScriptableObject() { return HTMLPage.this.getScriptableObject(); }
+            public ScriptableDelegate getScriptableObject() { return HTMLPage.this.getScriptableObject().getParent(); }
         });
     }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001, Russell Gold
+* Copyright (c) 2001-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,24 +19,17 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
+import com.meterware.httpunit.parsing.HTMLParserListener;
 
 /**
  * This interface represents a listener which can receive notification of errors and warnings during the parsing
  * of an HTML page.
  *
+ * @deprecated as of 1.5.2, use HTMLParserListener
+ *
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface HtmlErrorListener {
+public interface HtmlErrorListener extends HTMLParserListener {
 
-    /**
-     * callback for HTML warning.
-     **/
-    public void warning( URL url, String msg, int line, int column );
-
-    /**
-     * callback for HTML errors.
-     **/
-    public void error( URL url, String msg, int line, int column );
 }

@@ -19,37 +19,33 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-
-import org.w3c.dom.Node;
-
-import java.io.IOException;
-
+import java.net.URL;
 
 /**
+ * A listener for messages from the HTMLParser. This provides a mechanism to watch for errors and warnings generated
+ * during parsing.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
-public interface DocumentAdapter {
+public interface HTMLParserListener {
+
+    /**
+     * Invoked when the parser wishes to report a warning.
+     * @param url    the location of the document to which the warning applies.
+     * @param msg    the warning message
+     * @param line   the line in the document on which the problematic HTML was found
+     * @param column the column in the document on which the problematic HTML was found
+     */
+    void warning( URL url, String msg, int line, int column );
 
 
     /**
-     * Records the root (Document) node.
+     * Invoked when the parser wishes to report an error.
+     * @param url    the location of the document to which the error applies.
+     * @param msg    the warning message
+     * @param line   the line in the document on which the problematic HTML was found
+     * @param column the column in the document on which the problematic HTML was found
      */
-    public void setRootNode( Node rootNode );
-
-
-    /**
-     * Returns the contents of an included script, given its src attribute.
-     * @param srcAttribute the relative URL for the included script
-     * @return the contents of the script.
-     * @throws java.io.IOException if there is a problem retrieving the script
-     */
-    public String getIncludedScript( String srcAttribute ) throws IOException;
-
-
-    /**
-     * Returns the Scriptable object associated with the document
-     */
-    public ScriptableDelegate getScriptableObject();
+    void error( URL url, String msg, int line, int column );
 }

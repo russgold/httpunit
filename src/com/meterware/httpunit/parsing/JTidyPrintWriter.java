@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001, Russell Gold
+* Copyright (c) 2001-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,9 +19,6 @@ package com.meterware.httpunit.parsing;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.HttpUnitOptions;
-import com.meterware.httpunit.HtmlErrorListener;
-
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import java.io.PrintWriter;
@@ -201,17 +198,17 @@ class JTidyPrintWriter extends PrintWriter {
     }
 
     private void reportError( String msg, int line, int column ) {
-        Enumeration enum = HttpUnitOptions.getHtmlErrorListeners().elements();
+        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
         while (enum.hasMoreElements()) {
-            ((HtmlErrorListener) enum.nextElement()).error( _url, msg, line, column );
+            ((HTMLParserListener) enum.nextElement()).error( _url, msg, line, column );
         }
     }
 
 
     private void reportWarning( String msg, int line, int column ) {
-        Enumeration enum = HttpUnitOptions.getHtmlErrorListeners().elements();
+        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
         while (enum.hasMoreElements()) {
-            ((HtmlErrorListener) enum.nextElement()).warning( _url, msg, line, column );
+            ((HTMLParserListener) enum.nextElement()).warning( _url, msg, line, column );
         }
     }
 }

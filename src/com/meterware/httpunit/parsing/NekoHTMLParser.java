@@ -70,6 +70,11 @@ class NekoHTMLParser implements HTMLParser {
     }
 
 
+    public boolean supportsParserWarnings() {
+        return false;
+    }
+
+
     final private static char NBSP = (char) 160;   // non-breaking space, defined by nekoHTML
 }
 
@@ -85,10 +90,10 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
     protected static final String FILTERS = "http://cyberneko.org/html/properties/filters";
 
     /** Element case settings. possible values: "upper", "lower", "match" */
-    protected static final String ELEMS = "http://cyberneko.org/html/properties/names/elems";
+    protected static final String TAG_NAME_CASE = "http://cyberneko.org/html/properties/names/elems";
 
     /** Attribute case settings. possible values: "upper", "lower", "no-change" */
-    protected static final String ATTRS = "http://cyberneko.org/html/properties/names/attrs";
+    protected static final String ATTRIBUTE_NAME_CASE = "http://cyberneko.org/html/properties/names/attrs";
 
 
     private DocumentAdapter _documentAdapter;
@@ -101,8 +106,8 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
         final ScriptFilter javaScriptFilter = new ScriptFilter( configuration );
         configuration.setProperty( FILTERS, new XMLDocumentFilter[] { javaScriptFilter } );
         if (HTMLParserFactory.isPreserveTagCase()) {
-            configuration.setProperty( ELEMS, "match" );
-            configuration.setProperty( ATTRS, "no-change" );
+            configuration.setProperty( TAG_NAME_CASE, "match" );
+            configuration.setProperty( ATTRIBUTE_NAME_CASE, "no-change" );
         }
 
         try {
@@ -125,7 +130,7 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
             Node node = getCurrentElementNode();
             while (!(node instanceof Document)) node = node.getParentNode();
             _documentAdapter.setRootNode( node );
-            _scriptableObject = _documentAdapter.getScriptableObject().getParent();
+            _scriptableObject = _documentAdapter.getScriptableObject();
         }
         return _scriptableObject;
     }

@@ -21,6 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
+import com.meterware.httpunit.parsing.HTMLParserListener;
+import com.meterware.httpunit.parsing.HTMLParserFactory;
 
 import java.util.Vector;
 
@@ -40,7 +42,7 @@ public abstract class HttpUnitOptions {
      *  Resets all options to their default values.
      */
     public static void reset() {
-        _parserWarningsEnabled = false;
+        HTMLParserFactory.reset();
         _exceptionsOnErrorStatus = true;
         _parameterValuesValidated = true;
         _imagesTreatedAsAltText = false;
@@ -182,9 +184,19 @@ public abstract class HttpUnitOptions {
 
     /**
      * Returns true if parser warnings are enabled.
+     * @deprecated as of 1.5.2, use HTMLParserFactory#isParserWarningsEnabled
      **/
     public static boolean getParserWarningsEnabled() {
-        return _parserWarningsEnabled;
+        return HTMLParserFactory.isParserWarningsEnabled();
+    }
+
+
+    /**
+     * If true, tells the parser to display warning messages. The default is false (warnings are not shown).
+     * @deprecated as of 1.5.2, use HTMLParserFactory#setParserWarningsEnabled
+     **/
+    public static void setParserWarningsEnabled( boolean enabled ) {
+        HTMLParserFactory.setParserWarningsEnabled( enabled );
     }
 
 
@@ -202,14 +214,6 @@ public abstract class HttpUnitOptions {
      **/
     public static boolean getExceptionsThrownOnErrorStatus() {
         return _exceptionsOnErrorStatus;
-    }
-
-
-    /**
-     * If true, tells the parser to display warning messages. The default is false (warnings are not shown).
-     **/
-    public static void setParserWarningsEnabled( boolean enabled ) {
-        _parserWarningsEnabled = enabled;
     }
 
 
@@ -341,25 +345,29 @@ public abstract class HttpUnitOptions {
         _autoRefresh = autoRefresh;
     }
 
+
     /**
      * Remove an Html error listener.
+     * @deprecated as of 1.5.2, use HTMLParserfactory#removeHTMLParserListener
      **/
-    public static void removeHtmlErrorListener(HtmlErrorListener el) {
-        _listeners.removeElement(el);
+    public static void removeHtmlErrorListener(HTMLParserListener el) {
+        HTMLParserFactory.removeHTMLParserListener( el );
     }
 
     /**
      * Add an Html error listener.
+     * @deprecated as of 1.5.2, use HTMLParserfactory#addHTMLParserListener
      **/
-    public static void addHtmlErrorListener(HtmlErrorListener el) {
-        _listeners.addElement(el);
+    public static void addHtmlErrorListener(HTMLParserListener el) {
+        HTMLParserFactory.addHTMLParserListener( el );
     }
 
     /**
      * Get the list of Html Error Listeners
+     * @deprecated as of 1.5.2, removed with no replacement
      **/
     public static Vector getHtmlErrorListeners() {
-        return _listeners;
+        return null;
     }
 
 
@@ -470,8 +478,6 @@ public abstract class HttpUnitOptions {
 
     private static boolean _acceptCookies = true;
 
-    private static boolean _parserWarningsEnabled;
-
     private static boolean _exceptionsOnErrorStatus = true;
 
     private static boolean _parameterValuesValidated = true;
@@ -496,8 +502,6 @@ public abstract class HttpUnitOptions {
 
     private static String _contentType = DEFAULT_CONTENT_TYPE;
 
-    private static Vector _listeners;
-
     private static String _scriptEngineClassName;
 
     private static ScriptingEngineFactory _scriptingEngine;
@@ -508,7 +512,6 @@ public abstract class HttpUnitOptions {
 
 
     static {
-        _listeners = new Vector();
         reset();
 
     }

@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 
-import com.meterware.httpunit.parsing.HTMLParser;
-import com.meterware.httpunit.HttpUnitOptions;
-
 
 /**
  *
@@ -62,6 +59,11 @@ class JTidyHTMLParser implements HTMLParser {
     }
 
 
+    public boolean supportsParserWarnings() {
+        return true;
+    }
+
+
     final private static char NBSP = (char) 160;   // non-breaking space, defined by JTidy
 
     final private static String UTF_ENCODING = "UTF-8";
@@ -71,9 +73,9 @@ class JTidyHTMLParser implements HTMLParser {
         Tidy tidy = new Tidy();
         tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
         tidy.setQuiet( true );
-        tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
-        if (!HttpUnitOptions.getHtmlErrorListeners().isEmpty()) {
-            tidy.setErrout(new JTidyPrintWriter( url ));
+        tidy.setShowWarnings( HTMLParserFactory.isParserWarningsEnabled() );
+        if (!HTMLParserFactory.getHTMLParserListeners().isEmpty()) {
+            tidy.setErrout( new JTidyPrintWriter( url ) );
         }
         return tidy;
     }

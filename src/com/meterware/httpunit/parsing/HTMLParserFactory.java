@@ -19,10 +19,11 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.parsing.HTMLParser;
+import java.util.Vector;
+
 
 /**
- * Factory for creating HTML parsers. Parsers customization properties can be specified but do not necessarily work
+ * Factory for creating HTML parsers. Parser customization properties can be specified but do not necessarily work
  * for every parser type.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -30,12 +31,25 @@ import com.meterware.httpunit.parsing.HTMLParser;
  **/
 abstract public class HTMLParserFactory {
 
-    private static HTMLParser _htmlParser;
+    private static Vector     _listeners = new Vector();
     private static HTMLParser _jtidyParser;
     private static HTMLParser _nekoParser;
 
-    private static boolean _preserveTagCase = false;
-    private static boolean _returnHTMLDocument = true;
+    private static HTMLParser _htmlParser;
+    private static boolean    _preserveTagCase;
+    private static boolean    _returnHTMLDocument;
+    private static boolean    _parserWarningsEnabled;
+
+
+    /**
+     * Resets all settings to their default values. This includes the parser selection.
+     */
+    public static void reset() {
+        _preserveTagCase = false;
+        _returnHTMLDocument = true;
+        _parserWarningsEnabled = false;
+        _htmlParser = null;
+    }
 
 
     /**
@@ -119,9 +133,46 @@ abstract public class HTMLParserFactory {
     }
 
 
-    static {
-        _jtidyParser = loadParserIfSupported( "org.w3c.tidy.Parser", "com.meterware.httpunit.parsing.JTidyHTMLParser" );
-        _nekoParser  = loadParserIfSupported( "org.cyberneko.html.HTMLConfiguration", "com.meterware.httpunit.parsing.NekoHTMLParser" );
+    /**
+     * Returns true if parser warnings are enabled.
+     **/
+    public static boolean isParserWarningsEnabled() {
+        return _parserWarningsEnabled && getHTMLParser().supportsParserWarnings();
+    }
+
+
+    /**
+     * If true, tells the parser to display warning messages. The default is false (warnings are not shown).
+     **/
+    public static void setParserWarningsEnabled( boolean enabled ) {
+        _parserWarningsEnabled = enabled;
+    }
+
+
+    /**
+     * Remove an HTML Parser listener.
+     **/
+    public static void removeHTMLParserListener( HTMLParserListener el ) {
+        _listeners.removeElement( el );
+    }
+
+
+    /**
+     * Add an HTML Parser listener.
+     **/
+    public static void addHTMLParserListener( HTMLParserListener el ) {
+        _listeners.addElement( el );
+    }
+
+
+//------------------------------------- package protected members ------------------------------------------------------
+
+
+    /**
+     * Get the list of Html Error Listeners
+     **/
+    static Vector getHTMLParserListeners() {
+        return _listeners;
     }
 
 
@@ -137,8 +188,11 @@ abstract public class HTMLParserFactory {
     }
 
 
-    public static void reset() {
-        _preserveTagCase = false;
-        _returnHTMLDocument = true;
+    static {
+        _jtidyParser = loadParserIfSupported( "org.w3c.tidy.Parser", "com.meterware.httpunit.parsing.JTidyHTMLParser" );
+        _nekoParser  = loadParserIfSupported( "org.cyberneko.html.HTMLConfiguration", "com.meterware.httpunit.parsing.NekoHTMLParser" );
+        reset();
     }
+
+
 }
