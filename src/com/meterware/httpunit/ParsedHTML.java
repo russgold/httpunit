@@ -19,12 +19,12 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.net.URL;
-
-import java.util.Vector;
 import java.util.ArrayList;
-
-import org.w3c.dom.*;
 
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -32,8 +32,17 @@ import org.w3c.dom.*;
  **/
 class ParsedHTML {
 
+    private Node _rootNode;
+
+    private URL _baseURL;
+
+    private String _baseTarget;
+
+    private String _characterSet;
+
     private WebForm[]    _forms;
     private WebImage[]   _images;
+    private WebLink[]    _links;
     private WebResponse  _response;
 
 
@@ -64,7 +73,6 @@ class ParsedHTML {
 
     /**
      * Returns the form found in the page with the specified ID.
-     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebForm getFormWithID( String ID ) {
         WebForm[] forms = getForms();
@@ -78,8 +86,7 @@ class ParsedHTML {
 
     /**
      * Returns the form found in the page with the specified name.
-     * @exception SAXException thrown if there is an error parsing the response.
-     **/
+      **/
     public WebForm getFormWithName( String name ) {
         WebForm[] forms = getForms();
         for (int i = 0; i < forms.length; i++) {
@@ -300,7 +307,6 @@ class ParsedHTML {
 
     /**
      * Returns the domain object model associated with this page, to be used internally.
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     Node getOriginalDOM() {
         return _rootNode;
@@ -352,22 +358,6 @@ class ParsedHTML {
 
 
 //---------------------------------- private members --------------------------------
-
-    private Node _rootNode;
-
-    private WebLink[] _links;
-
-    private URL _baseURL;
-
-    private String _baseTarget;
-
-    private String _characterSet;
-
-
-    private String getValue( Node node ) {
-        return (node == null) ? "" : node.getNodeValue();
-    }
-
 
     /**
      * Returns true if the node is a link anchor node.

@@ -11,6 +11,9 @@ Limitations:
 
 Revision History:
 22-Oct-22
+Acknowledgements:
+    Thanks to Troy Waldrep for help with the new handling of response statuses and messages.
+
 Problems fixed:
     1. A bad certificate on an https connection was incorrectly being flagged as a no-such-server exception. This
        is fixed on JDK 1.4, due to a correct in the JDK. On previous versions of the JDK, HttpUnit is using a

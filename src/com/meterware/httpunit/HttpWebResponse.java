@@ -133,7 +133,7 @@ class HttpWebResponse extends WebResponse {
 
 
     private void readResponseHeader( HttpURLConnection connection ) throws IOException {
-        if (needStatusWorkaround()) {
+        if (!needStatusWorkaround()) {
             _responseCode = connection.getResponseCode();
             _responseMessage = connection.getResponseMessage();
         } else {
