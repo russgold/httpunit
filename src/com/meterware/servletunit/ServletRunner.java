@@ -132,6 +132,15 @@ public class ServletRunner {
 
 
     /**
+     * Returns the value of the named context parameter found in the application definition.
+     */
+    public String getContextParameter( String name ) {
+        Object value = _application.getContextParameters().get( name );
+        return value == null ? null : value.toString();
+    }
+
+
+    /**
      * Shuts down the servlet container, returning any resources held by it.
      * Calls the destroy method of each active servlet.
      */

@@ -139,6 +139,7 @@ public class WebXMLTest extends TestCase {
 
         ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient client = sr.newClient();
+        assertEquals( "Context parameter 'icecream'", "vanilla", sr.getContextParameter( "icecream" ) );
         InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
 
         javax.servlet.ServletContext sc = ((HttpServlet) ic.getServlet()).getServletContext();

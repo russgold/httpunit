@@ -18,6 +18,10 @@ Additions:
     1. A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
     2. It is now possible to define a CookieListener on CookieProperties to watch for cookie rejection events
 
+ 4-Jun-2003
+Additions:
+    1. You can now get the value of context parameters from a ServletRunner via the getContextParameter method
+
 23-May-2002
 Problems fixed:
     1. bug #721989: scripts did not see id attributes of form controls.
