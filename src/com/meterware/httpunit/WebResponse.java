@@ -871,10 +871,10 @@ class ByteTag {
         String token = nextToken();
         while (token.length() != 0) {
             if (token.equals( "=" ) && attribute.length() != 0) {
-                _attributes.put( attribute.toLowerCase(), nextToken() );
+                getAttributes().put( attribute.toLowerCase(), nextToken() );
                 attribute = "";
             } else {
-                if (attribute.length() > 0) _attributes.put( attribute.toLowerCase(), "" );
+                if (attribute.length() > 0) getAttributes().put( attribute.toLowerCase(), "" );
                 attribute = token;
             }
             token = nextToken();
@@ -887,15 +887,22 @@ class ByteTag {
     }
 
     public String getAttribute( String attributeName ) {
-        return (String) _attributes.get( attributeName );
+        return (String) getAttributes().get( attributeName );
     }
 
     public String toString() {
         return "ByteTag[ name=" + _name + ";attributes = " + _attributes + ']';
     }
 
+
+    private Hashtable getAttributes() {
+        if (_attributes == null) _attributes = new Hashtable();
+        return _attributes;
+    }
+
+
     private String _name = "";
-    private Hashtable _attributes = new Hashtable();
+    private Hashtable _attributes;
 
 
     private char[] _buffer;
