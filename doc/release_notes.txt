@@ -11,6 +11,12 @@ Limitations:
 
 
 Revision History:
+21-Jan-2002
+Additions:
+    1. MessageBodyWebRequest's constructors and inner class are now public, allowing outside code to create new request classes.
+    2. ServletUnit now supports creating a RequestDispatcher from ServletContext to forward to other servlets.
+       Support for this is rudimentary at present: query parameters on the request dispatcher create are ignored.
+
 17-Jan-2002
 Problems fixed:
     1. Link parameters are now sent in the proper order, as long as parameter validation is not turned off.

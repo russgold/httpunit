@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001, Russell Gold
+ * Copyright (c) 2001-2002, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -98,7 +98,7 @@ class WebApplication {
             if (!Servlet.class.isAssignableFrom( servletClass )) throw new HttpInternalErrorException( url );
 
             Servlet servlet = (Servlet) servletClass.newInstance();    // XXX cache instances - by class?
-            servlet.init( new ServletUnitServletConfig( servlet, configuration.getInitParams() ) );
+            servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams() ) );
             return servlet;
         } catch (ClassNotFoundException e) {
             throw new HttpNotFoundException( url, e );

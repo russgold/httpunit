@@ -1,5 +1,4 @@
 High Priority
-o Prevent setParameter calls from working on requests built from links if validation is enabled
 o Handle frames with the same name as one of their ancestors - fix both removal and lookup
 
 Medium priority:

@@ -405,6 +405,17 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
 //---------------------------------------------- package methods --------------------------------------------------
 
+    /**
+     * Clears all headers and content.
+     */
+    void restartResponse() {
+        _headers = new Hashtable();
+        _headersComplete = false;
+        _outputStream = null;
+        _servletStream = null;
+        _status = SC_OK;
+        _writer = null;
+    }
 
     /**
      * Returns the content type defined for this response.

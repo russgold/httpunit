@@ -63,6 +63,20 @@ public class NavigationTest extends TestCase {
     }
 
 
+    public void testForward() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "target", TargetServlet.class.getName() );
+        sr.registerServlet( "origin", FowarderServlet.class.getName() );
+
+        WebClient wc = sr.newClient();
+        WebResponse response = wc.getResponse( "http://localhost/origin" );
+        assertNotNull( "No response received", response );
+        assertEquals( "requested resource", TargetServlet.RESPONSE_TEXT, response.getText() );
+        assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
+
+
+
 
 
     static class OriginServlet extends HttpServlet {
@@ -70,6 +84,26 @@ public class NavigationTest extends TestCase {
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
             resp.setContentType( "text/plain" );
             resp.sendRedirect( "http://localhost/target" );
+        }
+
+    }
+
+
+    static class FowarderServlet extends HttpServlet {
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
+            getServletContext().getRequestDispatcher( "/target" ).forward( req, resp );
+        }
+
+    }
+
+
+    static class IncluderServlet extends HttpServlet {
+        static final String PREFIX = "expecting: ";
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
+            resp.getOutputStream().print( PREFIX );
+            getServletContext().getRequestDispatcher( "/target" ).include( req, resp );
         }
 
     }

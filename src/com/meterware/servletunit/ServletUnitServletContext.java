@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -23,6 +23,7 @@ package com.meterware.servletunit;
 import java.io.IOException;
 
 import java.net.URL;
+import java.net.MalformedURLException;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -38,6 +39,11 @@ import javax.servlet.*;
  **/
 class ServletUnitServletContext implements ServletContext {
 
+    public ServletUnitServletContext( WebApplication application ) {
+        _application = application;
+    }
+
+
     /**
      * Returns a ServletContext object that corresponds to a specified URL on the server. 
      * <p>
@@ -48,7 +54,7 @@ class ServletUnitServletContext implements ServletContext {
      * In a security conscious environment, the servlet container may return null for a given URL.
      **/
     public javax.servlet.ServletContext getContext(java.lang.String A) {
-        throw new RuntimeException( "getContext not implemented" );
+        return null;
     }
 
 
@@ -132,7 +138,13 @@ class ServletUnitServletContext implements ServletContext {
      * RequestDispatcher.
      **/
     public javax.servlet.RequestDispatcher getRequestDispatcher( String path ) {
-        return null;   // XXX not implemented
+        try {
+            return new RequestDispatcherImpl( _application.getServlet( new URL( "http", "localhost", path ) ) );
+        } catch (ServletException e) {
+            return null;
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 
 
@@ -317,5 +329,7 @@ class ServletUnitServletContext implements ServletContext {
 //------------------------------------------- private members ----------------------------------------------------
 
     private final static Vector EMPTY_VECTOR = new Vector();
-    private Hashtable _attributes = new Hashtable();
+
+    private Hashtable      _attributes = new Hashtable();
+    private WebApplication _application;
 }

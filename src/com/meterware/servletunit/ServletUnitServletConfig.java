@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -33,14 +33,10 @@ import javax.servlet.ServletContext;
 class ServletUnitServletConfig implements ServletConfig {
 
 
-    ServletUnitServletConfig( Servlet servlet ) {
-        this( servlet, NO_PARAMS );
-    }
-
-
-    ServletUnitServletConfig( Servlet servlet, Hashtable initParams ) {
+    ServletUnitServletConfig( Servlet servlet, WebApplication application, Hashtable initParams ) {
         _name = servlet.getClass().getName();
         _initParameters = initParams;
+        _context = new ServletUnitServletContext( application );
     }
 
 
@@ -82,11 +78,9 @@ class ServletUnitServletConfig implements ServletConfig {
 //----------------------------------------------- private members ------------------------------------------------------
 
 
-    private final static Hashtable NO_PARAMS = new Hashtable();
-
     private String _name;
 
-    private Hashtable _initParameters;
+    private final Hashtable _initParameters;
 
-    private ServletContext _context = new ServletUnitServletContext();
+    private final ServletContext _context;
 }
