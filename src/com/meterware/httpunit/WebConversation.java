@@ -55,7 +55,8 @@ public class WebConversation extends WebClient {
      **/
     protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException, IOException {
         URLConnection connection = openConnection( getRequestURL( request ) );
-	    sendHeaders( connection, request.getHeaderDictionary() );
+        sendHeaders( connection, getHeaderFields( request.getURL() ) );
+        sendHeaders( connection, request.getHeaderDictionary() );
         request.completeRequest( connection );
         return new HttpWebResponse( this, frameName, request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
     }
@@ -80,13 +81,7 @@ public class WebConversation extends WebClient {
         URLConnection connection = url.openConnection();
         if (connection instanceof HttpURLConnection) ((HttpURLConnection) connection).setInstanceFollowRedirects( false );
         connection.setUseCaches( false );
-        sendHeaders( connection );
         return connection;
-    }
-
-
-    private void sendHeaders( URLConnection connection ) {
-        sendHeaders( connection, getHeaderFields( connection.getURL() ) );
     }
 
 

@@ -350,12 +350,25 @@ public class WebClientTest extends HttpUnitTest {
 
         defineResource( "whereAmI", new PseudoServlet() {
             public WebResource getGetResponse() throws IOException {
-                return new WebResource( "found host header: " + getHeader( "Host" ) );
+                WebResource webResource = new WebResource( "found host header: " + getHeader( "Host" ) );
+                webResource.addHeader( "Set-Cookie: type=short" );
+                return webResource;
             }
         } );
 
+        defineResource( "checkCookies", new PseudoServlet() {
+            public WebResource getGetResponse() throws IOException {
+                return new WebResource( "found cookies: " + getHeader( "Cookie" ) );
+            }
+        } );
+
+
         WebResponse wr = wc.getResponse( "http://meterware.com:" + getHostPort() + "/whereAmI" );
         assertEquals( "Submitted host header", "found host header: meterware.com:" + getHostPort(), wr.getText() );
+        assertEquals( "Returned cookie 'type'", "short", wc.getCookieValue( "type" ) );
+
+        wr = wc.getResponse( "http://meterware.com:" + getHostPort() + "/checkCookies" );
+        assertEquals( "Submitted cookie header", "found cookies: type=short", wr.getText() );
     }
 
 
