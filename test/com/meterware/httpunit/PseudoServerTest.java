@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -195,6 +195,7 @@ public class PseudoServerTest extends HttpUnitTest {
         PseudoServer ps = new PseudoServer();
         int port = ps.getConnectedPort();
         ps.setResource( resourceName, resourceValue );
+        ps.addResourceHeader( resourceName, "Set-Cookie: HSBCLoginFailReason=; path=/" );
         ps.addResourceHeader( resourceName, "Set-Cookie: age=12, name= george" );
         ps.addResourceHeader( resourceName, "Set-Cookie: type=short" );
         ps.addResourceHeader( resourceName, "Set-Cookie: funky=ab$==" );
@@ -207,7 +208,8 @@ public class PseudoServerTest extends HttpUnitTest {
             WebResponse response = wc.getResponse( request );
             assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
-            assertEquals( "number of cookies", 7, wc.getCookieNames().length );
+            assertEquals( "number of cookies", 8, wc.getCookieNames().length );
+            assertEquals( "cookie 'HSBCLoginFailReason' value", "", wc.getCookieValue( "HSBCLoginFailReason" ) );
             assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
             assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
             assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );

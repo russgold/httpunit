@@ -13,6 +13,9 @@ Limitations:
 
 
 Revision History:
+10-Jan-2002
+    1. Empty cookies were not being recognized.
+
 12-Dec-2001
 
 Problems fixed:

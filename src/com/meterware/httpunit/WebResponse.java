@@ -651,10 +651,12 @@ public class WebResponse implements HTMLSegment {
                 tokensToAdd = "";
             } else {
                 tokensToAdd = token + tokensToAdd;
-                String preceedingToken = (String) tokens.elementAt( i - 1 );
-                char lastChar = preceedingToken.charAt( preceedingToken.length() - 1 );
-                if (lastChar != '=') {
-                    tokensToAdd = "," + tokensToAdd;
+                if (i > 0) {
+                    String preceedingToken = (String) tokens.elementAt( i - 1 );
+                    char lastChar = preceedingToken.charAt( preceedingToken.length() - 1 );
+                    if (lastChar != '=') {
+                        tokensToAdd = "," + tokensToAdd;
+                    }
                 }
             }
         }
@@ -667,10 +669,10 @@ public class WebResponse implements HTMLSegment {
      * part of a Base64-encoded value.
      */
     private int getEqualsIndex( String token ) {
-        if (!token.endsWith( "=" )) {
+        if (!token.endsWith( "==" )) {
             return token.indexOf( '=' );
         } else {
-            return getEqualsIndex( token.substring( 0, token.length()-1 ) );
+            return getEqualsIndex( token.substring( 0, token.length()-2 ) );
         }
     }
 
@@ -711,8 +713,7 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    private boolean isCookieAttribute( String string,
-                                             int version ) {
+    private boolean isCookieAttribute( String string, int version ) {
         String stringLowercase = string.toLowerCase();
         if (version == IETF_RFC2109) {
             return stringLowercase.equals("path") ||
@@ -995,7 +996,7 @@ class DefaultWebResponse extends WebResponse {
      * Returns the value for the specified header field. If no such field is defined, will return null.
      **/
     public String getHeaderField( String fieldName ) {
-        if (fieldName.equals( "Content-type" )) {
+        if (fieldName.equalsIgnoreCase( "Content-type" )) {
             return "text/html; charset=us-ascii";
         } else {
             return null;
