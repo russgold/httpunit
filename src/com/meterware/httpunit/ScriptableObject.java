@@ -33,9 +33,19 @@ abstract public class ScriptableObject {
     /**
      * Executes the specified scripted event.
      **/
-    public void doEvent( String eventScript ) {
+    public boolean doEvent( String eventScript ) {
         if (_scriptEngine == null) throw new IllegalStateException( "Script engine must be defined before running an event" );
-        _scriptEngine.executeScript( eventScript );
+        if (eventScript.length() == 0) return true;
+        return _scriptEngine.performEvent( eventScript );
+    }
+
+
+    /**
+     * Executes the specified script.
+     **/
+    public void runScript( String script ) {
+        if (_scriptEngine == null) throw new IllegalStateException( "Script engine must be defined before running an event" );
+        _scriptEngine.executeScript( script );
     }
 
 

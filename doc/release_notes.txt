@@ -12,6 +12,11 @@ Limitations:
 
 
 Revision History:
+ 6-Aug-2002
+Additions:
+    1. JavaScript: the link.onClick event is now supported
+    2. JavaScript: the form.onSubmit event is now supported
+
  5-Aug-2002
 Additions:
     1. The JavaScript link.href attribute is now readable.

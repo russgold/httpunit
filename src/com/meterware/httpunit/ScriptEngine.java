@@ -31,4 +31,7 @@ public interface ScriptEngine {
 
     public void executeScript( String script );
 
+
+    public boolean performEvent( String eventScript );
+
 }

@@ -146,8 +146,8 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
                                             "<form name='realform'><input type='checkbox' name='ready'></form>" +
-                                            "<a href='#' name='clear' onMouseOver=\"document.realform.ready.checked=false;\">clear</a>" +
-                                            "<a href='#' name='set' onMouseOver=\"document.realform.ready.checked=true;\">set</a>" +
+                                            "<a href='#' name='clear' onMouseOver='document.realform.ready.checked=false;'>clear</a>" +
+                                            "<a href='#' name='set' onMouseOver='document.realform.ready.checked=true;'>set</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
@@ -164,7 +164,7 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
                                             "<form name='realform'><input name='color' value='blue'></form>" +
-                                            "<a href='#' onMouseOver=\"document.realform.color.value='green';\">green</a>" +
+                                            "<a href='#' onMouseOver=\"document.realform.color.value='green';return false;\">green</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
@@ -173,6 +173,67 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
         link.mouseOver();
         assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
+    }
+
+
+    public void testLinkClickEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='realform'><input name='color' value='blue'></form>" +
+                                            "<a href='nothing.html' onClick=\"document.realform.color.value='green';return false;\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        WebLink link = response.getLinks()[0];
+        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
+        link.click();
+        assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
+    }
+
+
+    public void testHashDestinationOnEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='realform'><input name='color' value='blue'></form>" +
+                                            "<a href='#' onClick=\"document.realform.color.value='green';\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        WebLink link = response.getLinks()[0];
+        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
+        response = link.click();
+        assertEquals( "changed parameter value", "green", response.getFormWithName( "realform" ).getParameterValue( "color" ) );
+    }
+
+
+    public void testFormValidationOnSubmit() throws Exception {
+        defineResource( "doIt?color=pink", "You got it!", "text/plain" );
+        defineResource( "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                           "function verifyForm() { " +
+                                           "  if (document.realform.color.value == 'pink') {" +
+                                           "    return true;" +
+                                           "  } else {" +
+                                           "    alert( 'wrong color' );" +
+                                           "    return false;" +
+                                           "  }" +
+                                           "}" +
+                                           "</script></head>" +
+                                           "<body>" +
+                                           "<form name='realform' action='doIt' onSubmit='return verifyForm();'>" +
+                                           "  <input name='color' value='blue'>" +
+                                           "</form>" +
+                                           "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        form.submit();
+        assertEquals( "Alert message", "wrong color", response.popNextAlert() );
+        assertSame( "Current response", response, wc.getCurrentPage() );
+        form.setParameter( "color", "pink" );
+        WebResponse newResponse = form.submit();
+        assertEquals( "Result of submit", "You got it!", newResponse.getText() );
     }
 
 
@@ -225,6 +286,7 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Alert message", "2nd image is pict2.gif", response.popNextAlert() );
         assertNull( "Alert should have been removed", response.getNextAlert() );
     }
+
 
     public void testImageSwap() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +

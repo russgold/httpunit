@@ -79,7 +79,9 @@ public class WebLink extends WebRequestSource {
      * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
      **/
     public WebResponse click() throws IOException, SAXException {
-        return submitRequest();
+        String event = NodeUtils.getNodeAttribute( getNode(), "onclick" );
+        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest();
+        return getBaseResponse();
     }
 
 

@@ -501,7 +501,7 @@ public class WebResponse implements HTMLSegment {
 
 
         public void load() throws SAXException {
-            doEvent( getReceivedPage().getScripts() );
+            runScript( getReceivedPage().getScripts() );
             doEvent( getReceivedPage().getOnLoadEvent() );
         }
     }

@@ -29,13 +29,7 @@ import com.meterware.httpunit.WebImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import org.mozilla.javascript.ClassDefinitionException;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.NotAFunctionException;
-import org.mozilla.javascript.PropertyException;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.xml.sax.SAXException;
 
 
@@ -44,6 +38,9 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 public class JavaScript {
+
+    private final static Object[] NO_ARGS = new Object[0];
+
 
     /**
      * Initiates JavaScript execution for the specified web response.
@@ -86,10 +83,24 @@ public class JavaScript {
         }
 
 
+        public boolean performEvent( String eventScript ) {
+            try {
+                final Context context = Context.getCurrentContext();
+                Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
+                Object result = f.call( context, this, null, NO_ARGS );
+                return (result instanceof Boolean) ? ((Boolean) result).booleanValue() : true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException( "Script '" + eventScript + "' failed: " + e );
+            }
+        }
+
+
         void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             _scriptable = scriptable;
             _scriptable.setScriptEngine( this );
+            if (parent != null) setParentScope( parent );
         }
 
 
@@ -170,7 +181,7 @@ public class JavaScript {
 
         void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
-            super.initialize( this, scriptable );
+            super.initialize( parent, scriptable );
             _document = (Document) Context.getCurrentContext().newObject( this, "Document" );
             _document.initialize( this, getDelegate().getDocument() );
 
@@ -208,7 +219,7 @@ public class JavaScript {
 
         void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
-            super.initialize( this, scriptable );
+            super.initialize( parent, scriptable );
             initializeLinks();
             initializeForms();
             initializeImages();

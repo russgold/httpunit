@@ -47,7 +47,9 @@ public class WebForm extends WebRequestSource {
      * Submits this form using the web client from which it was originally obtained.
      **/
     public WebResponse submit() throws IOException, SAXException {
-        return submitRequest();
+        String event = NodeUtils.getNodeAttribute( getNode(), "onsubmit" );
+        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest();
+        return getBaseResponse();
     }
 
 
@@ -285,7 +287,8 @@ public class WebForm extends WebRequestSource {
      * Returns an object which provides scripting access to this form.
      **/
     public Scriptable getScriptableObject() {
-        return new Scriptable();
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
     }
 
 //---------------------------------- WebRequestSource methods --------------------------------
@@ -452,6 +455,9 @@ public class WebForm extends WebRequestSource {
 
     /** A map of parameter names to form parameter objects. **/
     private Map            _formParameters;
+
+    /** The Scriptable object associated with this form. **/
+    private Scriptable _scriptable;
 
     private Vector _buttonVector;
 
