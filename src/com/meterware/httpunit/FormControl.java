@@ -850,7 +850,7 @@ class SelectionFormControl extends FormControl {
         _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );
         _listBox          = _multiSelect || NodeUtils.isNodeAttributePresent( node, "size" );
 
-        _selectionOptions = new Options( node );
+        _selectionOptions = _multiSelect ? (Options) new MultiSelectOptions( node ) : (Options) new SingleSelectOptions( node );
     }
 
 
@@ -1034,10 +1034,9 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    class Options extends ScriptableDelegate implements SelectionOptions {
+    abstract class Options extends ScriptableDelegate implements SelectionOptions {
 
         private Option[] _options;
-
 
         Options( Node selectionNode ) {
             NodeList nl = ((Element) selectionNode).getElementsByTagName( "option" );
@@ -1054,22 +1053,15 @@ class SelectionFormControl extends FormControl {
 
 
         boolean claimUniqueValues( List values ) {
-            boolean changed = false;
-            int numMatches = 0;
-            for (int i = 0; i < _options.length; i++) {
-                final boolean newValue = values.contains( _options[i].getValue() );
-                if (newValue != _options[i].isSelected()) changed = true;
-                _options[i].setSelected( newValue );
-                if (newValue) {
-                    values.remove( _options[i].getValue() );
-                    numMatches++;
-                    if (!_multiSelect) for (++i; i < _options.length; i++) _options[i].setSelected( false );
-                }
-            }
-            if (!_listBox && numMatches == 0) {
-                throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
-            }
-            return changed;
+            return claimUniqueValues( values, _options );
+        }
+
+
+        protected abstract boolean claimUniqueValues( List values, Option[] options );
+
+
+        final protected void reportNoMatches( List values ) {
+            if (!_listBox) throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
         }
 
 
@@ -1121,8 +1113,11 @@ class SelectionFormControl extends FormControl {
             for (int i = 0; i < _options.length; i++) {
                 if (_options[i].isSelected()) return i;
             }
-            return _multiSelect ? -1 : 0;
+            return noOptionSelectedIndex();
         }
+
+
+        protected abstract int noOptionSelectedIndex();
 
 
         public int getLength() {
@@ -1151,17 +1146,12 @@ class SelectionFormControl extends FormControl {
                 }
                 _options[i] = (Option) option;
                 _options[i].setIndex( this, i );
-                if (option.isSelected()) ensureUniqueOption(i);
+                if (option.isSelected()) ensureUniqueOption( _options, i);
             }
         }
 
 
-        private void ensureUniqueOption( int i ) {
-            if (_multiSelect) return;
-            for (int j = 0; j < _options.length; j++) {
-                _options[j]._selected = (i == j);
-            }
-        }
+        protected abstract void ensureUniqueOption( Option[] options, int i );
 
 
         private void deleteOptionsEntry( int i ) {
@@ -1186,7 +1176,7 @@ class SelectionFormControl extends FormControl {
 
         /** Invoked when an option is set true. **/
         void optionSet( int i ) {
-            ensureUniqueOption(i);
+            ensureUniqueOption( _options, i);
         }
 
 
@@ -1208,6 +1198,74 @@ class SelectionFormControl extends FormControl {
             return (value == null) ? "" : value;
         }
 
+    }
+
+
+    class SingleSelectOptions extends Options {
+
+        public SingleSelectOptions( Node selectionNode ) {
+            super( selectionNode );
+        }
+
+
+        protected void ensureUniqueOption( Option[] options, int i ) {
+            for (int j = 0; j < options.length; j++) {
+                options[j]._selected = (i == j);
+            }
+        }
+
+
+        protected int noOptionSelectedIndex() {
+            return 0;
+        }
+
+
+        protected boolean claimUniqueValues( List values, Option[] options ) {
+            boolean changed = false;
+            for (int i = 0; i < values.size(); i++) {
+                String value = (String) values.get( i );
+                for (int j = 0; j < options.length; j++) {
+                    boolean selected = value.equals( options[j].getValue() );
+                    if (selected != options[j].isSelected()) changed = true;
+                    options[j].setSelected( selected );
+                    if (selected) {
+                        values.remove( value );
+                        for (++j; j < options.length; j++) options[j].setSelected( false );
+                        return changed;
+                    }
+                }
+            }
+            reportNoMatches( values );
+            return changed;
+        }
+    }
+
+
+    class MultiSelectOptions extends Options {
+
+        public MultiSelectOptions( Node selectionNode ) {
+            super( selectionNode );
+        }
+
+
+        protected void ensureUniqueOption( Option[] options, int i ) {}
+
+
+        protected int noOptionSelectedIndex() {
+            return -1;
+        }
+
+
+        protected boolean claimUniqueValues( List values, Option[] options ) {
+            boolean changed = false;
+            for (int i = 0; i < options.length; i++) {
+                final boolean newValue = values.contains( options[i].getValue() );
+                if (newValue != options[i].isSelected()) changed = true;
+                options[i].setSelected( newValue );
+                if (newValue) values.remove( options[i].getValue() );
+            }
+            return changed;
+        }
     }
 
 

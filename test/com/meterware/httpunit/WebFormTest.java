@@ -311,6 +311,24 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testSingleSelectParameterOrdering() throws Exception {
+        StringBuffer sb = new StringBuffer( "<form action='sendIt' id='theform'>" );
+        for (int i= 0; i < 4; i++) {
+            sb.append( "<select name='enabled'><option value='true'>Enabled<option value='false' selected>Disabled</select>" );
+        }
+        sb.append( "</form>" );
+
+        defineWebPage( "OnCommand", sb.toString() );
+
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithID( "theform" );
+        form.setParameter( "enabled", new String[] { "true", "false", "false", "true" } );
+        WebRequest request = form.getRequest();
+        assertEquals( "request", getHostPath() + "/sendIt?enabled=true&enabled=false&enabled=false&enabled=true", request.getURL().toExternalForm() );
+    }
+
+
     public void testMultiSelect() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Select multiple size=4 name=colors>" +

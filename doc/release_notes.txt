@@ -23,6 +23,8 @@ Additions:
 Problems fixed:
     1. bug #717280: URLs with "../" in them were not resolved properly
     2. bug #717640: <base> element was not being handled in the case when no host was specified.
+    3. When setting a selection control, HttpUnit would always select a value matching its first option if possible,
+       rather than taking the first valid value.
 
  4-Apr-2003
 Acknowledgements:
