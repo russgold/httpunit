@@ -181,7 +181,9 @@ public class WebClientTest extends HttpUnitTest {
 
 
     public void testGZIPHandling() throws Exception {
-        String expectedResponse = "Here is my answer";
+        String expectedResponse = "Here is my answer. It needs to be reasonably long to make compression smaller " +
+                                  "than the raw message. It should be obvious when you reach that point. " +
+                                  "Of course it is more than that - it needs to be long enough to cause a problem.";
         defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
 
         WebConversation wc = new WebConversation();

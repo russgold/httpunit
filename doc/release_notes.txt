@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+ 6-Jul-2003
+Additions:
+    1. WebResponse and TableCell now support getElementsWithName and getElementNames to look up HTML elements.
+Problems fixed:
+    1. gzip'ed responses were sometimes truncated.
+
 24-Jun-2003
 Additions:
     1. rfe #721424: You can now set checkbox values in a form via: setCheckbox(name,boolean) or toggleCheckbox(name).

@@ -174,7 +174,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
             _contentLength = (length == null) ? -1 : Integer.parseInt( length );
         }
         return _contentLength;
-       }
+    }
 
 
     /**
@@ -284,6 +284,22 @@ public class WebResponse implements HTMLSegment, CookieSource {
      */
     public HTMLElement getElementWithID( String id ) throws SAXException {
         return getReceivedPage().getElementWithID( id );
+    }
+
+
+    /**
+     * Returns a list of HTML element names contained in this HTML section.
+     */
+    public String[] getElementNames() throws SAXException {
+        return getReceivedPage().getElementNames();
+    }
+
+
+    /**
+     * Returns the HTMLElements found in this segment with the specified name.
+     */
+    public HTMLElement[] getElementsWithName( String name ) throws SAXException {
+        return getReceivedPage().getElementsWithName( name );
     }
 
 
@@ -719,7 +735,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
         }
 
         if (encodedUsingGZIP()) {
-            _inputStream = new GZIPInputStream( inputStream );
+            byte[] compressedData = readFromStream( inputStream, getContentLength() );
+            _inputStream = new GZIPInputStream( new ByteArrayInputStream( compressedData ) );
         } else {
             _inputStream = inputStream;
         }
@@ -838,29 +855,37 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
         InputStream inputStream = getInputStream();
         try {
-            int bytesRemaining = getContentLength() < 0 ? Integer.MAX_VALUE : getContentLength();
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[8 * 1024];
-            int count = 0;
-            do {
-                outputStream.write( buffer, 0, count );
-                bytesRemaining -= count;
-                if (bytesRemaining <= 0) break;
-                count = inputStream.read( buffer, 0, buffer.length );
-            } while (count != -1);
+            final int contentLength = this.encodedUsingGZIP() ? -1 : getContentLength();
+            int bytesRemaining = contentLength < 0 ? Integer.MAX_VALUE : contentLength;
+            byte[] bytes = readFromStream( inputStream, bytesRemaining );
 
-            byte[] bytes = outputStream.toByteArray();
             readTags( bytes );
             _responseText = new String( bytes, getCharacterSet() );
             _inputStream  = new ByteArrayInputStream( bytes );
 
-            if (HttpUnitOptions.isCheckContentLength() && getContentLength() >= 0 && bytes.length != getContentLength()) {
-                throw new IOException("Truncated message. Expected length: " + getContentLength() +
+            if (HttpUnitOptions.isCheckContentLength() && contentLength >= 0 && bytes.length != contentLength) {
+                throw new IOException("Truncated message. Expected length: " + contentLength +
                                                        ", Actual length: " + bytes.length);
             }
         } finally {
             inputStream.close();
         }
+    }
+
+
+    private byte[] readFromStream( InputStream inputStream, int maxBytes ) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8 * 1024];
+        int count = 0;
+        do {
+            outputStream.write( buffer, 0, count );
+            maxBytes -= count;
+            if (maxBytes <= 0) break;
+            count = inputStream.read( buffer, 0, Math.min( maxBytes, buffer.length ) );
+        } while (count != -1);
+
+        byte[] bytes = outputStream.toByteArray();
+        return bytes;
     }
 
 
