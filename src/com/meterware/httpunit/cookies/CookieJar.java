@@ -337,6 +337,8 @@ public class CookieJar {
 
             if (cookie.getDomain() == null) {
                 cookie.setDomain( _sourceURL.getHost() );
+            } else if (!CookieProperties.isDomainMatchingStrict() && cookie.getDomain().equalsIgnoreCase( _sourceURL.getHost() )) {
+                cookie.setDomain( _sourceURL.getHost() );
             } else {
                 int status = getDomainAttributeStatus( cookie.getDomain(), _sourceURL.getHost() );
                 if (status != CookieListener.ACCEPTED) {

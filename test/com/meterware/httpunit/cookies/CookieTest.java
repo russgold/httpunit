@@ -113,6 +113,7 @@ public class CookieTest extends TestCase {
         checkAcceptance( 6, false, "www.meterware.com/servlets/special", ".com", null );
         checkAcceptance( 7, false, "www.meterware.com/servlets/special", ".httpunit.org", null );
         checkAcceptance( 8, false, "www.some.meterware.com/servlets/special", ".meterware.com", null );
+        checkAcceptance( 9, false, "www.meterware.com/servlets/special", "www.meterware.com", null );
     }
 
 
@@ -196,10 +197,11 @@ public class CookieTest extends TestCase {
         CookieProperties.setDomainMatchingStrict( false );
         checkAcceptance( 1, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
         checkAcceptance( 2, false, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkAcceptance( 3, true, "www.meterware.com/servlets/special", "www.meterware.com", null );
 
         CookieProperties.setPathMatchingStrict( false );
-        checkAcceptance( 3, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
-        checkMatching( 4, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
+        checkAcceptance( 11, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkMatching( 12, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
     }
 
 
