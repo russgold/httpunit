@@ -227,6 +227,8 @@ public class FormSubmitTest extends HttpUnitTest {
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest( form.getSubmitButton( "update" ), 10, 15 );
         assertEquals( getHostPath() + "/ask?age=12&update=name&update.x=10&update.y=15", request.getURL().toExternalForm() );
+        request.setImageButtonClickPosition( 5, 20 );
+        assertEquals( getHostPath() + "/ask?age=12&update=name&update.x=5&update.y=20", request.getURL().toExternalForm() );
     }
 
 
@@ -296,6 +298,12 @@ public class FormSubmitTest extends HttpUnitTest {
 
         request = form.getRequest( "update" );
         assertEquals( getHostPath() + "/ask?age=12&update=age", request.getURL().toExternalForm() );
+
+        try {
+            request.setImageButtonClickPosition( 1, 2 );
+            fail( "Should not allow set position with non-image button" );
+        } catch (IllegalRequestParameterException e) {
+        }
     }
 
                               

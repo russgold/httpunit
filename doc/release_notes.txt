@@ -12,7 +12,7 @@ Limitations:
 
 Revision History:
 
- 1-Mar-2002
+ 6-Mar-2002 1.4
 Acknowledgements:
     Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
     Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
@@ -23,6 +23,7 @@ Acknowledgements:
             the requestURI for a servlet request, and wild-card mapping of servlets.
     Thanks to Peter Royal for correcting handling of long line numbers in JTidyWriter, based on locale
     Thanks to Peter Rossbach for some documentation and build fixes
+
 
 Problems fixed:
     1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields
@@ -36,6 +37,7 @@ Problems fixed:
     9. Control characters and spaces created by breaking HTML in the middle are now trimmed from link parameters.
    10. Forms with query strings included in the action attribute now are submitted with that string intact.
    11. (bug #490821) Javadoc generation no longer gives errors
+   12. (bug #524627) Null pointer exception in NodeUtils.convertNBSP
 
 Additions:
   Content and parsing enhancements:
@@ -58,6 +60,7 @@ Additions:
      10. Parameters defined in form query strings are now included in the known parameters of a form and requests
          built from it.
      11. Form parameters can be reset to their initial values using WebForm.reset().
+     12. You can now change the position of an image button click in a request with WebRequest.setImageButtonClickPosition()
 
   Test properties enhancements:
      12. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.

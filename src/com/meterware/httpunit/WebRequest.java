@@ -47,6 +47,7 @@ import java.util.Arrays;
  **/
 abstract
 public class WebRequest {
+    private SubmitButton _button;
 
     /**
      * Sets the value of a header to be sent with this request. A header set here will override any matching header set
@@ -123,6 +124,19 @@ public class WebRequest {
         if (!maySelectFile( parameterName )) throw new IllegalNonFileParameterException( parameterName );
         if (!isMimeEncoded()) throw new MultipartFormRequiredException();
         _parameterHolder.setParameter( parameterName, files );
+    }
+
+
+    /**
+     * Specifies the click position for the submit button. When a user clioks on an image button, not only the name
+     * and value of the button, but also the position of the mouse at the time of the click is submitted with the form.
+     * This method allows the caller to override the position selected when this request was created.
+     *
+     * @exception IllegalRequestParameterException thrown if the request was not created from a form with an image button.
+     **/
+    public void setImageButtonClickPosition( int x, int y ) throws IllegalRequestParameterException {
+        if (_button == null) throw new IllegalButtonPositionException();
+        _parameterHolder.selectImageButtonPosition( _button, x, y );
     }
 
 
@@ -253,7 +267,8 @@ public class WebRequest {
     protected WebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
         this( sourceForm );
         if (button != null && button.isImageButton() && button.getName().length() > 0) {
-            _parameterHolder.selectImageButtonPosition( button, x, y );
+            _button = button;
+            _parameterHolder.selectImageButtonPosition( _button, x, y );
         }
     }
 
@@ -574,6 +589,26 @@ class MultipartFormRequiredException extends IllegalRequestParameterException {
 
     public String getMessage() {
         return "The request does not use multipart/form-data encoding, and cannot be used to upload files ";
+    }
+
+}
+
+
+//============================= exception class IllegalButtonPositionException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a file parameter in a form that does not specify MIME encoding.
+ **/
+class IllegalButtonPositionException extends IllegalRequestParameterException {
+
+
+    IllegalButtonPositionException() {
+    }
+
+
+    public String getMessage() {
+        return "The request was not created with an image button, and cannot accept an image button click position";
     }
 
 }

@@ -117,6 +117,7 @@ class NodeUtils {
 
 
     private static String convertNBSP( String text ) {
+        if (text == null) return "";
         return text.replace( NBSP, ' ' );
     }
 
