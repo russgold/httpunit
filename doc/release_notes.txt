@@ -20,6 +20,7 @@ Revision History:
 
     Problems fixed:
         1. Renamed local variables which conflicted with new JDK 1.5 keyword "enum."
+        2. bug #1040508 Using the setCheckbox and toggleCheckbox methods was not triggering the onclick event
 
 4-Oct-2004
     Problems fixed:

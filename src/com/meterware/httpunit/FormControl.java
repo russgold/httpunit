@@ -677,11 +677,9 @@ class CheckboxFormControl extends BooleanFormControl {
 
 
     void claimUniqueValue( List values ) {
-        boolean wasChecked = isChecked();
         if (isValueRequired()) return;
-        setChecked( values.contains( getQueryValue() ) );
+        setState( values.contains( getQueryValue() ) );
         if (isChecked()) values.remove( getQueryValue() );
-        if (isChecked() != wasChecked) sendOnClickEvent();
     }
 
 
@@ -695,15 +693,17 @@ class CheckboxFormControl extends BooleanFormControl {
      * Toggles the value of this control.
      */
     public void toggle() {
-        setChecked( !isChecked() );
+        setState( !isChecked() );
     }
 
 
     /**
-     * Sets the state of this boolean control.
+     * Sets the state of this boolean control. Triggers the 'onclick' event if the state has changed.
      */
     public void setState( boolean state ) {
+        boolean wasChecked = isChecked();
         setChecked( state );
+        if (isChecked() != wasChecked) sendOnClickEvent();
     }
  }
 

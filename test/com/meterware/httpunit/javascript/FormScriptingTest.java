@@ -599,6 +599,24 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSetCheckboxOnClickEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <input type='checkbox' name='color' value='blue' " +
+                                            "         onClick='alert( \"color-blue is now \" + document.the_form.color.checked );'>" +
+                                            "</form>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        form.toggleCheckbox( "color" );
+        assertEquals( "Alert after change", "color-blue is now true", wc.popNextAlert() );
+        form.setCheckbox( "color", false );
+        assertEquals( "Alert after change", "color-blue is now false", wc.popNextAlert() );
+    }
+
+
     public void testIndexedRadioProperties() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function viewRadio( radio ) { \n" +
