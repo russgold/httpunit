@@ -125,8 +125,8 @@ public class WebClient {
     /**
      * Specifies the user agent identification. Used to trigger browser-specific server behavior.
      **/    
-    public void setUserAgent(String userAgent) {
-	setHeaderField( "User-Agent", userAgent );
+    public void setUserAgent( String userAgent ) {
+	    setHeaderField( "User-Agent", userAgent );
     }
     
         
@@ -134,7 +134,7 @@ public class WebClient {
      * Returns the current user agent setting.
      **/
     public String getUserAgent() {
-	return (String) _headers.get( "User-Agent" );
+	    return getHeaderField( "User-Agent" );
     }
 
 
@@ -151,25 +151,15 @@ public class WebClient {
      * removes the header from those to be sent.
      **/
     public void setHeaderField( String fieldName, String fieldValue ) {
-        fieldName = matchPreviousFieldName( fieldName );
-        if (fieldValue == null) {
-            _headers.remove( fieldName );
-        } else {
-            _headers.put( fieldName, fieldValue );
-        }
+        _headers.put( fieldName, fieldValue );
     }
 
 
     /**
-     * If a matching field name with different case is already known, returns the older name.
-     * Otherwise, returns the specified name.
-     **/
-    private String matchPreviousFieldName( String fieldName ) {
-        for (Enumeration e = _headers.keys(); e.hasMoreElements(); ) {
-            String key = (String) e.nextElement();
-            if (key.equalsIgnoreCase( fieldName )) return key;
-        }
-        return fieldName;
+     * Returns the value for the header field with the specified name. This method will ignore the case of the field name.
+     */
+    public String getHeaderField( String fieldName ) {
+        return (String) _headers.get( fieldName );
     }
 
 
@@ -245,7 +235,7 @@ public class WebClient {
 
 
     /** A map of header names to values. **/
-    private Hashtable _headers = new Hashtable();
+    private HeaderDictionary _headers = new HeaderDictionary();
 
 
     /**
@@ -317,6 +307,50 @@ public class WebClient {
             _frameContents.remove( names[i] );
             _subFrames.remove( names[i] );
         }
+    }
+
+//==================================================================================================
+
+
+    static public class HeaderDictionary extends Hashtable {
+
+        public void addEntries( Dictionary source ) {
+            for (Enumeration e = source.keys(); e.hasMoreElements(); ) {
+                Object key = e.nextElement();
+                put( key, source.get( key ) );
+            }
+        }
+
+        public Object get( Object fieldName ) {
+            return (String) super.get( matchPreviousFieldName( fieldName.toString() ) );
+        }
+
+
+        public Object put( Object fieldName, Object fieldValue ) {
+            fieldName = matchPreviousFieldName( fieldName.toString() );
+            Object oldValue = super.get( fieldName );
+            if (fieldValue == null) {
+                remove( fieldName );
+            } else {
+                super.put( fieldName, fieldValue );
+            }
+            return oldValue;
+        }
+
+
+        /**
+         * If a matching field name with different case is already known, returns the older name.
+         * Otherwise, returns the specified name.
+         **/
+        private String matchPreviousFieldName( String fieldName ) {
+            for (Enumeration e = keys(); e.hasMoreElements(); ) {
+                String key = (String) e.nextElement();
+                if (key.equalsIgnoreCase( fieldName )) return key;
+            }
+            return fieldName;
+        }
+
+
     }
 
 }

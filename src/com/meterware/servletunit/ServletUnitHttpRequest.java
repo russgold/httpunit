@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -21,17 +21,21 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.WebClient;
+import com.meterware.httpunit.Base64;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.Map;
+import java.util.Dictionary;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
@@ -48,9 +52,12 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     /**
      * Constructs a ServletUnitHttpRequest from a WebRequest object.
      **/
-    ServletUnitHttpRequest( WebRequest request, ServletUnitContext context ) throws MalformedURLException {
+    ServletUnitHttpRequest( WebRequest request, ServletUnitContext context, Dictionary clientHeaders ) throws MalformedURLException {
         _request = request;
         _context = context;
+        _headers = new WebClient.HeaderDictionary();
+        _headers.addEntries( clientHeaders );
+        _headers.addEntries( request.getHeaders() );
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
         String file = request.getURL().getFile();
@@ -127,7 +134,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * You can use this method with any request header.
      **/
     public String getHeader( String name ) {
-        return null;
+        return (String) _headers.get( name );
     }
 
 
@@ -194,7 +201,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Whether the user name is sent with each subsequent request depends on the browser and type of authentication.
      **/ 
     public String getRemoteUser() {
-        return null;
+        return _userName;
     }
 
 
@@ -549,6 +556,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * If the user has not been authenticated, the method returns false.
      **/
     public boolean isUserInRole( String role ) {
+        if (_roles == null) return false;
+        for (int i = 0; i < _roles.length; i++) {
+            if (role.equals( _roles[i] )) return true;
+        }
         return false;
     }
 
@@ -628,18 +639,83 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
+    void writeFormAuthentication( String userName, String password ) {
+        getServletSession().setUserInformation( userName, toArray( password ) );
+    }
+
+
+    private ServletUnitHttpSession getServletSession() {
+        return (ServletUnitHttpSession) getSession();
+    }
+
+
+    void readFormAuthentication() {
+        if (getSession( /* create */ false ) != null) {
+            recordAuthenticationInfo( getServletSession().getUserName(), getServletSession().getRoles() );
+        }
+    }
+
+
+    void readBasicAuthentication() {
+        String authorizationHeader = (String) _headers.get( "Authorization" );
+
+        if (authorizationHeader != null) {
+            String userAndPassword = Base64.decode( authorizationHeader.substring( authorizationHeader.indexOf( ' ' ) + 1 ) );
+            int colonPos = userAndPassword.indexOf( ':' );
+            recordAuthenticationInfo( userAndPassword.substring( 0, colonPos ),
+                                      toArray( userAndPassword.substring( colonPos+1 ) ) );
+        }
+    }
+
+    private String[] toArray( String roleList ) {
+        StringTokenizer st = new StringTokenizer( roleList, "," );
+        String[] result = new String[ st.countTokens() ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = st.nextToken();
+        }
+        return result;
+    }
+
+
+    void setOriginalURL( URL originalURL ) {
+        getServletSession().setOriginalURL( originalURL );
+    }
+
+
+    URL getOriginalURL() {
+        return getServletSession().getOriginalURL();
+    }
+
+
+    void recordAuthenticationInfo( String userName, String[] roles ) {
+        _userName = userName;
+        _roles    = roles;
+    }
+
+
+    String[] getRoles() {
+        return _roles == null ? NO_ROLES : _roles;
+    }
+
+
+
 //--------------------------------------------- private members ----------------------------------------------
 
     final static private String LOOPBACK_ADDRESS = "127.0.0.1";
+    final static private String[] NO_ROLES = new String[0];
 
 
-    private WebRequest             _request;
-    private ServletUnitContext     _context;
-    private ServletUnitHttpSession _session;
-    private Hashtable              _attributes = new Hashtable();
-    private Hashtable              _parameters = new Hashtable();
-    private Vector                 _cookies    = new Vector();
-    private String                 _sessionID;
+    private WebRequest                 _request;
+    private WebClient.HeaderDictionary _headers;
+    private ServletUnitContext         _context;
+    private ServletUnitHttpSession     _session;
+    private Hashtable                  _attributes = new Hashtable();
+    private Hashtable                  _parameters = new Hashtable();
+    private Vector                     _cookies    = new Vector();
+    private String                     _sessionID;
+
+    private String                     _userName;
+    private String[]                   _roles;
 
 
     final static private int STATE_INITIAL     = 0;
@@ -681,11 +757,11 @@ class ServletUnitHttpRequest implements HttpServletRequest {
                     state = STATE_INITIAL;
                 }
             } else if (state == STATE_INITIAL) {
-                name = token;
+                name = HttpUnitUtils.decode( token );
                 value = "";
                 state = STATE_HAVE_NAME;
             } else {
-                value = token;
+                value = HttpUnitUtils.decode( token );
                 state = STATE_HAVE_VALUE;
             }
         }
@@ -696,9 +772,9 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private void addParameter( String name, String encodedValue ) {
         String[] values = (String[]) _parameters.get( name );
         if (values == null) {
-            _parameters.put( name, new String[] { HttpUnitUtils.decode( encodedValue ) } );
+            _parameters.put( name, new String[] { encodedValue } );
         } else {
-            _parameters.put( name, extendedArray( values, HttpUnitUtils.decode( encodedValue ) ) );
+            _parameters.put( name, extendedArray( values, encodedValue ) );
         }
     }
 

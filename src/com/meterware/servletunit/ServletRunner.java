@@ -28,17 +28,11 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 
 import org.apache.xerces.parsers.DOMParser;
-
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
@@ -52,7 +46,9 @@ public class ServletRunner {
     /**
      * Default constructor, which defines no servlets.
      */
-    public ServletRunner() {}
+    public ServletRunner() {
+        _application = new WebApplication();
+    }
 
 
     /**
@@ -61,8 +57,7 @@ public class ServletRunner {
     public ServletRunner( String webXMLFileSpec ) throws IOException, SAXException {
         DOMParser parser = new DOMParser();
         parser.parse( webXMLFileSpec );
-
-        registerServlets( parser.getDocument() );
+        _application = new WebApplication( parser.getDocument() );
     }
 
 
@@ -72,46 +67,15 @@ public class ServletRunner {
     public ServletRunner( InputStream webXML ) throws IOException, SAXException {
         DOMParser parser = new DOMParser();
         parser.parse( new InputSource( webXML ) );
-
-        registerServlets( parser.getDocument() );
+        _application = new WebApplication( parser.getDocument() );
     }
 
-
-    private void registerServlets( Document document ) throws SAXException {
-        Hashtable nameToClass = new Hashtable();
-        NodeList nl = document.getElementsByTagName( "servlet" );
-        for (int i = 0; i < nl.getLength(); i++) registerServletClass( nameToClass, (Element) nl.item(i) );
-        nl = document.getElementsByTagName( "servlet-mapping" );
-        for (int i = 0; i < nl.getLength(); i++) registerServlet( nameToClass, (Element) nl.item(i) );
-    }
-
-
-    private void registerServletClass( Dictionary mapping, Element servletElement ) throws SAXException {
-        mapping.put( getChildNodeValue( servletElement, "servlet-name" ),
-                     getChildNodeValue( servletElement, "servlet-class" ) );
-    }
-
-
-    private void registerServlet( Dictionary mapping, Element servletElement ) throws SAXException {
-        registerServlet( getChildNodeValue( servletElement, "url-pattern" ),
-                         (String) mapping.get( getChildNodeValue( servletElement, "servlet-name" ) ) );
-    }
-
-
-    private String getChildNodeValue( Element root, String childNodeName ) throws SAXException {
-        NodeList nl = root.getElementsByTagName( childNodeName );
-        if (nl.getLength() != 1) throw new SAXException( "Node <" + root.getNodeName() + "> has no child named <" + childNodeName + ">" );
-        Node childNode = nl.item(0).getFirstChild();
-        if (childNode == null) throw new SAXException( "No value specified for <" + childNodeName + "> node" );
-        if (childNode.getNodeType() != Node.TEXT_NODE) throw new SAXException( "No text value found for <" + childNodeName + "> node" );
-        return childNode.getNodeValue();
-    }
 
     /**
      * Registers a servlet class to be run.
      **/
     public void registerServlet( String resourceName, String servletClassName ) {
-        _servlets.put( asResourceName( resourceName ), servletClassName );
+        _application.registerServlet( resourceName, servletClassName );
     }
 
 
@@ -121,6 +85,15 @@ public class ServletRunner {
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         return _client.getResponse( request );
+    }
+
+
+    /**
+     * Returns the response from the specified servlet using GET.
+     * @exception SAXException thrown if there is an error parsing the response
+     **/
+    public WebResponse getResponse( String url ) throws MalformedURLException, IOException, SAXException {
+        return _client.getResponse( url );
     }
 
 
@@ -135,23 +108,8 @@ public class ServletRunner {
 //-------------------------------- package methods -------------------------------------
 
 
-    Servlet getServlet( URL url ) {
-        String className = (String) _servlets.get( getServletName( url.getFile() ) );
-        if (className == null) throw new HttpNotFoundException( url );
-
-        try {
-            Class servletClass = Class.forName( className );
-            if (!Servlet.class.isAssignableFrom( servletClass )) {
-                throw new HttpInternalErrorException( url );
-            }
-            return (Servlet) servletClass.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new HttpNotFoundException( url, e );
-        } catch (IllegalAccessException e) {
-            throw new HttpInternalErrorException( url, e );
-        } catch (InstantiationException e) {
-            throw new HttpInternalErrorException( url, e );
-        }
+    Servlet getServlet( URL url ) throws ServletException {
+        return _application.getServlet( url );
     }
 
 
@@ -162,30 +120,9 @@ public class ServletRunner {
 
 //---------------------------- private members ------------------------------------
 
-
-    /** A mapping of resource names to servlet class names. **/
-    private Hashtable _servlets = new Hashtable();
+    WebApplication    _application;
 
     private ServletUnitClient  _client = new ServletUnitClient( this );
     private ServletUnitContext _context = new ServletUnitContext();
-
-
-    private String getServletName( String urlFile ) {
-        if (urlFile.indexOf( '?' ) < 0) {
-            return urlFile;
-        } else {
-            return urlFile.substring( 0, urlFile.indexOf( '?' ) );
-        }
-    }
-
-
-    private String asResourceName( String rawName ) {
-        if (rawName.startsWith( "/" )) {
-            return rawName;
-        } else {
-            return "/" + rawName;
-        }
-    }
-
 
 }

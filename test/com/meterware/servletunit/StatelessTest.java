@@ -106,6 +106,21 @@ public class StatelessTest extends TestCase {
         assertEquals( "requested resource", "You selected dark red", response.getText() );
     }
 
+    public void testHeaderRetrieval() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "/Parameters", ParameterServlet.class.getName() );
+
+        ServletUnitClient client = sr.newClient();
+        client.setHeaderField( "Sample", "Value" );
+        client.setHeaderField( "Request", "Client" );
+        WebRequest request   = new GetMethodWebRequest( "http://localhost/Parameters?color=dark+red" );
+        request.setHeaderField( "request", "Caller" );
+        InvocationContext ic = client.newInvocation( request );
+        assertEquals( "Sample header", "Value", ic.getRequest().getHeader( "sample" ) );
+        assertEquals( "Request header", "Caller", ic.getRequest().getHeader( "Request" ) );
+     }
+
+
     public void testSimplePost() throws Exception {
         final String resourceName = "something/interesting";
 

@@ -134,14 +134,12 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 //----------------------------- MessageBodyWebRequest methods ---------------------------
 
 
-    protected MessageBody newMessageBody() {
-        if (_body != null) {
-            return _body;
-        } else if (isMimeEncoded()) {
-            return new MimeEncodedMessageBody( this );
-        } else {
-            return new URLEncodedMessageBody( this );
+    protected MessageBody getMessageBody() {
+        if (_body == null) {
+            _body = isMimeEncoded() ? (MessageBody) new MimeEncodedMessageBody( this )
+                                    : (MessageBody) new URLEncodedMessageBody( this );
         }
+        return _body;
     }
 
 

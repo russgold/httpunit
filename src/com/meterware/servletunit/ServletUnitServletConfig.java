@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -19,7 +19,6 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -35,16 +34,24 @@ class ServletUnitServletConfig implements ServletConfig {
 
 
     ServletUnitServletConfig( Servlet servlet ) {
-        _name = servlet.getClass().getName();
-        _initParameters = new Hashtable();
+        this( servlet, NO_PARAMS );
     }
+
+
+    ServletUnitServletConfig( Servlet servlet, Hashtable initParams ) {
+        _name = servlet.getClass().getName();
+        _initParameters = initParams;
+    }
+
+
+//-------------------------------------------- ServletConfig methods ---------------------------------------------------
 
 
     /**
      * Returns the value of the specified init parameter, or null if no such init parameter is defined.
      **/
     public String getInitParameter( String name ) {
-        return null;
+        return (String) _initParameters.get( name );
     }
 
 
@@ -72,10 +79,14 @@ class ServletUnitServletConfig implements ServletConfig {
     }
 
 
+//----------------------------------------------- private members ------------------------------------------------------
+
+
+    private final static Hashtable NO_PARAMS = new Hashtable();
+
     private String _name;
 
     private Hashtable _initParameters;
-
 
     private ServletContext _context = new ServletUnitServletContext();
 }

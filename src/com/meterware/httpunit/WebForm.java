@@ -303,7 +303,7 @@ public class WebForm extends WebRequestSource {
                 }
             }
         }
-	    result.setRequestHeader( "Referer", getBaseURL().toExternalForm() );
+	    result.setHeaderField( "Referer", getBaseURL().toExternalForm() );
         return result;
     }
 

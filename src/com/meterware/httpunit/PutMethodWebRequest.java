@@ -60,7 +60,7 @@ public class PutMethodWebRequest extends MessageBodyWebRequest {
     /**
      * Returns a message body based on the input stream.
      **/
-    protected MessageBody newMessageBody() {
+    protected MessageBody getMessageBody() {
         return _body;
     }
 

@@ -47,6 +47,22 @@ public class WebRequest {
 
 
     /**
+     * Sets the value of a header to be sent with this request. A header set here will override any matching header set
+     * in the WebClient when the request is actually sent.
+     */
+    public void setHeaderField( String headerName, String headerValue ) {
+        getHeaderDictionary().put( headerName, headerValue );
+    }
+
+    /**
+     * Returns a copy of the headers to be sent with this request.
+     **/
+    public Dictionary getHeaders() {
+        return (Dictionary) getHeaderDictionary().clone();
+    }
+
+
+    /**
      * Sets the value of a parameter in a web request.
      **/
     public void setParameter( String name, String value ) {
@@ -274,6 +290,14 @@ public class WebRequest {
 
 
     /**
+     * Returns the content type of this request. If null, no content is specified.
+     */
+    protected String getContentType() {
+        return null;
+    }
+
+
+    /**
      * Returns the character set required for this request.
      **/
     final
@@ -341,12 +365,11 @@ public class WebRequest {
     }
 
 
-    void setRequestHeader( String headerName, String headerValue ) {
-        _headers.put( headerName, headerValue );
-    }
-
-
-    Dictionary getHeaders() {
+    Hashtable getHeaderDictionary() {
+        if (_headers == null) {
+            _headers = new Hashtable();
+            if (getContentType() != null) _headers.put( "Content-Type", getContentType() );
+        }
         return _headers;
     }
 
@@ -445,7 +468,7 @@ public class WebRequest {
     private WebForm      _sourceForm;
     private String       _imageButtonName;
     private String       _target = TOP_FRAME;
-    private Hashtable    _headers = new Hashtable();
+    private Hashtable    _headers;
 
     private boolean      _httpsProtocolSupportEnabled;
 

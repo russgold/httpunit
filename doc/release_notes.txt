@@ -13,6 +13,16 @@ Limitations:
 
 
 Revision History:
+22-Nov-2001
+Additions:
+   1. ServletUnit now handles protected URLs defined in web.xml, along with both Basic and Form authentication. Logins
+      with non-blank usernames are also accepted, with the password being interpreted as a comma-separated list of
+      role names.
+   2. ServletUnit now handles servlet initialization parameters defined in web.xml
+
+Problems fixed:
+   1. ServletUnit now handles URL-encoded parameter names properly.
+
 14-Nov-2001
 Acknowledgements:
     Thanks to Benoit Xhenseval for adding a mechanism to handle HTML parser errors.

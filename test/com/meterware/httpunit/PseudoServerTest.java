@@ -126,6 +126,13 @@ public class PseudoServerTest extends HttpUnitTest {
     }
 
 
+    public void testHeaderFields() throws Exception {
+        WebConversation wc = new WebConversation();
+        wc.setHeaderField( "user-agent", "Mozilla 6" );
+        assertEquals( "Mozilla 6", wc.getUserAgent() );
+    }
+
+
     public void testSimpleGet() throws Exception {
         String resourceName = "something/interesting";
         String resourceValue = "the desired content";

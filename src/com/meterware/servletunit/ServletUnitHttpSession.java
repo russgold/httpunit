@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.net.URL;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
@@ -213,22 +214,62 @@ class ServletUnitHttpSession implements HttpSession {
     }
 
 
+    URL getOriginalURL() {
+        return _originalURL;
+    }
+
+
+    void setOriginalURL( URL originalURL ) {
+        _originalURL = originalURL;
+    }
+
+
+    /**
+     * Sets the authenticated user information for a session.
+     *
+     * @param userName the name the user supplied when logging in
+     * @param roles an array of role names assigned to the user
+     **/
+    void setUserInformation( String userName, String[] roles ) {
+        _userName = userName;
+        _roles    = roles;
+    }
+
+
+    String getUserName() {
+        return _userName;
+    }
+
+
+    String[] getRoles() {
+        return _roles;
+    }
+
+
 //------------------------------------- private members ---------------------------------------
 
     private static int _NextID = 1;
 
-    private int _maxInactiveInterval;
-
     private final long _creationTime = new Date().getTime();
 
-    private long _lastAccessedTime = new Date().getTime();
+    private final String _id = Integer.toString( _NextID++ );
 
-    private boolean _isInvalid;
+
+
+    private int       _maxInactiveInterval;
+
+    private long      _lastAccessedTime = new Date().getTime();
+
+    private boolean   _isInvalid;
 
     private Hashtable _values = new Hashtable();
 
-    private boolean _isNew = true;
+    private boolean   _isNew = true;
 
-    private final String _id = Integer.toString( _NextID++ );
+    private String    _userName;
+
+    private String[]  _roles;
+
+    private URL       _originalURL;
 
 }

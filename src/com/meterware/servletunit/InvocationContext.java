@@ -21,9 +21,13 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.Base64;
+import com.meterware.httpunit.HttpException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.io.IOException;
+import java.util.Dictionary;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -62,10 +66,36 @@ public class InvocationContext {
      **/
     public Servlet getServlet() throws ServletException {
         if (_servlet == null) {
-            _servlet = _runner.getServlet( _requestURL );
-            _servlet.init( new ServletUnitServletConfig( _servlet ) );
+            if (!_application.requiresAuthorization( _requestURL ) || userIsAuthorized() ) {
+                _servlet = _application.getServlet( _requestURL );
+            } else if (_request.getRemoteUser() != null) {
+                throw new AccessDeniedException( _requestURL );
+            } else if (_application.usesBasicAuthentication()) {
+                throw new BasicAuthenticationRequiredException( _application.getAuthenticationRealm() );
+            } else if (_application.usesFormAuthentication()) {
+                _servlet = _application.getServlet( _application.getLoginURL() );
+                ((ServletUnitHttpRequest) getRequest()).setOriginalURL( _requestURL );
+            } else {
+                throw new IllegalStateException( "Authorization required but no authentication method defined" );
+            }
         }
         return _servlet;
+    }
+
+
+    private boolean userIsAuthorized() {
+        final String[] roles = _request.getRoles();
+        for (int i = 0; i < roles.length; i++) {
+            if (_application.roleMayAccess( roles[i], _requestURL )) return true;
+        }
+        return false;
+    }
+
+
+    class AccessDeniedException extends HttpException {
+        public AccessDeniedException( URL baseURL ) {
+            super( 403, "Access Denied", baseURL );
+        }
     }
 
 
@@ -92,14 +122,17 @@ public class InvocationContext {
      * Constructs a servlet invocation context for a specified servlet container,
      * request, and cookie headers.
      **/
-    InvocationContext( ServletRunner runner, WebRequest request, Cookie[] cookies ) throws MalformedURLException {
-        _runner     = runner;
-        _requestURL = request.getURL();
-        _target     = request.getTarget();
+    InvocationContext( ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders ) throws IOException, MalformedURLException {
+        _application         = runner._application;
+        _requestURL          = request.getURL();
+        _target              = request.getTarget();
 
-        _request = new ServletUnitHttpRequest( request, runner.getContext() );
+        _request = new ServletUnitHttpRequest( request, runner.getContext(), clientHeaders );
         for (int i = 0; i < cookies.length; i++) _request.addCookie( cookies[i] );
-        
+
+        if (_application.usesBasicAuthentication()) _request.readBasicAuthentication();
+        else if (_application.usesFormAuthentication()) _request.readFormAuthentication();
+
         HttpSession session = _request.getSession( /* create */ false );
         if (session != null) ((ServletUnitHttpSession) session).access();
     }
@@ -113,7 +146,7 @@ public class InvocationContext {
 //------------------------------ private members ---------------------------------------
 
 
-    private ServletRunner           _runner;
+    private WebApplication          _application;
     private ServletUnitHttpRequest  _request;
     private ServletUnitHttpResponse _response = new ServletUnitHttpResponse();
     private URL                     _requestURL;

@@ -43,7 +43,7 @@ public class WebLink extends WebRequestSource {
     public WebRequest getRequest() {
         WebRequest request = new GetMethodWebRequest( getBaseURL(), getBareURL(), getTarget() );
         addPresetParameters( request );
-        request.setRequestHeader( "Referer", getBaseURL().toExternalForm() );
+        request.setHeaderField( "Referer", getBaseURL().toExternalForm() );
         return request;
     }
 

@@ -41,8 +41,9 @@ class ServletUnitServletContext implements ServletContext {
     /**
      * Returns a ServletContext object that corresponds to a specified URL on the server. 
      * <p>
-     * This method allows servlets to gain access to the context for various parts of the server, and as needed obtain RequestDispatcher
-     * objects from the context. The given path must be absolute (beginning with "/") and is interpreted based on the server's document root. 
+     * This method allows servlets to gain access to the context for various parts of the server,
+     * and as needed obtain RequestDispatcher objects from the context. The given path must be
+     * absolute (beginning with "/") and is interpreted based on the server's document root.
      * <p>
      * In a security conscious environment, the servlet container may return null for a given URL.
      **/
@@ -62,10 +63,10 @@ class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns the minor version of the Servlet API that this servlet container supports. 
-     * All implementations that comply with Version 2.3 must have this method return the integer 2.
+     * All implementations that comply with Version 2.3 must have this method return the integer 3.
      **/
     public int getMinorVersion() {
-        return 2;
+        return 3;
     }
 
 

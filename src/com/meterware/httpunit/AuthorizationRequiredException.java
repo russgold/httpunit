@@ -29,7 +29,7 @@ import java.io.*;
 public class AuthorizationRequiredException extends RuntimeException {
 
 
-    AuthorizationRequiredException( String wwwAuthenticateHeader ) throws IOException {
+    AuthorizationRequiredException( String wwwAuthenticateHeader ) {
         final int index = wwwAuthenticateHeader.indexOf( ' ' );
         if (index < 0) {  // non-conforming header
             _scheme = "Basic";
@@ -38,8 +38,23 @@ public class AuthorizationRequiredException extends RuntimeException {
             _scheme = wwwAuthenticateHeader.substring( 0, index );
             _params = wwwAuthenticateHeader.substring( index+1 );
         }
-        _properties = new Properties();
-        _properties.load( new ByteArrayInputStream( _params.getBytes() ) );
+        loadProperties();
+    }
+
+
+    private void loadProperties() {
+        try {
+            _properties = new Properties();
+            _properties.load( new ByteArrayInputStream( _params.getBytes() ) );
+        } catch (IOException e) {
+        }
+    }
+
+
+    protected AuthorizationRequiredException( String scheme, String params ) {
+        _scheme = scheme;
+        _params = params;
+        loadProperties();
     }
 
 

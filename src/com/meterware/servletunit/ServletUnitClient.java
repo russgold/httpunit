@@ -19,19 +19,16 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
-import com.meterware.httpunit.HttpInternalErrorException;
-import com.meterware.httpunit.WebClient;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.GetMethodWebRequest;
+import com.meterware.httpunit.*;
 
 import java.io.IOException;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.Hashtable;
 
 import javax.servlet.ServletException;
 
@@ -55,7 +52,7 @@ public class ServletUnitClient extends WebClient {
     /**
      * Creates and returns a new invocation context from a GET request.
      **/
-    public InvocationContext newInvocation( String requestString ) throws MalformedURLException {
+    public InvocationContext newInvocation( String requestString ) throws IOException, MalformedURLException {
         return newInvocation( new GetMethodWebRequest( requestString ) );
     }
 
@@ -63,8 +60,8 @@ public class ServletUnitClient extends WebClient {
     /**
      * Creates and returns a new invocation context to test calling of servlet methods.
      **/
-    public InvocationContext newInvocation( WebRequest request ) throws MalformedURLException {
-        return new InvocationContext( _runner, request, getCookies() );
+    public InvocationContext newInvocation( WebRequest request ) throws IOException, MalformedURLException {
+        return new InvocationContext( _runner, request, getCookies(), this.getHeaderFields() );
     }
 
 
@@ -94,15 +91,15 @@ public class ServletUnitClient extends WebClient {
      * Creates a web response object which represents the response to the specified web request.
      **/
     protected WebResponse newResponse( WebRequest request ) throws MalformedURLException,IOException {
-        InvocationContext invocation = newInvocation( request );
 
         try {
+            InvocationContext invocation = newInvocation( request );
             invocation.getServlet().service( invocation.getRequest(), invocation.getResponse() );
+            return invocation.getServletResponse();
         } catch (ServletException e) {
             throw new HttpInternalErrorException( request.getURL(), e );
         }
 
-        return invocation.getServletResponse();
     }
 
 
@@ -111,8 +108,8 @@ public class ServletUnitClient extends WebClient {
 
     private ServletRunner _runner;
 
-    final private static Cookie[] NO_COOKIES = new Cookie[0]; 
-    
+    final private static Cookie[] NO_COOKIES = new Cookie[0];
+
 
     private Cookie[] getCookies() {
         String cookieHeader = (String) getHeaderFields().get( "Cookie" );

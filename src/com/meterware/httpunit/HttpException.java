@@ -30,12 +30,12 @@ import java.net.URL;
 public class HttpException extends RuntimeException {
 
 
-    HttpException( int responseCode ) {
+    protected HttpException( int responseCode ) {
         _responseCode = responseCode;
     }
 
 
-    HttpException( int responseCode, String responseMessage, URL baseURL ) {
+    protected HttpException( int responseCode, String responseMessage, URL baseURL ) {
         _responseMessage = responseMessage;
         _responseCode = responseCode;
         _url = baseURL;

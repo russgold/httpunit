@@ -42,7 +42,7 @@ public class MessageBodyWebRequest extends WebRequest {
      * request.
      **/ 
     abstract
-    protected MessageBody newMessageBody();
+    protected MessageBody getMessageBody();
 
 
 //---------------------------------- WebRequest methods --------------------------------
@@ -56,12 +56,15 @@ public class MessageBodyWebRequest extends WebRequest {
         connection.setDoInput( true );
         connection.setDoOutput( true );
 
-        MessageBody mb = newMessageBody();
-        connection.setRequestProperty( "Content-type", mb.getContentType() );
         OutputStream stream = connection.getOutputStream();
-        mb.writeTo( stream );
+        getMessageBody().writeTo( stream );
         stream.flush();
         stream.close();
+    }
+
+
+    protected String getContentType() {
+        return getMessageBody().getContentType();
     }
 
 
