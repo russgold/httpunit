@@ -92,7 +92,10 @@ public class WebResponse {
      * Returns the content type of this response.
      **/
     public String getContentType() {
-        if (_contentType == null) readContentTypeHeader();
+        if (_contentType == null) {
+            readContentTypeHeader();
+            if (_contentType == null) _contentType = DEFAULT_CONTENT_TYPE;
+        }
         return _contentType;
     }
 
@@ -101,7 +104,10 @@ public class WebResponse {
      * Returns the character set used in this response.
      **/
     public String getCharacterSet() {
-        if (_characterSet == null) readContentTypeHeader();
+        if (_characterSet == null) {
+            readContentTypeHeader();
+            if (_characterSet == null) _characterSet = DEFAULT_CHARACTER_SET;
+        }
         return _characterSet;
     }
 
@@ -319,7 +325,9 @@ public class WebResponse {
 //--------------------------------- private members --------------------------------------
 
 
-    final private static String DEFAULT_CONTENT_HEADER = "text/plain; charset=us-ascii";
+    final private static String DEFAULT_CONTENT_TYPE   = "text/plain";
+    final private static String DEFAULT_CHARACTER_SET  = "us-ascii";
+    final private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE + "; charset=" + DEFAULT_CHARACTER_SET;
 
     final private static String HTML_CONTENT = "text/html";
 
@@ -372,7 +380,7 @@ public class WebResponse {
             String parameter = st.nextToken();
             if (st.hasMoreTokens()) {
                 String value = st.nextToken();
-                if (parameter.equalsIgnoreCase( "charset" )) _characterSet = value;
+                if (parameter.trim().equalsIgnoreCase( "charset" )) _characterSet = value;
             }
         }
     }
@@ -396,7 +404,7 @@ public class WebResponse {
 
     private ReceivedPage getReceivedPage() throws SAXException {
         if (_page == null) {
-            if (!isHTML()) throw new RuntimeException( "Response is not HTML" );
+            if (!isHTML()) throw new NotHTMLException( getContentType() );
             _page = new ReceivedPage( _url, _target, getText() );
         }
         return _page;
@@ -484,5 +492,24 @@ class DefaultWebResponse extends WebResponse {
     
     
     private String _responseText;
+}
+
+
+//==================================================================================================
+
+
+class NotHTMLException extends RuntimeException {
+
+    NotHTMLException( String contentType ) {
+        _contentType = contentType;
+    }
+
+
+    public String getMessage() {
+        return "The content type of the response is '" + _contentType + "': it must be 'text/html' in order to be recognized as HTML";
+    }
+
+
+    private String _contentType;
 }
 

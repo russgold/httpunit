@@ -11,6 +11,7 @@ Revision History:
 Additions:
     1. Added getTableWithID method to WebResponse, ParsedHTML
     2. Implemented support for sendRedirect, getServletContext in ServletUnit
+    3. Added recognition of content charset header. This should allow for proper handling of non-ascii html pages.
      
 21-Nov-00
 Additions:

@@ -81,6 +81,19 @@ public class PseudoServer {
 
 
     /**
+     * Specifies the character set encoding for a resource.
+     **/
+    public void setCharacterSet( String name, String characterSet ) {
+        WebResource resource = (WebResource) _resources.get( asResourceName( name ) );
+        if (resource == null) {
+            resource = new WebResource( "" );
+            _resources.put( asResourceName( name ), resource );
+        }
+        resource.setCharacterSet( characterSet );
+    }
+
+
+    /**
      * Adds a header to a defined resource.
      **/
     public void addResourceHeader( String name, String header ) {
@@ -95,11 +108,12 @@ public class PseudoServer {
 
 //------------------------------------- private members ---------------------------------------
 
-
     private Hashtable _resources = new Hashtable();
 
     private boolean _active = true;
 
+    /** The encoding used for HTTP headers. **/
+    final private static String HEADER_ENCODING = "us-ascii";
 
     final private static String CRLF = "\r\n";
 
@@ -116,8 +130,9 @@ public class PseudoServer {
     private void handleConnection() throws IOException {
         Socket socket = getServerSocket().accept();
 
-        BufferedReader br = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
-        PrintStream ps = new PrintStream( socket.getOutputStream() );
+        BufferedReader br = new BufferedReader( new InputStreamReader( socket.getInputStream(), HEADER_ENCODING ) );
+        PrintWriter    pw = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), HEADER_ENCODING ) );
+
         socket.setSoTimeout( 1000 );
         socket.setTcpNoDelay( true );
 
@@ -128,41 +143,44 @@ public class PseudoServer {
         String protocol = st.nextToken();
 
         if (!command.equals( "GET" )) {
-            sendResponse( ps, HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + command );
+            sendResponse( pw, HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + command );
         } else {
             WebResource resource = (WebResource) _resources.get( uri );
             if (resource == null) {
-                sendResponse( ps, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
+                sendResponse( pw, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
             } else {
-                sendResponse( ps, HttpURLConnection.HTTP_OK, "OK" );
-                sendLine( ps, "Content-type: " + resource.getContentType() );
+                sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
+                sendLine( pw, "Content-type: " + resource.getContentType() + "; charset=" + resource.getCharacterSet() );
                 String[] headers = resource.getHeaders();
                 for (int i = 0; i < headers.length; i++) {
-                    sendLine( ps, headers[i] );
+                    sendLine( pw, headers[i] );
                 }
-                sendLine( ps, "" );
-                sendText( ps, resource.getContents() );
+                sendLine( pw, "" );
+                pw.flush();
+
+                pw = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), resource.getCharacterSet() ) );
+                sendText( pw, resource.getContents() );
             }
         }
 
-        ps.close();
+        pw.close();
         socket.close();
     }
 
 
-    private void sendResponse( PrintStream ps, int responseCode, String responseText ) throws IOException {
-        sendLine( ps, "HTTP/1.0 " + responseCode + ' ' + responseText );
+    private void sendResponse( PrintWriter pw, int responseCode, String responseText ) throws IOException {
+        sendLine( pw, "HTTP/1.0 " + responseCode + ' ' + responseText );
     }
 
 
-    private void sendLine( PrintStream ps, String text ) throws IOException {
-        sendText( ps, text );
-        sendText( ps, CRLF );
+    private void sendLine( PrintWriter pw, String text ) throws IOException {
+        sendText( pw, text );
+        sendText( pw, CRLF );
     }
 
 
-    private void sendText( PrintStream ps, String text ) throws IOException {
-        ps.write( text.getBytes() );
+    private void sendText( PrintWriter pw, String text ) throws IOException {
+        pw.write( text );
     }
 
 
@@ -185,6 +203,8 @@ class WebResource {
 
     final static String DEFAULT_CONTENT_TYPE = "text/html";
 
+    final static String DEFAULT_CHARACTER_SET = "us-ascii";
+
     WebResource( String contents ) {
         this( contents, DEFAULT_CONTENT_TYPE );
     }
@@ -198,6 +218,11 @@ class WebResource {
 
     void addHeader( String header ) {
         _headers.addElement( header );
+    }
+
+
+    void setCharacterSet( String characterSet ) {
+        _characterSet = characterSet;
     }
 
 
@@ -217,8 +242,14 @@ class WebResource {
         return _contentType;
     }
 
+
+    String getCharacterSet() {
+        return _characterSet;
+    }
+
     private String _contents;
     private String _contentType;
+    private String _characterSet = DEFAULT_CHARACTER_SET;
     private Vector _headers = new Vector();
 }
 

@@ -91,7 +91,7 @@ class HttpWebResponse extends WebResponse {
     private void loadResponseText( URL url, URLConnection connection ) throws FileNotFoundException {
         StringBuffer sb = new StringBuffer();
         try {
-            BufferedReader input = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
+            BufferedReader input = new BufferedReader( new InputStreamReader( connection.getInputStream(), getCharacterSet() ) );
 
             String str;
             while (null != ((str = input.readLine()))) {
@@ -135,9 +135,10 @@ class HttpWebResponse extends WebResponse {
             }
             addHeader( connection.getHeaderFieldKey( i ).toUpperCase(), connection.getHeaderField( i ) );
         }
+
         if (connection.getContentType() != null) {
             _headers.put( "Content-type".toUpperCase(), connection.getContentType() );
-        }
+        } 
     }
 
 

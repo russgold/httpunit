@@ -82,6 +82,7 @@ public class WebPageTest extends HttpUnitTest {
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
         WebResponse simplePage = wc.getResponse( request );
         assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
+        assertEquals( "Character set", "us-ascii", simplePage.getCharacterSet() );
     }
 
 
@@ -109,6 +110,7 @@ public class WebPageTest extends HttpUnitTest {
         WebRequest request = new GetMethodWebRequest( "file:" + file.getAbsolutePath() );
         WebResponse simplePage = wc.getResponse( request );
         assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
+        assertEquals( "Character set", "us-ascii", simplePage.getCharacterSet() );
 
         file.delete();
     }
