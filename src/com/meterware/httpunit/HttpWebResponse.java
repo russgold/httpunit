@@ -54,11 +54,21 @@ class HttpWebResponse extends WebResponse {
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/
         if (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST || !throwExceptionOnError) {
-            InputStream stream = (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST) ? connection.getInputStream()
-                                                                                      : ((HttpURLConnection) connection).getErrorStream();
-            defineRawInputStream( new BufferedInputStream( stream ) );
+            defineRawInputStream( new BufferedInputStream( getInputStream( connection ) ) );
             if (getContentType().startsWith( "text" )) loadResponseText();
         }
+    }
+
+
+    private InputStream getInputStream( URLConnection connection ) throws IOException {
+        return isResponseOnErrorStream( connection )
+                               ? ((HttpURLConnection) connection).getErrorStream()
+                               : connection.getInputStream();
+    }
+
+
+    private boolean isResponseOnErrorStream( URLConnection connection ) {
+        return _responseCode >= HttpURLConnection.HTTP_BAD_REQUEST && ((HttpURLConnection) connection).getErrorStream() != null;
     }
 
 
