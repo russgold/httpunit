@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,6 +20,12 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 /**
  * Utility code shared by httpunit and servletunit.
@@ -79,5 +85,19 @@ public class HttpUnitUtils {
             }
         }
         return sb.toString();
+    }
+
+
+    /**
+     * creates a parser using JAXP API.
+     */
+    public static DocumentBuilder newParser() throws SAXException {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            return factory.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            // redirect the new exception for code compatibility
+            throw new SAXException( ex );
+        }
     }
 }

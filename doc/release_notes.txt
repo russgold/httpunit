@@ -7,10 +7,17 @@ Known problems:
 
 Limitations:
     1. HttpUnit does not support JavaScript
-    2. JDK 1.2 or higher is now required
+    2. JDK 1.2 or higher is required
 
 
 Revision History:
+ 1-Feb-2002
+Acknowledgements:
+    Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces
+
+Additions:
+    1. ServletUnit can now use any jaxp-compliant parser
+
 30-Jan-2002
 Acknkowledgements:
     Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,6 +23,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.HttpInternalErrorException;
+import com.meterware.httpunit.HttpUnitUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -34,10 +35,13 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
-import org.apache.xerces.parsers.DOMParser;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
+import org.w3c.dom.Document;
 
 
 /**
@@ -57,9 +61,8 @@ public class ServletRunner {
      * Constructor which expects the full path to the web.xml for the application.
      **/
     public ServletRunner( String webXMLFileSpec ) throws IOException, SAXException {
-        DOMParser parser = new DOMParser();
-        parser.parse( webXMLFileSpec );
-        _application = new WebApplication( parser.getDocument() );
+        DocumentBuilder parser = HttpUnitUtils.newParser();
+        _application = new WebApplication( parser.parse( webXMLFileSpec ) );
     }
 
 
@@ -67,9 +70,8 @@ public class ServletRunner {
      * Constructor which expects an input stream containing the web.xml for the application.
      **/
     public ServletRunner( InputStream webXML ) throws IOException, SAXException {
-        DOMParser parser = new DOMParser();
-        parser.parse( new InputSource( webXML ) );
-        _application = new WebApplication( parser.getDocument() );
+        DocumentBuilder parser = HttpUnitUtils.newParser();
+        _application = new WebApplication( parser.parse( new InputSource( webXML ) ) );
     }
 
 
