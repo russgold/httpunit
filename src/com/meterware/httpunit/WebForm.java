@@ -19,13 +19,16 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import java.io.IOException;
 import java.net.URL;
 
-import java.util.*;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -51,7 +54,8 @@ public class WebForm extends WebRequestSource {
      * Returns the action defined for this form.
      **/
     public String getAction() {
-        return getDestination();
+        if (_action == null) _action = getDestination();
+        return _action;
      }
 
 
@@ -268,6 +272,14 @@ public class WebForm extends WebRequestSource {
         }
     }
 
+
+    /**
+     * Returns an object which provides scripting access to this form.
+     **/
+    public ScriptableObject getScriptableObject() {
+        return new ScriptableObject();
+    }
+
 //---------------------------------- WebRequestSource methods --------------------------------
 
     /**
@@ -388,6 +400,12 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    public class ScriptableObject {
+        public String getAction() { return WebForm.this.getAction(); }
+        public void setAction( String newAction ) { _action = newAction; }
+    }
+
+
 //---------------------------------- package members --------------------------------
 
     /**
@@ -420,6 +438,8 @@ public class WebForm extends WebRequestSource {
 
     private FormControl[] _presetParameters;
     private ArrayList     _presets;
+
+    private String        _action;
 
 
     private SubmitButton getDefaultButton() {

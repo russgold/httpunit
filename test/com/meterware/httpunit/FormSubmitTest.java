@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -38,8 +38,8 @@ public class FormSubmitTest extends HttpUnitTest {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-    
-    
+
+
     public static Test suite() {
         return new TestSuite( FormSubmitTest.class );
     }
@@ -54,8 +54,8 @@ public class FormSubmitTest extends HttpUnitTest {
         super.setUp();
         _wc = new WebConversation();
     }
-	
-	
+
+
     public void testEmbeddedEquals() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=\"age=x\" value=12>" +
@@ -91,6 +91,9 @@ public class FormSubmitTest extends HttpUnitTest {
         WebForm form = page.getForms()[0];
         assertEquals( "Form method", "GET", form.getMethod() );
         assertEquals( "Form action", "/ask", form.getAction() );
+
+        form.getScriptableObject().setAction( "/tell" );
+        assertEquals( "Form action", "/tell", form.getAction() );
     }
 
 
@@ -105,7 +108,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( getHostPath() + "/ask?age=23", request.getURL().toExternalForm() );
     }
 
-                              
+
     public void testNoNameSubmitString() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text value=dontSend>" +
@@ -130,7 +133,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "num detected submit buttons", 2, buttons.length );
     }
 
-                              
+
     public void testDisabledSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -180,7 +183,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "num detected submit buttons", 2, buttons.length );
     }
 
-                              
+
     public void testImageButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -193,7 +196,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "num detected submit buttons", 2, buttons.length );
     }
 
-                              
+
     public void testImageButtonDefaultSubmit() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -205,7 +208,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "Query", getHostPath() + "/ask?age=12&update=name&update.x=0&update.y=0", request.getURL().toExternalForm() );
     }
 
-                              
+
     public void testUnnamedImageButtonDefaultSubmit() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -217,7 +220,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( getHostPath() + "/ask?age=12", request.getURL().toExternalForm() );
     }
 
-                              
+
     public void testImageButtonPositionalSubmit() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -245,7 +248,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "submit button value", "age", buttons[0].getValue() );
     }
 
-                              
+
     public void testSubmitButtonSelectionByName() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -262,7 +265,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "submit button value", "age", button.getValue() );
     }
 
-                              
+
     public void testSubmitButtonSelectionByNameAndValue() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -281,7 +284,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( "submit button value", "name", button.getValue() );
     }
 
-                              
+
     public void testNamedButtonSubmitString() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -306,7 +309,7 @@ public class FormSubmitTest extends HttpUnitTest {
         }
     }
 
-                              
+
     public void testUnnamedButtonSubmit() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -319,10 +322,10 @@ public class FormSubmitTest extends HttpUnitTest {
             WebRequest request = form.getRequest();
             fail( "Should not allow submit with unnamed button" );
         } catch (IllegalRequestParameterException e) {
-        } 
+        }
     }
 
-                              
+
     public void testForeignSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +

@@ -11,6 +11,11 @@ Limitations:
 
 
 Revision History:
+14-Mar-2002
+Additions:
+    1. It is now possible to set the action on a form using a mechanism which will support scripting in the future:
+              form.getScriptableObject().setAction( newAction )
+
 11-Mar-2002
 
 Additions:
