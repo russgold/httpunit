@@ -48,6 +48,14 @@ public class PostMethodWebRequest extends WebRequest {
 
 
     /**
+     * Constructs a web request with a specific target.
+     **/
+    public PostMethodWebRequest( URL urlBase, String urlString, String target ) {
+        super( urlBase, urlString, target );
+    }
+
+
+    /**
      * Returns the HTTP method defined for this request.
      **/
     public String getMethod() {

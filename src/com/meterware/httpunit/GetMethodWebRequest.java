@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -45,6 +45,14 @@ public class GetMethodWebRequest extends WebRequest {
 
 
     /**
+     * Constructs a web request with a specific target.
+     **/
+    public GetMethodWebRequest( URL urlBase, String urlString, String target ) {
+        super( urlBase, urlString, target );
+    }
+
+
+    /**
      * Returns the HTTP method defined for this request.
      **/
     public String getMethod() {
@@ -53,14 +61,6 @@ public class GetMethodWebRequest extends WebRequest {
 
 
 //--------------------------------------- package members ---------------------------------------------
-
-
-    /**
-     * Constructs a web request with a specific target.
-     **/
-    GetMethodWebRequest( URL urlBase, String urlString, String target ) {
-        super( urlBase, urlString, target );
-    }
 
 
     /**
