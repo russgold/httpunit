@@ -100,6 +100,11 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
+    protected void setServerDebug( boolean enabled ) {
+        _server.setDebug( enabled );
+    }
+
+
     protected String getHostPath() {
         return _hostPath;
     }

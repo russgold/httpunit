@@ -98,6 +98,7 @@ public class WebResource {
         _stream = stream;
         _contentType = contentType;
         _responseCode = responseCode;
+        addHeader( "Connection: close" );
     }
 
 

@@ -18,6 +18,8 @@ Acknowledgements:
     Thanks to Brendan Boesen for correcting the session invalidation problem.
 Problems fixed:
     1. ServletUnit was creating a new session if the current one was not valid, even if "create" was not specified.
+Additions:
+    1. PseudoServer now handles persistent connections.
 
  17-Mar-2003
 Problems fixed:

@@ -157,11 +157,18 @@ public class PseudoServer {
     }
 
 
+    public void setDebug( boolean debug ) {
+        _debug = debug;
+    }
+
+
 //------------------------------------- private members ---------------------------------------
 
     private Hashtable _resources = new Hashtable();
 
     private boolean _active = true;
+
+    private boolean _debug;
 
 
     private String asResourceName( String rawName ) {
@@ -210,6 +217,7 @@ public class PseudoServer {
         socket.setSoTimeout( 1000 );
         socket.setTcpNoDelay( true );
 
+        if (_debug) System.out.println( "** Created server thread: " + hashCode() );
         final BufferedInputStream inputStream = new BufferedInputStream( socket.getInputStream() );
         final HttpResponseStream outputStream = new HttpResponseStream( socket.getOutputStream() );
 
@@ -221,12 +229,14 @@ public class PseudoServer {
                 try { Thread.sleep(10); } catch (InterruptedException e) {}
             }
         }
+        if (_debug) System.out.println( "** Closing server thread: " + hashCode() );
         outputStream.close();
         socket.close();
     }
 
 
     private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {
+        if (_debug) System.out.println( "** Server thread " + hashCode() + " handling request: " + request );
         boolean keepAlive = request.wantsKeepAlive();
         try {
             response.restart();
@@ -241,6 +251,7 @@ public class PseudoServer {
                 }
                 String[] headers = resource.getHeaders();
                 for (int i = 0; i < headers.length; i++) {
+                    if (_debug) System.out.println( "** Server thread " + hashCode() + " sending header: " + headers[i] );
                     response.addHeader( headers[i] );
                 }
                 response.write( resource );
