@@ -85,6 +85,25 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns a request to refresh this page, if any. This request will be defined
+     * by a <meta> tag in the header.  If no tag exists, will return null.
+     **/
+    public WebRequest getRefreshRequest() {
+        return _refreshRequest;
+    }
+
+
+    /**
+     * Returns the delay before normally following the request to refresh this page, if any. 
+     * This request will be defined by a <meta> tag in the header.  If no tag exists, 
+     * will return zero.
+     **/
+    public int getRefreshDelay() {
+        return _refreshDelay;
+    }
+
+
+    /**
      * Returns the response code associated with this response.
      **/
     abstract
@@ -323,6 +342,19 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+    final
+    protected void readRefreshRequest( String contentTypeHeader ) {
+        int splitIndex = contentTypeHeader.indexOf( ';' );
+        if (splitIndex < 0) splitIndex = 0;
+        try {
+            _refreshDelay = Integer.parseInt( contentTypeHeader.substring( 0, splitIndex ) );
+            _refreshRequest = new GetMethodWebRequest( contentTypeHeader.substring( splitIndex+1 ) );
+        } catch (NumberFormatException e) {
+            System.out.println( "Unable to interpret refresh tag: \"" + contentTypeHeader + '"' );
+        }
+    }
+
+
 //------------------------------------------ package members ------------------------------------------------
 
 
@@ -364,6 +396,10 @@ public class WebResponse implements HTMLSegment {
     private String _characterSet;
 
     private Hashtable _newCookies;
+
+    private WebRequest _refreshRequest;
+
+    private int _refreshDelay;
 
 
     // the following variables are essentially final; however, the JDK 1.1 compiler does not handle blank final variables properly with

@@ -64,7 +64,7 @@
 <target name="compile" depends="prepare,check_for_optional_packages">
     <mkdir dir="${build.classes}" /> 
     <javac srcdir="${src.dir}" destdir="${build.classes}" 
-           debug="off" deprecation="on" optimize="off">
+           debug="on" deprecation="on" optimize="off">
          <classpath refid="base.classpath" />
          <exclude name="**/servletunit/*" unless="jsdk.present" />
     </javac>

@@ -152,7 +152,8 @@ class HttpWebResponse extends WebResponse {
     }
 
 
-    private void readMetaTags( byte[] rawMessage ) throws UnsupportedEncodingException {
+    final
+    protected void readMetaTags( byte[] rawMessage ) throws UnsupportedEncodingException {
         ByteTagParser parser = new ByteTagParser( rawMessage );
         ByteTag tag = parser.getNextTag();
         while (tag != null && !tag.getName().equalsIgnoreCase( "body" )) {
@@ -163,9 +164,10 @@ class HttpWebResponse extends WebResponse {
 
 
     private void processMetaTag( ByteTag tag ) {
-        if (tag.getAttribute( "http_equiv" ) != null &&
-            tag.getAttribute( "http_equiv" ).equalsIgnoreCase( "content-type" )) {
+        if ("content-type".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
             inferContentType( tag.getAttribute( "content" ) );
+        } else if ("refresh".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
+            readRefreshRequest( tag.getAttribute( "content" ) );
         }
     }
 
@@ -272,6 +274,9 @@ class ByteTag {
             return "";
         } else if (_buffer[ _start ] == '"') {
             for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
+            return new String( _buffer, _start+1, _end-_start-1 );
+        } else if (_buffer[ _start ] == '\'') {
+            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
             return new String( _buffer, _start+1, _end-_start-1 );
         } else if (_buffer[ _start ] == '=') {
             _end = _start;

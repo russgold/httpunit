@@ -158,6 +158,27 @@ public class HttpUnitOptions {
     }
 
 
+    /**
+     * Returns true if HttpUnit should automatically follow page refresh requests. 
+     * By default, this is false, so that programs can verify the redirect page presented
+     * to users before the browser switches to the new page.
+     **/
+    public static boolean getAutoRefresh() {
+        return _autoRefresh;
+    }
+
+
+    /**
+     * Specifies whether HttpUnit should automatically follow page refresh requests. 
+     * By default, this is false, so that programs can verify the redirect page presented
+     * to users before the browser switches to the new page. Setting this to true can
+     * cause an infinite loop on pages that refresh themselves.
+     **/
+    public static void setAutoRefresh( boolean autoRefresh ) {
+        _autoRefresh = autoRefresh;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
@@ -172,6 +193,8 @@ public class HttpUnitOptions {
     private static boolean _loggingHttpHeaders;
 
     private static boolean _matchesIgnoreCase = true;
+
+    private static boolean _autoRefresh;
 
     private static int _redirectDelay;
 

@@ -11,6 +11,13 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+ 1-Jul-2001
+ Additions:
+    1. WebResponse.getRefreshRequest now returns a WebRequest object if a refresh URL
+       was specified in the response header.
+    2. WebResponse.getRefreshDelay specifies the delay found in the header, if any.
+    3. HttpUnitOptions.setAutoRefresh controls whether the refresh URL is automatically followed.
+
 19-Jun-2001
 Problems corrected:
     1. The cookbook was missing parentheses for its constructors

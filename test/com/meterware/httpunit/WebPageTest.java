@@ -54,9 +54,10 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
-    public void setUp() throws Exception {
-        super.setUp();
+    public void tearDown() throws Exception {
+        super.tearDown();
         HttpUnitOptions.resetDefaultCharacterSet();
+        HttpUnitOptions.setAutoRefresh( false );
     }
 	
 	
@@ -84,6 +85,7 @@ public class WebPageTest extends HttpUnitTest {
         WebResponse simplePage = wc.getResponse( request );
         assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
         assertEquals( "Character set", "iso-8859-1", simplePage.getCharacterSet() );
+        assertNull( "No refresh request should have been found", simplePage.getRefreshRequest() );
     }
 
 
@@ -208,6 +210,41 @@ public class WebPageTest extends HttpUnitTest {
         assertEquals( "Message", "Hello, " + hebrewName, cells[0][0] );
         assertEquals( "Character set", "iso-8859-8", answer.getCharacterSet() );
     }
+
+
+    public void testMetaRefreshRequest() throws Exception {
+        String refreshURL = getHostPath() + "/NextPage.html";
+        String page = "<html><head><title>Sample</title>" +
+                      "<meta Http_equiv=refresh content='2;" + refreshURL + "'></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Refresh URL", refreshURL, simplePage.getRefreshRequest().getURL().toExternalForm() );
+        assertEquals( "Refresh delay", 2, simplePage.getRefreshDelay() );
+     }
+
+
+    public void testAutoRefresh() throws Exception {
+        String refreshURL = getHostPath() + "/NextPage.html";
+        String page = "<html><head><title>Sample</title>" +
+                      "<meta Http_equiv=refresh content='2;" + refreshURL + "'></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+        defineWebPage( "NextPage", "Not much here" );
+
+        HttpUnitOptions.setAutoRefresh( true );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertNull( "No refresh request should have been found", simplePage.getRefreshRequest() );
+     }
 
 
     private String toUnicode( String string ) {

@@ -1,4 +1,3 @@
-o Support <META HTTP_EQUIV=REFRESH tags>
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Support IFRAME tag
 o Support reset button detection

@@ -47,7 +47,7 @@ class HttpUnitTest extends TestCase {
     }
 
 
-    public void tearDown() {
+    public void tearDown() throws Exception {
         if (_server != null) _server.shutDown();
     }
 

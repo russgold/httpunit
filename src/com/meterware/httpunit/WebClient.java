@@ -218,7 +218,9 @@ public class WebClient {
     protected void updateClient( WebResponse response ) throws MalformedURLException, IOException, SAXException {
         validateHeaders( response );
         updateCookies( response );
-        if (response.getHeaderField( "Location" ) == null) {
+        if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
+            getResponse( response.getRefreshRequest() );
+        } else if (response.getHeaderField( "Location" ) == null) {
             updateFrames( response );
         } else {
             delay( HttpUnitOptions.getRedirectDelay() );
