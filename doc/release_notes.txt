@@ -15,6 +15,11 @@ Thanks to Ken Hygh for the proper handling of parameters with no specified type
 Thanks to Gabriel Hauser for finding a bug in the handling of parameter defaults 
 
 Revision History:
+25-Oct-00
+Problems corrected:
+    1. Unnamed parameters are no longer submitted as part of a form request
+    2. Searching for tables beginning with a string no longer aborts with NullPointerException if the table is missing cells
+
 17-Oct-00 1.1
 Additions:
     1. It is now possible to set a delay in the handling of redirect requests, if necessary

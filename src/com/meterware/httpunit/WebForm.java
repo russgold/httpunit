@@ -90,7 +90,7 @@ public class WebForm {
 
         String[] parameterNames = getParameterNames();
         for (int i = 0; i < parameterNames.length; i++) {
-            if (getParameterDefaults().get( parameterNames[i] ) != null) {
+            if (parameterNames[i].length() > 0 && getParameterDefaults().get( parameterNames[i] ) != null) {
                 Object value = getParameterDefaults().get( parameterNames[i] );
                 if (value instanceof String) {
                     result.setParameter( parameterNames[i], (String) value);

@@ -43,6 +43,7 @@ public class HttpUnitSuite {
         suite.addTest( WebFrameTest.suite() );
         suite.addTest( RequestTargetTest.suite() );
         suite.addTest( FormParametersTest.suite() );
+        suite.addTest( FormSubmitTest.suite() );
         suite.addTest( Base64Test.suite() );
         suite.addTest( PseudoServerTest.suite() );
         return suite;
