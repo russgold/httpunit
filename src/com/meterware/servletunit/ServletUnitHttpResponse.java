@@ -69,8 +69,8 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Checks whether the response message header has a field with
      * the specified name.
      */
-    public boolean containsHeader(String name) {
-        throw new RuntimeException( "containsHeader not implemented" );
+    public boolean containsHeader( String name ) {
+        return _headers.containsKey( name.toUpperCase() );
     }
 
 

@@ -183,9 +183,11 @@ public class HttpServletResponseTest extends ServletUnitTest {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         servletResponse.setContentType( "text/html" );
 
+        assertFalse( "header foo wrongly detected", servletResponse.containsHeader( "foo" ) );
         servletResponse.setHeader( "foo", "bar" );
         String headerValue = servletResponse.getHeaderField( "foo" );
         assertEquals( "header is wrong", "bar", headerValue );
+        assertTrue( "header foo not detected", servletResponse.containsHeader( "foo" ) );
 
         servletResponse.setHeader( "foo", "baz" );
         headerValue = servletResponse.getHeaderField( "foo" );

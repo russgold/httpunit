@@ -16,6 +16,7 @@ Revision History:
 12-Feb-2004
 Acknowledgements:
     Thanks to Jarom Smith for finding some typos in the tutorial.
+    Thanks to Jay Dunning for providing an implementation of HttpServletResponse.containsHeader
 
 Problems fixed:
     1. Window.open() using an empty name was replacing the main window rather than creating a new one.
@@ -23,6 +24,9 @@ Problems fixed:
     3. bug #883301 - more typos in tutorial task 1 step 4
     4. bug #873169 - Cookie headers were generated with no space after the semicolon (unlike IE, Netscape, and Mozilla)
     5. Cookie domains without leading dots are now accepted, as per RFC 2965.
+
+Additions:
+    1. Patch #890995 - Implemented ServletUnitHttpResponse.containsHeader
 
  4-Dec-2003
 Acknowledgements:
