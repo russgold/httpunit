@@ -25,6 +25,8 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.HttpUnitTest;
 import com.meterware.httpunit.WebRequest;
 
+import org.xml.sax.SAXException;
+
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
 
@@ -175,21 +177,72 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testCheckboxSetChecked() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
+    public void testCheckboxProperties() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewCheckbox( checkbox ) { \n" +
+                                            "  alert( 'checkbox ' + checkbox.name + ' default = ' + checkbox.defaultChecked )\n;" +
+                                            "  alert( 'checkbox ' + checkbox.name + ' checked = ' + checkbox.checked )\n;" +
+                                            "  alert( 'checkbox ' + checkbox.name + ' value = ' + checkbox.value )\n;" +
+                                            "}\n" +
+                                            "</script></head>" +
                                             "<body>" +
-                                            "<form name='realform'><input type='checkbox' name='ready'></form>" +
+                                            "<form name='realform'><input type='checkbox' name='ready' value='good'></form>" +
                                             "<a href='#' name='clear' onMouseOver='document.realform.ready.checked=false;'>clear</a>" +
                                             "<a href='#' name='set' onMouseOver='document.realform.ready.checked=true;'>set</a>" +
+                                            "<a href='#' name='change' onMouseOver='document.realform.ready.value=\"waiting\";'>change</a>" +
+                                            "<a href='#' name='report' onMouseOver='viewCheckbox( document.realform.ready );'>report</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
+        verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "good" );
+
         assertEquals( "initial parameter value", null, form.getParameterValue( "ready" ) );
         response.getLinkWithName( "set" ).mouseOver();
-        assertEquals( "changed parameter value", "on", form.getParameterValue( "ready" ) );
+        assertEquals( "changed parameter value", "good", form.getParameterValue( "ready" ) );
         response.getLinkWithName( "clear" ).mouseOver();
         assertEquals( "final parameter value", null, form.getParameterValue( "ready" ) );
+        response.getLinkWithName( "change" ).mouseOver();
+        assertEquals( "final parameter value", null, form.getParameterValue( "ready" ) );
+        verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "waiting" );
+        form.setParameter( "ready", "waiting" );
+    }
+
+
+    private void verifyCheckbox( WebResponse response, boolean defaultChecked, boolean checked, String value ) throws SAXException {
+        response.getLinkWithName( "report" ).mouseOver();
+        assertEquals( "Message " + 1 + "-1", "checkbox ready default = " + defaultChecked, response.popNextAlert() );
+        assertEquals( "Message " + 1 + "-2", "checkbox ready checked = " + checked, response.popNextAlert() );
+        assertEquals( "Message " + 1 + "-3", "checkbox ready value = " + value, response.popNextAlert() );
+    }
+
+
+    public void testCheckboxOnClickEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <input type='checkbox' name='color' value='blue' " +
+                                            "         onClick='alert( \"color-blue is now \" + document.the_form.color.checked );'>" +
+                                            "</form>" +
+                                            "<a href='#' onClick='document.the_form.color.checked=true;'>blue</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        assertEquals( "Initial state", null, form.getParameterValue( "color" ) );
+
+        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        form.removeParameter( "color" );
+        assertEquals( "Alert message w/o change", null, response.getNextAlert() );
+        form.setParameter( "color", "blue" );
+        assertEquals( "Alert after change", "color-blue is now true", response.popNextAlert() );
+        form.removeParameter( "color" );
+        assertEquals( "Alert after change", "color-blue is now false", response.popNextAlert() );
+
+        assertEquals( "Changed state", null, form.getParameterValue( "color" ) );
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
+        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
     }
 
 

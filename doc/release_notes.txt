@@ -14,8 +14,11 @@ Revision History:
 20-Aug-2002
 
 Problems fixed:
-    1. JavaScript - HTML comments were not supported
+    1. JavaScript - HTML comments prevented JavaScript from working
     2. JavaScript - Errors were reported if Rhino was not present in the classpath
+
+Additions:
+    1. JavaScript - Added Checkbox.value property, along with Checkbox.defaultChecked and Input.name
 
 19-Aug-2002
 

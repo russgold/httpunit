@@ -45,10 +45,13 @@ abstract class FormControl {
 
     private       String  _name;
     private final String  _id;
-    private final String  _valueAttribute;
+    private       String  _valueAttribute;
     private final boolean _readOnly;
     private final boolean _disabled;
-    private Scriptable    _scriptable;
+    private final String  _onChangeEvent;
+    private final String  _onClickEvent;
+
+    private Scriptable _scriptable;
 
 
     FormControl() {
@@ -57,6 +60,8 @@ abstract class FormControl {
         _valueAttribute = "";
         _readOnly       = false;
         _disabled       = false;
+        _onChangeEvent  = "";
+        _onClickEvent   = "";
     }
 
 
@@ -66,6 +71,8 @@ abstract class FormControl {
         _valueAttribute = NodeUtils.getNodeAttribute( node, "value" );
         _readOnly       = NodeUtils.isNodeAttributePresent( node, "readonly" );
         _disabled       = NodeUtils.isNodeAttributePresent( node, "disabled" );
+        _onChangeEvent  = NodeUtils.getNodeAttribute( node, "onchange" );
+        _onClickEvent   = NodeUtils.getNodeAttribute( node, "onclick" );
     }
 
 
@@ -96,7 +103,7 @@ abstract class FormControl {
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
-    public ScriptableDelegate getScriptableObject() {
+    ScriptableDelegate getScriptableObject() {
         if (_scriptable == null) _scriptable = newScriptable();
         return _scriptable;
     }
@@ -113,7 +120,7 @@ abstract class FormControl {
     /**
      * Returns the list of values displayed by this control, if any.
      **/
-    public String[] getDisplayedOptions() {
+    String[] getDisplayedOptions() {
         return NO_VALUE;
     }
 
@@ -121,7 +128,7 @@ abstract class FormControl {
     /**
      * Returns true if this control is read-only.
      **/
-    public boolean isReadOnly() {
+    boolean isReadOnly() {
         return _readOnly;
     }
 
@@ -129,7 +136,7 @@ abstract class FormControl {
     /**
      * Returns true if this control is disabled, meaning that it will not send a value to the server as part of a request.
      **/
-    public boolean isDisabled() {
+    boolean isDisabled() {
         return _disabled;
     }
 
@@ -137,15 +144,15 @@ abstract class FormControl {
     /**
      * Returns true if this control accepts free-form text.
      **/
-    public boolean isTextControl() {
+    boolean isTextControl() {
         return false;
     }
 
 
     /**
-     * Returns true if only one control of this kind can have a value. This is true for radio buttons.
+     * Returns true if only one control of this kind with this name can have a value. This is true for radio buttons.
      **/
-    public boolean isExclusive() {
+    boolean isExclusive() {
         return false;
     }
 
@@ -153,7 +160,7 @@ abstract class FormControl {
     /**
      * Returns true if a single control can have multiple values.
      **/
-    public boolean isMultiValued() {
+    boolean isMultiValued() {
         return false;
     }
 
@@ -161,7 +168,7 @@ abstract class FormControl {
     /**
      * Returns true if this control accepts a file for upload.
      **/
-    public boolean isFileParameter() {
+    boolean isFileParameter() {
         return false;
     }
 
@@ -201,6 +208,22 @@ abstract class FormControl {
      * Resets this control to its initial value.
      **/
     void reset() {
+    }
+
+
+    /**
+     * Performs the 'onChange' event defined for this control.
+     */
+    protected void sendOnChangeEvent() {
+        if (_onChangeEvent.length() > 0) getScriptableObject().doEvent( _onChangeEvent );
+    }
+
+
+    /**
+     * Performs the 'onClick' event defined for this control.
+     */
+    protected void sendOnClickEvent() {
+        if (_onClickEvent.length() > 0) getScriptableObject().doEvent( _onClickEvent );
     }
 
 
@@ -272,6 +295,23 @@ abstract class FormControl {
 
 
     class Scriptable extends ScriptableDelegate {
+
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "name" )) {
+                return getName();
+            } else {
+                return super.get( propertyName );
+            }
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "value" )) {
+                _valueAttribute = value.toString();
+            } else {
+                super.set( propertyName, value );
+            }
+        }
     }
 
 }
@@ -285,7 +325,27 @@ class BooleanFormControl extends FormControl {
 
     private final boolean _isCheckedDefault;
 
+    class Scriptable extends FormControl.Scriptable {
 
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "checked" )) {
+                return isChecked() ? Boolean.TRUE : Boolean.FALSE;
+            } else if (propertyName.equalsIgnoreCase( "defaultchecked" )) {
+                return _isCheckedDefault ? Boolean.TRUE : Boolean.FALSE;
+            } else {
+                return super.get( propertyName );
+            }
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "checked" )) {
+                setChecked( value instanceof Boolean && ((Boolean) value).booleanValue() );
+            } else {
+                super.set( propertyName, value );
+            }
+        }
+    }
 
     public BooleanFormControl( Node node ) {
         super( node );
@@ -474,9 +534,11 @@ class CheckboxFormControl extends BooleanFormControl {
 
 
     void claimUniqueValue( List values ) {
+        boolean wasChecked = isChecked();
         if (isValueRequired()) return;
         setChecked( values.contains( getQueryValue() ) );
         if (isChecked()) values.remove( getQueryValue() );
+        if (isChecked() != wasChecked) sendOnClickEvent();
     }
 
 
@@ -485,11 +547,11 @@ class CheckboxFormControl extends BooleanFormControl {
     }
 
 
-    class Scriptable extends FormControl.Scriptable {
+    class Scriptable extends BooleanFormControl.Scriptable {
 
         public Object get( String propertyName ) {
-            if (propertyName.equalsIgnoreCase( "checked" )) {
-                return isChecked() ? Boolean.TRUE : Boolean.FALSE;
+            if (propertyName.equalsIgnoreCase( "value" )) {
+                return getQueryValue();
             } else {
                 return super.get( propertyName );
             }
@@ -535,29 +597,10 @@ class CheckboxFormControl extends BooleanFormControl {
 }
 
 
-abstract class ScalarFormControl extends FormControl {
-
-    private final String  _onChangeEvent;
-
-
-    public ScalarFormControl( Node node ) {
-        super( node );
-        _onChangeEvent    = NodeUtils.getNodeAttribute( node, "onchange" );
-    }
-
-
-    protected void sendOnChangeEvent() {
-        if (_onChangeEvent.length() > 0) getScriptableObject().doEvent( _onChangeEvent );
-    }
-
-}
-
-
-class TextFormControl extends ScalarFormControl {
+class TextFormControl extends FormControl {
 
     private String[]   _value = new String[1];
     private String[]   _defaultValue;
-    private Scriptable _scriptable;
 
 
     public TextFormControl( Node node, String defaultValue ) {
@@ -583,9 +626,8 @@ class TextFormControl extends ScalarFormControl {
     }
 
 
-    public ScriptableDelegate getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
-        return _scriptable;
+    protected FormControl.Scriptable newScriptable() {
+        return new Scriptable();
     }
 
 
@@ -687,7 +729,7 @@ class TextAreaFormControl extends TextFormControl {
 }
 
 
-class FileSubmitFormControl extends ScalarFormControl {
+class FileSubmitFormControl extends FormControl {
 
     private UploadFileSpec _fileToUpload;
 
@@ -734,13 +776,12 @@ class FileSubmitFormControl extends ScalarFormControl {
 }
 
 
-class SelectionFormControl extends ScalarFormControl {
+class SelectionFormControl extends FormControl {
 
     private final boolean _multiSelect;
     private final boolean _listBox;
 
     private Options _selectionOptions;
-    private Scriptable _scriptable;
 
 
     SelectionFormControl( Node node ) {
@@ -801,9 +842,8 @@ class SelectionFormControl extends ScalarFormControl {
     }
 
 
-    public ScriptableDelegate getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
-        return _scriptable;
+    protected FormControl.Scriptable newScriptable() {
+        return new Scriptable();
     }
 
 

@@ -71,6 +71,7 @@ as are the following DOM elements:
 <h4>properties</h4>
 <ul>
 <li>form    - read-only - the form containing the input</li>
+<li>name    - read-only - the name of the control</li>
 </ul>
 <h4>methods</h4>
 <ul>
@@ -122,7 +123,13 @@ as are the following DOM elements:
 <h3>Checkbox</h3>
 <h4>properties</h4>
 <ul>
-<li>checked - read/write - the state of the checkbox</li>
+<li>checked        - read/write - the state of the checkbox</li>
+<li>defaultChecked - read-only  - the default state of the checkbox</li>
+<li>value          - read/write - the value transmitted if the control is checked</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onClick - invoked when the state of the control is changed via form.setParameter</li>
 </ul>
 
 <h3>Select</h3>
