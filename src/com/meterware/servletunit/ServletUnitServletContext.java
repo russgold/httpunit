@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -22,7 +22,6 @@ package com.meterware.servletunit;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.FileNotFoundException;
 
 import java.net.URL;
@@ -32,7 +31,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Set;
-import java.util.Map;
 
 import javax.servlet.*;
 
@@ -153,7 +151,7 @@ class ServletUnitServletContext implements ServletContext {
      **/
     public javax.servlet.RequestDispatcher getRequestDispatcher( String path ) {
         try {
-            URL url = new URL( "http", "localhost", path );
+            URL url = new URL( "http", "localhost", _application.getContextPath() + path );
             return new RequestDispatcherImpl( _application.getServletRequest( url ).getServlet() );
         } catch (ServletException e) {
             return null;

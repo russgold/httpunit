@@ -46,6 +46,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     // rfc1123-date is "Sun, 06 Nov 1994 08:49:37 GMT"
     private static final String RFC1123_DATE_SPEC = "EEE, dd MMM yyyy hh:mm:ss z";
+    private boolean _committed;
 
 
     /**
@@ -377,11 +378,11 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
 
     /**
-     * Returns a boolean indicating if the response has been committed. A commited response has
+     * Returns a boolean indicating if the response has been committed. A committed response has
      * already had its status code and headers written.
      **/
     public boolean isCommitted() {
-        return false;    // XXX set true if flushBuffer has been called
+        return _committed;
     }
 
 
@@ -390,7 +391,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * commits the response, meaning the status code and headers will be written.
      **/
     public void flushBuffer() throws IOException {
-        throw new RuntimeException( "flushBuffer not implemented" );
+        _committed = true;
     }
 
 

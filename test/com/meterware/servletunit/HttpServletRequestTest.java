@@ -246,6 +246,36 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
+    /**
+     * Verifies that a request for a session when the current one is invalid will result in a new session.
+     * @throws Exception
+     */
+    public void testSessionInvalidation() throws Exception {
+        WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
+        ServletUnitContext context = new ServletUnitContext();
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
+        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, context.newSession().getId() ) );
+
+        HttpSession session = request.getSession( /* create */ false );
+        String originalID = session.getId();
+        session.setAttribute( "Initial", new Integer(1) );
+
+        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
+        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
+        session = request.getSession();
+        assertEquals( "Retrieved session ID", originalID, session.getId() );
+        assertEquals( "Attribute", new Integer(1), session.getAttribute( "Initial" ) );
+
+        session.invalidate();
+        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
+        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
+        session = request.getSession();
+        assertNull( "Attribute should not exist", session.getAttribute( "Initial" ) );
+        assertFalse( "New session not created", originalID.equals( session.getId() ) );
+    }
+
+
     public void testGetRequestURI() throws Exception {
         ServletUnitContext context = new ServletUnitContext();
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );

@@ -239,7 +239,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         if (_session == null && getRequestedSessionId() != null) {
             _session = _context.getSession( getRequestedSessionId() );
         }
-        if (_session == null && create) {
+        if (_session == null ? create : _session.isInvalid()) {
             _session = _context.newSession();
         }
         return _session;

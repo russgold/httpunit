@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -40,7 +40,7 @@ class ServletUnitHttpSession implements HttpSession {
      * between client requests. You can set the maximum time interval with the setMaxInactiveInterval method.
      **/
     public int getMaxInactiveInterval() {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         return _maxInactiveInterval;
     }
 
@@ -50,7 +50,7 @@ class ServletUnitHttpSession implements HttpSession {
      * if no user requests have been made of the session.
      **/
     public void setMaxInactiveInterval( int interval ) {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         _maxInactiveInterval = interval;
     }
 
@@ -60,7 +60,7 @@ class ServletUnitHttpSession implements HttpSession {
      * The identifier is assigned by the servlet engine and is implementation dependent.
      **/
     public String getId() {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         return _id;
     }
 
@@ -74,7 +74,7 @@ class ServletUnitHttpSession implements HttpSession {
      *						been invalidated
      **/
     public long getCreationTime() {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         return _creationTime;
     }
 
@@ -84,7 +84,7 @@ class ServletUnitHttpSession implements HttpSession {
      * as the number of milliseconds since midnight January 1, 1970 GMT.
      **/ 
     public long getLastAccessedTime() {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         return _lastAccessedTime;
     }
 
@@ -104,7 +104,7 @@ class ServletUnitHttpSession implements HttpSession {
      * Invalidates this session and unbinds any objects bound to it.
      **/
     public void invalidate() {
-        _isInvalid = true;
+        _invalid = true;
         _values.clear();
     }
 
@@ -145,7 +145,7 @@ class ServletUnitHttpSession implements HttpSession {
      * @deprecated as of JSDK 2.2, use getAttributeNames.
      **/
     public String[] getValueNames() {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         throw new RuntimeException( "getValueNames not implemented" );
     }
 
@@ -154,7 +154,7 @@ class ServletUnitHttpSession implements HttpSession {
      * Returns the object bound with the specified name in this session or null if no object of that name exists.
      **/
     public Object getAttribute( String name ) {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         return _values.get( name );
     }
 
@@ -164,7 +164,7 @@ class ServletUnitHttpSession implements HttpSession {
      * is already bound to the session, the object is replaced.
      **/
     public void setAttribute( String name, Object value ) {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         _values.put( name, value );
     }
 
@@ -174,7 +174,7 @@ class ServletUnitHttpSession implements HttpSession {
      * have an object bound with the specified name, this method does nothing.
      **/ 
     public void removeAttribute( String name ) {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         _values.remove( name );
     }
 
@@ -184,7 +184,7 @@ class ServletUnitHttpSession implements HttpSession {
      * This method is useful, for example, when you want to delete all the objects bound to this session.
      **/
     public Enumeration getAttributeNames() {
-        if (_isInvalid) throw new IllegalStateException();
+        if (_invalid) throw new IllegalStateException();
         return _values.keys();
     }
 
@@ -246,6 +246,11 @@ class ServletUnitHttpSession implements HttpSession {
     }
 
 
+    boolean isInvalid() {
+        return _invalid;
+    }
+
+
 //------------------------------------- private members ---------------------------------------
 
     private static int _NextID = 1;
@@ -260,7 +265,7 @@ class ServletUnitHttpSession implements HttpSession {
 
     private long      _lastAccessedTime = new Date().getTime();
 
-    private boolean   _isInvalid;
+    private boolean   _invalid;
 
     private Hashtable _values = new Hashtable();
 

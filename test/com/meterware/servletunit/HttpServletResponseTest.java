@@ -30,7 +30,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.meterware.httpunit.*;
@@ -127,6 +126,15 @@ public class HttpServletResponseTest extends ServletUnitTest {
             fail( "Should have thrown IllegalStateException" );
         } catch (IllegalStateException e) {
         }
+    }
+
+
+    public void testUpdateAfterFlushBuffer() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.getWriter();
+        assertFalse( "Should not be committed yet", servletResponse.isCommitted() );
+        servletResponse.flushBuffer();
+        assertTrue( "Should be committed now", servletResponse.isCommitted() );
     }
 
 

@@ -12,8 +12,16 @@ Limitations:
 
 Revision History:
  5-Feb-2003
+Acknowledgements:
+    Thanks to Navid Vahdat for ServletUnit fixes for invalid session handling and request dispatcher paths
+Additions:
+    1. ServletUnit now supports HttpServletResponse.flushBuffer()
+
 Problems Fixed:
     1. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
+    2. ServletUnit now creates a new session if the requested session exists but is marked invalid
+    3. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
+       as relative to the context root.
 
  4-Feb-2003
 Acknowledgements:

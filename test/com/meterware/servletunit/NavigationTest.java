@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -20,7 +20,6 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 import java.io.*;
-import java.net.HttpURLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
@@ -64,12 +63,14 @@ public class NavigationTest extends TestCase {
 
 
     public void testForward() throws Exception {
-        ServletRunner sr = new ServletRunner();
-        sr.registerServlet( "target", TargetServlet.class.getName() );
-        sr.registerServlet( "origin", FowarderServlet.class.getName() );
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/target", TargetServlet.class );
+        wxs.addServlet( "/origin", FowarderServlet.class );
+
+        ServletRunner sr = new ServletRunner( wxs.asInputStream(), "/context" );
 
         WebClient wc = sr.newClient();
-        WebResponse response = wc.getResponse( "http://localhost/origin" );
+        WebResponse response = wc.getResponse( "http://localhost/context/origin" );
         assertNotNull( "No response received", response );
         assertEquals( "requested resource", TargetServlet.RESPONSE_TEXT, response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
