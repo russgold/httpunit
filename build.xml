@@ -1,29 +1,29 @@
-<?xml version="1.0" ?> 
-<!--  ======================================================================= --> 
-<!--  httpunit build file                                                     --> 
-<!--  ======================================================================= --> 
+<?xml version="1.0" ?>
+<!--  ======================================================================= -->
+<!--  httpunit build file                                                     -->
+<!--  ======================================================================= -->
 <project name="httpunit" default="jar" basedir=".">
-    <property name="name" value="httpunit" /> 
-    <property name="Name" value="HttpUnit" /> 
+    <property name="name" value="httpunit" />
+    <property name="Name" value="HttpUnit" />
     <property name="version" value="1.2.7" />
     <property name="zip_version" value="1_2_7" />
-     
-    <property name="src.dir" value="src" /> 
-    <property name="tstsrc.dir" value="test" /> 
-    <property name="examples.dir" value="examples" /> 
+
+    <property name="src.dir" value="src" />
+    <property name="tstsrc.dir" value="test" />
+    <property name="examples.dir" value="examples" />
     <property name="lib.dir" value="lib" />
     <property name="jars.dir" value="jars" />
-     
-    <property name="docs.dir" value="doc" /> 
-    <property name="build.dir" value="build" /> 
-    <property name="build.classes" value="${build.dir}/classes" /> 
-    <property name="test.classes" value="${build.dir}/testclasses" /> 
+
+    <property name="docs.dir" value="doc" />
+    <property name="build.dir" value="build" />
+    <property name="build.classes" value="${build.dir}/classes" />
+    <property name="test.classes" value="${build.dir}/testclasses" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
-     
-    <property name="dist.dir" value="dist" /> 
+
+    <property name="dist.dir" value="dist" />
     <property name="classpath" value="" />
-    <property name="web.dir" value="web" /> 
-    <property name="packages" value="com.meterware.*" /> 
+    <property name="web.dir" value="web" />
+    <property name="packages" value="com.meterware.*" />
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
     <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />
 
@@ -35,35 +35,35 @@
         <include name="*.jar"/>
     </fileset>
 </path>
-          
- 
+
+
 <!-- =================================================================== -->
 <!-- Check to see what optional dependencies are available               -->
 <!-- =================================================================== -->
 <target name="check_for_optional_packages">
-    <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet" 
+    <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet"
                                            classpathref="base.classpath" />
-    <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"  
+    <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"
                                            classpathref="base.classpath" />
-    <available property="xerces.present"   classname="org.apache.xerces.parsers.DOMParser"  
+    <available property="xerces.present"   classname="org.apache.xerces.parsers.DOMParser"
                                            classpathref="base.classpath" />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Prepares the build directory                                         --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Prepares the build directory                                         -->
+<!--  ===================================================================  -->
 <target name="prepare">
-    <mkdir dir="${build.dir}" /> 
+    <mkdir dir="${build.dir}" />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Compiles the source code                                             --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Compiles the source code                                             -->
+<!--  ===================================================================  -->
 <target name="compile" depends="prepare,check_for_optional_packages">
-    <mkdir dir="${build.classes}" /> 
-    <javac srcdir="${src.dir}" destdir="${build.classes}" 
+    <mkdir dir="${build.classes}" />
+    <javac srcdir="${src.dir}" destdir="${build.classes}"
            debug="on" deprecation="on" optimize="off">
          <classpath refid="base.classpath" />
          <exclude name="**/servletunit/*" unless="jsdk.present" />
@@ -71,12 +71,12 @@
 </target>
 
 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
 <!--  Compiles the test code                                               -->
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
 <target name="testcompile" depends="compile,check_for_optional_packages">
     <mkdir dir="${test.classes}" />
-    <javac srcdir="${tstsrc.dir}" destdir="${test.classes}"  
+    <javac srcdir="${tstsrc.dir}" destdir="${test.classes}"
            debug="off" deprecation="on" optimize="off">
          <classpath>
              <path refid="base.classpath" />
@@ -89,7 +89,7 @@
 </target>
 
 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
 <!--  Runs the test code                                                   -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">
@@ -118,31 +118,48 @@
 
 
 <!--  ===================================================================  -->
-<!--  Creates the jar archive                                              --> 
-<!--  ===================================================================  --> 
+<!--  Creates the jar archive                                              -->
+<!--  ===================================================================  -->
 <target name="jar" depends="compile">
-    <mkdir dir="${lib.dir}" /> 
-    <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.classes}" includes="com/**" /> 
+    <mkdir dir="${lib.dir}" />
+    <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.classes}" includes="com/**" />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Creates the API documentation                                        --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Creates the API documentation                                        -->
+<!--  ===================================================================  -->
 <target name="javadocs" depends="prepare">
-    <mkdir dir="${javadoc.dir}" /> 
-    <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}" 
-             destdir="${javadoc.dir}" author="true" version="true" 
-             windowtitle="${Name} ${version} API" doctitle="${Name}" 
-             footer="Copyright &amp;copy; 2000-2001 Russell Gold. See &lt;a href=&quot;http://httpunit.sourceforge.net/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." /> 
+    <mkdir dir="${javadoc.dir}" />
+    <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}"
+             destdir="${javadoc.dir}" author="true" version="true"
+             windowtitle="${Name} ${version} API" doctitle="${Name}"
+             footer="Copyright &amp;copy; 2000-2001 Russell Gold. See &lt;a href=&quot;http://httpunit.sourceforge.net/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Creates the distribution                                             --> 
-<!--  ===================================================================  --> 
-<target name="dist" depends="jar,javadocs">
-    <mkdir dir="${dist.dir}" /> 
+<!--  ===================================================================  -->
+<!--  Creates the tutorial archives                                        -->
+<!--  ===================================================================  -->
+<target name="tutorial" depends="jar">
+    <mkdir dir="${build.dir}/tutorial" />
+    <copy todir="${build.dir}/tutorial" >
+        <fileset dir="${docs.dir}/tutorial">
+            <include name="build.xml" />
+            <include name="web.xml" />
+            <include name="**/persistence/*.java" />
+        </fileset>
+    </copy>
+    <mkdir dir="${build.dir}/tutorial/jars" />
+    <zip zipfile="${docs.dir}/tutorial/task1.zip" basedir="${build.dir}/tutorial" includes="**" />
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Creates the distribution                                             -->
+<!--  ===================================================================  -->
+<target name="dist" depends="jar,javadocs,tutorial">
+    <mkdir dir="${dist.dir}" />
     <copy todir="${dist.dir}" >
         <fileset dir="." >
             <include name="build.xml" />
@@ -156,16 +173,16 @@
         </fileset>
     </copy>
     <copy todir="${dist.dir}/lib" file="${jars.dir}/Tidy.jar" />
-    <replace file="${dist.dir}/index.html" token="var:dist " value="var:dist&gt;" /> 
-    <replace file="${dist.dir}/index.html" token="var:publish&gt;" value="var:publish " /> 
+    <replace file="${dist.dir}/index.html" token="var:dist " value="var:dist&gt;" />
+    <replace file="${dist.dir}/index.html" token="var:publish&gt;" value="var:publish " />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Packages the distribution with ZIP                                   --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Packages the distribution with ZIP                                   -->
+<!--  ===================================================================  -->
 <target name="dist-zip" depends="dist">
-    <zip zipfile="${name}_${zip_version}.zip" basedir="${dist.dir}" includes="**" /> 
+    <zip zipfile="${name}_${zip_version}.zip" basedir="${dist.dir}" includes="**" />
 </target>
 
 
@@ -177,37 +194,38 @@
     <copy todir="${web.dir}" >
         <fileset dir="." includes="*.zip,index.html,doc/**"/>
     </copy>
-    <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " /> 
+    <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " />
     <replace file="${web.dir}/index.html" token="var:publish " value="var:publish&gt;" />
-    <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${zip_version}" /> 
+    <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${zip_version}" />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Packages the web site with ZIP                                       --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Packages the web site with ZIP                                       -->
+<!--  ===================================================================  -->
 <target name="publish-zip" depends="publish">
-    <zip zipfile="${name}_website_${zip_version}.zip" basedir="${web.dir}" includes="**" /> 
+    <zip zipfile="${name}_website_${zip_version}.zip" basedir="${web.dir}" includes="**" />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Cleans up generated stuff                                            --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Cleans up generated stuff                                            -->
+<!--  ===================================================================  -->
 <target name="clean">
-    <delete dir="${build.dir}" /> 
+    <delete dir="${build.dir}" />
     <delete dir="${dist.dir}" />
     <delete dir="${web.dir}" />
 </target>
 
 
-<!--  ===================================================================  --> 
-<!--  Total cleanup                                                        --> 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Total cleanup                                                        -->
+<!--  ===================================================================  -->
 <target name="total-clean" depends="clean">
-    <delete file="${name}_*.zip" quiet="true" /> 
+    <delete file="${name}_*.zip" quiet="true" />
     <delete dir="${docs.dir}/api" />
-    <delete dir="${lib.dir}" /> 
+    <delete dir="${docs.dir}/tutorial/*.zip" />
+    <delete dir="${lib.dir}" />
 </target>
- 
+
 </project>

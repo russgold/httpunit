@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<web-app>
+  <servlet>
+     <servlet-name>Editor</servlet-name>
+     <servlet-class>tutorial.PoolEditorServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+     <servlet-name>Editor</servlet-name>
+     <url-pattern>/PoolEditor</url-pattern>
+   </servlet-mapping>
+</web-app>
