@@ -11,7 +11,12 @@ Limitations:
 
 
 Revision History:
+ 6-Sep-2002
+Acknowledgments:
+    1. Thanks to Ville Skyttä for removing the test dependency on xerces.
+
  5-Sep-2002
+    1. The web XML tests will now work with any jaxp-compliant parser, not just xerces.
 
 Problems fixed:
     1. An attempt to set a non-existent parameter now correctly throws NoSuchParameterException rather

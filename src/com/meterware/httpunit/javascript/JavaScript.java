@@ -99,6 +99,7 @@ public class JavaScript {
         public boolean performEvent( String eventScript ) {
             try {
                 final Context context = Context.getCurrentContext();
+                context.setOptimizationLevel( -1 );
                 Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
                 Object result = f.call( context, this, this, NO_ARGS );
                 return (result instanceof Boolean) ? ((Boolean) result).booleanValue() : true;

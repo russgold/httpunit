@@ -49,7 +49,7 @@
                                            classpathref="base.classpath" />
     <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"
                                            classpathref="base.classpath" />
-    <available property="xerces.present"   classname="org.apache.xerces.parsers.DOMParser"
+    <available property="jaxp.present"     classname="javax.xml.parsers.DocumentBuilderFactory"
                                            classpathref="base.classpath" />
     <available property="rhino.present"    classname="org.mozilla.javascript.Context"
                                            classpathref="base.classpath" />
@@ -92,7 +92,7 @@
          </classpath>
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/FileUploadTest.java" unless="javamail.present" />
-         <exclude name="**/XMLPageTest.java" unless="xerces.present" />
+         <exclude name="**/XMLPageTest.java" unless="jaxp.present" />
          <exclude name="**/javascript/*" unless="rhino.present" />
     </javac>
 </target>

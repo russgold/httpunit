@@ -21,25 +21,25 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
 import org.w3c.dom.Document;
-import org.apache.xerces.parsers.DOMParser;
+import org.xml.sax.SAXException;
 
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 
 public class WebXMLTest extends TestCase {
@@ -143,11 +143,9 @@ public class WebXMLTest extends TestCase {
     }
 
 
-    private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException {
-        DOMParser parser = new DOMParser();
-        parser.parse( new InputSource( toInputStream( contents ) ) );
-        return parser.getDocument();
-    }
+    private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException, ParserConfigurationException  {
+       DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
+       return fac.newDocumentBuilder().parse( toInputStream( contents ) );    }
 
 
     private ByteArrayInputStream toInputStream( String contents ) throws UnsupportedEncodingException {
