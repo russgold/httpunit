@@ -6,7 +6,7 @@
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
     <property name="version" value="0.9.1" />
-    <property name="zip_version" value="0_9" /> 
+    <property name="zip_version" value="0_9_1" /> 
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
