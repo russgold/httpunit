@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2001-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -26,12 +26,15 @@ import org.w3c.dom.NodeList;
 
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.ArrayList;
 
 
 /**
  * Represents a control in an HTML form.
  **/
 abstract class FormControl {
+
+    final static String[] NO_VALUE = new String[0];
 
     private String  _name;
     private boolean _readOnly;
@@ -48,7 +51,7 @@ abstract class FormControl {
     /**
      * Returns the name of this control. If no name is specified, defaults to the empty string.
      **/
-    String getName() {
+    public String getName() {
         return _name;
     }
 
@@ -57,13 +60,29 @@ abstract class FormControl {
      * Returns the current value(s) associated with this control. These values will be transmitted to the server
      * if the control is 'successful'.
      **/
-    abstract String[] getValues();
+    abstract public String[] getValues();
+
+
+    /**
+     * Returns the values permitted in this control. Does not apply to text or file controls.
+     **/
+    public String[] getOptionValues() {
+        return NO_VALUE;
+    }
+
+
+    /**
+     * Returns the list of values displayed by this control, if any.
+     **/
+    public String[] getDisplayedOptions() {
+        return NO_VALUE;
+    }
 
 
     /**
      * Returns true if this control is read-only.
      **/
-    boolean isReadOnly() {
+    public boolean isReadOnly() {
         return _readOnly;
     }
 
@@ -71,7 +90,7 @@ abstract class FormControl {
     /**
      * Returns true if this control is disabled, meaning that it will not send a value to the server as part of a request.
      **/
-    boolean isDisabled() {
+    public boolean isDisabled() {
         return _disabled;
     }
 
@@ -79,7 +98,7 @@ abstract class FormControl {
     /**
      * Returns true if this control accepts free-form text.
      **/
-    boolean isTextControl() {
+    public boolean isTextControl() {
         return false;
     }
 
@@ -87,7 +106,7 @@ abstract class FormControl {
     /**
      * Returns true if only one control of this kind can have a value. This is true for radio buttons.
      **/
-    boolean isExclusive() {
+    public boolean isExclusive() {
         return false;
     }
 
@@ -95,7 +114,7 @@ abstract class FormControl {
     /**
      * Returns true if a single control can have multiple values.
      **/
-    boolean isMultiValued() {
+    public boolean isMultiValued() {
         return false;
     }
 
@@ -103,20 +122,12 @@ abstract class FormControl {
     /**
      * Returns true if this control accepts a file for upload.
      **/
-    boolean isFileParameter() {
+    public boolean isFileParameter() {
         return false;
     }
 
 
     void updateRequiredValues( Hashtable required ) {
-    }
-
-
-    void updateParameterOptions( Hashtable options ) {
-    }
-
-
-    void updateParameterOptionValues( Hashtable options ) {
     }
 
 
@@ -172,8 +183,6 @@ abstract class FormControl {
 abstract
 class BooleanFormControl extends FormControl {
 
-    final static String[] NO_VALUE = new String[0];
-
     private boolean  _isChecked;
     private String[] _value = new String[1];
 
@@ -195,6 +204,23 @@ class BooleanFormControl extends FormControl {
 
 
     /**
+     * Returns the current value(s) associated with this control. These values will be transmitted to the server
+     * if the control is 'successful'.
+     **/
+    public String[] getValues() {
+        return isChecked() ? toArray( getQueryValue() ) : NO_VALUE;
+    }
+
+
+    /**
+     * Returns the values permitted in this control.
+     **/
+    public String[] getOptionValues() {
+        return (isReadOnly() && !isChecked()) ? NO_VALUE : toArray( getQueryValue() );
+    }
+
+
+    /**
      * Returns the default value of this control in the form. If no value is specified, defaults to the empty string.
      **/
     String getValueAttribute() {
@@ -202,23 +228,8 @@ class BooleanFormControl extends FormControl {
     }
 
 
-    /**
-     * Returns the current value(s) associated with this control. These values will be transmitted to the server
-     * if the control is 'successful'.
-     **/
-    String[] getValues() {
-        return isChecked() ? toArray( getQueryValue() ) : NO_VALUE;
-    }
-
-
     abstract String getQueryValue();
 
-
-    void updateParameterOptionValues( Hashtable options ) {
-        if (isChecked() || !isReadOnly()) {
-            addValue( options, getName(), getQueryValue() );
-        }
-    }
 
     private String[] toArray( String value ) {
         _value[0] = value;
@@ -238,7 +249,7 @@ class RadioButtonFormControl extends BooleanFormControl {
     /**
      * Returns true if only one control of this kind can have a value.
      **/
-    boolean isExclusive() {
+    public boolean isExclusive() {
         return true;
     }
 
@@ -292,7 +303,7 @@ class TextFormControl extends FormControl {
      * Returns the current value(s) associated with this control. These values will be transmitted to the server
      * if the control is 'successful'.
      **/
-    String[] getValues() {
+    public String[] getValues() {
         return (_value[0] != null) ? _value : _defaultValue;
    }
 
@@ -300,7 +311,7 @@ class TextFormControl extends FormControl {
     /**
      * Returns true to indicate that this control accepts free-form text.
      **/
-    boolean isTextControl() {
+    public boolean isTextControl() {
         return true;
     }
 
@@ -347,81 +358,84 @@ class FileSubmitFormControl extends FormControl {
     /**
      * Returns true if this control accepts a file for upload.
      **/
-    boolean isFileParameter() {
+    public boolean isFileParameter() {
         return true;
     }
 
 
-    String[] getValues() {
+    public String[] getValues() {
         return null;   // XXX what should this really do?
     }
 }
 
 
 class SelectionFormControl extends FormControl {
-    private boolean _multiSelect;
-    private Node    _node;
+    private final boolean _multiSelect;
+    private final String[] _optionValues;
+    private final String[] _displayedOptions;
+
+    private String[] _values;
 
 
     SelectionFormControl( Node node ) {
         super( node );
         if (!node.getNodeName().equalsIgnoreCase( "select" )) throw new RuntimeException( "Not a select element" );
 
-        _node = node;
-        _multiSelect = NodeUtils.isNodeAttributePresent( node, "multiple" );
+        _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );
+        _optionValues     = getInitialOptionValues( node );
+        _displayedOptions = getInitialDisplayedOptions( node );
+        _values           = getInitialValues( node, _optionValues );
     }
 
 
-    String[] getValues() {
-        return getSelected();
+    public String[] getValues() {
+        return _values;
+    }
+
+
+    public String[] getOptionValues() {
+        return _optionValues;
+    }
+
+
+    public String[] getDisplayedOptions() {
+        return _displayedOptions;
     }
 
 
     /**
      * Returns true if a single control can have multiple values.
      **/
-    boolean isMultiValued() {
+    public boolean isMultiValued() {
         return _multiSelect;
     }
 
 
     void updateRequiredParameters( Hashtable required ) {
-        if (isReadOnly()) required.put( getName(), getSelected() );
+        if (isReadOnly()) required.put( getName(), getValues() );
     }
 
 
-    void updateParameterOptions( Hashtable options ) {
-        options.put( getName(), getOptions() );
-    }
-
-
-    void updateParameterOptionValues( Hashtable options ) {
-        options.put( getName(), getOptionValues() );
-    }
-
-
-    String[] getSelected() {
-        Vector selected = new Vector();
-        NodeList nl = ((Element) _node).getElementsByTagName( "option" );
+    private String[] getInitialValues( Node selectionNode, String[] optionValues ) {
+        ArrayList selected = new ArrayList();
+        NodeList nl = ((Element) selectionNode).getElementsByTagName( "option" );
         for (int i = 0; i < nl.getLength(); i++) {
             if (nl.item(i).getAttributes().getNamedItem( "selected" ) != null) {
-                selected.addElement( getOptionValue( nl.item(i) ) );
+                selected.add( optionValues[i] );
             }
         }
 
         if (!isMultiValued() && selected.size() == 0 && nl.getLength() > 0) {
-            selected.addElement( getOptionValue( nl.item(0) ) );
+            selected.add( optionValues[0] );
         }
 
-        String[] result = new String[ selected.size() ];
-        selected.copyInto( result );
-        return result;
+        return (String[]) selected.toArray( new String[ selected.size() ] );
     }
 
 
-    String[] getOptions() {
+    private String[] getInitialDisplayedOptions( Node node ) {
         Vector options = new Vector();
-        NodeList nl = ((Element) _node).getElementsByTagName( "option" );
+        NodeList nl = ((Element) node).getElementsByTagName( "option" );
         for (int i = 0; i < nl.getLength(); i++) {
             options.addElement( getValue( nl.item(i).getFirstChild() ) );
         }
@@ -431,15 +445,13 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    String[] getOptionValues() {
-        Vector options = new Vector();
-        NodeList nl = ((Element) _node).getElementsByTagName( "option" );
+    private String[] getInitialOptionValues( Node selectNode ) {
+        NodeList nl = ((Element) selectNode).getElementsByTagName( "option" );
+        ArrayList options = new ArrayList( nl.getLength() );
         for (int i = 0; i < nl.getLength(); i++) {
-            options.addElement( getOptionValue( nl.item(i) ) );
+            options.add( getOptionValue( nl.item(i) ) );
         }
-        String[] result = new String[ options.size() ];
-        options.copyInto( result );
-        return result;
+        return (String[]) options.toArray( new String[ options.size() ] );
     }
 
 

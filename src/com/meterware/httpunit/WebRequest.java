@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -43,7 +43,7 @@ import java.util.Hashtable;
  * A request sent to a web server.
  **/
 abstract
-public class WebRequest {
+public class WebRequest implements ParameterHolder {
 
 
     /**
@@ -63,11 +63,46 @@ public class WebRequest {
 
 
     /**
+     * Returns the final URL associated with this web request.
+     **/
+    public URL getURL() throws MalformedURLException {
+        if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) validateProtocol( getURLString() );
+        return new URL( getURLBase(), getURLString() );
+    }
+
+
+    /**
+     * Returns the target for this web request.
+     **/
+    public String getTarget() {
+        return _target;
+    }
+
+
+    /**
+     * Returns the query string defined for this request.
+     **/
+    public String getQueryString() {
+        return getParameterString();
+    }
+
+
+    /**
+     * Returns the HTTP method defined for this request.
+     **/
+    abstract
+    public String getMethod();
+
+
+//------------------------------------- ParameterCollection methods ------------------------------------
+
+
+    /**
      * Sets the value of a parameter in a web request.
      **/
     public void setParameter( String name, String value ) {
         if (HttpUnitOptions.getParameterValuesValidated()) validateParameterValue( name, value );
-        _parameters.put( name, value );
+        _parameterCollection.setParameter( name, value );
     }
 
 
@@ -76,7 +111,7 @@ public class WebRequest {
      **/
     public void setParameter( String name, String[] values ) {
         if (HttpUnitOptions.getParameterValuesValidated()) validateParameterValues( name, values );
-        _parameters.put( name, values );
+        _parameterCollection.setParameter( name, values );
     }
 
 
@@ -128,7 +163,7 @@ public class WebRequest {
      * Returns an enumeration of all parameters in this web request.
      **/
     public Enumeration getParameterNames() {
-        return _parameters.keys();
+        return _parameterCollection.getParameterNames();
     }
 
 
@@ -138,14 +173,8 @@ public class WebRequest {
      *         if it is not set.
      **/
     public String getParameter( String name ) {
-        Object value = _parameters.get( name );
-        if (value instanceof String[]) {
-            return ((String[]) value)[0];
-        } else if (value == null) {
-            return "";
-        } else {
-            return value.toString();
-        }
+        String[] values = getParameterValues( name );
+        return values.length == 0 ? "" : values[0];
     }
 
 
@@ -153,11 +182,7 @@ public class WebRequest {
      * Returns the multiple default values of the named parameter.
      **/
     public String[] getParameterValues( String name ) {
-        Object result = _parameters.get( name );
-        if (result instanceof String) return new String[] { (String) result };
-        if (result instanceof String[]) return (String[]) result;
-        if (result instanceof UploadFileSpec) return new String[] { result.toString() };
-        return new String[0];
+        return _parameterCollection.getParameterValues( name );
     }
 
 
@@ -165,41 +190,11 @@ public class WebRequest {
      * Removes a parameter from this web request.
      **/
     public void removeParameter( String name ) {
-        _parameters.remove( name );
+        _parameterCollection.removeParameter( name );
     }
 
 
-
-    /**
-     * Returns the final URL associated with this web request.
-     **/
-    public URL getURL() throws MalformedURLException {
-        if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) validateProtocol( getURLString() );
-        return new URL( getURLBase(), getURLString() );
-    }
-
-
-    /**
-     * Returns the target for this web request.
-     **/
-    public String getTarget() {
-        return _target;
-    }
-
-
-    /**
-     * Returns the query string defined for this request.
-     **/
-    public String getQueryString() {
-        return getParameterString();
-    }
-
-
-    /**
-     * Returns the HTTP method defined for this request.
-     **/
-    abstract
-    public String getMethod();
+//------------------------------------- Object methods ------------------------------------
 
 
     public String toString() {
@@ -245,7 +240,7 @@ public class WebRequest {
         _sourceForm   = sourceForm;
 
         if (button != null && button.getName().length() > 0) {
-            _parameters.put( button.getName(), button.getValue() );
+            _parameterCollection._parameters.put( button.getName(), button.getValue() );
             if (button.isImageButton()) {
                 _imageButtonName = button.getName();
                 setSubmitPosition( 0, 0 );
@@ -330,17 +325,17 @@ public class WebRequest {
 
     final
     protected boolean hasNoParameters() {
-        return _parameters.size() == 0;
+        return _parameterCollection._parameters.size() == 0;
     }
 
     final
     protected String getParameterString() {
         StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
-        Enumeration e = _parameters.keys();
+        Enumeration e = _parameterCollection._parameters.keys();
 
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
-            Object value = _parameters.get( name );
+            Object value = _parameterCollection._parameters.get( name );
             if (value instanceof String) {
                 appendParameter( sb, name, (String) value, e.hasMoreElements() );
             } else {
@@ -359,8 +354,8 @@ public class WebRequest {
 
     void setSubmitPosition( int x, int y ) {
         if (_imageButtonName == null) return;
-        _parameters.put( _imageButtonName + ".x", Integer.toString( x ) );
-        _parameters.put( _imageButtonName + ".y", Integer.toString( y ) );
+        _parameterCollection._parameters.put( _imageButtonName + ".x", Integer.toString( x ) );
+        _parameterCollection._parameters.put( _imageButtonName + ".y", Integer.toString( y ) );
     }
 
 
@@ -460,10 +455,10 @@ public class WebRequest {
     /** The name of the JSSE class which supports the https protocol. **/
     private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
 
+    private UncheckedParameterCollection _parameterCollection = new UncheckedParameterCollection();
 
     private URL          _urlBase;
     private String       _urlString;
-    private Hashtable    _parameters = new Hashtable();
     private WebForm      _sourceForm;
     private String       _imageButtonName;
     private String       _target = TOP_FRAME;

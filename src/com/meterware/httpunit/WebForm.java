@@ -2,14 +2,14 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -64,6 +64,13 @@ public class WebForm extends WebRequestSource {
      **/
     public String getCharacterSet() {
         return _characterSet;
+    }
+
+
+    /**
+     * Sets the value of a parameter in this form.
+     **/
+    public void setParameter( String name, String value ) {
     }
 
 
@@ -270,7 +277,7 @@ public class WebForm extends WebRequestSource {
         if (HttpUnitOptions.getParameterValuesValidated()) {
             if (button == null) {
                 throw new IllegalUnnamedSubmitButtonException();
-            } else if (!getSubmitButtonVector().contains( button )) {  
+            } else if (!getSubmitButtonVector().contains( button )) {
                 throw new IllegalSubmitButtonException( button );
             } else if (button.isDisabled()) {
                 throw new DisabledSubmitButtonException( button );
@@ -330,9 +337,12 @@ public class WebForm extends WebRequestSource {
      * Returns the displayed options defined for the specified parameter name.
      **/
     public String[] getOptions( String name ) {
-        Object result = getParameterOptions().get( name );
-        if (result instanceof String[]) return (String[]) result;
-        return new String[0];
+        ArrayList optionList = new ArrayList();
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            optionList.addAll( Arrays.asList( controls[i].getDisplayedOptions() ) );
+        }
+        return (String[]) optionList.toArray( new String[ optionList.size() ] );
     }
 
 
@@ -340,9 +350,12 @@ public class WebForm extends WebRequestSource {
      * Returns the option values defined for the specified parameter name.
      **/
     public String[] getOptionValues( String name ) {
-        Object result = getParameterOptionValues().get( name );
-        if (result instanceof String[]) return (String[]) result;
-        return new String[0];
+        ArrayList valueList = new ArrayList();
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            valueList.addAll( Arrays.asList( controls[i].getOptionValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
     }
 
 
@@ -433,12 +446,6 @@ public class WebForm extends WebRequestSource {
     /** The attributes of the form parameters. **/
     private FormControl[] _parameters;
 
-    /** The parameters with their displayed options. **/
-    private Hashtable      _options;
-
-    /** The parameters with their options. **/
-    private Hashtable      _optionValues;
-
     /** The submit buttons in this form. **/
     private SubmitButton[] _submitButtons;
 
@@ -448,8 +455,9 @@ public class WebForm extends WebRequestSource {
     /** A map of parameter names to form parameter objects. **/
     private Map            _formParameters;
 
-
+    /** A map of parameter names to their required values. **/
     private Hashtable _required;
+
 
     private Hashtable getParameterRequiredValues() {
         if (_required == null) {
@@ -464,35 +472,7 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    private Hashtable getParameterOptions() {
-        if (_options == null) {
-            Hashtable options = new Hashtable();
-            FormControl[] parameters = getFormControls();
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i].updateParameterOptions( options );
-            }
-            _options = options;
-        }
-        return _options;
-    }
 
-
-    private Hashtable getParameterOptionValues() {
-        if (_optionValues == null) {
-            Hashtable options = new Hashtable();
-            FormControl[] parameters = getFormControls();
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i].updateParameterOptionValues( options );
-            }
-            _optionValues = options;
-        }
-        return _optionValues;
-    }
-
-
-    /**
-     * Returns an array of select control descriptors for this form.
-     **/
     /**
      * Returns an array of form parameter attributes for this form.
      **/

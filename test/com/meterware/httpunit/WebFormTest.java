@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -128,6 +128,10 @@ public class WebFormTest extends HttpUnitTest {
         assertTrue( "Did not find parameter 'first'", form.hasParameterNamed( "first" ) );
         assertTrue( "Did not find parameter with prefix 'sec'", form.hasParameterStartingWithPrefix( "sec" ) );
         assertTrue( "Did not find parameter with prefix 'nam'", form.hasParameterStartingWithPrefix( "nam" ) );
+
+        assertEquals( "Original text area value", "Something", form.getParameterValue( "name" ) );
+//        form.setParameter( "name", "Something Else" );
+//        assertEquals( "Changed text area value", "Something Else", form.getParameterValue( "name" ) );
     }
 
 
