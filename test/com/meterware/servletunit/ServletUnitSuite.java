@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -46,6 +46,8 @@ public class ServletUnitSuite extends ConditionalTestSuite {
         suite.addTest( NavigationTest.suite() );
         suite.addTest( ConfigTest.suite() );
         suite.addTest( WebXMLTest.suite() );
+        suite.addTest( ListenersTest.suite() );
+        suite.addTest( FiltersTest.suite() );
         suite.addTest( RequestContextTest.suite() );
         suite.addTest( RequestDispatcherTest.suite() );
         addOptionalTestCase( suite, "com.meterware.servletunit.JUnitServletTest" );
