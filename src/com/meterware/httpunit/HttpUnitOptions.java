@@ -52,9 +52,9 @@ public abstract class HttpUnitOptions {
         _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
+        _exceptionsThrownOnScriptError = true;
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
-        setExceptionsThrownOnScriptError( true );
     }
 
 
