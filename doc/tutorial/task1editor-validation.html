@@ -185,8 +185,11 @@ exception is not thrown, the test will be marked as failing.</li></ol></p>
 makes the form display read-only once the pool is open:</p>
 <pre class="servlet-code">
     for (int i = 0; i &lt; games.length; i++) {
-        pw.println( "&lt;tr&gt;&lt;td&gt;&lt;input name='home" + i + "' value='" + games[i].getHomeTeam() + "'" + getReadOnlyFlag() + "&gt;&lt;/td&gt;" );
-        pw.println( "&lt;td&gt;&lt;input name='away" + i + "' value='" + games[i].getAwayTeam() + "'" + getReadOnlyFlag() + "&gt;&lt;/td&gt;" );
+        pw.println( "&lt;tr&gt;&lt;td&gt;" );
+        pw.print( "&lt;input name='home" + i + "' value='" + games[i].getHomeTeam() + "'" );
+        pw.println( getReadOnlyFlag() + "&gt;&lt;/td&gt;" );
+        pw.print( "&lt;td&gt;&lt;input name='away" + i + "' value='" + games[i].getAwayTeam() + "'" );
+        pw.println( getReadOnlyFlag() + "&gt;&lt;/td&gt;" );
         pw.print( "&lt;td&gt;&lt;input type='radio' name='tiebreaker' value='" + i + "'" + getReadOnlyFlag() );
         if (i == BettingPool.getTieBreakerIndex()) pw.print( " checked" );
         pw.println( " /&gt;&lt;/td&gt;&lt;/tr&gt;" );
