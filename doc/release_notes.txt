@@ -14,8 +14,13 @@ Limitations:
 
 Revision History:
 12-Feb-2004
+Acknowledgements:
+    Thanks to Jarom Smith for finding some typos in the tutorial.
+
 Problems fixed:
     1. Window.open() using an empty name was replacing the main window rather than creating a new one.
+    2. bug #883293 - typos in tutorial task 1 step 4
+    3. bug #883301 - more typos in tutorial task 1 step 4
 
  4-Dec-2003
 Acknowledgements:
