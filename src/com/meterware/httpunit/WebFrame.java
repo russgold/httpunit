@@ -51,7 +51,7 @@ class WebFrame {
     }
 
 
-    private static String getNestedFrameName( String parentFrameName, final String relativeName ) {
+    static String getNestedFrameName( String parentFrameName, final String relativeName ) {
         if (parentFrameName.equalsIgnoreCase( WebRequest.TOP_FRAME )) return relativeName;
         return parentFrameName + ':' + relativeName;
     }

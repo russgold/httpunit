@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  * @author Seth Ladd
  **/
 abstract
-public class WebClient {
+public class WebClient implements FrameHolder {
 
     /**
      * Submits a GET method request and returns a response.
@@ -85,6 +85,7 @@ public class WebClient {
 
     /**
      * Returns the response associated with the specified frame name.
+     * Throws a runtime exception if no matching frame is defined.
      **/
     public WebResponse getFrameContents( String frameName ) {
         WebResponse response = (WebResponse) _frameContents.get( frameName );
@@ -316,6 +317,7 @@ public class WebClient {
 
     private void updateFrames( WebResponse response ) throws MalformedURLException, IOException, SAXException {
         removeSubFrames( response.getTarget() );
+        response.setFrameHolder( this );
         _frameContents.put( response.getTarget(), response );
 
         if (response.isHTML()) {
@@ -411,21 +413,3 @@ class RedirectWebRequest extends WebRequest {
 }
 
 
-
-//==================================================================================================
-
-
-class NoSuchFrameException extends RuntimeException {
-
-    NoSuchFrameException( String frameName ) {
-        _frameName = frameName;
-    }
-
-
-    public String getMessage() {
-        return "No frame named " + _frameName + " is currently active";
-    }
-
-
-    private String _frameName;
-}

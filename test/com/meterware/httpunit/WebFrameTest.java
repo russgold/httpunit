@@ -224,6 +224,25 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    public void testGetSubframes() throws Exception {
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
+        assertEquals( "red subframe", _wc.getFrameContents( "red" ), response.getSubframeContents( "red" ) );
+    }
+
+
+    public void testNestedSubFrames() throws Exception {
+        defineResource( "SuperFrames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"50%,50%\">" +
+                        "    <FRAME src=\"Frames.html\" name=\"red\">" +
+                        "    <FRAME src=\"Frames.html\" name=\"blue\">" +
+                        "</FRAMESET></HTML>" );
+        WebResponse response = _wc.getResponse( getHostPath() + "/SuperFrames.html" );
+        assertEquals( "red:red subframe", _wc.getFrameContents( "red:red" ),
+                      response.getSubframeContents( "red" ).getSubframeContents( "red" ) );
+    }
+
+
     public void testNestedCrossFrameLinks() throws Exception {
         defineResource( "SuperFrames.html",
                         "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
@@ -240,6 +259,26 @@ public class WebFrameTest extends HttpUnitTest {
         WebResponse frameContent = _wc.getResponse( _wc.getFrameContents( frameNames[1] ).getLinks()[0].getRequest() );
         assertTrue( "Second response not the same as source frame contents", frameContent == _wc.getFrameContents( frameNames[0] ) );
         assertEquals( "URL for second request", getHostPath() + "/Linker.html", frameContent.getURL().toExternalForm() );
+    }
+
+
+    public void testCrossLevelLinks() throws Exception {
+        defineResource( "SuperFrames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"50%,50%\">" +
+                        "    <FRAME src=\"Frames.html\" name=\"red\">" +
+                        "    <FRAME src=\"Frames.html\" name=\"blue\">" +
+                        "</FRAMESET></HTML>" );
+        WebResponse response = _wc.getResponse( getHostPath() + "/SuperFrames.html" );
+        String topFrameNames[] = response.getFrameNames();
+        WebResponse topRedFrame = _wc.getFrameContents( topFrameNames[0] );
+        String frameNames[] = topRedFrame.getFrameNames();
+
+        _wc.getResponse( _wc.getFrameContents( frameNames[0] ).getLinks()[0].getRequest() );
+        WebResponse frameContent = _wc.getResponse( _wc.getFrameContents( frameNames[0] ).getLinks()[0].getRequest() );
+        assertTrue( "Second response not the same as source frame contents", frameContent == _wc.getFrameContents( "_top" ) );
+        assertEquals( "URL for second request", getHostPath() + "/Form.html", frameContent.getURL().toExternalForm() );
+        assertEquals( "Number of active frames", 1, _wc.getFrameNames().length );
     }
 
 

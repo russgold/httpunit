@@ -53,6 +53,8 @@ public class WebRequestSource extends ParameterHolder {
             return _pageFrame;
         } else if (getSpecifiedTarget().equalsIgnoreCase( "_self" )) {
             return _pageFrame;
+        } else if (getSpecifiedTarget().equalsIgnoreCase( "_top" )) {
+            return "_top";
         } else {
             return WebFrame.getTargetFrameName( _pageFrame, getSpecifiedTarget() );
         }

@@ -11,6 +11,11 @@ Limitations:
 
 
 Revision History:
+13-Feb-2002
+Additions:
+    1. WebResponse now has a getSubframeContents method which returns the contents of a subframe of the frame represented
+       by the response.
+
 11-Feb-2002
 Problems corrected:
     1. Subframes with the same names as others in the same tree no longer cause an infinite loop / stack overflow

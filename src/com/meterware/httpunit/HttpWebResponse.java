@@ -95,7 +95,7 @@ class HttpWebResponse extends WebResponse {
     
     
     public String toString() {
-        return "[headers=" + _headers + "]";
+        return "HttpWebResponse [url=" + getURL() + "; headers=" + _headers + "]";
     }
 
 

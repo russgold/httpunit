@@ -262,6 +262,17 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+    /**
+     * Returns the contents of the specified subframe of this frameset response.
+     *
+     * @param subFrameName the name of the desired frame as defined in the frameset.
+     **/
+    public WebResponse getSubframeContents( String subFrameName ) {
+        if (_frameHolder == null) throw new NoSuchFrameException( subFrameName );
+        return _frameHolder.getFrameContents( WebFrame.getNestedFrameName( _frameName, subFrameName ) );
+    }
+
+
 //---------------------- HTMLSegment methods -----------------------------
 
     /**
@@ -497,6 +508,14 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+    /**
+     * Provides a FrameHolder to help with computation of subframes.
+     **/
+    void setFrameHolder( FrameHolder holder ) {
+        _frameHolder = holder;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
@@ -535,6 +554,8 @@ public class WebResponse implements HTMLSegment {
     private Hashtable _newCookies;
 
     private WebRequest _refreshRequest;
+
+    private FrameHolder _frameHolder;
 
     private int _refreshDelay;
 
@@ -1012,3 +1033,4 @@ class NotHTMLException extends RuntimeException {
 
     private String _contentType;
 }
+
