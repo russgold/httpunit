@@ -124,7 +124,6 @@ You should not have to do anything special; however, not all JavaScript construc
 If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.
 
 <a name="unsupported"><h3>How do I handle a page that uses JavaScript features that HttpUnit does not support?</h3></a>
-The latest pre-release version supports disabling exceptions as a result of Javascript errors.
 If you call<blockquote><code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></blockquote>problems will
 recorded but will not throw exceptions.
 You can see the list of problems detected by calling<blockquote><code>HttpUnitOptions.getScriptErrorMessages();</code></blockquote>
