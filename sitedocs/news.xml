@@ -1,5 +1,11 @@
 <?xml version='1.0' ?>
 <news>
+    <item date="16-June-2004" url="http://www.httpunit.org/prerelease/httpunit-1.5.5-d-16Jun.zip">
+Prerelease: Massive reworking of target functionality, PseudoServer handles large messages</item>
+    <item date="29-Apr-2004" url="http://www.httpunit.org/prerelease/httpunit-1.5.5-d-29Apr.zip">
+Prerelease: ServletUnit now supports filters and listeners, PseudoServer emulates proxy server</item>
+    <item date="19-Sep-2003" url="http://www.httpunit.org/prerelease/httpunit-1.5.5-d-19Sep.zip">
+Prerelease: Added attributes for HTMLElement, improved PseudoServer</item>
     <item date="21-Aug-2003">HttpUnit 1.5.4 released</item>
     <item date="16-May-2003">New web site format created</item>
     <item date="4-Apr-2003">HttpUnit 1.5.3 released</item>

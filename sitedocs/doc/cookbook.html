@@ -28,7 +28,7 @@ by the text within them, and to use those links as new page requests. For exampl
 for the <CODE>WebResponse</CODE> class, above.  That page could therefore be obtained as follows:
 <PRE>
     WebConversation wc = <b>new</b> WebConversation();
-    WebResponse   resp = wc.getResponse( "http://www.httpunit.org/doc/Cookbook.html" ); // read this page
+    WebResponse   resp = wc.getResponse( "http://www.httpunit.org/doc/cookbook.html" ); // read this page
     WebLink       link = resp.getLinkWith( "response" );                                // find the link
     link.click();                                                                       // follow it
     WebResponse   jdoc = wc.getCurrentPage();                                           // retrieve the referenced page
