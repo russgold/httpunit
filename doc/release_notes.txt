@@ -13,7 +13,7 @@ Limitations:
 
 
 Revision History:
- 28-Feb-2003 1.5.2 release candidate
+  3-Mar-2003 1.5.2
 Acknowledgements:
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
     Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
