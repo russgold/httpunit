@@ -185,83 +185,126 @@ class ParsedHTML {
 
 
     abstract static class HTMLElementFactory {
-        abstract HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element );
-        void recordElement( NodeUtils.PreOrderTraversal pot, Element element, HTMLElement htmlElement ) {
+        abstract HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element );
+
+        void recordElement( NodeUtils.PreOrderTraversal pot, Element element, ParsedHTML parsedHTML ) {
+            HTMLElement htmlElement = toHTMLElement( pot, parsedHTML, element );
             if (htmlElement != null) {
                 addToMaps( pot, element, htmlElement );
                 addToLists( pot, htmlElement );
             }
         }
+
+        protected boolean addToContext() { return false; }
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
             for (Iterator i = pot.getContexts(); i.hasNext();) {
                 Object o = i.next();
                 if (o instanceof ParsedHTML) ((ParsedHTML) o).addToList( htmlElement );
             }
         }
+
         protected void addToMaps( NodeUtils.PreOrderTraversal pot, Element element, HTMLElement htmlElement ) {
             for (Iterator i = pot.getContexts(); i.hasNext();) {
                 Object o = i.next();
                 if (o instanceof ParsedHTML) ((ParsedHTML) o).addToMaps( element, htmlElement );
             }
         }
+
+        final protected ParsedHTML getParsedHTML( NodeUtils.PreOrderTraversal pot ) {
+            return (ParsedHTML) getClosestContext( pot, ParsedHTML.class );
+        }
+
+        final protected Object getClosestContext( NodeUtils.PreOrderTraversal pot, Class aClass ) {
+            return pot.getClosestContext( aClass );
+        }
     }
 
 
     static class WebFormFactory extends HTMLElementFactory {
-        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebForm( element );
         }
     }
 
 
     static class WebLinkFactory extends HTMLElementFactory {
-        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toLinkAnchor( element );
         }
     }
 
 
     static class WebImageFactory extends HTMLElementFactory {
-        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebImage( element );
         }
     }
 
 
     static class WebAppletFactory extends HTMLElementFactory {
-        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebApplet( element );
         }
     }
 
 
     static class WebTableFactory extends HTMLElementFactory {
-        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebTable( element );
         }
+        protected boolean addToContext() { return true; }
 
-
-//        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
-//            for (Iterator i = pot.getContexts(); i.hasNext();) {
-//                Object o = i.next();
-//                if (o instanceof ParsedHTML) {
-//                    ((ParsedHTML) o).addToList( htmlElement );
-//                    return;
-//                }
-//            }
-//        }
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            getParsedHTML( pot ).addToList( htmlElement );
+        }
     }
+
+
+    static class TableRowFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            WebTable wt = getWebTable( pot );
+            if (wt == null) return null;
+            return wt.newTableRow( element );
+        }
+        private WebTable getWebTable( NodeUtils.PreOrderTraversal pot ) {
+            return (WebTable) getClosestContext( pot, WebTable.class );
+        }
+        protected boolean addToContext() { return true; }
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            getWebTable( pot ).addRow( (WebTable.TableRow) htmlElement );
+        }
+    }
+
+
+    static class TableCellFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            WebTable.TableRow tr = getTableRow( pot );
+            if (tr == null) return null;
+            return tr.newTableCell( element );
+        }
+        private WebTable.TableRow getTableRow( NodeUtils.PreOrderTraversal pot ) {
+            return (WebTable.TableRow) getClosestContext( pot, WebTable.TableRow.class );
+        }
+        protected boolean addToContext() { return true; }
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            getTableRow( pot ).addTableCell( (TableCell) htmlElement );
+        }
+    }
+
 
 
     private static HashMap _htmlFactoryClasses = new HashMap();
 
     static {
-        _htmlFactoryClasses.put( "a", new WebLinkFactory() );
-        _htmlFactoryClasses.put( "area", new WebLinkFactory() );
-        _htmlFactoryClasses.put( "form", new WebFormFactory() );
-        _htmlFactoryClasses.put( "img", new WebImageFactory() );
+        _htmlFactoryClasses.put( "a",      new WebLinkFactory() );
+        _htmlFactoryClasses.put( "area",   new WebLinkFactory() );
+        _htmlFactoryClasses.put( "form",   new WebFormFactory() );
+        _htmlFactoryClasses.put( "img",    new WebImageFactory() );
         _htmlFactoryClasses.put( "applet", new WebAppletFactory() );
-        _htmlFactoryClasses.put( "table", new WebTableFactory() );
+        _htmlFactoryClasses.put( "table",  new WebTableFactory() );
+        _htmlFactoryClasses.put( "tr",     new TableRowFactory() );
+        _htmlFactoryClasses.put( "td",     new TableCellFactory() );
+        _htmlFactoryClasses.put( "th",     new TableCellFactory() );
     }
 
     private static HTMLElementFactory getHTMLElementFactory( String tagName ) {
@@ -274,10 +317,11 @@ class ParsedHTML {
 
         NodeUtils.NodeAction action = new NodeUtils.NodeAction() {
             public boolean processElement( NodeUtils.PreOrderTraversal pot, Element element ) {
-                if (_elements.containsKey( element )) return true;
-
                 HTMLElementFactory factory = getHTMLElementFactory( element.getNodeName().toLowerCase() );
-                if (factory != null) factory.recordElement( pot, element, factory.toHTMLElement( ParsedHTML.this, element ) );
+                if (factory == null) return true;
+
+                if (!_elements.containsKey( element )) factory.recordElement( pot, element, ParsedHTML.this );
+                if (factory.addToContext()) pot.pushContext( _elements.get( element ) );
 
                 return true;
             }
@@ -298,7 +342,12 @@ class ParsedHTML {
 
 
     private WebLink toLinkAnchor( Element child ) {
-        return (!isLinkAnchor( child )) ? null : new WebLink( _response, _baseURL, _baseTarget, child );
+        return (!isWebLink( child )) ? null : new WebLink( _response, _baseURL, _baseTarget, child );
+    }
+
+
+    private boolean isWebLink( Node node ) {
+        return (node.getAttributes().getNamedItem( "href" ) != null);
     }
 
 
@@ -313,7 +362,6 @@ class ParsedHTML {
 
 
     private WebTable toWebTable( Element element ) {
-        if (!WebTable.isTopLevelTable( element, getRootNode() )) return null;
         return new WebTable( _response, element, _baseURL, _baseTarget, _characterSet );
     }
 
@@ -539,22 +587,6 @@ class ParsedHTML {
         if (_rootNode == null) throw new IllegalStateException( "The root node has not been specified" );
         return _rootNode;
     }
-
-
-
-    /**
-     * Returns true if the node is a link anchor node.
-     **/
-    private boolean isLinkAnchor( Node node ) {     // XXX do we really need all these tests any more?
-        if (node.getNodeType() != Node.ELEMENT_NODE) {
-            return false;
-        } else if (!node.getNodeName().equalsIgnoreCase( "a" ) && !node.getNodeName().equalsIgnoreCase( "area" )) {
-            return false;
-        } else {
-            return (node.getAttributes().getNamedItem( "href" ) != null);
-        }
-    }
-
 
 
     /**

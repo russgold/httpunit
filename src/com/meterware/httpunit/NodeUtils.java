@@ -153,6 +153,19 @@ class NodeUtils {
         }
 
 
+        /**
+         * Returns the most recently pushed context which implements the specified class.
+         * Will return null if no matching context is found.
+         */
+        public Object getClosestContext( Class matchingClass ) {
+            for (int i = _traversalContext.size()-1; i >= 0; i-- ) {
+                Object o = _traversalContext.elementAt( i );
+                if (matchingClass.isInstance(o)) return o;
+            }
+            return null;
+        }
+
+
         public void perform( NodeAction action ) {
             while (!_pendingNodes.empty()) {
                 final Object object = _pendingNodes.pop();

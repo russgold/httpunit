@@ -142,7 +142,7 @@ public class WebLink extends FixedURLWebRequestSource {
     /**
      * Returns the scriptable delegate.
      */
-    ScriptableDelegate getScriptableDelegate() {
+    public ScriptableDelegate getScriptableDelegate() {
         return getScriptableObject();
     }
 

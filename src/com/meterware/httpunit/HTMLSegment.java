@@ -23,9 +23,17 @@ import org.xml.sax.SAXException;
 
 /**
  * Represents the parse tree for a segment of HTML.
- * @author Russell Gold
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public interface HTMLSegment {
+
+
+    /**
+     * Returns the HTMLElement found in this segment with the specified ID.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     */
+    public HTMLElement getElementWithID( String id ) throws SAXException;
 
 
     /**

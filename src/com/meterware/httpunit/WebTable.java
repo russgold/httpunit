@@ -28,7 +28,7 @@ import org.w3c.dom.*;
 /**
  * This class represents a table in an HTML page.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class WebTable extends HTMLElementBase {
@@ -51,8 +51,14 @@ public class WebTable extends HTMLElementBase {
      * Returns the number of rows in the table.
      **/
     public int getRowCount() {
+        return getCells().length;
+    }
+
+
+    private TableCell[][] getCells() {
         if (_cells == null) readTable();
-        return _cells.length;
+        return _cells;
+
     }
 
 
@@ -60,9 +66,8 @@ public class WebTable extends HTMLElementBase {
      * Returns the number of columns in the table.
      **/
     public int getColumnCount() {
-        if (_cells == null) readTable();
-        if (_cells.length == 0) return 0;
-        return _cells[0].length;
+        if (getCells().length == 0) return 0;
+        return getCells()[0].length;
     }
 
 
@@ -94,8 +99,7 @@ public class WebTable extends HTMLElementBase {
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
      **/
     public TableCell getTableCell( int row, int column ) {
-        if (_cells == null) readTable();
-        return _cells[ row ][ column ];
+        return getCells()[ row ][ column ];
     }
 
 
@@ -104,14 +108,10 @@ public class WebTable extends HTMLElementBase {
      * @return TableCell with given ID or null if ID is not found.
      **/
     public TableCell getTableCellWithID( String id ) {
-        if (_cells == null) readTable();
-        String idToCompare;
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
-                if (_cells[i][j]!=null) {
-                    idToCompare = NodeUtils.getNodeAttribute( _cells[i][j].getOriginalDOM(), "id" );
-                    if (HttpUnitUtils.matches( id, idToCompare )) return _cells[i][j];
-                }
+                final TableCell tableCell = getCells()[i][j];
+                if (tableCell!=null && tableCell.getID().equals( id )) return tableCell;
             }
         }
         return null;
@@ -209,16 +209,15 @@ public class WebTable extends HTMLElementBase {
 
     public String toString() {
         String eol = System.getProperty( "line.separator" );
-        if (_cells == null) readTable();
         StringBuffer sb = new StringBuffer( HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE).append("WebTable:" ).append( eol );
-        for (int i = 0; i < _cells.length; i++) {
+        for (int i = 0; i < getCells().length; i++) {
             sb.append( "[" ).append( i ).append( "]: " );
-            for (int j = 0; j < _cells[i].length; j++) {
+            for (int j = 0; j < getCells()[i].length; j++) {
                 sb.append( "  [" ).append( j ).append( "]=" );
-                if (_cells[i][j] == null) {
+                if (getCells()[i][j] == null) {
                     sb.append( "null" );
                 } else {
-                    sb.append( _cells[i][j].asText() );
+                    sb.append( getCells()[i][j].asText() );
                 }
             }
             sb.append( eol );
@@ -284,106 +283,56 @@ public class WebTable extends HTMLElementBase {
     }
 
 
-
     private void placeCell( int row, int column, TableCell cell ) {
         while (_cells[ row ][ column ] != null) column++;
         _cells[ row ][ column ] = cell;
     }
 
 
-    /**
-     * Returns true if the specified table node is not nested within another one.
-     **/
-    static boolean isTopLevelTable( Node tableNode, Node root ) {
-        return isMoreCloselyNested( tableNode, root, "table" );
+    private ArrayList _rows = new ArrayList();
+
+
+    void addRow( TableRow tableRow ) {
+        _cells = null;
+        _rows.add( tableRow );
     }
 
 
-    /**
-     * Returns true if the desiredParentTag is found in the tree above this node more closely nested than
-     * the undesiredParentTag, or if the top of the tree is found before the undesired tag.
-     **/
-    private static boolean isMoreCloselyNested( Node node, Node desiredParentNode, String undesiredParentTag ) {
-        node = node.getParentNode();
-        while (true) {
-           if (node == desiredParentNode) {
-               return true;
-           } else if (node.getNodeName().equalsIgnoreCase( undesiredParentTag )) {
-               return false;
-           } else if (node.getParentNode() == null) {
-               return true;
-           }
-           node = node.getParentNode();
-        }
+    TableRow newTableRow( Element element ) {
+        return new TableRow( element );
     }
-
 
 
     private TableRow[] getRows() {
-        final Vector rows = new Vector();
-
-        processChildren( _dom, "table", new ElementHandler() {
-            public void handleElement( Element element ) {
-                rows.addElement( new TableRow( element ) );
-            }
-            public boolean shouldHandleElement( String tagName ) {
-                return tagName.equalsIgnoreCase( "tr" );
-            }
-        } );
-
-        TableRow[] result = new TableRow[ rows.size() ];
-        rows.copyInto( result );
-        return result;
+        return (TableRow[]) _rows.toArray( new TableRow[ _rows.size() ] );
     }
 
 
-    class TableRow {
-        Element getElement() {
-            return _element;
+    class TableRow extends HTMLElementBase {
+
+        private ArrayList _cells = new ArrayList();
+
+        TableRow( Element rowNode ) {
+            super( rowNode );
         }
+
 
         TableCell[] getCells() {
-            final Vector cells = new Vector();
-
-            processChildren( _element, "table", new ElementHandler() {
-                public void handleElement( Element element ) {
-                    cells.addElement( new TableCell( _response, element, _url, _parentTarget, _characterSet ) );
-                }
-                public boolean shouldHandleElement( String tagName ) {
-                    return tagName.equalsIgnoreCase( "th" ) || tagName.equalsIgnoreCase( "td" );
-                }
-            } );
-
-            TableCell[] result = new TableCell[ cells.size() ];
-            cells.copyInto( result );
-            return result;
+            return (TableCell[]) _cells.toArray( new TableCell[ _cells.size() ]);
         }
 
 
-        private Element _element;
-        TableRow( Element rowNode ) {
-            _element = rowNode;
+        TableCell newTableCell( Element element ) {
+            return new TableCell( _response, element, _url, _parentTarget, _characterSet );
         }
-    }
 
 
-    interface ElementHandler {
-        public void handleElement( Element element );
-        public boolean shouldHandleElement( String tagName );
-    }
-
-
-    static void processChildren( Element root, String avoidingParentTag, ElementHandler handler ) {
-
-        for (Node child = root.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof Element) {
-                Element element = (Element) child;
-                String name = child.getNodeName();
-                if (handler.shouldHandleElement( name )) handler.handleElement( element );
-                if (!name.equalsIgnoreCase( avoidingParentTag )) processChildren( element, avoidingParentTag, handler );
-            }
+        void addTableCell( TableCell cell ) {
+            _cells.add( cell );
         }
+
     }
+
 
     static {
         MATCH_FIRST_NONBLANK_CELL = new HTMLElementPredicate() {    // XXX find a way to do this w/o purging the table cells

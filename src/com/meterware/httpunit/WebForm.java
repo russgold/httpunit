@@ -425,7 +425,7 @@ public class WebForm extends WebRequestSource {
      * Returns the scriptable delegate.
      */
 
-    ScriptableDelegate getScriptableDelegate() {
+    public ScriptableDelegate getScriptableDelegate() {
         return getScriptableObject();
     }
 

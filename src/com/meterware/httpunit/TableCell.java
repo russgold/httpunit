@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.net.URL;
 
 import org.w3c.dom.Element;
@@ -28,7 +30,7 @@ import org.w3c.dom.Node;
 /**
  * A single cell in an HTML table.
  **/
-public class TableCell extends ParsedHTML implements HTMLSegment {
+public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
 
     
     /**
@@ -60,6 +62,46 @@ public class TableCell extends ParsedHTML implements HTMLSegment {
      **/
     public Node getDOM() {
         return super.getDOM();
+    }
+
+
+//-------------------------------- HTMLElement methods ---------------------------------------
+
+
+    /**
+     * Returns the ID associated with this element. IDs are unique throughout the HTML document.
+     **/
+    public String getID() {
+        return getAttribute( "id" );
+    }
+
+
+    /**
+     * Returns the name associated with this element.
+     **/
+    public String getName() {
+        return getAttribute( "name" );
+    }
+
+
+    /**
+     * Returns the title associated with this element.
+     **/
+    public String getTitle() {
+        return getAttribute( "title" );
+    }
+
+
+    /**
+     * Returns the delegate which supports scripting this element.
+     */
+    public ScriptableDelegate getScriptableDelegate() {
+        throw new RuntimeException( "No scripting support for " + getClass().getName() );
+    }
+
+
+    private String getAttribute( final String name ) {
+        return NodeUtils.getNodeAttribute( _element, name );
     }
 
 
@@ -96,7 +138,6 @@ public class TableCell extends ParsedHTML implements HTMLSegment {
     private int getAttributeValue( Node node, String attributeName, int defaultValue ) {
         return NodeUtils.getAttributeValue( node, attributeName, defaultValue );
     }
-
 
 }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,10 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
@@ -39,13 +35,13 @@ public class HtmlTablesTest extends HttpUnitTest {
     }
 
 
-    public static Test suite() {
-	return new TestSuite( HtmlTablesTest.class );
+    public static TestSuite suite() {
+        return new TestSuite( HtmlTablesTest.class );
     }
 
 
     public HtmlTablesTest( String name ) {
-	super( name );
+        super( name );
     }
 
 
@@ -269,7 +265,6 @@ public class HtmlTablesTest extends HttpUnitTest {
 
     /**
      * Get a specific cell with a given id in a WebTable
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public void testCellsWithID() throws Exception {
         defineWebPage( "Default", "<h2>Interesting data</h2>" +
@@ -293,16 +288,8 @@ public class HtmlTablesTest extends HttpUnitTest {
         cell = table.getTableCellWithID("nonExistingID");
         assertNull("cell id2",cell);
 
-        // check the ignore case.TRUE
-        HttpUnitOptions.setMatchesIgnoreCase(true);
-        cell = table.getTableCellWithID("iD2");
-        assertNotNull("cell id2",cell);
-        assertEquals("Value of cell id2","value2",cell.asText());
-
-        // check the ignore case FALSE
-        HttpUnitOptions.setMatchesIgnoreCase(false);
-        cell = table.getTableCellWithID("iD2");
-        assertNull("cell iD2",cell);
+        cell = (TableCell) page.getElementWithID( "id1" );
+        assertEquals( "value of cell found from page", "value1", cell.asText() );
     }
 
     private WebConversation _wc;

@@ -34,7 +34,6 @@ import org.w3c.dom.Node;
  **/
 public class WebImage extends FixedURLWebRequestSource {
 
-    private URL        _baseURL;
     private Node       _node;
     private ParsedHTML _parsedHTML;
     private Scriptable _scriptable;
@@ -44,7 +43,6 @@ public class WebImage extends FixedURLWebRequestSource {
 
     WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, Node node, String parentTarget ) {
         super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "src" ), parentTarget );
-        _baseURL = baseURL;
         _node = node;
         _parsedHTML = parsedHTML;
         _src = NodeUtils.getNodeAttribute( _node, "src" );
@@ -125,7 +123,7 @@ public class WebImage extends FixedURLWebRequestSource {
      * Returns the scriptable delegate.
      */
 
-    ScriptableDelegate getScriptableDelegate() {
+    public ScriptableDelegate getScriptableDelegate() {
         return getScriptableObject();
     }
 }

@@ -30,6 +30,7 @@ abstract
 public class HttpUnitTest extends HttpUserAgentTest {
 
     private boolean _showTestName;
+    private long _startTime;
 
 
     public HttpUnitTest( String name ) {
@@ -46,8 +47,21 @@ public class HttpUnitTest extends HttpUserAgentTest {
     public void setUp() throws Exception {
         super.setUp();
         HttpUnitOptions.reset();
-        if (_showTestName) System.out.println( "----------------------- " + getName() + " ------------------------");
+        if (_showTestName) {
+            System.out.println( "----------------------- " + getName() + " ------------------------");
+            _startTime = System.currentTimeMillis();
+        }
     }
+
+
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if (_showTestName) {
+            long duration = System.currentTimeMillis() - _startTime;
+            System.out.println( "... took " + duration + " msec");
+        }
+    }
+
 
     static {
         new WebConversation();

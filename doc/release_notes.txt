@@ -11,6 +11,11 @@ Limitations:
 
 
 Revision History:
+26-Dec-2002
+Additions:
+    WebResponse and TableCell now support the getElementWithID method, which returns any supported HTMLElement, given its ID.
+    Supported HTMLElement objects include WebForm, WebLink, WebTable, WebImage, WebApplet, TableCell, and TableRow.
+
 25-Dec-2002
 Notes:
     get...WithID was incorrectly doing case insensitive matches.  It is now case-sensitive, since that is the way the
