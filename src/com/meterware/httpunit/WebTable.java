@@ -110,11 +110,7 @@ public class WebTable {
             for (int j = 0; j < getColumnCount(); j++) {
                 if (_cells[i][j]!=null) {
                     idToCompare = NodeUtils.getNodeAttribute( _cells[i][j].getOriginalDOM(), "id" );
-                    if (HttpUnitOptions.getMatchesIgnoreCase())
-                        if (id.equalsIgnoreCase(idToCompare))
-                            return _cells[i][j];
-                        else if (id.equals(idToCompare))
-                            return _cells[i][j];
+                    if (HttpUnitUtils.matches( id, idToCompare )) return _cells[i][j];
                 }
             }
         }

@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+18-Dec-2001
+Acknowledgements:
+    Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
+
 18-Dec-2002 1.5.1
 
 Acknowledgements:

@@ -89,8 +89,7 @@ class ParsedHTML {
     public WebForm getFormWithID( String ID ) {
         WebForm[] forms = getForms();
         for (int i = 0; i < forms.length; i++) {
-            if (forms[i].getID().equals( ID )) return forms[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && forms[i].getID().equalsIgnoreCase( ID )) return forms[i];
+            if (HttpUnitUtils.matches( ID, forms[i].getID() )) return forms[i];
         }
         return null;
     }
@@ -102,8 +101,7 @@ class ParsedHTML {
     public WebForm getFormWithName( String name ) {
         WebForm[] forms = getForms();
         for (int i = 0; i < forms.length; i++) {
-            if (forms[i].getName().equals( name )) return forms[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && forms[i].getName().equalsIgnoreCase( name )) return forms[i];
+            if (HttpUnitUtils.matches( name, forms[i].getName() )) return forms[i];
         }
         return null;
     }
@@ -223,8 +221,7 @@ class ParsedHTML {
     public WebImage getImageWithName( String name ) {
         WebImage[] images = getImages();
         for (int i = 0; i < images.length; i++) {
-            if (images[i].getName().equals( name )) return images[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getName().equalsIgnoreCase( name )) return images[i];
+            if (HttpUnitUtils.matches( name, images[i].getName() )) return images[i];
         }
         return null;
     }
@@ -236,8 +233,7 @@ class ParsedHTML {
     public WebImage getImageWithSource( String source ) {
         WebImage[] images = getImages();
         for (int i = 0; i < images.length; i++) {
-            if (images[i].getSource().equals( source )) return images[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getSource().equalsIgnoreCase( source )) return images[i];
+            if (HttpUnitUtils.matches( source, images[i].getSource() )) return images[i];
         }
         return null;
     }
@@ -249,8 +245,7 @@ class ParsedHTML {
     public WebImage getImageWithAltText( String altText ) {
         WebImage[] images = getImages();
         for (int i = 0; i < images.length; i++) {
-            if (images[i].getSource().equals( altText )) return images[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getAltText().equalsIgnoreCase( altText )) return images[i];
+            if (HttpUnitUtils.matches( altText, images[i].getAltText() )) return images[i];
         }
         return null;
     }
