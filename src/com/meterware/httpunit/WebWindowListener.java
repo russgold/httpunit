@@ -20,8 +20,6 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 
-import java.lang.String;
-
 /**
  * A listener for web window openings and closings.
  *

@@ -19,16 +19,9 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.*;
-import java.net.HttpURLConnection;
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.meterware.httpunit.*;
 
 /**
  * Tests the HttpSession implementation.
@@ -72,7 +65,7 @@ public class SessionTest extends ServletUnitTest {
         ServletUnitHttpSession session = context.newSession();
         long accessedAt = session.getLastAccessedTime();
         assertTrue( "Session is not marked as new", session.isNew() );
-        try { Thread.currentThread().sleep( 50 ); } catch (InterruptedException e) {};
+        try { Thread.sleep( 50 ); } catch (InterruptedException e) {};
         assertEquals( "Initial access time", accessedAt, context.getSession( session.getId() ).getLastAccessedTime() ); 
         session.access();
         assertTrue( "Last access time not changed", accessedAt != context.getSession( session.getId() ).getLastAccessedTime() );

@@ -3,7 +3,6 @@ package tutorial;
 import com.meterware.httpunit.*;
 import com.meterware.servletunit.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import junit.framework.*;

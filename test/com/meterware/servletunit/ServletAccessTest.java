@@ -20,10 +20,7 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
 import com.meterware.httpunit.WebResponse;
-
-import java.util.*;
 
 import javax.servlet.http.HttpServlet;
 

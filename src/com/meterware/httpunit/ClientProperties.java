@@ -226,8 +226,8 @@ public class ClientProperties {
     }
 
 
-    static ClientProperties cloneProperties() {
-        return new ClientProperties( getDefaultProperties() );
+    ClientProperties cloneProperties() {
+        return new ClientProperties( this );
     }
 
 

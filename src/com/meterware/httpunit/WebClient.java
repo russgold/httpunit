@@ -30,7 +30,6 @@ import java.util.*;
 
 import org.xml.sax.SAXException;
 import com.meterware.httpunit.cookies.CookieJar;
-import com.meterware.httpunit.cookies.CookieJar;
 
 
 /**

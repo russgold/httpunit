@@ -19,13 +19,10 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
-import java.net.URLEncoder;
 
 
 /**

@@ -22,8 +22,6 @@ package com.meterware.servletunit;
  *******************************************************************************************************************/
 import com.meterware.httpunit.AuthorizationRequiredException;
 
-import java.io.IOException;
-
 
 /**
  * Thrown when servletunit wants to indicate that a resource is protected in an application using Basic Authorization.

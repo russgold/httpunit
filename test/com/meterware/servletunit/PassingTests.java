@@ -20,9 +20,6 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
-import java.util.*;
-
 import junit.framework.TestCase;
 
 

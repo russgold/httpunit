@@ -19,7 +19,6 @@ package com.meterware.httpunit.scripting;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import java.util.*;
 
 
 /**

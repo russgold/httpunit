@@ -1,11 +1,5 @@
 import com.meterware.httpunit.*;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-
-import org.xml.sax.*;
-import org.w3c.dom.*;
-
 import junit.framework.*;
 
 

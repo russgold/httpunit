@@ -19,17 +19,9 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import com.meterware.httpunit.*;
 
 /**
  * A base class for servlet unit tests.
