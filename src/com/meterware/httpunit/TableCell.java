@@ -78,6 +78,11 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
     }
 
 
+    public String getClassName() {
+        return getAttribute( "class" );
+    }
+
+
     /**
      * Returns the name associated with this element.
      **/

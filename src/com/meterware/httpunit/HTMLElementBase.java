@@ -41,6 +41,11 @@ class HTMLElementBase implements HTMLElement {
     }
 
 
+    public String getClassName() {
+        return getAttribute( "class" );
+    }
+
+
     public String getTitle() {
         return getAttribute( "title" );
     }

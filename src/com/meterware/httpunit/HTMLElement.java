@@ -37,6 +37,12 @@ public interface HTMLElement {
 
 
     /**
+     * Returns the class associated with this element.
+     **/
+    String getClassName();
+
+
+    /**
      * Returns the name associated with this element.
      **/
     String getName();

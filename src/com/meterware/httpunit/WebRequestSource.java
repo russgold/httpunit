@@ -41,6 +41,14 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     /**
+     * Returns the class associated with this request source.
+     **/
+    public String getClassName() {
+        return getAttribute( "class" );
+    }
+
+
+    /**
      * Returns the name associated with this request source.
      **/
     public String getName() {
