@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2003, Russell Gold
+ * Copyright (c) 2001-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -28,9 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletContext;
+import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +46,7 @@ import org.xml.sax.SAXException;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="balld@webslingerZ.com">Donald Ball</a>
+ * @author <a href="jaydunning@users.sourceforge.net">Jay Dunning</a>
  **/
 class WebApplication {
 
@@ -61,6 +60,8 @@ class WebApplication {
     private ServletMap _servletMapping = new ServletMap();
 
     private ArrayList _securityConstraints = new ArrayList();
+
+    private ArrayList _contextListeners = new ArrayList();
 
     private boolean _useBasicAuthentication;
 
@@ -116,8 +117,52 @@ class WebApplication {
         extractSecurityConstraints( document );
         extractContextParameters( document );
         extractLoginConfiguration( document );
+        extractContextListeners( document );
+        notifyContextInitialized();
         _servletMapping.autoLoadServlets();
     }
+
+
+     private void extractContextListeners( Document document ) throws SAXException {
+         ServletContextListener listener;
+         NodeList nl = document.getElementsByTagName( "listener" );
+         for (int i = 0; i < nl.getLength(); i++) {
+             String listenerName = getChildNodeValue((Element) nl.item(i), "listener-class").trim();
+             try {
+                 listener = (ServletContextListener) Class.forName(listenerName).newInstance();
+             } catch (Exception x) {
+                 throw new RuntimeException("Unable to load context listener " + listenerName, x);
+             } catch (Error x) {
+                 throw new RuntimeException("Unable to load context listener " + listenerName, x);
+             }
+             _contextListeners.add(listener);
+         }
+     }
+
+     private void notifyContextInitialized() {
+         ServletContextEvent event = new ServletContextEvent( getServletContext() );
+
+         for (Iterator i = _contextListeners.iterator(); i.hasNext();) {
+             ServletContextListener listener = (ServletContextListener) i.next();
+             listener.contextInitialized( event );
+         }
+     }
+
+
+     void shutDown() {
+         destroyServlets();
+         notifyContextDestroyed();
+     }
+
+
+     private void notifyContextDestroyed() {
+         ServletContextEvent event = new ServletContextEvent( getServletContext() );
+
+         for (ListIterator i = _contextListeners.listIterator( _contextListeners.size() ); i.hasPrevious();) {
+             ServletContextListener listener = (ServletContextListener) i.previous();
+             listener.contextDestroyed( event );
+         }
+     }
 
 
     private void extractSecurityConstraints( Document document ) throws SAXException {

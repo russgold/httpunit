@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2003, Russell Gold
+ * Copyright (c) 2001-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,12 +38,14 @@ class WebXMLString {
     private ArrayList _servlets = new ArrayList();
     private ArrayList _mappings = new ArrayList();
     private ArrayList _servletNames = new ArrayList();
+    private ArrayList _listeners = new ArrayList();
 
     private String _loginConfig = "";
     private Hashtable _resources = new Hashtable();
     private Hashtable _initParams = new Hashtable();
     private Hashtable _contextParams = new Hashtable();
     private Hashtable _loadOnStartup = new Hashtable();
+
 
     ByteArrayInputStream asInputStream() throws UnsupportedEncodingException {
         return new ByteArrayInputStream( asText().getBytes( "UTF-8" ) );
@@ -57,6 +59,11 @@ class WebXMLString {
             Map.Entry entry = (Map.Entry) i.next();
             result.append( "  <context-param>\n    <param-name>" ).append( entry.getKey() );
             result.append( "</param-name>\n    <param-value>" ).append( entry.getValue() ).append( "</param-value>\n  </context-param>\n" );
+        }
+        for (int i = 0; i < _listeners.size(); i++) {
+            Class aClass = (Class) _listeners.get( i );
+            result.append( "  <listener><listener-class>" ).append( aClass.getName() );
+            result.append( "</listener-class></listener>\n" );
         }
         for (int i = _servlets.size() - 1; i >= 0; i--) {
             Object name = _servletNames.get( i );
@@ -166,6 +173,11 @@ class WebXMLString {
 
     void addAuthorizedRole( String resourceName, String roleName ) {
         getWebResource( resourceName ).addAuthorizedRole( roleName );
+    }
+
+
+    void addContextListener( Class aClass ) {
+        _listeners.add( aClass );
     }
 
 

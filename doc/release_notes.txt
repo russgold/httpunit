@@ -17,6 +17,7 @@ Revision History:
 Acknowledgements:
     Thanks to Jarom Smith for finding some typos in the tutorial.
     Thanks to Jay Dunning for providing an implementation of HttpServletResponse.containsHeader
+                          and implementing support for ServletContextListeners.
 
 Problems fixed:
     1. Window.open() using an empty name was replacing the main window rather than creating a new one.
@@ -27,6 +28,7 @@ Problems fixed:
 
 Additions:
     1. Patch #890995 - Implemented ServletUnitHttpResponse.containsHeader
+    2. Patch #890936 - Added ServletContextListener support
 
  4-Dec-2003
 Acknowledgements:

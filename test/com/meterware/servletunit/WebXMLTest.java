@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2003, Russell Gold
+* Copyright (c) 2001-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,8 +30,7 @@ import java.util.Properties;
 import java.util.List;
 import java.util.Arrays;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletConfig;
+import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,11 +40,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
-public class WebXMLTest extends TestCase {
+public class WebXMLTest extends EventAwareTestCase {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -149,6 +147,36 @@ public class WebXMLTest extends TestCase {
         assertEquals( "init parameter: topping", "", sc.getInitParameter( "topping" ) );
         assertNull( "ServletContext.getInitParameter() should be null", sc.getInitParameter( "shoesize" ) );
 
+    }
+
+
+    public void testContextListeners() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        EventVerifier verifyContext = new ServletContextEventVerifier();
+
+        wxs.addContextListener( ListenerClass1.class );
+        wxs.addContextListener( ListenerClass2.class );
+
+        clearEvents();
+        expectEvent( "startup", ListenerClass1.class, verifyContext );
+        expectEvent( "startup", ListenerClass2.class, verifyContext );
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+        verifyEvents();
+
+        clearEvents();
+        expectEvent( "shutdown", ListenerClass2.class, verifyContext );
+        expectEvent( "shutdown", ListenerClass1.class, verifyContext );
+        sr.shutDown();
+        verifyEvents();
+    }
+
+
+    static class ServletContextEventVerifier implements EventVerifier {
+
+        public void verifyEvent( String eventLabel, Object eventObject ) {
+            if (!(eventObject instanceof ServletContextEvent)) fail( "Event " + eventLabel + " did not include a servlet context event" );
+        }
     }
 
 
@@ -399,6 +427,18 @@ public class WebXMLTest extends TestCase {
     static class Servlet3 extends SimpleGetServlet {}
     static class Servlet4 extends SimpleGetServlet {}
     static class Servlet5 extends SimpleGetServlet {}
+
+
+    static class EventDispatcher {
+
+        public void contextInitialized( ServletContextEvent event ) { sendEvent( "startup", this, event ); }
+
+        public void contextDestroyed( ServletContextEvent event ) { sendEvent( "shutdown", this, event ); }
+    }
+
+
+    static class ListenerClass1 extends EventDispatcher implements ServletContextListener {}
+    static class ListenerClass2 extends EventDispatcher implements ServletContextListener {}
 
 }
 

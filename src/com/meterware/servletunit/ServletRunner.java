@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -142,10 +142,11 @@ public class ServletRunner {
 
     /**
      * Shuts down the servlet container, returning any resources held by it.
-     * Calls the destroy method of each active servlet.
+     * Calls the destroy method of each active servlet, then notifies
+     * ContextListeners of server shutdown.
      */
     public void shutDown() {
-        _application.destroyServlets();
+        _application.shutDown();
     }
 
 
