@@ -40,6 +40,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * A request sent to a web server.
@@ -186,7 +188,7 @@ public class WebRequest {
 
 
     /**
-     * Returns an enumeration of all parameters in this web request.
+     * Returns an enumeration of all parameters in this web request. May include some parameters that will not be sent.
      * @deprecated use getRequestParameterNames instead
      **/
     public Enumeration getParameterNames() {
@@ -195,11 +197,26 @@ public class WebRequest {
 
 
     /**
-     * Returns an array of all parameter names in this web request.
+     * Returns an array of all parameter names defined as part of this web request.
      * @since 1.3.1
      **/
     public String[] getRequestParameterNames() {
-        return _parameterHolder.getParameterNames();
+        final HashSet names = new HashSet();
+        ParameterProcessor pp = new ParameterProcessor() {
+            public void addParameter( String name, String value, String characterSet ) throws IOException {
+                names.add( name );
+            }
+            public void addFile( String parameterName, UploadFileSpec fileSpec ) throws IOException {
+                names.add( parameterName );
+            }
+        };
+
+        try {
+            _parameterHolder.recordPredefinedParameters( pp );
+            _parameterHolder.recordParameters( pp );
+        } catch (IOException e) {}
+
+        return (String[]) names.toArray( new String[ names.size() ] );
     }
 
 

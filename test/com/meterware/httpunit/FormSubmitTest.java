@@ -148,13 +148,15 @@ public class FormSubmitTest extends HttpUnitTest {
     public void testSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
-                                  "<Input type=submit name=update>" +
-                                  "<Input type=submit name=recalculate>" +
+                                  "<Input type=submit name=update value=update>" +
+                                  "<Input type=submit name=recalculate value=value>" +
                                   "</form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         SubmitButton[] buttons = form.getSubmitButtons();
         assertEquals( "num detected submit buttons", 2, buttons.length );
+        assertMatchingSet( "selected request parameters", new String[]{"age","update"},
+                           form.getRequest( "update" ).getRequestParameterNames() );
     }
 
 

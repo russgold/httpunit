@@ -21,6 +21,7 @@ Additions:
 
 Problems fixed:
     1. Submitting a request created with parameter validation disabled would send disabled parameters as well as enabled ones.
+    2. WebRequest.getRequestParameterNames now returns only the names of the parameters that will be submitted with the request.
 
 27-Aug-2002
 Additions:
