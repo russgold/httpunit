@@ -64,7 +64,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _headers.addEntries( clientHeaders );
         _headers.addEntries( request.getHeaders() );
         _messageBody = messageBody;
-        readContentTypeHeader();
+        _contentType = (String) _headers.get( "Content-Type" );
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
         String file = request.getURL().getFile();
@@ -75,14 +75,6 @@ class ServletUnitHttpRequest implements HttpServletRequest {
                 loadParameters( request.getQueryString() );
                 loadParameters( new String( _messageBody ) );
             }
-        }
-    }
-
-
-    private void readContentTypeHeader() {
-        _contentType = (String) _headers.get( "Content-Type" );
-        if (_contentType != null && _contentType.indexOf( ';' ) >= 0) {
-            _contentType = _contentType.substring( 0, _contentType.indexOf( ';' ) );
         }
     }
 
