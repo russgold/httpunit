@@ -46,6 +46,9 @@ public class WebForm extends WebRequestSource {
     private Button[] _buttons;
 
 
+    /** Predicate to match a link's name. **/
+    public final static HTMLElementPredicate MATCH_NAME;
+
     /**
      * Submits this form using the web client from which it was originally obtained.
      **/
@@ -748,6 +751,17 @@ public class WebForm extends WebRequestSource {
         }
     }
 
+
+    static {
+        MATCH_NAME = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.matches( ((WebForm) htmlElement).getName(), (String) criteria );
+            };
+        };
+
+    }
+
+
 //===========================---===== exception class NoSuchParameterException =========================================
 
 
@@ -829,7 +843,7 @@ public class WebForm extends WebRequestSource {
     /**
      * This exception is thrown on an attempt to define a form request with a button not defined on that form.
      **/
-    class DisabledSubmitButtonException extends IllegalRequestParameterException {
+    class DisabledSubmitButtonException extends IllegalStateException {
 
 
         DisabledSubmitButtonException( SubmitButton button ) {

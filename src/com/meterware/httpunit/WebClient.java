@@ -220,6 +220,15 @@ public class WebClient {
 
 
     /**
+     * Clears the proxy server settings. Note that at present this is global to all web clients in the VM.
+     */
+    public void clearProxyServer() {
+        System.getProperties().remove( "proxyHost" );
+        System.getProperties().remove( "proxyPort" );
+    }
+
+
+    /**
      * Returns the name of the active proxy server.
      */
     public String getProxyHost() {

@@ -28,6 +28,7 @@ import java.io.File;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -212,6 +213,26 @@ public class FormScriptingTest extends HttpUnitTest {
 
         response.getFormWithName( "spectrum" ).getButtons()[0].click();
         assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
+    public void testDisabledScriptButton() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt' onsubmit='return false;'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=button id=submitButton disabled value=submit onClick='this.form.submit();'>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='document.spectrum.submit(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        try {
+            response.getFormWithName( "spectrum" ).getButtons()[0].click();
+            fail( "Should not have permitted click of disabled button" );
+        } catch (IllegalStateException e) {}
     }
 
 

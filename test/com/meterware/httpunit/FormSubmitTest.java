@@ -204,7 +204,11 @@ public class FormSubmitTest extends HttpUnitTest {
         try {
             form.getRequest( sb );
             fail( "Allowed to create a request for a disabled button" );
-        } catch (IllegalRequestParameterException e) {}
+        } catch (IllegalStateException e) {}
+        try {
+            sb.click();
+            fail( "Allowed to click a disabled button" );
+        } catch (IllegalStateException e) {}
     }
 
 

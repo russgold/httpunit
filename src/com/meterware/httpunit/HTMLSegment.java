@@ -58,6 +58,20 @@ public interface HTMLSegment {
 
 
     /**
+     * Returns the first form found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm getFirstMatchingForm( HTMLElementPredicate predicate, Object value ) throws SAXException;
+
+
+    /**
+     * Returns all forms found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm[] getMatchingForms( HTMLElementPredicate predicate, Object criteria ) throws SAXException;
+
+
+    /**
      * Returns the links found in this HTML segment in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the segment.
      **/

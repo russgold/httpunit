@@ -315,6 +315,24 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     /**
+     * Returns the first form found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm getFirstMatchingForm( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+        return getReceivedPage().getFirstMatchingForm( predicate, criteria );
+    }
+
+
+    /**
+     * Returns all forms found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm[] getMatchingForms( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+        return getReceivedPage().getMatchingForms( predicate, criteria );
+    }
+
+
+    /**
      * Returns the links found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the response.
      **/

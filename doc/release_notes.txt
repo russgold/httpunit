@@ -13,6 +13,17 @@ Limitations:
 
 
 Revision History:
+20-Jun-2003
+Acknowledgements:
+    Thanks to Brian O'Kelley for supplying a way to disable use of the proxy server.
+    Thanks to David Kilzer for submitting the WebLink.MATCH_TEXT predicate
+
+Additions:
+    1. rfe #751505: Add clearProxyServer() to disable the use of the proxy server
+    2. rfe #744360: Added getFirstMatchingForm and getMatchingForms() methods to WebResponse and HTMLSegment
+    3. rfe #756453: Made Button.isDisabled() method public
+    4: rfe #717752: Added WebLink.MATCH_TEXT predicate to match link text exactly
+
 17-Jun-2003
 Acknowledgements:
     Thanks to Lloyd McKenzie for finding a problem with listing cookie names and suggesting a fix.
@@ -22,7 +33,7 @@ Problems fixed:
     2. bug #744214: ServletUnit does not recognize subframes
 
 Additions:
-    1. A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
+    1. rfe #723895: A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
     2. It is now possible to define a CookieListener on CookieProperties to watch for cookie rejection events
 
  4-Jun-2003

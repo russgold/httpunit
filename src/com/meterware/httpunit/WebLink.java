@@ -42,6 +42,9 @@ public class WebLink extends FixedURLWebRequestSource {
     /** Predicate to match part or all of a link's URL string. **/
     public final static HTMLElementPredicate MATCH_URL_STRING;
 
+    /** Predicate to match a link's text exactly. **/
+    public final static HTMLElementPredicate MATCH_TEXT;
+
     /** Predicate to match part or all of a link's contained text. **/
     public final static HTMLElementPredicate MATCH_CONTAINED_TEXT;
 
@@ -178,6 +181,14 @@ public class WebLink extends FixedURLWebRequestSource {
                 return HttpUnitUtils.contains( ((WebLink) htmlElement).getURLString(), (String) criteria );
             };
         };
+
+
+        MATCH_TEXT = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.matches( ((WebLink) htmlElement).asText(), (String) criteria );
+            };
+        };
+
 
         MATCH_CONTAINED_TEXT = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {

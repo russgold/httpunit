@@ -222,14 +222,35 @@ class ParsedHTML {
 
 
     /**
+     * Returns the first link found in the page matching the specified criteria.
+     **/
+    public WebForm getFirstMatchingForm( HTMLElementPredicate predicate, Object criteria ) {
+        WebForm[] forms = getForms();
+        for (int i = 0; i < forms.length; i++) {
+            if (predicate.matchesCriteria( forms[i], criteria )) return forms[i];
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns all links found in the page matching the specified criteria.
+     **/
+    public WebForm[] getMatchingForms( HTMLElementPredicate predicate, Object criteria ) {
+        ArrayList matches = new ArrayList();
+        WebForm[] forms = getForms();
+        for (int i = 0; i < forms.length; i++) {
+            if (predicate.matchesCriteria( forms[i], criteria )) matches.add( forms[i] );
+        }
+        return (WebForm[]) matches.toArray( new WebForm[ matches.size() ] );
+    }
+
+
+    /**
      * Returns the form found in the page with the specified name.
       **/
     public WebForm getFormWithName( String name ) {
-        WebForm[] forms = getForms();
-        for (int i = 0; i < forms.length; i++) {
-            if (HttpUnitUtils.matches( name, forms[i].getName() )) return forms[i];
-        }
-        return null;
+        return getFirstMatchingForm( WebForm.MATCH_NAME, name );
     }
 
 

@@ -78,6 +78,19 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    public void testEmbeddedFontTags() throws Exception {
+        defineResource( "FontPage.html",
+                        "<html><head><title>A Sample Page</title></head>\n" +
+                        "<table><tr><td><a href='/other.html' id='activeID'><font face='Arial'>an <b>active</b> link</font></A></td>\n" +
+                        "<td><a href='basic.html' name=\"nextLink\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a></td>\n" +
+                        "<td><a href='another.html' name='myLink'>some text</a></td>\n" +
+                        "</tr></table></body></html>\n" );
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/FontPage.html" );
+        assertEquals( "Number of links found", 3, wr.getLinks().length );
+    }
+
+
     public void testLinkRequest() throws Exception {
         WebLink link = _simplePage.getLinks()[0];
         WebRequest request = link.getRequest();
