@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -31,15 +31,20 @@ public class AuthorizationRequiredException extends RuntimeException {
 
     AuthorizationRequiredException( String wwwAuthenticateHeader ) throws IOException {
         int i = wwwAuthenticateHeader.indexOf( ' ' );
-        _scheme = wwwAuthenticateHeader.substring( 0, i );
-        _params = wwwAuthenticateHeader.substring( i+1 );
+        if (i < 0) {  // non-conforming header
+            _scheme = "Basic";
+            _params = wwwAuthenticationHeader;
+        } else {
+            _scheme = wwwAuthenticateHeader.substring( 0, i );
+            _params = wwwAuthenticateHeader.substring( i+1 );
+        }
         _properties = new Properties();
         _properties.load( new ByteArrayInputStream( _params.getBytes() ) );
     }
 
 
     public String getMessage() {
-        return _scheme + " authorization required: " + _params;
+        return _scheme + " authentication required: " + _params;
     }
 
 

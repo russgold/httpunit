@@ -21,6 +21,7 @@ Problems corrected:
     3. The JavaDoc now correctly shows the public methods in TableCell used for handling nested tables.
     4. The XML retrieval test is no longer run when Xerces is not in the classpath, rather than giving an error.
     5. File upload capability no longer depends on JavaMail and JAF, although its test does
+    6. Non-conforming authentication headers are now assumed to be requesting Basic authentication
 
 Additions:
     1. The Referer header is now sent for requests derived from links and forms.
