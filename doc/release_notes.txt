@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+15-Mar-2002
+Acknowledgements:
+    Thanks to Stefan Renz for finding the file control value bug and providing a fix.
+
+Problems fixed:
+    1. Trying to get the value of a file parameter no longer results in a null pointer exception.
+
 14-Mar-2002
 Additions:
     1. It is now possible to set the action on a form using a mechanism which will support scripting in the future:

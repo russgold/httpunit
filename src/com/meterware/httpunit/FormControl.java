@@ -588,8 +588,11 @@ class FileSubmitFormControl extends FormControl {
     }
 
 
+    /**
+     * Returns the name of the selected file, if any.
+     */
     public String[] getValues() {
-        return null;   // XXX what should this really do?
+        return new String[] { _fileToUpload == null ? "" : _fileToUpload.getFileName() };
     }
 
 
