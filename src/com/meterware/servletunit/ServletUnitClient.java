@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import com.meterware.httpunit.*;
 
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,7 +70,9 @@ public class ServletUnitClient extends WebClient {
      * Creates and returns a new invocation context to test calling of servlet methods.
      **/
     public InvocationContext newInvocation( WebRequest request ) throws IOException, MalformedURLException {
-        return _invocationContextFactory.newInvocation( request, getCookies(), this.getHeaderFields() );
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        writeMessageBody( request, baos );
+        return _invocationContextFactory.newInvocation( request, getCookies(), this.getHeaderFields(), baos.toByteArray() );
     }
 
 

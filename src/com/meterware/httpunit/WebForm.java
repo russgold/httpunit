@@ -21,13 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Iterator;
+import java.util.*;
 import java.io.IOException;
 
 import org.w3c.dom.Element;
@@ -307,6 +301,14 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    /**
+     * Records a parameter defined by including it in the destination URL.
+     **/
+    protected void addPresetParameter( String name, String value ) {
+        _presets.add( new PresetFormParameter( name, value ) );
+    }
+
+
 //---------------------------------- ParameterHolder methods --------------------------------
 
 
@@ -315,6 +317,19 @@ public class WebForm extends WebRequestSource {
      **/
     public void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
         imageButton.setLocation( x, y );
+    }
+
+
+    /**
+     * Iterates through the fixed, predefined parameters in this holder, recording them in the supplied parameter processor.\
+     * These parameters always go on the URL, no matter what encoding method is used.
+     **/
+
+    void recordPredefinedParameters( ParameterProcessor processor ) throws IOException {
+        FormControl[] controls = getPresetParameters();
+        for (int i = 0; i < controls.length; i++) {
+            controls[i].addValues( processor, getCharacterSet() );
+        }
     }
 
 
@@ -392,6 +407,10 @@ public class WebForm extends WebRequestSource {
 
     private Vector _buttonVector;
 
+    private FormControl[] _presetParameters;
+    private ArrayList     _presets;
+
+
     private SubmitButton getDefaultButton() {
         if (getSubmitButtons().length == 1) {
             return getSubmitButtons()[0];
@@ -415,6 +434,16 @@ public class WebForm extends WebRequestSource {
             if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
         }
         return _buttonVector;
+    }
+
+
+    private FormControl[] getPresetParameters() {
+        if (_presetParameters == null) {
+            _presets = new ArrayList();
+            loadDestinationParameters();
+            _presetParameters = (FormControl[]) _presets.toArray( new FormControl[ _presets.size() ] );
+        }
+        return _presetParameters;
     }
 
 
@@ -446,18 +475,23 @@ public class WebForm extends WebRequestSource {
     private Map getFormParameters() {
         if (_formParameters == null) {
             _formParameters = new HashMap();
-            FormControl[] controls = getFormControls();
-            for (int i = 0; i < controls.length; i++) {
-                if (controls[i].getName().length() == 0) continue;
-                FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
-                if (parameter == null) {
-                    parameter = new FormParameter();
-                    _formParameters.put( controls[i].getName(), parameter );
-                }
-                parameter.addControl( controls[i] );
-            }
+            loadFormParameters( getPresetParameters() );
+            loadFormParameters( getFormControls() );
         }
         return _formParameters;
+    }
+
+
+    private void loadFormParameters( FormControl[] controls ) {
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].getName().length() == 0) continue;
+            FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
+            if (parameter == null) {
+                parameter = new FormParameter();
+                _formParameters.put( controls[i].getName(), parameter );
+            }
+            parameter.addControl( controls[i] );
+        }
     }
 
 
@@ -600,7 +634,71 @@ class FormParameter {
 }
 
 
-//================================ exception class NoSuchParameterException =========================================
+//========================================== class PresetFormParameter =================================================
+
+
+    class PresetFormParameter extends FormControl {
+
+        PresetFormParameter( String name, String value ) {
+            _name   = name;
+            _value  = value;
+        }
+
+
+        /**
+         * Returns the name of this control..
+         **/
+        public String getName() {
+            return _name;
+        }
+
+
+        /**
+         * Returns true if this control is read-only.
+         **/
+        public boolean isReadOnly() {
+            return true;
+        }
+
+
+        /**
+         * Returns true if this control accepts free-form text.
+         **/
+        public boolean isTextControl() {
+            return true;
+        }
+
+
+        /**
+         * Remove any required values for this control from the list, throwing an exception if they are missing.
+         **/
+        void claimRequiredValues( List values ) {
+            if (_value != null) claimValueIsRequired( values, _value );
+        }
+
+
+        /**
+         * Returns the current value(s) associated with this control. These values will be transmitted to the server
+         * if the control is 'successful'.
+         **/
+        public String[] getValues() {
+            if (_values == null) _values = new String[] { _value };
+            return _values;
+        }
+
+
+        void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+            processor.addParameter( _name, _value, characterSet );
+        }
+
+
+        private String   _name;
+        private String   _value;
+        private String[] _values;
+    }
+
+
+//===========================---===== exception class NoSuchParameterException =========================================
 
 
 /**

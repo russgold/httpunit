@@ -27,6 +27,7 @@ import com.meterware.httpunit.Base64;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,22 +50,28 @@ import javax.servlet.RequestDispatcher;
  **/
 class ServletUnitHttpRequest implements HttpServletRequest {
 
+
     /**
      * Constructs a ServletUnitHttpRequest from a WebRequest object.
      **/
-    ServletUnitHttpRequest( WebRequest request, ServletUnitContext context, Dictionary clientHeaders ) throws MalformedURLException {
+    ServletUnitHttpRequest( WebRequest request, ServletUnitContext context, Dictionary clientHeaders, byte[] messageBody ) throws MalformedURLException {
         _request = request;
         _context = context;
         _headers = new WebClient.HeaderDictionary();
         _headers.addEntries( clientHeaders );
         _headers.addEntries( request.getHeaders() );
+        _messageBody = messageBody;
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
         String file = request.getURL().getFile();
         if (file.indexOf( '?' ) >= 0) {
             loadParameters( file.substring( file.indexOf( '?' )+1 ) );
         } else {
-            loadParameters( request.getQueryString() );
+            final Object contentType = _headers.get( "Content-Type" );
+            if (contentType == null || contentType.toString().indexOf( "x-www-form-urlencoded" ) >= 0 ) {
+                loadParameters( request.getQueryString() );
+                loadParameters( new String( _messageBody ) );
+            }
         }
     }
 
@@ -713,6 +720,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private Hashtable                  _parameters = new Hashtable();
     private Vector                     _cookies    = new Vector();
     private String                     _sessionID;
+    private byte[]                     _messageBody;
 
     private String                     _userName;
     private String[]                   _roles;

@@ -180,8 +180,8 @@ public class JUnitServletTest extends TestCase {
     static class MyFactory implements InvocationContextFactory {
         private static ServletRunner _runner;
 
-        public InvocationContext newInvocation( WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders ) throws IOException, MalformedURLException {
-            return new InvocationContextImpl( _runner, request, clientCookies, clientHeaders );
+        public InvocationContext newInvocation( WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+            return new InvocationContextImpl( _runner, request, clientCookies, clientHeaders, messageBody );
         }
     }
 }

@@ -130,12 +130,12 @@ class InvocationContextImpl implements InvocationContext {
      * Constructs a servlet invocation context for a specified servlet container,
      * request, and cookie headers.
      **/
-    InvocationContextImpl( ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders ) throws IOException, MalformedURLException {
+    InvocationContextImpl( ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
         _application         = runner._application;
         _requestURL          = request.getURL();
         _target              = request.getTarget();
 
-        _request = new ServletUnitHttpRequest( request, runner.getContext(), clientHeaders );
+        _request = new ServletUnitHttpRequest( request, runner.getContext(), clientHeaders, messageBody );
         for (int i = 0; i < cookies.length; i++) _request.addCookie( cookies[i] );
 
         if (_application.usesBasicAuthentication()) _request.readBasicAuthentication();

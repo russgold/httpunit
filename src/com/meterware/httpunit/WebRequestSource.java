@@ -23,6 +23,7 @@ package com.meterware.httpunit;
 import org.w3c.dom.Node;
 
 import java.net.URL;
+import java.util.StringTokenizer;
 
 
 abstract
@@ -126,7 +127,7 @@ public class WebRequestSource extends ParameterHolder {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
         _node         = node;
         _baseURL      = baseURL;
-        _destination = destination;
+        _destination  = destination;
         _parentTarget = parentTarget;
     }
 
@@ -148,8 +149,30 @@ public class WebRequestSource extends ParameterHolder {
         return _node;
     }
 
- //----------------------------- private members -----------------------------------------------
 
+    /**
+     * Extracts any parameters specified as part of the destination URL, calling addPresetParameter for each one
+     * in the order in which they are found.
+     */
+    final
+    protected void loadDestinationParameters() {
+        StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
+        while (st.hasMoreTokens()) stripOneParameter( st.nextToken() );
+    }
+
+
+    /**
+     * Records a parameter defined by including it in the destination URL.
+     * The value can be null, if the parameter name was not specified with an equals sign.
+     **/
+    abstract
+    protected void addPresetParameter( String name, String value );
+
+
+//----------------------------- private members -----------------------------------------------
+
+
+    private static final String PARAM_DELIM = "&";
 
     /** The target in which the parent response is to be rendered. **/
     private String         _parentTarget;
@@ -166,6 +189,35 @@ public class WebRequestSource extends ParameterHolder {
     private String getSpecifiedTarget() {
         return NodeUtils.getNodeAttribute( _node, "target" );
     }
+
+
+    /**
+     * Gets all parameters from a URL
+     **/
+    private String getParametersString() {
+        final String url = trimFragment( getDestination() );
+        final int questionMarkIndex = url.indexOf("?");
+        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
+            return url.substring( questionMarkIndex + 1 );
+        }
+        return "";
+    }
+
+
+    /**
+     * Extracts a parameter of the form <name>[=[<value>]].
+     **/
+    private void stripOneParameter( String param ) {
+        final int index = param.indexOf( "=" );
+        String value = ((index < 0)
+                           ? null
+                           : ((index == param.length() - 1)
+                                    ? ""
+                                    : HttpUnitUtils.decode( param.substring( index + 1 ) ).trim() ));
+        String name = (index < 0) ? param.trim() : HttpUnitUtils.decode( param.substring( 0, index ) ).trim();
+        addPresetParameter( name, value );
+    }
+
 
 
 }

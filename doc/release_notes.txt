@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+ 4-Feb-2002
+Problems corrected:
+    1. Forms with query strings included in the action attribute now are submitted with that string intact.
+Additions:
+    1. Parameters defined in form query strings are now included in the known parameters of a form and requests
+       built from it.
+
  1-Feb-2002
 Acknowledgements:
     Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces

@@ -84,6 +84,20 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
 
     /**
+     * Returns the query string defined for this request.
+     **/
+    public String getQueryString() {
+        try {
+            URLEncodedString encoder = new URLEncodedString();
+            getParameterHolder().recordPredefinedParameters( encoder );
+            return encoder.getString();
+        } catch (IOException e) {
+            throw new RuntimeException( "Programming error: " + e );   // should never happen
+        }
+    }
+
+
+    /**
      * Returns true if selectFile may be called with this parameter.
      */
     protected boolean maySelectFile( String parameterName )
@@ -155,7 +169,18 @@ class URLEncodedMessageBody extends MessageBody {
      * Transmits the body of this request as a sequence of bytes.
      **/
     void writeTo( OutputStream outputStream ) throws IOException {
-        outputStream.write( getRequest().getParameterString().getBytes() );
+        outputStream.write( getParameterString().getBytes() );
+    }
+
+
+    private String getParameterString() {
+        try {
+            URLEncodedString encoder = new URLEncodedString();
+            getRequest().getParameterHolder().recordParameters( encoder );
+            return encoder.getString();
+        } catch (IOException e) {
+            throw new RuntimeException( "Programming error: " + e );   // should never happen
+        }
     }
 }
 

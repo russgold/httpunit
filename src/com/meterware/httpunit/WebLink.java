@@ -111,6 +111,15 @@ public class WebLink extends WebRequestSource {
 
 
     /**
+     * Iterates through the fixed, predefined parameters in this holder, recording them in the supplied parameter processor.\
+     * These parameters always go on the URL, no matter what encoding method is used.
+     **/
+
+    void recordPredefinedParameters( ParameterProcessor processor ) throws IOException {
+    }
+
+
+    /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
     void recordParameters( ParameterProcessor processor ) throws IOException {
@@ -204,23 +213,9 @@ public class WebLink extends WebRequestSource {
 
 
     private static final String[] NO_VALUES = new String[0];
-    private static final String PARAM_DELIM = "&";
 
     private Map       _presetParameterMap;
     private ArrayList _presetParameterList;
-
-
-    /**
-     * Gets all parameters from a URL
-     **/
-    private String getParametersString() {
-        final String url = getURLString();
-        final int questionMarkIndex = url.indexOf("?");
-        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
-            return url.substring(questionMarkIndex + 1);
-        }
-        return "";
-    }
 
 
     private Map getPresetParameterMap() {
@@ -238,23 +233,13 @@ public class WebLink extends WebRequestSource {
     private void loadPresetParameters() {
         _presetParameterMap = new HashMap();
         _presetParameterList = new ArrayList();
-        StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
-        while (st.hasMoreTokens()) stripOneParameter( _presetParameterList, _presetParameterMap, st.nextToken() );
+        loadDestinationParameters();
     }
 
 
-    /**
-     * add a pair key-value to the hashtable, creates an array of values if param already exists.
-     **/
-    private void stripOneParameter( ArrayList list, Map map, String param ) {
-        final int index = param.indexOf( "=" );
-        String value = ((index < 0) ? null
-                           : ((index == param.length() - 1)
-                               ? ""
-                               : HttpUnitUtils.decode( param.substring( index + 1 ) ).trim() ));
-        String name = (index < 0) ? param.trim() : HttpUnitUtils.decode( param.substring( 0, index ) ).trim();
-        map.put( name, withNewValue( (String[]) map.get( name ), value ) );
-        list.add( new LinkParameter( name, value ) );
+    protected void addPresetParameter( String name, String value ) {
+        _presetParameterMap.put( name, withNewValue( (String[]) _presetParameterMap.get( name ), value ) );
+        _presetParameterList.add( new LinkParameter( name, value ) );
     }
 
 

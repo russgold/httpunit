@@ -336,5 +336,60 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testGetWithQueryString() throws Exception {
+        defineResource( "QueryForm.html",
+                        "<html><head></head>" +
+                        "<form method=GET action=\"SayHello?speed=fast\">" +
+                        "<input type=text name=name><input type=submit></form></body></html>" );
+        defineResource( "SayHello?speed=fast&name=me", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
+                                                      "</td></tr></table></body></html>" );
+                return result;
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        WebResponse formPage = wc.getResponse( getHostPath() + "/QueryForm.html" );
+        WebForm form = formPage.getForms()[0];
+        form.setParameter( "name", "me" );
+        WebRequest request = form.getRequest();
+        assertEquals( "Request URL", getHostPath() + "/SayHello?speed=fast&name=me", request.getURL().toExternalForm() );
+
+        WebResponse answer = wc.getResponse( request );
+        String[][] cells = answer.getTables()[0].asText();
+
+        assertEquals( "Message", "Hello, there", cells[0][0] );
+    }
+
+
+    public void testPostWithQueryString() throws Exception {
+        defineResource( "QueryForm.html",
+                        "<html><head></head>" +
+                        "<form method=POST action=\"SayHello?speed=fast\">" +
+                        "<input type=text name=name><input type=submit></form></body></html>" );
+        defineResource( "SayHello?speed=fast", new PseudoServlet() {
+            public WebResource getPostResponse() {
+                String name = getParameter( "name" )[0];
+                WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
+                                                      "</td></tr></table></body></html>" );
+                return result;
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        WebResponse formPage = wc.getResponse( getHostPath() + "/QueryForm.html" );
+        WebForm form = formPage.getForms()[0];
+        WebRequest request = form.getRequest();
+        request.setParameter( "name", "Charlie" );
+        assertEquals( "Request URL", getHostPath() + "/SayHello?speed=fast", request.getURL().toExternalForm() );
+
+        WebResponse answer = wc.getResponse( request );
+        String[][] cells = answer.getTables()[0].asText();
+
+        assertEquals( "Message", "Hello, there", cells[0][0] );
+    }
+
+
     private WebConversation _wc;
 }

@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.net.URL;
+import java.io.IOException;
 
 /**
  * An HTTP request using the GET method.
@@ -59,6 +60,21 @@ public class GetMethodWebRequest extends WebRequest {
     }
 
 
+    /**
+     * Returns the query string defined for this request.
+     **/
+    public String getQueryString() {
+        try {
+            URLEncodedString encoder = new URLEncodedString();
+            getParameterHolder().recordPredefinedParameters( encoder );
+            getParameterHolder().recordParameters( encoder );
+            return encoder.getString();
+        } catch (IOException e) {
+            throw new RuntimeException( "Programming error: " + e );   // should never happen
+        }
+    }
+
+
 //--------------------------------------- package members ---------------------------------------------
 
 
@@ -75,19 +91,6 @@ public class GetMethodWebRequest extends WebRequest {
      **/
     GetMethodWebRequest( WebLink sourceLink ) {
         super( sourceLink );
-    }
-
-
-//------------------------------------- protected members ---------------------------------------------
-
-
-    protected String getURLString() {
-        final String parameterString = getParameterString();
-        if (parameterString.length() == 0) {
-            return super.getURLString();
-        } else {
-            return super.getURLString() + "?" + parameterString;
-        }
     }
 
 

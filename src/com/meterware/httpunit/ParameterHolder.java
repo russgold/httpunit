@@ -40,6 +40,14 @@ abstract class ParameterHolder {
 
 
     /**
+     * Iterates through the fixed, predefined parameters in this holder, recording them in the supplied parameter processor.\
+     * These parameters always go on the URL, no matter what encoding method is used.
+     **/
+    abstract
+    void recordPredefinedParameters( ParameterProcessor processor ) throws IOException;
+
+
+    /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
     abstract

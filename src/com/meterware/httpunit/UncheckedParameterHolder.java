@@ -68,6 +68,13 @@ class UncheckedParameterHolder extends ParameterHolder {
 
 
     /**
+     * Does nothing, since unchecked requests treat all parameters the same.
+     **/
+    void recordPredefinedParameters( ParameterProcessor processor ) throws IOException {
+    }
+
+
+    /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
     void recordParameters( ParameterProcessor processor ) throws IOException {

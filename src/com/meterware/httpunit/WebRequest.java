@@ -82,18 +82,19 @@ public class WebRequest {
 
 
     /**
-     * Returns the query string defined for this request.
-     **/
-    public String getQueryString() {
-        return getParameterString();
-    }
-
-
-    /**
      * Returns the HTTP method defined for this request.
      **/
     abstract
     public String getMethod();
+
+
+    /**
+     * Returns the query string defined for this request. The query string is sent to the HTTP server as part of
+     * the request header. This default implementation returns an empty string.
+     **/
+    public String getQueryString() {
+        return "";
+    }
 
 
 //------------------------------------- ParameterCollection methods ------------------------------------
@@ -348,19 +349,15 @@ public class WebRequest {
     }
 
 
+//------------------------------------- protected members ---------------------------------------------
+
+
     protected String getURLString() {
-        return _urlString;
-    }
-
-
-    final
-    protected String getParameterString() {
-        try {
-            URLEncodedString encoder = new URLEncodedString();
-            _parameterHolder.recordParameters( encoder );
-            return encoder.getString();
-        } catch (IOException e) {
-            throw new RuntimeException( "Programming error: " + e );   // should never happen
+        final String queryString = getQueryString();
+        if (queryString.length() == 0) {
+            return _urlString;
+        } else {
+            return _urlString + "?" + queryString;
         }
     }
 
