@@ -737,24 +737,10 @@ public class WebForm extends WebRequestSource {
             } else if (value instanceof String) {
                 setParameterValue( propertyName, (String) value );
             } else if (value instanceof Number) {
-                setParameterValue( propertyName, roundedValue( (Number) value ) );
+                setParameterValue( propertyName, HttpUnitUtils.trimmedValue( (Number) value ) );
             } else {
                 super.set( propertyName, value );
             }
-        }
-
-
-        /**
-         * Trim off any trailing zeros (and the decimal point if the result is an integer).
-         */
-        private String roundedValue( Number number ) {
-            String rawNumber = number.toString();
-            if (rawNumber.indexOf('.') == -1) return rawNumber;
-
-            int index = rawNumber.length();
-            while (rawNumber.charAt( index-1 ) == '0') index--;
-            if (rawNumber.charAt( index-1 ) == '.') index--;
-            return rawNumber.substring( 0, index );
         }
 
 

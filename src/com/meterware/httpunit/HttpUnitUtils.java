@@ -76,6 +76,20 @@ public class HttpUnitUtils {
     }
 
 
+    /**
+     * Returns a string representation of a number, trimming off any trailing decimal zeros.
+     */
+    static String trimmedValue( Number number ) {
+        String rawNumber = number.toString();
+        if (rawNumber.indexOf('.') == -1) return rawNumber;
+
+        int index = rawNumber.length();
+        while (rawNumber.charAt( index-1 ) == '0') index--;
+        if (rawNumber.charAt( index-1 ) == '.') index--;
+        return rawNumber.substring( 0, index );
+    }
+
+
 
     /**
      * Decodes a URL safe string into its original form using the

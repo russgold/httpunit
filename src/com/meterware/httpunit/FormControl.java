@@ -789,10 +789,12 @@ abstract class TextFormControl extends FormControl {
 
 
         public void set( String propertyName, Object value ) {
-            if (propertyName.equalsIgnoreCase( "value" )) {
-                _value[0] = (value == null) ? null : value.toString();
-            } else {
+            if (!propertyName.equalsIgnoreCase( "value" )) {
                 super.set( propertyName, value );
+            } else if (value instanceof Number) {
+                _value[0] = HttpUnitUtils.trimmedValue( (Number) value );
+            } else {
+                _value[0] = (value == null) ? null : value.toString();
             }
         }
     }
