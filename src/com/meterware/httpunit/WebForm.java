@@ -56,14 +56,13 @@ public class WebForm extends WebRequestSource {
 
     /**
      * Submits this form using the web client from which it was originally obtained.
-     * Will usually return the result of that submission; however, if a scripted event is triggered which
-     * inhibits the submission, will return the updated contents of the frame containing this form.
+     * Will usually return the result of that submission; however, if the 'onsubmit' event is triggered and
+     * inhibits the submission, will return the updated contents of the frame containing this form. Note that
+     * this will not run any event associated with the specified submit button. Use SubmitButton#click for that.
      **/
     public WebResponse submit( SubmitButton button ) throws IOException, SAXException {
-        if (button.doOnClickEvent()) {
-            String event = getAttribute( "onsubmit" );
-            if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest( getRequest( button ) );
-        }
+        String event = getAttribute( "onsubmit" );
+        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest( getRequest( button ) );
         return getBaseResponse().getWindow().getFrameContents( getTarget() );
     }
 
@@ -546,7 +545,9 @@ public class WebForm extends WebRequestSource {
                 return getTarget();
             } else {
                 final FormParameter parameter = getParameter( propertyName );
-                return parameter == UNKNOWN_PARAMETER ? super.get( propertyName ) : parameter.getScriptableObject();
+                if (parameter != UNKNOWN_PARAMETER) return parameter.getScriptableObject();
+                FormControl control = getControlWithID( propertyName );
+                return control == null ? super.get( propertyName ) : control.getScriptableDelegate();
             }
         }
 
@@ -599,6 +600,19 @@ public class WebForm extends WebRequestSource {
     WebForm( WebResponse response, URL baseURL, String frameName, Node node, String characterSet ) {
         super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), frameName );
         _characterSet = characterSet;
+    }
+
+
+    /**
+     * Returns the form control which is part of this form with the specified ID.
+     */
+    FormControl getControlWithID( String id ) {
+        FormControl[] controls = getFormControls();
+        for (int i = 0; i < controls.length; i++) {
+            FormControl control = controls[i];
+            if (control.getID().equals(id)) return control;
+        }
+        return null;
     }
 
 

@@ -3,6 +3,8 @@ HttpUnit release notes
 Known problems:
     1. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
+    2. Defining a form parameter with the same name or ID as a JavaScript Form function will cause that function not to
+       be callable.
 
 Limitations:
     1. JDK 1.3.1 or higher is required
@@ -35,17 +37,17 @@ Problems Fixed:
     JavaScript
         5. Scripts marked as something besides JavaScript are now ignored.
         6. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
-        7. Bug #682518: Calling WebForm.submit( button ) now runs the onClick event of the submit button before trying to
-           submit the form.
+        7. Bug #680695: Button.click() is now supported.
+        8. Bug #680695: Form control ids are now usable to locate components.
     ServletUnit
-        8. ServletUnit now creates a new session if the requested session exists but is marked invalid
-        9. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
+        9. ServletUnit now creates a new session if the requested session exists but is marked invalid
+       10. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
            as relative to the context root.
-       10. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
+       11. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
            had previously been defined.
-       11. Included and forwarded servlets now inherit parameters from their calling servlet.
-       12. Included servlets now have access to their path information as attributes, as per the spec.
-       13. Forwarded servlets now have access to their path information from the standard request methods, as required.
+       12. Included and forwarded servlets now inherit parameters from their calling servlet.
+       13. Included servlets now have access to their path information as attributes, as per the spec.
+       14. Forwarded servlets now have access to their path information from the standard request methods, as required.
 
 Additions:
     Content and Parsing

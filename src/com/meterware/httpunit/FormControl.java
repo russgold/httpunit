@@ -25,6 +25,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.util.Hashtable;
 import java.util.ArrayList;
@@ -315,6 +316,11 @@ abstract class FormControl extends HTMLElementBase {
         }
 
 
+        public Scriptable() {
+            super( FormControl.this );
+        }
+
+
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "name" )) {
                 return FormControl.this.getName();
@@ -333,8 +339,7 @@ abstract class FormControl extends HTMLElementBase {
         }
 
 
-        public Scriptable() {
-            super( FormControl.this );
+        public void click() throws IOException, SAXException {
         }
     }
 

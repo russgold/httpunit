@@ -179,9 +179,9 @@ public class JavaScript {
         private void handleScriptException( Exception e, String badScript ) {
             final String errorMessage = badScript + " failed: " + e;
             if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException)) {
-                e.printStackTrace();
                 throw new RuntimeException( errorMessage );
             } else if (isThrowExceptionsOnError()) {
+                e.printStackTrace();
                 throw new ScriptException( errorMessage );
             } else {
                 _errorMessages.add( errorMessage );
@@ -941,7 +941,18 @@ public class JavaScript {
 
         public void jsFunction_focus() {}
 
+
         public void jsFunction_select() {}
+
+
+        public void jsFunction_click() throws IOException, SAXException {
+            getDelegate().click();
+        }
+
+
+        private Input getDelegate() {
+            return (Input) _scriptable;
+        }
 
 
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )

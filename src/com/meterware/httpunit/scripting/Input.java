@@ -1,4 +1,8 @@
 package com.meterware.httpunit.scripting;
+import java.io.IOException;
+
+import org.xml.sax.SAXException;
+
 /********************************************************************************************************************
  * $Id$
  *
@@ -33,5 +37,8 @@ public interface Input extends NamedDelegate {
 
 
     void set( String propertyName, Object value );
+
+
+    void click() throws IOException, SAXException;
 
 }

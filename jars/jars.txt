@@ -5,7 +5,7 @@ junit   3.8
 servlet 2.3
 xerces  2.2
 jtidy   04aug2000r7
-rhino   1.5preR4 (patched)
+rhino   1.5R4+ (patched)
 NekoHTML 0.7.2
 
 (for testing HttpUnit only)

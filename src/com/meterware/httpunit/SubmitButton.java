@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -37,14 +37,13 @@ public class SubmitButton extends Button {
     }
 
 
-//--------------------------------- FormButton methods ----------------------------------------------
+//--------------------------------- Button methods ----------------------------------------------
 
 
     /**
-     * Performs the action associated with clicking this button. For a submit button this typically
-     * submits the form.
+     * Perform the normal action of this button.
      */
-    public void click() throws IOException, SAXException  {
+    protected void doButtonAction() throws IOException, SAXException {
         getForm().submit( this );
     }
 

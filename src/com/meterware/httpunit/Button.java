@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,6 +19,8 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.io.IOException;
 
 import org.w3c.dom.Node;
@@ -27,7 +29,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class Button extends FormControl {
 
@@ -54,11 +56,11 @@ public class Button extends FormControl {
 
 
     /**
-     * Performs the action associated with clicking this button. For a submit button this typically
-     * submits the form.
+     * Performs the action associated with clicking this button after running any 'onClick' script.
+     * For a submit button this typically submits the form.
      */
-    public void click() throws IOException, SAXException  {
-        doOnClickEvent();
+    public void click() throws IOException, SAXException {
+        if (doOnClickEvent()) doButtonAction();
     }
 
 
@@ -66,6 +68,12 @@ public class Button extends FormControl {
     protected boolean doOnClickEvent() {
         return _onClickEvent.length() == 0 || getScriptableDelegate().doEvent( _onClickEvent );
     }
+
+
+    /**
+     * Perform the normal action of this button.
+     */
+    protected void doButtonAction() throws IOException, SAXException {}
 
 
 //-------------------------------------------------- FormControl methods -----------------------------------------------
@@ -79,4 +87,16 @@ public class Button extends FormControl {
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
     }
 
+
+    protected ScriptableDelegate newScriptable() {
+        return new Scriptable();
+    }
+
+
+    class Scriptable extends FormControl.Scriptable {
+
+        public void click() throws IOException, SAXException {
+            doButtonAction();
+        }
+    }
 }

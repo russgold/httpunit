@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,10 +19,7 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import java.io.IOException;
-
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -38,11 +35,7 @@ public class ResetButton extends Button {
     }
 
 
-    /**
-     * Performs the action associated with clicking this button. For a submit button this typically
-     * submits the form.
-     */
-    public void click() throws IOException, SAXException {
-        if (doOnClickEvent()) getForm().reset();
+    protected void doButtonAction() {
+        getForm().reset();
     }
 }
