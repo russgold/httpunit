@@ -10,6 +10,16 @@ Limitations:
 
 
 Revision History:
+30-Oct-2002
+Acknowledgements:
+    Thanks to Troy Waldrep for fixing the JavaScript / HTML end-comment bug
+
+Problems fixed:
+    1. JavaScript ending with --> rather than the proper end-comment // --> was being treated as a syntax error
+
+Additions:
+    1. Added the HeadMethodWebRequest class
+
 24-Oct-2002
 Acknowledgements:
     Thanks to Andy Clark for help using the NekoHTML filter capability.

@@ -105,7 +105,10 @@ public class JavaScript {
         public String executeScript( String script ) {
             try {
                 script = script.trim();
-                if (script.startsWith( "<!--" )) script = withoutFirstLine( script );
+                if (script.startsWith( "<!--" )) {
+                    script = withoutFirstLine( script );
+                    if (script.endsWith( "-->" )) script = script.substring( 0, script.lastIndexOf( "-->" ));
+                }
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
                 StringBuffer buffer = getDocumentWriteBuffer();
                 return buffer.toString();

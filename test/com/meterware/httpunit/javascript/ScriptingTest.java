@@ -203,7 +203,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "<body'><script language='JavaScript'>\n" +
                                             "<!-- hide this\n" +
                                             "sayCheese();" +
-                                            "// end hiding -->" +
+                                            "-->" +
                                             "</script></body></html>" );
         WebConversation wc = new WebConversation();
         wc.getResponse( getHostPath() + "/OnCommand.html" );
