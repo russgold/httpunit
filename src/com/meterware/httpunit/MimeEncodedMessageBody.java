@@ -103,6 +103,8 @@ class MimeEncodedMessageBody extends MessageBody {
 
 
         public void addParameter( String name, String value, String characterSet ) throws IOException {
+            if (name == null || name.length() == 0) return;
+
             writeLn( _outputStream, "--" + BOUNDARY );
             writeLn( _outputStream, "Content-Disposition: form-data; name=\"" + name + '"' );  // XXX need to handle non-ascii names here
             writeLn( _outputStream, "Content-Type: text/plain; charset=" + getRequest().getCharacterSet() );
