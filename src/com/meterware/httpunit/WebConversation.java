@@ -57,9 +57,7 @@ public class WebConversation extends WebClient {
         URLConnection connection = openConnection( getRequestURL( request ) );
         if (HttpUnitOptions.isLoggingHttpHeaders()) {
             String urlString = request.getURLString();
-            String rawUrl = request.getURL().toExternalForm();
-            String target = rawUrl.substring( 0, rawUrl.indexOf( urlString ) );
-            System.out.println( "\nConnecting to " + target );
+            System.out.println( "\nConnecting to " + request.getURL().getHost() );
             System.out.println( "Sending:: " + request.getMethod() + " " + urlString );
         }
         sendHeaders( connection, getHeaderFields( request.getURL() ) );
