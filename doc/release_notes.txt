@@ -11,112 +11,68 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
-24-Oct-2001
-   Acknowledgements:
-       Thanks to Benoit Xhenseval for adding parameter detection in links and handling of meta and link tags.
+25-Oct-2001 1.2.7
 
-   Additions:
-       1. getParameter() and getParameterNames() now works for requests built from links with embedded parameters.
-       2. WebResponse.getMetaTagContent can be used to obtain the content of a meta tag (see the Javadoc)
-       3. WebResponse.getStylesheet can be used to obtain the path to the stylesheet associated with a page.
-       4. Added name attribute to WebLink
-       5. Added getLinkWithID and getLinkWithName to WebResponse
-
-19-Oct-2001
-   Additions:
-       1. Requests may now have as many values for a text parameter name as the number of <INPUT> tags with that name.
-
-18-Oct-2001
-   Additions:
-       1. It is now possible to upload a file via a POST request not derived from a form. To do this, call
-          PostMessageWebRequest.setMimeEncoded( true ) before calling selectFile.
-
-16-Oct-2001
-   Problems corrected:
-       1. WebRequest.isFileParameter is now functioning and public
-       2. auto-redirect now handles relative URLs
-
-15-Oct-2001
-   Problems corrected:
-       1. The http-equiv meta tag was incorrectly matched as "http_equiv"
-       2. By default, POSTs included charset attributes which messed up some servlet engines
-
-13-Sep-2001
-   Problems corrected:
-       1. The refresh handling now recognizes requests with content syntax "<seconds>;<location>" or "<seconds>; URL=<location>"
-
-21-Aug-2001
-Acknowledgements:
-    Thanks to Richard Scothern for identiying the cause of problems with POST requests and older servlet engines.
-
-    Additions:
-       1. HttpUnitOptions now has a postIncludesCharset which can be set to false to interoperate with older servlet
-          engines, such as Tomcat 3.1, which cannot handle the charset attribute
-
-13-Aug-2001
-Acknowledgements:
-    Thanks to Brett Neumeier for some Javadoc fixes and adding support for the non-standard "Charset" header
-
-    Additions:
-       1. Now recognizes a Charset header if no charset is specified in the Content-type header.
-
- 8-Aug-2001
-Acknowledgements:
-    Thanks to Dave Glowacki for the default content-type code.
-
-    Additions:
-       1. HttpUnitOptions.setDefaultContentType() lets you define a content-type to use when the web server does not
-          supply a Content-Type header.
-
- 2-Aug-2001
-    Problems Corrected:
-       1. Set-Cookie headers are now processed even on responses with 4xx and 5xx status
-       2. WebForm.getOptionValues now returns the options in the order listed in the form for both selections and radio buttons.
-
-31-Jul-2001
-    Additions:
-       1. Added ID property to SubmitButton and WebLink
-       2. Added getSubmitButtonWithID to WebForm
-       3. Added getMethod and getAction to WebForm
-       4. Image map <area> tags are now recognized as links, whose text is equal to their 'alt' tag. This allows
-          them to be retrieved using getLinkWith( altText ).
-       5. Added version of WebRequest.selectFile which allows clients to specify the file to upload using an input
-          stream rather than an actual file.
-
-    Problems corrected:
-       1. The _self target now works for forms.
-
-20-Jul-2001
-Acknowledgements:
-    Thanks to Drew Varner for more sophisticated cookie handling, including Set-Cookie2 code
-    Thanks to David Karr for pointing out the problem with status code 3xx responses and
-    suggesting a fix for it.
-
-Problems corrected:
-    1. cookies with embedded commas and quotes are now handled
-    2. Status code 3xx responses no longer result in a null pointer exception when
-       invoking getText or reading the input stream.
-
-Additions:
-    1. The Set-Cookie2 header is now handled
-
-19-Jul-2001
-Additions:
-    1. Added getHeaderFieldNames to WebResponse
-
-16-Jul-2001
 Acknowledgements:
     Thanks to Chris Stevenson for identifying a problem with forms lacking an action
-
-Additions:
-    1. It is now possible to see the response accompanying an error status by
-       calling HttpUnitOptions.setExceptionsThrownOnErrorStatus( false ) before
-       calling getResponse. This will prevent HttpUnit from throwing an exception
-       in such cases. You can still check the status of the response by calling
-       WebResponse.getStatusCode()
+    Thanks to Drew Varner for more sophisticated cookie handling, including Set-Cookie2 code
+    Thanks to David Karr for pointing out the problem with status code 3xx responses and
+        suggesting a fix for it.
+    Thanks to Dave Glowacki for the default content-type code.
+    Thanks to Brett Neumeier for some Javadoc fixes and adding support for the non-standard "Charset" header
+    Thanks to Richard Scothern for identiying the cause of problems with POST requests and older servlet engines.
+    Thanks to Benoit Xhenseval for adding parameter detection in links, handling of meta and link tags,
+        and selection of table cells by ID.
 
 Problems corrected:
     1. Forms with no action now default to the originating page
+    2. cookies with embedded commas and quotes are now handled
+    3. Status code 3xx responses no longer result in a null pointer exception when
+       invoking getText or reading the input stream.
+    4. The _self target now works for forms.
+    5. Set-Cookie headers are now processed even on responses with 4xx and 5xx status
+    6. WebForm.getOptionValues now returns the options in the order listed in the form for both selections and radio buttons.
+    7. The refresh handling now recognizes requests with content syntax "<seconds>;<location>" or "<seconds>; URL=<location>"
+    8. The http-equiv meta tag was incorrectly matched as "http_equiv"
+    9. By default, POSTs included charset attributes which messed up some servlet engines
+   10. WebRequest.isFileParameter is now functioning and public
+   11. auto-redirect now handles relative URLs
+
+Additions:
+    Content and parsing enhancements
+        1. Added ID property to SubmitButton
+        2. Added ID and name properties to WebLink
+        3. May now search web responses for links by name or ID
+        4. getParameter() and getParameterNames() now works for requests built from links with embedded parameters.
+        5. Image map <area> tags are now recognized as links, whose text is equal to their 'alt' tag. This allows
+           them to be retrieved using getLinkWith( altText ).
+        6. Added getSubmitButtonWithID to WebForm
+        7. Added getMethod and getAction to WebForm
+        8. WebResponse.getMetaTagContent can be used to obtain the content of a meta tag (see the Javadoc)
+        9. WebResponse.getStylesheet can be used to obtain the path to the stylesheet associated with a page.
+       10. Added WebTable.getTableCellWithID
+
+    Request submission enhancements:
+       11. Added version of WebRequest.selectFile which allows clients to specify the file to upload using an input
+           stream rather than an actual file.
+       12. HttpUnitOptions now has a postIncludesCharset which can be set to true when working with newer servlet
+           engines which can handle it (such as Tomcat 3.2 or later), and which may be important for internationalization.
+       13. It is now possible to upload a file via a POST request not derived from a form. To do this, call
+           PostMessageWebRequest.setMimeEncoded( true ) before calling selectFile.
+       14. Requests may now have as many values for a text parameter name as the number of <INPUT> tags with that name.
+
+    Response handling enhancements:
+       15. It is now possible to see the response accompanying an error status by
+           calling HttpUnitOptions.setExceptionsThrownOnErrorStatus( false ) before calling getResponse. This will
+           prevent HttpUnit from throwing an exception in such cases. You can still check the status of the response by
+           calling WebResponse.getStatusCode()
+       16. Added getHeaderFieldNames to WebResponse
+       17. The Set-Cookie2 header is now handled
+       18. HttpUnitOptions.setDefaultContentType() lets you define a content-type to use when the web server does not
+           supply a Content-Type header.
+       19. Now recognizes a Charset header if no charset is specified in the Content-type header. There are some servers
+           which send this non-standard header.
+
 
  6-Jul-2001 1.2.6
 Acknowledgements:

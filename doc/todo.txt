@@ -1,6 +1,5 @@
 High Priority
 o Allow servlet initialization parameters in registerServlet
-o Add support for getLinkWithName
 o Prevent setParameter calls from working on requests built from links if validation is enabled
 
 Medium priority:
