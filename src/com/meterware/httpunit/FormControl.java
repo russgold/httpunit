@@ -38,12 +38,10 @@ import java.io.IOException;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract class FormControl {
+abstract class FormControl extends HTMLElementBase {
 
     final static String[] NO_VALUE = new String[0];
 
-    private       String  _name;
-    private final String  _id;
     private       String  _valueAttribute;
     private final boolean _readOnly;
     private final boolean _disabled;
@@ -55,9 +53,8 @@ abstract class FormControl {
 
 
     FormControl( WebForm form ) {
+        super( newEmptyNode( form ) );
         _form           = form;
-        _id             = "";
-        _name           = "";
         _valueAttribute = "";
         _readOnly       = false;
         _disabled       = false;
@@ -66,32 +63,19 @@ abstract class FormControl {
     }
 
 
+    private static Node newEmptyNode( WebForm form ) {
+        return form.getNode().getOwnerDocument().createElement( "httpunit-supplied" );
+    }
+
+
     FormControl( WebForm form, Node node ) {
+        super( node );
         _form           = form;
-        _id             = NodeUtils.getNodeAttribute( node, "id" );
-        _name           = NodeUtils.getNodeAttribute( node, "name" );
         _valueAttribute = NodeUtils.getNodeAttribute( node, "value" );
         _readOnly       = NodeUtils.isNodeAttributePresent( node, "readonly" );
         _disabled       = NodeUtils.isNodeAttributePresent( node, "disabled" );
         _onChangeEvent  = NodeUtils.getNodeAttribute( node, "onchange" );
         _onClickEvent   = NodeUtils.getNodeAttribute( node, "onclick" );
-    }
-
-
-    /**
-     * Returns the name of this control. If no name is specified, defaults to the empty string.
-     **/
-    public String getName() {
-        return _name;
-    }
-
-
-    /**
-     * Returns the ID associated with this control, if any.
-     * @return the control ID, or an empty string if no ID is defined.
-     **/
-    public String getID() {
-        return _id;
     }
 
 
@@ -102,8 +86,12 @@ abstract class FormControl {
     abstract String[] getValues();
 
 
+    /**
+     * Returns either a single delegate object or potentially an array of delegates as needed, given the form control.
+     * This default implementation returns the scriptable delegate for the control.
+     */
     Object getDelegate() {
-        return getScriptableObject();
+        return getScriptableDelegate();
     }
 
 
@@ -115,7 +103,7 @@ abstract class FormControl {
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
-    ScriptableDelegate getScriptableObject() {
+    public ScriptableDelegate getScriptableDelegate() {
         if (_scriptable == null) {
             _scriptable = newScriptable();
             _scriptable.setScriptEngine( getForm().getScriptableObject().getScriptEngine( _scriptable ) );
@@ -230,7 +218,7 @@ abstract class FormControl {
      * Performs the 'onChange' event defined for this control.
      */
     protected void sendOnChangeEvent() {
-        if (_onChangeEvent.length() > 0) getScriptableObject().doEvent( _onChangeEvent );
+        if (_onChangeEvent.length() > 0) getScriptableDelegate().doEvent( _onChangeEvent );
     }
 
 
@@ -238,7 +226,7 @@ abstract class FormControl {
      * Performs the 'onClick' event defined for this control.
      */
     protected void sendOnClickEvent() {
-        if (_onClickEvent.length() > 0) getScriptableObject().doEvent( _onClickEvent );
+        if (_onClickEvent.length() > 0) getScriptableDelegate().doEvent( _onClickEvent );
     }
 
 
@@ -265,6 +253,11 @@ abstract class FormControl {
     final protected void claimValueIsRequired( List values, final String value ) {
         if (!values.contains( value )) throw new MissingParameterValueException( getName(), value, (String[]) values.toArray( new String[ values.size() ]) );
         values.remove( value );
+    }
+
+
+    static String[] getControlElementTags() {
+        return new String[] { "textarea", "select", "button", "input" };
     }
 
 
@@ -507,7 +500,7 @@ class RadioGroupFormControl extends FormControl {
     Object getDelegate() {
         ScriptableDelegate[] delegates = new ScriptableDelegate[ getButtons().length ];
         for (int i = 0; i < delegates.length; i++) {
-            delegates[i] = getButtons()[i].getScriptableObject();
+            delegates[i] = getButtons()[i].getScriptableDelegate();
         }
         return delegates;
     }

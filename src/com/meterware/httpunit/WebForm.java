@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
@@ -126,7 +125,7 @@ public class WebForm extends WebRequestSource {
     public Button getButtonWithID( String buttonID ) {
         Button[] buttons = getButtons();
         for (int i = 0; i < buttons.length; i++) {
-            if (buttons[i].getID().equalsIgnoreCase( buttonID )) return buttons[i];
+            if (buttons[i].getID().equals( buttonID )) return buttons[i];
         }
         return null;
     }
@@ -551,7 +550,7 @@ public class WebForm extends WebRequestSource {
             FormControl[] controls = getFormControls();
             ScriptableDelegate[] result = new ScriptableDelegate[ controls.length ];
             for (int i = 0; i < result.length; i++) {
-                result[i] = controls[i].getScriptableObject();
+                result[i] = controls[i].getScriptableDelegate();
             }
             return result;
         }
@@ -575,7 +574,7 @@ public class WebForm extends WebRequestSource {
     private final static String[] NO_VALUES = new String[0];
 
     /** The attributes of the form parameters. **/
-    private FormControl[] _parameters;
+    private FormControl[] _formControls;
 
     /** The submit buttons in this form. **/
     private SubmitButton[] _submitButtons;
@@ -629,18 +628,28 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    private ArrayList _controlList = new ArrayList();
+
+    FormControl newFormControl( Node child ) {
+        return FormControl.newFormParameter( this, child );
+    }
+
+
+    void addFormControl( FormControl control ) {
+        _controlList.add( control );
+        _formControls = null;
+        _formParameters = null;
+    }
+
+
     /**
      * Returns an array of form parameter attributes for this form.
      **/
     private FormControl[] getFormControls() {
-        if (_parameters == null) {
-            Vector list = new Vector();
-            if (getNode().hasChildNodes()) addFormParametersToList( getNode().getChildNodes(), list );
-            _parameters = new FormControl[ list.size() ];
-            list.copyInto( _parameters );
+        if (_formControls == null) {
+            _formControls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
         }
-
-        return _parameters;
+        return _formControls;
     }
 
 
@@ -673,23 +682,6 @@ public class WebForm extends WebRequestSource {
                 _formParameters.put( controls[i].getName(), parameter );
             }
             parameter.addControl( controls[i] );
-        }
-    }
-
-
-    private void addFormParametersToList( NodeList children, Vector list ) {
-        for (int i = 0; i < children.getLength(); i++) {
-            addFormParametersToList( children.item(i), list );
-        }
-    }
-
-
-    private void addFormParametersToList( Node child, Vector list ) {
-        final FormControl formParameter = FormControl.newFormParameter( this, child );
-        if (formParameter != null) {
-            list.addElement( formParameter );
-        } else if (child.hasChildNodes()) {
-            addFormParametersToList( child.getChildNodes(), list );
         }
     }
 

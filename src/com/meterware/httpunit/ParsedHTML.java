@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -224,6 +225,7 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebForm( element );
         }
+        protected boolean addToContext() { return true; }
     }
 
 
@@ -291,6 +293,18 @@ class ParsedHTML {
         }
     }
 
+    static class FormControlFactory extends HTMLElementFactory {
+
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return getForm( pot ).newFormControl( element );
+        }
+        private WebForm getForm( NodeUtils.PreOrderTraversal pot ) {
+            return (WebForm) getClosestContext( pot, WebForm.class );
+        }
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            getForm( pot ).addFormControl( (FormControl) htmlElement );
+        }
+    }
 
 
     private static HashMap _htmlFactoryClasses = new HashMap();
@@ -305,6 +319,10 @@ class ParsedHTML {
         _htmlFactoryClasses.put( "tr",     new TableRowFactory() );
         _htmlFactoryClasses.put( "td",     new TableCellFactory() );
         _htmlFactoryClasses.put( "th",     new TableCellFactory() );
+
+        for (Iterator i = Arrays.asList( FormControl.getControlElementTags() ).iterator(); i.hasNext();) {
+            _htmlFactoryClasses.put( i.next(), new FormControlFactory() );
+        }
     }
 
     private static HTMLElementFactory getHTMLElementFactory( String tagName ) {

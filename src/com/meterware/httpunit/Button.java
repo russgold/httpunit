@@ -64,7 +64,7 @@ public class Button extends FormControl {
 
     final
     protected boolean doOnClickEvent() {
-        return _onClickEvent.length() == 0 || getScriptableObject().doEvent( _onClickEvent );
+        return _onClickEvent.length() == 0 || getScriptableDelegate().doEvent( _onClickEvent );
     }
 
 

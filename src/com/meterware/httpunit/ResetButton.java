@@ -28,13 +28,9 @@ import org.xml.sax.SAXException;
 /**
  * Represents a form 'reset' button.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class ResetButton extends Button {
-
-    ResetButton( WebForm form ) {
-        super( form );
-    }
 
 
     ResetButton( WebForm form, Node node ) {

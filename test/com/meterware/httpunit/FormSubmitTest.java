@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,16 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.Enumeration;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import com.meterware.pseudoserver.PseudoServlet;
@@ -45,7 +37,7 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
-    public static Test suite() {
+    public static TestSuite suite() {
         return new TestSuite( FormSubmitTest.class );
     }
 
@@ -191,6 +183,8 @@ public class FormSubmitTest extends HttpUnitTest {
         Button reset = form.getButtonWithID( "clear" );
         reset.click();
         assertEquals( "Value after reset", "12", form.getParameterValue( "age" ) );
+        HTMLElement element = page.getElementWithID( "clear" );
+        assertSame( "Reset button", reset, element );
     }
 
 
@@ -415,7 +409,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         try {
-            WebRequest request = form.getRequest();
+            form.getRequest();
             fail( "Should not allow submit with unnamed button" );
         } catch (IllegalRequestParameterException e) {
         }
@@ -446,14 +440,14 @@ public class FormSubmitTest extends HttpUnitTest {
         WebForm wrongForm = wrong.getForms()[0];
 
         HttpUnitOptions.setParameterValuesValidated( true );
-        WebRequest request = form.getRequest( otherForm.getSubmitButtons()[0] );
+        form.getRequest( otherForm.getSubmitButtons()[0] );
 
         HttpUnitOptions.setParameterValuesValidated( false );
-        request = form.getRequest( wrongForm.getSubmitButtons()[0] );
+        form.getRequest( wrongForm.getSubmitButtons()[0] );
 
         HttpUnitOptions.setParameterValuesValidated( true );
         try {
-            request = form.getRequest( wrongForm.getSubmitButtons()[0] );
+            form.getRequest( wrongForm.getSubmitButtons()[0] );
             fail( "Failed to reject illegal button" );
         } catch (IllegalRequestParameterException e) {
         }
