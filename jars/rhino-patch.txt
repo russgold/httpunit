@@ -1,0 +1,13 @@
+Index: js/rhino/src/org/mozilla/javascript/Interpreter.java
+===================================================================
+RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Interpreter.java,v
+retrieving revision 1.113
+diff -r1.113 Interpreter.java
+2029a2030,2036
+>         else if (lhs == undefined) {
+>             // special code for better error message for get property from undefined
+>
+>             int i = getShort(iCode, pc-6);
+>             if (i != -1) lhs=strings[i];
+>             throw NativeGlobal.typeError1( "msg.is.not.defined", ScriptRuntime.toString(lhs),scope );
+>         }
