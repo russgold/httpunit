@@ -10,9 +10,13 @@ Limitations:
 
 
 Revision History:
+26-Nov-2002
+Problems fixed:
+    1. Bug #641687: when neither NekoHTML.jar or Tidy.jar is in the classpath, an explanatory exception is now thrown
+
 25-Nov-2002
 Acknowledgements:
-    Thanks to Larry Hamel for supplying an ant target to run the first example
+    Thanks to Larry Hamel for supplying an ant target to run Example.java
 
 Additions:
     1. There is now an ant target to run the Example program.

@@ -33,10 +33,7 @@ import junit.framework.TestCase;
 /**
  * Tests for the package.
  **/
-public class HttpUnitSuite {
-
-    private static Class[] NO_PARAMETERS = new Class[ 0 ];
-
+public class HttpUnitSuite extends ConditionalTestSuite {
 
     public static void main( String[] args ) {
         junit.textui.TestRunner.run( suite() );
@@ -68,26 +65,6 @@ public class HttpUnitSuite {
         addOptionalTestCase( result, "com.meterware.servletunit.ServletUnitSuite" );
         return result;
     }
-
-
-    private static void addOptionalTestCase( TestSuite testSuite, String testCaseName ) {
-        try {
-            final Class testClass = Class.forName( testCaseName );
-            Method suiteMethod = testClass.getMethod( "suite", NO_PARAMETERS );
-            if (suiteMethod != null && Modifier.isStatic( suiteMethod.getModifiers() )) {
-                testSuite.addTest( (TestSuite) suiteMethod.invoke( null, NO_PARAMETERS ) );
-            } else if (TestCase.class.isAssignableFrom( testClass )) {
-                testSuite.addTest( new TestSuite( testClass ) );
-            } else {
-                System.out.println( "Note: test suite " + testCaseName + " not a TestClass and has no suite() method" );
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println( "Note: skipping optional test suite " + testCaseName + " since it was not build." );
-        } catch (Exception e) {
-            System.out.println( "Note: unable to add " + testCaseName + ": " + e );
-        }
-    }
-
 
 }
 

@@ -62,7 +62,13 @@ public abstract class HttpUnitOptions {
 
 
     public static HTMLParser getHTMLParser() {
-        return _htmlParser;
+        if (_nekoParser != null) {
+            return _nekoParser;
+        } else if (_jtidyParser != null) {
+            return _jtidyParser;
+        } else {
+            throw new RuntimeException( "No HTML parser found. Make sure that either nekoHTML.jar or Tidy.jar is in the in classpath" );
+        }
     }
 
 
@@ -511,8 +517,6 @@ public abstract class HttpUnitOptions {
 
     private static boolean _exceptionsThrownOnScriptError = true;
 
-    private static HTMLParser _htmlParser;
-
     private static HTMLParser _jtidyParser;
 
     private static HTMLParser _nekoParser;
@@ -536,7 +540,5 @@ public abstract class HttpUnitOptions {
         } catch (IllegalAccessException e) {
         } catch (ClassNotFoundException e) {
         }
-
-        _htmlParser = (_nekoParser == null) ? _jtidyParser : _nekoParser;
     }
 }

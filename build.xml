@@ -59,6 +59,8 @@
                                            classpathref="base.classpath" />
     <available property="nekoHTML.present" classname="org.cyberneko.html.HTMLConfiguration"
                                            classpathref="base.classpath" />
+    <available property="junit.present"    classname="junit.framework.Test"
+                                           classpathref="base.classpath" />
 </target>
 
 
@@ -78,12 +80,13 @@
     <mkdir dir="${build.classes}" />
     <javac srcdir="${src.dir}" destdir="${build.classes}"
            debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
-         <classpath refid="base.classpath" />
-         <exclude name="**/JTidyHTMLParser.java" unless="jtidy.present" />
-         <exclude name="**/ScriptFilter.java" unless="nekoHTML.present" />
-         <exclude name="**/NekoHTMLParser.java" unless="nekoHTML.present" />
-         <exclude name="**/servletunit/*" unless="jsdk.present" />
-         <exclude name="**/javascript/*" unless="rhino.present" />
+        <classpath refid="base.classpath" />
+        <exclude name="**/JTidyHTMLParser.java" unless="jtidy.present" />
+        <exclude name="**/ScriptFilter.java" unless="nekoHTML.present" />
+        <exclude name="**/NekoHTMLParser.java" unless="nekoHTML.present" />
+        <exclude name="**/servletunit/*" unless="jsdk.present" />
+        <exclude name="**/JUnitServlet.java" unless="junit.present" />
+        <exclude name="**/javascript/*" unless="rhino.present" />
     </javac>
 </target>
 
@@ -124,14 +127,15 @@
     <mkdir dir="${test.classes}" />
     <javac srcdir="${tstsrc.dir}" destdir="${test.classes}"
            debug="on" deprecation="off" optimize="off">
-         <classpath>
-             <path refid="base.classpath" />
-             <pathelement location="${build.classes}" />
-         </classpath>
-         <exclude name="**/servletunit/*" unless="jsdk.present" />
-         <exclude name="**/FileUploadTest.java" unless="javamail.present" />
-         <exclude name="**/XMLPageTest.java" unless="jaxp.present" />
-         <exclude name="**/javascript/*" unless="rhino.present" />
+        <classpath>
+            <path refid="base.classpath" />
+            <pathelement location="${build.classes}" />
+        </classpath>
+        <exclude name="**/servletunit/*" unless="jsdk.present" />
+        <exclude name="**/FileUploadTest.java" unless="javamail.present" />
+        <exclude name="**/XMLPageTest.java" unless="jaxp.present" />
+        <exclude name="**/javascript/*" unless="rhino.present" />
+        <exclude name="**/JUnitServletTest.java" unless="junit.present" />
     </javac>
 </target>
 

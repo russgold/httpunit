@@ -20,6 +20,8 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.httpunit.ConditionalTestSuite;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -27,7 +29,7 @@ import junit.framework.TestSuite;
 /**
  * Tests for the package.
  **/
-public class ServletUnitSuite {
+public class ServletUnitSuite extends ConditionalTestSuite {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -44,7 +46,7 @@ public class ServletUnitSuite {
         suite.addTest( NavigationTest.suite() );
         suite.addTest( ConfigTest.suite() );
         suite.addTest( WebXMLTest.suite() );
-        suite.addTest( JUnitServletTest.suite() );
+        addOptionalTestCase( suite, "com.meterware.servletunit.JUnitServletTest" );
         return suite;
     }
 
