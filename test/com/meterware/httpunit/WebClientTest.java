@@ -54,6 +54,10 @@ public class WebClientTest extends HttpUnitTest {
         super( name );
     }
 
+    public void testNothing() {
+        new WebConversation(); // XXX delete me!!!
+    }
+
 
     public void testCookies() throws Exception {
         String resourceName = "something/baking";

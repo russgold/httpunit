@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.pseudoserver.PseudoServerTest;
+import com.meterware.httpunit.cookies.CookieTest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -59,6 +60,7 @@ public class HttpUnitSuite {
         result.addTest( PseudoServerTest.suite() );
         result.addTest( WebClientTest.suite() );
         result.addTest( MessageBodyRequestTest.suite() );
+        result.addTest( CookieTest.suite() );
         if (HttpUnitOptions.getHTMLParser().getClass().getName().indexOf("Tidy") >= 0) result.addTest( JTidyPrintWriterTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );

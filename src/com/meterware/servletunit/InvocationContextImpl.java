@@ -19,19 +19,19 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.Base64;
-import com.meterware.httpunit.HttpException;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.io.IOException;
 import java.util.Dictionary;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -130,7 +130,7 @@ class InvocationContextImpl implements InvocationContext {
      * Constructs a servlet invocation context for a specified servlet container,
      * request, and cookie headers.
      **/
-    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
         _client      = client;
         _application = runner.getApplication();
         _requestURL  = request.getURL();
@@ -138,6 +138,7 @@ class InvocationContextImpl implements InvocationContext {
 
         _request = new ServletUnitHttpRequest( _application.getServletRequest( _requestURL ), request, runner.getContext(),
                                                clientHeaders, messageBody );
+        Cookie[] cookies = getCookies( clientHeaders );
         for (int i = 0; i < cookies.length; i++) _request.addCookie( cookies[i] );
 
         if (_application.usesBasicAuthentication()) _request.readBasicAuthentication();
@@ -151,6 +152,9 @@ class InvocationContextImpl implements InvocationContext {
 //------------------------------ private members ---------------------------------------
 
 
+    final private static Cookie[] NO_COOKIES = new Cookie[0];
+
+
     private ServletUnitClient _client;
 
     private WebApplication          _application;
@@ -161,6 +165,25 @@ class InvocationContextImpl implements InvocationContext {
 
     private Servlet                 _servlet;
     private WebResponse             _webResponse;
+
+
+    private Cookie[] getCookies( Dictionary clientHeaders ) {
+        String cookieHeader = (String) clientHeaders.get( "Cookie" );
+        if (cookieHeader == null) return NO_COOKIES;
+        Vector cookies = new Vector();
+
+        StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
+        while (st.hasMoreTokens()) {
+            String name = st.nextToken();
+            if (st.hasMoreTokens()) {
+                String value = st.nextToken();
+                cookies.addElement( new Cookie( name, value ) );
+            }
+        }
+        Cookie[] results = new Cookie[ cookies.size() ];
+        cookies.copyInto( results );
+        return results;
+    }
 }
 
 

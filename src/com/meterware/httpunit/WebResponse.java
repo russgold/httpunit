@@ -20,6 +20,9 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.cookies.CookieJar;
+import com.meterware.httpunit.cookies.Cookie;
+import com.meterware.httpunit.cookies.CookieSource;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -45,7 +48,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 abstract
-public class WebResponse implements HTMLSegment {
+public class WebResponse implements HTMLSegment, CookieSource {
 
     /**
      * Returns a web response built from a URL connection. Provided to allow
@@ -206,12 +209,7 @@ public class WebResponse implements HTMLSegment {
      * Returns a list of new cookie names defined as part of this response.
      **/
     public String[] getNewCookieNames() {
-        String[] names = new String[ getNewCookies().size() ];
-        int i = 0;
-        for (Enumeration e = getNewCookies().keys(); e.hasMoreElements(); i++ ) {
-            names[i] = (String) e.nextElement();
-        }
-        return names;
+        return getCookieJar().getCookieNames();
     }
 
 
@@ -219,7 +217,7 @@ public class WebResponse implements HTMLSegment {
      * Returns the new cookie value defined as part of this response.
      **/
     public String getNewCookieValue( String name ) {
-        return (String) getNewCookies().get( name );
+        return getCookieJar().getCookieValue( name );
     }
 
 
@@ -230,19 +228,12 @@ public class WebResponse implements HTMLSegment {
     public String[] getHeaderFieldNames();
 
 
-    /**
+     /**
      * Returns the value for the specified header field. If no such field is defined, will return null.
      * If more than one header is defined for the specified name, returns only the first found.
      **/
     abstract
     public String getHeaderField( String fieldName );
-
-
-    /**
-     * Returns the values for the specified header field. If no such field is defined, will return an empty array.
-     **/
-    abstract
-    public String[] getHeaderFields( String fieldName );
 
 
     /**
@@ -775,26 +766,6 @@ public class WebResponse implements HTMLSegment {
 //--------------------------------- private members --------------------------------------
 
 
-    /**
-     * A version flag indicating a cookie is based on the
-     * Internet Engineering Task Force's (IETF)
-     * <a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</a>
-     *
-     * <br />
-     * These cookies come from the <code>Set-Cookie:</code> header
-     **/
-    final private static int IETF_RFC2109 = 0;
-
-    /**
-     * A version flag indicating a cookie is based on the
-     * Internet Engineering Task Force's (IETF)
-     * <a href="http://www.ietf.org/rfc/rfc2965.txt">RFC 2965</a>
-     *
-     * <br />
-     * These cookies come from the <code>Set-Cookie2:</code> header
-     **/
-    final private static int IETF_RFC2965 = 1;
-
     final private static String HTML_CONTENT = "text/html";
 
     final private static int UNINITIALIZED_INT = -2;
@@ -812,8 +783,6 @@ public class WebResponse implements HTMLSegment {
     private String _contentType;
 
     private String _characterSet;
-
-    private Hashtable _newCookies;
 
     private WebRequest _refreshRequest;
 
@@ -899,152 +868,13 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    /**
-     * Parses cookies from the <code>Set-Cookie</code> and the
-     * <code>Set-Cookie2</code> header fields.
-     * <p>
-     * This class does not strictly follow the specifications, but
-     * attempts to imitate the behavior of popular browsers. Specifically,
-     * this method allows cookie values to contain commas, which the
-     * Netscape standard does not allow for.
-     * </p><p>
-     * This method does not parse path,domain,expires or secure information
-     * about the cookie.</p>
-     *
-     * @return Hashtable a <code>Hashtable</code> of where the name of the
-     *                    cookie is the key and the value of the cookie is
-     *                    the value
-     */
-    private Hashtable getNewCookies() {
-        if (_newCookies == null) _newCookies = new Hashtable();
-        processCookieHeaders( getHeaderFields( "Set-Cookie" ), IETF_RFC2109 );
-        processCookieHeaders( getHeaderFields( "Set-Cookie2" ), IETF_RFC2965 );
-        return _newCookies;
+    CookieJar getCookieJar() {
+        if (_cookies == null) _cookies = new CookieJar( this );
+        return _cookies;
     }
 
 
-    private void processCookieHeaders( String cookieHeader[], int version ) {
-        for (int i = 0; i < cookieHeader.length; i++) {
-            processCookieHeader( cookieHeader[i], version );
-        }
-    }
-
-
-    private void processCookieHeader( String cookieHeader, int version ) {
-        Vector tokens = getCookieTokens( cookieHeader );
-        String tokensToAdd = "";
-        for (int i = tokens.size() - 1; i >= 0; i--) {
-            String token = (String) tokens.elementAt( i );
-
-            int equalsIndex = getEqualsIndex( token );
-            if (equalsIndex != -1) {
-                String name = token.substring( 0, equalsIndex ).trim();
-                if (!isCookieAttribute( name, version )) {
-                    String value = token.substring( equalsIndex + 1 ).trim();
-                    _newCookies.put( name, value + tokensToAdd );
-                }
-                tokensToAdd = "";
-            } else if (isCookieReservedWord( token, version )) {
-                tokensToAdd = "";
-            } else {
-                tokensToAdd = token + tokensToAdd;
-                if (i > 0) {
-                    String preceedingToken = (String) tokens.elementAt( i - 1 );
-                    char lastChar = preceedingToken.charAt( preceedingToken.length() - 1 );
-                    if (lastChar != '=') {
-                        tokensToAdd = "," + tokensToAdd;
-                    }
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Returns the index (if any) of the equals sign separating a cookie name from the its value.
-     * Equals signs at the end of the token are ignored in this calculation, since they may be
-     * part of a Base64-encoded value.
-     */
-    private int getEqualsIndex( String token ) {
-        if (!token.endsWith( "==" )) {
-            return token.indexOf( '=' );
-        } else {
-            return getEqualsIndex( token.substring( 0, token.length()-2 ) );
-        }
-    }
-
-
-    /**
-     * Tokenizes a cookie header and returns the tokens in a
-     * <code>Vector</code>.
-     **/
-    private Vector getCookieTokens(String cookieHeader) {
-        StringReader sr = new StringReader(cookieHeader);
-        StreamTokenizer st = new StreamTokenizer(sr);
-        Vector tokens = new Vector();
-
-        // clear syntax tables of the StreamTokenizer
-        st.resetSyntax();
-
-        // set all characters as word characters
-        st.wordChars(0,Character.MAX_VALUE);
-
-        // set up characters for quoting
-        st.quoteChar( '"' ); //double quotes
-        st.quoteChar( '\'' ); //single quotes
-
-        // set up characters to separate tokens
-        st.whitespaceChars(59,59); //semicolon
-        st.whitespaceChars(44,44); //comma
-
-        try {
-            while (st.nextToken() != StreamTokenizer.TT_EOF) {
-                tokens.addElement( st.sval.trim() );
-            }
-        }
-        catch (IOException ioe) {
-            // this will never happen with a StringReader
-        }
-        sr.close();
-        return tokens;
-    }
-
-
-    private boolean isCookieAttribute( String string, int version ) {
-        String stringLowercase = string.toLowerCase();
-        if (version == IETF_RFC2109) {
-            return stringLowercase.equals("path") ||
-                   stringLowercase.equals("domain") ||
-                   stringLowercase.equals("expires") ||
-                   stringLowercase.equals("comment") ||
-                   stringLowercase.equals("max-age") ||
-                   stringLowercase.equals("version");
-        } else if (version == IETF_RFC2965) {
-            return stringLowercase.equals("path") ||
-                   stringLowercase.equals("domain") ||
-                   stringLowercase.equals("comment") ||
-                   stringLowercase.equals("commenturl") ||
-                   stringLowercase.equals("max-age") ||
-                   stringLowercase.equals("version") ||
-                   stringLowercase.equals("$version") ||
-                   stringLowercase.equals("port");
-        } else {
-            return false;
-        }
-    }
-
-
-    private boolean isCookieReservedWord( String token,
-                                         int version ) {
-        if (version == IETF_RFC2109) {
-            return token.equalsIgnoreCase( "secure" );
-        } else if (version == IETF_RFC2965) {
-            return token.equalsIgnoreCase( "discard" ) || token.equalsIgnoreCase( "secure" );
-        } else {
-            return false;
-        }
-    }
-
+    private CookieJar _cookies;
 
     private void readContentTypeHeader() {
         String contentHeader = (_contentHeader != null) ? _contentHeader

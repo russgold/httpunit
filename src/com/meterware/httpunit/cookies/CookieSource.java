@@ -1,8 +1,8 @@
-package com.meterware.servletunit;
+package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, Russell Gold
+ * Copyright (c) 2002, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,23 +19,25 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebRequest;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.Dictionary;
+import java.net.URL;
 
 
 /**
- * An interface for an object which acts as a factory of InvocationContexts
+ * This interface represents a source from which to parse out cookies.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface InvocationContextFactory {
+public interface CookieSource {
 
     /**
-     * Creates and returns a new invocation context to test calling of servlet methods.
+     * Returns the URL which invoked this response.
      **/
-    public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException;
+    URL getURL();
+
+
+    /**
+     * Returns the values for the specified header field. If no such field is defined, will return an empty array.
+     **/
+    String[] getHeaderFields( String fieldName );
 
 }

@@ -24,10 +24,13 @@ import java.io.OutputStream;
 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import java.util.*;
 
 import org.xml.sax.SAXException;
+import com.meterware.httpunit.cookies.CookieJar;
+import com.meterware.httpunit.cookies.CookieJar;
 
 
 /**
@@ -204,7 +207,7 @@ public class WebClient {
      **/
     public void clearContents() {
         _mainWindow = new WebWindow( this );
-        _cookies = new Hashtable();
+        _cookieJar.clear();
         _headers = new HeaderDictionary();
     }
 
@@ -213,7 +216,7 @@ public class WebClient {
      * Defines a cookie to be sent to the server on every request.
      **/
     public void addCookie( String name, String value ) {
-        _cookies.put( name, value );
+        _cookieJar.addCookie( name, value );
     }
 
 
@@ -221,12 +224,7 @@ public class WebClient {
      * Returns the name of all the active cookies which will be sent to the server.
      **/
     public String[] getCookieNames() {
-        String[] names = new String[ _cookies.size() ];
-        int i = 0;
-        for (Enumeration e = _cookies.keys(); e.hasMoreElements();) {
-            names[i++] = (String) e.nextElement();
-        }
-        return names;
+        return _cookieJar.getCookieNames();
     }
 
 
@@ -234,7 +232,7 @@ public class WebClient {
      * Returns the value of the specified cookie.
      **/
     public String getCookieValue( String name ) {
-        return (String) _cookies.get( name );
+        return _cookieJar.getCookieValue( name );
     }
 
 
@@ -431,31 +429,19 @@ public class WebClient {
 
 
     /**
-     * Returns the value of the cookie header, or null if none is defined.
+     * Returns the value of all current header fields.
      **/
-    protected String getCookieHeaderField() {
-        String names[] = getCookieNames();
-        if (names.length == 0) return null;
-
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
-        for (int i = 0; i < names.length; i++) {
-            if (i != 0) sb.append( ";" );
-            String name = names[i];
-            sb.append( name ).append( '=' ).append( getCookieValue( name ) );
-        }
-        return sb.toString();
+    protected Dictionary getHeaderFields( URL targetURL ) {
+        Hashtable result = (Hashtable) _headers.clone();
+        result.put( "User-Agent", getClientProperties().getUserAgent() );
+        AddHeaderIfNotNull( result, "Cookie", _cookieJar.getCookieHeaderField( targetURL ) );
+        AddHeaderIfNotNull( result, getAuthorizationHeaderName(), _authorizationString );
+        return result;
     }
 
 
-    /**
-     * Returns the value of all current header fields.
-     **/
-    protected Dictionary getHeaderFields() {
-        setHeaderField( "User-Agent", getClientProperties().getUserAgent() );
-        Hashtable result = (Hashtable) _headers.clone();
-        if (getCookieHeaderField() != null) result.put( "Cookie", getCookieHeaderField() );
-        if (_authorizationString != null) result.put( getAuthorizationHeaderName(), _authorizationString );
-        return result;
+    private void AddHeaderIfNotNull( Hashtable result, final String headerName, final String headerValue ) {
+        if (headerValue != null) result.put( headerName, headerValue );
     }
 
 
@@ -475,7 +461,7 @@ public class WebClient {
 
 
     void updateClient( WebResponse response ) throws IOException {
-        updateCookies( response );
+        if (HttpUnitOptions.isAcceptCookies()) _cookieJar.updateCookies( response.getCookieJar() );
         validateHeaders( response );
     }
 
@@ -565,7 +551,7 @@ public class WebClient {
     private LinkedList _alerts = new LinkedList();
 
     /** The currently defined cookies. **/
-    private Hashtable _cookies = new Hashtable();
+    private CookieJar _cookieJar = new CookieJar();
 
 
     /** A map of header names to values. **/
@@ -596,19 +582,6 @@ public class WebClient {
             throw new HttpNotFoundException( response.getResponseMessage(), response.getURL() );
         } else if (response.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
             throw new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
-        }
-    }
-
-
-    /**
-     * Updates the cookies maintained in this client based on new cookies requested by the server.
-     **/
-    private void updateCookies( WebResponse response ) {
-        if (!HttpUnitOptions.isAcceptCookies()) return;
-
-        String[] names = response.getNewCookieNames();
-        for (int i = 0; i < names.length; i++) {
-            addCookie( names[i], response.getNewCookieValue( names[i] ) );
         }
     }
 

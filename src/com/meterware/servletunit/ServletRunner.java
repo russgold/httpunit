@@ -185,8 +185,8 @@ public class ServletRunner {
     private ServletUnitContext _context;
 
     private InvocationContextFactory _factory = new InvocationContextFactory() {
-        public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
-            return new InvocationContextImpl( client, ServletRunner.this, request, clientCookies, clientHeaders, messageBody );
+        public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+            return new InvocationContextImpl( client, ServletRunner.this, request, clientHeaders, messageBody );
         }
     };
 

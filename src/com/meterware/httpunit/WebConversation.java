@@ -57,7 +57,7 @@ public class WebConversation extends WebClient {
         URLConnection connection = openConnection( request.getURL() );
 	    sendHeaders( connection, request.getHeaderDictionary() );
         if (HttpUnitOptions.isLoggingHttpHeaders()) {
-            for (Enumeration e = getHeaderFields().keys(); e.hasMoreElements(); ) {
+            for (Enumeration e = getHeaderFields( request.getURL() ).keys(); e.hasMoreElements(); ) {
                 String key = (String) e.nextElement();
                 System.out.println( "Sending:: " + key + ": " + connection.getRequestProperty( key ) );
             }
@@ -83,7 +83,7 @@ public class WebConversation extends WebClient {
 
 
     private void sendHeaders( URLConnection connection ) {
-        sendHeaders( connection, getHeaderFields() );
+        sendHeaders( connection, getHeaderFields( connection.getURL() ) );
     }
 
 

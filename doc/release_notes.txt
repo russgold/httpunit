@@ -10,6 +10,11 @@ Limitations:
 
 
 Revision History:
+17-Oct-2002
+Additions:
+    1. Cookies are now restricted by their origin server, rather than being sent on every request.
+    2. A new package com.meterware.httpunit.cookies, now exists to support the cookie functionality.
+
 14-Oct-2002
 Acknowledgements:
     Thanks to Stefan Renz for describing the correct way to set up proxy servers in Java 2 and later.

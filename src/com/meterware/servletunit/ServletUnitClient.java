@@ -21,19 +21,11 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
-
+import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.Hashtable;
 
 import javax.servlet.ServletException;
-
-import javax.servlet.http.Cookie;
 
 import org.xml.sax.SAXException;
 
@@ -72,7 +64,7 @@ public class ServletUnitClient extends WebClient {
     public InvocationContext newInvocation( WebRequest request ) throws IOException, MalformedURLException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeMessageBody( request, baos );
-        return _invocationContextFactory.newInvocation( this, request, getCookies(), this.getHeaderFields(), baos.toByteArray() );
+        return _invocationContextFactory.newInvocation( this, request, getHeaderFields( request.getURL() ), baos.toByteArray() );
     }
 
 
@@ -111,33 +103,11 @@ public class ServletUnitClient extends WebClient {
 
     private InvocationContextFactory _invocationContextFactory;
 
-    final private static Cookie[] NO_COOKIES = new Cookie[0];
-
-
 //--------------------------------- package methods ---------------------------------------
 
 
     private ServletUnitClient( InvocationContextFactory factory ) {
         _invocationContextFactory = factory;
-    }
-
-
-    private Cookie[] getCookies() {
-        String cookieHeader = (String) getHeaderFields().get( "Cookie" );
-        if (cookieHeader == null) return NO_COOKIES;
-        Vector cookies = new Vector();
-
-        StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
-        while (st.hasMoreTokens()) {
-            String name = st.nextToken();
-            if (st.hasMoreTokens()) {
-                String value = st.nextToken();
-                cookies.addElement( new Cookie( name, value ) );
-            }
-        }
-        Cookie[] results = new Cookie[ cookies.size() ];
-        cookies.copyInto( results );
-        return results;
     }
 }
 

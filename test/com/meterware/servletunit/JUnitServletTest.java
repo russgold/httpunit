@@ -19,28 +19,27 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
-import com.meterware.httpunit.WebRequest;
 
-import java.util.Properties;
-import java.util.Dictionary;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.util.Dictionary;
+import java.util.Properties;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.ServletException;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class JUnitServletTest extends TestCase {
     private ServletRunner _runner;
@@ -180,8 +179,8 @@ public class JUnitServletTest extends TestCase {
     static class MyFactory implements InvocationContextFactory {
         private static ServletRunner _runner;
 
-        public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
-            return new InvocationContextImpl( client, _runner, request, clientCookies, clientHeaders, messageBody );
+        public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+            return new InvocationContextImpl( client, _runner, request, clientHeaders, messageBody );
         }
     }
 }
