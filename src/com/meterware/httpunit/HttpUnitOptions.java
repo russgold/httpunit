@@ -42,7 +42,6 @@ public abstract class HttpUnitOptions {
      *  Resets all options to their default values.
      */
     public static void reset() {
-        HTMLParserFactory.reset();
         _exceptionsOnErrorStatus = true;
         _parameterValuesValidated = true;
         _imagesTreatedAsAltText = false;

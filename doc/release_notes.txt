@@ -13,7 +13,7 @@ Limitations:
 
 
 Revision History:
- 27-Feb-2003 1.5.2 release candidate
+ 28-Feb-2003 1.5.2 release candidate
 Acknowledgements:
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
     Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
@@ -29,6 +29,7 @@ Acknowledgements:
     Thanks to Jason Bedell for supplying an implementation for HttpSession.getValueNames.
     Thanks to Jianqin Qu for finding the getTableStartingWithPrefix bug when using NekoHTML
     Thanks to Scott Fleischman for providing tests for missing frame handling functionality
+    Thanks to Artashes Aghajanyan for implementing error reporting for the NekoHTML parser
 
 Problems Fixed:
     Packaging
@@ -74,12 +75,12 @@ Additions:
            without a <frameset> tag. IFrame support is controlled by the ClientProperties.iframeSupported property.
         6. WebForm.isHiddenParameter returns true if all parameters with the specified name are hidden
         7. Frame handling is now more flexible, searching within a window for a target frame rather than just below the source frame.
+        8. HTMLParserListeners and parser warnings now work with the NekoHTML parser.
     JavaScript
-        8. Added support for document.getElementById
         9. All HTML elements with id attributes are now accessible
        10. The Form.target property is now supported
+       11. Added support for document.getElementById
     ServletUnit
-       11. ServletUnit now supports HttpServletRequest.getHeaderNames
        12. ServletUnit now handles https requests, marking them as "secure."
        13. ServletUnit now supports HttpServletResponse.flushBuffer()
        14. InvocationContext now supports include and forwarded servlets: calling pushIncludeRequest or pushForwardRequest
@@ -89,6 +90,7 @@ Additions:
        16. HttpServletResponse methods reset(), resetBuffer(), and setBufferSize() are now implemented.
        17. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked
            through that servlet runner.
+       18. ServletUnit now supports HttpServletRequest.getHeaderNames
 
 Notes:
     1. Upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.

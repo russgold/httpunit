@@ -33,8 +33,7 @@ public class ParsingTestSuite {
     public static TestSuite suite() {
         TestSuite result = new TestSuite();
         result.addTest( ParserPropertiesTest.suite() );
-
-        if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("Tidy") >= 0) result.addTest( JTidyPrintWriterTest.suite() );
+        result.addTest( HTMLParserListenerTest.suite() );
         return result;
     }
 

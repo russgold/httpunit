@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.pseudoserver.HttpUserAgentTest;
+import com.meterware.httpunit.parsing.HTMLParserFactory;
 
 /**
  * a base class for HttpUnit regression tests.
@@ -47,6 +48,7 @@ public class HttpUnitTest extends HttpUserAgentTest {
     public void setUp() throws Exception {
         super.setUp();
         HttpUnitOptions.reset();
+        HTMLParserFactory.reset();
         if (_showTestName) {
             System.out.println( "----------------------- " + getName() + " ------------------------");
             _startTime = System.currentTimeMillis();

@@ -20,6 +20,9 @@ package com.meterware.httpunit.parsing;
  *
  *******************************************************************************************************************/
 import org.apache.xerces.xni.parser.XMLDocumentFilter;
+import org.apache.xerces.xni.parser.XMLErrorHandler;
+import org.apache.xerces.xni.parser.XMLParseException;
+import org.apache.xerces.xni.XNIException;
 
 import org.cyberneko.html.HTMLConfiguration;
 
@@ -33,6 +36,7 @@ import org.w3c.dom.Document;
 import java.net.URL;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Enumeration;
 
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
@@ -40,13 +44,14 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
+ * @author <a href="mailto:Artashes.Aghajanyan@lycos-europe.com">Artashes Aghajanyan</a>
  **/
 class NekoHTMLParser implements HTMLParser {
 
 
     public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
         try {
-            DOMParser parser = DOMParser.newParser( adapter );
+            DOMParser parser = DOMParser.newParser( adapter, pageURL );
             parser.parse( new InputSource( new StringReader( pageText ) ) );
             adapter.setRootNode( parser.getDocument() );
         } catch (DOMParser.ScriptException e) {
@@ -71,7 +76,7 @@ class NekoHTMLParser implements HTMLParser {
 
 
     public boolean supportsParserWarnings() {
-        return false;
+        return true;
     }
 
 
@@ -83,25 +88,31 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
 
     private static final String HTML_DOCUMENT_CLASS_NAME = "org.apache.html.dom.HTMLDocumentImpl";
 
+    /** Error reporting feature identifier. */
+    private static final String REPORT_ERRORS = "http://cyberneko.org/html/features/report-errors";
+
     /** Augmentations feature identifier. */
-    protected static final String AUGMENTATIONS = "http://cyberneko.org/html/features/augmentations";
+    private static final String AUGMENTATIONS = "http://cyberneko.org/html/features/augmentations";
 
     /** Filters property identifier. */
-    protected static final String FILTERS = "http://cyberneko.org/html/properties/filters";
+    private static final String FILTERS = "http://cyberneko.org/html/properties/filters";
 
     /** Element case settings. possible values: "upper", "lower", "match" */
-    protected static final String TAG_NAME_CASE = "http://cyberneko.org/html/properties/names/elems";
+    private static final String TAG_NAME_CASE = "http://cyberneko.org/html/properties/names/elems";
 
     /** Attribute case settings. possible values: "upper", "lower", "no-change" */
-    protected static final String ATTRIBUTE_NAME_CASE = "http://cyberneko.org/html/properties/names/attrs";
-
+    private static final String ATTRIBUTE_NAME_CASE = "http://cyberneko.org/html/properties/names/attrs";
 
     private DocumentAdapter _documentAdapter;
     private ScriptableDelegate _scriptableObject;
 
 
-    static DOMParser newParser( DocumentAdapter adapter ) {
+    static DOMParser newParser( DocumentAdapter adapter, URL url ) {
         final HTMLConfiguration configuration = new HTMLConfiguration();
+        if (!HTMLParserFactory.getHTMLParserListeners().isEmpty() || HTMLParserFactory.isParserWarningsEnabled()) {
+            configuration.setErrorHandler( new ErrorHandler( url ) );
+            configuration.setFeature( REPORT_ERRORS, true);
+        }
         configuration.setFeature( AUGMENTATIONS, true );
         final ScriptFilter javaScriptFilter = new ScriptFilter( configuration );
         configuration.setProperty( FILTERS, new XMLDocumentFilter[] { javaScriptFilter } );
@@ -174,5 +185,40 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
         public IOException getException() {
             return _cause;
         }
+    }
+}
+
+
+class ErrorHandler implements XMLErrorHandler {
+
+    private URL _url = null;
+
+    ErrorHandler( URL url ) {
+        _url = url;
+    }
+
+    public void warning( String domain, String key, XMLParseException warningException ) throws XNIException {
+        if (HTMLParserFactory.isParserWarningsEnabled()) {
+            System.out.println( "At line " + warningException.getLineNumber() + ", column " + warningException.getColumnNumber() + ": " + warningException.getMessage() );
+        }
+
+        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
+        while (enum.hasMoreElements()) {
+            ((HTMLParserListener) enum.nextElement()).warning( _url, warningException.getMessage(), warningException.getLineNumber(), warningException.getColumnNumber() );
+        }
+    }
+
+
+    public void error( String domain, String key, XMLParseException errorException ) throws XNIException {
+        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
+        while (enum.hasMoreElements()) {
+            ((HTMLParserListener) enum.nextElement()).error( _url, errorException.getMessage(), errorException.getLineNumber(), errorException.getColumnNumber() );
+        }
+    }
+
+
+    public void fatalError( String domain, String key, XMLParseException fatalError ) throws XNIException {
+        error( domain, key, fatalError );
+        throw fatalError;
     }
 }
