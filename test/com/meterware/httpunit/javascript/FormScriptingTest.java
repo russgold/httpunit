@@ -179,6 +179,29 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verifies bug #1073810 (Null pointer exception if javascript sets control value to null)
+     */
+    public void testNullParameterSetting() throws Exception {
+        defineResource( "OnCommand.html", "<html><head>" +
+                                          "<script>" +
+                                          "  function myFunction(value) {" +
+                                          "    document.mainForm.id.value = null;" +
+                                          "  }</script>" +
+                                          "</head>" +
+                                          "<body>" +
+                                          "<form name=mainForm action='DoIt'>" +
+                                          "  <a href='javascript:myFunction()'>View Asset</a>" +
+                                          "  <input type='hidden' name='id'>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getLinks()[ 0 ].click();
+    }
+
+
     public void testEnablingDisabledSubmitButtonViaScript() throws Exception {
         defineResource( "DoIt?color=green&change=success", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +
@@ -353,7 +376,7 @@ public class FormScriptingTest extends HttpUnitTest {
 
     public void testSubmitViaScriptWithPostParams() throws Exception {
         defineResource( "/servlet/TestServlet?param3=value3&param4=value4", new PseudoServlet() {
-            public WebResource getPostResponse() throws IOException {
+            public WebResource getPostResponse() {
                 return new WebResource( "You made it!", "text/plain" );
             }
         } );

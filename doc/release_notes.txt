@@ -20,6 +20,7 @@ Revision History:
 
     Problems fixed:
         1. bug #1074232 buttons outside of forms were only recognized if defined with the <button> tag, not <input>
+        2. bug #1073810 a null pointer exception is no longer thrown when javascript sets a control value to null
 
 28-Oct-2004:
     Acknowledgements:

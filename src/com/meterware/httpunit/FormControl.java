@@ -790,7 +790,7 @@ abstract class TextFormControl extends FormControl {
 
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "value" )) {
-                _value[0] = value.toString();
+                _value[0] = (value == null) ? null : value.toString();
             } else {
                 super.set( propertyName, value );
             }
