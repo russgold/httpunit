@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -132,6 +132,29 @@ public class PseudoServerTest extends TestCase {
             assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
             assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
             assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );
+        } finally {
+            ps.shutDown();
+        }
+    }
+
+
+    public void testOldCookies() throws Exception {
+        String resourceName = "something/baking";
+        String resourceValue = "the desired content\r\n";
+
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
+        ps.setResource( resourceName, resourceValue );
+        ps.addResourceHeader( resourceName, "Set-Cookie: CUSTOMER=WILE_E_COYOTE; path=/; expires=Wednesday, 09-Nov-99 23:12:40 GMT" );
+
+        try {
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "content type", "text/html", response.getContentType() );
+            assertEquals( "number of cookies", 1, wc.getCookieNames().length );
+            assertEquals( "cookie 'CUSTOMER' value", "WILE_E_COYOTE", wc.getCookieValue( "CUSTOMER" ) );
         } finally {
             ps.shutDown();
         }

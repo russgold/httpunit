@@ -3,27 +3,30 @@ HttpUnit release notes
 Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
     2. The "_self" target only works for links, not forms
-    3. The "accept-charset" attribute for forms is ignored; the sent character set is used to encode any response
+    3. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response. 
+       This behavior matches that currently used by IE and Navigator.
 
 Limitations: HttpUnit does not support JavaScript
 
                             
 Revision History:
+    
+01-Jan-2001 1.2.1
 Acknowledgements:
     Thanks to Toyoshi Ushio for helping with the handling of non-English scripts and for translating the home page and cookbook into Japanese.
-25-Dec-2000
+    
+Problems corrected:
+    1. Content-type charset attribute is now recognized, allowing for the proper handling of non-ascii html pages.
+    2. Form submissions now use the page character set encoding.
+    3. Old format cookie headers (with the expires=attribute) are now recognized.
+    
 Additions:
-    1. Added getTableWithID method to WebResponse, ParsedHTML
-    2. Implemented support for sendRedirect, getServletContext in ServletUnit
-    3. Added recognition of content charset header. This should allow for proper handling of non-ascii html pages.
-    4. Added HttpUnitOptions.setDefaultCharacterSet to handle missing content charset headers, so as not to assume default encoding (iso-8859-1).
-     
-21-Nov-00
-Additions:
-    1. Introductory ServletUnit functionality (parameters and sessions, but no JSP, no redirect, no forwarding)
-    2. WebConversation now has a new public base class: WebClient
-    3. Any message header may now be defined, using: WebClient.setHeaderField and will be sent on all subsequent requests
-    4. Forms may now be retrieved by their name attributes, using WebResponse.getFormWithName()
+    1. Introductory ServletUnit functionality (parameters and sessions, but no JSP, no forwarding)
+    2. Added getTableWithID method to WebResponse, ParsedHTML
+    3. Added HttpUnitOptions.setDefaultCharacterSet to handle missing content charset headers, so as not to assume default encoding (iso-8859-1).
+    4. WebConversation now has a new public base class: WebClient
+    5. Any message header may now be defined, using: WebClient.setHeaderField and will be sent on all subsequent requests
+    6. Forms may now be retrieved by their name attributes, using WebResponse.getFormWithName()
 
 16-Nov-00 1.2
 Acknowledgements:

@@ -91,7 +91,7 @@
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}" 
              destdir="${javadoc.dir}" author="true" version="true" 
              windowtitle="${Name} ${version} API" doctitle="${Name}" 
-             footer="Copyright &amp;copy; 2000 Russell Gold. See &lt;a href=&quot;http://httpunit.sourceforge.net/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." /> 
+             footer="Copyright &amp;copy; 2000-2001 Russell Gold. See &lt;a href=&quot;http://httpunit.sourceforge.net/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." /> 
 </target>
 
 

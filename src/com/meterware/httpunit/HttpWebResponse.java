@@ -132,6 +132,9 @@ class HttpWebResponse extends WebResponse {
 
 
     private void loadHeaders( URLConnection connection ) {
+        if (HttpUnitOptions.isLoggingHttpHeaders()) {
+            System.out.println( "Header:: " + connection.getHeaderField(0) );
+        }
         for (int i = 1; true; i++) {
             String key = connection.getHeaderFieldKey( i );
             if (key == null) break;
