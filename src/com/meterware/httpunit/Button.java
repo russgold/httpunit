@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,6 +38,7 @@ public class Button extends FormControl {
     static final public HTMLElementPredicate WITH_LABEL;
 
     private String _onClickEvent = "";
+    private WebResponse _baseResponse;
 
 
     public String getType() {
@@ -53,6 +54,13 @@ public class Button extends FormControl {
     Button( WebForm form, Node node ) {
         super( form, node );
         _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
+    }
+
+
+    Button( WebResponse response, Node node ) {
+        super( null, node );
+        _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
+        _baseResponse = response;
     }
 
 
@@ -111,6 +119,12 @@ public class Button extends FormControl {
 
     protected ScriptableDelegate newScriptable() {
         return new Scriptable();
+    }
+
+
+    protected ScriptableDelegate getParentDelegate() {
+        if (getForm() != null) return super.getParentDelegate();
+        return _baseResponse.getScriptableObject().getDocument();
     }
 
 

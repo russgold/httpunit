@@ -710,4 +710,15 @@ public class ScriptingTest extends HttpUnitTest {
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
 
+
+    public void testButtonWithoutForm() throws Exception {
+        defineWebPage(  "OnCommand",  "<button id='mybutton' onclick='alert( \"I heard you!\" )'>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        Button button = (Button) response.getElementWithID( "mybutton" );
+        button.click();
+        assertEquals( "Alert message 1", "I heard you!", wc.popNextAlert() );
+    }
+
+
 }

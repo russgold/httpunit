@@ -518,13 +518,25 @@ class ParsedHTML {
 
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             final WebForm form = getForm( pot );
-            return form == null ? null : form.newFormControl( element );
+            return form == null ? newControlWithoutForm( parsedHTML, element ) : form.newFormControl( element );
         }
+
+        private HTMLElement newControlWithoutForm( ParsedHTML parsedHTML, Element element ) {
+            if (element.getNodeName().equalsIgnoreCase( "button" ) &&
+                NodeUtils.getNodeAttribute( element, "type" ).equals( "" )) {
+                return parsedHTML.toButtonWithoutForm( element );
+            } else {
+                return null;
+            }
+        }
+
         private WebForm getForm( NodeUtils.PreOrderTraversal pot ) {
             return getRootContext( pot )._activeForm;
         }
+
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
-            getForm( pot ).addFormControl( (FormControl) htmlElement );
+            WebForm form = getForm( pot );
+            if (form != null) form.addFormControl( (FormControl) htmlElement );
         }
     }
 
@@ -586,6 +598,11 @@ class ParsedHTML {
     private ClientProperties getClientProperties() {
         WebWindow window = _response.getWindow();
         return window == null ? ClientProperties.getDefaultProperties() : window.getClient().getClientProperties();
+    }
+
+
+    private Button toButtonWithoutForm( Element element ) {
+        return new Button( _response, element );
     }
 
 
