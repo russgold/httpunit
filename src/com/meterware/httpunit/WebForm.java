@@ -57,11 +57,13 @@ public class WebForm extends WebRequestSource {
 
     /**
      * Submits this form using the web client from which it was originally obtained.
+     * Will usually return the result of that submission; however, if a scripted event is triggered which
+     * inhibits the submission, will return the updated contents of the frame containing this form.
      **/
     WebResponse submit( SubmitButton button ) throws IOException, SAXException {
         String event = getAttribute( "onsubmit" );
         if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest( getRequest( button ) );
-        return getBaseResponse();
+        return getBaseResponse().getWindow().getFrameContents( getTarget() );
     }
 
 

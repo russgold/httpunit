@@ -10,6 +10,11 @@ Limitations:
 
 
 Revision History:
+31-Oct-2002
+Problems fixed:
+    1. When a JavaScript event resulted in submitting a request and bypassed the normal mechanism, WebForm.submit and
+       WebLink.click() did not return the changed page.
+
 30-Oct-2002
 Acknowledgements:
     Thanks to Troy Waldrep for fixing the JavaScript / HTML end-comment bug

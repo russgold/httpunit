@@ -19,22 +19,14 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
-import java.net.URL;
-
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.Dictionary;
-import java.util.Vector;
 
 import java.io.*;
 
-import org.w3c.dom.Document;
 
 
 /**
@@ -71,7 +63,7 @@ public class WebPageTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         try {
             WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
-            WebResponse simplePage = wc.getResponse( request );
+            wc.getResponse( request );
             fail( "Did not complain about missing page" );
         } catch (HttpNotFoundException e) {
         }
@@ -120,7 +112,7 @@ public class WebPageTest extends HttpUnitTest {
         try {
             WebConversation wc = new WebConversation();
             WebRequest request = new GetMethodWebRequest( "file:" + file.getAbsolutePath() );
-            WebResponse simplePage = wc.getResponse( request );
+            wc.getResponse( request );
             fail( "Should have complained about missing file" );
         } catch (java.io.FileNotFoundException e) {
         }
@@ -319,10 +311,8 @@ public class WebPageTest extends HttpUnitTest {
 
     /**
      * Test the meta tag content retrieval
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public void testMetaTag() throws Exception {
-        String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
                       "<meta Http-equiv=\"Expires\" content=\"now\"/>\n" +
                       "<meta name=\"robots\" content=\"index,follow\"/>" +
@@ -344,10 +334,8 @@ public class WebPageTest extends HttpUnitTest {
 
     /**
      * test the stylesheet retrieval
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public void testGetExternalStylesheet() throws Exception {
-        String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
                       "<link rev=\"made\" href=\"/Me@mycompany.com\"/>" +
                       "<link type=\"text/css\" rel=\"stylesheet\" href=\"/style.css\"/>" +
@@ -362,16 +350,6 @@ public class WebPageTest extends HttpUnitTest {
 
         assertEquals( "Stylesheet","/style.css",simplePage.getExternalStyleSheet());
      }
-
-    private String toUnicode( String string ) {
-        StringBuffer sb = new StringBuffer( );
-        char[] chars = string.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            sb.append( "\\u" );
-            sb.append( Integer.toHexString( chars[i] ) );
-        }
-        return sb.toString();
-    }
 
 
     /**
