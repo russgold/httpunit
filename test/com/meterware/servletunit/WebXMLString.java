@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001, Russell Gold
+ * Copyright (c) 2001-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -31,9 +31,19 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * A class which allows dynamic creation of Servlet configuration XML
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 class WebXMLString {
+
+    private ArrayList _servlets = new ArrayList();
+    private ArrayList _mappings = new ArrayList();
+    private ArrayList _servletNames = new ArrayList();
+
+    private String _loginConfig = "";
+    private Hashtable _resources = new Hashtable();
+    private Hashtable _initParams = new Hashtable();
+    private Hashtable _contextParams = new Hashtable();
+    private Hashtable _loadOnStartup = new Hashtable();
 
     ByteArrayInputStream asInputStream() throws UnsupportedEncodingException {
         return new ByteArrayInputStream( asText().getBytes( "UTF-8" ) );
@@ -49,13 +59,15 @@ class WebXMLString {
             result.append( "</param-name>\n    <param-value>" ).append( entry.getValue() ).append( "</param-value>\n  </context-param>\n" );
         }
         for (int i = _servlets.size() - 1; i >= 0; i--) {
-            result.append( "  <servlet>\n    <servlet-name>servlet_" ).append( i ).append( "</servlet-name>\n" );
+            Object name = _servletNames.get( i );
+            result.append( "  <servlet>\n    <servlet-name>" ).append( name ).append( "</servlet-name>\n" );
             result.append( "    <servlet-class>" ).append( ((Class) _servlets.get( i )).getName() ).append( "</servlet-class>\n" );
-            appendParams( result, "init-param", (Hashtable) _initParams.get( new Integer( i ) ) );
+            appendParams( result, "init-param", (Hashtable) _initParams.get( name ) );
+            appendLoadOnStartup( result, _loadOnStartup.get( name ) );
             result.append( "  </servlet>\n" );
         }
         for (int i = _mappings.size() - 1; i >= 0; i--) {
-            result.append( "  <servlet-mapping>\n    <servlet-name>servlet_" ).append( i ).append( "</servlet-name>\n" );
+            result.append( "  <servlet-mapping>\n    <servlet-name>" ).append( _servletNames.get( i ) ).append( "</servlet-name>\n" );
             result.append( "    <url-pattern>" ).append( _mappings.get( i ) ).append( "</url-pattern>\n  </servlet-mapping>\n" );
         }
         for (Enumeration e = _resources.elements(); e.hasMoreElements();) {
@@ -64,6 +76,14 @@ class WebXMLString {
         result.append( _loginConfig );
         result.append( "</web-app>" );
         return result.toString();
+    }
+
+
+    private void appendLoadOnStartup( StringBuffer result, Object startupOrder ) {
+        if (startupOrder == null) return;
+        result.append( "    <load-on-startup" );
+        if (startupOrder instanceof Number) result.append( ">" ).append( startupOrder ).append( "</load-on-startup>\n" );
+        else result.append( "/>\n" );
     }
 
 
@@ -84,14 +104,30 @@ class WebXMLString {
 
 
     void addServlet( String urlPattern, Class servletClass ) {
-        _servlets.add( servletClass );
-        _mappings.add( urlPattern );
+        addServlet( "servlet_" + _servlets.size(), urlPattern, servletClass );
     }
 
 
-    void addServlet( String urlPattern, Class servletClass, Properties initParams ) {
-        _initParams.put( new Integer( _servlets.size() ), initParams );
-        addServlet( urlPattern, servletClass );
+    void addServlet( String name, String urlPattern, Class servletClass ) {
+        _servlets.add( servletClass );
+        _mappings.add( urlPattern );
+        _servletNames.add( name );
+    }
+
+
+    void addServlet( String name, String urlPattern, Class servletClass, Properties initParams ) {
+        _initParams.put( name, initParams );
+        addServlet( name, urlPattern, servletClass );
+    }
+
+
+    void setLoadOnStartup( String servletName ) {
+        _loadOnStartup.put( servletName, Boolean.TRUE );
+    }
+
+
+    void setLoadOnStartup( String servletName, int i ) {
+        _loadOnStartup.put( servletName, new Integer(i) );
     }
 
 
@@ -131,14 +167,6 @@ class WebXMLString {
     void addAuthorizedRole( String resourceName, String roleName ) {
         getWebResource( resourceName ).addAuthorizedRole( roleName );
     }
-
-
-    private ArrayList _servlets = new ArrayList();
-    private ArrayList _mappings = new ArrayList();
-    private String _loginConfig = "";
-    private Hashtable _resources = new Hashtable();
-    private Hashtable _initParams = new Hashtable();
-    private Hashtable _contextParams = new Hashtable();
 
 
     private WebResourceSpec getWebResource( String resourceName ) {

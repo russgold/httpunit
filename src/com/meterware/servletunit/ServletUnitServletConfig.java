@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,7 +19,6 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -37,7 +36,7 @@ class ServletUnitServletConfig implements ServletConfig {
     ServletUnitServletConfig( Servlet servlet, WebApplication application, Hashtable initParams ) {
         _name = servlet.getClass().getName();
         _initParameters = initParams;
-        _context = new ServletUnitServletContext( application );
+        _context = application.getServletContext();
     }
 
 

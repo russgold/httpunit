@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, Russell Gold
+ * Copyright (c) 2001-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -129,7 +129,7 @@ public class JUnitServletTest extends TestCase {
         Properties params = new Properties();
         params.setProperty( "color", "red" );
         params.setProperty( "age", "12" );
-        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class, params );
+        wxs.addServlet( "simple", "/SimpleServlet", SimpleGetServlet.class, params );
         wxs.addServlet( "/JUnit", TestRunnerServlet.class );
 
         MyFactory._runner = _runner = new ServletRunner( wxs.asInputStream() );

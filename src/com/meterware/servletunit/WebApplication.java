@@ -30,6 +30,7 @@ import java.util.*;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +50,35 @@ import org.xml.sax.SAXException;
  * @author <a href="balld@webslingerZ.com">Donald Ball</a>
  **/
 class WebApplication {
+
+    private final static SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
+
+    private final ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
+
+    private final ServletMapping SECURITY_CHECK_MAPPING = new ServletMapping( SECURITY_CHECK_CONFIGURATION );
+
+    /** A mapping of resource names to servlet class names. **/
+    private ServletMap _servletMapping = new ServletMap();
+
+    private ArrayList _securityConstraints = new ArrayList();
+
+    private boolean _useBasicAuthentication;
+
+    private boolean _useFormAuthentication;
+
+    private String _authenticationRealm = "";
+
+    private URL _loginURL;
+
+    private URL _errorURL;
+
+    private Hashtable _contextParameters = new Hashtable();
+
+    private File _contextDir = null;
+
+    private String _contextPath = null;
+
+    private ServletUnitServletContext _servletContext;
 
 
     /**
@@ -85,6 +115,7 @@ class WebApplication {
         extractSecurityConstraints( document );
         extractContextParameters( document );
         extractLoginConfiguration( document );
+        _servletMapping.autoLoadServlets();
     }
 
 
@@ -98,6 +129,14 @@ class WebApplication {
 
     String getContextPath() {
         return _contextPath;
+    }
+
+
+    ServletContext getServletContext() {
+        if (_servletContext == null) {
+            _servletContext = new ServletUnitServletContext( this );
+        }
+        return _servletContext;
     }
 
 
@@ -226,34 +265,6 @@ class WebApplication {
 //------------------------------------------------ private members ---------------------------------------------
 
 
-    private final static SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
-
-    private final ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
-
-    private final ServletMapping SECURITY_CHECK_MAPPING = new ServletMapping( SECURITY_CHECK_CONFIGURATION );
-
-    /** A mapping of resource names to servlet class names. **/
-    private ServletMap _servletMapping = new ServletMap();
-
-    private ArrayList _securityConstraints = new ArrayList();
-
-    private boolean _useBasicAuthentication;
-
-    private boolean _useFormAuthentication;
-
-    private String _authenticationRealm = "";
-
-    private URL _loginURL;
-
-    private URL _errorURL;
-
-    private Hashtable _contextParameters = new Hashtable();
-
-    private File _contextDir = null;
-
-    private String _contextPath = null;
-
-
     private void extractLoginConfiguration( Document document ) throws MalformedURLException, SAXException {
         NodeList nl = document.getElementsByTagName( "login-config" );
         if (nl.getLength() == 1) {
@@ -360,8 +371,15 @@ class WebApplication {
     }
 //============================================= ServletConfiguration class =============================================
 
+    final static int DONT_AUTOLOAD = Integer.MIN_VALUE;
+    final static int ANY_LOAD_ORDER = Integer.MAX_VALUE;
 
     class ServletConfiguration {
+
+        private Servlet _servlet;
+        private String _className;
+        private Hashtable _initParams = new Hashtable();
+        private int _loadOrder = DONT_AUTOLOAD;
 
         ServletConfiguration( String className ) {
             _className = className;
@@ -380,6 +398,15 @@ class WebApplication {
             for (int i = initParams.getLength() - 1; i >= 0; i--) {
                 _initParams.put( getChildNodeValue( (Element) initParams.item( i ), "param-name" ),
                                  getChildNodeValue( (Element) initParams.item( i ), "param-value" ) );
+            }
+            final NodeList loadOrder = servletElement.getElementsByTagName( "load-on-startup" );
+            for (int i = 0; i < loadOrder.getLength(); i++) {
+                String order = getTextValue( loadOrder.item(i) );
+                try {
+                    _loadOrder = Integer.parseInt( order );
+                } catch (NumberFormatException e) {
+                    _loadOrder = ANY_LOAD_ORDER;
+                }
             }
         }
 
@@ -410,9 +437,14 @@ class WebApplication {
         }
 
 
-        private Servlet _servlet;
-        private String _className;
-        private Hashtable _initParams = new Hashtable();
+        boolean isLoadOnStartup() {
+            return _loadOrder != DONT_AUTOLOAD;
+        }
+
+
+        public int getLoadOrder() {
+            return _loadOrder;
+        }
     }
 
 
@@ -674,10 +706,55 @@ class WebApplication {
         }
 
 
-        private void destroyServlets( Map exactMatches ) {
-            for (Iterator iterator = exactMatches.values().iterator(); iterator.hasNext();) {
-                ServletMapping servletMapping = (ServletMapping) iterator.next();
-                servletMapping.destroyServlet();
+        private void destroyServlets( Map map ) {
+            for (Iterator iterator = map.values().iterator(); iterator.hasNext();) {
+                Object o = iterator.next();
+                if (o instanceof ServletMapping) {
+                    ServletMapping servletMapping = (ServletMapping) o;
+                    servletMapping.destroyServlet();
+                } else {
+                    destroyServlets( (Map) o );
+                }
+            }
+        }
+
+
+        void autoLoadServlets() {
+            ArrayList autoLoadable = new ArrayList();
+            if (_defaultMapping != null && _defaultMapping.getConfiguration().isLoadOnStartup()) autoLoadable.add( _defaultMapping.getConfiguration() );
+            collectAutoLoadableServlets( autoLoadable, _exactMatches );
+            collectAutoLoadableServlets( autoLoadable, _extensions );
+            collectAutoLoadableServlets( autoLoadable, _urlTree );
+            if (autoLoadable.isEmpty()) return;
+
+            Collections.sort( autoLoadable, new Comparator() {
+                public int compare( Object o1, Object o2 ) {
+                    ServletConfiguration sc1 = (ServletConfiguration) o1;
+                    ServletConfiguration sc2 = (ServletConfiguration) o2;
+                    return (sc1.getLoadOrder() <= sc2.getLoadOrder()) ? -1 : +1;
+                }
+            });
+            for (Iterator iterator = autoLoadable.iterator(); iterator.hasNext();) {
+                ServletConfiguration servletConfiguration = (ServletConfiguration) iterator.next();
+                try {
+                    servletConfiguration.getServlet();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to autoload servlet: " + servletConfiguration.getClassName() + ": " + e );
+                }
+            }
+        }
+
+
+        private void collectAutoLoadableServlets( Collection collection, Map map ) {
+            for (Iterator iterator = map.values().iterator(); iterator.hasNext();) {
+                Object o = iterator.next();
+                if (o instanceof ServletMapping) {
+                    ServletMapping servletMapping = (ServletMapping) o;
+                    if (servletMapping.getConfiguration().isLoadOnStartup()) collection.add( servletMapping.getConfiguration() );
+                } else {
+                    collectAutoLoadableServlets( collection, (Map) o );
+                }
             }
         }
 

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2001,2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,6 +66,24 @@ public class ConfigTest extends TestCase {
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
         assertEquals( "servlet name is " + ConfigServlet.class.getName(), response.getText() );
+    }
+
+
+    public void testContextAttributes() throws Exception {
+        final String servlet1Name = "something/interesting";
+        final String servlet2Name = "something/else";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( servlet1Name, ConfigServlet.class.getName() );
+        sr.registerServlet( servlet2Name, ConfigServlet.class.getName() );
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic1 = wc.newInvocation( "http://localhost/" + servlet1Name );
+        ServletContext sc1 = ic1.getServlet().getServletConfig().getServletContext();
+        sc1.setAttribute( "sample", "found me" );
+
+        InvocationContext ic2 = wc.newInvocation( "http://localhost/" + servlet2Name );
+        ServletContext sc2 = ic2.getServlet().getServletConfig().getServletContext();
+        assertEquals( "attribute 'sample'", "found me", sc2.getAttribute( "sample") );
     }
 
 

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -117,12 +118,13 @@ public class WebXMLTest extends TestCase {
         Properties params = new Properties();
         params.setProperty( "color", "red" );
         params.setProperty( "age", "12" );
-        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class, params );
+        wxs.addServlet( "simple", "/SimpleServlet", SimpleGetServlet.class, params );
 
         ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient client = sr.newClient();
         InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
-        assertNull( "init parameter 'gender' should be null", ic.getServlet().getServletConfig().getInitParameter( "gender" ) );
+        ServletConfig servletConfig = ic.getServlet().getServletConfig();
+        assertNull( "init parameter 'gender' should be null", servletConfig.getInitParameter( "gender" ) );
         assertEquals( "init parameter via config", "red", ic.getServlet().getServletConfig().getInitParameter( "color" ) );
         assertEquals( "init parameter directly", "12", ((HttpServlet) ic.getServlet()).getInitParameter( "age" ) );
     }
@@ -288,6 +290,44 @@ public class WebXMLTest extends TestCase {
     }
 
 
+    /**
+     * Verifies that only those servlets designated will pre-load when the application is initialized.
+     * SimpleGetServlet and each of its subclasses adds its classname to the 'initialized' context attribute.
+     */
+    public void testLoadOnStartup() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "servlet1", "one", Servlet1.class );
+        wxs.setLoadOnStartup( "servlet1" );
+        wxs.addServlet( "servlet2", "two", Servlet2.class );
+        wxs.addServlet( "servlet3", "three", Servlet3.class );
+
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic = wc.newInvocation( "http://localhost/three" );
+        assertEquals( "Initialized servlets", "Servlet1,Servlet3", ic.getServlet().getServletConfig().getServletContext().getAttribute( "initialized" ) );
+    }
+
+
+    /**
+     * Verifies that servlets pre-load in the order specified.
+     * SimpleGetServlet and each of its subclasses adds its classname to the 'initialized' context attribute.
+     */
+    public void testLoadOrder() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "servlet1", "one", Servlet1.class );
+        wxs.setLoadOnStartup( "servlet1", 2 );
+        wxs.addServlet( "servlet2", "two", Servlet2.class );
+        wxs.setLoadOnStartup( "servlet2", 3 );
+        wxs.addServlet( "servlet3", "three", Servlet3.class );
+        wxs.setLoadOnStartup( "servlet3", 1 );
+
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic = wc.newInvocation( "http://localhost/two" );
+        assertEquals( "Initialized servlets", "Servlet3,Servlet1,Servlet2", ic.getServlet().getServletConfig().getServletContext().getAttribute( "initialized" ) );
+    }
+
+
 
 //===============================================================================================================
 
@@ -329,6 +369,21 @@ public class WebXMLTest extends TestCase {
 
     static class SimpleGetServlet extends HttpServlet {
         static String RESPONSE_TEXT = "the desired content\r\n";
+
+        public void init() throws ServletException {
+            ServletConfig servletConfig = getServletConfig();
+            String initialized = (String) servletConfig.getServletContext().getAttribute( "initialized" );
+            if (initialized == null) initialized = getLocalName();
+            else initialized = initialized + "," + getLocalName();
+            servletConfig.getServletContext().setAttribute( "initialized", initialized );
+        }
+
+        private String getLocalName() {
+            String className = getClass().getName();
+            int dollarIndex = className.indexOf( '$' );
+            if (dollarIndex < 0) return className;
+            return className.substring( dollarIndex+1 );
+        }
 
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
             resp.setContentType( "text/html" );
