@@ -38,6 +38,30 @@ public class MessageBodyWebRequest extends WebRequest {
 
 
     /**
+     * Constructs a web request using a specific absolute url string.
+     **/
+    protected MessageBodyWebRequest( String urlString ) {
+        super( urlString );
+    }
+
+
+    /**
+     * Constructs a web request with a specific target.
+     **/
+    protected MessageBodyWebRequest( URL urlBase, String urlString, String target ) {
+        super( urlBase, urlString, target );
+    }
+
+
+    /**
+     * Constructs a web request for a form.
+     **/
+    protected MessageBodyWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
+        super( sourceForm, button, x, y );
+    }
+
+
+    /**
      * Subclasses must override this method to provide a message body for the
      * request.
      **/ 
@@ -68,41 +92,12 @@ public class MessageBodyWebRequest extends WebRequest {
     }
 
 
-//----------------------------------- package members -----------------------------------
-
-
-    /**
-     * Constructs a web request using a specific absolute url string.
-     **/
-    MessageBodyWebRequest( String urlString ) {
-        super( urlString );
-    }
-
-
-    /**
-     * Constructs a web request with a specific target.
-     **/
-    MessageBodyWebRequest( URL urlBase, String urlString, String target ) {
-        super( urlBase, urlString, target );
-    }
-
-
-    /**
-     * Constructs a web request for a form.
-     **/
-    MessageBodyWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
-        super( sourceForm, button, x, y );
-    }
-
-
-
-
 //============================= class InputStreamMessageBody ======================================
 
     /**
      * A method request message body read directly from an input stream.
      **/
-    static class InputStreamMessageBody extends MessageBody {
+    public static class InputStreamMessageBody extends MessageBody {
     
     
         InputStreamMessageBody( MessageBodyWebRequest request, InputStream source, String contentType ) {
