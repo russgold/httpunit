@@ -712,12 +712,15 @@ public class ScriptingTest extends HttpUnitTest {
 
 
     public void testButtonWithoutForm() throws Exception {
-        defineWebPage(  "OnCommand",  "<button id='mybutton' onclick='alert( \"I heard you!\" )'>" );
+        defineWebPage(  "OnCommand",  "<button id='mybutton' onclick='alert( \"I heard you!\" )'>" +
+                                      "<button id='yourbutton' type='button'  onclick='alert( \"Loud and Clear.\" )'>");
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        Button button = (Button) response.getElementWithID( "mybutton" );
-        button.click();
+        ((Button) response.getElementWithID( "mybutton" )).click();
         assertEquals( "Alert message 1", "I heard you!", wc.popNextAlert() );
+
+        ((Button) response.getElementWithID( "yourbutton" )).click();
+        assertEquals( "Alert message 2", "Loud and Clear.", wc.popNextAlert() );
     }
 
 

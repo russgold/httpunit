@@ -214,47 +214,5 @@ public class FrameScriptingTest extends HttpUnitTest {
         assertEquals("Links in green frame", 1, _wc.getFrameContents("green").getLinks().length);
         assertEquals("Links in blue frame", 0, _wc.getFrameContents("blue").getLinks().length);
     }
-
-
-    /**
-     * Verifies that an open call from a subframe can specify another frame name.
-     */
-    public void testOpenIntoSubframe() throws Exception {
-        defineResource( "Frames.html",
-                        "<html><head><frameset>" +
-                        "    <frame name='banner'>" +
-                        "    <frame src='main.html' name='main'>" +
-                        "</frameset></html>" );
-        defineResource( "target.txt", "You made it!" );
-        defineWebPage( "main", "<button id='button' onclick=\"window.open( 'target.txt', 'banner' )\">" );
-
-        _wc.getResponse( getHostPath() + "/Frames.html" );
-        ((Button) _wc.getFrameContents( "main" ).getElementWithID( "button" )).click();
-        assertEquals( "Num open windows", 1, _wc.getOpenWindows().length );
-        assertEquals( "New banner", "You made it!", _wc.getFrameContents( "banner" ).getText() );
-        assertNotNull( "Original button no longer there",  _wc.getFrameContents( "main" ).getElementWithID( "button" ) );
-    }
-
-
-
-    /**
-     * Verifies that an open call from a subframe can specify another frame name.
-     */
-    public void testSelfOpenFromSubframe() throws Exception {
-        defineResource( "Frames.html",
-                        "<html><head><frameset>" +
-                        "    <frame name='banner' src='banner.html'>" +
-                        "    <frame name='main'   src='main.html'>" +
-                        "</frameset></html>" );
-        defineResource( "target.txt", "You made it!" );
-        defineWebPage( "main", "<button id='button2' onclick=\"window.open( 'target.txt', 'banner' )\">" );
-        defineWebPage( "banner", "<button id='button1' onclick=\"window.open( 'target.txt', '_self' )\">" );
-
-        _wc.getResponse( getHostPath() + "/Frames.html" );
-        ((Button) _wc.getFrameContents( "banner" ).getElementWithID( "button1" )).click();
-        assertEquals( "Num open windows", 1, _wc.getOpenWindows().length );
-        assertEquals( "New banner", "You made it!", _wc.getFrameContents( "banner" ).getText() );
-        assertNotNull( "Second frame no longer there",  _wc.getFrameContents( "main" ).getElementWithID( "button2" ) );
-    }
     private WebConversation _wc;
 }

@@ -560,12 +560,18 @@ class ParsedHTML {
 
         private HTMLElement newControlWithoutForm( ParsedHTML parsedHTML, Element element ) {
             if (element.getNodeName().equalsIgnoreCase( "button" ) &&
-                NodeUtils.getNodeAttribute( element, "type" ).equals( "" )) {
+                    isValidNonFormButtonType( NodeUtils.getNodeAttribute( element, "type" ) )) {
                 return parsedHTML.toButtonWithoutForm( element );
             } else {
                 return null;
             }
         }
+
+
+        private boolean isValidNonFormButtonType( String buttonType ) {
+            return buttonType.equals( "" ) || buttonType.equalsIgnoreCase( "button" );
+        }
+
 
         private WebForm getForm( NodeUtils.PreOrderTraversal pot ) {
             return getRootContext( pot )._activeForm;
