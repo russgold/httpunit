@@ -912,10 +912,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private String getRefreshURL( String text ) {
         text = text.trim();
         if (!text.toUpperCase().startsWith( "URL" )) {
-            return text;
+            return HttpUnitUtils.stripQuotes( text );
         } else {
             int splitIndex = text.indexOf( '=' );
-            return text.substring( splitIndex+1 ).trim();
+            String value = text.substring( splitIndex+1 ).trim();
+            return HttpUnitUtils.stripQuotes( value );
         }
     }
 

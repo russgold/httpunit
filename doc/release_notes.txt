@@ -12,10 +12,16 @@ Limitations:
 
 Revision History:
  4-Feb-2003
+Acknowledgements:
+    Thanks to Daniel Sheppard and Krystyna Polomski for identifying a problem with meta refresh tags.
+
 Additions:
     1. Added support for <iframe> tag. IFrames work just like regular frames, except that they are embedded in a response
        without a <frameset> tag. IFrame support is controlled by the ClientProperties.iframeSupported property.
     2. ServletUnit now handles https requests, marking them as "secure."
+
+Problems fixed:
+    1. Quotes in refresh URL meta tags are now recognized and stripped.
 
 13-Jan-2003
     Notes: upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.
