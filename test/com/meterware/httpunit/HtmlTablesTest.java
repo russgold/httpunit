@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.parsing.HTMLParserFactory;
+
 import junit.framework.TestSuite;
 
 
@@ -190,7 +192,7 @@ public class HtmlTablesTest extends HttpUnitTest {
                                   "Inner Table 1<br>" +
                                   "<table id=you summary='inner zero'>" +
                                   "        <tr><td colspan=2>&nbsp;</td></tr>" +
-                                  "        <tr><td>Red</td><td>1</td></tr>" +
+                                  "        <tr><td>\nRed\n</td><td>1</td></tr>" +
                                   "        <tr><td>Blue</td><td>2</td></tr>" +
                                   "</table></td><td>" +
                                   "Inner Table 2<br>" +

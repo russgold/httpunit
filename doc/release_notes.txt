@@ -27,6 +27,7 @@ Acknowledgements:
     Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
     Thanks to Raphael Corre for improving logger of transmitted headers
     Thanks to Jason Bedell for supplying an implementation for HttpSession.getValueNames.
+    Thanks to Jianqin Qu for finding the getTableStartingWithPrefix bug when using NekoHTML
 
 Problems Fixed:
     Packaging
@@ -37,15 +38,15 @@ Problems Fixed:
         3. Forms prematurely closed because of improper nesting will now contain any controls defined before the next form.
         4. Quotes in refresh URL meta tags are now recognized and stripped.
         5. Headers defined per request were not being logged
+        6. WebResponse.getTableStartingWith and getTableStartingWithPrefix was trying to match newline characters when
+           using the NekoHTML parser.
     JavaScript
-        6. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
         7. Bug #680695: Button.click() is now supported.
         8. Bug #680695: Form control ids are now usable to locate components.
         9. Scripts marked as something besides JavaScript are now ignored.
        10. Calling document.close() in the middle of an immediate script no longer replaces the current page.
+       11. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
     ServletUnit
-       11. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
-           had previously been defined.
        12. Included and forwarded servlets now inherit parameters from their calling servlet.
        13. Included servlets now have access to their path information as attributes, as per the spec.
        14. Forwarded servlets now have access to their path information from the standard request methods, as required.
@@ -55,6 +56,8 @@ Problems Fixed:
        17. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
            as relative to the context root.
        18. ServletUnit now supports HttpSession.getValueNames().
+       19. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
+           had previously been defined.
 
 Additions:
     Content and Parsing

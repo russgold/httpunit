@@ -351,7 +351,7 @@ public class WebTable extends HTMLElementBase {
                 WebTable table = ((WebTable) htmlElement);
                 table.purgeEmptyCells();
                 return table.getRowCount() > 0 &&
-                       HttpUnitUtils.matches( table.getCellAsText(0,0), (String) criteria );
+                       HttpUnitUtils.matches( table.getCellAsText(0,0).trim(), (String) criteria );
             };
         };
 
@@ -361,7 +361,7 @@ public class WebTable extends HTMLElementBase {
                 WebTable table = ((WebTable) htmlElement);
                 table.purgeEmptyCells();
                 return table.getRowCount() > 0 &&
-                       HttpUnitUtils.hasPrefix( table.getCellAsText(0,0).toUpperCase(), (String) criteria );
+                       HttpUnitUtils.hasPrefix( table.getCellAsText(0,0).toUpperCase().trim(), (String) criteria );
             };
         };
 
