@@ -27,6 +27,8 @@ import org.w3c.dom.NodeList;
 
 import java.util.Stack;
 
+import com.meterware.httpunit.parsing.HTMLParserFactory;
+
 
 /**
  * Some common utilities for manipulating DOM nodes.

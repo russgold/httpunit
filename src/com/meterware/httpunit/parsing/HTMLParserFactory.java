@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,7 +19,7 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
+import com.meterware.httpunit.parsing.HTMLParser;
 
 /**
  * Factory for creating HTML parsers. Parsers customization properties can be specified but do not necessarily work
@@ -30,11 +30,55 @@ package com.meterware.httpunit;
  **/
 abstract public class HTMLParserFactory {
 
+    private static HTMLParser _htmlParser;
     private static HTMLParser _jtidyParser;
     private static HTMLParser _nekoParser;
 
     private static boolean _preserveTagCase = false;
     private static boolean _returnHTMLDocument = true;
+
+
+    /**
+     * Selects the JTidy parser, if present.
+     */
+    public static void useJTidyParser() {
+        if (_jtidyParser == null) throw new RuntimeException( "JTidy parser not available" );
+        _htmlParser = _jtidyParser;
+    }
+
+
+    /**
+     * Selects the NekoHTML parser, if present.
+     */
+    public static void useNekoHTMLParser() {
+        if (_nekoParser == null) throw new RuntimeException( "NekoHTML parser not available" );
+        _htmlParser = _nekoParser;
+    }
+
+
+    /**
+     * Specifies the parser to use.
+     */
+    public static void setHTMLParser( HTMLParser htmlParser ) {
+        _htmlParser = htmlParser;
+    }
+
+
+    /**
+     * Returns the current selected parser.
+     */
+    public static HTMLParser getHTMLParser() {
+        if (_htmlParser == null) {
+            if (_nekoParser != null) {
+                _htmlParser = _nekoParser;
+            } else if (_jtidyParser != null) {
+                _htmlParser = _jtidyParser;
+            } else {
+                throw new RuntimeException( "No HTML parser found. Make sure that either nekoHTML.jar or Tidy.jar is in the in classpath" );
+            }
+        }
+        return _htmlParser;
+    }
 
 
     /**
@@ -75,19 +119,9 @@ abstract public class HTMLParserFactory {
     }
 
 
-    public static HTMLParser getHTMLParser() {
-        if (_nekoParser != null) {
-            return _nekoParser;
-        } else if (_jtidyParser != null) {
-            return _jtidyParser;
-        } else {
-            throw new RuntimeException( "No HTML parser found. Make sure that either nekoHTML.jar or Tidy.jar is in the in classpath" );
-        }
-    }
-
     static {
-        _jtidyParser = loadParserIfSupported( "org.w3c.tidy.Parser", "com.meterware.httpunit.JTidyHTMLParser" );
-        _nekoParser  = loadParserIfSupported( "org.cyberneko.html.HTMLConfiguration", "com.meterware.httpunit.NekoHTMLParser" );
+        _jtidyParser = loadParserIfSupported( "org.w3c.tidy.Parser", "com.meterware.httpunit.parsing.JTidyHTMLParser" );
+        _nekoParser  = loadParserIfSupported( "org.cyberneko.html.HTMLConfiguration", "com.meterware.httpunit.parsing.NekoHTMLParser" );
     }
 
 
@@ -100,5 +134,11 @@ abstract public class HTMLParserFactory {
         } catch (ClassNotFoundException e) {
         }
         return null;
+    }
+
+
+    public static void reset() {
+        _preserveTagCase = false;
+        _returnHTMLDocument = true;
     }
 }

@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
@@ -44,11 +44,11 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
 class NekoHTMLParser implements HTMLParser {
 
 
-    public void parse( HTMLPage page, URL pageURL, String pageText ) throws IOException, SAXException {
+    public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
         try {
-            DOMParser parser = DOMParser.newParser( page );
+            DOMParser parser = DOMParser.newParser( adapter );
             parser.parse( new InputSource( new StringReader( pageText ) ) );
-            page.setRootNode( parser.getDocument() );
+            adapter.setRootNode( parser.getDocument() );
         } catch (DOMParser.ScriptException e) {
              throw e.getException();
         }
@@ -91,11 +91,11 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
     protected static final String ATTRS = "http://cyberneko.org/html/properties/names/attrs";
 
 
-    private HTMLPage _htmlPage;
+    private DocumentAdapter _documentAdapter;
     private ScriptableDelegate _scriptableObject;
 
 
-    static DOMParser newParser( HTMLPage page ) {
+    static DOMParser newParser( DocumentAdapter adapter ) {
         final HTMLConfiguration configuration = new HTMLConfiguration();
         configuration.setFeature( AUGMENTATIONS, true );
         final ScriptFilter javaScriptFilter = new ScriptFilter( configuration );
@@ -106,7 +106,7 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
         }
 
         try {
-            final DOMParser domParser = new DOMParser( configuration, page );
+            final DOMParser domParser = new DOMParser( configuration, adapter );
             domParser.setFeature( DEFER_NODE_EXPANSION, false );
             if (HTMLParserFactory.isReturnHTMLDocument()) domParser.setProperty( DOCUMENT_CLASS_NAME, HTML_DOCUMENT_CLASS_NAME );
             javaScriptFilter.setParser( domParser );
@@ -124,8 +124,8 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
         if (_scriptableObject == null) {
             Node node = getCurrentElementNode();
             while (!(node instanceof Document)) node = node.getParentNode();
-            _htmlPage.setRootNode( node );
-            _scriptableObject = _htmlPage.getScriptableObject().getParent();
+            _documentAdapter.setRootNode( node );
+            _scriptableObject = _documentAdapter.getScriptableObject().getParent();
         }
         return _scriptableObject;
     }
@@ -146,16 +146,16 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
 
     String getIncludedScript( String srcAttribute ) {
         try {
-            return _htmlPage.getIncludedScript( srcAttribute );
+            return _documentAdapter.getIncludedScript( srcAttribute );
         } catch (IOException e) {
             throw new ScriptException( e );
         }
     }
 
 
-    DOMParser( HTMLConfiguration configuration, HTMLPage page ) {
+    DOMParser( HTMLConfiguration configuration, DocumentAdapter adapter ) {
         super( configuration );
-        _htmlPage = page;
+        _documentAdapter = adapter;
     }
 
 

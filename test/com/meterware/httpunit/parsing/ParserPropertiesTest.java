@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
@@ -27,6 +27,9 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
+import com.meterware.httpunit.parsing.HTMLParserFactory;
+import com.meterware.httpunit.*;
+
 /**
  * This test checks certain customizable behaviors of the HTML parsers. Not every parser implements every behavior.
  *
@@ -45,6 +48,12 @@ public class ParserPropertiesTest extends HttpUnitTest {
         boolean isJTidy = parserClassHasSubstring( "Tidy" );
         if (!isJTidy) ts.addTest( new ParserPropertiesTest( "testKeepCase" ) );
         return ts;
+    }
+
+
+    public void tearDown() throws Exception {
+        super.tearDown();
+        HTMLParserFactory.reset();
     }
 
 

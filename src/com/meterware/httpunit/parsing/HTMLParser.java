@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,60 +19,41 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.w3c.tidy.Tidy;
 import org.xml.sax.SAXException;
 
 import java.net.URL;
 import java.io.IOException;
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-
 
 /**
+ * A front end to a DOM parser that can handle HTML.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
  **/
-class JTidyHTMLParser implements HTMLParser {
+public interface HTMLParser {
+
+    /**
+     * Parses the specified text string as a Document, registering it in the HTMLPage.
+     * Any error reporting will be annotated with the specified URL.
+     */
+    public void parse( URL baseURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException;
 
 
-    public void parse( HTMLPage page, URL pageURL, String pageText ) throws IOException, SAXException {
-        try {
-            page.setRootNode( getParser( pageURL ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null ) );
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException( "UTF-8 encoding failed" );
-        }
-    }
+    /**
+     * Removes any string artifacts placed in the text by the parser. For example, a parser may choose to encode
+     * an HTML entity as a special character. This method should convert that character to normal text.
+     */
+    public String getCleanedText( String string );
 
 
-    public String getCleanedText( String string ) {
-        return (string == null) ? "" : string.replace( NBSP, ' ' );
-    }
+    /**
+     * Returns true if this parser supports preservation of the case of tag and attribute names.
+     */
+    public boolean supportsPreserveTagCase();
 
 
-    public boolean supportsPreserveTagCase() {
-        return false;
-    }
-
-
-    public boolean supportsReturnHTMLDocument() {
-        return false;
-    }
-
-
-    final private static char NBSP = (char) 160;   // non-breaking space, defined by JTidy
-
-    final private static String UTF_ENCODING = "UTF-8";
-
-
-    private static Tidy getParser( URL url ) {
-        Tidy tidy = new Tidy();
-        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
-        tidy.setQuiet( true );
-        tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
-        if (!HttpUnitOptions.getHtmlErrorListeners().isEmpty()) {
-            tidy.setErrout(new JTidyPrintWriter( url ));
-        }
-        return tidy;
-    }
-
+    /**
+     * Returns true if this parser can return an HTMLDocument object.
+     */
+    public boolean supportsReturnHTMLDocument();
 }

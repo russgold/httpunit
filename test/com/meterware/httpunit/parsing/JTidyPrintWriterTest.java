@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
 * $Id$
 *
@@ -25,6 +25,8 @@ import java.io.PrintWriter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import com.meterware.httpunit.parsing.JTidyPrintWriter;
+import com.meterware.httpunit.*;
 
 /**
  * Unit tests for valid HTML test.  This is using the JTidy callback feature.

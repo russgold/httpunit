@@ -22,12 +22,10 @@ package com.meterware.httpunit;
 import com.meterware.pseudoserver.PseudoServerTest;
 import com.meterware.httpunit.cookies.CookieTest;
 import com.meterware.httpunit.javascript.NekoEnhancedScriptingTest;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import com.meterware.httpunit.parsing.HTMLParserFactory;
+import com.meterware.httpunit.parsing.ParsingTestSuite;
 
 import junit.framework.TestSuite;
-import junit.framework.TestCase;
 
 
 /**
@@ -57,9 +55,8 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( WebClientTest.suite() );
         result.addTest( MessageBodyRequestTest.suite() );
         result.addTest( CookieTest.suite() );
-        result.addTest( ParserPropertiesTest.suite() );
+        result.addTest( ParsingTestSuite.suite() );
 
-        if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("Tidy") >= 0) result.addTest( JTidyPrintWriterTest.suite() );
         if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("NekoHTML") >= 0) result.addTest( NekoEnhancedScriptingTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );

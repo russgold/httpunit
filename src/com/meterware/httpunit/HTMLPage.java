@@ -21,6 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.parsing.HTMLParserFactory;
+import com.meterware.httpunit.parsing.DocumentAdapter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -260,7 +262,11 @@ public class HTMLPage extends ParsedHTML {
 
 
     public void parse( String text, URL pageURL ) throws SAXException, IOException {
-        HTMLParserFactory.getHTMLParser().parse( this, pageURL, text );
+        HTMLParserFactory.getHTMLParser().parse( pageURL, text, new DocumentAdapter() {
+            public void setRootNode( Node rootNode ) { HTMLPage.this.setRootNode( rootNode ); }
+            public String getIncludedScript( String srcAttribute ) throws IOException { return HTMLPage.this.getIncludedScript( srcAttribute ); }
+            public Scriptable getScriptableObject() { return HTMLPage.this.getScriptableObject(); }
+        });
     }
 
 

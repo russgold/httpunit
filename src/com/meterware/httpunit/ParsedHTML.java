@@ -351,7 +351,7 @@ class ParsedHTML {
     /**
      * Specifies the root node for this HTML fragment.
      */
-    protected void setRootNode( Node rootNode ) {
+    void setRootNode( Node rootNode ) {
         if (_rootNode != null && rootNode != _rootNode )
             throw new IllegalStateException( "The root node has already been defined as " + _rootNode + " and cannot be redefined as " + rootNode );
         _rootNode = rootNode;

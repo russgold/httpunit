@@ -1,4 +1,11 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.parsing;
+
+import org.w3c.dom.Node;
+
+import java.io.IOException;
+
+import com.meterware.httpunit.HTMLPage;
+
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,41 +26,31 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
-
-import java.net.URL;
-import java.io.IOException;
 
 /**
- * A front end to a DOM parser that can handle HTML.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
  **/
-interface HTMLParser {
-
-    /**
-     * Parses the specified text string as a Document, registering it in the HTMLPage.
-     * Any error reporting will be annotated with the specified URL.
-     */
-    public void parse( HTMLPage page, URL baseURL, String pageText ) throws IOException, SAXException;
+public interface DocumentAdapter {
 
 
     /**
-     * Removes any string artifacts placed in the text by the parser. For example, a parser may choose to encode
-     * an HTML entity as a special character. This method should convert that character to normal text.
+     * Records the root (Document) node.
      */
-    public String getCleanedText( String string );
+    public void setRootNode( Node rootNode );
 
 
     /**
-     * Returns true if this parser supports preservation of the case of tag and attribute names.
+     * Returns the contents of an included script, given its src attribute.
+     * @param srcAttribute the relative URL for the included script
+     * @return the contents of the script.
+     * @throws java.io.IOException if there is a problem retrieving the script
      */
-    public boolean supportsPreserveTagCase();
+    public String getIncludedScript( String srcAttribute ) throws IOException;
 
 
     /**
-     * Returns true if this parser can return an HTMLDocument object.
+     * Returns the Scriptable object associated with the document
      */
-    public boolean supportsReturnHTMLDocument();
+    public HTMLPage.Scriptable getScriptableObject();
 }
