@@ -550,6 +550,7 @@ public class JavaScript {
 
         public void jsSet_cookie( String cookieSpec ) {
             final int equalsIndex = cookieSpec.indexOf( '=' );
+            if (equalsIndex <0) return;
             int endIndex = cookieSpec.indexOf( ";", equalsIndex );
             if (endIndex < 0) endIndex = cookieSpec.length();
             String name = cookieSpec.substring( 0, equalsIndex );

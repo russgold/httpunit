@@ -632,6 +632,15 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSetCookieToNull() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><script>" +
+                                            "document.cookie = null;" +
+                                            "</script></html>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+    }
+
+
     public void testReadCookies() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function viewCookies() { \n" +
