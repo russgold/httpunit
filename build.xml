@@ -51,6 +51,8 @@
                                            classpathref="base.classpath" />
     <available property="xerces.present"   classname="org.apache.xerces.parsers.DOMParser"
                                            classpathref="base.classpath" />
+    <available property="rhino.present"    classname="org.mozilla.javascript.Context"
+                                           classpathref="base.classpath" />
 </target>
 
 
@@ -72,6 +74,7 @@
            debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
          <classpath refid="base.classpath" />
          <exclude name="**/servletunit/*" unless="jsdk.present" />
+         <exclude name="**/javascript/*" unless="rhino.present" />
     </javac>
 </target>
 
@@ -90,6 +93,7 @@
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/FileUploadTest.java" unless="javamail.present" />
          <exclude name="**/XMLPageTest.java" unless="xerces.present" />
+         <exclude name="**/javascript/*" unless="rhino.present" />
     </javac>
 </target>
 
