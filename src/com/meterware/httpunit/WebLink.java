@@ -78,13 +78,17 @@ public class WebLink extends FixedURLWebRequestSource {
 
     /**
      * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
-     * If clicking results in submitting a request, will return the result of that submission; otherwise, will
-     * return the updated contents of the frame containing this link.
+     * If clicking results in submitting a request (that is, there is no 'onClick' event or it returns true,
+     * this method will return the result of that submission; otherwise, it will
+     * return the updated contents of the frame containing this link. Note that if an event updates a different frame
+     * that frame will not be returned by this method.
      **/
     public WebResponse click() throws IOException, SAXException {
+        WebResponse response = null;
         String event = getAttribute( "onclick" );
-        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest();
-        return getBaseResponse().getWindow().getFrameContents( getTarget() );
+        if (event.length() == 0 || getScriptableObject().doEvent( event )) response = submitRequest();
+        if (response == null) response = getBaseResponse().getWindow().getFrameContents( getTarget() );
+        return response;
     }
 
 

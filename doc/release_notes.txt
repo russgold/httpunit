@@ -10,7 +10,11 @@ Limitations:
 
 
 Revision History:
-16-Nov-202
+17-Nov-2002
+Problems fixed:
+    1. Bug #637208 Link.click() no longer returns null when an 'onClick' event fails to return true.
+
+16-Nov-2002
 Problems fixed:
     1. Bug #638304 Interframe dependancies for JavaScript at load time are now handled better.
 
