@@ -422,6 +422,9 @@ public class JavaScript {
         }
 
 
+        public void jsFunction_focus() {}
+
+
         Scriptable toScriptable( ScriptableDelegate delegate )
                 throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
             JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
