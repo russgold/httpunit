@@ -686,6 +686,107 @@ public class WebForm extends WebRequestSource {
         }
     }
 
+//===========================---===== exception class NoSuchParameterException =========================================
+
+
+    /**
+     * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+     **/
+    class NoSuchParameterException extends IllegalRequestParameterException {
+
+
+        NoSuchParameterException( String parameterName ) {
+            _parameterName = parameterName;
+        }
+
+
+        public String getMessage() {
+            return "No parameter named '" + _parameterName + "' is defined in the form";
+        }
+
+
+        private String _parameterName;
+
+    }
+
+
+//============================= exception class IllegalUnnamedSubmitButtonException ======================================
+
+
+    /**
+     * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+     **/
+    class IllegalUnnamedSubmitButtonException extends IllegalRequestParameterException {
+
+
+        IllegalUnnamedSubmitButtonException() {
+        }
+
+
+        public String getMessage() {
+            return "This form has more than one submit button, none unnamed. You must specify the button to be used.";
+        }
+
+    }
+
+
+//============================= exception class IllegalSubmitButtonException ======================================
+
+
+    /**
+     * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+     **/
+    class IllegalSubmitButtonException extends IllegalRequestParameterException {
+
+
+        IllegalSubmitButtonException( SubmitButton button ) {
+            _name  = button.getName();
+            _value = button.getValue();
+        }
+
+
+        IllegalSubmitButtonException( String name, String value ) {
+            _name = name;
+            _value = value;
+        }
+
+
+        public String getMessage() {
+            return "Specified submit button (name=\"" + _name + "\" value=\"" + _value + "\") not part of this form.";
+        }
+
+
+        private String _name;
+        private String _value;
+
+    }
+
+//============================= exception class IllegalUnnamedSubmitButtonException ======================================
+
+
+    /**
+     * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+     **/
+    class DisabledSubmitButtonException extends IllegalRequestParameterException {
+
+
+        DisabledSubmitButtonException( SubmitButton button ) {
+            _name  = button.getName();
+            _value = button.getValue();
+        }
+
+
+        public String getMessage() {
+            return "The specified button (name='" + _name + "' value='" + _value
+                   + "' is disabled and may not be used to submit this form.";
+        }
+
+
+        private String _name;
+        private String _value;
+
+    }
+
 }
 
 
@@ -754,168 +855,6 @@ public class WebForm extends WebRequestSource {
     }
 
 
-//===========================---===== exception class NoSuchParameterException =========================================
-
-
-/**
- * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
- **/
-class NoSuchParameterException extends IllegalRequestParameterException {
-
-
-    NoSuchParameterException( String parameterName ) {
-        _parameterName = parameterName;
-    }
-
-
-    public String getMessage() {
-        return "No parameter named '" + _parameterName + "' is defined in the form";
-    }
-
-
-    private String _parameterName;
-
-}
-
-
-//============================= exception class UnusedParameterValueException ======================================
-
-
-/**
- * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
- **/
-class UnusedParameterValueException extends IllegalRequestParameterException {
-
-
-    UnusedParameterValueException( String parameterName, String badValue ) {
-        _parameterName = parameterName;
-        _badValue      = badValue;
-    }
-
-
-    public String getMessage() {
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
-        sb.append( "Attempted to assign to parameter '" ).append( _parameterName );
-        sb.append( "' the extraneous value '" ).append( _badValue ).append( "'." );
-        return sb.toString();
-    }
-
-
-    private String   _parameterName;
-    private String   _badValue;
-}
-
-
-//============================= exception class UnusedUploadFileException ======================================
-
-
-/**
- * This exception is thrown on an attempt to upload more files than permitted by the form.
- **/
-class UnusedUploadFileException extends IllegalRequestParameterException {
-
-
-    UnusedUploadFileException( String parameterName, int numFilesExpected, int numFilesSupplied ) {
-        _parameterName = parameterName;
-        _numExpected   = numFilesExpected;
-        _numSupplied   = numFilesSupplied;
-    }
-
-
-    public String getMessage() {
-        StringBuffer sb = new StringBuffer( HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE );
-        sb.append( "Attempted to upload " ).append( _numSupplied ).append( " files using parameter '" ).append( _parameterName );
-        if (_numExpected == 0) {
-            sb.append( "' which is not a file parameter." );
-        } else {
-            sb.append( "' which only has room for " ).append( _numExpected ).append( '.' );
-        }
-        return sb.toString();
-    }
-
-
-    private String _parameterName;
-    private int    _numExpected;
-    private int    _numSupplied;
-}
-
-
-//============================= exception class IllegalUnnamedSubmitButtonException ======================================
-
-
-/**
- * This exception is thrown on an attempt to define a form request with a button not defined on that form.
- **/
-class IllegalUnnamedSubmitButtonException extends IllegalRequestParameterException {
-
-
-    IllegalUnnamedSubmitButtonException() {
-    }
-
-
-    public String getMessage() {
-        return "This form has more than one submit button, none unnamed. You must specify the button to be used.";
-    }
-
-}
-
-
-//============================= exception class IllegalSubmitButtonException ======================================
-
-
-/**
- * This exception is thrown on an attempt to define a form request with a button not defined on that form.
- **/
-class IllegalSubmitButtonException extends IllegalRequestParameterException {
-
-
-    IllegalSubmitButtonException( SubmitButton button ) {
-        _name  = button.getName();
-        _value = button.getValue();
-    }
-
-
-    IllegalSubmitButtonException( String name, String value ) {
-        _name = name;
-        _value = value;
-    }
-
-
-    public String getMessage() {
-        return "Specified submit button (name=\"" + _name + "\" value=\"" + _value + "\") not part of this form.";
-    }
-
-
-    private String _name;
-    private String _value;
-
-}
-
-//============================= exception class IllegalUnnamedSubmitButtonException ======================================
-
-
-/**
- * This exception is thrown on an attempt to define a form request with a button not defined on that form.
- **/
-class DisabledSubmitButtonException extends IllegalRequestParameterException {
-
-
-    DisabledSubmitButtonException( SubmitButton button ) {
-        _name  = button.getName();
-        _value = button.getValue();
-    }
-
-
-    public String getMessage() {
-        return "The specified button (name='" + _name + "' value='" + _value
-               + "' is disabled and may not be used to submit this form.";
-    }
-
-
-    private String _name;
-    private String _value;
-
-}
 
 
 

@@ -21,13 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLStreamHandler;
-import java.net.URLConnection;
-
 import java.util.*;
 
 import org.xml.sax.SAXException;
@@ -46,12 +41,34 @@ import org.xml.sax.SAXException;
 abstract
 public class WebClient {
 
+
+    /** The current main window. **/
+    private WebWindow _mainWindow = new WebWindow( this );
+    private ArrayList _openWindows = new ArrayList();
+
+
+    public WebWindow getMainWindow() {
+        return _mainWindow;
+    }
+
+
+    public void setMainWindow( WebWindow mainWindow ) {
+        if (!_openWindows.contains( mainWindow )) throw new IllegalArgumentException( "May only select an open window owned by this client" );
+        _mainWindow = mainWindow;
+    }
+
+
+    public WebWindow[] getOpenWindows() {
+        return (WebWindow[]) _openWindows.toArray( new WebWindow[ _openWindows.size() ] );
+    }
+
+
     /**
      * Submits a GET method request and returns a response.
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
     public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException, SAXException {
-        return getResponse( new GetMethodWebRequest( urlString ) );
+        return _mainWindow.getResponse( urlString );
     }
 
 
@@ -59,15 +76,15 @@ public class WebClient {
      * Submits a web request and returns a response. This is an alternate name for the getResponse method.
      */
     public WebResponse sendRequest( WebRequest request ) throws MalformedURLException, IOException, SAXException {
-        return getResponse( request );
+        return _mainWindow.sendRequest( request );
     }
 
 
     /**
-     * Returns the response representing the current main page.
+     * Returns the response representing the current top page in the main window.
      */
     public WebResponse getCurrentPage() {
-        return getFrameContents( WebRequest.TOP_FRAME );
+        return _mainWindow.getCurrentPage();
     }
 
 
@@ -77,15 +94,24 @@ public class WebClient {
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
-        tellListeners( request );
+        return _mainWindow.getResponse( request );
+    }
 
-        WebResponse response = getResource( request );
-        if (response != null) {
-            tellListeners( response );
-            updateClient( response );
-        }
 
-        return getFrameContents( request.getTarget() );
+    /**
+     * Returns the name of the currently active frames in the main window.
+     **/
+    public String[] getFrameNames() {
+        return _mainWindow.getFrameNames();
+    }
+
+
+    /**
+     * Returns the response associated with the specified frame name in the main window.
+     * Throws a runtime exception if no matching frame is defined.
+     **/
+    public WebResponse getFrameContents( String frameName ) {
+        return _mainWindow.getFrameContents( frameName );
     }
 
 
@@ -94,6 +120,19 @@ public class WebClient {
      * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
      */
     public WebResponse getResource( WebRequest request ) throws IOException {
+        return getResourceForWindow( request, _mainWindow );
+    }
+
+
+    WebResponse getResourceForWindow( WebRequest request, WebWindow window ) throws IOException {
+        tellListeners( request );
+        WebResponse response = getResource( request, window );
+        if (response != null) tellListeners( response );
+        return response;
+    }
+
+
+    private WebResponse getResource( WebRequest request, final WebWindow window ) throws IOException {
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
             return WebResponse.BLANK_RESPONSE;
@@ -101,7 +140,7 @@ public class WebClient {
             return newResponse( request );
         } else {
             WebRequestSource wrs = request.getWebRequestSource();
-            String result = (wrs == null) ? getCurrentPage().getScriptableObject().evaluateURL( urlString )
+            String result = (wrs == null) ? window.getCurrentPage().getScriptableObject().evaluateURL( urlString )
                                           : wrs.getScriptableDelegate().evaluateURL( urlString );
             if (result == null) return null;
 
@@ -141,29 +180,9 @@ public class WebClient {
      * any listeners or preferences which may have been set.
      **/
     public void clearContents() {
-        _frameContents = new FrameHolder( this, WebRequest.TOP_FRAME );
+        _mainWindow = new WebWindow( this );
         _cookies = new Hashtable();
         _headers = new HeaderDictionary();
-    }
-
-
-    /**
-     * Returns the name of the currently active frames.
-     **/
-    public String[] getFrameNames() {
-        final List names = _frameContents.getActiveFrameNames();
-        return (String[]) names.toArray( new String[ names.size() ] );
-    }
-
-
-    /**
-     * Returns the response associated with the specified frame name.
-     * Throws a runtime exception if no matching frame is defined.
-     **/
-    public WebResponse getFrameContents( String frameName ) {
-        WebResponse response = (WebResponse) _frameContents.get( frameName );
-        if (response == null) throw new NoSuchFrameException( frameName );
-        return response;
     }
 
 
@@ -316,12 +335,7 @@ public class WebClient {
         if (HttpUnitOptions.isAcceptGzip()) {
             setHeaderField( "Accept-Encoding", "gzip" );
         }
-
-        try {
-            _frameContents.updateFrames( new DefaultWebResponse( this, null, WebResponse.BLANK_HTML ) );
-        } catch (IOException e) {
-        } catch (SAXException e) {
-        }
+        _openWindows.add( _mainWindow );
     }
 
 
@@ -373,25 +387,14 @@ public class WebClient {
      * cookies and frames.
      **/
     final
-    protected void updateClient( WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        updateCookies( response );
-        validateHeaders( response );
-        if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
-            getResponse( response.getRefreshRequest() );
-        } else if (shouldFollowRedirect( response )) {
-            delay( HttpUnitOptions.getRedirectDelay() );
-            getResponse( new RedirectWebRequest( response ) );
-        } else {
-            _frameContents.updateFrames( response );
-        }
+    protected void updateMainWindow( WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        _mainWindow.updateWindow( response );
     }
 
 
-    private boolean shouldFollowRedirect( WebResponse response ) {
-        return HttpUnitOptions.getAutoRedirect()
-            && response.getResponseCode() >= HttpURLConnection.HTTP_MOVED_PERM
-            && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
-            && response.getHeaderField( "Location" ) != null;
+    void updateClient( WebResponse response ) throws IOException {
+        updateCookies( response );
+        validateHeaders( response );
     }
 
 
@@ -419,10 +422,6 @@ public class WebClient {
 
     /** The currently defined cookies. **/
     private Hashtable _cookies = new Hashtable();
-
-
-    /** A map of frame names to current contents. **/
-    private FrameHolder _frameContents = new FrameHolder( this, WebRequest.TOP_FRAME );
 
 
     /** A map of header names to values. **/
@@ -464,19 +463,6 @@ public class WebClient {
         String[] names = response.getNewCookieNames();
         for (int i = 0; i < names.length; i++) {
             addCookie( names[i], response.getNewCookieValue( names[i] ) );
-        }
-    }
-
-
-    /**
-     * Delays the specified amount of time.
-     **/
-    private void delay( int numMilliseconds ) {
-        if (numMilliseconds == 0) return;
-        try {
-            Thread.sleep( numMilliseconds );
-        } catch (InterruptedException e) {
-            // ignore the exception
         }
     }
 

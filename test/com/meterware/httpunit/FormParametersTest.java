@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -37,8 +37,8 @@ public class FormParametersTest extends HttpUnitTest {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-    
-    
+
+
     public static Test suite() {
         return new TestSuite( FormParametersTest.class );
     }
@@ -53,8 +53,8 @@ public class FormParametersTest extends HttpUnitTest {
         super.setUp();
         _wc = new WebConversation();
     }
-	
-	
+
+
     public void testChoiceParameterValidationBypass() throws Exception {
         HttpUnitOptions.setParameterValuesValidated( false );
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
@@ -72,7 +72,7 @@ public class FormParametersTest extends HttpUnitTest {
         request.setParameter( "fish", new String[] { "red", "pink" } );
     }
 
-                              
+
     public void testChoiceParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
@@ -88,7 +88,7 @@ public class FormParametersTest extends HttpUnitTest {
         validateSetParameterRejected( request, "media", "CDRom", "setting list to illegal value" );
         validateSetParameterRejected( request, "colors", new String[] { "blue", "red" }, "setting multiple values on choice" );
         validateSetParameterRejected( request, "media", new String[] { "TV", "CDRom" }, "setting one bad value in a group" );
-    
+
         request.setParameter( "colors", "blue" );
         request.setParameter( "fish", "red" );
         request.setParameter( "media", "TV" );
@@ -158,7 +158,7 @@ public class FormParametersTest extends HttpUnitTest {
         try {
             request.setParameter( "secret", "zork" );
             fail( "Should have rejected set of unknown parameter" );
-        } catch (NoSuchParameterException e) {
+        } catch (WebForm.NoSuchParameterException e) {
         }
     }
 
@@ -363,7 +363,7 @@ public class FormParametersTest extends HttpUnitTest {
         }
     }
 
-                              
+
     private void validateSetParameterRejected( WebRequest request, String parameterName, String[] values, String comment ) throws Exception {
         try {
             request.setParameter( parameterName, values );

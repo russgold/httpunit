@@ -82,7 +82,7 @@ public class ServletUnitClient extends WebClient {
      * servlet invocation unless that invocation results in a redirect request.
      **/
     public WebResponse getResponse( InvocationContext invocation ) throws MalformedURLException,IOException,SAXException {
-        updateClient( invocation.getServletResponse() );
+        updateMainWindow( invocation.getServletResponse() );
         return getFrameContents( invocation.getTarget() );
     }
 
