@@ -10,14 +10,14 @@ import java.net.URLConnection;
 /**
  * An HTTP request using the POST method.
  **/
-class PostMethodWebRequest extends WebRequest {
+public class PostMethodWebRequest extends WebRequest {
 
 
     /**
-     * Constructs a web request using a base URL and a relative url string.
+     * Constructs a web request using a specific absolute url string.
      **/
-    PostMethodWebRequest( URL urlBase, String urlString ) {
-        super( urlBase, urlString );
+    public PostMethodWebRequest( String urlString ) {
+        super( urlString );
     }
 
 
@@ -36,6 +36,16 @@ class PostMethodWebRequest extends WebRequest {
         printout.writeBytes( getParameterString() );
         printout.flush();
         printout.close();
+    }
+
+//----------------------------------- package members -----------------------------------
+
+
+    /**
+     * Constructs a web request using a base URL and a relative url string.
+     **/
+    PostMethodWebRequest( URL urlBase, String urlString ) {
+        super( urlBase, urlString );
     }
 
 

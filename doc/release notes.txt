@@ -1,5 +1,9 @@
 HttpUnit release notes
 
+27-Jun-00 0.9.1
+Additions:
+    1. The PostMethodWebRequest class is now public.
+    
 19-Jun-00 0.9
 Additions:
     1. The parser may be tested during the build by issuing the command: 'ant test -Dclasspath="%classpath%"'
