@@ -485,7 +485,7 @@ public class WebForm extends WebRequestSource {
 
     public class Scriptable extends ScriptableDelegate implements NamedDelegate {
         public String getAction() { return WebForm.this.getAction(); }
-        public void setAction( String newAction ) { setDestination( newAction ); }
+        public void setAction( String newAction ) { setDestination( newAction ); _presetParameters = null; }
 
 
         public void submit() throws IOException, SAXException {

@@ -25,6 +25,11 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.HttpUnitTest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebClient;
+import com.meterware.httpunit.WebLink;
+import com.meterware.pseudoserver.PseudoServlet;
+import com.meterware.pseudoserver.WebResource;
+
+import java.io.IOException;
 
 import org.xml.sax.SAXException;
 
@@ -150,6 +155,36 @@ public class FormScriptingTest extends HttpUnitTest {
         response.getLinks()[ 0 ].click();
         assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
     }
+
+
+    public void testSubmitViaScriptWithPostParams() throws Exception {
+        defineResource( "/servlet/TestServlet?param3=value3&param4=value4", new PseudoServlet() {
+            public WebResource getPostResponse() throws IOException {
+                return new WebResource( "You made it!", "text/plain" );
+            }
+        } );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form method=POST enctype='multipart/form-data' name='TestForm'>" +
+                                          "  <input type=hidden name=param1 value='value1'>" +
+                                          "  <input type=text   name=param2 value=''>" +
+                                          "</form>" +
+                                          "<a href='#' onclick='SubmitForm(\"/servlet/TestServlet?param3=value3&param4=value4\")'>" +
+                                          "<img SRC='/gifs/submit.gif' ALT='Submit' TITLE='Submit' NAME='Submit'></a>" +
+                                          "<script language=JavaScript type='text/javascript'>" +
+                                          "  function SubmitForm(submitLink) {" +
+                                          "     var ltestForm = document.TestForm;" +
+                                          "     ltestForm.action = submitLink;" +
+                                          "     ltestForm.submit();" +
+                                          "  }" +
+                                          "</script>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getLinks()[0].click();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+     }
 
 
     public void testSubmitButtonlessFormViaScript() throws Exception {

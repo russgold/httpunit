@@ -21,6 +21,11 @@ Additions:
     2. It is now possible to control the handling of script errors by calling HttpUnitOptions.setExceptionsThrownOnScriptError.
        If the exceptions are not thrown, the error messages will instead be available via HttpUnitOptions.getScriptErrorMessages()
 
+25-Sep-2002
+Problems fixed:
+    1. Bug #604478 - setting the form action did not always update the predefined parameter list. This could cause a request
+       to be sent with the wrong URL parameters.
+
  9-Sep-2002
 Acknowledgement:
     1. Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.
