@@ -376,6 +376,8 @@ public class WebClient implements FrameHolder {
      * Updates the cookies maintained in this client based on new cookies requested by the server.
      **/
     private void updateCookies( WebResponse response ) {
+        if (!HttpUnitOptions.isAcceptCookies()) return;
+
         String[] names = response.getNewCookieNames();
         for (int i = 0; i < names.length; i++) {
             addCookie( names[i], response.getNewCookieValue( names[i] ) );

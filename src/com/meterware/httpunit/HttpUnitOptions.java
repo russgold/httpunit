@@ -49,8 +49,24 @@ public abstract class HttpUnitOptions {
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
         _acceptGzip = true;
+        _acceptCookies = true;
     }
 
+
+    /**
+     * Returns true if HttpUnit is accepting and saving cookies. The default is to accept them.
+     */
+    public static boolean isAcceptCookies() {
+        return _acceptCookies;
+    }
+
+
+    /**
+     * Specifies whether HttpUnit should accept and send cookies.
+     */
+    public static void setAcceptCookies( boolean acceptCookies ) {
+        _acceptCookies = acceptCookies;
+    }
 
 
     /**
@@ -341,6 +357,8 @@ public abstract class HttpUnitOptions {
     private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
 
     private static boolean _acceptGzip = true;
+
+    private static boolean _acceptCookies = true;
 
     private static boolean _parserWarningsEnabled;
 

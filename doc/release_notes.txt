@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+25-Jun-2002
+Additions:
+    1. The HttpUnitOption property 'acceptCookies' now controls whether cookies received from the server will be saved
+       in a web client and sent on subsequent requests. The default is true.
+
 23-Jun-2002
 Acknowledgements:
     Thanks to Steve Heath for an example on how to make JSPs work with ServletUnit.

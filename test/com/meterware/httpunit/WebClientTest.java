@@ -88,6 +88,23 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    public void testCookiesDisabled() throws Exception {
+        String resourceName = "something/baking";
+        String resourceValue = "the desired content";
+
+        defineResource( resourceName, resourceValue );
+        addResourceHeader( resourceName, "Set-Cookie: age=12" );
+
+        HttpUnitOptions.setAcceptCookies( false );
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+        assertEquals( "number of cookies", 0, wc.getCookieNames().length );
+    }
+
+
     public void testOldCookies() throws Exception {
         String resourceName = "something/baking";
         String resourceValue = "the desired content";
