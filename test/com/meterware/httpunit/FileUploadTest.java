@@ -182,6 +182,19 @@ public class FileUploadTest extends HttpUnitTest {
     }
 
 
+    public void testFileUploadWithoutForm() throws Exception {
+        ByteArrayInputStream bais = new ByteArrayInputStream( "Not much text\nBut two lines\n".getBytes() );
+
+        defineResource( "ListParams", new MimeEcho() );
+        WebConversation wc = new WebConversation();
+        PostMethodWebRequest formSubmit = new PostMethodWebRequest( getHostPath() + "/ListParams" );
+        formSubmit.setMimeEncoded( true );
+        formSubmit.selectFile( "message", "temp.txt", bais, "text/plain" );
+        WebResponse encoding = wc.getResponse( formSubmit );
+        assertEqualQueries( "text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
+    }
+
+
     public void testFileContentType() throws Exception {
         File file = new File( "temp.gif" );
         FileOutputStream fos = new FileOutputStream( file );

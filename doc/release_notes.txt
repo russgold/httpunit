@@ -10,6 +10,11 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+18-Oct-2001
+   Additions:
+       1. It is now possible to upload a file via a POST request not derived from a form. To do this, call
+          PostMessageWebRequest.setMimeEncoded( true ) before calling selectFile.
+
 16-Oct-2001
    Problems corrected:
        1. WebRequest.isFileParameter is now functioning and public

@@ -64,9 +64,7 @@ public class WebRequest {
      * Sets the file for a parameter upload in a web request. 
      **/
     public void selectFile( String parameterName, File file ) {
-        if (_sourceForm == null || !_sourceForm.isFileParameter( parameterName )) {
-            throw new IllegalNonFileParameterException( parameterName );
-        }
+        assertFileParameter( parameterName );
         if (!isMimeEncoded()) throw new MultipartFormRequiredException();
     }
 
@@ -75,9 +73,7 @@ public class WebRequest {
      * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, File file, String contentType ) {
-        if (_sourceForm == null || !_sourceForm.isFileParameter( parameterName )) {
-            throw new IllegalNonFileParameterException( parameterName );
-        }
+        assertFileParameter( parameterName );
         if (!isMimeEncoded()) throw new MultipartFormRequiredException();
     }
 
@@ -86,9 +82,16 @@ public class WebRequest {
      * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, String fileName, InputStream inputStream, String contentType ) {
-        if (_sourceForm == null || !_sourceForm.isFileParameter( parameterName )) {
-            throw new IllegalNonFileParameterException( parameterName );
-        }
+        assertFileParameter( parameterName );
+    }
+
+
+    /**
+     * Throws an exception if the specified parameter may not be set as a file.
+     */
+    private void assertFileParameter( String parameterName )
+    {
+        if (!maySelectFile( parameterName )) throw new IllegalNonFileParameterException( parameterName );
         if (!isMimeEncoded()) throw new MultipartFormRequiredException();
     }
 
@@ -233,9 +236,26 @@ public class WebRequest {
 
 
     /**
-     * Returns true if this request is to be MIME-encoded.
+     * Returns true if this request is based on a web form.
      **/
     final
+    protected boolean isFormBased() {
+        return _sourceForm != null;
+    }
+
+
+    /**
+     * Returns true if selectFile may be called with this parameter.
+     */
+    protected boolean maySelectFile( String parameterName )
+    {
+        return isFileParameter( parameterName );
+    }
+
+
+    /**
+     * Returns true if this request is to be MIME-encoded.
+     **/
     protected boolean isMimeEncoded() {
         return _sourceForm != null && _sourceForm.isSubmitAsMime();
     }
