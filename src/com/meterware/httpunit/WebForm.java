@@ -354,7 +354,11 @@ public class WebForm {
                     selected.addElement( getOptionValue( nl.item(i) ) );
                 }
             }
-            if (selected.size() == 0 && nl.getLength() > 0) selected.addElement( getOptionValue( nl.item(0) ) );
+
+            if (!isMultiSelect() && selected.size() == 0 && nl.getLength() > 0) {
+                selected.addElement( getOptionValue( nl.item(0) ) );
+            }
+
             String[] result = new String[ selected.size() ];
             selected.copyInto( result );
             return result;
@@ -382,6 +386,11 @@ public class WebForm {
             String[] result = new String[ options.size() ];
             options.copyInto( result );
             return result;
+        }
+
+
+        private boolean isMultiSelect() {
+            return _node.getAttributes().getNamedItem( "multiple" ) != null;
         }
 
 
