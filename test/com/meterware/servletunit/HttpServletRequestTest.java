@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003 by Russell Gold
+* Copyright (c) 2000-2005 by Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -33,6 +33,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import com.meterware.httpunit.*;
+import com.meterware.httpunit.cookies.CookieProperties;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -290,6 +291,36 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals( "Number of sessions in context after request.getSession()", 1, context.getSessionIDs().size() );
         assertSame( "Session with ID", session, context.getSession( session.getId() ) );
         assertNull( "New request should still not have a request session ID", request.getRequestedSessionId() );
+    }
+
+    /**
+     * Test recognition of cookies defined on the client.
+     */
+    public void testGetUserCookies() throws Exception {
+        String FIRST_COOKIE = "RANDOM_COOKIE";
+        String SECOND_COOKIE = "ANOTHER_COOKIE";
+        String FIRST_COOKIE_VALUE = "cookie1";
+        String SECOND_COOKIE_VALUE = "cookie2";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "testServlet", "ServletName" );
+        ServletUnitClient m_sc = sr.newClient();
+        m_sc.putCookie( FIRST_COOKIE, FIRST_COOKIE_VALUE );
+        m_sc.putCookie( SECOND_COOKIE, SECOND_COOKIE_VALUE );
+
+        InvocationContext invocation = m_sc.newInvocation( "http://localhost/testServlet" );
+        HttpServletRequest requ = invocation.getRequest();
+
+        Cookie[] cookies = requ.getCookies();
+        assertEquals( 2, cookies.length );
+        Cookie firstActualCookie = cookies[0];
+        Cookie secondActualCookie = cookies[1];
+
+        assertEquals( FIRST_COOKIE, firstActualCookie.getName() );
+        assertEquals( SECOND_COOKIE, secondActualCookie.getName() );
+
+        assertEquals( FIRST_COOKIE_VALUE, firstActualCookie.getValue() );
+        assertEquals( SECOND_COOKIE_VALUE, secondActualCookie.getValue() );
     }
 
 

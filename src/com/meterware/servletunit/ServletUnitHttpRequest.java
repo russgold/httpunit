@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2005, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -760,18 +760,14 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         String cookieHeader = (String) clientHeaders.get( "Cookie" );
         if (cookieHeader == null) return;
 
-        StringTokenizer st = new StringTokenizer( cookieHeader, "," );
+        StringTokenizer st = new StringTokenizer( cookieHeader, ",;=", true );
+        String lastToken = st.nextToken();
         while (st.hasMoreTokens()) {
-            addOneCookie( st.nextToken() );
-        }
-    }
-
-
-    private void addOneCookie( String cookieDefinition ) {
-        StringTokenizer st = new StringTokenizer( cookieDefinition, "=;" );
-        String name = st.nextToken();
-        if (st.hasMoreTokens()) {
-            addCookie( new Cookie( name, st.nextToken() ) );
+            String token = st.nextToken();
+            if (token.equals( "=" )) {
+                if (st.hasMoreTokens()) addCookie( new Cookie( lastToken.trim(), st.nextToken().trim() ) );
+            }
+            lastToken = token;
         }
     }
 
