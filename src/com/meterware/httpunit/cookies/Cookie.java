@@ -20,13 +20,12 @@ package com.meterware.httpunit.cookies;
  *
  *******************************************************************************************************************/
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.net.URL;
 
 
 /**
- *
+ * An HTTP client-side cookie.
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class Cookie {
@@ -40,6 +39,9 @@ public class Cookie {
     private String _domain;
 
 
+    /**
+     * Constructs a cookie w/o any domain or path restrictions.
+     */
     Cookie( String name, String value ) {
         _name = name;
         _value = value;
@@ -59,21 +61,33 @@ public class Cookie {
     }
 
 
+    /**
+     * Returns the name of this cookie.
+     */
     public String getName() {
         return _name;
     }
 
 
+    /**
+     * Returns the value associated with this cookie.
+     */
     public String getValue() {
         return _value;
     }
 
 
+    /**
+     * Returns the path to which this cookie is restricted.
+     */
     public String getPath() {
         return _path;
     }
 
 
+    /**
+     * Returns the domain to which this cookie may be sent.
+     */
     public String getDomain() {
         return _domain;
     }
