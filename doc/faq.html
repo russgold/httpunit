@@ -17,18 +17,19 @@
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 <LI><A HREF="#badType">The server is not sending a valid content type. How do I test HTML pages anyway?</A></LI>
+<LI><A HREF="#timeout">How does HttpUnit handle request timeouts?</A></LI>
 
-</ol><ol start=8>
+</ol><ol start=9>
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
 <LI><A HREF="#hidden">Why can't I change hidden parameters?</A></LI>
 
-</ol><ol start=10>
+</ol><ol start=11>
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
 <li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
 <li><a href="#text">I called document.write() in my page, but getText() does not show the results! Why not?</a></li>
 
-</ol><ol start=14>
+</ol><ol start=15>
 <LI><A HREF="#session">How can I see the servlet session between calls?</A></LI>
 <li><a href="#JSP">Can I use JSPs with ServletUnit?</a></li>
 </OL>
@@ -91,6 +92,10 @@ By default, HttpUnit assumes a content type of "text/plain" unless the server se
 it, as most servers do. If yours is not, you can
 call<blockquote><code>HttpUnitOptions.setDefaultContentType( "text/html" );</code></blockquote>before running your tests.
 If you are using JUnit, call this method in your <code>setUp()</code> method.
+
+<A name="#timeout"><h3>How does HttpUnit handle request timeouts?</h3></A>
+Badly. Unfortunately, through JDK 1.3, HttpURLConnection (used by HttpUnit to access web servers) has no support for
+timeouts. This is changed in JDK 1.4, but HttpUnit does not support the new feature as yet.
 
 <h2>Form Handling Problems</h2>
 

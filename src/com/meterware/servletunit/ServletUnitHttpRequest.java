@@ -290,7 +290,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * length is not known.
      **/
     public int getContentLength() {
-        return -1;
+        return getIntHeader( "Content-length" );
     }
 
 

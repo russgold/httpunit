@@ -115,7 +115,17 @@ class HttpWebResponse extends WebResponse {
 
 
     public String toString() {
-        return "HttpWebResponse [url=" + getURL() + "; headers=" + _headers + "]";
+        StringBuffer sb = new StringBuffer( "HttpWebResponse [url=" );
+        sb.append( getURL() ).append( "; headers=" );
+        for (Enumeration e = _headers.keys(); e.hasMoreElements(); ) {
+            Object key = e.nextElement();
+            String[] values = (String[]) _headers.get( key );
+            for (int i = 0; i < values.length; i++) {
+                sb.append( "\n   " ).append( key ).append( ": " ).append( values[i] );
+            }
+        }
+        sb.append( " ]" );
+        return sb.toString();
     }
 
 

@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+ 20-Mar-2003
+Problems fixed:
+    1. ServletUnit had not implemented HttpServletRequest.getContentLength();
+
  19-Mar-2003
 Acknowledgements:
     Thanks to Brendan Boesen for correcting the session invalidation problem.
