@@ -102,6 +102,7 @@ public class JavaScript {
     abstract static class JavaScriptEngine extends ScriptableObject implements ScriptingEngine {
 
         protected ScriptableDelegate _scriptable;
+        protected JavaScriptEngine   _parent;
 
 
         public String executeScript( String script ) {
@@ -189,6 +190,7 @@ public class JavaScript {
                 throws SAXException, PropertyException, JavaScriptException, NotAFunctionException {
             _scriptable = scriptable;
             _scriptable.setScriptEngine( this );
+            _parent = parent;
             if (parent != null) setParentScope( parent );
        }
 
@@ -362,12 +364,22 @@ public class JavaScript {
         }
 
 
+        public void jsSet_location( String relativeURL ) throws IOException, SAXException {
+            setLocation( relativeURL );
+        }
+
+
+        void setLocation( String relativeURL ) throws IOException, SAXException {
+            getDelegate().setLocation( relativeURL );
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
 
             _location = (Location) Context.getCurrentContext().newObject( this, "Location" );
-            _location.setURL( ((WebResponse.Scriptable) scriptable).getURL() );
+            _location.initialize(this, ((WebResponse.Scriptable) scriptable).getURL() );
 
             _navigator = (Navigator) Context.getCurrentContext().newObject( this, "Navigator" );
             _navigator.setClientProperties( getDelegate().getClientProperties() );
@@ -463,6 +475,21 @@ public class JavaScript {
         }
 
 
+        public Object jsGet_location() {
+            return _parent == null ? NOT_FOUND : getWindow().jsGet_location();
+        }
+
+
+        public void jsSet_location( String urlString ) throws IOException, SAXException {
+            getWindow().setLocation( urlString );
+        }
+
+
+        private Window getWindow() {
+            return ((Window) _parent);
+        }
+
+
         public void jsFunction_write( String string ) {
             final StringBuffer documentWriteBuffer = getDocumentWriteBuffer();
             documentWriteBuffer.append( string );
@@ -518,14 +545,31 @@ public class JavaScript {
     static public class Location extends JavaScriptEngine {
 
         private URL _url;
+        private Window _window;
 
         public String getClassName() {
             return "Location";
         }
 
 
-        public void setURL( URL url ) {
+        void initialize( Window window, URL url ) {
+            _window = window;
             _url = url;
+        }
+
+
+        public void jsFunction_replace( String urlString ) throws IOException, SAXException {
+            _window.setLocation( urlString );
+        }
+
+
+        /**
+         * Returns the default value of this scriptable object. In this case, it returns simply the URL as a string.
+         * Note that this method is necessary, since Rhino will only call the toString method directly if there are no
+         * Rhino methods defined (jsGet_*, jsFunction_*, etc.)
+         */
+        public Object getDefaultValue( Class typeHint ) {
+            return _url.toExternalForm();
         }
 
 

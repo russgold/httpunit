@@ -608,8 +608,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
             } else if (propertyName.equalsIgnoreCase( "parent" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? null
                         : _window.getFrameContents( WebFrame.getParentFrameName( getFrameName() ) ).getScriptableObject();
-            } else if (propertyName.equalsIgnoreCase( "location" )) {
-                return getURL().toExternalForm();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
             } else if (propertyName.equalsIgnoreCase( "closed" )) {
@@ -639,17 +637,14 @@ public class WebResponse implements HTMLSegment, CookieSource {
                 if (getFrameName().equals( WebRequest.TOP_FRAME )) {
                     _window.setName( value.toString() );
                 }
-            } else if (propertyName.equalsIgnoreCase( "location" )) {
-                try {
-                    getWindow().getResponse( new GetMethodWebRequest( _url, value.toString(), _frameName ) );
-                } catch (IOException e) {
-                    throw new RuntimeException( "Error handling 'location=': " + e );
-                } catch (SAXException e) {
-                    throw new RuntimeException( "Error handling 'location=': " + e );
-                }
             } else {
                 super.set( propertyName, value );
             }
+        }
+
+
+        public void setLocation( String relativeURL ) throws IOException, SAXException {
+            getWindow().getResponse( new GetMethodWebRequest( _url, relativeURL, _frameName ) );
         }
 
 

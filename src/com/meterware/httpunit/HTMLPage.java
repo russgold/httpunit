@@ -166,11 +166,7 @@ public class HTMLPage extends ParsedHTML {
             delegate = getNamedItem( getImages(), propertyName );
             if (delegate != null) return delegate;
 
-            if (propertyName.equalsIgnoreCase( "location" )) {
-                return getResponse().getScriptableObject().get( "location" );
-            } else {
-                return super.get( propertyName );
-            }
+            return super.get( propertyName );
         }
 
 

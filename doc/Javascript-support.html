@@ -12,7 +12,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>closed    - true if the window has been closed</li>
 <li>document  - the associated Document object</li>
 <li>frames    - an array of subframes of this window</li>
-<li>location  - r/w full URL only</li>
+<li>location  - r/w the associated Location object, which may be treated as a URL string</li>
 <li>name      - r/w the name of the window</li>
 <li>navigator - the Navigator object</li>
 <li>opener    - r/o the window which opened this one (top-level frames only)</li>
@@ -60,6 +60,12 @@ Inline and included scripts are supported, as are the following DOM elements:
 <h4>methods</h4>
 <ul>
 <li>javaEnabled - always returns false to indicate that applets are not supported</li>
+</ul>
+
+<h3>Location</h3>
+<h4>methods</h4>
+<ul>
+<li>replace - replaces the current window by doing a new request to the server</li>
 </ul>
 
 <h3>Document</h3>
