@@ -81,7 +81,7 @@ public class HTMLPage extends ParsedHTML {
         for (int i = 0; i < nl.getLength(); i++) {
             Node scriptNode = nl.item(i);
             String language = NodeUtils.getNodeAttribute( scriptNode, "language", null );
-            if (language != null && !language.startsWith( "JavaScript ")) continue;
+            if (language != null && !language.startsWith( "JavaScript")) continue;
             String scriptLocation = NodeUtils.getNodeAttribute( scriptNode, "src", null );
             if (scriptLocation == null) {
                 scripts.add( NodeUtils.asText( scriptNode.getChildNodes() ) );
