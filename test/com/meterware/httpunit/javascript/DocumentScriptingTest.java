@@ -22,7 +22,6 @@ package com.meterware.httpunit.javascript;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 import com.meterware.httpunit.*;
-import com.meterware.httpunit.parsing.HTMLParserFactory;
 
 
 public class DocumentScriptingTest extends HttpUnitTest {
@@ -51,7 +50,6 @@ public class DocumentScriptingTest extends HttpUnitTest {
 
 
     public void testDocumentFindForms() throws Exception {
-        HTMLParserFactory.useJTidyParser();   // TODO remove this line
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function getFound( object ) {" +
                                             "  return (object == null) ? \"did not find \" : \"found \";" +
