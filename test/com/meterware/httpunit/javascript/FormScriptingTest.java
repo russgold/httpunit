@@ -728,6 +728,21 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitOnLoad() throws Exception {
+        defineResource( "test2.txt?Submit=Submit", "You made it!", "text/plain" );
+        defineResource( "OnCommand.html", "<html><body onload='document.myform.btn.click();'>" +
+                                          "<form name='myform' action='test2.txt'>" +
+                                          "  <input type='submit' id='btn' name='Submit' value='Submit'/>" +
+                                          "</form></body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "current page URL", getHostPath() + "/test2.txt?Submit=Submit", wc.getCurrentPage().getURL().toExternalForm() );
+        assertEquals( "current page", "You made it!", wc.getCurrentPage().getText() );
+        assertEquals( "returned page URL", getHostPath() + "/test2.txt?Submit=Submit", wr.getURL().toExternalForm() );
+        assertEquals( "returned page", "You made it!", wr.getText() );
+    }
+
+
     public void testSelectValueProperty() throws Exception {
         defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
                                           "function testProperty( form ) {\n" +

@@ -84,11 +84,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * that frame will not be returned by this method.
      **/
     public WebResponse click() throws IOException, SAXException {
-        WebResponse response = null;
-        String event = getAttribute( "onclick" );
-        if (event.length() == 0 || getScriptableObject().doEvent( event )) response = submitRequest();
-        if (response == null) response = getBaseResponse().getWindow().getFrameContents( getPageFrame() );
-        return response;
+        return submitRequest( getAttribute( "onclick" ), getRequest() );
     }
 
 

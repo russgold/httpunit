@@ -68,9 +68,10 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        response.getLinks()[0].click();
+        WebResponse myPage = response.getLinks()[0].click();
         assertEquals( "Alert message", "Hi there!", wc.popNextAlert() );
         assertEquals( "Current page URL", getHostPath() + "/OnCommand.html", wc.getCurrentPage().getURL().toExternalForm() );
+        assertEquals( "Returned page URL", getHostPath() + "/OnCommand.html", myPage.getURL().toExternalForm() );
     }
 
 
@@ -422,6 +423,21 @@ public class ScriptingTest extends HttpUnitTest {
         response.getScriptableObject().doEvent( "window.location.href='" + getHostPath() + "/Target.html'" );
         assertEquals( "5th page URL", getHostPath() + "/Target.html", wc.getCurrentPage().getURL().toExternalForm() );
         assertEquals( "5th page", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
+    public void testLocationPropertyOnLoad() throws Exception {
+        defineResource( "Target.html", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title>" +
+                                          "</head>" +
+                                          "<body onLoad=\"document.location='" + getHostPath() + "/Target.html';\">" +
+                                          "</body>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "current page URL", getHostPath() + "/Target.html", wc.getCurrentPage().getURL().toExternalForm() );
+        assertEquals( "current page", "You made it!", wc.getCurrentPage().getText() );
+        assertEquals( "returned page URL", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
+        assertEquals( "returned page", "You made it!", response.getText() );
     }
 
 

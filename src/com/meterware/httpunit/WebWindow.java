@@ -109,7 +109,7 @@ public class WebWindow {
         final RequestContext requestContext = new RequestContext();
         final WebResponse response = getSubframeResponse( request, requestContext );
         requestContext.runScripts();
-        return response;
+        return response == null ? null : getFrameContents( response.getFrameName() );
     }
 
 

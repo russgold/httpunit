@@ -61,9 +61,7 @@ public class WebForm extends WebRequestSource {
      * this will not run any event associated with the specified submit button. Use SubmitButton#click for that.
      **/
     public WebResponse submit( SubmitButton button ) throws IOException, SAXException {
-        String event = getAttribute( "onsubmit" );
-        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest( getRequest( button ) );
-        return getBaseResponse().getWindow().getFrameContents( getPageFrame() );
+        return submitRequest( getAttribute( "onsubmit" ), getRequest( button ) );
     }
 
 

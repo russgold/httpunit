@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+ 14-Mar-2003
+Problems fixed:
+    1. When loading a page triggered a script function which redirected to a new page in the same frame,
+       the WebResponse returned from getResponse was the triggering page. It is now the redirected page.
+
  13-Mar-2003
 Additions:
     1. Select.value is now supported.

@@ -201,12 +201,12 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
 
-    /**
-     * Submits a request to the web client from which this request source was originally obtained.
-     **/
-    final
-    protected WebResponse submitRequest() throws IOException, SAXException {
-        return submitRequest( getRequest() );
+
+    protected WebResponse submitRequest( String event, final WebRequest request ) throws IOException, SAXException {
+        WebResponse response = null;
+        if (event.length() == 0 || getScriptableDelegate().doEvent( event )) response = submitRequest( request );
+        if (response == null) response = getBaseResponse().getWindow().getFrameContents( getPageFrame() );
+        return response;
     }
 
 
