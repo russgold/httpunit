@@ -252,11 +252,21 @@ public class JavaScript {
 
         /**
          * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
-         * This default implementation throws an exception.
          **/
-        Scriptable toScriptable( ScriptableDelegate delegate )
-                throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
-            throw new UnsupportedOperationException();
+        final Scriptable toScriptable( ScriptableDelegate delegate )
+                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
+            if (delegate.getScriptEngine() instanceof Scriptable) {
+                return (Scriptable) delegate.getScriptEngine();
+            } else {
+                JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
+                element.initialize( this, delegate );
+                return element;
+            }
+        }
+
+
+        protected String getScriptableClassName( ScriptableDelegate delegate ) {
+            throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
         }
 
     }
@@ -341,15 +351,8 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( ScriptableDelegate delegate )
-                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
-            if (!(delegate instanceof WebResponse.Scriptable)) {
-                return null;
-            } else {
-                JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, "Window" );
-                element.initialize( this, delegate );
-                return element;
-            }
+        protected String getScriptableClassName( ScriptableDelegate delegate ) {
+            return (delegate instanceof WebResponse.Scriptable) ? "Window" : super.getScriptableClassName( delegate );
         }
 
 
@@ -433,15 +436,7 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( com.meterware.httpunit.scripting.ScriptableDelegate delegate )
-                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
-            JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
-            element.initialize( this, delegate );
-            return element;
-        }
-
-
-        private String getScriptableClassName( ScriptableDelegate delegate ) {
+        protected String getScriptableClassName( ScriptableDelegate delegate ) {
             if (delegate instanceof WebForm.Scriptable) {
                 return "Form";
             } else if (delegate instanceof WebLink.Scriptable) {
@@ -449,7 +444,7 @@ public class JavaScript {
             } else if (delegate instanceof WebImage.Scriptable) {
                 return "Image";
             } else {
-                throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
+                return super.getScriptableClassName( delegate );
             }
         }
 
@@ -633,11 +628,8 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( ScriptableDelegate delegate )
-                throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
-            final Control control = (Control) Context.getCurrentContext().newObject( this, "Control" );
-            control.initialize( this, delegate );
-            return control;
+        protected String getScriptableClassName( ScriptableDelegate delegate ) {
+            return "Control";
         }
 
 
@@ -715,20 +707,8 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( ScriptableDelegate delegate )
-                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
-            JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
-            element.initialize( this, delegate );
-            return element;
-        }
-
-
-        private String getScriptableClassName( ScriptableDelegate delegate ) {
-            if (delegate instanceof SelectionOptions) {
-                return "Options";
-            } else {
-                throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
-            }
+        protected String getScriptableClassName( ScriptableDelegate delegate ) {
+            return (delegate instanceof SelectionOptions) ? "Options" : super.getScriptableClassName( delegate );
         }
 
     }
@@ -767,11 +747,8 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( ScriptableDelegate delegate )
-                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
-            JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, "Option" );
-            element.initialize( this, delegate );
-            return element;
+        protected String getScriptableClassName( ScriptableDelegate delegate ) {
+            return "Option";
         }
     }
 

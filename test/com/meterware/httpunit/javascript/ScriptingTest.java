@@ -288,6 +288,29 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testOpenedWindowProperties() throws Exception {
+        defineResource( "Target.html", "<html><head><script language='JavaScript'>" +
+                                       "function show_properties() {" +
+                                       "   alert( 'name=' + window.name );" +
+                                       "   alert( 'opener name=' + window.opener.name );" +
+                                       "}" +
+                                       "</script></head><body onload='show_properties()'>" +
+                                       "</body></html>" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body onload='window.name=\"main\"'>" +
+                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Target.html' );\">go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "main window name", "main", wc.getMainWindow().getName() );
+        response.getLinks()[0].click();
+
+        assertEquals( "1st alert", "name=sample", wc.popNextAlert() );
+        assertEquals( "2nd alert", "opener name=main", wc.popNextAlert() );
+    }
+
+
     public void testLocationProperty() throws Exception {
         defineResource( "Target.html", "You made it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +

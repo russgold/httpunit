@@ -99,6 +99,26 @@ public class DocumentScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testJavaScriptObjectIdentity() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function compareLinks() { " +
+                                            "  if (document.reallink == document.links['reallink']) {" +
+                                            "      alert( 'they are the same' );" +
+                                            "  } else {" +
+                                            "      alert( 'they are different' );" +
+                                            "  }" +
+                                            "}" +
+                                            "</script></head>" +
+                                            "<body onLoad='compareLinks()'>" +
+                                            "<a href='something' name='reallink'>first</a>" +
+                                            "<a href='else'>second</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Alert message", "they are the same", wc.popNextAlert() );
+    }
+
+
     public void testCaseSensitiveNames() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +

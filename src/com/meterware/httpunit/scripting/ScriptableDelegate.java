@@ -96,7 +96,7 @@ abstract public class ScriptableDelegate {
     }
 
 
-    private ScriptingEngine getScriptEngine() {
+    public ScriptingEngine getScriptEngine() {
         return _scriptEngine != null ? _scriptEngine : NULL_SCRIPT_ENGINE;
     }
 

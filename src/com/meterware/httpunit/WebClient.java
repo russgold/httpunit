@@ -443,6 +443,16 @@ public class WebClient {
     }
 
 
+    WebResponse openInNewWindow( WebRequest request, String windowName, WebResponse opener ) throws IOException, SAXException {
+        WebWindow window = new WebWindow( this, opener );
+        window.setName( windowName );
+        WebResponse response = window.getResponse( request );
+        _openWindows.add( window );
+        reportWindowOpened( window );
+        return response;
+    }
+
+
     private WebWindow getTargetWindow( WebWindow requestWindow, String target ) {
         return WebRequest.NEW_WINDOW.equalsIgnoreCase( target ) ? null : requestWindow;
     }

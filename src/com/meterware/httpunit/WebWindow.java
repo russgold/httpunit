@@ -41,6 +41,9 @@ public class WebWindow {
     /** The name of the window, set via JavaScript. **/
     private String _name = "";
 
+    /** The web response containing the reference that opened this window **/
+    private WebResponse _opener;
+
 
     public WebClient getClient() {
         return _client;
@@ -53,6 +56,14 @@ public class WebWindow {
      */
     public String getName() {
         return _name;
+    }
+
+
+    /**
+     * Returns the web response that contained the script which opened this window.
+     */
+    public WebResponse getOpener() {
+        return _opener;
     }
 
 
@@ -116,6 +127,12 @@ public class WebWindow {
     WebWindow( WebClient client ) {
         _client = client;
         _frameContents = new FrameHolder( _client, WebRequest.TOP_FRAME );
+    }
+
+
+    WebWindow( WebClient client, WebResponse opener ) {
+        this( client );
+        _opener = opener;
     }
 
 

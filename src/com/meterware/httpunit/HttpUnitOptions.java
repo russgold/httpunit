@@ -57,7 +57,7 @@ public abstract class HttpUnitOptions {
         _acceptCookies = true;
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
-        _exceptionsThrownOnScriptError = true;
+        setExceptionsThrownOnScriptError( true );
     }
 
 

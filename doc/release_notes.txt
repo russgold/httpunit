@@ -10,11 +10,17 @@ Limitations:
 
 
 Revision History:
+ 9-Oct-2002
+Additions:
+    1. Added support for the Window.opener property
+    2. Added support for the Window.name property for top-level frames
+
  8-Oct-2002
 Acknowledgements:
     Thanks to Richard Harris for adding support for the title attribute for links,
            for adding the JavaScript Navigator.platform property,
-           and for adding Javascript support for the Screen object.
+           for adding Javascript support for the Screen object,
+           for pointing out the value of retaining the same ScriptingEngine instance for a ScriptableDelegate.
 
 Additions:
     1. Links, forms, and images now have a readable title property.
@@ -25,6 +31,8 @@ Additions:
 Problems fixed:
     1. When not using Latin-1 encoding, URL string characters *, _, and - were improperly being encoded
     2. AuthorizationRequiredException was being thrown even when exceptions on error status was disabled
+    3. Repeated requests for the same JavaScript domain objects returned new and different instances, thus
+       preventing identity tests.
 
 
  4-Oct-2002

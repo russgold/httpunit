@@ -563,27 +563,16 @@ public class WebResponse implements HTMLSegment {
 
         public Scriptable open( String name, String urlString, String features, boolean replace )
                 throws IOException, SAXException {
+            if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
+            GetMethodWebRequest request = new GetMethodWebRequest( getURL(), urlString );
+
             WebWindow[] windows = _client.getOpenWindows();
             for (int i = 0; i < windows.length; i++) {
                 WebWindow window = windows[i];
-                if (window.getName().equals( name )) return openInWindow( window, name, urlString, "_top" );
+                if (window.getName().equals( name )) return window.getResponse( request ).getScriptableObject();
             }
 
-            return openInWindow( _window, name, urlString, "_blank" );
-        }
-
-
-        private Scriptable openInWindow( WebWindow window, String name, String urlString, String target ) throws IOException, SAXException {
-            try {
-                if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
-                WebRequest request = new GetMethodWebRequest( getURL(), urlString, target );
-                WebResponse response = window.getResponse( request );
-                response._window.setName( name );
-                return response.getScriptableObject();
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-                throw e;
-            }
+            return _client.openInNewWindow( request, name, WebResponse.this ).getScriptableObject();
         }
 
 
@@ -591,8 +580,12 @@ public class WebResponse implements HTMLSegment {
          * Returns the value of the named property. Will return null if the property does not exist.
          **/
         public Object get( String propertyName ) {
-            if (propertyName.equalsIgnoreCase( "location" )) {
+            if (propertyName.equals( "name" )) {
+                return getTarget().equals( WebRequest.TOP_FRAME ) ? _window.getName() : null;
+            } else if (propertyName.equalsIgnoreCase( "location" )) {
                 return WebResponse.this._url.toExternalForm();
+            } else if (propertyName.equalsIgnoreCase( "opener" )) {
+                return getTarget().equals( WebRequest.TOP_FRAME ) ? _window.getOpener().getScriptableObject() : null;
             } else {
                 return super.get( propertyName );
             }
@@ -604,7 +597,12 @@ public class WebResponse implements HTMLSegment {
          * cannot accept the specified value.
          **/
         public void set( String propertyName, Object value ) {
-            if (propertyName.equalsIgnoreCase( "location" )) {
+            if (propertyName.equals( "name" )) {
+                if (value == null) value = "";
+                if (getTarget().equals( WebRequest.TOP_FRAME )) {
+                    _window.setName( value.toString() );
+                }
+            } else if (propertyName.equalsIgnoreCase( "location" )) {
                 try {
                     getWindow().getResponse( new GetMethodWebRequest( _url, value.toString(), _frameName ) );
                 } catch (IOException e) {
