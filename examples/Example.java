@@ -23,7 +23,7 @@ public class Example {
             request = loginForm.getRequest();
             request.setParameter( "name", "master" );
             response = conversation.getResponse( request );
-            System.out.println( response );
+            System.out.println( response.getText() );
 
         } catch (Exception e) {
             System.err.println( "Exception: " + e );

@@ -57,7 +57,7 @@ public class ExampleTest extends TestCase {
         WebForm loginForm = response.getForms()[0];
         request = loginForm.getRequest();
         response = conversation.getResponse( request );
-        assert( "Login not rejected", response.toString().indexOf( "Login failed" ) != -1 );
+        assertTrue( "Login not rejected", response.getText().indexOf( "Login failed" ) != -1 );
     }
 
 
@@ -74,12 +74,9 @@ public class ExampleTest extends TestCase {
         request = loginForm.getRequest();
         request.setParameter( "name", "master" );
         response = conversation.getResponse( request );
-        assert( "Login not accepted", response.toString().indexOf( "You made it!" ) != -1 );
+        assertTrue( "Login not accepted", response.getText().indexOf( "You made it!" ) != -1 );
 
-        Document document = response.getDOM();
-        NodeList nl = document.getElementsByTagName( "title" );
-        assert( "No unique title found", nl.getLength() == 1 );
-        assertEquals( "Top Secret", nl.item(0).getFirstChild().getNodeValue() );
+        assertEquals( "Page title", "Top Secret", response.getTitle() );
     }
 }
 
