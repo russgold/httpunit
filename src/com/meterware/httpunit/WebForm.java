@@ -337,6 +337,22 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Returns the number of text parameters in this form with the specified name.
+     **/
+    public int getNumTextParameters( String name ) {
+        Object count = getTextParameterCounts().get( name );
+        if (count == null) return 0;
+        return ((Number) count ).intValue();
+    }
+
+
+    private Hashtable getTextParameterCounts() {
+        getParameterTypes();
+        return _textParameterCounts;
+    }
+
+
+    /**
      * Returns true if the named parameter accepts files for upload.
      **/
     public boolean isFileParameter( String name ) {
@@ -378,6 +394,9 @@ public class WebForm extends WebRequestSource {
     /** The type of a parameter which accepts files for upload. **/
     private final static Integer TYPE_FILE = new Integer(4);
 
+    /** A constant set to indicate one parameter. **/
+    private final static Integer ONE_PARAMETER = new Integer(1);
+
 
     /** The attributes of the form parameters. **/
     private NamedNodeMap[] _parameters;
@@ -393,6 +412,9 @@ public class WebForm extends WebRequestSource {
 
     /** The parameters mapped to the type of data which they accept. **/
     private Hashtable      _dataTypes;
+
+    /** The parameters mapped to their number of occurrences as text parameters. **/
+    private Hashtable      _textParameterCounts;
 
     /** The submit buttons in this form. **/
     private SubmitButton[] _submitButtons;
@@ -513,19 +535,26 @@ public class WebForm extends WebRequestSource {
         if (_dataTypes == null) {
             NamedNodeMap[] parameters = getParameters();
             Hashtable types = new Hashtable();
+            _textParameterCounts = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
                 String name  = getValue( parameters[i].getNamedItem( "name" ) );
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null || type.length() == 0) type = "TEXT";
 
-                if (type.equals( "TEXT" ) || type.equals( "HIDDEN" ) || type.equals( "PASSWORD" )) {
-                    types.put( name, TYPE_TEXT );
-                } else if (type.equals( "RADIO" )) {
+                if (type.equals( "RADIO" )) {
                     types.put( name, TYPE_SCALAR );
                 } else if (type.equals( "CHECKBOX" )) {
                     types.put( name, TYPE_MULTI_VALUED );
                 } else if (type.equals( "FILE" )) {
                     types.put( name, TYPE_FILE );
+                } else if (type.equals( "TEXT" ) || type.equals( "HIDDEN" ) || type.equals( "PASSWORD" )) {
+                    types.put( name, TYPE_TEXT );
+                    Integer oldCount = (Integer) _textParameterCounts.get( name );
+                    if (oldCount == null) {
+                        _textParameterCounts.put( name, ONE_PARAMETER );
+                    } else {
+                        _textParameterCounts.put( name, new Integer( oldCount.intValue() + 1 ) );
+                    }
                 }
             }
             HTMLSelectElement[] selections = getSelections();

@@ -128,8 +128,28 @@ public class FormParametersTest extends HttpUnitTest {
         request.setParameter( "password", "purple" );
         request.setParameter( "secret", "value" );
         validateSetParameterRejected( request, "colors", new String[] { "blue", "red" }, "setting input to multiple values" );
-        validateSetParameterRejected( request, "fish", new String[] { "red", "pink" }, "setting password to multiple values" );
+        validateSetParameterRejected( request, "password", new String[] { "red", "pink" }, "setting password to multiple values" );
         validateSetParameterRejected( request, "secret", new String[] { "red", "pink" }, "setting hidden field to multiple values" );
+    }
+
+    public void testMultipleTextParameterValidation() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                       "<Input type=text name=color>" +
+                                       "<Input type=password name=password>" +
+                                       "<Input type=hidden name=color>" +
+                                       "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = form.getRequest();
+        HttpUnitOptions.setParameterValuesValidated( true );
+
+        assertEquals( "Number of parameters named 'password'", 1, form.getNumTextParameters( "password" ) );
+        assertEquals( "Number of parameters named 'color'", 2, form.getNumTextParameters( "color" ) );
+        request.setParameter( "color", "green" );
+        request.setParameter( "password", "purple" );
+        request.setParameter( "color", new String[] { "red", "green" } );
+        validateSetParameterRejected( request, "colors", new String[] { "blue", "red", "green" }, "setting input to multiple values" );
+        validateSetParameterRejected( request, "password", new String[] { "red", "pink" }, "setting password to multiple values" );
     }
 
 

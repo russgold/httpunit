@@ -10,6 +10,10 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+19-Oct-2001
+   Additions:
+       1. Requests may now have as many values for a text parameter name as the number of <INPUT> tags with that name.
+
 18-Oct-2001
    Additions:
        1. It is now possible to upload a file via a POST request not derived from a form. To do this, call

@@ -497,7 +497,11 @@ public class WebRequest {
     private void validateParameterValues( String name, String[] values ) {
         if (_sourceForm == null) return;
         if (values.length > 1 && !_sourceForm.isMultiValuedParameter( name )) {
-            throw new SingleValuedParameterException( name );
+            if (!_sourceForm.isTextParameter( name ) || _sourceForm.getNumTextParameters( name ) == 1) {
+                throw new SingleValuedParameterException( name );
+            } else if (values.length > _sourceForm.getNumTextParameters( name )) {
+                throw new TextParameterCountException( name, _sourceForm.getNumTextParameters( name ) );
+            }
         }
 
         for (int i = 0; i < values.length; i++) validateParameterValue( name, values[i] );
@@ -661,6 +665,29 @@ class SingleValuedParameterException extends IllegalRequestParameterException {
 
 
     private String _parameterName;
+
+}
+
+
+/**
+ * This exception is thrown on an attempt to set a text parameter to more values than are allowed.
+ **/
+class TextParameterCountException extends IllegalRequestParameterException {
+
+
+    TextParameterCountException( String parameterName, int numAllowed ) {
+        _parameterName = parameterName;
+        _numAllowed    = numAllowed;
+    }
+
+
+    public String getMessage() {
+        return "Parameter '" + _parameterName + "' may have no more than " + _numAllowed + " values.";
+    }
+
+
+    private String _parameterName;
+    private int    _numAllowed;
 
 }
 
