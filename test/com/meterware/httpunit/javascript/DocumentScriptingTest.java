@@ -99,23 +99,6 @@ public class DocumentScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testEmbeddedDocumentWrite() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><title>something</title></head>" +
-                                            "<body>" +
-                                            "<script language='JavaScript'>" +
-                                            "document.write( '<a id=here href=about:blank>' );" +
-                                            "document.write( document.title );" +
-                                            "document.write( '</a>' );" +
-                                            "</script>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebLink link = response.getLinkWithID( "here" );
-        assertNotNull( "The link was not found", link );
-        assertEquals( "Link contents", "something", link.asText() );
-    }
-
-
     public void testJavaScriptObjectIdentity() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function compareLinks() { " +

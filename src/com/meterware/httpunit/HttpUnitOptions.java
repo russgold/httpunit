@@ -522,6 +522,7 @@ public abstract class HttpUnitOptions {
         reset();
 
         try {
+            Class.forName( "org.w3c.tidy.Parser" );
             _jtidyParser = (HTMLParser) Class.forName( "com.meterware.httpunit.JTidyHTMLParser" ).newInstance();
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {
@@ -529,6 +530,7 @@ public abstract class HttpUnitOptions {
         }
 
         try {
+            Class.forName( "org.cyberneko.html.HTMLConfiguration" );
             _nekoParser = (HTMLParser) Class.forName( "com.meterware.httpunit.NekoHTMLParser" ).newInstance();
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {
