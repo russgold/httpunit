@@ -44,6 +44,7 @@ public class ServletUnitSuite {
         suite.addTest( NavigationTest.suite() );
         suite.addTest( ConfigTest.suite() );
         suite.addTest( WebXMLTest.suite() );
+        suite.addTest( JUnitServletTest.suite() );
         return suite;
     }
 
