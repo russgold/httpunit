@@ -93,11 +93,18 @@ Inline and included scripts are supported, as are the following DOM elements:
 <ul>
 <li>open  - opens a document for writing, optionally specifying a MIME type</li>
 <li>close - closes the open document and replaces its contents with the written text</li>
+<li>getElementByID - returns the element in the document with the specified ID</li>
 <li>write - writes a string to the contents of the current open document</li>
 <li>writeln - writes a line with carriage-return to the contents of the current open document</li>
 </ul>
 
-<h3>Form</h3>
+<h3>HTMLElement</h3>
+<h4>properties</h4>
+<ul>
+<li>title    - r/o the title attribute of the element</li>
+</ul>
+
+<h3>Form (inherits from HTMLElement)</h3>
 <h4>properties</h4>
 <ul>
 <li>action   - r/w the action associated with the form</li>
@@ -123,7 +130,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>src - read/write - the relative URL of the image</li>
 </ul>
 
-<h3>Link</h3>
+<h3>Link (inherits from HTMLElement)</h3>
 <h4>properties</h4>
 <ul>
 <li>href - read/write - the URL associated with the link</li>
@@ -134,7 +141,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onMouseOver - invoked when link.mouseOver() is invoked<li>
 </ul>
 
-<h3>Input (and subclasses)</h3>
+<h3>Input (inherits from HTMLElement)</h3>
 <h4>properties</h4>
 <ul>
 <li>form    - read-only - the form containing the input</li>
@@ -145,13 +152,13 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>focus() - a no-op</li>
 </ul>
 
-<h3>Button</h3>
+<h3>Button (inherits from Input)</h3>
 <h4>events</h4>
 <ul>
 <li>onClick - invoked when button.click() is called</li>
 </ul>
 
-<h3>Text</h3>
+<h3>Text (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>value    - read/write - the current text value</li>
@@ -161,7 +168,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onChange - invoked when the value of the control is changed via form.setParameter</li>
 </ul>
 
-<h3>TextArea</h3>
+<h3>TextArea (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>value    - read/write - the current text value</li>
@@ -171,13 +178,13 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onChange - invoked when the value of the control is changed via form.setParameter</li>
 </ul>
 
-<h3>Hidden</h3>
+<h3>Hidden (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>value - read/write - the current text value</li>
 </ul>
 
-<h3>Password</h3>
+<h3>Password (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>value    - read/write - the current text value</li>
@@ -187,7 +194,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onChange - invoked when the value of the control is changed via form.setParameter</li>
 </ul>
 
-<h3>Checkbox</h3>
+<h3>Checkbox (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>checked        - read/write - the state of the checkbox</li>
@@ -199,7 +206,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onClick - invoked when the state of the control is changed via form.setParameter or form.removeParameter</li>
 </ul>
 
-<h3>Radio</h3>
+<h3>Radio (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>checked        - read/write - the state of the radio button</li>
@@ -211,7 +218,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onClick - invoked when the state of the control is changed via form.setParameter</li>
 </ul>
 
-<h3>Select</h3>
+<h3>Select (inherits from Input)</h3>
 <h4>properties</h4>
 <ul>
 <li>length         - read-only - the number of options associated with the control</li>
@@ -224,7 +231,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>onChange       - invoked when the value of the control is changed via form.setParameter</li>
 </ul>
 
-<h3>Option</h3>
+<h3>Option (inherits from Input)</h3>
 <h4>constructor</h4>
 You may construct an Option object and assign it to an element in the Select.options array
 <h4>properties</h4>

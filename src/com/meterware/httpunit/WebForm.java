@@ -510,7 +510,7 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
+    public class Scriptable extends HTMLElementScriptable implements NamedDelegate {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); _presetParameters = null; }
 
@@ -535,7 +535,7 @@ public class WebForm extends WebRequestSource {
                 return getTarget();
             } else {
                 final FormParameter parameter = getParameter( propertyName );
-                return parameter == UNKNOWN_PARAMETER ? null : parameter.getScriptableObject();
+                return parameter == UNKNOWN_PARAMETER ? super.get( propertyName ) : parameter.getScriptableObject();
             }
         }
 
@@ -570,6 +570,11 @@ public class WebForm extends WebRequestSource {
                 result[i] = controls[i].getScriptableDelegate();
             }
             return result;
+        }
+
+
+        Scriptable() {
+            super( WebForm.this );
         }
     }
 

@@ -32,7 +32,9 @@ import org.w3c.dom.Node;
  **/
 public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
 
-    
+    private ScriptableDelegate _scriptable;
+
+
     /**
      * Returns the number of columns spanned by this cell.
      **/
@@ -96,7 +98,11 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
      * Returns the delegate which supports scripting this element.
      */
     public ScriptableDelegate getScriptableDelegate() {
-        throw new RuntimeException( "No scripting support for " + getClass().getName() );
+        if (_scriptable == null) {
+            _scriptable = new HTMLElementScriptable( this );
+            _scriptable.setScriptEngine( getResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
+        }
+        return _scriptable;
     }
 
 

@@ -49,10 +49,7 @@ abstract class FormControl extends HTMLElementBase {
     private final String  _onClickEvent;
     private final WebForm _form;
 
-    private Scriptable _scriptable;
-
-
-    FormControl( WebForm form ) {
+   FormControl( WebForm form ) {
         super( newEmptyNode( form ) );
         _form           = form;
         _valueAttribute = "";
@@ -100,15 +97,8 @@ abstract class FormControl extends HTMLElementBase {
     }
 
 
-    /**
-     * Returns a scriptable object which can act as a proxy for this control.
-     */
-    public ScriptableDelegate getScriptableDelegate() {
-        if (_scriptable == null) {
-            _scriptable = newScriptable();
-            _scriptable.setScriptEngine( getForm().getScriptableObject().getScriptEngine( _scriptable ) );
-        }
-        return _scriptable;
+    protected ScriptableDelegate getParentDelegate() {
+        return getForm().getScriptableDelegate();
     }
 
 
@@ -234,7 +224,7 @@ abstract class FormControl extends HTMLElementBase {
      * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different
      * implementation of Scriptable.
      */
-    protected Scriptable newScriptable() {
+    protected ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -304,7 +294,7 @@ abstract class FormControl extends HTMLElementBase {
     }
 
 
-    class Scriptable extends ScriptableDelegate implements Input {
+    class Scriptable extends HTMLElementScriptable implements Input {
 
         public String getName() {
             return FormControl.this.getName();
@@ -327,6 +317,11 @@ abstract class FormControl extends HTMLElementBase {
                 super.set( propertyName, value );
             }
         }
+
+
+        public Scriptable() {
+            super( FormControl.this );
+        }
     }
 
 }
@@ -340,7 +335,7 @@ class BooleanFormControl extends FormControl {
 
     private final boolean _isCheckedDefault;
 
-    protected FormControl.Scriptable newScriptable() {
+    protected ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -615,7 +610,7 @@ class TextFormControl extends FormControl {
     }
 
 
-    protected FormControl.Scriptable newScriptable() {
+    protected ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -723,7 +718,7 @@ class FileSubmitFormControl extends FormControl {
     private UploadFileSpec _fileToUpload;
 
 
-    protected FormControl.Scriptable newScriptable() {
+    protected ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -857,7 +852,7 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    protected FormControl.Scriptable newScriptable() {
+    protected ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 

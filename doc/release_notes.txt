@@ -11,6 +11,11 @@ Limitations:
 
 
 Revision History:
+30-Dec-2002
+Additions:
+    1. Added support for document.getElementByID
+    2. all HTML elements with id attributes are now accessible
+
 27-Dec-2002
 Additions:
     1. Added getFragmentIdentifier() to WebRequestSource (parent of WebLink, WebForm, and WebImage)
@@ -27,26 +32,26 @@ Problems fixed:
 
 25-Dec-2002
 Notes:
-    get...WithID was incorrectly doing case insensitive matches.  It is now case-sensitive, since that is the way the
-    ID attribute is defined.
+    1. get...WithID was incorrectly doing case insensitive matches.  It is now case-sensitive, since that is the way the
+       ID attribute is defined.
 
 24-Dec-2002
 Additions:
-    HTMLParserFactory now supports methods to explicitly select the parser without playing with the class path.
-    This includes support for additional parsers not bundled with HttpUnit.
+    1. HTMLParserFactory now supports methods to explicitly select the parser without playing with the class path.
+       This includes support for additional parsers not bundled with HttpUnit.
 
 22-Dec-2002
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
 
 Problems fixed:
-    The manifest.mf file now has line breaks between properties
+    1. The manifest.mf file now has line breaks between properties
 
 19-Dec-2002
     Thanks to Bernhard Wagner for adding some parser customization code.
 
 Additions:
-    You may call HTMLParserFactory.setPreserveTagCase and setReturnHTMLDocument to control whether the parser coerces
-    the case of tags and attributes or returns a HTMLDocument object, respectively.
+    1. You may call HTMLParserFactory.setPreserveTagCase and setReturnHTMLDocument to control whether the parser coerces
+       the case of tags and attributes or returns a HTMLDocument object, respectively.
 
 18-Dec-2001
 Acknowledgements:

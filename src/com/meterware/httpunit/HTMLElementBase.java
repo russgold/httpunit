@@ -19,9 +19,8 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-
 import org.w3c.dom.Node;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 
 /**
@@ -33,6 +32,8 @@ abstract
 class HTMLElementBase implements HTMLElement {
 
     private Node        _node;
+    private ScriptableDelegate _scriptable;
+
 
 
     public String getID() {
@@ -51,10 +52,14 @@ class HTMLElementBase implements HTMLElement {
 
 
     /**
-     * Returns the delegate which supports scripting this element.
+     * Returns a scriptable object which can act as a proxy for this control.
      */
     public ScriptableDelegate getScriptableDelegate() {
-        throw new RuntimeException( "No scripting support for " + getClass().getName() );
+        if (_scriptable == null) {
+            _scriptable = newScriptable();
+            _scriptable.setScriptEngine( getParentDelegate().getScriptEngine( _scriptable ) );
+        }
+        return _scriptable;
     }
 
 
@@ -76,4 +81,19 @@ class HTMLElementBase implements HTMLElement {
     protected Node getNode() {
         return _node;
     }
+
+
+    /**
+     * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different
+     * implementation of Scriptable.
+     */
+    abstract protected ScriptableDelegate newScriptable();
+
+
+    /**
+     * Returns the scriptable delegate which can provide the scriptable delegate for this element.
+     */
+    abstract protected ScriptableDelegate getParentDelegate();
+
+
 }

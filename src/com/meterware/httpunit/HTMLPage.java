@@ -248,6 +248,12 @@ public class HTMLPage extends ParsedHTML {
         public String getCookie() {
             return getResponse().getCookieHeader();
         }
+
+
+        public ScriptableDelegate getElementWithID( String id ) {
+            final HTMLElement elementWithID = HTMLPage.this.getElementWithID( id );
+            return elementWithID == null ? null : elementWithID.getScriptableDelegate();
+        }
     }
 
 

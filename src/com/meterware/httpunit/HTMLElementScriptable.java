@@ -1,4 +1,4 @@
-package com.meterware.httpunit.javascript;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,30 +19,28 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.DocumentElement;
 
 
 /**
- * Master suite for testing JavaScript support
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class JavaScriptTestSuite {
+class HTMLElementScriptable extends ScriptableDelegate implements DocumentElement {
 
-    public static void main( String[] args ) {
-        junit.textui.TestRunner.run( suite() );
+    private HTMLElement _element;
+
+    public Object get( String propertyName ) {
+        if (propertyName.equalsIgnoreCase( "title" )) {
+            return _element.getTitle();
+        } else {
+            return super.get( propertyName );
+        }
     }
 
 
-    public static Test suite() {
-        TestSuite result = new TestSuite();
-        result.addTest( ScriptingTest.suite() );
-        result.addTest( DocumentScriptingTest.suite() );
-        result.addTest( FormScriptingTest.suite() );
-        result.addTest( HTMLElementTest.suite() );
-        return result;
+    public HTMLElementScriptable( HTMLElement element ) {
+        _element = element;
     }
 }
-
-

@@ -96,6 +96,7 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Options.class );
         ScriptableObject.defineClass( scope, Option.class );
         ScriptableObject.defineClass( scope, ElementArray.class );
+        ScriptableObject.defineClass( scope, HTMLElement.class );
     }
 
 
@@ -276,8 +277,10 @@ public class JavaScript {
         /**
          * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
          **/
-        final Scriptable toScriptable( ScriptableDelegate delegate ) {
-            if (delegate.getScriptEngine() instanceof Scriptable) {
+        final Object toScriptable( ScriptableDelegate delegate ) {
+            if (delegate == null) {
+                return NOT_FOUND;
+            } else if (delegate.getScriptEngine() instanceof Scriptable) {
                 return (Scriptable) delegate.getScriptEngine();
             } else {
                 try {
@@ -302,6 +305,7 @@ public class JavaScript {
             if (delegate instanceof SelectionOptions) return "Options";
             if (delegate instanceof SelectionOption) return "Option";
             if (delegate instanceof Input) return "Control";
+            if (delegate instanceof DocumentElement) return "HTMLElement";
 
             throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
         }
@@ -485,6 +489,11 @@ public class JavaScript {
         public Scriptable jsGet_forms() throws SAXException {
             if (_forms == null) initializeForms();
             return _forms;
+        }
+
+
+        public Object jsFunction_getElementWithID( String id ) {
+            return toScriptable( getDelegate().getElementWithID( id ) );
         }
 
 
@@ -817,9 +826,14 @@ public class JavaScript {
     }
 
 
-    abstract static public class HTMLElement extends JavaScriptEngine {
+    static public class HTMLElement extends JavaScriptEngine {
 
         private Document _document;
+
+
+        public String getClassName() {
+            return "HTMLElement";
+        }
 
 
         public Document jsGet_document() {

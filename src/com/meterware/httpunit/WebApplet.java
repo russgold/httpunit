@@ -34,6 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 
 /**
@@ -205,6 +206,16 @@ public class WebApplet extends HTMLElementBase {
             throw new RuntimeException( e.toString() );
         } catch (SAXException e) {
         }
+    }
+
+
+    protected ScriptableDelegate newScriptable() {
+        return new HTMLElementScriptable( this );
+    }
+
+
+    protected ScriptableDelegate getParentDelegate() {
+        return _response.getScriptableObject().getDocument();
     }
 
 }

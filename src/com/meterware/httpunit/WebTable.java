@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.w3c.dom.*;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 /**
  * This class represents a table in an HTML page.
@@ -226,6 +227,16 @@ public class WebTable extends HTMLElementBase {
     }
 
 
+    protected ScriptableDelegate newScriptable() {
+        return new HTMLElementScriptable( this );
+    }
+
+
+    protected ScriptableDelegate getParentDelegate() {
+        return _response.getScriptableObject().getDocument();
+    }
+
+
 //----------------------------------- private members -----------------------------------
 
     private Element     _dom;
@@ -331,6 +342,15 @@ public class WebTable extends HTMLElementBase {
             _cells.add( cell );
         }
 
+
+        protected ScriptableDelegate newScriptable() {
+            return new HTMLElementScriptable( this );
+        }
+
+
+        protected ScriptableDelegate getParentDelegate() {
+            return _response.getScriptableObject().getDocument();
+        }
     }
 
 

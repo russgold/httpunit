@@ -101,7 +101,12 @@ public class WebLink extends FixedURLWebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
+    public class Scriptable extends HTMLElementScriptable implements NamedDelegate {
+
+        public Scriptable() {
+            super( WebLink.this );
+        }
+
 
         public String getName() {
             return WebLink.this.getName();

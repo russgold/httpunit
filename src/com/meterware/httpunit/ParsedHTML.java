@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Arrays;
 
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
@@ -226,6 +228,25 @@ class ParsedHTML {
     }
 
 
+    static class DefaultElementFactory extends HTMLElementFactory {
+
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            if (element.getAttribute( "id" ).equals( "" )) return null;
+            return parsedHTML.toDefaultElement( element );
+        }
+
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {}
+    }
+
+
+    private HTMLElement toDefaultElement( Element element ) {
+        return new HTMLElementBase( element ) {
+            protected ScriptableDelegate newScriptable() { return new HTMLElementScriptable( this ); }
+            protected ScriptableDelegate getParentDelegate() { return getResponse().getScriptableObject().getDocument(); }
+        };
+    }
+
+
     static class WebFormFactory extends HTMLElementFactory {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebForm( element );
@@ -257,6 +278,7 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebApplet( element );
         }
+        protected boolean addToContext() { return true; }
     }
 
 
@@ -319,6 +341,7 @@ class ParsedHTML {
 
 
     private static HashMap _htmlFactoryClasses = new HashMap();
+    private static HTMLElementFactory _defaultFactory = new DefaultElementFactory();
 
     static {
         _htmlFactoryClasses.put( "a",      new WebLinkFactory() );
@@ -337,7 +360,8 @@ class ParsedHTML {
     }
 
     private static HTMLElementFactory getHTMLElementFactory( String tagName ) {
-        return (HTMLElementFactory) _htmlFactoryClasses.get( tagName );
+        final HTMLElementFactory factory = (HTMLElementFactory) _htmlFactoryClasses.get( tagName );
+        return factory != null ? factory : _defaultFactory;
     }
 
 
