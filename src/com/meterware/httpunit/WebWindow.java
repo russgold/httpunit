@@ -106,11 +106,71 @@ public class WebWindow {
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
-        WebResponse response = _client.getResourceForWindow( request, this );
-
-        return response == null ? null : updateWindow( request.getTarget(), response );
+        final RequestContext requestContext = new RequestContext();
+        final WebResponse response = getSubframeResponse( request, requestContext );
+        requestContext.runScripts();
+        return response;
     }
 
+
+    WebResponse getSubframeResponse( WebRequest request, RequestContext requestContext ) throws IOException, SAXException {
+        WebResponse response = getResource( request );
+
+        return response == null ? null : updateWindow( request.getTarget(), response, requestContext );
+    }
+
+
+    /**
+     * Updates this web client based on a received response. This includes updating
+     * cookies and frames.
+     **/
+    WebResponse updateWindow( String requestTarget, WebResponse response, RequestContext requestContext ) throws MalformedURLException, IOException, SAXException {
+        _client.updateClient( response );
+        if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
+            return getResponse( response.getRefreshRequest() );
+        } else if (shouldFollowRedirect( response )) {
+            delay( HttpUnitOptions.getRedirectDelay() );
+            return getResponse( new RedirectWebRequest( response ) );
+        } else {
+            _client.updateFrameContents( this, requestTarget, response, requestContext );
+            return response;
+        }
+    }
+
+
+    /**
+     * Returns the resource specified by the request. Does not update the window or load included framesets.
+     * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
+     */
+    public WebResponse getResource( WebRequest request ) throws IOException {
+        _client.tellListeners( request );
+
+        WebResponse response = null;
+        final String frameName = getTargetFrame( request.getTarget() );
+        String urlString = request.getURLString().trim();
+        if (urlString.startsWith( "about:" )) {
+            response = WebResponse.BLANK_RESPONSE;
+        } else if (!urlString.startsWith( "javascript:" )) {
+            response = _client.newResponse( request, frameName );
+        } else {
+            WebRequestSource wrs = request.getWebRequestSource();
+            String result = (wrs == null) ? getCurrentPage().getScriptableObject().evaluateURL( urlString )
+                                          : wrs.getScriptableDelegate().evaluateURL( urlString );
+            if (result != null) response = new DefaultWebResponse( _client, frameName, request.getURL(), result );
+        }
+
+        if (response != null) _client.tellListeners( response );
+        return response;
+    }
+
+
+    private String getTargetFrame( String target ) {
+        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
+            return WebRequest.TOP_FRAME;
+        } else {
+            return target;
+        }
+    }
 
     /**
      * Returns the name of the currently active frames.
@@ -126,7 +186,7 @@ public class WebWindow {
      * Throws a runtime exception if no matching frame is defined.
      **/
     public WebResponse getFrameContents( String frameName ) {
-        WebResponse response = (WebResponse) _frameContents.get( frameName );
+        WebResponse response = _frameContents.get( frameName );
         if (response == null) throw new NoSuchFrameException( frameName );
         return response;
     }
@@ -152,36 +212,9 @@ public class WebWindow {
     }
 
 
-    /**
-     * Updates this web client based on a received response. This includes updating
-     * cookies and frames.
-     **/
-    WebResponse updateWindow( String requestTarget, WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        _client.updateClient( response );
-        if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
-            return getResponse( response.getRefreshRequest() );
-        } else if (shouldFollowRedirect( response )) {
-            delay( HttpUnitOptions.getRedirectDelay() );
-            return getResponse( new RedirectWebRequest( response ) );
-        } else {
-            _client.updateFrameContents( this, requestTarget, response );
-            return response;
-        }
-    }
-
-
-    /**
-     * Returns the resource specified by the request. Does not update the client or load included framesets.
-     * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
-     */
-    WebResponse getResource( WebRequest request ) throws IOException {
-        return _client.getResourceForWindow( request, this );
-    }
-
-
-    void updateFrameContents( WebResponse response ) throws IOException, SAXException {
+    void updateFrameContents( WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         response.setWindow( this );
-        _frameContents.updateFrames( response, response.getFrameName() );
+        _frameContents.updateFrames( response, response.getFrameName(), requestContext );
     }
 
 
@@ -209,7 +242,6 @@ public class WebWindow {
             && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
             && response.getHeaderField( "Location" ) != null;
     }
-
 
 
 }

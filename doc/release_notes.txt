@@ -10,6 +10,10 @@ Limitations:
 
 
 Revision History:
+16-Nov-202
+Problems fixed:
+    1. Bug #638304 Interframe dependancies for JavaScript at load time are now handled better.
+
 14-Nov-2002
 Problems fixed:
     1. Bug #638406 Multi-line values in form data were using the platform-specific line ending rather than CRLF.

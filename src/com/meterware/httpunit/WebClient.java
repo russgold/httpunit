@@ -140,67 +140,6 @@ public class WebClient {
     }
 
 
-    WebResponse getResourceForWindow( WebRequest request, WebWindow window ) throws IOException {
-        tellListeners( request );
-        WebResponse response = getResource( request, window );
-        if (response != null) tellListeners( response );
-        return response;
-    }
-
-
-    private WebResponse getResource( WebRequest request, final WebWindow window ) throws IOException {
-        final String frameName = getTargetFrame( request.getTarget() );
-        String urlString = request.getURLString().trim();
-        if (urlString.startsWith( "about:" )) {
-            return WebResponse.BLANK_RESPONSE;
-        } else if (!urlString.startsWith( "javascript:" )) {
-            return newResponse( request, frameName );
-        } else {
-            WebRequestSource wrs = request.getWebRequestSource();
-            String result = (wrs == null) ? window.getCurrentPage().getScriptableObject().evaluateURL( urlString )
-                                          : wrs.getScriptableDelegate().evaluateURL( urlString );
-            if (result == null) return null;
-
-            return new DefaultWebResponse( this, frameName, request.getURL(), result );
-        }
-    }
-
-
-    private String getTargetFrame( String target ) {
-        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
-            return WebRequest.TOP_FRAME;
-        } else {
-            return target;
-        }
-    }
-
-
-    private void tellListeners( WebRequest request ) {
-        List listeners;
-
-        synchronized (_clientListeners) {
-            listeners = new ArrayList( _clientListeners );
-        }
-
-        for (Iterator i = listeners.iterator(); i.hasNext();) {
-            ((WebClientListener) i.next()).requestSent( this, request );
-        }
-    }
-
-
-    private void tellListeners( WebResponse response ) {
-        List listeners;
-
-        synchronized (_clientListeners) {
-            listeners = new ArrayList( _clientListeners );
-        }
-
-        for (Iterator i = listeners.iterator(); i.hasNext();) {
-            ((WebClientListener) i.next()).responseReceived( this, response );
-        }
-    }
-
-
     /**
      * Resets the state of this client, removing all cookies, frames, and per-client headers. This does not affect
      * any listeners or preferences which may have been set.
@@ -452,11 +391,40 @@ public class WebClient {
 
     /**
      * Updates this web client based on a received response. This includes updating
-     * cookies and frames.
+     * cookies and frames.  This method is required by ServletUnit, which cannot call the updateWindow method directly.
      **/
     final
     protected void updateMainWindow( String target, WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        _mainWindow.updateWindow( target, response );
+        getMainWindow().updateWindow( target, response, new RequestContext() );
+    }
+
+
+//------------------------------------------------- package members ----------------------------------------------------
+
+
+    void tellListeners( WebRequest request ) {
+        List listeners;
+
+        synchronized (_clientListeners) {
+            listeners = new ArrayList( _clientListeners );
+        }
+
+        for (Iterator i = listeners.iterator(); i.hasNext();) {
+            ((WebClientListener) i.next()).requestSent( this, request );
+        }
+    }
+
+
+    void tellListeners( WebResponse response ) {
+        List listeners;
+
+        synchronized (_clientListeners) {
+            listeners = new ArrayList( _clientListeners );
+        }
+
+        for (Iterator i = listeners.iterator(); i.hasNext();) {
+            ((WebClientListener) i.next()).responseReceived( this, response );
+        }
     }
 
 
@@ -466,13 +434,13 @@ public class WebClient {
     }
 
 
-    void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response ) throws IOException, SAXException {
+    void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         WebWindow window = getTargetWindow( requestWindow, requestTarget );
         if (window != null) {
-            window.updateFrameContents( response );
+            window.updateFrameContents( response, requestContext );
         } else {
             window = new WebWindow( this );
-            window.updateFrameContents( response );
+            window.updateFrameContents( response, requestContext );
             _openWindows.add( window );
             reportWindowOpened( window );
         }

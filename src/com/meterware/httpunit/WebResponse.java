@@ -48,6 +48,8 @@ import org.xml.sax.SAXException;
 abstract
 public class WebResponse implements HTMLSegment, CookieSource {
     private String _refreshHeader;
+    private boolean _hasSubframes;
+
 
     /**
      * Returns a web response built from a URL connection. Provided to allow
@@ -797,7 +799,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
             } while (count != -1);
 
             byte[] bytes = outputStream.toByteArray();
-            readMetaTags( bytes );
+            readTags( bytes );
             _responseText = new String( bytes, getCharacterSet() );
             _inputStream  = new ByteArrayInputStream( bytes );
 
@@ -811,11 +813,12 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    private void readMetaTags( byte[] rawMessage ) throws UnsupportedEncodingException {
+    private void readTags( byte[] rawMessage ) throws UnsupportedEncodingException {
         ByteTagParser parser = new ByteTagParser( rawMessage );
         ByteTag tag = parser.getNextTag();
         while (tag != null && !tag.getName().equalsIgnoreCase( "body" )) {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
+            if (tag.getName().equalsIgnoreCase( "frameset" )) _hasSubframes = true;
             tag = parser.getNextTag();
         }
     }
@@ -969,6 +972,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
         } catch (UnsupportedEncodingException e) {
             _characterSet = getDefaultEncoding();
         }
+    }
+
+
+    boolean hasSubframes() {
+        return _hasSubframes;
     }
 
 

@@ -646,4 +646,24 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testAccessAcrossFrames() throws Exception {
+        defineWebPage( "First",  "<script language='JavaScript'>" +
+                                 "  top.frame2.document.testform.param1.value = 'new1';" +
+                                 "  window.alert('value: ' + top.frame2.document.testform.param1.value);" +
+                                 "</script>" );
+        defineWebPage( "Second",  "<form method=post name=testform action='http://trinity/dummy'>" +
+                                  "  <input type=hidden name='param1' value='old1'></form>" );
+        defineResource( "Frames.html",
+                        "<html><head><title>Initial</title></head>" +
+                        "<frameset cols=\"20%,80%\">" +
+                        "    <frame src='First.html' name='frame1'>" +
+                        "    <frame src='Second.html' name='frame2'>" +
+                        "</frameset></html>" );
+
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/Frames.html" );
+        assertEquals( "Alert message", "value: new1", wc.popNextAlert() );
+    }
+
+
 }

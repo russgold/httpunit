@@ -74,15 +74,19 @@ class FrameHolder {
     }
 
 
-    void updateFrames( WebResponse response, String target ) throws MalformedURLException, IOException, SAXException {
+    void updateFrames( WebResponse response, String target, RequestContext requestContext ) throws MalformedURLException, IOException, SAXException {
         removeSubFrames( target );
         _contents.put( target, response );
 
         if (response.isHTML()) {
-            HttpUnitOptions.getScriptingEngine().associate( response );
-            createSubFrames( target, response.getFrameNames() );
-            WebRequest[] requests = response.getFrameRequests();
-            for (int i = 0; i < requests.length; i++) response.getWindow().getResponse( requests[ i ] );
+            if (!response.hasSubframes()) {
+                requestContext.addNewResponse( response );
+            } else {
+                HttpUnitOptions.getScriptingEngine().associate( response );
+                createSubFrames( target, response.getFrameNames() );
+                WebRequest[] requests = response.getFrameRequests();
+                for (int i = 0; i < requests.length; i++) response.getWindow().getSubframeResponse( requests[ i ], requestContext );
+            }
         }
     }
 
