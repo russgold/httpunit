@@ -6,13 +6,16 @@ Known problems:
 
 Limitations:
     1. JDK 1.2 or higher is required
-    2. JavaScript support does not include Document.open() and some DOM properties
+    2. JavaScript support does not include some DOM properties
 
 
 Revision History:
 17-Nov-2002
 Problems fixed:
     1. Bug #637208 Link.click() no longer returns null when an 'onClick' event fails to return true.
+
+Additions:
+    1. Added support for Document.open, Document.close, and Document.write / writeln for new documents
 
 16-Nov-2002
 Problems fixed:

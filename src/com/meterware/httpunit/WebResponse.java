@@ -248,7 +248,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * Returns a buffered input stream for reading the contents of this reply.
      **/
     public InputStream getInputStream() throws IOException {
-        if (_inputStream == null) _inputStream = new ByteArrayInputStream( new byte[0] );
+        if (_inputStream == null) _inputStream = new ByteArrayInputStream( getText().getBytes() );
         return _inputStream;
     }
 
@@ -680,6 +680,17 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+    /**
+     * Constructs a response object.
+     * @param frameName the name of the frame to hold the response
+     * @param url the url from which the response was received
+     **/
+    protected WebResponse( WebClient client, String frameName, URL url, String text ) {
+        this( client, frameName, url );
+        _responseText = text;
+    }
+
+
     final
     protected void defineRawInputStream( InputStream inputStream ) throws IOException {
         if (_inputStream != null || _responseText != null) {
@@ -721,6 +732,14 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     void setWindow( WebWindow window ) {
         _window = window;
+    }
+
+
+    void replaceText( String text, String contentType ) {
+        _responseText = text;
+        _inputStream = null;
+        _page = null;
+        _contentType = contentType;
     }
 
 
@@ -1100,8 +1119,7 @@ class DefaultWebResponse extends WebResponse {
 
 
     DefaultWebResponse( WebClient client, String target, URL url, String text ) {
-        super( client, target, url );
-        _responseText = text;
+        super( client, target, url, text );
     }
 
 
@@ -1137,33 +1155,19 @@ class DefaultWebResponse extends WebResponse {
         }
     }
 
+
     public String[] getHeaderFields( String fieldName ) {
         String value = getHeaderField( fieldName );
         return value == null ? new String[0] : new String[]{ value };
     }
 
-    /**
-     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
-     * which may be used to represent internal state of this object.
-     **/
-    public String getText() {
-        return _responseText;
-    }
-
-
-    /**
-     * Returns an input stream for reading the contents of this reply.
-     **/
-    public InputStream getInputStream() {
-        return new ByteArrayInputStream( _responseText.getBytes() );
-    }
-
 
     public String toString() {
-        return "DefaultWebResponse [" + _responseText + "]";
+        try {
+            return "DefaultWebResponse [" + getText() + "]";
+        } catch (IOException e) { // should never happen
+            return "DefaultWebResponse [???]";
+        }
     }
-
-
-    private String _responseText;
 }
 

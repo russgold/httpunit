@@ -232,6 +232,11 @@ public class HTMLPage extends ParsedHTML {
 
 
         Scriptable() {}
+
+
+        public void replaceText( String text, String contentType ) {
+            getResponse().replaceText( text, contentType );
+        }
     }
 
 

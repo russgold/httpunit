@@ -119,17 +119,18 @@ public class JavaScript {
                 handleScriptException( e, "Script '" + script + "'" );
                 return "";
             } finally {
-                Context.getCurrentContext().removeThreadLocal( "stream" );
+                discardDocumentWriteBuffer();
             }
         }
 
+
         protected StringBuffer getDocumentWriteBuffer() {
-            StringBuffer buffer = (StringBuffer) Context.getCurrentContext().getThreadLocal( "stream" );
-            if (buffer == null) {
-                buffer = new StringBuffer();
-                Context.getCurrentContext().putThreadLocal( "stream", buffer );
-            }
-            return buffer;
+            throw new IllegalStateException( "may not run executeScript() from " + getClass() );
+        }
+
+
+        protected void discardDocumentWriteBuffer() {
+            throw new IllegalStateException( "may not run executeScript() from " + getClass() );
         }
 
 
@@ -264,6 +265,11 @@ public class JavaScript {
                 e.printStackTrace();
                 throw new RuntimeException( e.toString() );
             }
+        }
+
+
+        protected static String toStringIfNotUndefined( Object object ) {
+            return (object == null || Undefined.instance.equals( object )) ? null : object.toString();
         }
 
 
@@ -429,8 +435,13 @@ public class JavaScript {
         }
 
 
-        private String toStringIfNotUndefined( Object object ) {
-            return (object == null || Undefined.instance.equals( object )) ? null : object.toString();
+        protected StringBuffer getDocumentWriteBuffer() {
+            return jsGet_document().getWriteBuffer();
+        }
+
+
+        protected void discardDocumentWriteBuffer() {
+            jsGet_document().clearWriteBuffer();
         }
 
 
@@ -445,6 +456,8 @@ public class JavaScript {
         private ElementArray _forms;
         private ElementArray _links;
         private ElementArray _images;
+        private StringBuffer _writeBuffer;
+        private String _mimeType;
 
 
         public String getClassName() {
@@ -490,15 +503,34 @@ public class JavaScript {
         }
 
 
+        public void jsFunction_open( Object mimeType ) {
+            _mimeType = toStringIfNotUndefined( mimeType );
+        }
+
+
+        public void jsFunction_close() {
+            getDelegate().replaceText( getWriteBuffer().toString(), _mimeType == null ? "text/html" : _mimeType );
+        }
+
+
         public void jsFunction_write( String string ) {
-            final StringBuffer documentWriteBuffer = getDocumentWriteBuffer();
-            documentWriteBuffer.append( string );
+            getWriteBuffer().append( string );
         }
 
 
         public void jsFunction_writeln( String string ) {
-            final StringBuffer documentWriteBuffer = getDocumentWriteBuffer();
-            documentWriteBuffer.append( string ).append( (char) 0x0D ).append( (char) 0x0A );
+            getWriteBuffer().append( string ).append( (char) 0x0D ).append( (char) 0x0A );
+        }
+
+
+        protected StringBuffer getWriteBuffer() {
+            if (_writeBuffer == null) _writeBuffer = new StringBuffer();
+            return _writeBuffer;
+        }
+
+
+        protected void clearWriteBuffer() {
+            _writeBuffer = null;
         }
 
 
