@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.HttpNotFoundException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -30,8 +31,10 @@ import java.net.MalformedURLException;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -47,7 +50,8 @@ import org.xml.sax.SAXException;
 
 
 /**
- * This class represents the information recorded about a single web application. It is usually extracted from web.xml.
+ * This class represents the information recorded about a single web 
+ * application. It is usually extracted from web.xml.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
@@ -57,19 +61,42 @@ class WebApplication {
     /**
      * Constructs a default application spec with no information.
      */
-    WebApplication() {}
-
+    WebApplication() {
+        _contextPath = "";
+    }
 
     /**
      * Constructs an application spec from an XML document.
      */
-    WebApplication( Document document ) throws MalformedURLException,SAXException {
+    WebApplication(Document document) throws MalformedURLException,SAXException {
+        this(document, null, "");
+    }
+
+    /**
+     * Constructs an application spec from an XML document.
+     */
+    WebApplication(Document document, String contextPath) throws MalformedURLException,SAXException {
+        this(document, null, contextPath);
+    }
+
+    /**
+     * Constructs an application spec from an XML document.
+     */
+    WebApplication(Document document, File file) throws MalformedURLException,SAXException {
+        this(document, null, "");
+    }
+
+    /**
+     * Constructs an application spec from an XML document.
+     */
+    WebApplication(Document document, File file, String contextPath) throws MalformedURLException,SAXException {
+        _contextDir = file;
+        _contextPath = contextPath;
         registerServlets( document );
         NodeList nl = document.getElementsByTagName( "security-constraint" );
         for (int i = 0; i < nl.getLength(); i++) {
             _securityConstraints.add( new SecurityConstraintImpl( (Element) nl.item(i) ) );
         }
-
         extractContextParameters( document );
         extractLoginConfiguration( document );
     }
@@ -86,7 +113,11 @@ class WebApplication {
      * Registers a servlet to be run.
      **/
     void registerServlet( String resourceName, ServletConfiguration servletConfiguration ) {
-        _servlets.put( asResourceName( resourceName ), servletConfiguration );
+        // FIXME - shouldn't everything start with one or the other?
+        if (!resourceName.startsWith("/") && !resourceName.startsWith("*")) {
+            resourceName = "/"+resourceName;
+        }
+        _servletMapping.put( resourceName, servletConfiguration);
     }
 
 
@@ -99,7 +130,7 @@ class WebApplication {
             if (!Servlet.class.isAssignableFrom( servletClass )) throw new HttpInternalErrorException( url );
 
             Servlet servlet = (Servlet) servletClass.newInstance();    // XXX cache instances - by class?
-            servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams(), _contextParameters ) );
+            servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams(), _contextParameters, _contextDir ) );
             return servlet;
         } catch (ClassNotFoundException e) {
             throw new HttpNotFoundException( url, e );
@@ -112,17 +143,27 @@ class WebApplication {
 
 
     private ServletConfiguration getServletConfiguration(URL url) {
+        if (!url.getFile().startsWith(_contextPath)) {
+            return null;
+        }
         String servletName = getServletName( getURLPath( url ) );
         if (servletName.endsWith( "j_security_check" )) {
             return SECURITY_CHECK_CONFIGURATION;
         } else {
-            return (ServletConfiguration) _servlets.get( servletName );
+            return _servletMapping.get( servletName );
         }
     }
 
 
     private String getURLPath( URL url ) {
-        return url.getFile();
+        String file = url.getFile();
+        if (_contextPath.equals("")) {
+            return file;
+        } else if (file.startsWith(_contextPath)) {
+            return file.substring(_contextPath.length());
+        } else {
+            return null;
+        }
     }
 
 
@@ -188,7 +229,7 @@ class WebApplication {
     private final static ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
 
     /** A mapping of resource names to servlet class names. **/
-    private Hashtable _servlets = new Hashtable();
+    private ServletMapping _servletMapping = new ServletMapping();
 
     private ArrayList _securityConstraints = new ArrayList();
 
@@ -203,6 +244,10 @@ class WebApplication {
     private URL _errorURL;
 
     private Hashtable _contextParameters = new Hashtable();
+
+    private File _contextDir = null;
+
+    private String _contextPath = null;
 
     final static private SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
 
@@ -422,6 +467,117 @@ class WebApplication {
 
             private ArrayList _urlPatterns  = new ArrayList();
         }
+    }
+
+    /**
+     * A utility class for mapping servlets to url patterns. This implements the
+     * matching algorithm documented in section 10 of the JSDK-2.2 reference.
+     *
+     * @author <a href="balld@webslingerZ.com">Donald Ball</a>
+     * @version $Revision$
+     */
+    class ServletMapping {
+    
+        private final Map exactMatches = new HashMap();
+        private final Map extensions = new HashMap();
+        private final Map urlTree = new HashMap();
+    
+        void put(String mapping, ServletConfiguration servletConfiguration) {
+            if (mapping.indexOf('*') == -1) {
+                exactMatches.put(mapping, servletConfiguration);
+            } else if (mapping.startsWith("*.")) {
+                extensions.put(mapping.substring(2), servletConfiguration);
+            } else {
+                ParsedPath path = new ParsedPath(mapping);
+                Map context = urlTree;
+                while (path.hasNext()) {
+                    String part = path.next();
+                    if (part.equals("*")) {
+                        context.put("*", servletConfiguration);
+                        return;
+                    }
+                    if (!context.containsKey(part)) {
+                        context.put(part, new HashMap());
+                    }
+                    context = (Map)context.get(part);
+                }
+                context.put("/", servletConfiguration);
+            }
+        }
+    
+        ServletConfiguration get(String url) {
+            if (exactMatches.containsKey(url)) {
+                return (ServletConfiguration)exactMatches.get(url);
+            }
+            ParsedPath path = new ParsedPath(url);
+            Map context = urlTree;
+            while (path.hasNext()) {
+                String part = path.next();
+                if (!context.containsKey(part)) {
+                    if (context.containsKey("*")) {
+                        return (ServletConfiguration)context.get("*");
+                    } else {
+                        int index = url.lastIndexOf('.');
+                        if (index == -1 || index == url.length()-1) {
+                            return null;
+                        } else {
+                            return (ServletConfiguration)extensions.get(url.substring(index+1));
+                        }
+                    }
+                }
+                context = (Map)context.get(part);
+            }
+            if (context.containsKey("*")) {
+                return (ServletConfiguration)context.get("*");
+            }
+            return (ServletConfiguration)context.get("/");
+        }
+    
+    }
+
+}
+
+/**
+ * A utility class for parsing URLs into paths
+ *
+ * @author <a href="balld@webslingerZ.com">Donald Ball</a>
+ */
+class ParsedPath {
+
+    private final String path;
+    private int position = 0;
+    static final char seperator_char = '/';
+
+    /**
+     * Creates a new parsed path for the given path value
+     *
+     * @param path the path
+     */
+    ParsedPath(String path) {
+        if (path.charAt(0) != seperator_char) {
+            throw new IllegalArgumentException("Illegal path '"+path+"', does not begin with "+seperator_char);
+        }
+        this.path = path;
+    }
+
+    /**
+     * Returns true if there are more parts left, otherwise false
+     */
+    public final boolean hasNext() {
+        return (position < path.length());
+    }
+
+    /**
+     * Returns the next part in the path
+     */
+    public final String next() {
+        int offset = position+1;
+        while (offset < path.length() && path.charAt(offset) != seperator_char) {
+            offset++;
+        }
+        String result = path.substring(position+1, offset);
+        position = offset;
+        return result;
     }
 
 }

@@ -20,6 +20,8 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.net.URL;
@@ -39,9 +41,10 @@ import javax.servlet.*;
  **/
 class ServletUnitServletContext implements ServletContext {
 
-    ServletUnitServletContext( WebApplication application, Hashtable contextParams ) {
+    ServletUnitServletContext( WebApplication application, Hashtable contextParams, File contextDir ) {
         _application = application;
         _contextParams = contextParams;
+        _contextDir = contextDir;
     }
 
 
@@ -108,7 +111,16 @@ class ServletUnitServletContext implements ServletContext {
      * method does not use class loaders.
      **/
     public java.net.URL getResource( String path ) {
-        return null;  // XXX not implemented
+        if (_contextDir == null) {
+            return null; // no context, but maybe try against working dir?
+        } else {
+            try {
+                File resourceFile = new File(_contextDir, path.substring(1));
+                return resourceFile.toURL();
+            } catch (IOException e) {
+                return null;
+            }
+        }
     }
 
 
@@ -126,7 +138,16 @@ class ServletUnitServletContext implements ServletContext {
      * containers to make a resource available to a servlet from any location, without using a class loader.
      **/
     public java.io.InputStream getResourceAsStream( String path ) {
-        return null;   // XXX not implemented
+        if (_contextDir == null) {
+            return null; // no context, but maybe try against working dir?
+        } else {
+            try {
+                File resourceFile = new File(_contextDir, path.substring(1));
+                return new FileInputStream(resourceFile);
+            } catch (IOException e) {
+                return null;
+            }
+        }
     }
 
 
@@ -346,4 +367,5 @@ class ServletUnitServletContext implements ServletContext {
     private Hashtable      _attributes = new Hashtable();
     private WebApplication _application;
     private Hashtable      _contextParams = new Hashtable();
+    private File           _contextDir;
 }

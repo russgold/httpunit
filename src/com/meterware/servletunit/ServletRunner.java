@@ -25,6 +25,7 @@ import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.HttpUnitUtils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -49,25 +50,47 @@ public class ServletRunner {
      * Default constructor, which defines no servlets.
      */
     public ServletRunner() {
+        _context = new ServletUnitContext();
         _application = new WebApplication();
     }
 
-
     /**
-     * Constructor which expects the full path to the web.xml for the application.
-     **/
-    public ServletRunner( String webXMLFileSpec ) throws IOException, SAXException {
-        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ) );
+     * Constructor which expects the full path to the web.xml for the 
+     * application.
+     *
+     * @param webXMLFileSpec the full path to the web.xml file
+     */
+    public ServletRunner( String webXMLFileSpec) throws IOException, SAXException {
+        this(webXMLFileSpec, null);
     }
 
+    /**
+     * Constructor which expects the full path to the web.xml for the 
+     * application and a context path under which to mount it.
+     *
+     * @param webXMLFileSpec the full path to the web.xml file
+     * @param contextPath the context path
+     */
+    public ServletRunner( String webXMLFileSpec, String contextPath ) throws IOException, SAXException {
+        _context = new ServletUnitContext(contextPath);
+        File webXMLFile = new File(webXMLFileSpec);
+        _application = new WebApplication(HttpUnitUtils.newParser().parse( webXMLFileSpec ), webXMLFile.getParentFile().getParentFile(), _context.getContextPath());
+    }
 
     /**
      * Constructor which expects an input stream containing the web.xml for the application.
      **/
     public ServletRunner( InputStream webXML ) throws IOException, SAXException {
-        _application = new WebApplication( HttpUnitUtils.newParser().parse( new InputSource( webXML ) ) );
+        this(webXML, null);
     }
 
+    /**
+     * Constructor which expects an input stream containing the web.xml for the application.
+     **/
+    public ServletRunner( InputStream webXML, String contextPath ) throws IOException, SAXException {
+        _context = new ServletUnitContext(contextPath);
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( new InputSource( webXML ) ), _context.getContextPath());
+    }
 
     /**
      * Registers a servlet class to be run.
@@ -122,7 +145,7 @@ public class ServletRunner {
 
     private ServletUnitClient  _client;
 
-    private ServletUnitContext _context = new ServletUnitContext();
+    private ServletUnitContext _context;
 
     private InvocationContextFactory _factory = new InvocationContextFactory() {
         public InvocationContext newInvocation( WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {

@@ -25,6 +25,13 @@ import java.util.Hashtable;
 
 class ServletUnitContext {
 
+    ServletUnitContext() {
+        _contextPath = "";
+    }
+
+    ServletUnitContext(String contextPath) {
+        _contextPath = (contextPath != null ? contextPath : "");
+    }
 
     /**
      * Returns the session with the specified ID, if any.
@@ -43,11 +50,20 @@ class ServletUnitContext {
         return result;
     }
 
+    /**
+     * Returns the contextPath
+     */
+    String getContextPath() {
+        return _contextPath;
+    }
+
 
 //------------------------------- private members ---------------------------
 
 
     private Hashtable _sessions = new Hashtable();
+
+    private String _contextPath = null;
 
 
 }

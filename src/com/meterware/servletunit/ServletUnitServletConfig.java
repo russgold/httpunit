@@ -19,6 +19,7 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -33,10 +34,10 @@ import javax.servlet.ServletContext;
 class ServletUnitServletConfig implements ServletConfig {
 
 
-    ServletUnitServletConfig( Servlet servlet, WebApplication application, Hashtable initParams, Hashtable contextParams ) {
+    ServletUnitServletConfig( Servlet servlet, WebApplication application, Hashtable initParams, Hashtable contextParams, File contextDir ) {
         _name = servlet.getClass().getName();
         _initParameters = initParams;
-        _context = new ServletUnitServletContext( application, contextParams );
+        _context = new ServletUnitServletContext( application, contextParams, contextDir );
     }
 
 
@@ -83,4 +84,5 @@ class ServletUnitServletConfig implements ServletConfig {
     private final Hashtable _initParameters;
 
     private final ServletContext _context;
+
 }

@@ -226,10 +226,12 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns the part of this request's URL from the protocol name up to the query string in the first line of the HTTP request.
      **/
     public String getRequestURI() {
-        throwNotImplementedYet();
-        return "";
+        try {
+            return _request.getURL().getPath();
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
-
 
     /**
      * Returns the current HttpSession associated with this request or, if there is no current session 
@@ -586,7 +588,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * this method returns "".
      **/
     public java.lang.String getContextPath() {
-        throw new RuntimeException( "getContextPath not implemented" );
+        return _context.getContextPath();
     }
 
 
