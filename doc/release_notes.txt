@@ -13,6 +13,16 @@ Limitations:
 
 
 Revision History:
+  7-Mar-2003
+Acknowledgements:
+    Thanks to Andrew Bickerton for correcting the handling of document.open for non-HTML pages and new pages with
+              base tags.
+
+Problems fixed:
+    1. calling Document.open() on a non-HTML page no longer throws an exception.
+    2. Rewriting a document now properly handles any <base> tags in the new document.
+
+
   3-Mar-2003 1.5.2
 Acknowledgements:
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix

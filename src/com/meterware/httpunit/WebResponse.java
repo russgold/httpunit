@@ -544,6 +544,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
         public HTMLPage.Scriptable getDocument() {
             try {
+                if (!isHTML()) replaceText( BLANK_HTML, HTML_CONTENT );
                 return getReceivedPage().getScriptableObject();
             } catch (SAXException e) {
                 throw new RuntimeException( e.toString() );
@@ -736,6 +737,18 @@ public class WebResponse implements HTMLSegment, CookieSource {
         _inputStream = null;
         _page = null;
         _contentType = contentType;
+        _baseURL = null;
+        _baseTarget = null;
+        _refreshHeader = null;
+        _hasSubframes = false;
+
+        try {
+            readTags( text.getBytes() );
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException( "Failure while attempting to reparse text: " + e );
+        } catch (MalformedURLException e) {
+            throw new RuntimeException( "Failure while attempting to reparse text: " + e );
+        }
     }
 
 

@@ -63,6 +63,11 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
+    protected void defineResource( String resourceName, byte[] value, String contentType ) {
+        _server.setResource( resourceName, value, contentType );
+    }
+
+
     protected void defineResource( String resourceName, String value, int statusCode ) {
         _server.setErrorResource( resourceName, statusCode, value );
     }
