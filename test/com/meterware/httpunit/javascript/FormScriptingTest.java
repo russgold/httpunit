@@ -153,6 +153,32 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verifies bug #959918
+     */
+    public void testNumericParameterSetting() throws Exception {
+        defineResource( "DoIt?id=1234", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head>" +
+                                          "<script>" +
+                                          "  function myFunction(value) {" +
+                                          "    document.mainForm.id = value;" +
+                                          "    document.mainForm.submit();" +
+                                          "  }</script>" +
+                                          "</head>" +
+                                          "<body>" +
+                                          "<form name=mainForm action='DoIt'>" +
+                                          "  <a href='javascript:myFunction(1234)'>View Asset</a>" +
+                                          "  <input type='hidden' name='id'>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
     public void testEnablingDisabledSubmitButtonViaScript() throws Exception {
         defineResource( "DoIt?color=green&change=success", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +
