@@ -226,7 +226,7 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource( "Target.html", "You made it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
                         "<body>" +
-                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Target.html' );\">go</a>" +
+                        "<a href='#' onClick=\"window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
                         "</body></html>" );
         final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
@@ -244,10 +244,9 @@ public class ScriptingTest extends HttpUnitTest {
 
 
     public void testWindowOpenNoContents() throws Exception {
-        defineResource( "Target.html", "You made it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
                         "<body>" +
-                        "<a href='#' onClick=\"window.open( 'sample' );\">go</a>" +
+                        "<a href='#' onClick=\"window.open( null, 'sample' );\">go</a>" +
                         "</body></html>" );
         final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
@@ -269,8 +268,8 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource( "Revise.html", "You changed it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
                         "<body>" +
-                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Target.html' );\">go</a>" +
-                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Revise.html' );\">go</a>" +
+                        "<a href='#' onClick=\"window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
+                        "<a href='#' onClick=\"window.open( '" + getHostPath() + "/Revise.html', 'sample' );\">go</a>" +
                         "</body></html>" );
         final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
@@ -297,13 +296,14 @@ public class ScriptingTest extends HttpUnitTest {
                                        "</script></head><body onload='show_properties()'>" +
                                        "</body></html>" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
-                        "<body onload='window.name=\"main\"'>" +
-                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Target.html' );\">go</a>" +
+                        "<body onload=\"window.name='main'; alert ('opener ' + (window.opener ? 'found' : 'not defined') );\">" +
+                        "<a href='#' onClick=\"window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
                         "</body></html>" );
         final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "main window name", "main", wc.getMainWindow().getName() );
+        assertEquals( "main window alert", "opener not defined", wc.popNextAlert() );
         response.getLinks()[0].click();
 
         assertEquals( "1st alert", "name=sample", wc.popNextAlert() );

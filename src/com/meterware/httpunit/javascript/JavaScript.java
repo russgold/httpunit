@@ -376,9 +376,9 @@ public class JavaScript {
         }
 
 
-        public Window jsFunction_open( String name, Object url, String features, boolean replace )
+        public Window jsFunction_open( Object url, String name, String features, boolean replace )
                 throws PropertyException, JavaScriptException, NotAFunctionException, IOException, SAXException {
-            return (Window) toScriptable( getDelegate().open( name, toStringIfNotUndefined( url ), features, replace ) );
+            return (Window) toScriptable( getDelegate().open( toStringIfNotUndefined( url ), name, features, replace ) );
         }
 
 

@@ -571,7 +571,7 @@ public class WebResponse implements HTMLSegment {
         }
 
 
-        public Scriptable open( String name, String urlString, String features, boolean replace )
+        public Scriptable open( String urlString, String name, String features, boolean replace )
                 throws IOException, SAXException {
             if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
             GetMethodWebRequest request = new GetMethodWebRequest( getURL(), urlString );
@@ -597,10 +597,15 @@ public class WebResponse implements HTMLSegment {
             } else if (propertyName.equalsIgnoreCase( "location" )) {
                 return WebResponse.this._url.toExternalForm();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
-                return getTarget().equals( WebRequest.TOP_FRAME ) ? _window.getOpener().getScriptableObject() : null;
+                return getTarget().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
             } else {
                 return super.get( propertyName );
             }
+        }
+
+
+        private Scriptable getScriptable( WebResponse opener ) {
+            return opener == null ? null : opener.getScriptableObject();
         }
 
 

@@ -10,10 +10,7 @@ o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Documentation, Documentation
 
 JavaScript priorities:
-o Window.name for frames
-o Window.frames[]
 o Window.parent
-o Window.top
 o Document.write - may required substantial parser rewrite
 
 
