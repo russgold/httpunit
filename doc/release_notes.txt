@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+27-Sep-2002
+Additions:
+    1. The Javascript property Link.href is now read-write
+
 26-Sep-2002
 Problems fixed:
     1. A Javascript URL containing a question mark was incorrectly being URL-encoded.

@@ -368,6 +368,24 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testLinkProperties() throws Exception {
+        defineResource( "somewhere.html?with=values", "you made it!" );
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<a name=target href='nowhere.html'>" +
+                                            "<a name=control href='#' onClick=\"document.target.href='somewhere.html?with=values';\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebLink link = response.getLinkWithName( "target" );
+        assertEquals( "initial value", "nowhere.html", link.getURLString() );
+        response.getLinkWithName( "control" ).click();
+        assertEquals( "changed reference", getHostPath() + "/somewhere.html?with=values", link.getRequest().getURL().toExternalForm() );
+        response = link.click();
+        assertEquals( "New page", "you made it!", response.getText() );
+    }
+
+
     public void testLinkIndexes() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function alertLinks() { " +

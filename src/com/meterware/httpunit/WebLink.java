@@ -46,16 +46,10 @@ public class WebLink extends FixedURLWebRequestSource {
 
 
     /**
-     * Returns the URL referenced by this link. This may be a relative URL.
+     * Returns the URL referenced by this link. This may be a relative URL. It will not include any fragment identifier.
      **/
     public String getURLString() {
-        String href = NodeUtils.getNodeAttribute( getNode(), "href" );
-        final int hashIndex = href.indexOf( '#' );
-        if (hashIndex < 0) {
-            return href;
-        } else {
-            return href.substring( 0, hashIndex );
-        }
+        return getRelativeURL();
     }
 
 
@@ -104,6 +98,15 @@ public class WebLink extends FixedURLWebRequestSource {
                 return getReference().toExternalForm();
             } else {
                return super.get( propertyName );
+            }
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equals( "href" )) {
+                setDestination( (String) value );
+            } else {
+                super.set( propertyName, value );
             }
         }
 

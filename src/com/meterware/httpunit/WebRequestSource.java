@@ -112,7 +112,7 @@ public class WebRequestSource extends ParameterHolder {
     }
 
 
-    private String getRelativeURL() {
+    protected String getRelativeURL() {
         String result = trimFragment( getDestination() );
         if (result.trim().length() == 0) result = getBaseURL().getFile();
         return result;

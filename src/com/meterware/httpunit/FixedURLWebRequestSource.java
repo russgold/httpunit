@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 
 
 /**
+ * An implementation of web request source whose URL does not change under user action.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
@@ -74,6 +75,13 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
     protected void addPresetParameter( String name, String value ) {
         _presetParameterMap.put( name, HttpUnitUtils.withNewValue( (String[]) _presetParameterMap.get( name ), value ) );
         _presetParameterList.add( new PresetParameter( name, value ) );
+    }
+
+
+    protected void setDestination( String destination ) {
+        super.setDestination( destination );
+        _presetParameterList = null;
+        _presetParameterMap = null;
     }
 
 
