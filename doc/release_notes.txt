@@ -26,6 +26,7 @@ Acknowledgements:
     Thanks to Daniel Sheppard, Navid Vahdat, and Ron Hanson for help in adding capabilities to the RequestDispatcher implementation.
     Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
     Thanks to Raphael Corre for improving logger of transmitted headers
+    Thanks to Jason Bedell for supplying an implementation for HttpSession.getValueNames.
 
 Problems Fixed:
     Packaging
@@ -53,6 +54,7 @@ Problems Fixed:
        16. ServletUnit now creates a new session if the requested session exists but is marked invalid
        17. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
            as relative to the context root.
+       18. ServletUnit now supports HttpSession.getValueNames().
 
 Additions:
     Content and Parsing

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -20,7 +20,6 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
@@ -33,7 +32,7 @@ import junit.framework.TestSuite;
 import com.meterware.httpunit.*;
 
 /**
- * Tests support for stateless HttpServlets.
+ * Tests support for state-management behavior.
  **/
 public class StatefulTest extends TestCase {
 
@@ -128,6 +127,10 @@ public class StatefulTest extends TestCase {
         assertTrue( "No attribute names in list", e.hasMoreElements() );
         assertEquals( "First attribute name", "color", e.nextElement() );
         assertTrue( "List did not end after one name", !e.hasMoreElements() );
+
+        String[] names = ic.getRequest().getSession().getValueNames();
+        assertEquals( "number of value names", 1, names.length );
+        assertEquals( "first name", "color", names[0] );
     }
 
 

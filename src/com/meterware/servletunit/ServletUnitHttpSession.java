@@ -146,7 +146,7 @@ class ServletUnitHttpSession implements HttpSession {
      **/
     public String[] getValueNames() {
         if (_invalid) throw new IllegalStateException();
-        throw new RuntimeException( "getValueNames not implemented" );
+        return (String[]) _values.keySet().toArray( new String[ _values.size() ]);
     }
 
 
