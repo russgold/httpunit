@@ -23,9 +23,11 @@ import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
 import java.net.HttpURLConnection;
+import java.io.IOException;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -73,6 +75,24 @@ public class WebFormTest extends HttpUnitTest {
         form.setParameter( "name", "master" );
         form.submit();
         assertEquals( "Expected response", "You made it!", _wc.getCurrentPage().getText() );
+    }
+
+
+    public void testAmbiguousSubmitFromForm() throws Exception {
+        defineWebPage( "Form", "<form method=GET id=main action = 'tryMe'>" +
+                              "<Input type=text Name=name>" +
+                              "<input type=\"checkbox\" name=second checked>Enabled" +
+                              "<input type='submit' name='left'><input type='submit' name='right'>" +
+                              "</form>" );
+        defineResource( "/tryMe?name=master&second=on", "You made it!" );
+        WebResponse wr = _wc.getResponse( getHostPath() + "/Form.html" );
+        WebForm form = wr.getFormWithID( "main" );
+        form.setParameter( "name", "master" );
+        try {
+            form.submit();
+            fail( "Should have rejected request as ambiguous" );
+        } catch (IllegalRequestParameterException e) {
+        }
     }
 
 

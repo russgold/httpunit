@@ -64,7 +64,7 @@ public class WebForm extends WebRequestSource {
      * inhibits the submission, will return the updated contents of the frame containing this form.
      **/
     public WebResponse submit( SubmitButton button ) throws IOException, SAXException {
-        return button.doOnClickEvent() ? doFormSubmit( button ) : getCurrentFrameContents();
+        return (button == null || button.doOnClickEvent()) ? doFormSubmit( button ) : getCurrentFrameContents();
     }
 
 
