@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 
 
 /**
+ * A button in a form.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/

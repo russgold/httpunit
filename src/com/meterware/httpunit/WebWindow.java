@@ -27,8 +27,9 @@ import java.util.List;
 import org.xml.sax.SAXException;
 
 /**
+ * A window managed by a {@link com.meterware.httpunit.WebClient WebClient}.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class WebWindow {
 
@@ -47,6 +48,7 @@ public class WebWindow {
     /** True if this window has been closed. **/
     private boolean _closed;
 
+
     /**
      * Returns the web client associated with this window.
      */
@@ -55,11 +57,17 @@ public class WebWindow {
     }
 
 
+    /**
+     * Returns true if this window has been closed.
+     */
     public boolean isClosed() {
         return _closed;
     }
 
 
+    /**
+     * Closes this window.
+     */
     public void close() {
         if (!_closed) _client.close( this );
         _closed = true;

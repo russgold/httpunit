@@ -15,13 +15,13 @@ used to convert raw HTML into an XML DOM. This is required for handling HTML.</d
 <dt>xmlParserAPIs.jar</dt><dd>The interfaces for a W3-compliant XML parser. Required for interpreting either HTML or XML pages.</dd>
 <dt>xercesImpl.jar</dt><dd>The <a href="http://xml.apache.org/xerces2-j/index.html">Xerces 2 implementation</a> of an XML parser.
 NekoHTML requires this implementation.
-<dt>servlet.jar</dt><dd>The APIs and common classes for the Java Servlet 1.3 standard. Required for use with <a href="../servletunit-intro.html">ServletUnit.</a></dd>
+<dt>servlet.jar</dt><dd>The APIs and common classes for the Java Servlet 1.3 standard. Required for use with <a href="../../../../servletunit-intro.html">ServletUnit.</a></dd>
 <dt>junit.jar</dt><dd><a href="http://www.junit.org">JUnit</a>, the unit test framework. Used to test HttpUnit and
 recommended for writing tests that use HttpUnit.</dd>
-</dl>
-No longer included, but still supported, is <A HREF="http://lempinen.net/sami/jtidy">JTidy</A>, an alternate HTML parser/validator.
+<dt>tidy.jar</dt><dd><A HREF="http://lempinen.net/sami/jtidy">JTidy</A>, an alternate HTML parser/validator.
 JTidy is a lot pickier about HTML structure than NekoHTML, and uses its own implementation of the DOM classes, rather than using those
-found in the xerces jar. Some JavaScript features, such as <code>document.write()</code> will only work with NekoHTML.
+found in the xerces jar. Some JavaScript features, such as <code>document.write()</code> will only work with NekoHTML.</dd>
+</dl>
 
 
 <H2>Example</H2>
