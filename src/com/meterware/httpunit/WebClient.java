@@ -47,6 +47,7 @@ public class WebClient {
 
     /**
      * Submits a GET method request and returns a response.
+     * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
     public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException, SAXException {
         return getResponse( new GetMethodWebRequest( urlString ) );
@@ -56,6 +57,7 @@ public class WebClient {
     /**
      * Submits a web request and returns a response, using all state developed so far as stored in
      * cookies as requested by the server.
+     * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         if (request.getURLString().startsWith( "about:" )) return WebResponse.BLANK_RESPONSE;

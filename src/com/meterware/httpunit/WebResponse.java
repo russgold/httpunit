@@ -67,6 +67,7 @@ public class WebResponse {
 
     /**
      * Returns the title of the page.
+     * @exception SAXException thrown if there is an error parsing this response
      **/
     public String getTitle() throws SAXException {
         return getReceivedPage().getTitle();
@@ -75,6 +76,7 @@ public class WebResponse {
 
     /**
      * Returns the target of the page.
+     * @exception SAXException thrown if there is an error parsing this response
      **/
     public String getTarget() throws SAXException {
         return _target;
@@ -152,6 +154,7 @@ public class WebResponse {
     
     /**
      * Returns the names of the frames found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing this response
      **/
     public String[] getFrameNames() throws SAXException {
         WebFrame[] frames = getFrames();
@@ -193,6 +196,7 @@ public class WebResponse {
 
     /**
      * Returns the first link which contains the specified text.
+     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebLink getLinkWith( String text ) throws SAXException {
         return getReceivedPage().getLinkWith( text );
@@ -201,6 +205,7 @@ public class WebResponse {
 
     /**
      * Returns the first link which contains an image with the specified text as its 'alt' attribute.
+     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebLink getLinkWithImageText( String text ) throws SAXException {
         return getReceivedPage().getLinkWithImageText( text );

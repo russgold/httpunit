@@ -56,6 +56,7 @@ public class ServletRunner {
 
     /**
      * Returns the response from the specified servlet.
+     * @exception SAXException thrown if there is an error parsing the response
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         return _client.getResponse( request );
