@@ -90,7 +90,9 @@ class SocketConnection {
 
     SocketResponse getResponse() throws IOException {
         if (!_isChunking) throw new IllegalStateException( "Not chunking a request." );
+        _isChunking = false;
         sendHTTPLine( "0" );
+        sendHTTPLine( "" );
         return new SocketResponse( _is );
     }
 
@@ -113,12 +115,12 @@ class SocketConnection {
         }
 
 
-        protected void appendMessageHeader( StringBuffer sb ) {
+        void appendMessageHeader( StringBuffer sb ) {
             sb.append( _protocol ).append( ' ' ).append( _responseCode ).append( ' ' ).append( _message );
         }
 
 
-        protected void interpretMessageHeader( String messageHeader ) {
+        void interpretMessageHeader( String messageHeader ) {
             int s1 = messageHeader.indexOf( ' ' );
             int s2 = messageHeader.indexOf( ' ', s1+1 );
 

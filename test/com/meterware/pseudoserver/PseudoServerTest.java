@@ -156,6 +156,26 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
+    public void testPseudoServletWithGET() throws Exception {
+        String resourceName = "tellMe";
+        String name = "Charlie";
+        final String prefix = "Hello there, ";
+        String expectedResponse = prefix + name;
+
+        defineResource( resourceName, new PseudoServlet() {
+            public WebResource getGetResponse() {
+                return new WebResource( prefix + getParameter( "name" )[0], "text/plain" );
+            }
+        } );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "GET", '/' + resourceName + "?name=" + name );
+        assertEquals( "Response code", 200, response.getResponseCode() );
+        assertEquals( "Content type", "text/plain", response.getHeader( "Content-Type" ) );
+        assertEquals( "Response", expectedResponse, new String( response.getBody() ) );
+    }
+
+
     public void testChunkedRequest() throws Exception {
         super.defineResource( "/chunkedServlet", new PseudoServlet() {
             public WebResource getPostResponse() {
@@ -173,10 +193,41 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
+    // need test: respond with HTTP_BAD_REQUEST if header line is bad
+
+
+    public void testChunkedRequestFollowedByAnother() throws Exception {
+        super.defineResource( "/chunkedServlet", new PseudoServlet() {
+            public WebResource getPostResponse() {
+                return new WebResource( super.getBody(), "text/plain" );
+            }
+        } );
+
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        conn.startChunkedResponse( "POST", "/chunkedServlet" );
+        conn.sendChunk( "This " );
+        conn.sendChunk( "is " );
+        conn.sendChunk( "chunked.");
+        SocketConnection.SocketResponse response = conn.getResponse();
+        assertEquals( "retrieved body", "This is chunked.", new String( response.getBody() ) );
+
+
+        // Make a second request to duplicate the problem...
+        conn.startChunkedResponse( "POST", "/chunkedServlet" );
+        conn.sendChunk( "This " );
+        conn.sendChunk( "is " );
+        conn.sendChunk( "also " );
+        conn.sendChunk( "chunked.");
+        SocketConnection.SocketResponse response2 = conn.getResponse();
+        assertEquals( "retrieved body", "This is also chunked.", new String( response2.getBody() ) );
+    }
+
+
     public void testChunkedResponse() throws Exception {
         defineResource( "/chunkedServlet", new PseudoServlet() {
             public WebResource getGetResponse() {
-                WebResource webResource = new WebResource( "5\r\nSent \r\n3\r\nin \r\n07\r\nchunks.\r\n0\r\n", "text/plain" );
+                WebResource webResource = new WebResource( "5\r\nSent \r\n3\r\nin \r\n07\r\nchunks.\r\n0\r\n\r\n", "text/plain" );
                 webResource.addHeader( "Transfer-Encoding: chunked" );
                 return webResource;
             }

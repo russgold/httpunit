@@ -31,7 +31,7 @@ import java.util.Hashtable;
 /**
  * Represents a single HTTP request, extracted from the input stream.
  */
-class HttpRequest extends ReceivedHttpMessage {
+public class HttpRequest extends ReceivedHttpMessage {
 
     private String         _protocol;
     private String         _command;
@@ -44,7 +44,7 @@ class HttpRequest extends ReceivedHttpMessage {
     }
 
 
-    protected void interpretMessageHeader( String messageHeader ) {
+    void interpretMessageHeader( String messageHeader ) {
         StringTokenizer st = new StringTokenizer( messageHeader );
         _command  = st.nextToken();
         _uri      = st.nextToken();
@@ -52,21 +52,31 @@ class HttpRequest extends ReceivedHttpMessage {
     }
 
 
-    protected void appendMessageHeader( StringBuffer sb ) {
+    void appendMessageHeader( StringBuffer sb ) {
         sb.append( _command ).append( ' ' ).append( _uri ).append( ' ' ).append( _protocol );
     }
 
 
-    String getCommand() {
+    /**
+     * Returns the command associated with this request.
+     */
+    public String getCommand() {
         return _command;
     }
 
-    String getURI() {
+
+    /**
+     * Returns the URI specified in the message header for this request.
+     */
+    public String getURI() {
         return _uri;
     }
 
 
-    String getProtocol() {
+    /**
+     * Returns the protocol string specified in the message header for this request.
+     */
+    public String getProtocol() {
         return _protocol;
     }
 
@@ -75,11 +85,20 @@ class HttpRequest extends ReceivedHttpMessage {
      * Returns the parameter with the specified name. If no such parameter exists, will
      * return null.
      **/
-    String[] getParameter( String name ) {
+    public String[] getParameter( String name ) {
         if (_parameters == null) {
-            _parameters = readParameters( new String( getBody() ) );
+            if (_command.equalsIgnoreCase( "GET" ) || _command.equalsIgnoreCase( "HEAD" )) {
+                _parameters = readParameters( getParameterString( _uri ) );
+            } else {
+                _parameters = readParameters( new String( getBody() ) );
+            }
         }
         return (String[]) _parameters.get( name );
+    }
+
+
+    private String getParameterString( String uri ) {
+        return uri.indexOf( '?' ) < 0 ? "" : uri.substring( uri.indexOf( '?' )+1 );
     }
 
 

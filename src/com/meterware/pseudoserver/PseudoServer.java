@@ -327,6 +327,7 @@ public class PseudoServer {
 
     private WebResource getResource( HttpRequest request ) throws IOException {
         Object resource = _resources.get( request.getURI() );
+        if (resource == null) resource = _resources.get( withoutParameters( request.getURI() ) );
 
         if (request.getCommand().equals( "GET" ) && resource instanceof WebResource) {
             return (WebResource) resource;
@@ -361,6 +362,11 @@ public class PseudoServer {
         } else {
             return null;
         }
+    }
+
+
+    private String withoutParameters( String uri ) {
+        return uri.indexOf( '?' ) < 0 ? uri : uri.substring( 0, uri.indexOf( '?' ) );
     }
 
 

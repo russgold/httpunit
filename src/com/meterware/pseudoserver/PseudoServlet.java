@@ -73,7 +73,7 @@ public class PseudoServlet {
 
 
     void init( HttpRequest requestStream ) {
-        _requestStream = requestStream;
+        _request = requestStream;
     }
 
 
@@ -81,7 +81,7 @@ public class PseudoServlet {
      * Returns the header with the specified name. If no such header exists, will return null.
      **/
     protected String getHeader( String name ) {
-        return _requestStream.getHeader( name );
+        return _request.getHeader( name );
     }
 
 
@@ -90,7 +90,7 @@ public class PseudoServlet {
      * will return null.
      **/
     protected String[] getParameter( String name ) {
-        return _requestStream.getParameter( name );
+        return _request.getParameter( name );
     }
 
 
@@ -98,21 +98,21 @@ public class PseudoServlet {
      * Returns a reader for the body of the request.
      **/
     protected Reader getReader() {
-        return _requestStream.getReader();
+        return _request.getReader();
     }
 
 
     protected byte[] getBody() {
-        return _requestStream.getBody();
+        return _request.getBody();
     }
 
 
     protected HttpRequest getRequest() {
-        return _requestStream;
+        return _request;
     }
 
 
-    private HttpRequest _requestStream;
+    private HttpRequest _request;
 
 }
 

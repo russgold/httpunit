@@ -78,7 +78,7 @@ abstract class ReceivedHttpMessage {
     }
 
 
-    protected void appendContents( StringBuffer sb ) {
+    void appendContents( StringBuffer sb ) {
         for (Enumeration e = _headers.keys(); e.hasMoreElements();) {
             Object key = e.nextElement();
             sb.append( "      " ).append( key ).append( ": " ).append( _headers.get( key ) ).append( "\n" );
@@ -106,12 +106,19 @@ abstract class ReceivedHttpMessage {
         if ("chunked".equalsIgnoreCase( getHeader( "Transfer-Encoding") )) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             while (getNextChunkLength( inputStream ) > 0) { baos.write( readDelimitedChunk( inputStream ) ); }
+            flushChunkTrailer( inputStream );
             _requestBody = baos.toByteArray();
         } else {
             _requestBody = new byte[ getContentLength() ];
             inputStream.read( _requestBody );
         }
         _reader = new InputStreamReader( new ByteArrayInputStream( _requestBody ) );
+    }
+
+
+    private void flushChunkTrailer( InputStream inputStream ) throws IOException {
+        byte[] line;
+        do { line = readDelimitedChunk( inputStream ); } while (line.length > 0);
     }
 
 
@@ -155,10 +162,10 @@ abstract class ReceivedHttpMessage {
     }
 
 
-    protected abstract void appendMessageHeader( StringBuffer sb );
+    abstract void appendMessageHeader( StringBuffer sb );
 
 
-    protected abstract void interpretMessageHeader( String messageHeader );
+    abstract void interpretMessageHeader( String messageHeader );
 
 
 }
