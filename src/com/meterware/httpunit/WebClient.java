@@ -303,7 +303,7 @@ public class WebClient {
         String[] names = (String[]) _subFrames.get( targetName );
         if (names == null) return;
         for (int i = 0; i < names.length; i++) {
-            removeSubFrames( names[i] );
+            if (!targetName.equals( names[i] )) removeSubFrames( names[i] );
             _frameContents.remove( names[i] );
             _subFrames.remove( names[i] );
         }
