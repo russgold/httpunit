@@ -12,6 +12,13 @@ Limitations:
 
 
 Revision History:
+29-Jul-2002
+Acknowledgements:
+    Thanks to Sebastien Rosset for pointing out the case sensitivity problem with WebResponse.isHTML
+
+Problems fixed:
+    1. WebResponses are now recognized as HTML even if the content type is not lower case.
+
 Acknowledgements:
     Thanks to Rajan Narasimhan for fixing the relative URL computation problem.
 

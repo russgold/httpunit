@@ -66,7 +66,7 @@ public class WebResponse implements HTMLSegment {
      * Returns true if the response is HTML.
      **/
     public boolean isHTML() {
-        return getContentType().equals( HTML_CONTENT );
+        return getContentType().equalsIgnoreCase( HTML_CONTENT );
     }
 
 
