@@ -191,15 +191,6 @@ public class WebRequest {
 
 
     /**
-     * Returns an enumeration of all parameters in this web request. May include some parameters that will not be sent.
-     * @deprecated use getRequestParameterNames instead
-     **/
-    public Enumeration getParameterNames() {
-        return new Vector( Arrays.asList( _parameterHolder.getParameterNames() ) ).elements();
-    }
-
-
-    /**
      * Returns an array of all parameter names defined as part of this web request.
      * @since 1.3.1
      **/

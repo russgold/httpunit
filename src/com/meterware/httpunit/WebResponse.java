@@ -120,15 +120,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     /**
-     * Returns the target of the page.
-     * @deprecated use getFrameName
-     **/
-    public String getTarget() {
-        return getFrameName();
-    }
-
-
-    /**
      * Returns the name of the frame containing this page.
      **/
     public String getFrameName() {
@@ -511,23 +502,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
 //---------------------------------------- JavaScript methods ----------------------------------------
-
-    /**
-     * Returns the next javascript alert without removing it from the queue.
-     * @deprecated use WebClient#getNextAlert. Will be removed in next release.
-     */
-    public String getNextAlert() {
-        return _client.getNextAlert();
-    }
-
-
-    /**
-     * Returns the next javascript alert and removes it from the queue.
-     * @deprecated use WebClient#popNextAlert. Will be removed in next release.
-     */
-    public String popNextAlert() {
-        return _client.popNextAlert();
-    }
 
 
     public Scriptable getScriptableObject() {

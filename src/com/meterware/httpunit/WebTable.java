@@ -76,17 +76,6 @@ public class WebTable extends HTMLElementBase {
      * Returns the contents of the specified table cell as text.
      * The row and column numbers are zero-based.
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
-     * @deprecated use #getCellAsText
-     **/
-    public String getCell( int row, int column ) {
-        return getCellAsText( row, column );
-    }
-
-
-    /**
-     * Returns the contents of the specified table cell as text.
-     * The row and column numbers are zero-based.
-     * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
      **/
     public String getCellAsText( int row, int column ) {
         TableCell cell = getTableCell( row, column );

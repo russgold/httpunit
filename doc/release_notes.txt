@@ -11,117 +11,71 @@ Limitations:
 
 
 Revision History:
- 13-Feb-2003
+ 14-Feb-2003 1.5.2 release candidate
 Acknowledgements:
-    Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
-    Thanks to Ron Hanson and also to Daniel Sheppard for help in adding capabilities to the RequestDispatcher implementation.
-
-Problems Fixed:
-    1. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
-       had previously been defined.
-    2. Included and forwarded servlets now inherit parameters from their calling servlet.
-    3. Included servlets now have access to their path information as attributes, as per the spec.
-    4. Forwarded servlets now have access to their path information from the standard request methods, as required.
-
-Additions:
-    1. InvocationContext now supports include and forwarded servlets: calling pushIncludeRequest or pushForwardRequest
-       updates the servlet, request, and response properties of the context so that subsequent calls can be done from
-       the dispatched servlet. Calling popRequest reverts to the dispatching servlet.
-
- 5-Feb-2003
-Acknowledgements:
-    Thanks to Navid Vahdat for ServletUnit fixes for invalid session handling and request dispatcher paths
-    Thanks to Daniel Sheppard for correcting the return status for HttpServletResponse.sendRedirect
-
-Additions:
-    1. ServletUnit now supports HttpServletResponse.flushBuffer()
-    2. WebForm.isHiddenParameter returns true if all parameters with the specified name are hidden
-
-Problems Fixed:
-    1. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
-    2. ServletUnit now creates a new session if the requested session exists but is marked invalid
-    3. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
-       as relative to the context root.
-
- 4-Feb-2003
-Acknowledgements:
-    Thanks to Daniel Sheppard for identifying a problem with meta refresh tags.
-
-Additions:
-    1. Added support for <iframe> tag. IFrames work just like regular frames, except that they are embedded in a response
-       without a <frameset> tag. IFrame support is controlled by the ClientProperties.iframeSupported property.
-    2. ServletUnit now handles https requests, marking them as "secure."
-
-Problems fixed:
-    1. Quotes in refresh URL meta tags are now recognized and stripped.
-
-13-Jan-2003
-    Notes: upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.
-
-10-Jan-2003
-    Thanks to Alex Beggs for noting the mishandling of non-JavaScript scripts and providing a test case.
-
-Problems fixed:
-    1. Scripts marked as something besides JavaScript are now ignored.
-
- 9-Jan-2003
- Acknowledgements:
-    Thanks to James Howe for noting the mispelling of the getElementById method
-
-Problems fixed:
-    1. Corrected spelling of getElementById
-
- 3-Jan-2003
-Additions:
-    1. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked
-       through that servlet runner.
-    2. ServletUnit now supports HttpServletRequest.getHeaderNames
-
-30-Dec-2002
-Additions:
-    1. Added support for document.getElementByID
-    2. all HTML elements with id attributes are now accessible
-
-27-Dec-2002
-Additions:
-    1. Added getFragmentIdentifier() to WebRequestSource (parent of WebLink, WebForm, and WebImage)
-
-26-Dec-2002
-Additions:
-    1. WebResponse and TableCell now support the getElementWithID method, which returns any supported HTMLElement, given its ID.
-       Supported HTMLElement objects include WebForm, WebLink, WebTable, WebImage, WebApplet, FormControl, TableCell, and TableRow.
-    2. The Form.target property is now supported
-
-Problems fixed:
-    1. Forms prematurely closed because of improper nesting will now contain any controls defined before the next form.
-       At present, this only works with the JTidy parser.
-
-25-Dec-2002
-Notes:
-    1. get...WithID was incorrectly doing case insensitive matches.  It is now case-sensitive, since that is the way the
-       ID attribute is defined.
-
-24-Dec-2002
-Additions:
-    1. HTMLParserFactory now supports methods to explicitly select the parser without playing with the class path.
-       This includes support for additional parsers not bundled with HttpUnit.
-
-22-Dec-2002
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
-
-Problems fixed:
-    1. The manifest.mf file now has line breaks between properties
-
-19-Dec-2002
+    Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
     Thanks to Bernhard Wagner for adding some parser customization code.
+    Thanks to James Howe for noting the mispelling of the getElementById method
+    Thanks to Alex Beggs for noting the mishandling of non-JavaScript scripts and providing a test case.
+    Thanks to Navid Vahdat for ServletUnit fixes for invalid session handling and request dispatcher paths
+    Thanks to Daniel Sheppard for identifying a problem with meta refresh tags.
+    Thanks to Daniel Sheppard for correcting the return status for HttpServletResponse.sendRedirect
+    Thanks to Daniel Sheppard, Navid Vahdat, and Ron Hanson for help in adding capabilities to the RequestDispatcher implementation.
+    Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
+
+Problems Fixed:
+    Packaging
+        1. The manifest.mf file now has line breaks between properties
+    Content and Parsing
+        2. get...WithID was incorrectly doing case insensitive matches.  It is now case-sensitive, since that is the way
+           the ID attribute is defined.
+        3. Forms prematurely closed because of improper nesting will now contain any controls defined before the next form.
+        4. Quotes in refresh URL meta tags are now recognized and stripped.
+    JavaScript
+        5. Scripts marked as something besides JavaScript are now ignored.
+        6. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
+    ServletUnit
+        7. ServletUnit now creates a new session if the requested session exists but is marked invalid
+        8. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
+           as relative to the context root.
+        9. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
+           had previously been defined.
+       10. Included and forwarded servlets now inherit parameters from their calling servlet.
+       11. Included servlets now have access to their path information as attributes, as per the spec.
+       12. Forwarded servlets now have access to their path information from the standard request methods, as required.
 
 Additions:
-    1. You may call HTMLParserFactory.setPreserveTagCase and setReturnHTMLDocument to control whether the parser coerces
-       the case of tags and attributes or returns a HTMLDocument object, respectively.
+    Content and Parsing
+        1. You may call HTMLParserFactory.setPreserveTagCase and setReturnHTMLDocument to control whether the parser coerces
+           the case of tags and attributes or returns a HTMLDocument object, respectively.
+        2. HTMLParserFactory now supports methods to explicitly select the parser without playing with the class path.
+           This includes support for additional parsers not bundled with HttpUnit.
+        3. WebResponse and TableCell now support the getElementWithID method, which returns any supported HTMLElement,
+           given its ID. Supported HTMLElement objects include WebForm, WebLink, WebTable, WebImage, WebApplet,
+           FormControl, TableCell, and TableRow.
+        4. Added getFragmentIdentifier() to WebRequestSource (parent of WebLink, WebForm, and WebImage)
+        5. Added support for <iframe> tag. IFrames work just like regular frames, except that they are embedded in a response
+           without a <frameset> tag. IFrame support is controlled by the ClientProperties.iframeSupported property.
+        6. WebForm.isHiddenParameter returns true if all parameters with the specified name are hidden
+    JavaScript
+        7. The Form.target property is now supported
+        8. Added support for document.getElementById
+        9. All HTML elements with id attributes are now accessible
+    ServletUnit
+       10. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked
+           through that servlet runner.
+       11. ServletUnit now supports HttpServletRequest.getHeaderNames
+       12. ServletUnit now handles https requests, marking them as "secure."
+       13. ServletUnit now supports HttpServletResponse.flushBuffer()
+       14. InvocationContext now supports include and forwarded servlets: calling pushIncludeRequest or pushForwardRequest
+           updates the servlet, request, and response properties of the context so that subsequent calls can be done from
+           the dispatched servlet. Calling popRequest reverts to the dispatching servlet.
 
-18-Dec-2001
-Acknowledgements:
-    Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
+Notes:
+    1. Upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.
+    2. Removed a number of deprecated methods
+
 
 18-Dec-2002 1.5.1
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, 2003 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -22,9 +22,6 @@ package com.meterware.httpunit;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import java.net.URLConnection;
-
-
 /**
  * An abstract class representing the body of a web request.
  **/
@@ -43,15 +40,6 @@ class MessageBody {
      **/
     abstract
     String getContentType();
-
-
-    /**
-     * Updates the headers for this request as needed.
-     * @deprecated use getContentType
-     **/
-    final
-    void updateHeaders( URLConnection connection ) throws IOException {
-    }
 
 
     /**
