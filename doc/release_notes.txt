@@ -17,7 +17,7 @@ Revision History:
    Thanks to Fabrizio Giustina for adding an entity-resolver to support local use of ServletUnit with a regular web.xml
 
    Additions:
-       1. Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified, rather than connecting to
+       1. patch #915296: Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified, rather than connecting to
           the Sun website.
 
 24-Jun-2004
