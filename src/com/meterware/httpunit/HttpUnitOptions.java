@@ -318,7 +318,7 @@ public abstract class HttpUnitOptions {
 
     private static boolean _autoRefresh;
 
-    private static boolean _autoRedirect;
+    private static boolean _autoRedirect = true;
 
     private static boolean _postIncludesCharset = false;
 
