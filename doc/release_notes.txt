@@ -14,8 +14,13 @@ Limitations:
 
 Revision History:
 24-Sep-2004:
+   Acknowledgements:
+       Thanks to Dave Brosius for adding hashCode to Cookie and QuerySpec
+
    Problems fixed:
        1. bug #1034067: ServletConfig.getServletName now returns the name specified in web.xml for registered servlets.
+   Additions:
+       1. patch #1026566 The Cookie class now implements hashCode properly.
 
 23-Sep-2004:
    Additions:

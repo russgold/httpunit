@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -278,6 +278,12 @@ public class HttpUserAgentTest extends TestCase {
         public boolean equals( Object o ) {
             return getClass().equals( o.getClass() ) && equals( (QuerySpec) o );
         }
+
+
+        public int hashCode() {
+            return _path.hashCode() ^ _parameters.size();
+        }
+
 
         private String _path;
         private String _fullString;

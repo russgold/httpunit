@@ -117,8 +117,28 @@ public class Cookie {
     }
 
 
+    public int hashCode() {
+        int hashCode = _name.hashCode();
+        if (_domain != null) hashCode ^= _domain.hashCode();
+        if (_path != null) hashCode ^= _path.hashCode();
+        return hashCode;
+    }
+
+
     public boolean equals( Object obj ) {
         return obj.getClass() == getClass() && equals( (Cookie) obj );
+    }
+
+
+    private boolean equals( Cookie other ) {
+        return _name.equalsIgnoreCase( other._name ) &&
+                equalProperties( getDomain(), other.getDomain() ) &&
+                equalProperties( getPath(), other.getPath() );
+    }
+
+
+    private boolean equalProperties( String first, String second ) {
+        return first == second || (first != null && first.equals( second ));
     }
 
 
@@ -132,18 +152,6 @@ public class Cookie {
 
     private boolean acceptPath( String pathPattern, String hostPath ) {
         return !CookieProperties.isPathMatchingStrict() || hostPath.startsWith( pathPattern );
-    }
-
-
-    private boolean equals( Cookie other ) {
-        return _name.equalsIgnoreCase( other._name ) &&
-                equalProperties( getDomain(), other.getDomain() ) &&
-                equalProperties( getPath(), other.getPath() );
-    }
-
-
-    private boolean equalProperties( String first, String second ) {
-        return first == second || (first != null && first.equals( second ));
     }
 
 
