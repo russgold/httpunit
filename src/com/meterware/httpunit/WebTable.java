@@ -41,7 +41,18 @@ public class WebTable {
      **/
     public String getCell( int row, int column ) {
         if (_cells == null) readTable();
-        return asText( _cells[ row ][ column ].getFirstChild() );
+        return getCellContentsAsText( _cells[ row ][ column ] );
+    }
+
+
+    private String getCellContentsAsText( Node node ) {
+        if (node == null) {
+            return null;
+        } else if (!node.hasChildNodes()) {
+            return null;
+        } else {
+            return asText( node.getFirstChild() );
+        }
     }
 
 
@@ -226,14 +237,14 @@ public class WebTable {
 
 
     private TableRow[] getRows() {
-        NodeList nl = _dom.getElementsByTagName( "tr" );
-        Vector rows = new Vector();
+        final Vector rows = new Vector();
 
-        for (int i = 0; i < nl.getLength(); i++) {
-            if (isMoreCloselyNested( nl.item(i), _dom, "table" )) {
-                rows.addElement( new TableRow( (Element) nl.item(i) ) );
+        processChildren( _dom, "tr", "table", new ElementHandler() {
+            public void handleElement( Element element ) {
+                rows.addElement( new TableRow( element ) );
             }
-        }
+        } );
+
         TableRow[] result = new TableRow[ rows.size() ];
         rows.copyInto( result );
         return result;
@@ -246,17 +257,22 @@ public class WebTable {
         }
 
         TableCell[] getCells() {
-            NodeList nl = _element.getElementsByTagName( "td" );
             Vector cells = new Vector();
+            collectChildren( "td", cells );
+            collectChildren( "th", cells );
 
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (isMoreCloselyNested( nl.item(i), _element, "table" )) {
-                    cells.addElement( new TableCell( (Element) nl.item(i) ) );
-                }
-            }
             TableCell[] result = new TableCell[ cells.size() ];
             cells.copyInto( result );
             return result;
+        }
+
+
+        private void collectChildren( String childTag, final Vector children ) {
+            processChildren( _element, childTag, "table", new ElementHandler() {
+                public void handleElement( Element element ) {
+                    children.addElement( new TableCell( element ) );
+                }
+            } );
         }
 
 
@@ -288,6 +304,21 @@ public class WebTable {
             _element = cellNode;
             _colSpan = getAttributeValue( cellNode, "colspan", 1 );
             _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );
+        }
+    }
+
+
+    interface ElementHandler {
+        public void handleElement( Element element );
+    }
+
+
+    static void processChildren( Element root, String childTag, String avoidingParentTag, ElementHandler handler ) {
+        NodeList nl = root.getElementsByTagName( childTag );
+        for (int i = 0; i < nl.getLength(); i++) {
+            if (isMoreCloselyNested( nl.item(i), root, avoidingParentTag )) {
+                handler.handleElement( (Element) nl.item(i) );
+            }
         }
     }
 

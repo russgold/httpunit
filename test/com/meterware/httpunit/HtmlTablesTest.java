@@ -48,7 +48,7 @@ public class HtmlTablesTest extends TestCase {
                                        "</table></body></html>" );
         _spanTable = new ReceivedPage( baseURL, HEADER + "<body><h2>Interesting data</h2>" +
                                        "<table summary=\"tough luck\">" +
-                                       "<tr><td colspan=2>Colors</td><td>Names</td></tr>" +
+                                       "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
                                        "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td><td>rot</td></tr>" +
                                        "<tr><td>Green</td><td>vert</td></tr>" +
                                        "</table></body></html>" );
