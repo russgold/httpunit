@@ -26,10 +26,11 @@
 </ol><ol start=11>
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
+<LI><A HREF="#nofunction">My JavaScript works in a browser, but HttpUnit says "ReferenceError: ... is not defined"</A></LI>
 <li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
 <li><a href="#text">I called document.write() in my page, but getText() does not show the results! Why not?</a></li>
 
-</ol><ol start=15>
+</ol><ol start=16>
 <LI><A HREF="#session">How can I see the servlet session between calls?</A></LI>
 <li><a href="#JSP">Can I use JSPs with ServletUnit?</a></li>
 </OL>
@@ -130,6 +131,12 @@ You should not have to do anything special; however, not all JavaScript construc
 
 <A NAME="norhino"><h3>JavaScript is not being executed at all. Why not?</h3></A>
 If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.
+
+<A NAME="#nofunction"><h3>My JavaScript works in a browser, but HttpUnit says "ReferenceError: ... is not defined"</h3></A>
+This usually indicates that you are calling a function which contains statements that HttpUnit does not understand.
+Rhino unfortunately does not provide a very helpful error message in such cases. Try removing statements from the
+function until you find out which one is causing the problem and then submit a request for the offending construct to be
+supported.
 
 <a name="unsupported"><h3>How do I handle a page that uses JavaScript features that HttpUnit does not support?</h3></a>
 If you call<blockquote><code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></blockquote>problems will
