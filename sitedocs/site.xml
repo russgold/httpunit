@@ -11,7 +11,7 @@
         <fragment source="sitedocs/doc/license.html"/>
     </page>
 
-    <external location="http://prdownloads.sourceforge.net/httpunit/httpunit-1.5.4.zip?download" item="Download 1.5.4"/>
+    <external location="http://prdownloads.sourceforge.net/httpunit/httpunit-1.6.zip?download" item="Download 1.6"/>
 
     <space/>
     <page location="doc/cookbook.html" title="Cookbook">
