@@ -55,6 +55,7 @@ class ServletUnitWebResponse extends WebResponse {
     ServletUnitWebResponse( String target, URL url, HttpServletResponse response ) {
         super( target, url );
         _response = (ServletUnitHttpResponse) response;
+        defineRawInputStream( new ByteArrayInputStream( _response.getContents() ) );
     }
 
 
@@ -73,23 +74,6 @@ class ServletUnitWebResponse extends WebResponse {
         return _response.getHeaderField( fieldName );
     }
     
-    
-    /**
-     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
-     * which may be used to represent internal state of this object.
-     **/
-    public String getText() {
-        return _response.getContents();
-    }
-
-
-    /**
-     * Returns an input stream for reading the contents of this reply.
-     **/
-    public InputStream getInputStream() throws IOException {
-        return new ByteArrayInputStream( getText().getBytes() );
-    }
-
     
     public String toString() {
         return "[ _response = " + _response + "]";

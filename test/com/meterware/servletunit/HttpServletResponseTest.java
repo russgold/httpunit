@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 import junit.framework.Test;
@@ -71,6 +71,59 @@ public class HttpServletResponseTest extends ServletUnitTest {
         assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );
+    }
+
+
+    public void testEncoding() throws Exception {
+        String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
+        String page = "<html><head><title>" + hebrewTitle + "</title></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setContentType( "text/html; charset=iso-8859-8" );
+        PrintWriter pw = servletResponse.getWriter();
+        pw.print( page );
+        pw.close();
+
+        WebResponse response = new ServletUnitWebResponse( "_self", null, servletResponse );
+        assertEquals( "Character set", "iso-8859-8", response.getCharacterSet() );
+        assertEquals( "Title", hebrewTitle, response.getTitle() );
+    }
+
+
+    public void testStreamResponse() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setContentType( "text/html" );
+        ServletOutputStream sos = servletResponse.getOutputStream();
+        sos.println( "<html><head><title>Sample Page</title></head><body></body></html>" );
+
+        WebResponse response = new ServletUnitWebResponse( "_self", null, servletResponse );
+        assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
+        assertEquals( "Content type", "text/html", response.getContentType() );
+        assertEquals( "Title", "Sample Page", response.getTitle() );
+    }
+
+
+    public void testStreamWriterAfterOutputStream() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setContentType( "text/html" );
+        ServletOutputStream sos = servletResponse.getOutputStream();
+        try {
+            servletResponse.getWriter();
+            fail( "Should have thrown IllegalStateException" );
+        } catch (IllegalStateException e) {
+        }
+    }
+
+
+    public void testStreamOutputStreamAfterWriter() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.getWriter();
+        try {
+            servletResponse.getOutputStream();
+            fail( "Should have thrown IllegalStateException" );
+        } catch (IllegalStateException e) {
+        }
     }
 
 

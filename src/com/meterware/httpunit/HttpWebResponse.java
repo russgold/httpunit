@@ -20,34 +20,39 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
                       
 
 /**
  * A response from a web server to an Http request.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 class HttpWebResponse extends WebResponse {
 
 
     /**
      * Constructs a response object from an input stream.
+     * @param target the target window or frame to which the request should be directed
      * @param url the url from which the response was received
-     * @param inputStream the input stream from which the response can be read
+     * @param connection the URL connection from which the response can be read
      **/
     HttpWebResponse( String target, URL url, URLConnection connection ) throws IOException {
         super( target, url );
-        _connection = connection;
         readHeaders( connection );
-        if (_responseCode == HttpURLConnection.HTTP_OK && getContentType().startsWith( "text" )) {
-            loadResponseText( connection );
+
+        /** make sure that any IO exception for HTML received page happens here, not later. **/
+        if (_responseCode == HttpURLConnection.HTTP_OK) {
+            defineRawInputStream( new BufferedInputStream( connection.getInputStream() ) );
+            if (getContentType().startsWith( "text" )) loadResponseText();
         }
     }
 
@@ -68,75 +73,23 @@ class HttpWebResponse extends WebResponse {
     }
     
     
-    /**
-     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
-     * which may be used to represent internal state of this object.
-     **/
-    public String getText() throws IOException {
-        if (_responseText == null) loadResponseText( _connection );
-        return _responseText;
-    }
-    
-
-    /**
-     * Returns an input stream for reading the contents of this reply.
-     **/
-    public InputStream getInputStream() throws IOException {
-        if (_responseText != null) {
-            return new ByteArrayInputStream( _responseText.getBytes() );
-        } else {
-            return new BufferedInputStream( _connection.getInputStream() );
-        }
-    }
-
-    
     public String toString() {
-        return "[headers=" + _headers + "; ??]";
+        return "[headers=" + _headers + "]";
     }
-    
-//-------------------------------------------- private members ------------------------------------------------
+
+
+//------------------------------------- private members -------------------------------------
 
 
     final private static String END_OF_LINE   = System.getProperty( "line.separator" );
     final private static String FILE_ENCODING = System.getProperty( "file.encoding" );
 
 
-    private int    _responseCode = HttpURLConnection.HTTP_OK;
-
-    private URLConnection _connection;
-
-    private String _responseText;
+    private int       _responseCode = HttpURLConnection.HTTP_OK;
 
     private Hashtable _headers = new Hashtable();
 
-    private void loadResponseText( URLConnection connection ) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BufferedInputStream inputStream = new BufferedInputStream( connection.getInputStream() );
-            byte[] buffer = new byte[8 * 1024];
-            int count = 0;
-            do {
-                outputStream.write( buffer, 0, count );
-                count = inputStream.read( buffer, 0, buffer.length );
-            } while (count != -1);
-
-            inputStream.close();
-
-            readMetaTags( outputStream.toByteArray() );
-            _responseText = new String( outputStream.toByteArray(), getCharacterSet() );
-        } catch (FileNotFoundException e) {
-            if (connection instanceof HttpURLConnection) {
-                _responseCode = HttpURLConnection.HTTP_NOT_FOUND;
-                _responseText = "";
-            } else {
-                e.fillInStackTrace();
-                throw e;
-            }
-        }
-    }
-
-
+    
     private int getResponseCode( URLConnection connection, String statusHeader ) {
         if (statusHeader == null) throw new HttpNotFoundException( connection.getURL().toExternalForm() );
 
@@ -152,42 +105,14 @@ class HttpWebResponse extends WebResponse {
     }
 
 
-    final
-    protected void readMetaTags( byte[] rawMessage ) throws UnsupportedEncodingException {
-        ByteTagParser parser = new ByteTagParser( rawMessage );
-        ByteTag tag = parser.getNextTag();
-        while (tag != null && !tag.getName().equalsIgnoreCase( "body" )) {
-            if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
-            tag = parser.getNextTag();
-        }
-    }
-
-
-    private void processMetaTag( ByteTag tag ) {
-        if ("content-type".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
-            inferContentType( tag.getAttribute( "content" ) );
-        } else if ("refresh".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
-            readRefreshRequest( tag.getAttribute( "content" ) );
-        }
-    }
-
-
-    private void inferContentType( String contentTypeHeader ) {
-        String originalHeader = (String) _headers.get( "Content-type".toUpperCase() );
-        if (originalHeader == null || originalHeader.indexOf( "charset" ) < 0) {
-            _headers.put( "Content-type".toUpperCase(), contentTypeHeader );
-        }
-    }
-
-
     private void readHeaders( URLConnection connection ) {
         loadHeaders( connection );
         if (connection instanceof HttpURLConnection) {
             _responseCode = getResponseCode( connection, connection.getHeaderField(0) );
         } else {
             _responseCode = HttpURLConnection.HTTP_OK;
-            if (getContentType().startsWith( "text" )) {
-                _headers.put( "Content-type".toUpperCase(), getContentType() + "; charset=" + FILE_ENCODING );
+            if (connection.getContentType().startsWith( "text" )) {
+                setContentTypeHeader( connection.getContentType() + "; charset=" + FILE_ENCODING );
             }
         }
     }
@@ -207,7 +132,7 @@ class HttpWebResponse extends WebResponse {
         }
 
         if (connection.getContentType() != null) {
-            _headers.put( "Content-type".toUpperCase(), connection.getContentType() );
+            setContentTypeHeader( connection.getContentType() );
         } 
     }
 
@@ -221,95 +146,5 @@ class HttpWebResponse extends WebResponse {
         }
     }
 
-}
-
-//=======================================================================================
-
-class ByteTag {
-
-    ByteTag( byte[] buffer, int start, int length ) throws UnsupportedEncodingException {
-        _buffer = new String( buffer, start, length, "iso-8859-1" ).toCharArray();
-        _name = nextToken();
-
-        String attribute = "";
-        String token = nextToken();
-        while (token.length() != 0) {
-            if (token.equals( "=" ) && attribute.length() != 0) {
-                _attributes.put( attribute.toLowerCase(), nextToken() );
-                attribute = "";
-            } else {
-                if (attribute.length() > 0) _attributes.put( attribute.toLowerCase(), "" );
-                attribute = token;
-            }
-            token = nextToken();
-        }
-    }
-
-
-    public String getName() {
-        return _name;
-    }
-
-    public String getAttribute( String attributeName ) {
-        return (String) _attributes.get( attributeName );
-    }
-
-    public String toString() {
-        return "ByteTag[ name=" + _name + ";attributes = " + _attributes + ']';
-    }
-
-    private String _name = "";
-    private Hashtable _attributes = new Hashtable();
-
-
-    private char[] _buffer;
-    private int    _start;
-    private int    _end = -1;
-
-
-    private String nextToken() {
-        _start = _end+1;
-        while (_start < _buffer.length && Character.isWhitespace( _buffer[ _start ] )) _start++;
-        if (_start >= _buffer.length) {
-            return "";
-        } else if (_buffer[ _start ] == '"') {
-            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
-            return new String( _buffer, _start+1, _end-_start-1 );
-        } else if (_buffer[ _start ] == '\'') {
-            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
-            return new String( _buffer, _start+1, _end-_start-1 );
-        } else if (_buffer[ _start ] == '=') {
-            _end = _start;
-            return "=";
-        } else {
-            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '=' && !Character.isWhitespace( _buffer[ _end ] ); _end++);
-            return new String( _buffer, _start, (_end--)-_start );
-        }
-    }
-}
-
-//=======================================================================================
-
-
-class ByteTagParser {
-
-    ByteTagParser( byte[] buffer ) {
-        _buffer = buffer;
-    }
-
-
-    ByteTag getNextTag() throws UnsupportedEncodingException {
-        _start = _end+1;
-        while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
-        for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
-        if (_end >= _buffer.length || _end < _start) return null;
-        return new ByteTag( _buffer, _start+1, _end-_start-1 );
-    }
-
-
-    private int _start = 0;
-    private int _end   = -1;
-
-    private byte[] _buffer;
 }
 

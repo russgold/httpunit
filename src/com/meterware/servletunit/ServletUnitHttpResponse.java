@@ -30,6 +30,7 @@ import java.util.Vector;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebRequest;
 
 
@@ -200,14 +201,9 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     /**
      * Returns the name of the character set encoding used for
      * the MIME body sent by this response.
-     *
-     * <p>The character encoding is either the one specified in
-     * the content itself or another one the client understands.
-     * If no character encoding has been assigned, it is implicitly
-     * set to <i>text/plain</i>.
      **/
     public String getCharacterEncoding() {
-        throw new RuntimeException( "getCharacterEncoding not implemented" );
+        return _encoding;
     }
 
 
@@ -221,7 +217,12 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * {@link ServletOutputStream} object to return a response.
      **/
     public void setContentType( String type ) {
-        _contentType = type;
+        String[] typeAndEncoding = HttpUnitUtils.parseContentTypeHeader( type );
+
+        _contentType = typeAndEncoding[0];
+        if (typeAndEncoding[1] != null) _encoding = typeAndEncoding[1];
+
+        setHeader( "Content-type", _contentType + "; charset=" + _encoding );
     }
 
 
@@ -233,7 +234,12 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * @exception IllegalStateException if you have already called the <code>getWriter</code> method
      **/
     public ServletOutputStream getOutputStream() throws IOException {
-        throw new RuntimeException( "getOutputStream not implemented" );
+        if (_writer != null) throw new IllegalStateException( "Tried to create output stream; writer already exists" );
+        if (_servletStream == null) {
+            _outputStream = new ByteArrayOutputStream();
+            _servletStream = new ServletUnitOutputStream( _outputStream );
+        }
+        return _servletStream;
     }
 
 
@@ -262,10 +268,11 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      *						use this method
      *
      **/
-    public PrintWriter getWriter() throws IOException {
+    public PrintWriter getWriter() throws UnsupportedEncodingException {
+        if (_servletStream != null) throw new IllegalStateException( "Tried to create writer; output stream already exists" );
         if (_writer == null) {
-            _stringWriter = new java.io.StringWriter();
-            _writer = new PrintWriter( _stringWriter );
+            _outputStream = new ByteArrayOutputStream();
+            _writer = new PrintWriter( new OutputStreamWriter( _outputStream, getCharacterEncoding() ) );
         }
         return _writer;
     }
@@ -386,11 +393,12 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     /**
      * Returns the contents of this response.
      **/
-    String getContents() {
-        if (_stringWriter == null) {
-            return "";
+    byte[] getContents() {
+        if (_outputStream == null) {
+            return new byte[0];
         } else {
-            return _stringWriter.getBuffer().toString();
+            if (_writer != null) _writer.flush();
+            return _outputStream.toByteArray();
         }
     }
 
@@ -417,9 +425,13 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     private String _contentType = "text/plain";
 
+    private String _encoding    = "us-ascii";
+
     private PrintWriter  _writer;
 
-    private StringWriter _stringWriter;
+    private ServletOutputStream _servletStream;
+
+    private ByteArrayOutputStream _outputStream;
 
     private int _status = SC_OK;
 
@@ -432,7 +444,6 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     private void completeHeaders() {
         if (_headersComplete) return;
-        setHeader( "Content-Type", _contentType + "; charset=us-ascii" );
         addCookieHeader();
         _headersComplete = true;
     }
@@ -449,4 +460,20 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         }
         setHeader( "Set-Cookie", sb.toString() );
     }
+}
+
+
+
+class ServletUnitOutputStream extends ServletOutputStream {
+
+    ServletUnitOutputStream( ByteArrayOutputStream stream ) {
+        _stream = stream;
+    }
+
+
+    public void write( int aByte ) throws IOException {
+        _stream.write( aByte );
+    }
+
+    private ByteArrayOutputStream _stream;
 }

@@ -20,17 +20,22 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import java.net.URL;
 import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -49,6 +54,15 @@ import org.xml.sax.SAXException;
  **/
 abstract
 public class WebResponse implements HTMLSegment {
+
+
+    /**
+     * Returns a web response built from a URL connection. Provided to allow
+     * access to WebResponse parsing without using a WebClient.
+     **/
+    public static WebResponse newResponse( URLConnection connection ) throws IOException {
+        return new HttpWebResponse( "_top", connection.getURL(), connection );
+    }
 
 
     /**
@@ -168,15 +182,18 @@ public class WebResponse implements HTMLSegment {
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
      * which may be used to represent internal state of this object.
      **/
-    abstract
-    public String getText() throws IOException;
+    public String getText() throws IOException {
+        if (_responseText == null) loadResponseText();
+        return _responseText;
+    }
     
 
     /**
-     * Returns an input stream for reading the contents of this reply.
+     * Returns a buffered input stream for reading the contents of this reply.
      **/
-    abstract
-    public InputStream getInputStream() throws IOException;
+    public InputStream getInputStream() throws IOException {
+        return _inputStream;
+    }
 
     
     /**
@@ -343,6 +360,15 @@ public class WebResponse implements HTMLSegment {
 
 
     final
+    protected void defineRawInputStream( InputStream inputStream ) {
+        if (_inputStream != null || _responseText != null) {
+            throw new IllegalStateException( "Must be called before response text is defined." );
+        }
+        _inputStream = inputStream;
+    }
+
+
+    final
     protected void readRefreshRequest( String contentTypeHeader ) {
         int splitIndex = contentTypeHeader.indexOf( ';' );
         if (splitIndex < 0) splitIndex = 0;
@@ -355,6 +381,14 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+    /**
+     * Overwrites the current value (if any) of the content type header.
+     **/
+    protected void setContentTypeHeader( String value ) {
+        _contentHeader = value;
+    }
+
+    
 //------------------------------------------ package members ------------------------------------------------
 
 
@@ -391,6 +425,8 @@ public class WebResponse implements HTMLSegment {
 
     private ReceivedPage _page;
 
+    private String _contentHeader;
+
     private String _contentType;
 
     private String _characterSet;
@@ -401,6 +437,10 @@ public class WebResponse implements HTMLSegment {
 
     private int _refreshDelay;
 
+    private String _responseText;
+
+    private InputStream _inputStream;
+
 
     // the following variables are essentially final; however, the JDK 1.1 compiler does not handle blank final variables properly with
     // multiple constructors that call each other, so the final qualifiers have been removed.
@@ -408,6 +448,57 @@ public class WebResponse implements HTMLSegment {
     private URL    _url;
 
     private String _target;
+
+
+    protected void loadResponseText() throws IOException {
+        if (_responseText != null) throw new IllegalStateException( "May only invoke loadResponseText once" );
+        _responseText = "";
+
+        InputStream inputStream = _inputStream;
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8 * 1024];
+            int count = 0;
+            do {
+                outputStream.write( buffer, 0, count );
+                count = inputStream.read( buffer, 0, buffer.length );
+            } while (count != -1);
+
+            byte[] bytes = outputStream.toByteArray();
+            readMetaTags( bytes );
+            _responseText = new String( bytes, getCharacterSet() );
+            _inputStream  = new ByteArrayInputStream( bytes ); 
+        } finally {
+            inputStream.close();
+        }
+    }
+
+
+    private void readMetaTags( byte[] rawMessage ) throws UnsupportedEncodingException {
+        ByteTagParser parser = new ByteTagParser( rawMessage );
+        ByteTag tag = parser.getNextTag();
+        while (tag != null && !tag.getName().equalsIgnoreCase( "body" )) {
+            if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
+            tag = parser.getNextTag();
+        }
+    }
+
+
+    private void processMetaTag( ByteTag tag ) {
+        if ("content-type".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
+            inferContentType( tag.getAttribute( "content" ) );
+        } else if ("refresh".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
+            readRefreshRequest( tag.getAttribute( "content" ) );
+        }
+    }
+
+
+    private void inferContentType( String contentTypeHeader ) {
+        String originalHeader = getHeaderField( "Content-type" );
+        if (originalHeader == null || originalHeader.indexOf( "charset" ) < 0) {
+            setContentTypeHeader( contentTypeHeader );
+        }
+    }
 
 
     private Hashtable getNewCookies() {
@@ -446,17 +537,12 @@ public class WebResponse implements HTMLSegment {
 
 
     private void readContentTypeHeader() {
-        String contentHeader = getHeaderField( "Content-type" );
+        String contentHeader = (_contentHeader != null) ? _contentHeader
+                                                        : getHeaderField( "Content-type" );
         if (contentHeader == null) contentHeader = DEFAULT_CONTENT_HEADER;
-        StringTokenizer st = new StringTokenizer( contentHeader, ";=" );
-        _contentType = st.nextToken();
-        while (st.hasMoreTokens()) {
-            String parameter = st.nextToken();
-            if (st.hasMoreTokens()) {
-                String value = st.nextToken();
-                if (parameter.trim().equalsIgnoreCase( "charset" )) _characterSet = value;
-            }
-        }
+        String[] parts = HttpUnitUtils.parseContentTypeHeader( contentHeader );
+        _contentType = parts[0];
+        if (parts[1] != null) _characterSet = parts[1];
     }
 
 
@@ -536,6 +622,100 @@ public class WebResponse implements HTMLSegment {
 
 }
 
+
+//=======================================================================================
+
+class ByteTag {
+
+    ByteTag( byte[] buffer, int start, int length ) throws UnsupportedEncodingException {
+        _buffer = new String( buffer, start, length, "iso-8859-1" ).toCharArray();
+        _name = nextToken();
+
+        String attribute = "";
+        String token = nextToken();
+        while (token.length() != 0) {
+            if (token.equals( "=" ) && attribute.length() != 0) {
+                _attributes.put( attribute.toLowerCase(), nextToken() );
+                attribute = "";
+            } else {
+                if (attribute.length() > 0) _attributes.put( attribute.toLowerCase(), "" );
+                attribute = token;
+            }
+            token = nextToken();
+        }
+    }
+
+
+    public String getName() {
+        return _name;
+    }
+
+    public String getAttribute( String attributeName ) {
+        return (String) _attributes.get( attributeName );
+    }
+
+    public String toString() {
+        return "ByteTag[ name=" + _name + ";attributes = " + _attributes + ']';
+    }
+
+    private String _name = "";
+    private Hashtable _attributes = new Hashtable();
+
+
+    private char[] _buffer;
+    private int    _start;
+    private int    _end = -1;
+
+
+    private String nextToken() {
+        _start = _end+1;
+        while (_start < _buffer.length && Character.isWhitespace( _buffer[ _start ] )) _start++;
+        if (_start >= _buffer.length) {
+            return "";
+        } else if (_buffer[ _start ] == '"') {
+            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
+            return new String( _buffer, _start+1, _end-_start-1 );
+        } else if (_buffer[ _start ] == '\'') {
+            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
+            return new String( _buffer, _start+1, _end-_start-1 );
+        } else if (_buffer[ _start ] == '=') {
+            _end = _start;
+            return "=";
+        } else {
+            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '=' && !Character.isWhitespace( _buffer[ _end ] ); _end++);
+            return new String( _buffer, _start, (_end--)-_start );
+        }
+    }
+}
+
+
+//=======================================================================================
+
+
+class ByteTagParser {
+
+    ByteTagParser( byte[] buffer ) {
+        _buffer = buffer;
+    }
+
+
+    ByteTag getNextTag() throws UnsupportedEncodingException {
+        _start = _end+1;
+        while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
+        for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
+        if (_end >= _buffer.length || _end < _start) return null;
+        return new ByteTag( _buffer, _start+1, _end-_start-1 );
+    }
+
+
+    private int _start = 0;
+    private int _end   = -1;
+
+    private byte[] _buffer;
+}
+
+
+//=======================================================================================
 
 
 class DefaultWebResponse extends WebResponse {

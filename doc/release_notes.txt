@@ -11,7 +11,7 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
- 1-Jul-2001
+ 6-Jul-2001
 Acknowledgements:
     Thanks to Marcos Tarruella for adding a test case for the Base64 class
     
@@ -20,11 +20,15 @@ Additions:
        was specified in the response header.
     2. WebResponse.getRefreshDelay specifies the delay found in the header, if any.
     3. HttpUnitOptions.setAutoRefresh controls whether the refresh URL is automatically followed.
+    4. ServletUnit now supports HttpServletResponse.getOutputStream
+    5. ServletUnit now supports <meta> tag parsing
+    6. WebResponse.newResponse added to allow other libraries (such as Apache Cactus)
+       to create WebResponse objects without using WebClient.
 
-19-Jun-2001
 Problems corrected:
     1. The cookbook was missing parentheses for its constructors
     2. Updated the NearWords example to accomodate changes to the Merriam-Webster site
+
     
 18-Jun-2001 1.2.5                            
 Acknowledgements:
