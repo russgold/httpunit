@@ -7,15 +7,14 @@
 <OL>
 <LI><A HREF="#Cannot unzip">Why can't I unzip the download library?</A></LI>
 <LI><A HREF="#org.xml.sax">What is the org.xml.sax package?</A></LI>
-<LI><A HREF="#meterware.com">Where is meterware.com?</A></LI>
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="sslfaq.html">Does HttpUnit support https?</A></LI>
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
-<LI><A HREF="#utf8">HttpUnit fails with an IllegalArgumentException: sun.io.CharToByteUTF-8, what do I do?</A></LI>
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
 <LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
 <LI><A HREF="#badPost">Why doesn't my servlet see parameters on a POST request?</A></LI>
+<LI><A HREF="#hidden">Why can't I change hidden parameters?</A></LI>
 </OL>
 
 
@@ -30,15 +29,9 @@ by HttpUnit. You should download Jtidy from
 <A HREF="http://sourceforge.net/project/showfiles.php?group_id=13153">its SourceForge download page</A>
 and install Tidy.jar in your classpath.
 
-<A NAME="meterware.com"><H2>Where is meterware.com?</H2></A>
-When I started HttpUnit, I had a web site with the meterware.com domain, and relied on it to host some of the example code.
-Since then, my ISP has dropped the hosting package I was using and I have not yet signed up with another host, mostly due to
-lack of funds. I hope to correct this in the near future.
-
 <A NAME="javascript"><H2>How do I use HttpUnit to test my pages that use JavaScript?</H2></A>
-Unfortunately, you can't. HttpUnit does not support any dialect of JavaScript. I have been shown a JavaScript library and it is possible
-that I will one day add JavaScript support, but since I use it very little in my own development, and since it looks like a lot of work,
-it is not a major priority for me. If you feel ambitious enough to add JavaScript support yourself, I would be happy to accept submissions.
+Unfortunately, you can't - yet. I have started to add JavaScript support, but it is very basic as yet.
+If you would like to help out, please examine the code in cvs.
 
 <A NAME="proxy"><H2>Can I use HttpUnit through a proxy server?</H2></A>
 Yes. HttpUnit uses java.net.HttpURLConnection, so the
@@ -65,14 +58,6 @@ String japaneseName = new String(name.getBytes("8859_1"),"EUC_JP");
 </code></blockquote>
 where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract the raw bytes from the parameter string.
 
-<A NAME="utf8"><H2>HttpUnit fails with an IllegalArgumentException:
-sun.io.CharToByteUTF-8, what do I do?</H2></A>
-JTidy requires bytes, not characters, and HttpUnit 1.2.1 sends it bytes in UTF-8
-encoding, which it obtains from the input page
-using <code>getBytes( "UTF-8" )</code>. Unfortunately, Sun used the wrong
-encoding name in its JDK 1.1.x implementations, so this code
-fails under JDK 1.1. This has been corrected in HttpUnit 1.2.2.
-
 <A NAME="buttons"><H2>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</H2></A>
 This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
 JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and
@@ -94,10 +79,23 @@ This will require extracting the file, modifying it and then putting it back <em
 tests to reload safely.</ul></p>
 <p>This problem appears to be resolved in JTidy r7, which is included with HttpUnit 1.4.1 or later.
 
-<A HREF="#badPost"><H2>Why doesn't my servlet see parameters on a POST request?</H2></A>
+<A NAME="#badPost"><H2>Why doesn't my servlet see parameters on a POST request?</H2></A>
 Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type
 header. HttpUnit 1.2.6 sends this attribute; As of HttpUnit 1.2.7 it will only send it if you call
 <code>HttpUnitOptions.setPostIncludesCharset(true)</code> before your request.
+
+<A name="#hidden"><h2>Why can't I change hidden parameter values?</h2></A>
+By default, HttpUnit verifies any parameter value changes against the form containing them. Since a user cannot directly
+change hidden parameters, HttpUnit stops you from doing it in your code. If you have to change these values, you have a couple
+of choices:<ul>
+<li>If you call <code>HttpUnitOptions.setParameterValuesValidated( false )</code> before calling getRequest on your form,
+the request will be created with validation disabled and you will be able to set any values you like. Note that in such a case
+the order of parameters in the request is not guaranteed, in case your server cares about such things (servlets do not).
+<li>You can call <code>&lt;form&gt;.getScriptableObject().setParameterValue( &lt;name&gt;, &lt;valuem&gt; );</code> to change
+the underlying value in the form. This will behave the way JavaScript does - resetting the form will now restore this value,
+rather than the original one.
+</ul>
+
 </BODY></HTML>
 
 

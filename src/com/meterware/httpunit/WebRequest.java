@@ -69,7 +69,13 @@ public class WebRequest {
      **/
     public URL getURL() throws MalformedURLException {
         if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) validateProtocol( getURLString() );
-        return new URL( getURLBase(), getURLString() );
+        if (getURLBase() == null || getURLBase().toString().indexOf( "?" ) < 0) {
+            return new URL( getURLBase(), getURLString() );
+        } else {
+            final String urlBaseString = getURLBase().toString();
+            URL newurlbase = new URL( urlBaseString.substring( 0, urlBaseString.indexOf( "?" ) ) );
+            return new URL( newurlbase, getURLString() );
+        }
     }
 
 

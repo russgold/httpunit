@@ -192,6 +192,23 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    public void testLinksWithSlashesInQuery() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineResource( "sample/Initial.html?age=3/5", "<html><head><title>Initial</title></head><body>" +
+                                              "Go to <a href=\"Next.html\">the next page.</a>" +
+                                              "</body></html>" );
+        defineWebPage( "sample/Next", "And go back to <a href=\"Initial.html?age=3/5\">the first page.</a>" );
+
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/sample/Initial.html?age=3/5" );
+        assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
+        WebLink link = initialPage.getLinks()[0];
+
+        WebResponse nextPage = wc.getResponse( link.getRequest() );
+        assertEquals( "Title of next page", "sample/Next", nextPage.getTitle() );
+        assertEquals( "Num links in next page", 1, nextPage.getLinks().length );
+    }
+
+
     public void testDocumentBase() throws Exception {
         WebConversation wc = new WebConversation();
         defineWebPage( "alternate/Target", "Found me!" );
