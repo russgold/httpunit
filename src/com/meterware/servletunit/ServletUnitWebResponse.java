@@ -86,8 +86,14 @@ class ServletUnitWebResponse extends WebResponse {
     public String getHeaderField( String fieldName ) {
         return _response.getHeaderField( fieldName );
     }
-    
-    
+
+
+    public String[] getHeaderFields( String fieldName ) {
+        String field = getHeaderField( fieldName );
+        return field == null ? NO_HEADERS : new String[] { _response.getHeaderField( fieldName ) };
+    }
+
+
     public String toString() {
         return "[ _response = " + _response + "]";
     }
@@ -98,6 +104,7 @@ class ServletUnitWebResponse extends WebResponse {
 
     private ServletUnitHttpResponse _response;
 
+    private static final String[] NO_HEADERS = new String[0];
 
 }
 

@@ -100,4 +100,20 @@ public class HttpUnitUtils {
             throw new SAXException( ex );
         }
     }
+
+
+    /**
+     * Returns a string array created by appending a string to an existing array. The existing array may be null.
+     **/
+    static String[] withNewValue( String[] oldValue, String newValue ) {
+        String[] result;
+        if (oldValue == null) {
+            result = new String[] { newValue };
+        } else {
+            result = new String[ oldValue.length+1 ];
+            System.arraycopy( oldValue, 0, result, 0, oldValue.length );
+            result[ oldValue.length ] = newValue;
+        }
+        return result;
+    }
 }

@@ -90,10 +90,17 @@ class HttpWebResponse extends WebResponse {
      * Returns the value for the specified header field. If no such field is defined, will return null.
      **/
     public String getHeaderField( String fieldName ) {
-        return (String) _headers.get( fieldName.toUpperCase() );
+        String[] fields = (String[]) _headers.get( fieldName.toUpperCase());
+        return fields == null ? null : fields[0];
     }
-    
-    
+
+
+    public String[] getHeaderFields( String fieldName ) {
+        String[] fields = (String[]) _headers.get( fieldName.toUpperCase());
+        return fields == null ? new String[0] : fields;
+    }
+
+
     public String toString() {
         return "HttpWebResponse [url=" + getURL() + "; headers=" + _headers + "]";
     }
@@ -165,11 +172,7 @@ class HttpWebResponse extends WebResponse {
 
 
     private void addHeader( String key, String field ) {
-        if (_headers.get( key ) == null) {
-            _headers.put( key, field );
-        } else {
-            _headers.put( key, _headers.get( key ) + ", " + field );
-        }
+        _headers.put( key, HttpUnitUtils.withNewValue( (String[]) _headers.get( key ), field ) );
     }
 
 }

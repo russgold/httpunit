@@ -222,10 +222,17 @@ public class WebResponse implements HTMLSegment {
 
     /**
      * Returns the value for the specified header field. If no such field is defined, will return null.
-     * No more than one header may be defined for each key.
+     * If more than one header is defined for the specified name, returns only the first found.
      **/
     abstract
     public String getHeaderField( String fieldName );
+
+
+    /**
+     * Returns the values for the specified header field. If no such field is defined, will return an empty array.
+     **/
+    abstract
+    public String[] getHeaderFields( String fieldName );
 
 
     /**
@@ -648,17 +655,20 @@ public class WebResponse implements HTMLSegment {
      */
     private Hashtable getNewCookies() {
         if (_newCookies == null) _newCookies = new Hashtable();
-        processCookieHeader( getHeaderField( "Set-Cookie" ), IETF_RFC2109 );
-        processCookieHeader( getHeaderField( "Set-Cookie2" ), IETF_RFC2965 );
+        processCookieHeaders( getHeaderFields( "Set-Cookie" ), IETF_RFC2109 );
+        processCookieHeaders( getHeaderFields( "Set-Cookie2" ), IETF_RFC2965 );
         return _newCookies;
     }
 
 
-    /**
-     *
-     */
+    private void processCookieHeaders( String cookieHeader[], int version ) {
+        for (int i = 0; i < cookieHeader.length; i++) {
+            processCookieHeader( cookieHeader[i], version );
+        }
+    }
+
+
     private void processCookieHeader( String cookieHeader, int version ) {
-        if (cookieHeader == null) return;
         Vector tokens = getCookieTokens( cookieHeader );
         String tokensToAdd = "";
         for (int i = tokens.size() - 1; i >= 0; i--) {
@@ -989,6 +999,10 @@ class DefaultWebResponse extends WebResponse {
         }
     }
 
+    public String[] getHeaderFields( String fieldName ) {
+        String value = getHeaderField( fieldName );
+        return value == null ? new String[0] : new String[]{ value };
+    }
 
     /**
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'

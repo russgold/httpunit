@@ -170,21 +170,32 @@ public class PseudoServerTest extends HttpUnitTest {
 
         String redirectName = "anOldOne";
 
-        PseudoServer ps = new PseudoServer();
-        int port = ps.getConnectedPort();
-        ps.setResource( resourceName, resourceValue );
-        ps.setErrorResource( redirectName, HttpURLConnection.HTTP_MOVED_PERM, "" );
-        ps.addResourceHeader( redirectName, "Location: http://localhost:" + port + '/' + resourceName );
+        defineResource( resourceName, resourceValue );
+        defineResource( redirectName, "ignored content", HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
 
-        try {
-            WebConversation wc   = new WebConversation();
-            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
-            WebResponse response = wc.getResponse( request );
-            assertEquals( "requested resource", resourceValue, response.getText().trim() );
-            assertEquals( "content type", "text/html", response.getContentType() );
-        } finally {
-            ps.shutDown();
-        }
+        WebConversation wc   = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
+
+    public void testDuplicateHeaderRedirect() throws Exception {
+        String resourceName = "something/redirected";
+        String resourceValue = "the desired content";
+
+        String redirectName = "anOldOne";
+
+        defineResource( resourceName, resourceValue );
+        defineResource( redirectName, "ignored content", HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
+
+        WebConversation wc   = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
     }
 
 
@@ -195,23 +206,15 @@ public class PseudoServerTest extends HttpUnitTest {
         String redirectName = "anOldOne";
         String redirectValue = "old content";
 
-        PseudoServer ps = new PseudoServer();
-        int port = ps.getConnectedPort();
-        ps.setResource( resourceName, resourceValue );
-        ps.setErrorResource( redirectName, HttpURLConnection.HTTP_MOVED_PERM, redirectValue );
-        ps.addResourceHeader( redirectName, "Location: http://localhost:" + port + '/' + resourceName );
+        defineResource( resourceName, resourceValue );
+        defineResource( redirectName, redirectValue, HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
 
-        try {
-            HttpUnitOptions.setAutoRedirect( false );
-            WebConversation wc   = new WebConversation();
-            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
-            WebResponse response = wc.getResponse( request );
-            assertEquals( "requested resource", redirectValue, response.getText().trim() );
-            assertEquals( "content type", "text/html", response.getContentType() );
-        } finally {
-            HttpUnitOptions.setAutoRedirect( true );
-            ps.shutDown();
-        }
+        HttpUnitOptions.setAutoRedirect( false );
+        WebConversation wc   = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
+        assertEquals( "requested resource", redirectValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
     }
 
 

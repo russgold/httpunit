@@ -238,25 +238,10 @@ public class WebLink extends WebRequestSource {
 
 
     protected void addPresetParameter( String name, String value ) {
-        _presetParameterMap.put( name, withNewValue( (String[]) _presetParameterMap.get( name ), value ) );
+        _presetParameterMap.put( name, HttpUnitUtils.withNewValue( (String[]) _presetParameterMap.get( name ), value ) );
         _presetParameterList.add( new LinkParameter( name, value ) );
     }
 
-
-    /**
-     * Returns a string array created by appending a string to an existing array. The existing array may be null.
-     **/
-    private String[] withNewValue( String[] oldValue, String newValue ) {
-        String[] result;
-        if (oldValue == null) {
-            result = new String[] { newValue };
-        } else {
-            result = new String[ oldValue.length+1 ];
-            System.arraycopy( oldValue, 0, result, 0, oldValue.length );
-            result[ oldValue.length ] = newValue;
-        }
-        return result;
-    }
 
 }
 

@@ -38,6 +38,7 @@ Problems fixed:
    10. Forms with query strings included in the action attribute now are submitted with that string intact.
    11. (bug #490821) Javadoc generation no longer gives errors
    12. (bug #524627) Null pointer exception in NodeUtils.convertNBSP
+   13. (bug #513051) Multiple headers with the same name are now handled independantly
 
 Additions:
   Content and parsing enhancements:
