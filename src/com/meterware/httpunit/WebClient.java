@@ -276,7 +276,7 @@ public class WebClient {
      */
     public void setProxyServer( String proxyHost, int proxyPort ) {
         System.setProperty( "proxyHost", proxyHost );
-        System.setProperty( "proxyPost", Integer.toString( proxyPort ) );
+        System.setProperty( "proxyPort", Integer.toString( proxyPort ) );
     }
 
 

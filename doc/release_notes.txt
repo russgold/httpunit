@@ -13,9 +13,11 @@ Revision History:
  7-Nov-2002
 Acknowledgements:
     Thanks to Raul Benito Garcia for pointing out the problem with no-action forms accessed with URL parameters
+    Thanks to Charles Mendis for finding the bug in the proxy support
 Problems fixed:
     1. When a form obtained using parameters as part of the URL has no action, those parameters are now sent
        as part of the form submission.
+    2. Bug #635273 Proxy port always interpreted as port 80 due to typo
 
  6-Nov-2002
 Problems fixed:
