@@ -91,7 +91,7 @@ class ScriptFilter extends DefaultFilter {
     private boolean isSupportedScript( QName element, XMLAttributes attrs ) {
         if (!element.rawname.equalsIgnoreCase( "script" ) || attrs == null) return false;
         String value = attrs.getValue( "language" );
-        return value != null && value.toLowerCase().startsWith( SCRIPT_TYPE );
+        return value == null || value.toLowerCase().startsWith( SCRIPT_TYPE );
     }
 
 

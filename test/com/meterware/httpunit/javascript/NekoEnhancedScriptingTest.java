@@ -65,4 +65,33 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testUnknownScript() throws Exception {
+        defineWebPage( "FunkyScript",
+                       "<SCRIPT>" +
+                       "var stuff='<A href=\"#\">Default JavaScript Working</A><BR>';" +
+                       "document.writeln(stuff);" +
+                       "</SCRIPT>" +
+                       "<SCRIPT Language='JavaScript'>" +
+                       "var stuff='<A href=\"#\">JavaScript Working</A><BR>';" +
+                       "document.writeln(stuff);" +
+                       "</SCRIPT>" +
+                       "<SCRIPT Language='JavaScript1.2'>" +
+                       "var stuff='<A href=\"#\">JavaScript 1.2 Working</A><BR>';" +
+                       "document.writeln(stuff);" +
+                       "</SCRIPT>" +
+                       "<SCRIPT Language='VBScript'>" +
+                       "Dim stuff" +
+                       "stuff = '<A href=\"#\">VBScript</A><BR>'" +
+                       "document.writeln(stuff)" +
+                       "</SCRIPT>" );
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/FunkyScript.html" );
+        assertNotNull( "No default script link found", wr.getLinkWith( "Default JavaScript Working" ) );
+        assertNotNull( "No default script link found", wr.getLinkWith( "JavaScript Working" ) );
+        assertNotNull( "No default script link found", wr.getLinkWith( "JavaScript 1.2 Working" ) );
+        assertNull( "VBScript link found", wr.getLinkWith( "VBScript" ) );
+    }
+
+
+
 }

@@ -11,9 +11,15 @@ Limitations:
 
 
 Revision History:
+10-Jan-2003
+    Thanks to Alex Beggs for noting the mishandling of non-JavaScript scripts and providing a test case.
+
+Problems fixed:
+    1. Scripts marked as something besides JavaScript are now ignored.
+
  9-Jan-2003
- Acknolwedgements:
-    1. Thanks to James Howe for noting the mispelling of the getElementById method
+ Acknowledgements:
+    Thanks to James Howe for noting the mispelling of the getElementById method
 
 Problems fixed:
     1. Corrected spelling of getElementById
