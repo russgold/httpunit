@@ -301,6 +301,7 @@ public class WebClientTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
         assertEquals( "requested resource", resourceValue, response.getText().trim() );
         assertEquals( "content type", "text/html", response.getContentType() );
+        assertEquals( "status", HttpURLConnection.HTTP_OK, response.getResponseCode() );
     }
 
 

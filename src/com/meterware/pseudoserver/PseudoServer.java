@@ -334,6 +334,8 @@ class HttpResponseStream {
     void restart() {
         _headersWritten = false;
         _headers.clear();
+        _responseCode = HttpURLConnection.HTTP_OK;
+        _responseText = "OK";
     }
 
 
