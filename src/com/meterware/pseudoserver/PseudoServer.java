@@ -19,25 +19,20 @@ package com.meterware.pseudoserver;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.InterruptedIOException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * A basic simulated web-server for testing user agents without a web server.
  **/
 public class PseudoServer {
+
+    private ArrayList _classpathDirs = new ArrayList();
 
 
     public PseudoServer() {
@@ -157,6 +152,11 @@ public class PseudoServer {
     }
 
 
+    public void mapToClasspath( String directory ) {
+        _classpathDirs.add( directory );
+    }
+
+
 //------------------------------------- private members ---------------------------------------
 
     private Hashtable _resources = new Hashtable();
@@ -212,7 +212,7 @@ public class PseudoServer {
                 for (int i = 0; i < headers.length; i++) {
                     response.addHeader( headers[i] );
                 }
-                response.write( resource.getContents() );
+                response.write( resource );
             }
         } catch (UnknownMethodException e) {
             response.setResponse( HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + e.getMethod() );
@@ -237,6 +237,13 @@ public class PseudoServer {
         } else if (resource instanceof PseudoServlet) {
             return getResource( (PseudoServlet) resource, request );
         } else {
+            for (Iterator iterator = _classpathDirs.iterator(); iterator.hasNext();) {
+                String directory = (String) iterator.next();
+                if (request.getURI().startsWith( directory )) {
+                    String resourceName = request.getURI().substring( directory.length()+1 );
+                    return new WebResource( getClass().getClassLoader().getResourceAsStream( resourceName ), "application/class", 200 );
+                }
+            }
             return null;
         }
     }
@@ -303,9 +310,9 @@ class HttpResponseStream {
     }
 
 
-    void write( byte[] contents ) throws IOException {
+    void write( WebResource resource ) throws IOException {
         flushHeaders();
-        _stream.write( contents, 0, contents.length );
+        resource.writeTo( _stream );
     }
 
 
@@ -315,7 +322,7 @@ class HttpResponseStream {
     }
 
 
-    private void flushHeaders() throws IOException {
+    private void flushHeaders() {
         if (!_headersWritten) {
             sendResponse( _responseCode, _responseText );
             for (Enumeration e = _headers.elements(); e.hasMoreElements();) {
@@ -328,18 +335,18 @@ class HttpResponseStream {
     }
 
 
-    private void sendResponse( int responseCode, String responseText ) throws IOException {
+    private void sendResponse( int responseCode, String responseText ) {
         sendLine( "HTTP/1.0 " + responseCode + ' ' + responseText );
     }
 
 
-    private void sendLine( String text ) throws IOException {
+    private void sendLine( String text ) {
         sendText( text );
         sendText( CRLF );
     }
 
 
-    private void sendText( String text ) throws IOException {
+    private void sendText( String text ) {
         _pw.write( text );
     }
 

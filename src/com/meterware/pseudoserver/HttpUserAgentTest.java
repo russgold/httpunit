@@ -89,6 +89,11 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
+    protected void mapToClasspath( String directory ) {
+        _server.mapToClasspath( directory );
+    }
+
+
     protected String getHostPath() {
         return _hostPath;
     }
@@ -189,6 +194,7 @@ public class HttpUserAgentTest extends TestCase {
         }
         return sb.toString();
     }
+
 
     static class QuerySpec {
         QuerySpec( String urlString ) {

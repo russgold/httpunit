@@ -1,10 +1,4 @@
 package com.meterware.httpunit;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-
-import org.w3c.dom.Node;
-
 /********************************************************************************************************************
  * $Id$
  *
@@ -25,6 +19,15 @@ import org.w3c.dom.Node;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URLClassLoader;
+import java.applet.Applet;
+import java.io.IOException;
+
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
 
 /**
  * This class represents the embedding of an applet in a web page.
@@ -39,6 +42,7 @@ public class WebApplet {
     private String      _baseTarget;
     private URL         _codeBase;
     private String      _className;
+    private Applet      _applet;
 
     final private String CLASS_EXTENSION = ".class";
 
@@ -108,4 +112,50 @@ public class WebApplet {
     public int getHeight() {
         return Integer.parseInt( getAttribute( "height" ) );
     }
+
+
+    public Applet getApplet() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        if (_applet == null) {
+            ClassLoader cl = new URLClassLoader( getClassPath() );
+            Object o = cl.loadClass( getMainClassName() ).newInstance();
+            if (!(o instanceof Applet)) throw new RuntimeException( getMainClassName() + " is not an Applet" );
+            _applet = (Applet) o;
+            _applet.setStub( new AppletStubImpl( this ) );
+        }
+        return _applet;
+    }
+
+
+    private URL[] getClassPath() throws MalformedURLException {
+        return new URL[] { getCodeBase() };
+    }
+
+
+    String getBaseTarget() {
+        return _baseTarget;
+    }
+
+
+    WebApplet[] getAppletsInPage() {
+        try {
+            return _response.getApplets();
+        } catch (SAXException e) {
+            e.printStackTrace();  // should never happen.
+            return null;
+        }
+    }
+
+
+    void sendRequest( URL url, String target ) {
+        WebRequest wr = new GetMethodWebRequest( null, url.toExternalForm(), target );
+        try {
+            _response.getWindow().getResponse( wr );
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+            throw new RuntimeException( e.toString() );
+        } catch (SAXException e) {
+        }
+    }
+
+
 }

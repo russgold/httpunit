@@ -156,5 +156,12 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
+    public void testClasspathDirectory() throws Exception {
+        WebConversation wc = new WebConversation();
+        mapToClasspath( "/some/classes" );
+        wc.getResponse( getHostPath() + "/some/classes/" + PseudoServerTest.class.getName().replace('.','/') + ".class" );
+    }
+
+
 }
 

@@ -25,6 +25,8 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebApplet;
 
 import java.applet.Applet;
+import java.util.Enumeration;
+import java.net.URL;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
@@ -94,7 +96,59 @@ public class AppletTest extends HttpUnitTest {
 
 
     public void testAppletLoading() throws Exception {
+        defineWebPage( "start", "<applet code='" + SimpleApplet.class.getName() +
+                                ".class' codebase=/classes width=100 height=100></applet>");
+        mapToClasspath( "/classes" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebApplet wa = response.getApplets()[0];
+        Applet applet = wa.getApplet();
+        assertNotNull( "Applet was not loaded", applet );
+        assertEquals( "Applet class", SimpleApplet.class.getName(), applet.getClass().getName() );
+    }
 
+
+    public void testAppletFindFromApplet() throws Exception {
+        defineWebPage( "start", "<applet name=first code='" + SimpleApplet.class.getName() +
+                                ".class' codebase=/classes width=100 height=100></applet>" +
+                                "<applet name=second code='" + SecondApplet.class.getName() +
+                                ".class' codebase=/classes width=100 height=100></applet>");
+        mapToClasspath( "/classes" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        Applet applet = response.getApplets()[0].getApplet();
+        Applet applet2 = applet.getAppletContext().getApplet( "second" );
+        assertNotNull( "Applet was not loaded", applet2 );
+        assertEquals( "Applet class", SecondApplet.class.getName(), applet2.getClass().getName() );
+
+        Enumeration applets = applet2.getAppletContext().getApplets();
+        assertNotNull( "No applet enumeration returned", applets );
+        assertTrue( "No applets in enumeration", applets.hasMoreElements() );
+        assertTrue( "First is not an applet", applets.nextElement() instanceof Applet );
+        assertTrue( "Only one applet in enumeration", applets.hasMoreElements() );
+        assertTrue( "Second is not an applet", applets.nextElement() instanceof Applet );
+        assertFalse( "More than two applets enumerated", applets.hasMoreElements() );
+    }
+
+
+    public void testShowDocument() throws Exception {
+        defineResource( "next.html", "You made it!" );
+        defineWebPage( "start", "<applet code='" + SimpleApplet.class.getName() +
+                                ".class' codebase=/classes width=100 height=100></applet>");
+        mapToClasspath( "/classes" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebApplet wa = response.getApplets()[0];
+        Applet applet = wa.getApplet();
+        applet.getAppletContext().showDocument( new URL( getHostPath() + "/next.html" ) );
+        assertEquals( "current page URL", getHostPath() + "/next.html", wc.getCurrentPage().getURL().toExternalForm() );
+    }
+
+
+    public static class SimpleApplet extends Applet {
+    }
+
+    public static class SecondApplet extends Applet {
     }
 
 }

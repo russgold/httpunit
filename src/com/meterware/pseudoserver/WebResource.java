@@ -21,7 +21,9 @@ package com.meterware.pseudoserver;
 *******************************************************************************************************************/
 import com.meterware.httpunit.HttpUnitUtils;
 
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Vector;
 
@@ -87,6 +89,13 @@ public class WebResource {
     }
 
 
+    public WebResource( InputStream stream, String contentType, int responseCode ) {
+        _stream = stream;
+        _contentType = contentType;
+        _responseCode = responseCode;
+    }
+
+
     String[] getHeaders() {
         final Vector effectiveHeaders = (Vector) _headers.clone();
         if (!_hasExplicitContentTypeHeader) effectiveHeaders.add( getContentTypeHeader() );
@@ -96,11 +105,18 @@ public class WebResource {
     }
 
 
-    byte[] getContents() throws UnsupportedEncodingException {
+    void writeTo( OutputStream outputStream ) throws IOException {
         if (_string != null) {
-            return _string.getBytes( getCharacterSet() );
-        } else {
-            return _contents;
+            outputStream.write( _string.getBytes( getCharacterSet() ) );
+        } else if (_contents != null) {
+            outputStream.write( _contents );
+        } else if (_stream != null) {
+            byte[] buffer = new byte[8 * 1024];
+            int count = 0;
+            do {
+                outputStream.write( buffer, 0, count );
+                count = _stream.read( buffer, 0, buffer.length );
+            } while (count != -1);
         }
     }
 
@@ -143,8 +159,9 @@ public class WebResource {
     }
 
 
-    private byte[]  _contents;
-    private String  _string;
+    private byte[]      _contents;
+    private String      _string;
+    private InputStream _stream;
 
     private int     _responseCode;
     private boolean _sendCharacterSet;
