@@ -161,11 +161,25 @@ public class WebClient {
      * removes the header from those to be sent.
      **/
     public void setHeaderField( String fieldName, String fieldValue ) {
+        fieldName = matchPreviousFieldName( fieldName );
         if (fieldValue == null) {
-            _headers.remove( fieldName.toUpperCase() );
+            _headers.remove( fieldName );
         } else {
-            _headers.put( fieldName.toUpperCase(), fieldValue );
+            _headers.put( fieldName, fieldValue );
         }
+    }
+
+
+    /**
+     * If a matching field name with different case is already known, returns the older name.
+     * Otherwise, returns the specified name.
+     **/
+    private String matchPreviousFieldName( String fieldName ) {
+        for (Enumeration e = _headers.keys(); e.hasMoreElements(); ) {
+            String key = (String) e.nextElement();
+            if (key.equalsIgnoreCase( fieldName )) return key;
+        }
+        return fieldName;
     }
 
 

@@ -17,6 +17,9 @@ Acknowledgements:
     
 Problems corrected:
     1. Redirection with subframes was incorrectly targeted at the top frame.
+    2. No longer capitalizes all header names; this was necessary for
+       compatibility with those servers that do not understand case-insensitive
+       header names.
 
 2-Apr-01 1.2.3
 Acknowledgements:

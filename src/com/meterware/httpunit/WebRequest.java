@@ -267,7 +267,7 @@ public class WebRequest {
 
 
     void setRequestHeader( String headerName, String headerValue ) {
-        _headers.put( headerName.toUpperCase(), headerValue );
+        _headers.put( headerName, headerValue );
     }
 
 
