@@ -31,19 +31,19 @@ import java.net.URLEncoder;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-class UncheckedParameterCollection implements ParameterHolder {
+class UncheckedParameterHolder implements ParameterHolder {
 
-    Hashtable    _parameters = new Hashtable();
+    private Hashtable    _parameters = new Hashtable();
     private static final String[] NO_VALUES = new String[ 0 ];
     private final String _characterSet;
 
 
-    UncheckedParameterCollection() {
+    UncheckedParameterHolder() {
         _characterSet = "iso-8859-1";
     }
 
 
-    UncheckedParameterCollection( WebRequestSource source ) {
+    UncheckedParameterHolder( WebRequestSource source ) {
         _characterSet = source.getCharacterSet();
         String[] names = source.getParameterNames();
         for (int i = 0; i < names.length; i++) {
@@ -54,65 +54,20 @@ class UncheckedParameterCollection implements ParameterHolder {
     }
 
 
-    String getParameterString() {
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
+    /**
+     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
+     **/
+    public void recordParameters( ParameterProcessor processor ) {
         Enumeration e = _parameters.keys();
 
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
             Object value = _parameters.get( name );
             if (value instanceof String) {
-                appendParameter( sb, name, (String) value, e.hasMoreElements() );
-            } else {
-                appendParameters( sb, name, (String[]) value, e.hasMoreElements() );
-            }
-        }
-        return sb.toString();
-    }
-
-
-    private void appendParameters( StringBuffer sb, String name, String[] values, boolean moreToCome ) {
-        for (int i = 0; i < values.length; i++) {
-            appendParameter( sb, name, values[i], (i < values.length-1 || moreToCome ) );
-        }
-    }
-
-
-    private void appendParameter( StringBuffer sb, String name, String value, boolean moreToCome ) {
-        sb.append( encode( name ) );
-        if (value != null) sb.append( '=' ).append( encode( value ) );
-        if (moreToCome) sb.append( '&' );
-    }
-
-
-    /**
-     * Returns a URL-encoded version of the string, including all eight bits, unlike URLEncoder, which strips the high bit.
-     **/
-    private String encode( String source ) {
-        if (_characterSet.equalsIgnoreCase( "iso-8859-1" )) {
-            return URLEncoder.encode( source );
-        } else {
-            try {
-                byte[] rawBytes = source.getBytes( _characterSet );
-                StringBuffer result = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
-                for (int i = 0; i < rawBytes.length; i++) {
-                    int candidate = rawBytes[i] & 0xff;
-                    if (candidate == ' ') {
-                        result.append( '+' );
-                    } else if ((candidate >= 'A' && candidate <= 'Z') ||
-                               (candidate >= 'a' && candidate <= 'z') ||
-                               (candidate == '.') ||
-                               (candidate >= '0' && candidate <= '9')) {
-                        result.append( (char) rawBytes[i] );
-                    } else if (candidate < 16) {
-                        result.append( "%0" ).append( Integer.toHexString( candidate ).toUpperCase() );
-                    } else {
-                        result.append( '%' ).append( Integer.toHexString( candidate ).toUpperCase() );
-                    }
-                }
-                return result.toString();
-            } catch (java.io.UnsupportedEncodingException e) {
-                return "????";    // XXX should pass the exception through as IOException ultimately
+                processor.addParameter( name, (String) value, _characterSet );
+            } else if (value instanceof String[]) {
+                String[] values = (String[]) value;
+                for (int i = 0; i < values.length; i++) processor.addParameter( name, values[i], _characterSet );
             }
         }
     }

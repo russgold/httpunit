@@ -74,10 +74,11 @@ public class GetMethodWebRequest extends WebRequest {
 
 
     protected String getURLString() {
-        if (hasNoParameters()) {
+        final String parameterString = getParameterString();
+        if (parameterString.length() == 0) {
             return super.getURLString();
         } else {
-            return super.getURLString() + "?" + getParameterString();
+            return super.getURLString() + "?" + parameterString;
         }
     }
 

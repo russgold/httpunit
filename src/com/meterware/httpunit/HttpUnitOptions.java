@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -43,7 +43,7 @@ public abstract class HttpUnitOptions {
         _matchesIgnoreCase = true;
         _autoRefresh = false;
         _redirectDelay = 0;
-        _characterSet = DEFAULT_CHARACTER_SET;
+        _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
     }
@@ -53,7 +53,7 @@ public abstract class HttpUnitOptions {
      * Resets the default character set to the HTTP default encoding.
      **/
     public static void resetDefaultCharacterSet() {
-        _characterSet = DEFAULT_CHARACTER_SET;
+        _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
     }
 
 
@@ -284,7 +284,6 @@ public abstract class HttpUnitOptions {
 
     private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
     private static final String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
-    private static final String DEFAULT_CHARACTER_SET  = "iso-8859-1";
 
     private static boolean _parserWarningsEnabled;
 
@@ -304,7 +303,7 @@ public abstract class HttpUnitOptions {
 
     private static int _redirectDelay;
 
-    private static String _characterSet = DEFAULT_CHARACTER_SET;
+    private static String _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
 
     private static String _contentType = DEFAULT_CONTENT_TYPE;
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -838,7 +838,7 @@ public class WebResponse implements HTMLSegment {
 
     private static String _defaultEncoding;
 
-    private final static String[] DEFAULT_ENCODING_CANDIDATES = { "iso-8859-1", "us-ascii", "utf-8", "utf8" };
+    private final static String[] DEFAULT_ENCODING_CANDIDATES = { HttpUnitUtils.DEFAULT_CHARACTER_SET, "us-ascii", "utf-8", "utf8" };
 
     static String getDefaultEncoding() {
         if (_defaultEncoding == null) {

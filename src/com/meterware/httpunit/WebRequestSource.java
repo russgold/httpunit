@@ -90,7 +90,7 @@ public class WebRequestSource {
      * Returns the character set encoding for the request.
      **/
     String getCharacterSet() {
-        return "iso-8859-1";
+        return HttpUnitUtils.DEFAULT_CHARACTER_SET;
     }
 
 

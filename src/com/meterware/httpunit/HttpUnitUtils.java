@@ -28,6 +28,8 @@ public class HttpUnitUtils {
 
     public static final int DEFAULT_TEXT_BUFFER_SIZE = 2048;
     public static final int DEFAULT_BUFFER_SIZE = 128;
+    static final String DEFAULT_CHARACTER_SET = "iso-8859-1";
+
 
     /**
      * Returns the content type and encoding as a pair of strings.

@@ -43,7 +43,7 @@ import java.util.Hashtable;
  * A request sent to a web server.
  **/
 abstract
-public class WebRequest implements ParameterHolder {
+public class WebRequest {
 
 
     /**
@@ -238,12 +238,12 @@ public class WebRequest implements ParameterHolder {
     protected WebRequest( WebForm sourceForm, SubmitButton button ) {
         this( sourceForm.getBaseURL(), sourceForm.getRelativeURL(), sourceForm.getTarget() );
         _sourceForm   = sourceForm;
-        _parameterCollection = new UncheckedParameterCollection( sourceForm );
+        _parameterCollection = new UncheckedParameterHolder( sourceForm );
 
         setHeaderField( "Referer", sourceForm.getBaseURL().toExternalForm() );
 
         if (button != null && button.getName().length() > 0) {
-            _parameterCollection._parameters.put( button.getName(), button.getValue() );
+            _parameterCollection.setParameter( button.getName(), button.getValue() );
             if (button.isImageButton()) {
                 _imageButtonName = button.getName();
                 setSubmitPosition( 0, 0 );
@@ -301,7 +301,7 @@ public class WebRequest implements ParameterHolder {
     final
     protected String getCharacterSet() {
         if (_sourceForm == null) {
-            return "iso-8859-1";
+            return HttpUnitUtils.DEFAULT_CHARACTER_SET;
         } else {
             return _sourceForm.getCharacterSet();
         }
@@ -327,14 +327,10 @@ public class WebRequest implements ParameterHolder {
 
 
     final
-    protected boolean hasNoParameters() {
-        return _parameterCollection._parameters.size() == 0;
-    }
-
-
-    final
     protected String getParameterString() {
-        return _parameterCollection.getParameterString();
+        URLEncodedString encoder = new URLEncodedString();
+        _parameterCollection.recordParameters( encoder );
+        return encoder.getString();
     }
 
 
@@ -347,8 +343,8 @@ public class WebRequest implements ParameterHolder {
 
     void setSubmitPosition( int x, int y ) {
         if (_imageButtonName == null) return;
-        _parameterCollection._parameters.put( _imageButtonName + ".x", Integer.toString( x ) );
-        _parameterCollection._parameters.put( _imageButtonName + ".y", Integer.toString( y ) );
+        _parameterCollection.setParameter( _imageButtonName + ".x", Integer.toString( x ) );
+        _parameterCollection.setParameter( _imageButtonName + ".y", Integer.toString( y ) );
     }
 
 
@@ -448,7 +444,7 @@ public class WebRequest implements ParameterHolder {
     /** The name of the JSSE class which supports the https protocol. **/
     private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
 
-    private UncheckedParameterCollection _parameterCollection = new UncheckedParameterCollection();
+    private UncheckedParameterHolder _parameterCollection = new UncheckedParameterHolder();
 
     private URL          _urlBase;
     private String       _urlString;
@@ -575,6 +571,61 @@ public class WebRequest implements ParameterHolder {
 
 }
 
+
+class URLEncodedString implements ParameterProcessor {
+
+    private StringBuffer _buffer = new StringBuffer( HttpUnitUtils.DEFAULT_BUFFER_SIZE );
+
+    private boolean _haveParameters = false;
+
+
+    public String getString() {
+        return _buffer.toString();
+    }
+
+
+    public void addParameter( String name, String value, String characterSet ) {
+        if (_haveParameters) _buffer.append( '&' );
+        _buffer.append( encode( name, characterSet ) );
+        if (value != null) _buffer.append( '=' ).append( encode( value, characterSet ) );
+        _haveParameters = true;
+    }
+
+
+    /**
+     * Returns a URL-encoded version of the string, including all eight bits, unlike URLEncoder, which strips the high bit.
+     **/
+    private String encode( String source, String characterSet ) {
+        if (characterSet.equalsIgnoreCase( HttpUnitUtils.DEFAULT_CHARACTER_SET )) {
+            return URLEncoder.encode( source );
+        } else {
+            try {
+                byte[] rawBytes = source.getBytes( characterSet );
+                StringBuffer result = new StringBuffer( 3*rawBytes.length );
+                for (int i = 0; i < rawBytes.length; i++) {
+                    int candidate = rawBytes[i] & 0xff;
+                    if (candidate == ' ') {
+                        result.append( '+' );
+                    } else if ((candidate >= 'A' && candidate <= 'Z') ||
+                               (candidate >= 'a' && candidate <= 'z') ||
+                               (candidate == '.') ||
+                               (candidate >= '0' && candidate <= '9')) {
+                        result.append( (char) rawBytes[i] );
+                    } else if (candidate < 16) {
+                        result.append( "%0" ).append( Integer.toHexString( candidate ).toUpperCase() );
+                    } else {
+                        result.append( '%' ).append( Integer.toHexString( candidate ).toUpperCase() );
+                    }
+                }
+                return result.toString();
+            } catch (java.io.UnsupportedEncodingException e) {
+                return "???";    // XXX should pass the exception through as IOException ultimately
+            }
+        }
+    }
+
+
+}
 
 //================================ exception class NoSuchParameterException =========================================
 
