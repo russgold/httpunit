@@ -19,16 +19,10 @@ package com.meterware.website;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 
 import com.meterware.website.MenuTarget;
 import com.meterware.website.PageFragment;
@@ -93,20 +87,24 @@ public class WebPage extends MenuTarget {
     }
 
 
-    public void generatePage( SiteTemplate template ) throws ParserConfigurationException, IllegalAccessException, SAXException, IOException, ParseException, IntrospectionException, InvocationTargetException {
-        StringBuffer sb = new StringBuffer();
-        template.appendPageHeader( sb, this );
-        for (int i = 0; i < _fragments.size(); i++) {
-            PageFragment pageFragment = (PageFragment) _fragments.get( i );
-            sb.append( pageFragment.asText() ).append( FragmentTemplate.LINE_BREAK );
-        }
-        template.appendPageFooter( sb, this );
+    public void generatePage( SiteTemplate template ) {
+        try {
+            StringBuffer sb = new StringBuffer();
+            template.appendPageHeader( sb, this );
+            for (int i = 0; i < _fragments.size(); i++) {
+                PageFragment pageFragment = (PageFragment) _fragments.get( i );
+                sb.append( pageFragment.asText() ).append( FragmentTemplate.LINE_BREAK );
+            }
+            template.appendPageFooter( sb, this );
 
-        File file = new File( _root, _location );
-        file.getParentFile().mkdir();
-        FileWriter fw = new FileWriter( file );
-        fw.write( sb.toString() );
-        fw.close();
+            File file = new File( _root, _location );
+            file.getParentFile().mkdir();
+            FileWriter fw = new FileWriter( file );
+            fw.write( sb.toString() );
+            fw.close();
+        } catch (IOException e) {
+            throw new RuntimeException( "Error writing page '" + e );
+        }
     }
 
 

@@ -24,6 +24,7 @@ import com.meterware.xml.DocumentSemantics;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
 
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
@@ -42,6 +43,7 @@ import java.text.ParseException;
  **/
 public class Site {
 
+    private ArrayList _commonElements = new ArrayList();
     private ArrayList _pages = new ArrayList();
 
     private String _project;
@@ -51,10 +53,11 @@ public class Site {
     private CopyRight _copyRight;
 
 
-    public static void generate( File siteFile, File directory ) throws SAXException, IOException, ParserConfigurationException, IntrospectionException, IllegalAccessException, InvocationTargetException, ParseException {
-        Document document = parseDocument( siteFile );
+    public static void generate( File siteFile, File directory ) throws SAXException, IOException {
+        PageFragment.setRoot( siteFile.getParentFile() );
+        Document document = DocumentSemantics.parseDocument( siteFile );
         Site site = new Site();
-        DocumentSemantics.build( document, site );
+        DocumentSemantics.build( document, site, siteFile.getAbsolutePath() );
 
         WebPage.setRoot( directory );
         for (int i = 0; i < site._pages.size(); i++) {
@@ -64,8 +67,10 @@ public class Site {
     }
 
 
-    private static Document parseDocument( File file ) throws SAXException, IOException, ParserConfigurationException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( file );
+    public CommonElement createCommonElement() {
+        CommonElement element = new CommonElement();
+        _commonElements.add( element );
+        return element;
     }
 
 
@@ -198,6 +203,34 @@ public class Site {
     }
 
 
+    public class CommonElement {
+        private ArrayList _fragments = new ArrayList();
+        private String _div;
+
+
+        public PageFragment createFragment() {
+            PageFragment fragment = new PageFragment();
+            _fragments.add( fragment );
+            return fragment;
+        }
+
+
+        public void setDiv( String div ) {
+            _div = div;
+        }
+
+
+        public void appendTo( StringBuffer sb ) {
+            sb.append( "<div id='" ).append( _div ).append( "'>" ).append( FragmentTemplate.LINE_BREAK );
+            for (int i = 0; i < _fragments.size(); i++) {
+                PageFragment pageFragment = (PageFragment) _fragments.get( i );
+                sb.append( pageFragment.asText() ).append( FragmentTemplate.LINE_BREAK );
+            }
+            sb.append( "</div>" ).append( FragmentTemplate.LINE_BREAK );
+        }
+    }
+
+
     class Template implements SiteTemplate {
 
         public void appendPageHeader( StringBuffer sb, WebPage currentPage ) {
@@ -208,6 +241,11 @@ public class Site {
             sb.append( "<image src='" ).append( relativeURL( currentPage.getLocation(), _logo ) ).append( "'/>" ).append( FragmentTemplate.LINE_BREAK );
             sb.append( "<h1>" ).append( currentPage.getTitle() ).append( "</h1>" ).append( FragmentTemplate.LINE_BREAK );
             appendMenu( sb, currentPage.getLocation() );
+
+            for (int i = 0; i < _commonElements.size(); i++) {
+                CommonElement commonElement = (CommonElement) _commonElements.get( i );
+                commonElement.appendTo( sb );
+            }
             sb.append( "<div id='Content'>" ).append( FragmentTemplate.LINE_BREAK );
             if (currentPage.isLicense()) sb.append( "<p>" ).append( _copyRight.getNotice() ).append( "</p>" ). append( FragmentTemplate.LINE_BREAK );
          }

@@ -22,7 +22,10 @@ package com.meterware.xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.beans.Introspector;
@@ -30,7 +33,8 @@ import java.beans.IntrospectionException;
 import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.util.Date;
-import java.text.ParseException;
+import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -42,8 +46,12 @@ public class DocumentSemantics {
     private static final Class[]  NO_ARG_CLASSES = new Class[0];
     private static final Object[] NO_ARGS        = new Object[0];
 
-    public static void build( Document document, Object documentRoot ) throws IntrospectionException, IllegalAccessException, InvocationTargetException, ParseException {
-        interpretNode( getRootNode( document ), documentRoot );
+    public static void build( Document document, Object documentRoot, String documentName ) {
+        try {
+            interpretNode( getRootNode( document ), documentRoot );
+        } catch (Exception e) {
+            throw new RuntimeException( "Error interpreting document: " + documentName + ": " + e );
+        }
     }
 
 
@@ -55,7 +63,7 @@ public class DocumentSemantics {
     }
 
 
-    private static void interpretNode( final Node node, Object elementObject ) throws IntrospectionException, IllegalAccessException, InvocationTargetException, ParseException {
+    private static void interpretNode( final Node node, Object elementObject ) throws IntrospectionException, IllegalAccessException, InvocationTargetException {
         Class elementClass = elementObject.getClass();
         BeanInfo beanInfo = Introspector.getBeanInfo( elementClass, Object.class );
         NamedNodeMap nnm = node.getAttributes();
@@ -87,7 +95,7 @@ public class DocumentSemantics {
     }
 
 
-    private static void interpretNestedElement( Class elementClass, Object elementObject, BeanInfo beanInfo, Node child ) throws IllegalAccessException, InvocationTargetException, IntrospectionException, ParseException {
+    private static void interpretNestedElement( Class elementClass, Object elementObject, BeanInfo beanInfo, Node child ) throws IllegalAccessException, InvocationTargetException, IntrospectionException {
         try {
             Method method = elementClass.getMethod( getCreateMethodName( child.getNodeName() ), NO_ARG_CLASSES );
             Object subElement = method.invoke( elementObject, NO_ARGS );
@@ -143,13 +151,36 @@ public class DocumentSemantics {
     }
 
 
-    private static PropertyDescriptor getProperty( BeanInfo beanInfo, String propertyName ) {
+    public static PropertyDescriptor getProperty( BeanInfo beanInfo, String propertyName ) {
         PropertyDescriptor properties[] = beanInfo.getPropertyDescriptors();
         for (int i = 0; i < properties.length; i++) {
             PropertyDescriptor property = properties[i];
             if (property.getName().equals( propertyName )) return property;
         }
         return null;
+    }
+
+
+    public static String getStringProperty( String propertyName, Object template ) {
+        try {
+            BeanInfo beanInfo = Introspector.getBeanInfo( template.getClass(), Object.class );
+            final PropertyDescriptor propertyDescriptor = getProperty( beanInfo, propertyName );
+            if (propertyDescriptor == null) return "";
+            Object result = propertyDescriptor.getReadMethod().invoke( template, NO_ARGS );
+            return result == null ? "" : result.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException( "Unable to get '" + propertyName + "' property: " + e );
+        }
+    }
+
+
+    public static Document parseDocument( File file ) throws SAXException, IOException {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( file );
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException( "Unable to create a parser for XML documents: " + e );
+        }
     }
 
 }

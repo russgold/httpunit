@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
  **/
 interface SiteElement {
 
-    void generatePage( SiteTemplate template ) throws ParserConfigurationException, IllegalAccessException, SAXException, IOException, ParseException, IntrospectionException, InvocationTargetException;
+    void generatePage( SiteTemplate template );
 
 
     void appendMenuItem( StringBuffer sb, SiteTemplate template, String currentLocation );

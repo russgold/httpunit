@@ -24,42 +24,46 @@ import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.cyberneko.html.parsers.DOMParser;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 
 import com.meterware.xml.DocumentSemantics;
 import com.meterware.website.FragmentTemplate;
-import com.meterware.httpunit.site.Faq;
-import com.meterware.httpunit.site.News;
-import com.meterware.httpunit.site.Citations;
-import com.meterware.httpunit.site.Developers;
 
 
 /**
  *
- * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@meterware.com">Russell Gold</a>
  **/
 public class PageFragment {
 
     private String _source;
+    private String _extract;
+
+    private static File _root;
 
 
-    public String asText() throws IOException, SAXException, IntrospectionException, InvocationTargetException, IllegalAccessException, ParserConfigurationException, ParseException {
-        File file = new File( _source );
-        if (isXmlFile( file )) {
-            return getXMLBasedFragment( file );
-        } else if (isHtmlFile( file )) {
-            return getHtmlBasedFragment( file );
-        } else {
-            return getTextFragment( file );
+    static void setRoot( File root ) {
+        _root = root;
+    }
+
+
+    public String asText() {
+        try {
+            File file = new File( _source );
+            if (!file.exists()) file = new File( _root, _source );
+            if (isXmlFile( file )) {
+                return getXMLBasedFragment( file );
+            } else if (isHtmlFile( file )) {
+                return getHtmlBasedFragment( file );
+            } else {
+                return getTextFragment( file );
+            }
+        } catch (SAXException e) {
+            throw new RuntimeException( "Error parsing " + _source + ": " + e );
+        } catch (IOException e) {
+            throw new RuntimeException( "Error reading " + _source + ": " + e );
         }
     }
 
@@ -80,7 +84,7 @@ public class PageFragment {
 
 
     private String getHtmlBasedFragment( File file ) throws IOException, SAXException {
-        org.cyberneko.html.parsers.DOMParser parser = new DOMParser();
+        DOMParser parser = new DOMParser();
         parser.parse( new InputSource( new FileInputStream( file ) ) );
         Document document = parser.getDocument();
         NodeList nl = document.getElementsByTagName( "body" );
@@ -124,21 +128,11 @@ public class PageFragment {
     }
 
 
-    private String getXMLBasedFragment( File file ) throws SAXException, IOException, ParserConfigurationException, IntrospectionException, IllegalAccessException, InvocationTargetException, ParseException {
-        Document document = parseDocument( file );
-        FragmentTemplate template = FragmentTemplate.getTemplateFor( com.meterware.xml.DocumentSemantics.getRootNode( document ).getNodeName() );
-        com.meterware.xml.DocumentSemantics.build( document, template );
-        return template.asText();
-    }
-
-
-    private static Document parseDocument( File file ) throws SAXException, IOException, ParserConfigurationException {
-        DocumentBuilder result;
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        result = factory.newDocumentBuilder();
-        DocumentBuilder db = result;
-        final Document document = db.parse( file );
-        return document;
+    private String getXMLBasedFragment( File file ) throws SAXException, IOException {
+        Document document = DocumentSemantics.parseDocument( file );
+        FragmentTemplate template = FragmentTemplate.getTemplateFor( DocumentSemantics.getRootNode( document ).getNodeName() );
+        DocumentSemantics.build( document, template, file.getAbsolutePath() );
+        return _extract == null ? template.asText() : DocumentSemantics.getStringProperty( _extract, template );
     }
 
 
@@ -146,4 +140,8 @@ public class PageFragment {
         _source = source;
     }
 
+
+    public void setExtract( String extract ) {
+        _extract = extract;
+    }
 }
