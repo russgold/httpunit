@@ -117,8 +117,13 @@ public class Cookie {
 
     private boolean equals( Cookie other ) {
         return _name.equalsIgnoreCase( other._name ) &&
-                getDomain().equals( other.getDomain() ) &&
-                getPath().equals( other.getPath() );
+                equalProperties( getDomain(), other.getDomain() ) &&
+                equalProperties( getPath(), other.getPath() );
+    }
+
+
+    private boolean equalProperties( String first, String second ) {
+        return first == second || (first != null && first.equals( second ));
     }
 
 

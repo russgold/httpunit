@@ -37,6 +37,7 @@ public class CookieJar {
     private static final int DEFAULT_HEADER_SIZE = 80;
 
     private ArrayList _cookies = new ArrayList();
+    private ArrayList _globalCookies = new ArrayList();
     private CookiePress _press;
 
 
@@ -77,6 +78,7 @@ public class CookieJar {
      */
     public void clear() {
         _cookies.clear();
+        _globalCookies.clear();
     }
 
 
@@ -85,7 +87,7 @@ public class CookieJar {
      * certain cookies are sent based on their host and path.
      **/
     public void addCookie( String name, String value ) {
-        addUniqueCookie( new Cookie( name, value ) );
+        _globalCookies.add( new Cookie( name, value ) );
     }
 
 
@@ -93,9 +95,13 @@ public class CookieJar {
      * Returns the name of all the active cookies in this cookie jar.
      **/
     public String[] getCookieNames() {
-        String[] names = new String[ _cookies.size() ];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = ((Cookie) _cookies.get(i)).getName();
+        final int numGlobalCookies = _globalCookies.size();
+        String[] names = new String[ _cookies.size() + numGlobalCookies ];
+        for (int i = 0; i < numGlobalCookies; i++) {
+            names[i] = ((Cookie) _globalCookies.get(i)).getName();
+        }
+        for (int i = numGlobalCookies; i < names.length; i++) {
+            names[ i + numGlobalCookies ] = ((Cookie) _cookies.get(i)).getName();
         }
         return names;
     }
@@ -105,7 +111,9 @@ public class CookieJar {
      * Returns a collection containing all of the cookies in this jar.
      */
     public Collection getCookies() {
-        return (Collection) _cookies.clone();
+        final Collection collection = (Collection) _cookies.clone();
+        collection.addAll( _globalCookies );
+        return collection;
     }
 
 
@@ -127,6 +135,10 @@ public class CookieJar {
             Cookie cookie = (Cookie) iterator.next();
             if (name.equals( cookie.getName() )) return cookie;
         }
+        for (Iterator iterator = _globalCookies.iterator(); iterator.hasNext();) {
+            Cookie cookie = (Cookie) iterator.next();
+            if (name.equals( cookie.getName() )) return cookie;
+        }
         return null;
     }
 
@@ -136,11 +148,19 @@ public class CookieJar {
      * Will return null if no compatible cookie is defined.
      **/
     public String getCookieHeaderField( URL targetURL ) {
-        if (_cookies.isEmpty()) return null;
+        if (_cookies.isEmpty() && _globalCookies.isEmpty()) return null;
         StringBuffer sb = new StringBuffer( DEFAULT_HEADER_SIZE );
+        HashSet restrictedCookies = new HashSet();
         for (Iterator i = _cookies.iterator(); i.hasNext();) {
             Cookie cookie = (Cookie) i.next();
             if (!cookie.mayBeSentTo( targetURL )) continue;
+            restrictedCookies.add( cookie.getName() );
+            if (sb.length() != 0) sb.append( ';' );
+            sb.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
+        }
+        for (Iterator i = _globalCookies.iterator(); i.hasNext();) {
+            Cookie cookie = (Cookie) i.next();
+            if (restrictedCookies.contains( cookie.getName() )) continue;
             if (sb.length() != 0) sb.append( ';' );
             sb.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
         }

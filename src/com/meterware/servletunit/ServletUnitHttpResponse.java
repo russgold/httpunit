@@ -570,7 +570,9 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         StringBuffer sb = new StringBuffer();
         for (Enumeration e = _cookies.elements(); e.hasMoreElements();) {
             Cookie cookie = (Cookie) e.nextElement();
-            sb.append( cookie.getName() ).append( '=' ).append( cookie.getValue() ).append( ";path=" ).append( cookie.getPath() );
+            sb.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
+            if (cookie.getPath() != null) sb.append( ";path=" ).append( cookie.getPath() );
+            if (cookie.getDomain() != null) sb.append( ";domain=" ).append( cookie.getDomain() );
             if (e.hasMoreElements()) sb.append( ',' );
         }
         setHeader( "Set-Cookie", sb.toString() );

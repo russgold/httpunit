@@ -147,15 +147,15 @@ public class CookieTest extends TestCase {
 
     public void testHeaderGeneration() throws Exception {
         CookieJar jar = new CookieJar();
+        jar.addCookie( "zero", "nil" );
         jar.updateCookies( newJar( "www.meterware.com/servlets/standard/AServlet", "first=ready" ) );
         jar.updateCookies( newJar( "www.meterware.com/servlets/AnotherServlet", "second=set" ) );
-        jar.updateCookies( newJar( "www.httpunit.org", "third=go; domain=.httpunit.org" ) );
+        jar.updateCookies( newJar( "www.httpunit.org", "zero=go; domain=.httpunit.org" ) );
         jar.updateCookies( newJar( "meterware.com", "fourth=money" ) );
-        jar.addCookie( "zero", "nil" );
 
         checkHeader( 1, jar, "first=ready;second=set;zero=nil", "www.meterware.com/servlets/standard/Count" );
         checkHeader( 2, jar, "second=set;zero=nil", "www.meterware.com/servlets/special/Divide" );
-        checkHeader( 3, jar, "third=go;zero=nil", "fancy.httpunit.org/servlets/AskMe" );
+        checkHeader( 3, jar, "zero=go", "fancy.httpunit.org/servlets/AskMe" );
     }
 
 
@@ -167,11 +167,11 @@ public class CookieTest extends TestCase {
     public void testCookieReplacement() throws Exception {
         CookieJar jar = new CookieJar();
         jar.updateCookies( newJar( "www.meterware.com/servlets/standard", "first=ready" ) );
-        jar.updateCookies( newJar( "meterware.com/servlets/standard", "first=more" ) );
-        jar.updateCookies( newJar( "www.meterware.com/servlets", "first=day" ) );
-        jar.updateCookies( newJar( "www.meterware.com/servlets", "first=tomorrow" ) );
+        jar.updateCookies( newJar( "meterware.com/servlets/standard", "second=more" ) );
+        jar.updateCookies( newJar( "www.meterware.com/servlets", "third=day" ) );
+        jar.updateCookies( newJar( "www.meterware.com/servlets", "third=tomorrow" ) );
 
-        checkHeader( 1, jar, "first=ready;first=tomorrow", "www.meterware.com/servlets/standard" );
+        checkHeader( 1, jar, "first=ready;third=tomorrow", "www.meterware.com/servlets/standard" );
     }
 
 
