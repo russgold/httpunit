@@ -395,10 +395,13 @@ public class WebTable {
 
 
     static void processChildren( Element root, String childTag, String avoidingParentTag, ElementHandler handler ) {
-        NodeList nl = root.getElementsByTagName( childTag );
-        for (int i = 0; i < nl.getLength(); i++) {
-            if (isMoreCloselyNested( nl.item(i), root, avoidingParentTag )) {
-                handler.handleElement( (Element) nl.item(i) );
+
+        for (Node child = root.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof Element) {
+                Element element = (Element) child;
+                String name = child.getNodeName();
+                if (name.equalsIgnoreCase( childTag )) handler.handleElement( element );
+                if (!name.equalsIgnoreCase( avoidingParentTag )) processChildren( element, childTag, avoidingParentTag, handler );
             }
         }
     }

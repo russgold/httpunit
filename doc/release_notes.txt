@@ -13,6 +13,12 @@ Limitations:
 
 Revision History:
  6-Aug-2002
+Acknowledgements:
+    Thanks to Hans-Joerg Hessmann for a faster algorithm for the table lookups
+
+Problems fixed:
+    1. Table lookups should be faster, especially for complex and large tables
+
 Additions:
     1. JavaScript: the link.onClick event is now supported
     2. JavaScript: the form.onSubmit event is now supported

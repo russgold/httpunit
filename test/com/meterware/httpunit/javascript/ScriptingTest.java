@@ -304,6 +304,4 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
-
-
 }

@@ -84,7 +84,6 @@ public class HTMLPage extends ParsedHTML {
      * <code>
      * <link type="text/css" rel="stylesheet" href="/mystyle.css" />
      * </code>
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public String getExternalStyleSheet() throws SAXException {
         NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "link" );
