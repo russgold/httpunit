@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,6 +30,7 @@ import java.util.List;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -151,6 +152,151 @@ public class FormScriptingTest extends HttpUnitTest {
         assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
     }
 
+
+    public void testEnablingDisabledSubmitButtonViaScript() throws Exception {
+        defineResource( "DoIt?color=green&change=success", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=button name=enableChange id=enableChange value=Hello onClick='document.spectrum.change.disabled=false;'>" +
+                                          "  <input type=submit disabled name=change value=success>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "spectrum" );
+
+        assertSubmitButtonDisabled( form );
+        assertDisabledSubmitButtonCanNotBeClicked( form );
+
+        form = runJavaScriptToToggleEnabledStateOfButton( form, wc );
+
+        assertSubmitButtonEnabled( form );
+        clickSubmitButtonToProveThatItIsEnabled( form );
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+    public void testDisablingEnabledSubmitButtonViaScript() throws Exception {
+        defineResource( "DoIt?color=green&change=success", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=button name=enableChange id=enableChange value=Hello onClick='document.spectrum.change.disabled=true;'>" +
+                                          "  <input type=submit name=change value=success>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "spectrum" );
+
+        assertSubmitButtonEnabled( form );
+
+        form = runJavaScriptToToggleEnabledStateOfButton( form, wc );
+        assertNotNull( form );
+
+        assertSubmitButtonDisabled( form );
+        assertDisabledSubmitButtonCanNotBeClicked( form );
+    }
+
+    public void testEnablingDisabledNormalButtonViaScript() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=button name=enableChange id=enableChange value=Hello onClick='document.spectrum.changee.disabled=false;'>" +
+                                          "  <input type=button disabled name=changee id=changee value=Hello onClick='document.spectrum.submit();'>" +
+                                          "  <input type=submit name=change value=success>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "spectrum" );
+
+        assertNormalButtonDisabled( form, "changee" );
+        assertDisabledNormalButtonCanNotBeClicked( form, "changee" );
+
+        form = runJavaScriptToToggleEnabledStateOfButton( form, wc );
+
+        assertNormalButtonEnabled( form, "changee" );
+        clickButtonToProveThatItIsEnabled( form, "changee" );
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+    public void testDisablingEnableddNormalButtonViaScript() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=button name=enableChange id=enableChange value=Hello onClick='document.spectrum.changee.disabled=true;'>" +
+                                          "  <input type=button name=changee id=changee value=Hello onClick='document.spectrum.submit();'>" +
+                                          "  <input type=submit name=change value=success>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "spectrum" );
+
+        assertNormalButtonEnabled( form, "changee" );
+        form = runJavaScriptToToggleEnabledStateOfButton( form, wc );
+
+        assertNormalButtonDisabled( form, "changee" );
+        assertDisabledNormalButtonCanNotBeClicked( form, "changee" );
+    }
+
+    private void assertSubmitButtonDisabled( WebForm form ) {
+        assertTrue( "Button should have been Disabled", form.getSubmitButton( "change" ).isDisabled() );
+    }
+
+    private void assertNormalButtonDisabled( WebForm form, String buttonID ) {
+        assertTrue( "Button should have been Disabled", form.getButtonWithID( buttonID ).isDisabled() );
+    }
+
+    private void assertSubmitButtonEnabled( WebForm form ) {
+        assertFalse( "Button should have been enabled or NOT-Disabled", form.getSubmitButton( "change" ).isDisabled() );
+    }
+
+    private void assertNormalButtonEnabled( WebForm form, String buttonID ) {
+        assertFalse( "Button should have been enabled or NOT-Disabled", form.getButtonWithID( buttonID ).isDisabled() );
+    }
+
+    private void clickSubmitButtonToProveThatItIsEnabled( WebForm form ) throws IOException, SAXException {
+        WebResponse response = form.submit();
+        assertNotNull( response );
+    }
+
+    private void clickButtonToProveThatItIsEnabled( WebForm form, String buttonID ) throws IOException, SAXException {
+        form.getButtonWithID( buttonID ).click();
+    }
+
+    private WebForm runJavaScriptToToggleEnabledStateOfButton( WebForm form, WebConversation wc ) throws IOException, SAXException {
+        Button enableChange = form.getButtonWithID( "enableChange" );
+        enableChange.click();
+        WebResponse currentPage = wc.getCurrentPage();
+        form = currentPage.getFormWithName( "spectrum" );
+        return form;
+    }
+
+    private void assertDisabledSubmitButtonCanNotBeClicked( WebForm form ) {
+        try {
+            SubmitButton button = form.getSubmitButton( "change" );
+            form.submit( button );
+        } catch (Exception e) {
+            assertTrue( e.toString().indexOf( "The specified button (name='change' value='success' is disabled and may not be used to submit this form" ) > -1 );
+        }
+    }
+
+    private void assertDisabledNormalButtonCanNotBeClicked( WebForm form, String buttonID ) {
+        try {
+            Button button = form.getButtonWithID( buttonID );
+            button.click();
+        } catch (Exception e) {
+            assertTrue( e.toString().indexOf( "Button 'changee' is disabled and may not be clicked" ) > -1 );
+        }
+         }
 
     public void testSubmitViaScriptWithPostParams() throws Exception {
         defineResource( "/servlet/TestServlet?param3=value3&param4=value4", new PseudoServlet() {

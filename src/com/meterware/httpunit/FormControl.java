@@ -45,7 +45,7 @@ abstract class FormControl extends HTMLElementBase {
 
     private       String  _valueAttribute;
     private final boolean _readOnly;
-    private final boolean _disabled;
+    private       boolean _disabled;
     private final String  _onChangeEvent;
     private final String  _onClickEvent;
     private final WebForm _form;
@@ -159,6 +159,11 @@ abstract class FormControl extends HTMLElementBase {
      **/
     boolean isHidden() {
         return false;
+    }
+
+
+    void setDisabled( boolean disabled ) {
+        _disabled = disabled;
     }
 
 

@@ -17,11 +17,13 @@ Revision History:
     Acknowledgements:
         1. Thanks to Dan Frankow for supplying an implementation of ServletContext.getMimeType and correcting the
            implementation of HttpSession.setAttribute when the value is null
+        2. Thanks to Michael Corum for making the Button.disabled property settable from JavaScript.
 
     Problems fixed:
         1. ServletUnit now applies character encoding in interpreting post parameters
         2. Patch #873911: ServletUnit now supports ServletContext.getMimeType
         3. Patch #873914: ServletUnit HttpSession.setAttribute( name, null ) now properly removes the named attribute
+        4. Patch #812709: Support JavaScript changing "disabled" attribute on Buttons
 
 26-Feb-2004
 Additions:
