@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -20,15 +20,16 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import java.util.Vector;
 
 /**
  * A collection of global options to control HttpUnit's behavior.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
-abstract
-public class HttpUnitOptions {
+public abstract class HttpUnitOptions {
 
     /**
      *  Resets all options to their default values.
@@ -238,7 +239,7 @@ public class HttpUnitOptions {
 
 
     /**
-     * Returns true if HttpUnit should automatically follow page refresh requests. 
+     * Returns true if HttpUnit should automatically follow page refresh requests.
      * By default, this is false, so that programs can verify the redirect page presented
      * to users before the browser switches to the new page.
      **/
@@ -248,7 +249,7 @@ public class HttpUnitOptions {
 
 
     /**
-     * Specifies whether HttpUnit should automatically follow page refresh requests. 
+     * Specifies whether HttpUnit should automatically follow page refresh requests.
      * By default, this is false, so that programs can verify the redirect page presented
      * to users before the browser switches to the new page. Setting this to true can
      * cause an infinite loop on pages that refresh themselves.
@@ -257,6 +258,26 @@ public class HttpUnitOptions {
         _autoRefresh = autoRefresh;
     }
 
+    /**
+     * Remove an Html error listener.
+     **/
+    public static void removeHtmlErrorListener(HtmlErrorListener el) {
+        _listeners.removeElement(el);
+    }
+
+    /**
+     * Add an Html error listener.
+     **/
+    public static void addHtmlErrorListener(HtmlErrorListener el) {
+        _listeners.addElement(el);
+    }
+
+    /**
+     * Get the list of Html Error Listeners
+     **/
+    public static Vector getHtmlErrorListeners() {
+        return _listeners;
+    }
 
 //--------------------------------- private members --------------------------------------
 
@@ -286,5 +307,10 @@ public class HttpUnitOptions {
     private static String _characterSet = DEFAULT_CHARACTER_SET;
 
     private static String _contentType = DEFAULT_CONTENT_TYPE;
-}
 
+    private static Vector _listeners;
+
+    static {
+        _listeners = new Vector();
+    }
+}

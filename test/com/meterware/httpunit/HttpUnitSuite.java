@@ -47,6 +47,7 @@ public class HttpUnitSuite {
         result.addTest( Base64Test.suite() );
         result.addTest( PseudoServerTest.suite() );
         result.addTest( MessageBodyRequestTest.suite() );
+        result.addTest( JTidyPrintWriterTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );
         return result;

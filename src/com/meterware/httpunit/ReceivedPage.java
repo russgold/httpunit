@@ -44,7 +44,7 @@ class ReceivedPage extends ParsedHTML {
 
 
     public ReceivedPage( URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
-        super( url, parentTarget, getDOM( pageText ), characterSet );
+        super( url, parentTarget, getDOM( url, pageText ), characterSet );
         setBaseAttributes();
     }
 
@@ -108,9 +108,9 @@ class ReceivedPage extends ParsedHTML {
     }
 
 
-    private static Node getDOM( String pageText ) throws SAXException {
+    private static Node getDOM( URL url, String pageText ) throws SAXException {
         try {
-            return getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes( getUTFEncodingName() ) ), null );
+            return getParser( url ).parseDOM( new ByteArrayInputStream( pageText.getBytes( getUTFEncodingName() ) ), null );
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException( "UTF-8 encoding failed" );
         }
@@ -154,11 +154,14 @@ class ReceivedPage extends ParsedHTML {
     }
 
 
-    private static Tidy getParser() {
+    private static Tidy getParser( URL url ) {
         Tidy tidy = new Tidy();
         tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
         tidy.setQuiet( true );
         tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
+        if (!HttpUnitOptions.getHtmlErrorListeners().isEmpty()) {
+            tidy.setErrout(new JTidyPrintWriter( url ));
+        }
         return tidy;
     }
 
