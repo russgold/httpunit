@@ -32,8 +32,6 @@ import java.util.Arrays;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -149,9 +147,9 @@ public class WebXMLTest extends TestCase {
     }
 
 
-    private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException, ParserConfigurationException  {
-       DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
-       return fac.newDocumentBuilder().parse( toInputStream( contents ) );    }
+    private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException {
+       return HttpUnitUtils.newParser().parse( toInputStream( contents ) );
+    }
 
 
     private ByteArrayInputStream toInputStream( String contents ) throws UnsupportedEncodingException {

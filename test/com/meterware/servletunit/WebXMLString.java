@@ -59,7 +59,12 @@ class WebXMLString {
 
 
     String asText() {
-        StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n<web-app>\n" );
+        StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n" );
+        result.append( "<!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/web-app_2_3.dtd'>" );
+        result.append( "<web-app>\n" );
+//        result.append( "<web-app version='2.4' xmlns='http://java.sun.com/xml/ns/j2ee'\n " );
+//        result.append( "                       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" );
+//        result.append( "                       xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'>\n" );
 
         for (Iterator i = _contextParams.entrySet().iterator(); i.hasNext();) {
             Map.Entry entry = (Map.Entry) i.next();

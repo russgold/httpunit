@@ -20,12 +20,16 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
+import org.xml.sax.EntityResolver;
 
 /**
  * Utility code shared by httpunit and servletunit.
@@ -95,7 +99,9 @@ public class HttpUnitUtils {
     public static DocumentBuilder newParser() throws SAXException {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            return factory.newDocumentBuilder();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setEntityResolver( new HttpUnitUtils.ClasspathEntityResolver() );
+            return builder;
         } catch (ParserConfigurationException ex) {
             // redirect the new exception for code compatibility
             throw new SAXException( ex );
@@ -176,5 +182,24 @@ public class HttpUnitUtils {
 
     static boolean isJavaScriptURL( String urlString ) {
         return urlString.toLowerCase().startsWith( "javascript:" );
+    }
+
+
+    static class ClasspathEntityResolver implements EntityResolver {
+
+        public InputSource resolveEntity( String publicID, String systemID ) {
+            if (systemID == null) return null;
+
+            String localName = systemID;
+            if (localName.indexOf( "/" ) > 0) {
+                localName = localName.substring( localName.lastIndexOf( "/" ) + 1, localName.length() );
+            }
+
+            try {
+                return new InputSource( getClass().getClassLoader().getResourceAsStream( localName ) );
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

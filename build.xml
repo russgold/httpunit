@@ -91,6 +91,9 @@
         <exclude name="**/JUnitServlet.java" unless="junit.present" />
         <exclude name="**/javascript/*" unless="rhino.present" />
     </javac>
+    <copy todir="${build.classes}">
+        <fileset dir="META-INF" includes="*.dtd"/>
+    </copy>
 </target>
 
 
