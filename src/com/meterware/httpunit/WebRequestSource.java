@@ -50,6 +50,14 @@ public class WebRequestSource extends ParameterHolder {
 
 
     /**
+     * Returns the title associated with this request source.
+     **/
+    public String getTitle() {
+        return getAttribute( "title" );
+    }
+
+
+    /**
      * Returns the target for this request source.
      **/
     public String getTarget() {

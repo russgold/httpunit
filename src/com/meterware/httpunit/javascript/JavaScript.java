@@ -472,6 +472,11 @@ public class JavaScript {
         }
 
 
+        public String jsGet_platform() {
+            return getDelegate().getClientProperties().getPlatform();
+        }
+
+
         public Object[] jsGet_plugins() {
             return new Object[0];
         }

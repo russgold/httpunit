@@ -90,6 +90,16 @@ public class ClientProperties {
     }
 
 
+    public String getPlatform() {
+        return _platform;
+    }
+
+
+    public void setPlatform( String platform ) {
+        _platform = platform;
+    }
+
+
     static ClientProperties cloneProperties() {
         return new ClientProperties( getDefaultProperties() );
     }
@@ -99,6 +109,7 @@ public class ClientProperties {
     private String _applicationName     = "HttpUnit";
     private String _applicationVersion  = "1.4";
     private String _userAgent;
+    private String _platform            = "Java";
 
     private static ClientProperties _defaultProperties = new ClientProperties();
 
@@ -112,5 +123,6 @@ public class ClientProperties {
         _applicationName     = source._applicationName;
         _applicationVersion  = source._applicationVersion;
         _userAgent           = source._userAgent;
+        _platform            = source._platform;
     }
 }

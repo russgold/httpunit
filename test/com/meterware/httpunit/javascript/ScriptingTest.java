@@ -476,6 +476,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "  alert( 'appCodeName=' + navigator.appCodeName )\n;" +
                                             "  alert( 'appVersion=' + navigator.appVersion )\n;" +
                                             "  alert( 'userAgent=' + navigator.userAgent )\n;" +
+                                            "  alert( 'platform=' + navigator.platform )\n;" +
                                             "  alert( 'javaEnabled=' + navigator.javaEnabled() )\n;" +
                                             "  alert( '# plugins=' + navigator.plugins.length )\n;" +
                                             "}" +
@@ -485,13 +486,15 @@ public class ScriptingTest extends HttpUnitTest {
         HttpUnitOptions.setExceptionsThrownOnScriptError( true );
         WebConversation wc = new WebConversation();
         wc.getClientProperties().setApplicationID( "Internet Explorer", "Mozilla", "4.0" );
+        wc.getClientProperties().setPlatform( "JVM" );
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message 1", "appName=Internet Explorer", wc.popNextAlert() );
         assertEquals( "Alert message 2", "appCodeName=Mozilla", wc.popNextAlert() );
         assertEquals( "Alert message 3", "appVersion=4.0", wc.popNextAlert() );
         assertEquals( "Alert message 4", "userAgent=Mozilla/4.0", wc.popNextAlert() );
-        assertEquals( "Alert message 5", "javaEnabled=false", wc.popNextAlert() );
-        assertEquals( "Alert message 6", "# plugins=0", wc.popNextAlert() );
+        assertEquals( "Alert message 5", "platform=JVM", wc.popNextAlert() );
+        assertEquals( "Alert message 6", "javaEnabled=false", wc.popNextAlert() );
+        assertEquals( "Alert message 7", "# plugins=0", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
 

@@ -10,6 +10,16 @@ Limitations:
 
 
 Revision History:
+ 8-Oct-2002
+Acknowledgements:
+    Thanks to Richard Harris for adding support for the title attribute for links,
+           and for adding the JavaScript Navigator.platform property.
+
+Additions:
+    1. Links, forms, and images now have a readable title property.
+    2. The navigator object now supports the readable 'platform' property.
+
+
  4-Oct-2002
 Additions:
     1. WebClient now supports a WebWindowListener which will be called when a new window is opened.
