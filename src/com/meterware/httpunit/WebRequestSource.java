@@ -153,7 +153,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     protected String getRelativeURL() {
-        String result = trimFragment( getDestination() );
+        String result = HttpUnitUtils.trimAll( trimFragment( getDestination() ) );
         if (result.trim().length() == 0) result = getBaseURL().getFile();
         return result;
     }

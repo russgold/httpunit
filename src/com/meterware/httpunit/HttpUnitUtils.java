@@ -20,8 +20,6 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
-import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -182,6 +180,35 @@ public class HttpUnitUtils {
 
     static boolean isJavaScriptURL( String urlString ) {
         return urlString.toLowerCase().startsWith( "javascript:" );
+    }
+
+
+    /**
+     * Trims not only whitespace from the ends, but also from the middle. Spaces within quotes are respected.
+     */
+    static String trimAll( String s ) {
+        s = s.trim();
+        if (s.indexOf( ' ' ) < 0) return s;
+
+        boolean inQuotes = false;
+        StringBuffer sb = new StringBuffer();
+        char[] chars = s.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char aChar = chars[i];
+            if (aChar == '"' || aChar == '\'' ) {
+                inQuotes = !inQuotes;
+                sb.append( aChar );
+            } else if (inQuotes || (aChar > ' ')) {
+                sb.append( aChar );
+            }
+        }
+        return sb.toString();
+    }
+
+
+    private static String trimFromMiddle( String s, int ch ) {
+        int index = s.indexOf( ch );
+        return s.substring( 0, index ) + s.substring( index+1 );
     }
 
 

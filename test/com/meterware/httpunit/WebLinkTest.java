@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -99,6 +99,17 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    public void testLinkUrlAcrossLineBreaks() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "Initial", "<a id='midbreak' href='http://loc\nalhost/somewhere'</a>" +
+                                  "<a id='endbreak' href='http://localhost/somewhere\n'</a>" );
+
+        WebResponse response = wc.getResponse( getHostPath() + "/Initial.html" );
+        assertEquals( "URL with break at end", "http://localhost/somewhere", response.getLinkWithID( "endbreak" ).getRequest().getURL().toExternalForm() );
+        assertEquals( "URL across linebreak", "http://localhost/somewhere", response.getLinkWithID( "midbreak" ).getRequest().getURL().toExternalForm() );
+    }
+
+
     public void testLinkReference() throws Exception {
         WebLink link = _simplePage.getLinks()[0];
         assertEquals( "URLString", "/other.html", link.getURLString() );
@@ -133,7 +144,7 @@ public class WebLinkTest extends HttpUnitTest {
 
         link = _simplePage.getFirstMatchingLink( WebLink.MATCH_URL_STRING, "/other.html" );
         assertNotNull( "an active link was not found", link );
-        assertEquals( "active link text", "an active link", link.asText() );
+        assertEquals( "active link text", "an active link", link.getText() );
 
         link = _simplePage.getFirstMatchingLink( WebLink.MATCH_URL_STRING, "basic" );
         assertNotNull( "the image link was not found", link );
@@ -170,7 +181,7 @@ public class WebLinkTest extends HttpUnitTest {
 
     public void testLinkText() throws Exception {
         WebLink link = _simplePage.getLinks()[0];
-        assertEquals( "Link text", "an active link", link.asText() );
+        assertEquals( "Link text", "an active link", link.getText() );
     }
 
 
@@ -180,7 +191,7 @@ public class WebLinkTest extends HttpUnitTest {
 
         WebResponse initialPage = wc.getResponse( getHostPath() + "/HasImage.html" );
         WebLink link = initialPage.getLinks()[0];
-        assertEquals( "Link text", "", link.asText().trim() );
+        assertEquals( "Link text", "", link.getText().trim() );
         initialPage.getLinkWithImageText("Blah Blah");
     }
 

@@ -20,13 +20,14 @@ Revision History:
    Problems fixed:
        1. bug #959918: Javascript setting of numeric values included trailing zeros after the decimal point.
        2. bug #957882: URL path elements containing leading '.' were being stripped of those periods.
+       3. bug #830856: WebLink URLs broken across lines are now handled correctly
 
 27-Jun-2004
    Thanks to Fabrizio Giustina for adding an entity-resolver to support local use of ServletUnit with a regular web.xml
 
    Additions:
-       1. patch #915296: Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified, rather than connecting to
-          the Sun website.
+       1. patch #915296: Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified, 
+          rather than connecting to the Sun website.
        2. HTMLElement now supports a getText() method to return the text contents of any element
        3. WebResponse now supports getTextBlocks and getFirstMatchingTextBlock to retrieve headers and paragraphs from a page.
 
