@@ -22,7 +22,7 @@ package com.meterware.httpunit;
 
 import java.io.*;
 import java.net.*;
-import java.util.StringTokenizer;
+import java.util.*;
 import org.xml.sax.*;
 import org.w3c.dom.*;
 
@@ -91,13 +91,17 @@ public class WebResponse {
      **/
     public WebRequest[] getFrameRequests() throws SAXException {
         NodeList frames = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
-        WebRequest[] result = new WebRequest[ frames.getLength() ];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new GetMethodWebRequest( this.getURL(), 
-                                                 NodeUtils.getNodeAttribute( frames.item(i), "src" ),
-                                                 NodeUtils.getNodeAttribute( frames.item(i), "name" ) );
+        Vector requests = new Vector();
+        for (int i = 0; i < frames.getLength(); i++) {
+            if (NodeUtils.getNodeAttribute( frames.item(i), "src" ).length() > 0) {
+                requests.addElement( new GetMethodWebRequest( this.getURL(), 
+                                                     NodeUtils.getNodeAttribute( frames.item(i), "src" ),
+                                                     NodeUtils.getNodeAttribute( frames.item(i), "name" ) ) );
+            }
         }
 
+        WebRequest[] result = new WebRequest[ requests.size() ];
+        requests.copyInto( result );
         return result;
     }
 
@@ -196,6 +200,9 @@ public class WebResponse {
 //---------------------------------- package members --------------------------------
 
 
+    final static WebResponse BLANK_RESPONSE = new WebResponse( "<html><head></head><body></body></html>" );
+
+
     /**
      * Constructs a response object from an input stream.
      * @param conversation the web conversation which received the response
@@ -203,23 +210,8 @@ public class WebResponse {
      * @param inputStream the input stream from which the response can be read
      **/
     WebResponse( WebConversation conversation, String target, URL url, URLConnection connection ) {
-        _conversation = conversation;
-        _url = url;
-        _target = target;
-        StringBuffer sb = new StringBuffer();
-        try {
-            BufferedReader input = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
-
-            String str;
-            while (null != ((str = input.readLine()))) {
-                sb.append( str ).append( endOfLine );
-            }
-            input.close ();
-            _responseText = sb.toString();
-            readHeaders( connection );
-        } catch (IOException e) {
-            throw new RuntimeException( "Unable to retrieve data from URL: " + _url.toExternalForm() + " (" + e + ")" );
-        }
+        this( conversation, target, url, getResponseText( url, connection ) );
+        readHeaders( connection );
     }
 
 
@@ -233,6 +225,7 @@ public class WebResponse {
 
 
 //--------------------------------- private members --------------------------------------
+
 
 
     final private static String endOfLine = System.getProperty( "line.separator" );
@@ -250,6 +243,46 @@ public class WebResponse {
     final private WebConversation _conversation;
 
     final private String _target;
+
+
+    /**
+     * Constructs a response object from a text response.
+     **/
+    private WebResponse( String responseText ) {
+        this( null, "", null, responseText );
+        _contentType = "text/html";
+    }
+
+
+    /**
+     * Constructs a response object.
+     * @param conversation the web conversation which received the response
+     * @param url the url from which the response was received
+     * @param inputStream the input stream from which the response can be read
+     **/
+    private WebResponse( WebConversation conversation, String target, URL url, String responseText ) {
+        _conversation = conversation;
+        _url = url;
+        _target = target;
+        _responseText = responseText;
+    }
+
+
+    private static String getResponseText( URL url, URLConnection connection ) {
+        StringBuffer sb = new StringBuffer();
+        try {
+            BufferedReader input = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
+
+            String str;
+            while (null != ((str = input.readLine()))) {
+                sb.append( str ).append( endOfLine );
+            }
+            input.close ();
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException( "Unable to retrieve data from URL: " + url.toExternalForm() + " (" + e + ")" );
+        }
+    }
 
 
     private ReceivedPage getReceivedPage() throws SAXException {

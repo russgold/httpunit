@@ -120,5 +120,31 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    public void testEmptyFrame() throws Exception {
+        defineResource( "HalfFrames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src=\"Linker.html\" name=\"red\">" +
+                        "    <FRAME name=blue>" +
+                        "</FRAMESET></HTML>" );
+        _wc.getResponse( getHostPath() + "/HalfFrames.html" );
+        WebResponse response = _wc.getFrameContents( "blue" );
+
+        assertNotNull( "Loaded nothing for the empty frame", response );
+        assertEquals( "Num links", 0, response.getLinks().length );
+    }
+
+
+    public void testSelfTarget() throws Exception {
+        defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html target=_self>one link</a>" );
+
+        _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
+        assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
+        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
+    }
+
+
     private WebConversation _wc;
 }

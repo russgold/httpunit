@@ -98,10 +98,18 @@ public class WebConversation {
             WebResponse result = new WebResponse( this, request.getTarget(), request.getURL(), connection );
             removeSubFrames( request.getTarget() );
             _frameContents.put( request.getTarget(), result );
-            _subFrames.put( request.getTarget(), result.getFrameNames() );
+            createSubFrames( request.getTarget(), result.getFrameNames() );
             WebRequest[] requests = result.getFrameRequests();
             for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
             return result;
+        }
+    }
+
+
+    private void createSubFrames( String targetName, String[] frameNames ) {
+        _subFrames.put( targetName, frameNames );
+        for (int i = 0; i < frameNames.length; i++) {
+            _frameContents.put( frameNames[i], WebResponse.BLANK_RESPONSE );
         }
     }
 

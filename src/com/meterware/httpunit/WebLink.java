@@ -36,11 +36,18 @@ public class WebLink {
      * Returns the target for this link.
      **/
     public String getTarget() {
-        if (_node.getAttributes().getNamedItem( "target" ) == null) {
+        if (getSpecifiedTarget().length() == 0) {
+            return _parentTarget;
+        } else if (getSpecifiedTarget().equalsIgnoreCase( "_self" )) {
             return _parentTarget;
         } else {
-            return getValue( _node.getAttributes().getNamedItem( "target" ) );
+            return getSpecifiedTarget();
         }
+    }
+
+
+    private String getSpecifiedTarget() {
+        return NodeUtils.getNodeAttribute( _node, "target" );
     }
 
 

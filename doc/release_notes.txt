@@ -1,5 +1,9 @@
 HttpUnit release notes
 
+Known problems:
+    1. Unnamed frames are not handled correctly
+    2. The "_parent" and "_empty" targets are not handled correctly
+
 Limitations: HttpUnit does not support JavaScript
 
 Acknowledgements:
@@ -10,6 +14,11 @@ Thanks to Perry Doell for the methods to examine cookies on WebConversation
 Thanks to Ken Hygh for the proper handling of parameters with no specified type 
 
 Revision History:
+ 5-Oct-00
+Problems corrected:
+    1. Blank "src" attributes in FRAME nodes now correctly result in a blank page
+    2. The "_self" target is now handled as the default target
+    
  4-Oct-00
 Additions:
     1. Frames are now supported. The WebConversation method has two methods: getFrameNames and getFrameContents which
