@@ -59,7 +59,7 @@ class ReceivedPage extends ParsedHTML {
 
     private static Node getDOM( String pageText ) throws SAXException {
         try {
-            return getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes( "UTF-8" ) ), null );
+            return getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes( getUTFEncodingName() ) ), null );
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException( "UTF-8 encoding failed" );
         }
@@ -67,6 +67,18 @@ class ReceivedPage extends ParsedHTML {
 
 
 //---------------------------------- private members --------------------------------
+
+
+    private static String _utfEncodingName;
+
+    private static String getUTFEncodingName() {
+        if (_utfEncodingName == null) {
+            String versionNum = System.getProperty( "java.version" );
+            if (versionNum.startsWith( "1.1" )) _utfEncodingName = "UTF8";
+            else _utfEncodingName = "UTF-8";
+        }
+        return _utfEncodingName;
+    }
 
 
     private void setBaseAttributes() throws SAXException {
