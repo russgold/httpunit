@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+ 9-Sep-2002
+Acknowledgement:
+    1. Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.
+
+Additions:
+    1. Select.selectedIndex is now read/write.
+
  6-Sep-2002
 Acknowledgments:
     1. Thanks to Ville Skyttä for removing the test dependency on xerces.

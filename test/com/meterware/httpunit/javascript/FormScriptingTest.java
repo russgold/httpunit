@@ -533,6 +533,7 @@ public class FormScriptingTest extends HttpUnitTest {
                                             "<a href='#' onClick='selectOptionNum( document.the_form.choices, 0 )'>red</a>" +
                                             "<a href='#' onClick='document.the_form.choices.options[0].value=\"9\"'>red</a>" +
                                             "<a href='#' onClick='document.the_form.choices.options[0].text=\"orange\"'>orange</a>" +
+                                            "<a href='#' onClick='document.the_form.choices.selectedIndex=3'>azure</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
@@ -549,6 +550,8 @@ public class FormScriptingTest extends HttpUnitTest {
         assertMatchingSet( "Displayed options", new String[] { "red", "blue", "green", "azure" }, form.getOptions( "choices" ) );
         response.getLinks()[3].click();
         assertMatchingSet( "Modified options", new String[] { "orange", "blue", "green", "azure" }, form.getOptions( "choices" ) );
+        response.getLinks()[4].click();
+        assertEquals( "5th selection", "7", form.getParameterValue( "choices" ) );
     }
 
 

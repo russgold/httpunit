@@ -841,6 +841,9 @@ class SelectionFormControl extends FormControl {
 
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "value" )) {
+            } else if (propertyName.equalsIgnoreCase( "selectedIndex" )) {
+                if (!(value instanceof Number)) throw new RuntimeException( "selectedIndex must be set to an integer" );
+                _selectionOptions.setSelectedIndex( ((Number) value).intValue() );
             } else {
                 super.set( propertyName, value );
             }
@@ -1029,6 +1032,16 @@ class SelectionFormControl extends FormControl {
             String[] values = new String[ _options.length ];
             for (int i = 0; i < values.length; i++) values[i] = _options[i].getValue();
             return values;
+        }
+
+
+        /**
+         * Selects the matching item and deselects the others.
+         **/
+        void setSelectedIndex( int index ) {
+            for (int i = 0; i < _options.length; i++) {
+                _options[ i ]._selected = (i == index);
+            }
         }
 
 

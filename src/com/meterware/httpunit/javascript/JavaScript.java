@@ -199,6 +199,11 @@ public class JavaScript {
         }
 
 
+        public String toString() {
+            return (_scriptable == null ? "prototype " : "") + getClassName();
+        }
+
+
         /**
          * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
          * This default implementation throws an exception.
