@@ -225,10 +225,12 @@ public class StatelessTest extends TestCase {
 
         WebClient client = sr.newClient();
         WebRequest request = new GetMethodWebRequest( "http://host/Frames" );
-        client.getResponse( request );
+        WebResponse page = client.getResponse( request );
         HttpUserAgentTest.assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, client.getFrameNames() );
         WebResponse response = client.getFrameContents( "red" );
         assertEquals( "Frame contents", SimpleGetServlet.RESPONSE_TEXT, response.getText() );
+
+        page.getSubframeContents( page.getFrameNames()[0] );
     }
 
 

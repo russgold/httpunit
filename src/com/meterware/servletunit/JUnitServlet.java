@@ -185,6 +185,7 @@ public class JUnitServlet extends HttpServlet {
 
 
         protected String sgmlEscape( String s ) {
+            if (s == null) return "NULL";
             StringBuffer result = new StringBuffer( s.length() );
             char[] chars = s.toCharArray();
             for (int i = 0; i < chars.length; i++) {
