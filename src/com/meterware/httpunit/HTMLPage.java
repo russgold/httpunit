@@ -218,6 +218,16 @@ public class HTMLPage extends ParsedHTML {
             final HTMLElement elementWithID = HTMLPage.this.getElementWithID( id );
             return elementWithID == null ? null : elementWithID.getScriptableDelegate();
         }
+
+
+        public ScriptableDelegate[] getElementsByName( String name ) {
+            final HTMLElement[] elements = HTMLPage.this.getElementsByName( name );
+            ScriptableDelegate[] result = new ScriptableDelegate[ elements.length ];
+            for (int i = 0; i < elements.length; i++) {
+                result[i] = elements[i].getScriptableDelegate();
+            }
+            return result;
+        }
     }
 
 

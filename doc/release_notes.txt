@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+27-Mar-2003
+Acknowledgements:
+    Thanks to Mark Luty for supplying a test for the getElementsByName function.
+
+Additions:
+    1. Document.getElementsByName is now supported
+
 26-Mar-2003
 Problems fixed:
     1. HttpUnit was chopping off javascript urls if they contained a '#' character.

@@ -34,6 +34,8 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
  **/
 class ParsedHTML {
 
+    final static private HTMLElement[] NO_ELEMENTS = new HTMLElement[0];
+
     private Node _rootNode;
 
     private URL _baseURL;
@@ -52,6 +54,9 @@ class ParsedHTML {
 
     /** map of element IDs to elements. **/
     private HashMap      _elementsByID = new HashMap();
+
+    /** map of element names to lists of elements. **/
+    private HashMap      _elementsByName = new HashMap();
 
     /** map of DOM elements to HTML elements **/
     private HashMap      _elements = new HashMap();
@@ -151,6 +156,14 @@ class ParsedHTML {
      */
     public HTMLElement getElementWithID( String id ) {
         return (HTMLElement) getElementWithID( id, HTMLElement.class );
+    }
+
+
+
+    HTMLElement[] getElementsByName( String name ) {
+        loadElements();
+        ArrayList elements = (ArrayList) _elementsByName.get( name );
+        return elements == null ? NO_ELEMENTS : (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
     }
 
 
@@ -547,6 +560,14 @@ class ParsedHTML {
     private void addToMaps( Element element, HTMLElement htmlElement ) {
         _elements.put( element, htmlElement );
         if (htmlElement.getID() != null) _elementsByID.put( htmlElement.getID(), htmlElement );
+        if (htmlElement.getName() != null) addNamedElement( htmlElement.getName(), htmlElement );
+    }
+
+
+    private void addNamedElement( String name, HTMLElement htmlElement ) {
+        List list = (List) _elementsByName.get( name );
+        if (list == null) _elementsByName.put( name, list = new ArrayList() );
+        list.add( htmlElement );
     }
 
 

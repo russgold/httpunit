@@ -504,6 +504,18 @@ public class JavaScript {
         }
 
 
+        public Object jsFunction_getElementsByName( String name ) {
+            ScriptableDelegate scriptables[] = getDelegate().getElementsByName( name );
+            JavaScriptEngine[] elements = new JavaScriptEngine[ scriptables.length ];
+            for (int i = 0; i < elements.length; i++) {
+                elements[ i ] = (JavaScriptEngine) toScriptable( scriptables[ i ] );
+            }
+            ElementArray result = ElementArray.newElementArray( this );
+            result.initialize( elements );
+            return result;
+        }
+
+
         public Object jsGet_location() {
             return _parent == null ? NOT_FOUND : getWindow().jsGet_location();
         }
