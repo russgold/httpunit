@@ -210,7 +210,12 @@ public class HTMLPage extends ParsedHTML {
 
 
         public String getCookie() {
-            return getResponse().getCookieHeader();
+            return emptyIfNull( getResponse().getCookieHeader() );
+        }
+
+
+        private String emptyIfNull( String string ) {
+            return string == null ? "" : string;
         }
 
 

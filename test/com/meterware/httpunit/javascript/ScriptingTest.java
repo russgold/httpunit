@@ -607,6 +607,21 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testReadNoCookie() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewCookies() { \n" +
+                                            "  alert( 'cookies: ' + document.cookie );\n" +
+                                            "}" +
+                                            "</script></head>\n" +
+                                            "<body onLoad='viewCookies()'>\n" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Alert message 1", "cookies: ", wc.popNextAlert() );
+        assertNull( "Alert should have been removed", wc.getNextAlert() );
+    }
+
+
     public void testSimpleSetCookie() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>\n" +
                                             "<body onLoad='document.cookie=\"color=red;path=/\"'>\n" +

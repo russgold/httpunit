@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+17-Oct-2003
+Problems fixed:
+    1. Bug #823433: document.cookie now defaults to the empty string, like IE and Mozilla, rather than null
+
  1-Oct-2003
 Acknowledgements:
     Thanks to Patrick Lightbody for adding JavaScript support for the Style object
