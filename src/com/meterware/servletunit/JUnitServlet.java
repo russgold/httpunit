@@ -115,6 +115,18 @@ public class JUnitServlet extends HttpServlet {
         }
 
 
+        public void testStarted( String s ) {
+        }
+
+
+        public void testEnded( String s ) {
+        }
+
+
+        public void testFailed( int i, Test test, Throwable throwable ) {
+        }
+
+
         /**
          * Always use the StandardTestSuiteLoader. Overridden from
          * BaseTestRunner.
