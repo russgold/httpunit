@@ -160,6 +160,27 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    public void testLinksWithFragmentsAndParameters() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineResource( "Initial.html?age=3", "<html><head><title>Initial</title></head><body>" +
+                                              "Go to <a href=\"Next.html\">the next page.</a> <a name=\"bottom\">Bottom</a>" +
+                                              "</body></html>" );
+        defineWebPage( "Next", "And go back to <a href=\"Initial.html?age=3#Bottom\">the first page.</a>" );
+
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/Initial.html?age=3" );
+        assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
+        WebLink link = initialPage.getLinks()[0];
+
+        WebResponse nextPage = wc.getResponse( link.getRequest() );
+        assertEquals( "Title of next page", "Next", nextPage.getTitle() );
+        assertEquals( "Num links in next page", 1, nextPage.getLinks().length );
+        link = nextPage.getLinks()[0];
+
+        WebResponse thirdPage = wc.getResponse( link.getRequest() );
+        assertEquals( "Title of next page", "Initial", thirdPage.getTitle() );
+    }
+
+
     public void testDocumentBase() throws Exception {
         WebConversation wc = new WebConversation();
         defineWebPage( "alternate/Target", "Found me!" );

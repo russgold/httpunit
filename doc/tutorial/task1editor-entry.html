@@ -39,6 +39,7 @@ we will also add the set up code to clear the pool before each test:</p>
 
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
     WebForm form = response.getFormWithID( "pool" );
@@ -83,6 +84,7 @@ as well:<p />
 <b>public void</b> testPoolEntry() <b>throws</b> Exception {
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
     WebForm form = response.getFormWithID( "pool" );
@@ -95,7 +97,7 @@ as well:<p />
     response = client.getResponse( request );                                // (3) submit the form
     form = response.getFormWithID( "pool" );
 
-    assertEquals( "Away team 0", "", form.getParameterValue( "home0" ) );    // (4) verify the response
+    assertEquals( "Away team 0", "", form.getParameterValue( "away0" ) );    // (4) verify the response
     assertEquals( "Home team 0", "", form.getParameterValue( "home0" ) );
     assertEquals( "Away team 1", "Detroit Lions", form.getParameterValue( "away1" ) );
     assertEquals( "Home team 1", "Denver Broncos", form.getParameterValue( "home1" ) );
@@ -126,7 +128,7 @@ We do so now:</p>
     pw.println( "&lt;/body&gt;&lt;/html&gt;" );
 }
 
-<b>private void</b> updateBettingPool( HttpServletRequest request ) {
+<b>void</b> updateBettingPool( HttpServletRequest request ) {
     BettingPoolGame[] games = BettingPool.getGames();
     <b>for</b> (int i = 0; i < games.length; i++) {
         games[i].setAwayTeam( request.getParameter( "away" + i ) );

@@ -13,7 +13,17 @@ Limitations:
 
 
 Revision History:
-22-Nov-2001
+27-Nov-2001
+Acknowledgements:
+    Thanks to Peter Rossbach for catching some typos in the tutorial.
+
+Additions:
+   1. The tutorial now includes an explanation of security testing in ServletUnit
+
+26-Nov-2001
+Acknowledgements:
+    Thanks to Oliver Imbusch for finding and supplying a fix for bad parsing of link URLs with parameters and fragments.
+
 Additions:
    1. ServletUnit now handles protected URLs defined in web.xml, along with both Basic and Form authentication. Logins
       with non-blank usernames are also accepted, with the password being interpreted as a comma-separated list of

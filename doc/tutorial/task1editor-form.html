@@ -27,6 +27,7 @@ the betting pool. We can write a test for each of these required behaviors.</p>
 <b>public void</b> testFormAction() <b>throws</b> Exception {
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
     WebForm form = response.getFormWithID( "pool" );               // (1) obtain the desired form
@@ -59,6 +60,7 @@ which it was retrieved - in the case, the same servlet that produced it.</li></o
 <b>public void</b> testFormContents() <b>throws</b> Exception {
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
     WebForm form = response.getFormWithID( "pool" );
@@ -100,6 +102,7 @@ which it was retrieved - in the case, the same servlet that produced it.</li></o
 <b>public void</b> testSubmitButtons() <b>throws</b> Exception {
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
     WebForm form = response.getFormWithID( "pool" );

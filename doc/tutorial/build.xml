@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--  ======================================================================= -->
-<!--  httpunit tutorial build file                                                     -->
+<!--  httpunit tutorial build file                                            -->
 <!--  ======================================================================= -->
 <project name="tutorial" default="test" basedir=".">
     <property name="src.dir" value="src" />

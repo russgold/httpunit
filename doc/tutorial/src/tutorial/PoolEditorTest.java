@@ -11,7 +11,7 @@ import tutorial.persistence.BettingPool;
 
 public class PoolEditorTest extends TestCase {
 
-    public static void main(String args[]) {
+    public static void main( String args[] ) {
         junit.textui.TestRunner.run( suite() );
     }
 
@@ -31,8 +31,15 @@ public class PoolEditorTest extends TestCase {
 
     public void testGetForm() throws Exception {
         ServletRunner sr = new ServletRunner( "web.xml" );
-
         ServletUnitClient client = sr.newClient();
+
+        try {
+            client.getResponse( "http://localhost/PoolEditor" );
+            fail( "PoolEditor is not protected" );
+        } catch (AuthorizationRequiredException e) {
+        }
+
+        client.setAuthorization( "aUser", "pool-admin" );
         client.getResponse( "http://localhost/PoolEditor" );
     }
 
@@ -121,7 +128,7 @@ public class PoolEditorTest extends TestCase {
         response = client.getResponse( request );
         form = response.getFormWithID( "pool" );
 
-        assertEquals( "Away team 0", "", form.getParameterValue( "home0" ) );
+        assertEquals( "Away team 0", "", form.getParameterValue( "away0" ) );
         assertEquals( "Home team 0", "", form.getParameterValue( "home0" ) );
         assertEquals( "Away team 1", "Detroit Lions", form.getParameterValue( "away1" ) );
         assertEquals( "Home team 1", "Denver Broncos", form.getParameterValue( "home1" ) );
@@ -198,4 +205,5 @@ public class PoolEditorTest extends TestCase {
             fail( "Could still edit the pool" );
         } catch (IllegalRequestParameterException e) {}
     }
+
 }

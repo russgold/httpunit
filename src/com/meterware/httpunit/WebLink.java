@@ -129,7 +129,13 @@ public class WebLink extends WebRequestSource {
      * Returns the URL referenced by this link. This may be a relative URL.
      **/
     public String getURLString() {
-        return NodeUtils.getNodeAttribute( getNode(), "href" );
+        String href = NodeUtils.getNodeAttribute( getNode(), "href" );
+        final int hashIndex = href.indexOf( '#' );
+        if (hashIndex < 0) {
+            return href;
+        } else {
+            return href.substring( 0, hashIndex );
+        }
     }
 
 

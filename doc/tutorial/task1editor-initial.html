@@ -11,7 +11,10 @@
 <img src="arrow_yellow.gif" width=13 height=9 align=bottom ALT="-&gt;"> Step 1: Invoking the pool editor</p>
 
 <h1>Invoking the Pool Editor</h1>
-<p class="goals">In this step, you will learn how to:<br />&bull; Initialize ServletUnit<br />&bull; Invoke a servlet</p>
+<p class="goals">In this step, you will learn how to:<br />
+&bull; Initialize ServletUnit<br />
+&bull; Invoke a servlet<br />
+&bull; Specify a username and password for basic authentication</p>
 <p>The first step will simply be to verify that we can register
 and access the servlet, which we will name <code>PoolEditorServlet</code>. A GET method to this page should return the editor form
 itself, while updates will be handled by a POST method to the same address.  Since we are working with servlets, we can
@@ -23,6 +26,7 @@ bypass the web server and use the <code>servletunit</code> package to run our te
 
 <b>import</b> com.meterware.httpunit.*;
 <b>import</b> com.meterware.servletunit.*;
+<b>import</b> java.util.*;
 <b>import</b> junit.framework.*;
 <b>import</b> tutorial.persistence.*;
 
@@ -41,10 +45,17 @@ bypass the web server and use the <code>servletunit</code> package to run our te
     }
 
     <b>public void</b> testGetForm() <b>throws</b> Exception {
-        ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );    // (1) use the web.xml file to define mappings
+        ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );       // (1) use the web.xml file to define mappings
+        ServletUnitClient client = sr.newClient();               // (2) create a client to invoke the application
 
-        ServletUnitClient client = sr.newClient();            // (2) create a client to invoke the application
-        client.getResponse( "http://localhost/PoolEditor" );  // (3) invoke the servlet
+        try {
+            client.getResponse( "http://localhost/PoolEditor" ); // (3) invoke the servlet w/o authorization
+            fail( "PoolEditor is not protected" );
+        } catch (AuthorizationRequiredException e) {             // (4) verify that access is denied
+        }
+
+        client.setAuthorization( "aUser", "pool-admin" );        // (5) specify authorization and
+        client.getResponse( "http://localhost/PoolEditor" );     //     invoke the servlet again
     }
 
 }
@@ -56,7 +67,10 @@ The significant points in the code are:<ol>
 The application is defined by an XML file which maps URL information to servlet classes.</li>
 <li>Creating a client which can access the application and maintain state across multiple invocations.</li>
 <li>Invoking the servlet via its URL. Note that ServletUnit ignores any host and port information. All URL patterns
-are treated as being relative to the root ("/").</li></ol></p>
+are treated as being relative to the root ("/").</li>
+<li>Catching an exception which indicates that authentication is required.</li>
+<li>Specifying the authorization information. ServletUnit does not maintain a database of users, no any username is
+accepted, and the password is interpreted as a comma-separated list of role names associated with the user.</li></ol></p>
 
 <p>To run this code, you will also need the <a href="web.xml">web.xml</a> file in your current directory. This file
 maps the request URL to the Pool Editor servlet.</p>
@@ -68,6 +82,7 @@ can now proceed to do so. Here is a simple implementation:</p>
 <b>package</b> tutorial;
 
 <b>import</b> java.io.*;
+<b>import</b> java.util.*;
 
 <b>import</b> javax.servlet.http.*;
 <b>import</b> javax.servlet.ServletException;

@@ -29,6 +29,7 @@ pieces and build one at a time. With <code>ServletUnit</code>, we can:<p />
 <b>public void</b> testPoolValidation() <b>throws</b> Exception {
     ServletRunner sr = new ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
     WebForm form = response.getFormWithID( "pool" );
     WebRequest request = form.getRequest( "save", "Open Pool" );
@@ -86,6 +87,7 @@ containing bad inputs. We therefore ask for the response from the bad open pool 
 <b>public void</b> testBadPoolOpen() <b>throws</b> Exception {
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
     WebForm form = response.getFormWithID( "pool" );
     WebRequest request = form.getRequest( "save", "Open Pool" );               // (1) select a submit button
@@ -96,7 +98,7 @@ containing bad inputs. We therefore ask for the response from the bad open pool 
     request.setParameter( "tiebreaker", "3" );
     response = client.getResponse( request );                                  // (3) submit the form
 
-    WebTable errorTable = response.getTableStartingWith( "Errors Detected:" ); // (4) Look for error table
+    WebTable errorTable = response.getTableStartingWithPrefix( "Cannot ope" ); // (4) Look for error table
     assertNotNull( "No errors reported", errorTable );
     String[][] cells = errorTable.asText();                                    // (5) Convert non-empty cells to text
     assertEquals( "Number of error messages provided", 2, cells.length - 1 );
@@ -108,7 +110,7 @@ containing bad inputs. We therefore ask for the response from the bad open pool 
 <li>We select the "Open Pool" button to be included with the form submission.</li>
 <li>We then enter known bad values.</li>
 <li>We want the response when we submit the form changes.</li>
-<li>We expect to find them in a table which we can recognize because its upper-leftmost non-empty cell which contain
+<li>We expect to find them in a table which we can recognize because its upper-leftmost non-empty cell which starts with
 a known string.</li>
 <li>Since we want to examine the textual content of any non-empty cells in the table, we ask that the table be converted
 to a two-dimensional string array. In this case, there should only be one non-blank cell in each row.</li></ol></p>
@@ -149,6 +151,7 @@ the pool itself. We will test this by verifying that the "save" submit buttons a
 <b>public void</b> testGoodPoolOpen() <b>throws</b> Exception {
     ServletRunner sr = <b>new</b> ServletRunner( "web.xml" );
     ServletUnitClient client = sr.newClient();
+    client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
     WebForm form = response.getFormWithID( "pool" );
     WebRequest request = form.getRequest( "save", "Open Pool" );
