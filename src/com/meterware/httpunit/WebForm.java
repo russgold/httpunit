@@ -608,6 +608,7 @@ public class WebForm extends WebRequestSource {
      * @param name the name of the checkbox parameter
      * @throws IllegalArgumentException if the specified parameter is not a checkbox or there is more than one
      *         control with that name.
+     * @since 1.5.4
      */
     public void toggleCheckbox( String name ) {
         FormParameter parameter = getParameter( name );
@@ -622,6 +623,7 @@ public class WebForm extends WebRequestSource {
      * @param value of the checkbox parameter
      * @throws IllegalArgumentException if the specified parameter is not a checkbox or if there is no checkbox
      *         with the specified name and value.
+     * @since 1.5.5
      */
     public void toggleCheckbox( String name, String value ) {
         FormParameter parameter = getParameter( name );
@@ -636,6 +638,7 @@ public class WebForm extends WebRequestSource {
      * @param state the new state of the checkbox
      * @throws IllegalArgumentException if the specified parameter is not a checkbox or there is more than one
      *         control with that name.
+     * @since 1.5.4
      */
     public void setCheckbox( String name, boolean state ) {
         FormParameter parameter = getParameter( name );
@@ -651,6 +654,7 @@ public class WebForm extends WebRequestSource {
      * @param state the new state of the checkbox
      * @throws IllegalArgumentException if the specified parameter is not a checkbox or if there is no checkbox
      *         with the specified name and value.
+     * @since 1.5.5
      */
     public void setCheckbox( String name, String value, boolean state ) {
         FormParameter parameter = getParameter( name );
