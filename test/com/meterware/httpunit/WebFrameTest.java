@@ -104,6 +104,19 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    public void testFrameRequestsWithFragments() throws Exception {
+        defineResource( "Frames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src='Linker.html' name=\"red\">" +
+                        "    <FRAME src='Form.html#middle' name=blue>" +
+                        "</FRAMESET></HTML>" );
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebRequest[] requests = response.getFrameRequests();
+        assertEquals( "URL for second request", getHostPath() + "/Form.html", requests[1].getURL().toExternalForm() );
+    }
+
+
     public void testFrameLoading() throws Exception {
         _wc.getResponse( getHostPath() + "/Frames.html" );
 

@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+ 8-Jul-2004
+   Problems fixed:
+       1. bug #986397: Subframe included fragments in their source attributes now ignore those fragments when generating requests.
+
 29-Jun-2004
    Problems fixed:
        1. bug #805921: WebForm.selectImageButtonPosition was misleadingly public and should not have been used.

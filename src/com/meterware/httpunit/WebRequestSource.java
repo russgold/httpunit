@@ -153,20 +153,9 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     protected String getRelativeURL() {
-        String result = HttpUnitUtils.trimAll( trimFragment( getDestination() ) );
+        String result = HttpUnitUtils.trimAll( HttpUnitUtils.trimFragment( getDestination() ) );
         if (result.trim().length() == 0) result = getBaseURL().getFile();
         return result;
-    }
-
-
-    private String trimFragment( String href ) {
-        if (HttpUnitUtils.isJavaScriptURL( href )) return href;
-        final int hashIndex = href.indexOf( '#' );
-        if (hashIndex < 0) {
-            return href;
-        } else {
-            return href.substring( 0, hashIndex );
-        }
     }
 
 
@@ -343,7 +332,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
      * Gets all parameters from a URL
      **/
     private String getParametersString() {
-        String url = trimFragment( getDestination() );
+        String url = HttpUnitUtils.trimFragment( getDestination() );
         if (url.trim().length() == 0) url = getBaseURL().toExternalForm();
         if (HttpUnitUtils.isJavaScriptURL( url )) return "";
         final int questionMarkIndex = url.indexOf("?");

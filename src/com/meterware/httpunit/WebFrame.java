@@ -75,7 +75,7 @@ class WebFrame extends HTMLElementBase {
 
     WebRequest getInitialRequest() {
         return new GetMethodWebRequest( _baseURL,
-                                        NodeUtils.getNodeAttribute( _element, "src" ),
+                                        HttpUnitUtils.trimFragment( NodeUtils.getNodeAttribute( _element, "src" ) ),
                                         _selector );
     }
 

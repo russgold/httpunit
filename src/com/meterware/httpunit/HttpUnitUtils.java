@@ -224,6 +224,16 @@ public class HttpUnitUtils {
     }
 
 
+    /**
+     * Strips the fragment identifier (if any) from the Url.
+     */
+    static String trimFragment( String rawUrl ) {
+        if (isJavaScriptURL( rawUrl )) return rawUrl;
+        final int hashIndex = rawUrl.indexOf( '#' );
+        return hashIndex < 0 ? rawUrl: rawUrl.substring( 0, hashIndex );
+    }
+
+
     static class ClasspathEntityResolver implements EntityResolver {
 
         public InputSource resolveEntity( String publicID, String systemID ) {
