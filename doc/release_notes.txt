@@ -14,6 +14,11 @@ Thanks to Perry Doell for the methods to examine cookies on WebConversation
 Thanks to Ken Hygh for the proper handling of parameters with no specified type 
 
 Revision History:
+Additions:
+    1. It is now possible to set a delay in the handling of redirect requests, if necessary
+    2. The WebResponse now can return the response code associated with it (2xx)
+    3. An exception (HttpException or a subclass) is now thrown on all client and server errors (4xx or 5xx)
+     
 Problems corrected:
     1. Unnamed frames are now handled
 

@@ -19,19 +19,18 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.util.Properties;
-import java.io.*;
+import java.net.HttpURLConnection;
 
 
 /**
  * This exception is thrown when an internal error is found on the server.
  * @author Seth Ladd
  **/
-public class HttpInternalErrorException extends RuntimeException {
+public class HttpInternalErrorException extends HttpException {
 
 
     HttpInternalErrorException( String url ) {
-        super( url );
+        super( HttpURLConnection.HTTP_INTERNAL_ERROR, url );
     }
 
 

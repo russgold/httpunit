@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.meterware.httpunit.*;
+import java.net.HttpURLConnection;
 
 /**
  * Tests the basic authentication.
@@ -55,6 +56,7 @@ public class PseudoServerTest extends TestCase {
             WebResponse response = wc.getResponse( request );
             fail( "Should have rejected the request" );
         } catch (HttpNotFoundException e) {
+            assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
         }
     }
 

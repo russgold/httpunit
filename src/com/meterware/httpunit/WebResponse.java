@@ -41,6 +41,14 @@ public class WebResponse {
 
 
     /**
+     * Returns the response code associated with this response.
+     **/
+    public int getResponseCode() {
+        return _responseCode;
+    }
+
+
+    /**
      * Returns the URL which invoked this response.
      **/
     public URL getURL() {
@@ -249,6 +257,8 @@ public class WebResponse {
 
     private String _characterSet = "us-ascii";
 
+    private int    _responseCode;
+
     final private URL    _url;
 
     final private WebConversation _conversation;
@@ -323,6 +333,10 @@ public class WebResponse {
 
     private void readHeaders( URLConnection connection ) {
         readContentTypeHeader( connection );
+        try {
+            _responseCode = ((HttpURLConnection) connection).getResponseCode();
+        } catch (IOException e) {
+        }
     }
 
 

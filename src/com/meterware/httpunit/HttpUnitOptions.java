@@ -96,6 +96,25 @@ public class HttpUnitOptions {
     }
 
 
+    /**
+     * Returns the delay, in milliseconds, before a redirect request is issues.
+     **/
+    public static int getRedirectDelay() {
+        return _redirectDelay;
+    }
+
+
+    /**
+     * Sets the delay, in milliseconds, before a redirect request is issued. This may be necessary if the server
+     * under some cases where the server performs asynchronous processing which must be completed before the
+     * new request can be handled properly, and is taking advantage of slower processing by most user agents. It
+     * almost always indicates an error in the server design, and therefore the default delay is zero.
+     **/
+    public static void setRedirectDelay( int delayInMilliseconds ) {
+        _redirectDelay = delayInMilliseconds;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
@@ -106,6 +125,8 @@ public class HttpUnitOptions {
     private static boolean _imagesTreatedAsAltText;
 
     private static boolean _loggingHttpHeaders;
+
+    private static int _redirectDelay;
 
 }
 

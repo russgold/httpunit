@@ -87,6 +87,7 @@ public class WebConversation {
         updateCookies( connection );
 
         if (connection.getHeaderField( "Location" ) != null) {
+            delay( HttpUnitOptions.getRedirectDelay() );
             return getResponse( new RedirectWebRequest( request, connection.getHeaderField( "Location" ) ) );
         } else if (connection.getHeaderField( "WWW-Authenticate" ) != null) {
             throw new AuthorizationRequiredException( connection.getHeaderField( "WWW-Authenticate" ) );
@@ -94,6 +95,8 @@ public class WebConversation {
             throw new HttpInternalErrorException( request.getURLString() );
         } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new HttpNotFoundException( request.getURLString() );        
+        } else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
+            throw new HttpException( connection.getResponseCode(), request.getURLString() );        
         } else {
             WebResponse result = new WebResponse( this, request.getTarget(), request.getURL(), connection );
             if (result.isHTML()) {
@@ -104,6 +107,16 @@ public class WebConversation {
                 for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
             }
             return result;
+        }
+    }
+
+
+    private void delay( int numMilliseconds ) {
+        if (numMilliseconds == 0) return;
+        try {
+            Thread.sleep( numMilliseconds );
+        } catch (InterruptedException e) {
+            // ignore the exception
         }
     }
 

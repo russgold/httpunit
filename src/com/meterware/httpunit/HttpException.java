@@ -19,20 +19,35 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.HttpURLConnection;
+import java.util.Properties;
+import java.io.*;
 
 
 /**
- * This exception is thrown when the desired URL is not found.
+ * This exception is thrown when an Http error (response code 4xx or 5xx) is detected.
  * @author Seth Ladd
  * @author Russell Gold
  **/
-public class HttpNotFoundException extends HttpException {
+public class HttpException extends RuntimeException {
 
 
-    HttpNotFoundException( String url ) {
-        super( HttpURLConnection.HTTP_NOT_FOUND, url );
+    HttpException( int responseCode ) {
+        _responseCode = responseCode;
     }
+
+
+    HttpException( int responseCode, String reason ) {
+        super( reason );
+        _responseCode = responseCode;
+    }
+
+
+    public int getResponseCode() {
+        return _responseCode;
+    }
+
+
+    private int _responseCode;
 
 
 }
