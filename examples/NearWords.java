@@ -52,6 +52,7 @@ class WordSeeker {
         WebForm lookupForm = getFormWithName( "dict" );
         WebRequest request = lookupForm.getRequest();
         request.setParameter( "va", pattern );
+        request.setParameter( "book", "Dictionary" );
         response = conversation.getResponse( request );
 
         return getOptionsFromResponse();

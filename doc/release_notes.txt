@@ -11,6 +11,11 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+19-Jun-2001
+Problems corrected:
+    1. The cookbook was missing parentheses for its constructors
+    2. Updated the NearWords example to accomodate changes to the Merriam-Webster site
+    
 18-Jun-2001 1.2.5                            
 Acknowledgements:
     Thanks to Rolf Schmidiger for corrected behavior when failing to find a site
