@@ -67,7 +67,9 @@ public class WebConversation extends WebClient {
 
         String hostName = request.getURL().getHost();
         setHeaderField( "Host", hostName + ':' + request.getURL().getPort() );
-        return new URL( request.getURL().getProtocol(), dnsListener.getIpAddress( hostName ), request.getURL().getPort(), request.getURL().getFile() );
+        String actualHost = dnsListener.getIpAddress( hostName );
+        if (HttpUnitOptions.isLoggingHttpHeaders()) System.out.println( "Rerouting request to :: " + actualHost );
+        return new URL( request.getURL().getProtocol(), actualHost, request.getURL().getPort(), request.getURL().getFile() );
     }
 
 
