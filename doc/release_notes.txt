@@ -12,7 +12,10 @@ Limitations: HttpUnit does not support JavaScript
 Revision History:
 
  1-Jul-2001
- Additions:
+Acknowledgements:
+    Thanks to Marcos Tarruella for adding a test case for the Base64 class
+    
+Additions:
     1. WebResponse.getRefreshRequest now returns a WebRequest object if a refresh URL
        was specified in the response header.
     2. WebResponse.getRefreshDelay specifies the delay found in the header, if any.
