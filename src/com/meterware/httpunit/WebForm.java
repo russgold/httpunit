@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -53,11 +53,19 @@ public class WebForm {
     }
 
 
-    /**
+    /** 
      * Returns the name of the form.
      **/
     public String getName() {
         return emptyIfNull( getValue( _node.getAttributes().getNamedItem( "name" ) ) );
+    }
+
+
+    /**
+     * Returns the ID associated with the form.
+     **/
+    public String getID() {
+        return emptyIfNull( getValue( _node.getAttributes().getNamedItem( "id" ) ) );
     }
 
 

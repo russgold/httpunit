@@ -1,5 +1,24 @@
 package com.meterware.httpunit;
-
+/********************************************************************************************************************
+* $Id$
+*
+* Copyright (c) 2000-2001, Russell Gold
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+* the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+* to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
+* of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+* THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+* CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+*
+*******************************************************************************************************************/
 import java.net.URL;
 
 import junit.framework.Test;
@@ -72,6 +91,20 @@ public class WebFormTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         assertNull( "Found nonexistent form", page.getFormWithName( "nobody" ) );
         assertNotNull( "Did not find named form", page.getFormWithName( "oneform" ) );
+    }
+
+
+    public void testFindFormByID() throws Exception {
+        defineWebPage( "Default", "<form id=oneForm method=POST action = \"/servlet/Login\">" +
+                                  "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
+                                  "<br><Input name=typeless value=nothing>" +
+                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                                  "<br><Input type=submit value = \"Log in\">" +
+                                  "</form>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        assertNull( "Found nonexistent form", page.getFormWithID( "nobody" ) );
+        assertNotNull( "Did not find specified form", page.getFormWithID( "oneform" ) );
     }
 
 

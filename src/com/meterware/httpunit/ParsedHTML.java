@@ -51,6 +51,19 @@ class ParsedHTML {
 
 
     /**
+     * Returns the form found in the page with the specified ID.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm getFormWithID( String ID ) {
+        WebForm[] forms = getForms();
+        for (int i = 0; i < forms.length; i++) {
+            if (forms[i].getID().equalsIgnoreCase( ID )) return forms[i];
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the form found in the page with the specified name.
      * @exception SAXException thrown if there is an error parsing the response.
      **/

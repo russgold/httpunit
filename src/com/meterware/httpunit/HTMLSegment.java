@@ -36,6 +36,13 @@ public interface HTMLSegment {
 
 
     /**
+     * Returns the form found in this HTML segment with the specified ID.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     **/
+    public WebForm getFormWithID( String ID ) throws SAXException;
+
+
+    /**
      * Returns the form found in this HTML segment with the specified name.
      * @exception SAXException thrown if there is an error parsing the segment.
      **/

@@ -188,6 +188,15 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns the form found in the page with the specified ID.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm getFormWithID( String ID ) throws SAXException {
+        return getReceivedPage().getFormWithID( ID );
+    }
+
+
+    /**
      * Returns the links found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the response.
      **/
