@@ -28,6 +28,7 @@ import junit.framework.TestSuite;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.io.ByteArrayOutputStream;
 
 
 /**
@@ -206,6 +207,19 @@ public class FormSubmitTest extends HttpUnitTest {
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
         assertEquals( "Query", getHostPath() + "/ask?age=12&update=name&update.x=0&update.y=0", request.getURL().toExternalForm() );
+    }
+
+
+    public void testImageButtonNoValue() throws Exception {
+        defineWebPage( "Default", "<form name='login' method='get' action='ask'>" +
+                                  "<input type='text' name='email' value='bread'>" +
+                                  "<input type='image' name='login' src='../../se/images/buttons/login.gif'" +
+                                  "       Alt='OK' border='0'>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = form.getRequest();
+        assertEquals( "Query", getHostPath() + "/ask?email=bread&login.x=0&login.y=0", request.getURL().toExternalForm() );
     }
 
 

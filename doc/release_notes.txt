@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+25-Mar-2002
+Problems fixed:
+    1. Parameters were not being submitted for image buttons with no specified value
+
 21-Mar-2002
 Acknowledgements:
     Thanks to Frank Carver for extending base 64 encoding to handle character values > 127.
