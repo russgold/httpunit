@@ -55,11 +55,11 @@ public class HtmlTablesTest extends HttpUnitTest {
 
         defineWebPage( "OneTable", "<h2>Interesting data</h2>" +
                                    "<table summary=\"tough luck\">" +
-                                   "<tr><td>One</td><td>&nbsp;</td><td>1</td></tr>" +
+                                   "<tr><th>One</th><td>&nbsp;</td><td>1</td></tr>" +
                                    "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" +
-                                   "<tr><td>Two</td><td>&nbsp;</td><td>2</td></tr>" +
+                                   "<tr><th>Two</th><td>&nbsp;</td><td>2</td></tr>" +
                                    "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" +
-                                   "<tr><td>Three</td><td>&nbsp;</td><td>3</td></tr>" +
+                                   "<tr><th>Three</th><td>&nbsp;</td><td>3</td></tr>" +
                                    "</table>" );
         defineWebPage( "SpanTable", "<h2>Interesting data</h2>" +
                                     "<table summary=\"tough luck\">" +

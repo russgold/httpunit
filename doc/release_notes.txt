@@ -16,6 +16,10 @@ Acknowledgements:
 
 Additions:
     1. There is now an ant target to run the Example program.
+    2. The Rhino jar now includes a patch to improve error-reporting for unsupported DOM elements
+
+Problems fixed:
+    1. Table <th> elements were being handled *after* <td> elements in the same row
 
 22-Nov-2002
 Notes:

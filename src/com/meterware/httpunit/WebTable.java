@@ -356,9 +356,12 @@ public class WebTable {
     private TableRow[] getRows() {
         final Vector rows = new Vector();
 
-        processChildren( _dom, "tr", "table", new ElementHandler() {
+        processChildren( _dom, "table", new ElementHandler() {
             public void handleElement( Element element ) {
                 rows.addElement( new TableRow( element ) );
+            }
+            public boolean shouldHandleElement( String tagName ) {
+                return tagName.equalsIgnoreCase( "tr" );
             }
         } );
 
@@ -374,22 +377,20 @@ public class WebTable {
         }
 
         TableCell[] getCells() {
-            Vector cells = new Vector();
-            collectChildren( "td", cells );
-            collectChildren( "th", cells );
+            final Vector cells = new Vector();
+
+            processChildren( _element, "table", new ElementHandler() {
+                public void handleElement( Element element ) {
+                    cells.addElement( new TableCell( _response, element, _url, _parentTarget, _characterSet ) );
+                }
+                public boolean shouldHandleElement( String tagName ) {
+                    return tagName.equalsIgnoreCase( "th" ) || tagName.equalsIgnoreCase( "td" );
+                }
+            } );
 
             TableCell[] result = new TableCell[ cells.size() ];
             cells.copyInto( result );
             return result;
-        }
-
-
-        private void collectChildren( String childTag, final Vector children ) {
-            processChildren( _element, childTag, "table", new ElementHandler() {
-                public void handleElement( Element element ) {
-                    children.addElement( new TableCell( _response, element, _url, _parentTarget, _characterSet ) );
-                }
-            } );
         }
 
 
@@ -400,21 +401,20 @@ public class WebTable {
     }
 
 
-
-
     interface ElementHandler {
         public void handleElement( Element element );
+        public boolean shouldHandleElement( String tagName );
     }
 
 
-    static void processChildren( Element root, String childTag, String avoidingParentTag, ElementHandler handler ) {
+    static void processChildren( Element root, String avoidingParentTag, ElementHandler handler ) {
 
         for (Node child = root.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof Element) {
                 Element element = (Element) child;
                 String name = child.getNodeName();
-                if (name.equalsIgnoreCase( childTag )) handler.handleElement( element );
-                if (!name.equalsIgnoreCase( avoidingParentTag )) processChildren( element, childTag, avoidingParentTag, handler );
+                if (handler.shouldHandleElement( name )) handler.handleElement( element );
+                if (!name.equalsIgnoreCase( avoidingParentTag )) processChildren( element, avoidingParentTag, handler );
             }
         }
     }
