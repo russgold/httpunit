@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.servlet.*;
@@ -280,6 +281,97 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     }
 
 
+//------------------------------- the following methods are new in JSDK 2.2 ----------------------
+
+
+    /**
+     * Adds a response header with the given name and value. This method allows response headers to have multiple values.
+     **/
+    public void addHeader( String name, String value ) {
+        throw new RuntimeException( "addHeader not implemented" );
+    }
+
+
+    /**
+     * Adds a response header with the given name and value. This method allows response headers to have multiple values.
+     **/
+    public void addIntHeader( String name, int value ) {
+        throw new RuntimeException( "addIntHeader not implemented" );
+    }
+
+
+    /**
+     * Adds a response header with the given name and value. This method allows response headers to have multiple values.
+     **/
+    public void addDateHeader( String name, long value ) {
+        throw new RuntimeException( "addDateHeader not implemented" );
+    }
+
+    
+    /**
+     * Sets the preferred buffer size for the body of the response. The servlet container 
+     * will use a buffer at least as large as the size requested. The actual buffer size 
+     * used can be found using getBufferSize.
+     **/
+    public void setBufferSize( int size ) {   // XXX throw IllegalStateException if anything has been written
+        throw new RuntimeException( "setBufferSize not implemented" );
+    }
+
+
+    /**
+     * Returns the actual buffer size used for the response. If no buffering is used, this method returns 0.
+     **/ 
+    public int getBufferSize() {
+        return 0;
+    }
+
+
+    /**
+     * Returns a boolean indicating if the response has been committed. A commited response has 
+     * already had its status code and headers written.
+     **/
+    public boolean isCommitted() {
+        return false;    // XXX set true if flushBuffer has been called
+    }
+     
+     
+    /**
+     * Forces any content in the buffer to be written to the client. A call to this method automatically 
+     * commits the response, meaning the status code and headers will be written.
+     **/
+    public void flushBuffer() throws IOException {
+        throw new RuntimeException( "flushBuffer not implemented" );
+    }
+
+    
+    /**
+     * Clears any data that exists in the buffer as well as the status code and headers. 
+     * If the response has been committed, this method throws an IllegalStateException.
+     **/
+    public void reset() {
+        throw new RuntimeException( "reset not implemented" );
+    }
+
+
+    /**
+     * Sets the locale of the response, setting the headers (including the Content-Type's charset) 
+     * as appropriate. This method should be called before a call to getWriter(). 
+     * By default, the response locale is the default locale for the server.
+     **/
+    public void setLocale( Locale locale ) {
+        throw new RuntimeException( "setLocale not implemented" );
+    }
+
+     
+    /**
+     * Returns the locale assigned to the response.
+     **/
+    public Locale getLocale() {
+        throw new RuntimeException( "getLocale not implemented" );
+    }
+
+     
+     
 //---------------------------------------- package methods ---------------------------------------
 
 

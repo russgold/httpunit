@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.servlet.ServletException;
@@ -125,9 +126,42 @@ class ServletUnitHttpSession implements HttpSession {
 
 
     /**
-     * Returns the object bound with the specified name in this session or null if no object of that name exists.
+     * @deprecated as of JSDK 2.2, use getAttribute
      **/
     public Object getValue( String name ) {
+        return getAttribute( name );
+    }
+
+
+    /**
+     * @deprecated as of JSDK 2.2, use setAttribute
+     **/
+    public void putValue( String name, Object value ) {
+        setAttribute( name, value );
+    }
+
+
+    /**
+     * @deprecated as of JSDK 2.2, use removeAttribute
+     **/ 
+    public void removeValue( String name ) {
+        removeAttribute( name );
+    }
+
+
+    /**
+     * @deprecated as of JSDK 2.2, use getAttributeNames.
+     **/
+    public String[] getValueNames() {
+        if (_isInvalid) throw new IllegalStateException();
+        throw new RuntimeException( "getValueNames not implemented" );
+    }
+
+
+    /**
+     * Returns the object bound with the specified name in this session or null if no object of that name exists.
+     **/
+    public Object getAttribute( String name ) {
         if (_isInvalid) throw new IllegalStateException();
         return _values.get( name );
     }
@@ -137,7 +171,7 @@ class ServletUnitHttpSession implements HttpSession {
      * Binds an object to this session, using the name specified. If an object of the same name 
      * is already bound to the session, the object is replaced.
      **/
-    public void putValue( String name, Object value ) {
+    public void setAttribute( String name, Object value ) {
         if (_isInvalid) throw new IllegalStateException();
         _values.put( name, value );
     }
@@ -147,7 +181,7 @@ class ServletUnitHttpSession implements HttpSession {
      * Removes the object bound with the specified name from this session. If the session does not 
      * have an object bound with the specified name, this method does nothing.
      **/ 
-    public void removeValue( String name ) {
+    public void removeAttribute( String name ) {
         if (_isInvalid) throw new IllegalStateException();
         _values.remove( name );
     }
@@ -157,7 +191,7 @@ class ServletUnitHttpSession implements HttpSession {
      * Returns an array containing the names of all the objects bound to this session. 
      * This method is useful, for example, when you want to delete all the objects bound to this session.
      **/
-    public String[] getValueNames() {
+    public Enumeration getAttributeNames() {
         if (_isInvalid) throw new IllegalStateException();
         throw new RuntimeException( "getValueNames not implemented" );
     }

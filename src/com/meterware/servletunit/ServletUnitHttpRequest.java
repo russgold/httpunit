@@ -261,7 +261,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
-//--------------------------------- Servlet methods ----------------------------------------------------
+//--------------------------------- ServletRequest methods ----------------------------------------------------
 
 
     /**
@@ -469,6 +469,105 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
+//--------------------------------- methods added to ServletRequest in JSDK 2.2 ------------------------------------------------
+
+
+    /**
+     * Returns a boolean indicating whether this request was made using a secure channel, such as HTTPS.
+     **/
+    public boolean isSecure() {
+        throw new RuntimeException( "isSecure not implemented" );
+    }
+
+
+    /**
+     * Returns the preferred Locale that the client will accept content in, based on the Accept-Language header. 
+     * If the client request doesn't provide an Accept-Language header, this method returns the default locale for the server.
+     **/
+    public java.util.Locale getLocale() {
+        throw new RuntimeException( "getLocale not implemented" );
+    }
+
+     
+    /**
+     * Returns an Enumeration of Locale objects indicating, in decreasing order starting with the preferred locale, 
+     * the locales that are acceptable to the client based on the Accept-Language header. 
+     * If the client request doesn't provide an Accept-Language header, this
+     * method returns an Enumeration containing one Locale, the default locale for the server.
+     **/
+    public java.util.Enumeration getLocales() {
+        throw new RuntimeException( "getLocales not implemented" );
+    }
+
+     
+    /**
+     * Removes an attribute from this request. This method is not generally needed 
+     * as attributes only persist as long as the request is being handled.
+     **/ 
+    public void removeAttribute( String name ) {
+        _attributes.remove( name );
+    }
+
+
+    /**
+     * Returns a RequestDispatcher object that acts as a wrapper for the resource located at the given path. 
+     * A RequestDispatcher object can be used to forward a request to the resource or to include the 
+     * resource in a response. The resource can be dynamic or static. 
+     *
+     * The pathname specified may be relative, although it cannot extend outside the current servlet 
+     * context. If the path begins with a "/" it is interpreted as relative to the current context root. 
+     * This method returns null if the servlet container cannot return a RequestDispatcher. 
+     *
+     * The difference between this method and ServletContext.getRequestDispatcher(java.lang.String) 
+     * is that this method can take a relative path.
+     **/ 
+    public RequestDispatcher getRequestDispatcher( String path ) {
+        throw new RuntimeException( "getRequestDispatcher not implemented" );
+    }
+
+         
+
+//--------------------------------- methods added to HttpServletRequest in JSDK 2.2 ------------------------------------------------
+
+
+    /**
+     * Returns a java.security.Principal object containing the name of the current authenticated user. 
+     * If the user has not been authenticated, the method returns null.
+     **/
+    public java.security.Principal getUserPrincipal() {
+        return null;
+    }
+
+          
+    /**
+     * Returns a boolean indicating whether the authenticated user is included in the specified 
+     * logical "role". Roles and role membership can be defined using deployment descriptors. 
+     * If the user has not been authenticated, the method returns false.
+     **/
+    public boolean isUserInRole( String role ) {
+        return false;
+    }
+
+               
+    /**
+     * Returns all the values of the specified request header as an Enumeration of String objects.
+     **/
+    public java.util.Enumeration getHeaders( String name ) {
+        throw new RuntimeException( "getHeaders not implemented" );
+    }
+
+      
+    /**
+     * Returns the portion of the request URI that indicates the context of the request. 
+     * The context path always comes first in a request URI. The path starts with a "/" character 
+     * but does not end with a "/" character. For servlets in the default (root) context, 
+     * this method returns "".
+     **/
+    public java.lang.String getContextPath() {
+        throw new RuntimeException( "getContextPath not implemented" );
+    }
+
+     
 //--------------------------------------------- package members ----------------------------------------------
 
 
