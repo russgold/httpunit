@@ -21,6 +21,8 @@ Additions:
        particular form parameter. Note that if multiple controls exist with the same name, these methods only return
        true when all such controls are read-only or disabled, as appropriate.
     2. RFE #585495 ServletUnit now supports HttpServletResponse.setContentLength.
+    3. RFE #614397 <input> parameters with unrecognized type fields are now treated as text fields. This appears
+       to match the behavior in most browsers.
 
  2-Oct-2002 1.4.6
 Acknowledgements:

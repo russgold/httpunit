@@ -149,13 +149,14 @@ public class WebFormTest extends HttpUnitTest {
                                   "Enter the name 'master': <textarea Name=name>Something</textarea></B>" +
                                   "<input type=\"checkbox\" name=first>Disabled" +
                                   "<input type=\"checkbox\" name=second checked>Enabled" +
+                                  "<input type=textbox name=third value=something>" +
                                   "<br><Input type=submit value = \"Log in\">" +
                                   "</form>" );
 
         WebForm form = _wc.getResponse( getHostPath() + "/AForm.html" ).getForms()[0];
         String[] parameters = form.getParameterNames();
         assertNotNull( parameters );
-        assertMatchingSet( "form parameter names", new String[] { "first", "name", "second" }, parameters );
+        assertMatchingSet( "form parameter names", new String[] { "first", "name", "second", "third" }, parameters );
 
         assertNull( "First checkbox has a non-null value",  form.getParameterValue( "first" ) );
         assertEquals( "Second checkbox", "on", form.getParameterValue( "second" ) );
@@ -163,6 +164,9 @@ public class WebFormTest extends HttpUnitTest {
         assertTrue( "Did not find parameter 'first'", form.hasParameterNamed( "first" ) );
         assertTrue( "Did not find parameter with prefix 'sec'", form.hasParameterStartingWithPrefix( "sec" ) );
         assertTrue( "Did not find parameter with prefix 'nam'", form.hasParameterStartingWithPrefix( "nam" ) );
+
+        assertTrue( "Did not find parameter named 'third'", form.hasParameterNamed( "third" ) );
+        assertEquals( "Value of parameter with unknown type", "something", form.getParameterValue( "third" ) );
 
         assertEquals( "Original text area value", "Something", form.getParameterValue( "name" ) );
         form.setParameter( "name", "Something Else" );

@@ -296,7 +296,7 @@ abstract class FormControl {
             } else if (type.equalsIgnoreCase( "file" )) {
                 return new FileSubmitFormControl( node );
             } else {
-                return null;
+                return new TextFieldFormControl( node );
             }
         }
     }
