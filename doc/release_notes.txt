@@ -12,68 +12,42 @@ Limitations:
 
 Revision History:
  1-Oct-2002
-Problems fixed:
-    1. Bug #617065: using Javascript to set an option in a drop-down box does not unset other options.
-
-Additions:
-    1. Added support for the Navigator object.
-    2. Created a ClientProperties object to hold per-client properties. Each new web client is initialized from the
-       default, but may be configured independently.
-
-27-Sep-2002
-Problems fixed:
-    1. Disabled form parameters were being submitted with requests and could be modified by setParameter calls.
-
-Additions:
-    1. The Javascript property Link.href is now read-write.
-
-26-Sep-2002
-Problems fixed:
-    1. A Javascript URL containing a question mark was incorrectly being URL-encoded.
-    2. HTML comments at the start of a JavaScript were not being completely ignored
-
-25-Sep-2002
-Problems fixed:
-    1. Bug #604478 - setting the form action did not always update the predefined parameter list. This could cause a request
-       to be sent with the wrong URL parameters.
-    2. Form, Image, and Link names are now properly treated as case-sensitive within Javascript.
-
-13-Sep-2002
 Acknowledgements:
+    Thanks to Ville Skyttä for removing the test dependency on xerces.
+    Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.
     Thanks to Jin Zhao for help in expanding the search possibilities for links.
-
-Additions:
-    1. The mechanism for search for links has been expanded to permit arbitrary search criteria and to retrieve
-       either the first match or all matches.
-    2. It is now possible to control the handling of script errors by calling HttpUnitOptions.setExceptionsThrownOnScriptError.
-       If the exceptions are not thrown, the error messages will instead be available via HttpUnitOptions.getScriptErrorMessages()
-
- 9-Sep-2002
-Acknowledgement:
-    1. Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.
-
-Additions:
-    1. Select.selectedIndex is now read/write.
-
- 6-Sep-2002
-Acknowledgments:
-    1. Thanks to Ville Skyttä for removing the test dependency on xerces.
-
- 5-Sep-2002
-Additions:
-    1. The web XML tests will now work with any jaxp-compliant parser, not just xerces.
 
 Problems fixed:
     1. An attempt to set a non-existent parameter now correctly throws NoSuchParameterException rather
        than UnusedParameterValueException.
     2. Obtaining the URL from a javascript: request no longer throws MalformedURLException.
+    3. Bug #604478 - setting the form action did not always update the predefined parameter list. This could cause a request
+       to be sent with the wrong URL parameters.
+    4. Form, Image, and Link names are now properly treated as case-sensitive within Javascript.
+    5. A Javascript URL containing a question mark was incorrectly being URL-encoded.
+    6. HTML comments at the start of a JavaScript were not being completely ignored
+    7. Disabled form parameters were being submitted with requests and could be modified by setParameter calls.
+    8. Bug #617065: using Javascript to set an option in a drop-down box does not unset other options.
 
 Additions:
-    1. The forms, images, links, and Form.elements arrays now handle string indexes
-    2. When no response is received from a server, HttpUnit will now throw HttpServerNotFoundException, which is a
-       subclass of HttpNotFoundException. This should aid in diagnosing response failures.
-    3. When a 404 (not found status) is received from a server, the accompanying message is now available
-       from HttpNotFoundException.getResponseMessage().
+    Content and parsing enhancements:
+       1. When no response is received from a server, HttpUnit will now throw HttpServerNotFoundException, which is a
+          subclass of HttpNotFoundException. This should aid in diagnosing response failures.
+       2. When a 404 (not found status) is received from a server, the accompanying message is now available
+          from HttpNotFoundException.getResponseMessage().
+       3. The mechanism for search for links has been expanded to permit arbitrary search criteria and to retrieve
+          either the first match or all matches.
+       4. Some per-client properties are now stored in a per-client object. Each new web client is initialized from the
+          default, but may also be configured independently by retrieving the clientProperties object.
+
+    Scripting enhancements:
+       6. It is now possible to control the handling of script errors by calling HttpUnitOptions.setExceptionsThrownOnScriptError.
+          If the exceptions are not thrown, the error messages will instead be available via HttpUnitOptions.getScriptErrorMessages()
+       7. The forms, images, links, and Form.elements arrays now handle string indexes
+       8. Select.selectedIndex is now read/write.
+       9. Link.href is now read-write.
+      10. The Navigator object is now supported.
+
 
 30-Aug-2002 1.4.5
 Acknowledgements:
