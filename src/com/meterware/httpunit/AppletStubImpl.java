@@ -94,7 +94,7 @@ class AppletStubImpl implements AppletStub {
      * or <tt>null</tt> if not set.
      */
     public String getParameter( String name ) {
-        return null;
+        return _webApplet.getParameter( name );
     }
 
 

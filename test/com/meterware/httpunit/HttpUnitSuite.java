@@ -25,9 +25,7 @@ import com.meterware.httpunit.javascript.NekoEnhancedScriptingTest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.InvocationTargetException;
 
-import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
 
@@ -45,7 +43,7 @@ public class HttpUnitSuite {
     }
 	
 	
-    public static Test suite() {
+    public static TestSuite suite() {
         TestSuite result = new TestSuite();
         result.addTest( WebPageTest.suite() );
         result.addTest( WebLinkTest.suite() );
@@ -77,7 +75,7 @@ public class HttpUnitSuite {
             final Class testClass = Class.forName( testCaseName );
             Method suiteMethod = testClass.getMethod( "suite", NO_PARAMETERS );
             if (suiteMethod != null && Modifier.isStatic( suiteMethod.getModifiers() )) {
-                testSuite.addTest( (Test) suiteMethod.invoke( null, NO_PARAMETERS ) );
+                testSuite.addTest( (TestSuite) suiteMethod.invoke( null, NO_PARAMETERS ) );
             } else if (TestCase.class.isAssignableFrom( testClass )) {
                 testSuite.addTest( new TestSuite( testClass ) );
             } else {

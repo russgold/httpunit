@@ -10,6 +10,13 @@ Limitations:
 
 
 Revision History:
+22-Nov-2002
+Notes:
+    1. The nekohtml.jar included has a patch supplied by the author (Andy Clark) to support applet parameter tags
+
+Additions:
+    1. Added support for applet parameters and archives
+
 20-Nov-2002
 Problems fixed:
     1. HttpUnit now ignores empty parameters on form actions, as IE and Netscape do.

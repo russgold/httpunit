@@ -24,8 +24,15 @@ import java.net.MalformedURLException;
 import java.net.URLClassLoader;
 import java.applet.Applet;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.List;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
@@ -40,9 +47,12 @@ public class WebApplet {
     private WebResponse _response;
     private Node        _node;
     private String      _baseTarget;
+
     private URL         _codeBase;
     private String      _className;
     private Applet      _applet;
+    private HashMap     _parameters;
+    private String[]    _parameterNames;
 
     final private String CLASS_EXTENSION = ".class";
 
@@ -57,11 +67,17 @@ public class WebApplet {
     /**
      * Returns the URL of the codebase used to find the applet classes
      */
-    public URL getCodeBase() throws MalformedURLException {
+    public URL getCodeBaseURL() throws MalformedURLException {
         if (_codeBase == null) {
-            _codeBase = new URL( _response.getURL(), getAttribute( "codebase", "/" ) );
+            _codeBase = new URL( _response.getURL(), getCodeBase() );
         }
         return _codeBase;
+    }
+
+
+    private String getCodeBase() {
+        final String codeBaseAttribute = getAttribute( "codebase", "/" );
+        return codeBaseAttribute.endsWith( "/" ) ? codeBaseAttribute : (codeBaseAttribute + "/");
     }
 
 
@@ -114,9 +130,60 @@ public class WebApplet {
     }
 
 
+    /**
+     * Returns the archive specification.
+     */
+    public String getArchiveSpecification() {
+        String specification = getParameter( "archive" );
+        if (specification == null) specification = getAttribute( "archive" );
+        return specification;
+    }
+
+
+    List getArchiveList() throws MalformedURLException {
+        ArrayList al = new ArrayList();
+        StringTokenizer st = new StringTokenizer( getArchiveSpecification(), "," );
+        while (st.hasMoreTokens()) al.add( new URL( _response.getURL(), st.nextToken() ) );
+        return al;
+    }
+
+
+    /**
+     * Returns an array containing the names of the parameters defined for the applet.
+     */
+    public String[] getParameterNames() {
+        if (_parameterNames == null) {
+            ArrayList al = new ArrayList( getParameterMap().keySet() );
+            _parameterNames = (String[]) al.toArray( new String[ al.size() ] );
+        }
+        return _parameterNames;
+    }
+
+
+    /**
+     * Returns the value of the specified applet parameter, or null if not defined.
+     */
+    public String getParameter( String name ) {
+        return (String) getParameterMap().get( name );
+    }
+
+
+    private Map getParameterMap() {
+        if (_parameters == null) {
+            _parameters = new HashMap();
+            NodeList nl = ((Element) _node).getElementsByTagName( "param" );
+            for (int i = 0; i < nl.getLength(); i++) {
+                Node n = nl.item(i);
+                _parameters.put( NodeUtils.getNodeAttribute( n, "name", "" ), NodeUtils.getNodeAttribute( n, "value", "" ) );
+            }
+        }
+        return _parameters;
+    }
+
+
     public Applet getApplet() throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (_applet == null) {
-            ClassLoader cl = new URLClassLoader( getClassPath() );
+            ClassLoader cl = new URLClassLoader( getClassPath(), null );
             Object o = cl.loadClass( getMainClassName() ).newInstance();
             if (!(o instanceof Applet)) throw new RuntimeException( getMainClassName() + " is not an Applet" );
             _applet = (Applet) o;
@@ -127,7 +194,9 @@ public class WebApplet {
 
 
     private URL[] getClassPath() throws MalformedURLException {
-        return new URL[] { getCodeBase() };
+        List classPath = getArchiveList();
+        classPath.add( getCodeBaseURL() );
+        return (URL[]) classPath.toArray( new URL[ classPath.size() ] );
     }
 
 
@@ -156,6 +225,5 @@ public class WebApplet {
         } catch (SAXException e) {
         }
     }
-
 
 }

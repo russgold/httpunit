@@ -27,6 +27,10 @@ import com.meterware.httpunit.WebApplet;
 import java.applet.Applet;
 import java.util.Enumeration;
 import java.net.URL;
+import java.lang.reflect.Method;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
@@ -74,12 +78,27 @@ public class AppletTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
         WebApplet applet1 = response.getApplets()[0];
         WebApplet applet2 = response.getApplets()[1];
-        assertEquals( "Applet 1 codebase", getHostPath() + "/classes", applet1.getCodeBase().toExternalForm() );
-        assertEquals( "Applet 2 codebase", getHostPath() + "/", applet2.getCodeBase().toExternalForm() );
+        assertEquals( "Applet 1 codebase", getHostPath() + "/classes/", applet1.getCodeBaseURL().toExternalForm() );
+        assertEquals( "Applet 2 codebase", getHostPath() + "/", applet2.getCodeBaseURL().toExternalForm() );
 
         assertEquals( "Applet 1 name", "first", applet1.getName() );
         assertEquals( "Applet 1 width", 150, applet1.getWidth() );
         assertEquals( "Applet 1 height", 100, applet1.getHeight() );
+    }
+
+
+    public void testReadAppletParameters() throws Exception {
+        defineWebPage( "start", "<applet code='DoIt'>" +
+                                "  <param name='color' value='ffff00'>" +
+                                "  <param name='age' value='12'>" +
+                                "</applet>" );
+
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebApplet applet = response.getApplets()[0];
+        assertNotNull( "Parameter names return null", applet.getParameterNames() );
+        assertEquals( "Number of parameters", 2, applet.getParameterNames().length );
+        assertMatchingSet( "Parameter names", new String[]{"color", "age"}, applet.getParameterNames() );
     }
 
 
@@ -105,6 +124,37 @@ public class AppletTest extends HttpUnitTest {
         Applet applet = wa.getApplet();
         assertNotNull( "Applet was not loaded", applet );
         assertEquals( "Applet class", SimpleApplet.class.getName(), applet.getClass().getName() );
+    }
+
+
+    public void testAppletArchive() throws Exception {
+        defineWebPage( "start", "<applet archive='/lib/xercesImpl.jar,/lib/xmlParserAPIs.jar'" +
+                                " code='" + XMLApplet.class.getName() + ".class'" +
+                                " codebase=/classes width=100 height=100></applet>");
+        mapToClasspath( "/classes" );
+        mapToClasspath( "/lib" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        Applet applet = response.getApplets()[0].getApplet();
+        Method testMethod = applet.getClass().getMethod( "getDocumentBuilder", new Class[0] );
+        Object result = testMethod.invoke( applet, new Object[0] );
+        assertEquals( "Superclass name", DocumentBuilder.class.getName(), result.getClass().getSuperclass().getName() );
+    }
+
+
+    public void testAppletParameterAccess() throws Exception {
+        defineWebPage( "start", "<applet code='" + SimpleApplet.class.getName() +
+                                ".class' codebase=/classes width=100 height=100>" +
+                                "  <param name='color' value='ffff00'>" +
+                                "  <param name='age' value='12'>" +
+                                "</applet>");
+        mapToClasspath( "/classes" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        Applet applet = response.getApplets()[0].getApplet();
+        assertNull( "Applet parameter 'hue' should be null", applet.getParameter( "hue" ) );
+        assertEquals( "Applet parameter 'color'", "ffff00", applet.getParameter( "color" ) );
+        assertEquals( "Applet parameter 'age'", "12", applet.getParameter( "age" ) );
     }
 
 
@@ -148,7 +198,14 @@ public class AppletTest extends HttpUnitTest {
     public static class SimpleApplet extends Applet {
     }
 
-    public static class SecondApplet extends Applet {
+    public static class SecondApplet extends SimpleApplet {
+    }
+
+    public static class XMLApplet extends Applet {
+        public DocumentBuilder getDocumentBuilder() throws Exception {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            return factory.newDocumentBuilder();
+        }
     }
 
 }
