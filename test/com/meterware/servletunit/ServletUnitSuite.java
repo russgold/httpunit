@@ -47,6 +47,7 @@ public class ServletUnitSuite extends ConditionalTestSuite {
         suite.addTest( ConfigTest.suite() );
         suite.addTest( WebXMLTest.suite() );
         suite.addTest( ListenersTest.suite() );
+        suite.addTest( FiltersTest.suite() );
         suite.addTest( RequestContextTest.suite() );
         suite.addTest( RequestDispatcherTest.suite() );
         addOptionalTestCase( suite, "com.meterware.servletunit.JUnitServletTest" );

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,37 +19,58 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import java.util.List;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-interface ServletMetaData {
+abstract class WebResourceConfiguration {
 
-    /**
-     * Returns the servlet instance to use.
-     */
-    Servlet getServlet() throws ServletException;
-
-    /**
-     * Returns the path used to identify the servlet.
-     */
-    String getServletPath();
+    private String _className;
+    private Hashtable _initParams = new Hashtable();
 
 
-    /**
-     * Returns the path info beyond the servlet path.
-     */
-    String getPathInfo();
+    WebResourceConfiguration( String className ) {
+        _className = className;
+    }
 
 
-    /**
-     * Returns an ordered list of the filters associated with this servlet.
-     */
-    FilterMetaData[] getFilters();
+    WebResourceConfiguration( String className, Hashtable initParams ) {
+        _className = className;
+        if (initParams != null) _initParams = initParams;
+    }
+
+
+    WebResourceConfiguration( Element resourceElement, String resourceNodeName ) throws SAXException {
+        this( XMLUtils.getChildNodeValue( resourceElement, resourceNodeName ) );
+        final NodeList initParams = resourceElement.getElementsByTagName( "init-param" );
+        for (int i = initParams.getLength() - 1; i >= 0; i--) {
+            _initParams.put( XMLUtils.getChildNodeValue( (Element) initParams.item( i ), "param-name" ),
+                             XMLUtils.getChildNodeValue( (Element) initParams.item( i ), "param-value" ) );
+        }
+    }
+
+
+    abstract void destroyResource();
+
+
+    String getClassName() {
+        return _className;
+    }
+
+
+    Hashtable getInitParams() {
+        return _initParams;
+    }
+
+
+    abstract boolean isLoadOnStartup();
 
 }

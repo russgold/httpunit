@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,37 +19,46 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import java.util.List;
-
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-interface ServletMetaData {
+class FilterConfigImpl implements FilterConfig {
 
-    /**
-     * Returns the servlet instance to use.
-     */
-    Servlet getServlet() throws ServletException;
-
-    /**
-     * Returns the path used to identify the servlet.
-     */
-    String getServletPath();
+    private String _name;
+    private ServletContext _servletContext;
+    private Hashtable _initParams;
 
 
-    /**
-     * Returns the path info beyond the servlet path.
-     */
-    String getPathInfo();
+    FilterConfigImpl( String name, ServletContext servletContext, Hashtable initParams ) {
+        _name = name;
+        _servletContext = servletContext;
+        _initParams = initParams;
+    }
 
 
-    /**
-     * Returns an ordered list of the filters associated with this servlet.
-     */
-    FilterMetaData[] getFilters();
+    public String getFilterName() {
+        return _name;
+    }
+
+
+    public ServletContext getServletContext() {
+        return _servletContext;
+    }
+
+
+    public String getInitParameter( String s ) {
+        return (String) _initParams.get( s );
+    }
+
+
+    public Enumeration getInitParameterNames() {
+        return _initParams.keys();
+    }
 
 }

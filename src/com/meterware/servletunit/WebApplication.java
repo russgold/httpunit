@@ -33,7 +33,6 @@ import javax.servlet.http.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -52,10 +51,16 @@ class WebApplication implements SessionListenerDispatcher {
 
     private final ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
 
-    private final ServletMapping SECURITY_CHECK_MAPPING = new ServletMapping( SECURITY_CHECK_CONFIGURATION );
+    private final WebResourceMapping SECURITY_CHECK_MAPPING = new WebResourceMapping( SECURITY_CHECK_CONFIGURATION );
 
-    /** A mapping of resource names to servlet class names. **/
-    private ServletMap _servletMapping = new ServletMap();
+    /** A mapping of resource names to servlet configurations. **/
+    private WebResourceMap _servletMapping = new WebResourceMap();
+
+    /** A mapping of resource names to filter configurations. **/
+    private FilterUrlMap _filterUrlMapping = new FilterUrlMap();
+
+    /** A mapping of servlet names to filter configurations. **/
+    private Hashtable _filterMapping = new Hashtable();
 
     private ArrayList _securityConstraints = new ArrayList();
 
@@ -118,6 +123,7 @@ class WebApplication implements SessionListenerDispatcher {
         _contextDir = file;
         _contextPath = contextPath == null ? "" : contextPath;
         registerServlets( document );
+        registerFilters( document );
         extractSecurityConstraints( document );
         extractContextParameters( document );
         extractLoginConfiguration( document );
@@ -130,7 +136,7 @@ class WebApplication implements SessionListenerDispatcher {
      private void extractListeners( Document document ) throws SAXException {
          NodeList nl = document.getElementsByTagName( "listener" );
          for (int i = 0; i < nl.getLength(); i++) {
-             String listenerName = getChildNodeValue((Element) nl.item(i), "listener-class").trim();
+             String listenerName = XMLUtils.getChildNodeValue((Element) nl.item(i), "listener-class").trim();
              try {
                  Object listener = Class.forName( listenerName ).newInstance();
 
@@ -245,7 +251,7 @@ class WebApplication implements SessionListenerDispatcher {
      * Calls the destroy method for every active servlet.
      */
     void destroyServlets() {
-        _servletMapping.destroyServlets();
+        _servletMapping.destroyWebResources();
     }
 
 
@@ -398,20 +404,62 @@ class WebApplication implements SessionListenerDispatcher {
 //--------------------------------------------------- private members --------------------------------------------------
 
 
+    private void registerFilters( Document document ) throws SAXException {
+        Hashtable nameToClass = new Hashtable();
+        NodeList nl = document.getElementsByTagName( "filter" );
+        for (int i = 0; i < nl.getLength(); i++) registerFilterClass( nameToClass, (Element) nl.item( i ) );
+        nl = document.getElementsByTagName( "filter-mapping" );
+        for (int i = 0; i < nl.getLength(); i++) registerFilter( nameToClass, (Element) nl.item( i ) );
+    }
+
+
+    private void registerFilterClass( Dictionary mapping, Element filterElement ) throws SAXException {
+        String filterName = XMLUtils.getChildNodeValue( filterElement, "filter-name" );
+        mapping.put( filterName, new FilterConfiguration( filterName, filterElement ) );
+    }
+
+
+    private void registerFilter( Dictionary mapping, Element filterElement ) throws SAXException {
+        if (XMLUtils.hasChildNode( filterElement, "servlet-name" )) {
+            registerFilterForServlet( XMLUtils.getChildNodeValue( filterElement, "servlet-name" ),
+                             (FilterConfiguration) mapping.get( XMLUtils.getChildNodeValue( filterElement, "filter-name" ) ) );
+        }
+        if (XMLUtils.hasChildNode( filterElement, "url-pattern" )) {
+            registerFilterForUrl( XMLUtils.getChildNodeValue( filterElement, "url-pattern" ),
+                             (FilterConfiguration) mapping.get( XMLUtils.getChildNodeValue( filterElement, "filter-name" ) ) );
+        }
+    }
+
+
+    private void registerFilterForUrl( String resourceName, FilterConfiguration filterConfiguration ) {
+        _filterUrlMapping.put( resourceName, filterConfiguration );
+    }
+
+
+    private void registerFilterForServlet( String servletName, FilterConfiguration filterConfiguration ) {
+        List list = (List) _filterMapping.get( servletName );
+        if (list == null) {
+            list = new ArrayList();
+            _filterMapping.put( servletName, list );
+        }
+        list.add( filterConfiguration );
+    }
+
+
     private void extractLoginConfiguration( Document document ) throws MalformedURLException, SAXException {
         NodeList nl = document.getElementsByTagName( "login-config" );
         if (nl.getLength() == 1) {
             final Element loginConfigElement = (Element) nl.item( 0 );
-            String authenticationMethod = getChildNodeValue( loginConfigElement, "auth-method", "BASIC" );
-            _authenticationRealm = getChildNodeValue( loginConfigElement, "realm-name", "" );
+            String authenticationMethod = XMLUtils.getChildNodeValue( loginConfigElement, "auth-method", "BASIC" );
+            _authenticationRealm = XMLUtils.getChildNodeValue( loginConfigElement, "realm-name", "" );
             if (authenticationMethod.equalsIgnoreCase( "BASIC" )) {
                 _useBasicAuthentication = true;
                 if (_authenticationRealm.length() == 0) throw new SAXException( "No realm specified for BASIC Authorization" );
             } else if (authenticationMethod.equalsIgnoreCase( "FORM" )) {
                 _useFormAuthentication = true;
                 if (_authenticationRealm.length() == 0) throw new SAXException( "No realm specified for FORM Authorization" );
-                _loginURL = new URL( "http", "localhost", getChildNodeValue( loginConfigElement, "form-login-page" ) );
-                _errorURL = new URL( "http", "localhost", getChildNodeValue( loginConfigElement, "form-error-page" ) );
+                _loginURL = new URL( "http", "localhost", XMLUtils.getChildNodeValue( loginConfigElement, "form-login-page" ) );
+                _errorURL = new URL( "http", "localhost", XMLUtils.getChildNodeValue( loginConfigElement, "form-error-page" ) );
             }
         }
     }
@@ -427,14 +475,14 @@ class WebApplication implements SessionListenerDispatcher {
 
 
     private void registerServletClass( Dictionary mapping, Element servletElement ) throws SAXException {
-        mapping.put( getChildNodeValue( servletElement, "servlet-name" ),
+        mapping.put( XMLUtils.getChildNodeValue( servletElement, "servlet-name" ),
                      new ServletConfiguration( servletElement ) );
     }
 
 
     private void registerServlet( Dictionary mapping, Element servletElement ) throws SAXException {
-        registerServlet( getChildNodeValue( servletElement, "url-pattern" ),
-                         (ServletConfiguration) mapping.get( getChildNodeValue( servletElement, "servlet-name" ) ) );
+        registerServlet( XMLUtils.getChildNodeValue( servletElement, "url-pattern" ),
+                         (ServletConfiguration) mapping.get( XMLUtils.getChildNodeValue( servletElement, "servlet-name" ) ) );
     }
 
 
@@ -442,35 +490,10 @@ class WebApplication implements SessionListenerDispatcher {
         NodeList nl = document.getElementsByTagName( "context-param" );
         for (int i = 0; i < nl.getLength(); i++) {
             Element param = (Element) nl.item( i );
-            String name = getChildNodeValue( param, "param-name" );
-            String value = getChildNodeValue( param, "param-value" );
+            String name = XMLUtils.getChildNodeValue( param, "param-name" );
+            String value = XMLUtils.getChildNodeValue( param, "param-value" );
             _contextParameters.put( name, value );
         }
-    }
-
-
-    private static String getChildNodeValue( Element root, String childNodeName ) throws SAXException {
-        return getChildNodeValue( root, childNodeName, null );
-    }
-
-
-    private static String getChildNodeValue( Element root, String childNodeName, String defaultValue ) throws SAXException {
-        NodeList nl = root.getElementsByTagName( childNodeName );
-        if (nl.getLength() == 1) {
-            return getTextValue( nl.item( 0 ) ).trim();
-        } else if (defaultValue == null) {
-            throw new SAXException( "Node <" + root.getNodeName() + "> has no child named <" + childNodeName + ">" );
-        } else {
-            return defaultValue;
-        }
-    }
-
-
-    private static String getTextValue( Node node ) throws SAXException {
-        Node textNode = node.getFirstChild();
-        if (textNode == null) return "";
-        if (textNode.getNodeType() != Node.TEXT_NODE) throw new SAXException( "No text value found for <" + node.getNodeName() + "> node" );
-        return textNode.getNodeValue();
     }
 
 
@@ -485,57 +508,58 @@ class WebApplication implements SessionListenerDispatcher {
     static class SecurityCheckServlet extends HttpServlet {
 
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
-            handleLogin( (ServletUnitHttpRequest) req, resp );
+            handleLogin( req, resp );
         }
 
 
         protected void doPost( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
-            handleLogin( (ServletUnitHttpRequest) req, resp );
+            handleLogin( req, resp );
         }
 
 
-        private void handleLogin( ServletUnitHttpRequest req, HttpServletResponse resp ) throws IOException {
+        private void handleLogin( HttpServletRequest req, HttpServletResponse resp ) throws IOException {
             final String username = req.getParameter( "j_username" );
-            final String password = req.getParameter( "j_password" );
-            req.writeFormAuthentication( username, password );
-            resp.sendRedirect( req.getOriginalURL().toExternalForm() );
+            final String roleList = req.getParameter( "j_password" );
+            getServletSession( req ).setUserInformation( username, ServletUnitHttpRequest.toArray( roleList ) );
+            resp.sendRedirect( getServletSession( req ).getOriginalURL().toExternalForm() );
+        }
+
+
+        private ServletUnitHttpSession getServletSession( HttpServletRequest req ) {
+            return (ServletUnitHttpSession) req.getSession();
         }
 
     }
+
+
 //============================================= ServletConfiguration class =============================================
 
     final static int DONT_AUTOLOAD = Integer.MIN_VALUE;
     final static int ANY_LOAD_ORDER = Integer.MAX_VALUE;
 
 
-    class ServletConfiguration {
+    class ServletConfiguration extends WebResourceConfiguration {
 
         private Servlet _servlet;
-        private String _className;
-        private Hashtable _initParams = new Hashtable();
+        private String _servletName;
         private int _loadOrder = DONT_AUTOLOAD;
 
         ServletConfiguration( String className ) {
-            _className = className;
+            super( className );
         }
 
 
         ServletConfiguration( String className, Hashtable initParams ) {
-            _className = className;
-            if (initParams != null) _initParams = initParams;
+            super( className, initParams );
         }
 
 
         ServletConfiguration( Element servletElement ) throws SAXException {
-            this( getChildNodeValue( servletElement, "servlet-class" ) );
-            final NodeList initParams = servletElement.getElementsByTagName( "init-param" );
-            for (int i = initParams.getLength() - 1; i >= 0; i--) {
-                _initParams.put( getChildNodeValue( (Element) initParams.item( i ), "param-name" ),
-                                 getChildNodeValue( (Element) initParams.item( i ), "param-value" ) );
-            }
+            super( servletElement, "servlet-class" );
+            _servletName = XMLUtils.getChildNodeValue( servletElement, "servlet-name" );
             final NodeList loadOrder = servletElement.getElementsByTagName( "load-on-startup" );
             for (int i = 0; i < loadOrder.getLength(); i++) {
-                String order = getTextValue( loadOrder.item(i) );
+                String order = XMLUtils.getTextValue( loadOrder.item(i) );
                 try {
                     _loadOrder = Integer.parseInt( order );
                 } catch (NumberFormatException e) {
@@ -556,18 +580,13 @@ class WebApplication implements SessionListenerDispatcher {
         }
 
 
-        synchronized void destroyServlet() {
+        synchronized void destroyResource() {
             if (_servlet != null) _servlet.destroy();
         }
 
 
-        String getClassName() {
-            return _className;
-        }
-
-
-        Hashtable getInitParams() {
-            return _initParams;
+        String getServletName() {
+            return _servletName;
         }
 
 
@@ -578,6 +597,53 @@ class WebApplication implements SessionListenerDispatcher {
 
         public int getLoadOrder() {
             return _loadOrder;
+        }
+    }
+
+
+//============================================= FilterConfiguration class =============================================
+
+
+    class FilterConfiguration extends WebResourceConfiguration implements FilterMetaData {
+
+        private Filter _filter;
+        private String _name;
+
+
+        FilterConfiguration( String name, Element filterElement ) throws SAXException {
+            super( filterElement, "filter-class" );
+            _name = name;
+        }
+
+
+        public synchronized Filter getFilter() throws ServletException {
+            try {
+                if (_filter == null) {
+                    Class filterClass = Class.forName( getClassName() );
+                    _filter = (Filter) filterClass.newInstance();
+                    _filter.init( new FilterConfigImpl( _name, getServletContext(), getInitParams() ) );
+                }
+
+                return _filter;
+            } catch (ClassNotFoundException e) {
+                throw new ServletException( "Did not find filter class: " + getClassName() );
+            } catch (IllegalAccessException e) {
+                throw new ServletException( "Filter class " + getClassName() + " lacks a public no-arg constructor" );
+            } catch (InstantiationException e) {
+                throw new ServletException( "Filter class " + getClassName() + " instantiation threw" + e.getCause() );
+            } catch (ClassCastException e) {
+                throw new ServletException( "Filter class " + getClassName() + " does not implement" + Filter.class.getName() );
+            }
+        }
+
+
+        boolean isLoadOnStartup() {
+            return false;
+        }
+
+
+        synchronized void destroyResource() {
+            if (_filter != null) _filter.destroy();
         }
     }
 
@@ -614,7 +680,7 @@ class WebApplication implements SessionListenerDispatcher {
 
         SecurityConstraintImpl( Element root ) throws SAXException {
             final NodeList roleNames = root.getElementsByTagName( "role-name" );
-            for (int i = 0; i < roleNames.getLength(); i++) _roleList.add( getTextValue( roleNames.item( i ) ) );
+            for (int i = 0; i < roleNames.getLength(); i++) _roleList.add( XMLUtils.getTextValue( roleNames.item( i ) ) );
 
             final NodeList resources = root.getElementsByTagName( "web-resource-collection" );
             for (int i = 0; i < resources.getLength(); i++) _resources.add( new WebResourceCollection( (Element) resources.item( i ) ) );
@@ -652,7 +718,7 @@ class WebApplication implements SessionListenerDispatcher {
 
             WebResourceCollection( Element root ) throws SAXException {
                 final NodeList urlPatterns = root.getElementsByTagName( "url-pattern" );
-                for (int i = 0; i < urlPatterns.getLength(); i++) _urlPatterns.add( getTextValue( urlPatterns.item( i ) ) );
+                for (int i = 0; i < urlPatterns.getLength(); i++) _urlPatterns.add( XMLUtils.getTextValue( urlPatterns.item( i ) ) );
             }
 
 
@@ -670,17 +736,24 @@ class WebApplication implements SessionListenerDispatcher {
     }
 
 
+    static final FilterMetaData[] NO_FILTERS = new FilterMetaData[0];
+
+
     static class ServletRequestImpl implements ServletMetaData {
 
-        private URL            _url;
-        private String         _servletName;
-        private ServletMapping _mapping;
+        private URL                _url;
+        private String             _fullServletPath;
+        private WebResourceMapping _mapping;
+        private Hashtable          _filtersPerName;
+        private FilterUrlMap       _filtersPerUrl;
 
 
-        ServletRequestImpl( URL url, String servletName, ServletMapping mapping ) {
-            _url = url;
-            _servletName = servletName;
-            _mapping = mapping;
+        ServletRequestImpl( URL url, String servletPath, WebResourceMapping mapping, Hashtable filtersPerName, FilterUrlMap filtersPerUrl ) {
+            _url             = url;
+            _fullServletPath = servletPath;
+            _mapping         = mapping;
+            _filtersPerName  = filtersPerName;
+            _filtersPerUrl = filtersPerUrl;
         }
 
 
@@ -702,102 +775,138 @@ class WebApplication implements SessionListenerDispatcher {
 
 
         public String getServletPath() {
-            return _mapping == null ? null : _mapping.getServletPath( _servletName );
+            return _mapping == null ? null : _mapping.getServletPath( _fullServletPath );
         }
 
 
         public String getPathInfo() {
-            return _mapping == null ? null : _mapping.getPathInfo( _servletName );
+            return _mapping == null ? null : _mapping.getPathInfo( _fullServletPath );
+        }
+
+
+        public FilterMetaData[] getFilters() {
+            if (getConfiguration() == null) return NO_FILTERS;
+
+            List filters = new ArrayList();
+            addFiltersForPath( filters, _fullServletPath );
+            addFiltersForServletWithName( filters, getConfiguration().getServletName() );
+
+            return (FilterMetaData[]) filters.toArray( new FilterMetaData[ filters.size() ]);
+        }
+
+
+        private void addFiltersForPath( List filters, String fullServletPath ) {
+            FilterMetaData[] matches = _filtersPerUrl.getMatchingFilters( fullServletPath );
+            for (int i = 0; i < matches.length; i++) {
+                filters.add( matches[i] );
+            }
+        }
+
+
+        private void addFiltersForServletWithName( List filters, String servletName ) {
+            if (servletName == null) return;
+            List matches = (List) _filtersPerName.get( servletName );
+            if (matches != null) filters.addAll( matches );
         }
 
 
         private ServletConfiguration getConfiguration() {
-            return _mapping == null ? null : _mapping.getConfiguration();
+            return _mapping == null ? null : (ServletConfiguration) _mapping.getConfiguration();
         }
     }
 
 
-    static class ServletMapping {
+    static class WebResourceMapping {
 
-        private ServletConfiguration _configuration;
+        private WebResourceConfiguration _configuration;
 
 
-        ServletConfiguration getConfiguration() {
+        WebResourceConfiguration getConfiguration() {
             return _configuration;
         }
 
 
-        ServletMapping( ServletConfiguration configuration ) {
+        WebResourceMapping( WebResourceConfiguration configuration ) {
             _configuration = configuration;
         }
 
 
-        String getServletPath( String servletName ) {
-            return servletName;
+        /**
+         * Returns the portion of the request path which was actually used to select the servlet. This default
+         * implementation returns the full specified path.
+         * @param requestPath the full path of the request, relative to the application root.
+         */
+        String getServletPath( String requestPath ) {
+            return requestPath;
         }
 
 
-        String getPathInfo( String servletName ) {
+        /**
+         * Returns the portion of the request path which was not used to select the servlet, and can be
+         * used as data by the servlet. This default implementation returns null.
+         * @param requestPath the full path of the request, relative to the application root.
+         */
+        String getPathInfo( String requestPath ) {
             return null;
         }
 
 
-        public void destroyServlet() {
-            getConfiguration().destroyServlet();
+        public void destroyResource() {
+            getConfiguration().destroyResource();
         }
     }
 
 
-    static class PartialMatchServletMapping extends ServletMapping {
+    static class PartialMatchWebResourceMapping extends WebResourceMapping {
 
         private String _prefix;
 
 
-        public PartialMatchServletMapping( ServletConfiguration configuration, String prefix ) {
+        public PartialMatchWebResourceMapping( WebResourceConfiguration configuration, String prefix ) {
             super( configuration );
             if (!prefix.endsWith( "/*" )) throw new IllegalArgumentException( prefix + " does not end with '/*'" );
             _prefix = prefix.substring( 0, prefix.length()-2 );
         }
 
 
-        String getServletPath( String servletName ) {
+        String getServletPath( String requestPath ) {
             return _prefix;
         }
 
 
-        String getPathInfo( String servletName ) {
-            return servletName.length() > _prefix.length()
-                    ? servletName.substring( _prefix.length() )
+        String getPathInfo( String requestPath ) {
+            return requestPath.length() > _prefix.length()
+                    ? requestPath.substring( _prefix.length() )
                     : null;
         }
     }
 
 
     /**
-     * A utility class for mapping servlets to url patterns. This implements the
+     * A utility class for mapping web resources to url patterns. This implements the
      * matching algorithm documented in section 10 of the JSDK-2.2 reference.
      */
-    class ServletMap {
+    class WebResourceMap {
 
         private final Map _exactMatches = new HashMap();
         private final Map _extensions = new HashMap();
         private final Map _urlTree = new HashMap();
-        private ServletMapping _defaultMapping;
+        private WebResourceMapping _defaultMapping;
 
-        void put( String mapping, ServletConfiguration servletConfiguration ) {
+        void put( String mapping, WebResourceConfiguration configuration ) {
             if (mapping.equals( "/" )) {
-                _defaultMapping = new ServletMapping( servletConfiguration );
+                _defaultMapping = new WebResourceMapping( configuration );
             } else if (mapping.startsWith( "*." )) {
-                _extensions.put( mapping.substring( 2 ), new ServletMapping( servletConfiguration ) );
+                _extensions.put( mapping.substring( 2 ), new WebResourceMapping( configuration ) );
             } else if (!mapping.startsWith( "/" ) || !mapping.endsWith( "/*" )) {
-                _exactMatches.put( mapping, new ServletMapping( servletConfiguration ) );
+                _exactMatches.put( mapping, new WebResourceMapping( configuration ) );
             } else {
                 ParsedPath path = new ParsedPath( mapping );
                 Map context = _urlTree;
                 while (path.hasNext()) {
                     String part = path.next();
                     if (part.equals( "*" )) {
-                        context.put( "*", new PartialMatchServletMapping( servletConfiguration, mapping ) );
+                        context.put( "*", new PartialMatchWebResourceMapping( configuration, mapping ) );
                         return;
                     }
                     if (!context.containsKey( part )) {
@@ -813,17 +922,17 @@ class WebApplication implements SessionListenerDispatcher {
             String file = url.getFile();
             if (!file.startsWith( _contextPath )) throw new HttpNotFoundException( "File path does not begin with '" + _contextPath + "'", url );
 
-            String servletName = getServletName( file.substring( _contextPath.length() ) );
+            String servletPath = getServletPath( file.substring( _contextPath.length() ) );
 
-            if (servletName.endsWith( "j_security_check" )) {
-                return new ServletRequestImpl( url, servletName, SECURITY_CHECK_MAPPING );
+            if (servletPath.endsWith( "j_security_check" )) {
+                return new ServletRequestImpl( url, servletPath, SECURITY_CHECK_MAPPING, _filterMapping, _filterUrlMapping );
             } else {
-                return new ServletRequestImpl( url, servletName, getMapping( servletName ) );
+                return new ServletRequestImpl( url, servletPath, getMapping( servletPath ), _filterMapping, _filterUrlMapping );
             }
         }
 
 
-        private String getServletName( String urlFile ) {
+        private String getServletPath( String urlFile ) {
             if (urlFile.indexOf( '?' ) < 0) {
                 return urlFile;
             } else {
@@ -832,22 +941,22 @@ class WebApplication implements SessionListenerDispatcher {
         }
 
 
-        public void destroyServlets() {
-            if (_defaultMapping != null) _defaultMapping.destroyServlet();
-            destroyServlets( _exactMatches );
-            destroyServlets( _extensions );
-            destroyServlets( _urlTree );
+        public void destroyWebResources() {
+            if (_defaultMapping != null) _defaultMapping.destroyResource();
+            destroyWebResources( _exactMatches );
+            destroyWebResources( _extensions );
+            destroyWebResources( _urlTree );
         }
 
 
-        private void destroyServlets( Map map ) {
+        private void destroyWebResources( Map map ) {
             for (Iterator iterator = map.values().iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
-                if (o instanceof ServletMapping) {
-                    ServletMapping servletMapping = (ServletMapping) o;
-                    servletMapping.destroyServlet();
+                if (o instanceof WebResourceMapping) {
+                    WebResourceMapping webResourceMapping = (WebResourceMapping) o;
+                    webResourceMapping.destroyResource();
                 } else {
-                    destroyServlets( (Map) o );
+                    destroyWebResources( (Map) o );
                 }
             }
         }
@@ -883,8 +992,8 @@ class WebApplication implements SessionListenerDispatcher {
         private void collectAutoLoadableServlets( Collection collection, Map map ) {
             for (Iterator iterator = map.values().iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
-                if (o instanceof ServletMapping) {
-                    ServletMapping servletMapping = (ServletMapping) o;
+                if (o instanceof WebResourceMapping) {
+                    WebResourceMapping servletMapping = (WebResourceMapping) o;
                     if (servletMapping.getConfiguration().isLoadOnStartup()) collection.add( servletMapping.getConfiguration() );
                 } else {
                     collectAutoLoadableServlets( collection, (Map) o );
@@ -893,15 +1002,15 @@ class WebApplication implements SessionListenerDispatcher {
         }
 
 
-        private ServletMapping getMapping( String url ) {
-            if (_exactMatches.containsKey( url )) return (ServletMapping) _exactMatches.get( url );
+        private WebResourceMapping getMapping( String url ) {
+            if (_exactMatches.containsKey( url )) return (WebResourceMapping) _exactMatches.get( url );
 
             Map context = getContextForLongestPathPrefix( url );
-            if (context.containsKey( "*" )) return (ServletMapping) context.get( "*" );
+            if (context.containsKey( "*" )) return (WebResourceMapping) context.get( "*" );
 
-            if (_extensions.containsKey( getExtension( url ))) return (ServletMapping) _extensions.get( getExtension( url ) );
+            if (_extensions.containsKey( getExtension( url ))) return (WebResourceMapping) _extensions.get( getExtension( url ) );
 
-            if (_urlTree.containsKey( "/" )) return (ServletMapping) _urlTree.get( "/" );
+            if (_urlTree.containsKey( "/" )) return (WebResourceMapping) _urlTree.get( "/" );
 
             if (_defaultMapping != null) return _defaultMapping;
 
@@ -911,7 +1020,7 @@ class WebApplication implements SessionListenerDispatcher {
             String className = url.substring( prefix.length() );
             try {
                 Class.forName( className );
-                return new ServletMapping( new ServletConfiguration( className ) );
+                return new WebResourceMapping( new ServletConfiguration( className ) );
             } catch (ClassNotFoundException e) {
                 return null;
             }

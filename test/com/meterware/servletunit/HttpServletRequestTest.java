@@ -19,10 +19,7 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Locale;
+import java.util.*;
 import java.net.MalformedURLException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -437,6 +434,11 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
 
         public String getPathInfo() {
+            return null;
+        }
+
+
+        public FilterMetaData[] getFilters() {
             return null;
         }
     };

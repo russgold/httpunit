@@ -74,6 +74,7 @@ public class RequestDispatcherTest extends TestCase {
     public void testRequestDispatcherParameters() throws Exception {
         InvocationContext ic = _runner.newClient().newInvocation( "http://localhost/sample/" + outerServletName + "?param=original&param1=first" );
 
+
         final HttpServletRequest request = ic.getRequest();
         final HttpServletResponse response = ic.getResponse();
         RequestDispatcherServlet servlet = (RequestDispatcherServlet) ic.getServlet();

@@ -91,7 +91,7 @@ public class ServletUnitClient extends WebClient {
 
         try {
             InvocationContext invocation = newInvocation( request );
-            invocation.getServlet().service( invocation.getRequest(), invocation.getResponse() );
+            invocation.service();
             return invocation.getServletResponse();
         } catch (ServletException e) {
             throw new HttpInternalErrorException( request.getURL(), e );

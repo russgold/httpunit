@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -692,11 +691,6 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
-    void writeFormAuthentication( String userName, String password ) {
-        getServletSession().setUserInformation( userName, toArray( password ) );
-    }
-
-
     private ServletUnitHttpSession getServletSession() {
         return (ServletUnitHttpSession) getSession();
     }
@@ -720,23 +714,13 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         }
     }
 
-    private String[] toArray( String roleList ) {
+    static String[] toArray( String roleList ) {
         StringTokenizer st = new StringTokenizer( roleList, "," );
         String[] result = new String[ st.countTokens() ];
         for (int i = 0; i < result.length; i++) {
             result[i] = st.nextToken();
         }
         return result;
-    }
-
-
-    void setOriginalURL( URL originalURL ) {
-        getServletSession().setOriginalURL( originalURL );
-    }
-
-
-    URL getOriginalURL() {
-        return getServletSession().getOriginalURL();
     }
 
 

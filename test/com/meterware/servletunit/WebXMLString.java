@@ -38,11 +38,17 @@ class WebXMLString {
     private ArrayList _servlets = new ArrayList();
     private ArrayList _mappings = new ArrayList();
     private ArrayList _servletNames = new ArrayList();
+    private Hashtable _initParams = new Hashtable();
+
     private ArrayList _listeners = new ArrayList();
+
+    private ArrayList _filters        = new ArrayList();
+    private Hashtable _filterMappings = new Hashtable();
+    private ArrayList _filterNames    = new ArrayList();
+    private Hashtable _filterParams   = new Hashtable();
 
     private String _loginConfig = "";
     private Hashtable _resources = new Hashtable();
-    private Hashtable _initParams = new Hashtable();
     private Hashtable _contextParams = new Hashtable();
     private Hashtable _loadOnStartup = new Hashtable();
 
@@ -59,6 +65,17 @@ class WebXMLString {
             Map.Entry entry = (Map.Entry) i.next();
             result.append( "  <context-param>\n    <param-name>" ).append( entry.getKey() );
             result.append( "</param-name>\n    <param-value>" ).append( entry.getValue() ).append( "</param-value>\n  </context-param>\n" );
+        }
+        for (int i = 0; i < _filters.size(); i++) {
+            Object name = _filterNames.get( i );
+            result.append( "  <filter>\n    <filter-name>" ).append( name ).append( "</filter-name>\n" );
+            result.append( "    <filter-class>" ).append( ((Class) _filters.get( i )).getName() ).append( "</filter-class>\n" );
+            appendParams( result, "init-param", (Hashtable) _filterParams.get( name ) );
+            result.append( "  </filter>\n" );
+        }
+        for (int i = 0; i < _filters.size(); i++) {
+            result.append( "  <filter-mapping>\n    <filter-name>" ).append( _filterNames.get( i ) ).append( "</filter-name>\n" );
+            result.append( "    " ).append( _filterMappings.get( _filterNames.get( i ) ) ).append( "\n  </filter-mapping>\n" );
         }
         for (int i = 0; i < _listeners.size(); i++) {
             Class aClass = (Class) _listeners.get( i );
@@ -120,8 +137,6 @@ class WebXMLString {
         _mappings.add( urlPattern );
         _servletNames.add( name );
     }
-
-
     void addServlet( String name, String urlPattern, Class servletClass, Properties initParams ) {
         _initParams.put( name, initParams );
         addServlet( name, urlPattern, servletClass );
@@ -135,6 +150,29 @@ class WebXMLString {
 
     void setLoadOnStartup( String servletName, int i ) {
         _loadOnStartup.put( servletName, new Integer(i) );
+    }
+
+
+    void addFilterForServlet( String name, Class filterClass, String servletName, Properties initParams ) {
+        _filterParams.put( name, initParams );
+        addFilterForServlet( name, filterClass, servletName );
+    }
+
+
+    void addFilterForServlet( String name, Class filterClass, String servletName ) {
+        addFilter( filterClass, name, "<servlet-name>" + servletName + "</servlet-name>" );
+    }
+
+
+    void addFilterForUrl( String name, Class filterClass, String urlPattern ) {
+        addFilter( filterClass, name, "<url-pattern>" + urlPattern + "</url-pattern>" );
+    }
+
+
+    private void addFilter( Class filterClass, String name, String mapping ) {
+        _filters.add( filterClass );
+        _filterNames.add( name );
+        _filterMappings.put( name, mapping );
     }
 
 

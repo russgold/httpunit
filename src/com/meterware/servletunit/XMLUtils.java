@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,37 +19,48 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import java.util.List;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-interface ServletMetaData {
+abstract class XMLUtils {
 
-    /**
-     * Returns the servlet instance to use.
-     */
-    Servlet getServlet() throws ServletException;
-
-    /**
-     * Returns the path used to identify the servlet.
-     */
-    String getServletPath();
+    static String getChildNodeValue( Element root, String childNodeName ) throws SAXException {
+        return getChildNodeValue( root, childNodeName, null );
+    }
 
 
-    /**
-     * Returns the path info beyond the servlet path.
-     */
-    String getPathInfo();
+    static String getChildNodeValue( Element root, String childNodeName, String defaultValue ) throws SAXException {
+        NodeList nl = root.getElementsByTagName( childNodeName );
+        if (nl.getLength() == 1) {
+            return getTextValue( nl.item( 0 ) ).trim();
+        } else if (defaultValue == null) {
+            throw new SAXException( "Node <" + root.getNodeName() + "> has no child named <" + childNodeName + ">" );
+        } else {
+            return defaultValue;
+        }
+    }
 
 
-    /**
-     * Returns an ordered list of the filters associated with this servlet.
-     */
-    FilterMetaData[] getFilters();
+    static String getTextValue( Node node ) throws SAXException {
+        Node textNode = node.getFirstChild();
+        if (textNode == null) return "";
+        if (textNode.getNodeType() != Node.TEXT_NODE) throw new SAXException( "No text value found for <" + node.getNodeName() + "> node" );
+        return textNode.getNodeValue();
+    }
+
+
+    static boolean hasChildNode( Element root, String childNodeName ) {
+        NodeList nl = root.getElementsByTagName( childNodeName );
+        return (nl.getLength() > 0);
+    }
 
 }

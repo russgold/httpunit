@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2003, Russell Gold
+ * Copyright (c) 2001-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,9 +23,7 @@ import com.meterware.httpunit.WebResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.RequestDispatcher;
+import javax.servlet.*;
 
 import java.io.IOException;
 
@@ -39,20 +37,26 @@ public interface InvocationContext {
 
 
     /**
-     * Returns the request to be processed by the servlet.
+     * Returns the request to be processed by the servlet or filter.
      **/
     HttpServletRequest getRequest();
 
 
     /**
-     * Returns the response which the servlet should modify during its operation.
+     * Returns the response which the servlet or filter should modify during its operation.
      **/
     HttpServletResponse getResponse();
 
 
     /**
+     * Invokes the current servlet or filter.
+     */
+    void service() throws ServletException, IOException;
+
+
+    /**
      * Returns the selected servlet, initialized to provide access to sessions
-     * and servlet context information.
+     * and servlet context information.  Only valid to call if {@link #isFilterActive} returns false.
      **/
     Servlet getServlet() throws ServletException;
 
@@ -83,8 +87,40 @@ public interface InvocationContext {
 
 
     /**
-     * Removes the top request dispatcher from this context.
+     * Removes the top request dispatcher or filter from this context.
      */
     void popRequest();
+
+
+    /**
+     * Returns true if the current context is a filter, rather than a servlet.
+     */
+    boolean isFilterActive();
+
+
+    /**
+     * Returns the current active filter object. Only valid to call if {@link #isFilterActive} returns true.
+     */
+    Filter getFilter() throws ServletException;
+
+
+    /**
+     * Returns the current filter chain. Only valid to call if {@link #isFilterActive} returns true.
+     */
+    FilterChain getFilterChain();
+
+
+    /**
+     * Pushes the current filter onto the execution stack and switches to the next filter or the selected servlet.
+     * This can be used to simulate the effect of the {@link javax.servlet.FilterChain#doFilter doFilter} call.
+     * <br><b>Note:</b> this method specifies {@link ServletRequest} and {@link ServletResponse} because those are the
+     * types passed to {@link Filter#doFilter}; however, HttpUnit requires the objects to implement
+     * {@link HttpServletRequest} and {@link HttpServletResponse} because they will eventually be passed to an
+     * {@link javax.servlet.http.HttpServlet}.
+     *
+     * @param request the request to pass to the next filter. May be a wrapper.
+     * @param response the response object to pass to the next filter. May be a wrapper.
+     */
+    void pushFilter( ServletRequest request, ServletResponse response );
 
 }
