@@ -51,7 +51,7 @@ public class ScriptingTest extends HttpUnitTest {
     public void testJavaScriptURLWithValue() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
-                                            "<a href='javascript:\"You made it!\"'>go</a>" +
+                                            "<a href='JavaScript:\"You made it!\"'>go</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );

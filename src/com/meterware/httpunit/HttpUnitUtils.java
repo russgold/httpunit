@@ -172,4 +172,9 @@ public class HttpUnitUtils {
             return string1.equals( string2 );
         }
     }
+
+
+    static boolean isJavaScriptURL( String urlString ) {
+        return urlString.toLowerCase().startsWith( "javascript:" );
+    }
 }

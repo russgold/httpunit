@@ -16,6 +16,7 @@ Revision History:
 22-May-2003
 Problems fixed:
     1. bug #722788: WebForm.submit() was not invoking the 'onClick' event of the specified submit button.
+    2. bug #734133: javascript: URLs were ignored if "javascript:" is not all lower case.
 
  2-May-2003
 Acknowledgements:

@@ -125,7 +125,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
      */
     String getRelativePage() {
         final String url = getRelativeURL();
-        if (url.startsWith( "javascript:" )) return url;
+        if (HttpUnitUtils.isJavaScriptURL( url )) return url;
         final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
             return url.substring(0, questionMarkIndex);
@@ -142,7 +142,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     private String trimFragment( String href ) {
-        if (href.startsWith( "javascript:" )) return href;
+        if (HttpUnitUtils.isJavaScriptURL( href )) return href;
         final int hashIndex = href.indexOf( '#' );
         if (hashIndex < 0) {
             return href;
@@ -304,7 +304,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     private String getParametersString() {
         String url = trimFragment( getDestination() );
         if (url.trim().length() == 0) url = getBaseURL().toExternalForm();
-        if (url.startsWith( "javascript:" )) return "";
+        if (HttpUnitUtils.isJavaScriptURL( url )) return "";
         final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
             return url.substring( questionMarkIndex + 1 );
