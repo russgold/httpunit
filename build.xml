@@ -5,8 +5,8 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
-    <property name="version" value="0.9.5" />
-    <property name="zip_version" value="0_9_5" /> 
+    <property name="version" value="1.0" />
+    <property name="zip_version" value="1_0" /> 
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
@@ -19,7 +19,8 @@
     <property name="classpath" value="" />
     <property name="web.dir" value="web" /> 
     <property name="packages" value="com.meterware.*" /> 
-    <property name="build.compiler" value="classic" /> 
+    <property name="build.compiler" value="classic" />
+    <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" /> 
     
  
 <!--  ===================================================================  --> 
@@ -56,7 +57,7 @@
 <!--  Note: the classpath variable must be set on the command line         -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">
-    <java classname="com.meterware.httpunit.HttpUnitSuite"
+    <java classname="${test.class}"
           fork="yes" classpath="${build.classes};${classpath}" >
     </java>
 </target>
@@ -125,6 +126,14 @@
     <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " /> 
     <replace file="${web.dir}/index.html" token="var:publish " value="var:publish&gt;" />
     <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${zip_version}" /> 
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Packages the web site with ZIP                                       --> 
+<!--  ===================================================================  --> 
+<target name="publish-zip" depends="publish">
+    <zip zipfile="${name}_website_${zip_version}.zip" basedir="${web.dir}" includes="**" /> 
 </target>
 
 

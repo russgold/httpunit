@@ -34,6 +34,20 @@ public class WebLink {
     }
 
 
+    /**
+     * Returns the text value of this link.
+     **/
+    public String asText() {
+        if (_node == null) {
+            return "";
+        } else if (!_node.hasChildNodes()) {
+            return "";
+        } else {
+            return NodeUtils.asText( _node.getChildNodes() );
+        }
+    }
+
+
 //---------------------------------- package members --------------------------------
 
 

@@ -2,14 +2,12 @@ HttpUnit release notes
 
 Known issues: none
 
+1-Sep-00 1.0
 
-21-Aug-00
-Additions:
-    1. Thanks to Jan Ohrstrom <Jan.Ohrstrom@edt.ericsson.se> for his additions to Web Conversation:
-       o setUserAgent allows httpunit to pretend to be a particular browser
-       o addCookie allows the test to include additional cookies for the servlets to respond to.
+Acknowledgements: 
+Thanks to Jan Ohrstrom <Jan.Ohrstrom@edt.ericsson.se> for his additions to Web Conversation
 
-8-Aug-00
+
 Problems corrected:
     1. Parsing a response would crash if there were no nodes inside a form
 Additions:
@@ -17,6 +15,12 @@ Additions:
        available to the user in a <select>
     2. WebRespose.getLinkWith() and .getLinkWithImageText() can now be used to locate a link in a page
        based on its text or the ALT text attribute of an enclosed image
+    3. WebConversation.setUserAgent allows httpunit to pretend to be a particular browser
+    4. WebConversation.addCookie allows the test to include additional cookies for the servlets to respond to.
+    5. WebLink.asText returns the text value of a link
+    6. WebConversation now throws AuthorizationRequiredException when the web server rejects a request
+       because of authorization problems.
+    7. WebConversation now supports basic authentication via the setAuthorization method.
 
 
 4-Aug-00 0.9.5

@@ -54,6 +54,8 @@ public class WebConversation {
         
         if (connection.getHeaderField( "Location" ) != null) {
             return getResponse( new RedirectWebRequest( request, connection.getHeaderField( "Location" ) ) );
+        } else if (connection.getHeaderField( "WWW-Authenticate" ) != null) {
+            throw new AuthorizationRequiredException( connection.getHeaderField( "WWW-Authenticate" ) );
         } else {
             WebResponse result = new WebResponse( this, request.getURL(), connection.getInputStream() );
             return result;
@@ -85,6 +87,14 @@ public class WebConversation {
     }
 
 
+    /**
+     * Sets a username and password for a basic authentication scheme.
+     **/
+    public void setAuthorization( String userName, String password ) {
+        _authorization = "Basic " + Base64.encode( userName + ':' + password );
+    }
+
+
 //---------------------------------- private members --------------------------------
 
     /** The currently defined cookies. **/
@@ -94,6 +104,10 @@ public class WebConversation {
     /** The current user agent. **/
     private String _userAgent;
 
+
+    /** The authorization header value. **/
+    private String _authorization;
+
     
     static {
         HttpURLConnection.setFollowRedirects( false );
@@ -102,9 +116,16 @@ public class WebConversation {
     private URLConnection openConnection( URL url ) throws MalformedURLException, IOException {
         URLConnection connection = url.openConnection();
         connection.setUseCaches( false );
+        sendAuthorization( connection );
 	sendUserAgent( connection );
         sendCookies( connection );
         return connection;
+    }
+
+
+    private void sendAuthorization( URLConnection connection ) {
+        if (_authorization == null) return;
+        connection.setRequestProperty( "Authorization", _authorization );
     }
 
     

@@ -85,13 +85,26 @@ public class WebResponse {
 
 
     /**
-     * Returns the first table in the response which has the specified text in its first non-blank row and
-     * non-blank column. Will recurse into any nested tables, as needed.
+     * Returns the first table in the response which has the specified text as the full text of
+     * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
+     * Case is ignored.
      * @exception SAXException thrown if there is an error parsing the response.
      * @return the selected table, or null if none is found
      **/
     public WebTable getTableStartingWith( String text ) throws SAXException {
         return getReceivedPage().getTableStartingWith( text );
+    }
+    
+    
+    /**
+     * Returns the first table in the response which has the specified text as a prefix of the text of
+     * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
+     * Case is ignored.
+     * @exception SAXException thrown if there is an error parsing the response.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableStartingWithPrefix( String text ) throws SAXException {
+        return getReceivedPage().getTableStartingWithPrefix( text );
     }
     
     

@@ -72,6 +72,12 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "image link URL", "http://www.meterware.com/basic.html", link.getRequest().getURL().toExternalForm() );
     }
 
+
+    public void testLinkText() throws Exception {
+        WebLink link = _simplePage.getLinks()[0];
+        assertEquals( "Link text", "an active link", link.asText() );
+    }
+
                               
     private static URL _baseURL;
      

@@ -114,12 +114,22 @@ class ParsedHTML {
 
 
     /**
-     * Returns the first table in the response which has the specified text in its first non-blank row and
-     * non-blank column. Will recurse into any nested tables, as needed.
+     * Returns the first table in the response which has the specified text as the full text of
+     * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
     public WebTable getTableStartingWith( String text ) {
         return getTableStartingWith( text, getTables() );
+    }
+    
+    
+    /**
+     * Returns the first table in the response which has the specified text as a prefix of the text 
+     * in its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableStartingWithPrefix( String text ) {
+        return getTableStartingWithPrefix( text.toUpperCase(), getTables() );
     }
     
     
@@ -191,6 +201,28 @@ class ParsedHTML {
                 WebTable[] innerTables = tables[i].getTableCell(0,0).getTables();
                 if (innerTables.length != 0) {
                     WebTable result = getTableStartingWith( text, innerTables );
+                    if (result != null) return result;
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+    /**
+     * Returns the table with the specified text in its first non-blank row and column.
+     **/
+    private WebTable getTableStartingWithPrefix( String text, WebTable[] tables ) {
+        for (int i = 0; i < tables.length; i++) {
+            tables[i].purgeEmptyCells();
+            if (tables[i].getRowCount() == 0) continue;
+            if (tables[i].getCellAsText(0,0).toUpperCase().startsWith( text )) {
+                return tables[i];
+            } else {
+                WebTable[] innerTables = tables[i].getTableCell(0,0).getTables();
+                if (innerTables.length != 0) {
+                    WebTable result = getTableStartingWithPrefix( text, innerTables );
                     if (result != null) return result;
                 }
             }

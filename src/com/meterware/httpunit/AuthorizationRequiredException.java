@@ -19,30 +19,50 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Properties;
+import java.io.*;
 
 
 /**
- * Tests for the package.
+ * This exception is thrown when an unauthorized request is made for a page that requires authentication.
  **/
-public class HttpUnitSuite {
+public class AuthorizationRequiredException extends RuntimeException {
 
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run( suite() );
-    }
-	
-	
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( WebLinkTest.suite() );
-        suite.addTest( HtmlTablesTest.suite() );
-        suite.addTest( WebFormTest.suite() );
-        suite.addTest( Base64Test.suite() );
-        return suite;
+
+    AuthorizationRequiredException( String wwwAuthenticateHeader ) throws IOException {
+        int i = wwwAuthenticateHeader.indexOf( ' ' );
+        _scheme = wwwAuthenticateHeader.substring( 0, i );
+        _params = wwwAuthenticateHeader.substring( i+1 );
+        _properties = new Properties();
+        _properties.load( new ByteArrayInputStream( _params.getBytes() ) );
     }
 
 
+    public String getMessage() {
+        return _scheme + " authorization required: " + _params;
+    }
+
+
+    /**
+     * Returns the name of the <a href="ftp://ftp.isi.edu/in-notes/rfc2617.txt">authentication scheme</a>.
+     **/
+    public String getAuthenticationScheme() {
+        return _scheme;
+    }
+
+
+    /**
+     * Returns the named authentication parameter. For Basic authentication, the only parameter is "realm".
+     **/
+    public String getAuthenticationParameter( String parameterName ) {
+        return _properties.getProperty( parameterName );
+    }
+
+
+//------------------------------------- private members ------------------------------------------
+
+
+    private String     _params;
+    private String     _scheme;
+    private Properties _properties;
 }
-

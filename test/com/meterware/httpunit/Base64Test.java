@@ -19,30 +19,41 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
 /**
- * Tests for the package.
+ * Tests the base64 converter.
  **/
-public class HttpUnitSuite {
+public class Base64Test extends TestCase {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+    
+    
     public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( WebLinkTest.suite() );
-        suite.addTest( HtmlTablesTest.suite() );
-        suite.addTest( WebFormTest.suite() );
-        suite.addTest( Base64Test.suite() );
-        return suite;
+        return new TestSuite( Base64Test.class );
     }
 
+
+    public Base64Test( String name ) {
+        super( name );
+    }
+
+	
+    public void testEncode() {
+        assertEquals( "Result of encoding", "QWxhZGRpbjpvcGVuIHNlc2FtZQ==", Base64.encode( "Aladdin:open sesame" ) );
+        assertEquals( "Result of encoding", "QWRtaW46Zm9vYmFy",             Base64.encode( "Admin:foobar" ) );
+    }
+
+
+    public void testDecode() {
+        assertEquals( "Result of decoding", "Aladdin:open sesame", Base64.decode( "QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ) );
+        assertEquals( "Result of decoding", "Admin:foobar",        Base64.decode( "QWRtaW46Zm9vYmFy" ) );
+    }
 
 }
 

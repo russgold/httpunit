@@ -82,7 +82,7 @@ class NodeUtils {
                 } else if (node.getNodeName().equalsIgnoreCase( "td")) {
                     sb.append( " | " );
                 } else if (node.getNodeName().equalsIgnoreCase( "th")) {
-                    sb.append( " | " );
+                    sb.append( " | " );  
                 }
 
                 pushNodeList( node.getChildNodes(), pendingNodes );

@@ -49,6 +49,14 @@ public class TableCell extends ParsedHTML {
     }
 
 
+    /**
+     * Returns the text value of this cell.
+     **/
+    public String asText() {
+        return getCellContentsAsText( _element );
+    }
+
+    
 //---------------------------------------- package methods -----------------------------------------
 
 
@@ -60,11 +68,6 @@ public class TableCell extends ParsedHTML {
     }
 
 
-    String asText() {
-        return getCellContentsAsText( _element );
-    }
-
-    
 //----------------------------------- private fields and methods -----------------------------------
 
 

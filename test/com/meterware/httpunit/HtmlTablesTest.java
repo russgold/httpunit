@@ -189,6 +189,10 @@ public class HtmlTablesTest extends TestCase {
         assertEquals( "Non-blank rows",    2, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
+        cells = rp.getTableStartingWithPrefix( "Re" ).asText();
+        assertEquals( "Non-blank rows",    2, cells.length );
+        assertEquals( "Non-blank columns", 2, cells[0].length );
+        assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
     }
 
 

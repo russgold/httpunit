@@ -19,30 +19,50 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
 /**
- * Tests for the package.
+ * Tests the basic authentication.
  **/
-public class HttpUnitSuite {
+public class AuthenticationTest extends TestCase {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+    
+    
     public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( WebLinkTest.suite() );
-        suite.addTest( HtmlTablesTest.suite() );
-        suite.addTest( WebFormTest.suite() );
-        suite.addTest( Base64Test.suite() );
-        return suite;
+        return new TestSuite( AuthenticationTest.class );
     }
 
+
+    public AuthenticationTest( String name ) {
+        super( name );
+    }
+
+	
+    public void testRejection() throws Exception {
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( "http://www.adhq.com/adnet" );
+        try {
+            WebResponse response = wc.getResponse( request );
+            fail( "Should have rejected this no-password request" );
+        } catch (AuthorizationRequiredException e) {
+            System.out.println( "Realm = " + e.getAuthenticationParameter( "realm" ) );
+        }
+    }
+
+
+    public void testAuthorization() throws Exception {
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( "http://www.adhq.com/adnet" );
+        wc.setAuthorization( "helpguy", "chester5" );
+        WebResponse response = wc.getResponse( request );
+        System.out.println( "response=" + response );
+    }
 
 }
 
