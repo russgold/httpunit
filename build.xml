@@ -143,6 +143,7 @@
 <target name="clean">
     <deltree dir="${build.dir}" /> 
     <deltree dir="${dist.dir}" />
+    <deltree dir="${web.dir}" />
 </target>
 
 
@@ -151,6 +152,7 @@
 <!--  ===================================================================  --> 
 <target name="total-clean" depends="clean">
     <delete file="${name}_${zip_version}.zip" /> 
+    <delete file="${name}_website_${zip_version}.zip" /> 
     <deltree dir="${docs.dir}/api" />
     <deltree dir="${lib.dir}" /> 
 </target>
