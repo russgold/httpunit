@@ -13,9 +13,16 @@ Limitations:
 
 
 Revision History:
+ 12-Mar-2002
+Acknowledgements:
+    Thanks to Daniel Jasmin for fixing the handling of applet loading from archives.
+
+Problems fixed:
+    1. Applets were not loading properly from applets if a codebase was specified in the <applet> tag.
+
   9-Mar-2003
 Additions:
-    1. <noscript> nodes now show their content if a <script> earlier in the page is not recognized.
+    1. <noscript> nodes in the body of a page now show their content if a <script> earlier in the page is not recognized.
 
   7-Mar-2003
 Acknowledgements:

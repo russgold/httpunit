@@ -125,7 +125,7 @@ public class WebApplet extends HTMLElementBase {
     List getArchiveList() throws MalformedURLException {
         ArrayList al = new ArrayList();
         StringTokenizer st = new StringTokenizer( getArchiveSpecification(), "," );
-        while (st.hasMoreTokens()) al.add( new URL( _response.getURL(), st.nextToken() ) );
+        while (st.hasMoreTokens()) al.add( new URL( getCodeBaseURL(), st.nextToken() ) );
         return al;
     }
 
