@@ -105,4 +105,18 @@ public class HTMLElementTest  extends HttpUnitTest {
     }
 
 
+    public void testElementProperties() throws Exception {
+        defineWebPage( "start",
+                       "<form name='perform' title=fifth>" +
+                       "  <input name='name' maxlength=20 tabindex='1'>" +
+                       "</form>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+
+        assertEquals( "tabindex", "1", response.getScriptableObject().evaluateURL( "document.perform.name.tabindex") );
+        assertEquals( "maxlength", "20", response.getScriptableObject().evaluateURL( "document.perform.name.maxlength") );
+    }
+
+
+
 }

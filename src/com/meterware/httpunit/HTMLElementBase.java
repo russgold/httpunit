@@ -22,6 +22,9 @@ package com.meterware.httpunit;
 import org.w3c.dom.Node;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
+import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  *
@@ -33,7 +36,7 @@ class HTMLElementBase implements HTMLElement {
 
     private Node        _node;
     private ScriptableDelegate _scriptable;
-
+    private List _supportedAttributes = new ArrayList();
 
 
     public String getID() {
@@ -70,11 +73,20 @@ class HTMLElementBase implements HTMLElement {
 
     protected HTMLElementBase( Node node ) {
         _node = node;
+        supportAttribute( "id" );
+        supportAttribute( "class" );
+        supportAttribute( "title" );
+        supportAttribute( "name" );
     }
 
 
     public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( getNode(), name );
+    }
+
+
+    public boolean isSupportedAttribute( String name ) {
+        return _supportedAttributes.contains( name );
     }
 
 
@@ -85,6 +97,11 @@ class HTMLElementBase implements HTMLElement {
 
     protected Node getNode() {
         return _node;
+    }
+
+
+    protected void supportAttribute( String name ) {
+        _supportedAttributes.add( name );
     }
 
 

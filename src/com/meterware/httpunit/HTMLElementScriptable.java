@@ -34,6 +34,8 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
     public Object get( String propertyName ) {
         if (propertyName.equalsIgnoreCase( "title" )) {
             return _element.getTitle();
+        } else if (_element.isSupportedAttribute( propertyName )) {
+            return _element.getAttribute( propertyName );
         } else {
             return super.get( propertyName );
         }

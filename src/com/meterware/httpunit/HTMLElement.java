@@ -62,6 +62,12 @@ public interface HTMLElement {
 
 
     /**
+     * Returns true if this element may have an attribute with the specified name.
+     */
+    boolean isSupportedAttribute( String name );
+
+
+    /**
      * Returns the delegate which supports scripting this element.
      */
     ScriptableDelegate getScriptableDelegate();

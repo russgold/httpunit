@@ -80,6 +80,8 @@ abstract class FormControl extends HTMLElementBase {
         _disabled       = NodeUtils.isNodeAttributePresent( node, "disabled" );
         _onChangeEvent  = NodeUtils.getNodeAttribute( node, "onchange" );
         _onClickEvent   = NodeUtils.getNodeAttribute( node, "onclick" );
+
+        supportAttribute( "tabindex" );
     }
 
 
@@ -756,6 +758,7 @@ class TextFormControl extends FormControl {
 class TextFieldFormControl extends TextFormControl {
     public TextFieldFormControl( WebForm form, Node node ) {
         super( form, node, NodeUtils.getNodeAttribute( node, "value" ) );
+        supportAttribute( "maxlength" );
     }
 
 }

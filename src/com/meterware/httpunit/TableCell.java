@@ -116,6 +116,14 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
     }
 
 
+    /**
+     * Returns true if this element may have an attribute with the specified name.
+     */
+    public boolean isSupportedAttribute( String name ) {
+        return false;
+    }
+
+
     public boolean equals( Object obj ) {
         return obj instanceof TableCell && equals( (TableCell) obj );
     }

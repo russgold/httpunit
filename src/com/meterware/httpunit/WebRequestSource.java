@@ -270,6 +270,11 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
 
+    public boolean isSupportedAttribute( String name ) {
+        return false;
+    }
+
+
     String getAttribute( final String name, String defaultValue ) {
         return NodeUtils.getNodeAttribute( _node, name, defaultValue );
     }

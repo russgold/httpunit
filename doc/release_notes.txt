@@ -13,11 +13,34 @@ Limitations:
 
 
 Revision History:
+16-Sep-2003
+Acknowledgements:
+    Thanks to Chris Hane for making it easier to add support for javascript properties and for providing support for
+    getAttribute() to handle any property defined in the underlying Node
+
+Additions:
+    1. HTMLElement now supports a getAttribute method to return the value of any named attribute.
+    2. PseudoServer can now received chunked requests, and will not send a "Content-Length" header if a
+       "Transfer-Encoding: chunked" has been defined.
+    3. Added support for javascript Input.tabindex and Text.maxlength properties (read-only)
+
+11-Sep-2003
+Additions:
+    1. PseudoServer now pools its ServerSocket's in order to be more gracious regarding system resources. Pooling can
+       be controlled via the properties: socketReleaseWaitTime and waitThreshhold.
+Problems fixed:
+    1. The HeadMethodWebRequest was actually sending the GET method, as was any HeaderOnlyWebRequest.
+    2. PseudoServer now supports any method handled by a PseudoServlet. Previously, it only handled GET, POST, and PUT.
+       It is simple necessary to override the getResponse method to make this work.
+    3. Bug #804585: Undocumented method in API: the javascript documentation referred to the old location of the
+       getNextAlert and popNextAlert methods
+    4. Bug #804559: Documentation incomplete in download: removed the pending links from the incomplete user manual.
+    5. The tutorial referred to a method without specifying the object to which it belongs
+    6. The HeadMethodWebRequest was actually sending a GET method
 
 26-Aug-2003
 Additions:
-    1. HTMLElement now supports a getAttribute method to return the value of any named attribute.
-    2. WebResponse and TableCell now support getElementsWithAttribute to return all contained HTML elements with
+    1. WebResponse and TableCell now support getElementsWithAttribute to return all contained HTML elements with
        the specified attribute.
 
 21-Aug-2003 1.5.4

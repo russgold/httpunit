@@ -28,7 +28,6 @@ import java.io.File;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
-import org.xml.sax.SAXException;
 
 
 /**
