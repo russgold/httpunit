@@ -94,7 +94,7 @@ as well:<p />
     form.setParameter( "home1", "Denver Broncos" );
     form.setParameter( "tiebreaker", "1" );
 
-    SubmitButton saveButton = getSubmitButton( "save", "Save" );             // (2) select the desired submit button
+    SubmitButton saveButton = form.getSubmitButton( "save", "Save" );        // (2) select the desired submit button
     response = form.submit( saveButton );                                    // (3) submit the form
 
     assertEquals( "Away team 0", "", form.getParameterValue( "away0" ) );    // (4) verify the response
