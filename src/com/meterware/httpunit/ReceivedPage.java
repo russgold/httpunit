@@ -68,9 +68,13 @@ class ReceivedPage extends ParsedHTML {
      **/
     public String getExternalStyleSheet() throws SAXException {
         NodeList nl = ((Document) getDOM()).getElementsByTagName( "link" );
-        if (nl.getLength() == 0) return "";
-        if ("stylesheet".equalsIgnoreCase(NodeUtils.getNodeAttribute( nl.item(0), "rel" )))
-            return NodeUtils.getNodeAttribute( nl.item(0), "href" );
+        int length = nl.getLength();
+        if (length == 0) return "";
+
+        for (int i = 0; i < length; i++) {
+            if ("stylesheet".equalsIgnoreCase(NodeUtils.getNodeAttribute( nl.item(i), "rel" )))
+                return NodeUtils.getNodeAttribute( nl.item(i), "href" );
+        }
         return "";
     }
 

@@ -298,6 +298,7 @@ public class WebPageTest extends HttpUnitTest {
     public void testGetExternalStylesheet() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
+                      "<link rev=\"made\" href=\"/Me@mycompany.com\"/>" +
                       "<link type=\"text/css\" rel=\"stylesheet\" href=\"/style.css\"/>" +
                       "</head>\n" +
                       "<body>This has no data\n" +

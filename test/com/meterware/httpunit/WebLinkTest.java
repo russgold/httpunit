@@ -34,7 +34,7 @@ import java.util.Enumeration;
  * Tests for the WebLink class.
  *
  * @author <a href="mailto:russgold@acm.org>Russell Gold</a>
- * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
+ * @author <a href="mailto:bx@bigfoot.com>Benoit Xhenseval</a>
  **/
 public class WebLinkTest extends HttpUnitTest {
 
@@ -209,70 +209,71 @@ public class WebLinkTest extends HttpUnitTest {
         WebLink[] links = wc.getResponse( getHostPath() + "/ParameterLinks.html" ).getLinks();
         assertNotNull( links );
         assertEquals( "number of links", 5, links.length );
-		WebRequest request;
+        WebRequest request;
 
-		// first link should not have any param
-		request = links[0].getRequest();
-		assertNotNull( request);
-		Enumeration e = request.getParameterNames();
-		assertNotNull( e);
-		assertTrue( "Should not have any params", !e.hasMoreElements() );
+        // first link should not have any param
+        request = links[0].getRequest();
+        assertNotNull( request);
+        Enumeration e = request.getParameterNames();
+        assertNotNull( e);
+        assertTrue( "Should not have any params", !e.hasMoreElements() );
+        assertEquals("Non Existent parameter should be empty","",request.getParameter("nonexistent"));
 
         // second link should have one parameter
-		request = links[1].getRequest();
-		assertNotNull( request );
-		e = request.getParameterNames();
-		assert( e.hasMoreElements() );
-		String paramName = (String)e.nextElement();
-		assertNotNull(paramName);
-		assert(!e.hasMoreElements());
-		assertEquals("param1",paramName);
-		assertEquals("value1",request.getParameter(paramName));
+        request = links[1].getRequest();
+        assertNotNull( request );
+        e = request.getParameterNames();
+        assertTrue( e.hasMoreElements() );
+        String paramName = (String)e.nextElement();
+        assertNotNull(paramName);
+        assertTrue(!e.hasMoreElements());
+        assertEquals("param1",paramName);
+        assertEquals("value1",request.getParameter(paramName));
 
-		// third link should have 2 parameters.  !! Order of parameters cannot be guaranted.
-		request = links[2].getRequest();
-		assertNotNull( request );
-		e = request.getParameterNames();
-		assert( e.hasMoreElements() );
-		paramName = (String)e.nextElement();
-		assertNotNull(paramName);
-		assert(e.hasMoreElements());
-    	String paramName2 = (String)e.nextElement();
-		assertNotNull(paramName2);
-		assert("different names",!paramName.equals(paramName2));
-		assert("test names for param1",paramName.equals("param1") || paramName2.equals("param1"));
-		assert("test names for param2",paramName.equals("param2") || paramName2.equals("param2"));
-		assertEquals("value1",request.getParameter("param1"));
-		assertEquals("value2",request.getParameter("param2"));
+        // third link should have 2 parameters.  !! Order of parameters cannot be guaranted.
+        request = links[2].getRequest();
+        assertNotNull( request );
+        e = request.getParameterNames();
+        assertTrue( e.hasMoreElements() );
+        paramName = (String)e.nextElement();
+        assertNotNull(paramName);
+        assertTrue(e.hasMoreElements());
+        String paramName2 = (String)e.nextElement();
+        assertNotNull(paramName2);
+        assertTrue("different names",!paramName.equals(paramName2));
+        assertTrue("test names for param1",paramName.equals("param1") || paramName2.equals("param1"));
+        assertTrue("test names for param2",paramName.equals("param2") || paramName2.equals("param2"));
+        assertEquals("value1",request.getParameter("param1"));
+        assertEquals("value2",request.getParameter("param2"));
 
-		// fourth link should have 1 parameter with 2 values.
-		request = links[3].getRequest();
-		assertNotNull( request );
-		e = request.getParameterNames();
-		assert( e.hasMoreElements() );
-		paramName = (String)e.nextElement();
-		assertNotNull(paramName);
-		String[] values = request.getParameterValues("param1");
-		assertEquals("Length of ",2,values.length);
-		assertMatchingSet("Values",new String[] {"value1", "value3"}, values);
+        // fourth link should have 1 parameter with 2 values.
+        request = links[3].getRequest();
+        assertNotNull( request );
+        e = request.getParameterNames();
+        assertTrue( e.hasMoreElements() );
+        paramName = (String)e.nextElement();
+        assertNotNull(paramName);
+        String[] values = request.getParameterValues("param1");
+        assertEquals("Length of ",2,values.length);
+        assertMatchingSet("Values",new String[] {"value1", "value3"}, values);
 
-		// fifth link should have 2 parameters with one with 2 values.
-		request = links[4].getRequest();
-		assertNotNull( request );
-		e = request.getParameterNames();
-		assert( e.hasMoreElements() );
-		paramName = (String)e.nextElement();
-		assertNotNull(paramName);
-		assert( e.hasMoreElements() );
-		paramName2 = (String)e.nextElement();
-		assertNotNull(paramName2);
-		assert("different names",!paramName.equals(paramName2));
-		values = request.getParameterValues("param1");
-		assertEquals("Length of ",2,values.length);
-		assertMatchingSet("Values for param1",new String[] {"value1", "value3"}, values);
-		assertMatchingSet("Values form param2",new String[] {"value2"}, request.getParameterValues("param2"));
-		assertEquals("value2",request.getParameter("param2"));
-	}
+        // fifth link should have 2 parameters with one with 2 values.
+        request = links[4].getRequest();
+        assertNotNull( request );
+        e = request.getParameterNames();
+        assertTrue( e.hasMoreElements() );
+        paramName = (String)e.nextElement();
+        assertNotNull(paramName);
+        assertTrue( e.hasMoreElements() );
+        paramName2 = (String)e.nextElement();
+        assertNotNull(paramName2);
+        assertTrue("different names",!paramName.equals(paramName2));
+        values = request.getParameterValues("param1");
+        assertEquals("Length of ",2,values.length);
+        assertMatchingSet("Values for param1",new String[] {"value1", "value3"}, values);
+        assertMatchingSet("Values form param2",new String[] {"value2"}, request.getParameterValues("param2"));
+        assertEquals("value2",request.getParameter("param2"));
+    }
 
 
     public void testImageMapLinks() throws Exception {
