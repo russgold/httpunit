@@ -155,6 +155,24 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+   public void testMetaEncoding() throws Exception {
+       String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
+       String page = "<html><head><title>" + hebrewTitle + "</title>" +
+                     "<meta Http_equiv=content-type content=\"text/html; charset=iso-8859-8\"></head>\n" +
+                     "<body>This has no data\n" +
+                     "</body></html>\n";
+       defineResource( "SimplePage.html", page );
+       setResourceCharSet( "SimplePage.html", "iso-8859-8", false );
+
+       WebConversation wc = new WebConversation();
+       WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+       WebResponse simplePage = wc.getResponse( request );
+
+       assertEquals( "Character set", "iso-8859-8", simplePage.getCharacterSet() );
+       assertEquals( "Title", hebrewTitle, simplePage.getTitle() );
+    }
+
+
     public void testHebrewForm() throws Exception {
         String hebrewName = "\u05d0\u05d1\u05d2\u05d3";
         defineResource( "HebrewForm.html",

@@ -11,6 +11,10 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
+22-May-01
+Additions:
+    1. Reading the character set from a <meta> tag is now supported.
+
 21-May-01
 Additions:
     1. selectFile now infers file content for zip extension
