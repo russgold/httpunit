@@ -81,6 +81,7 @@
            debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
          <classpath refid="base.classpath" />
          <exclude name="**/JTidyHTMLParser.java" unless="jtidy.present" />
+         <exclude name="**/ScriptFilter.java" unless="nekoHTML.present" />
          <exclude name="**/NekoHTMLParser.java" unless="nekoHTML.present" />
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/javascript/*" unless="rhino.present" />
@@ -157,7 +158,7 @@
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}"
              destdir="${javadoc.dir}" author="true" version="true"
              windowtitle="${Name} ${version} API" doctitle="${Name}"
-             footer="Copyright &amp;copy; 2000-2002 Russell Gold. See &lt;a href=&quot;http://httpunit.sourceforge.net/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
+             footer="Copyright &amp;copy; 2000-2002 Russell Gold. See &lt;a href=&quot;http://www.httpunit.org/doc/license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
         <classpath refid="base.classpath"/>
     </javadoc>
 </target>

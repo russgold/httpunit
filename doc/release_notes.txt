@@ -10,6 +10,10 @@ Limitations:
 
 
 Revision History:
+ 9-Nov-2002
+Problems fixed:
+    1. As of 1.5, HttpUnit was not building if NekoHTML was not in the classpath. This is now fixed.
+
  7-Nov-2002
 Acknowledgements:
     Thanks to Raul Benito Garcia for pointing out the problem with no-action forms accessed with URL parameters
