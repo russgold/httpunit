@@ -57,6 +57,7 @@ public abstract class HttpUnitOptions {
         _acceptCookies = true;
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
+        _exceptionsThrownOnScriptError = true;
     }
 
 
@@ -381,6 +382,7 @@ public abstract class HttpUnitOptions {
                 Class factoryClass = Class.forName( _scriptEngineClassName );
                 final ScriptingEngineFactory factory = (ScriptingEngineFactory) factoryClass.newInstance();
                 _scriptingEngine = factory.isEnabled() ? factory : NULL_SCRIPTING_ENGINE_FACTORY;
+                _scriptingEngine.setThrowExceptionsOnError( _exceptionsThrownOnScriptError );
             } catch (ClassNotFoundException e) {
                 disableScripting( e, "Unable to find scripting engine factory class " );
             } catch (InstantiationException e) {
@@ -411,6 +413,7 @@ public abstract class HttpUnitOptions {
      * Determines whether script errors result in exceptions or warning messages.
      */
     public static void setExceptionsThrownOnScriptError( boolean throwExceptions ) {
+        _exceptionsThrownOnScriptError = throwExceptions;
         getScriptingEngine().setThrowExceptionsOnError( throwExceptions );
     }
 
@@ -419,7 +422,7 @@ public abstract class HttpUnitOptions {
      * Returns true if script errors cause exceptions to be thrown.
      */
     public static boolean getExceptionsThrownOnScriptError() {
-        return getScriptingEngine().isThrowExceptionsOnError();
+        return _exceptionsThrownOnScriptError;
     }
 
 
@@ -500,6 +503,9 @@ public abstract class HttpUnitOptions {
     private static ScriptingEngineFactory _scriptingEngine;
 
     private static boolean _scriptingEnabled = true;
+
+    private static boolean _exceptionsThrownOnScriptError = true;
+
 
 
     static {
