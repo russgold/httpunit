@@ -219,12 +219,20 @@ public class WebClient {
         validateHeaders( response );
         if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
             getResponse( response.getRefreshRequest() );
-        } else if (!HttpUnitOptions.getAutoRedirect() || response.getHeaderField( "Location" ) == null) {
-            updateFrames( response );
-        } else {
+        } else if (shouldFollowRedirect( response )) {
             delay( HttpUnitOptions.getRedirectDelay() );
             getResponse( new RedirectWebRequest( response ) );
+        } else {
+            updateFrames( response );
         }
+    }
+
+
+    private boolean shouldFollowRedirect( WebResponse response ) {
+        return HttpUnitOptions.getAutoRedirect()
+            && response.getResponseCode() >= HttpURLConnection.HTTP_MOVED_PERM
+            && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
+            && response.getHeaderField( "Location" ) != null;
     }
 
 

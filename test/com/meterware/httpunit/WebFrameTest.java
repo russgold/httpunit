@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.net.URL;
+import java.net.HttpURLConnection;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -262,7 +263,7 @@ public class WebFrameTest extends HttpUnitTest {
     
     public void testSelfTargetForm() throws Exception {
         defineWebPage( "Linker",  "<form action=redirect.html target=_self><input type=text name=sample value=z></form>" );
-        defineResource( "redirect.html?sample=z", "" );
+        defineResource( "redirect.html?sample=z", "", HttpURLConnection.HTTP_MOVED_PERM );
         addResourceHeader( "redirect.html?sample=z", "Location: " + getHostPath() + "/Target.html" );
 
         _wc.getResponse( getHostPath() + "/Frames.html" );
@@ -274,7 +275,7 @@ public class WebFrameTest extends HttpUnitTest {
 
 
     public void testSubFrameRedirect() throws Exception {
-        defineResource( "Linker.html", "" );
+        defineResource( "Linker.html", "", HttpURLConnection.HTTP_MOVED_PERM );
         addResourceHeader( "Linker.html", "Location: " + getHostPath() + "/Target.html" );
                         
         _wc.getResponse( getHostPath() + "/Frames.html" );

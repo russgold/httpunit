@@ -172,7 +172,7 @@ public class PseudoServerTest extends HttpUnitTest {
         PseudoServer ps = new PseudoServer();
         int port = ps.getConnectedPort();
         ps.setResource( resourceName, resourceValue );
-        ps.setResource( redirectName, "" );
+        ps.setErrorResource( redirectName, HttpURLConnection.HTTP_MOVED_PERM, "" );
         ps.addResourceHeader( redirectName, "Location: http://localhost:" + port + '/' + resourceName );
 
         try {
@@ -186,6 +186,32 @@ public class PseudoServerTest extends HttpUnitTest {
         }
     }
 
+
+    public void testDisabledRedirect() throws Exception {
+        String resourceName = "something/redirected";
+        String resourceValue = "the desired content";
+
+        String redirectName = "anOldOne";
+        String redirectValue = "old content";
+
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
+        ps.setResource( resourceName, resourceValue );
+        ps.setErrorResource( redirectName, HttpURLConnection.HTTP_MOVED_PERM, redirectValue );
+        ps.addResourceHeader( redirectName, "Location: http://localhost:" + port + '/' + resourceName );
+
+        try {
+            HttpUnitOptions.setAutoRedirect( false );
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "requested resource", redirectValue, response.getText().trim() );
+            assertEquals( "content type", "text/html", response.getContentType() );
+        } finally {
+            HttpUnitOptions.setAutoRedirect( true );
+            ps.shutDown();
+        }
+    }
 
 
     public void testCookies() throws Exception {

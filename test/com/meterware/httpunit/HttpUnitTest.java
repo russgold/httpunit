@@ -68,6 +68,11 @@ class HttpUnitTest extends TestCase {
     }
 
 
+    protected void defineResource( String resourceName, String value, int statusCode ) {
+        _server.setErrorResource( resourceName, statusCode, value );
+    }
+
+
     protected void defineResource( String resourceName, String value, String contentType ) {
         _server.setResource( resourceName, value, contentType );
     }
