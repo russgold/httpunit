@@ -39,6 +39,11 @@ class HttpUnitTest extends TestCase {
     }
 
 
+    protected void defineResource( String resourceName, String value, String contentType ) {
+        _server.setResource( resourceName, value, contentType );
+    }
+
+
     protected void defineWebPage( String pageName, String body ) {
         defineResource( pageName + ".html", "<html><head><title>" + pageName + "</title></head>\n" + 
                                             "<body>" + body + "</body></html>" );

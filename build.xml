@@ -38,7 +38,7 @@
 <target name="compile" depends="prepare">
     <mkdir dir="${build.classes}" /> 
     <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
-           debug="on" deprecation="off" optimize="off">
+           debug="on" deprecation="on" optimize="off">
     </javac>
 </target>
 
@@ -48,7 +48,7 @@
 <!--  ===================================================================  --> 
 <target name="testcompile" depends="compile">
     <javac srcdir="${tstsrc.dir}" destdir="${build.classes}" classpath="${classpath}" 
-           debug="on" deprecation="off" optimize="off">
+           debug="on" deprecation="on" optimize="off">
     </javac>
 </target>
 

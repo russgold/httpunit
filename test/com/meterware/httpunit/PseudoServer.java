@@ -68,7 +68,28 @@ public class PseudoServer {
      * Defines the contents of an expected resource.
      **/
     public void setResource( String name, String value ) {
-        _resources.put( asResourceName( name ), value );
+        setResource( name, value, "text/html" );
+    }
+
+
+    /**
+     * Defines the contents of an expected resource.
+     **/
+    public void setResource( String name, String value, String contentType ) {
+        _resources.put( asResourceName( name ), new WebResource( value, contentType ) );
+    }
+
+
+    /**
+     * Adds a header to a defined resource.
+     **/
+    public void addResourceHeader( String name, String header ) {
+        WebResource resource = (WebResource) _resources.get( asResourceName( name ) );
+        if (resource == null) {
+            resource = new WebResource( "" );
+            _resources.put( asResourceName( name ), resource );
+        }
+        resource.addHeader( header );
     }
 
 
@@ -109,14 +130,18 @@ public class PseudoServer {
         if (!command.equals( "GET" )) {
             sendResponse( ps, HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + command );
         } else {
-            String resource = (String) _resources.get( uri );
+            WebResource resource = (WebResource) _resources.get( uri );
             if (resource == null) {
                 sendResponse( ps, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
             } else {
                 sendResponse( ps, HttpURLConnection.HTTP_OK, "OK" );
-                sendLine( ps, "Content-type: text/html" );
+                sendLine( ps, "Content-type: " + resource.getContentType() );
+                String[] headers = resource.getHeaders();
+                for (int i = 0; i < headers.length; i++) {
+                    sendLine( ps, headers[i] );
+                }
                 sendLine( ps, "" );
-                sendText( ps, resource );
+                sendText( ps, resource.getContents() );
                 ps.close();
             }
         }
@@ -152,6 +177,49 @@ public class PseudoServer {
 
     private ServerSocket _serverSocket;
 
+}
+
+
+class WebResource {
+
+
+    final static String DEFAULT_CONTENT_TYPE = "text/html";
+
+    WebResource( String contents ) {
+        this( contents, DEFAULT_CONTENT_TYPE );
+    }
+
+
+    WebResource( String contents, String contentType ) {
+        _contents    = contents;
+        _contentType = contentType;
+    }
+
+
+    void addHeader( String header ) {
+        _headers.addElement( header );
+    }
+
+
+    String[] getHeaders() {
+        String[] headers = new String[ _headers.size() ];
+        _headers.copyInto( headers );
+        return headers;
+    }
+
+
+    String getContents() {
+        return _contents;
+    }
+
+
+    String getContentType() {
+        return _contentType;
+    }
+
+    private String _contents;
+    private String _contentType;
+    private Vector _headers = new Vector();
 }
 
 

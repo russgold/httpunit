@@ -28,6 +28,10 @@ import junit.framework.TestSuite;
 
 import java.util.Vector;
 
+import java.io.*;
+
+import org.w3c.dom.Document;
+
 
 /**
  * A unit test of the httpunit parsing classes.
@@ -51,6 +55,21 @@ public class WebPageTest extends HttpUnitTest {
 
     public void setUp() throws Exception {
         super.setUp();
+    }
+	
+	
+    public void testNoResponse() throws Exception {
+        WebConversation wc = new WebConversation();
+        try {
+            WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+            WebResponse simplePage = wc.getResponse( request );
+            fail( "Did not complain about missing page" );
+        } catch (HttpNotFoundException e) {
+        }
+    }
+
+
+    public void testTitle() throws Exception {
         defineResource( "SimplePage.html",
                         "<html><head><title>A Sample Page</title></head>\n" +
                         "<body>This has no forms but it does\n" +
@@ -61,17 +80,39 @@ public class WebPageTest extends HttpUnitTest {
 
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
-        _simplePage = wc.getResponse( request );
+        WebResponse simplePage = wc.getResponse( request );
+        assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
     }
-	
-	
-    public void testTitle() throws Exception {
-        assertEquals( "Title", "A Sample Page", _simplePage.getTitle() );
+
+
+    public void testXML() throws Exception {
+        defineResource( "SimplePage.xml",
+                        "<?xml version=\"1.0\" ?><main><title>See me now</title></main>",
+                        "text/xml" );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.xml" );
+        WebResponse simplePage = wc.getResponse( request );
+        Document doc = simplePage.getDOM();
+    }
+
+
+    public void testLocalFile() throws Exception {
+        File file = new File( "temp.html" );
+        FileWriter fw = new FileWriter( file );
+        PrintWriter pw = new PrintWriter( fw );
+        pw.println( "<html><head><title>A Sample Page</title></head>" );
+        pw.println( "<body>This is a very simple page<p>With not much text</body></html>" );
+        pw.close();
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( "file:" + file.getAbsolutePath() );
+        WebResponse simplePage = wc.getResponse( request );
+        assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
+
+        file.delete();
     }
 
 
                               
-    private WebResponse _simplePage;
-
-
 }

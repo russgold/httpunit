@@ -8,10 +8,20 @@ Limitations: HttpUnit does not support JavaScript
 
 
 Revision History:
-25-Oct-00
+Acknowledgements:
+    Thanks to Robert Krueger for providing an interface to the xerces parser for XML web responses.
+    Thanks to Marco Tamanti and Gabriele Antonelli for suggesting ways to support file URLs
+    
+10-Nov-00 
+Additions:
+    1. XML parsing is now supported. If WebResponse.getDOM is called for a non-HTML response, the xerces parser 
+       will be invoked to treat the response as XML.
+    2. File URLs (file:xxx) are now supported 
+    
+02-Nov-00
 Additions:
     1. Forms with multiple buttons are now supported, using the SubmitButton class.
-    2. WebResponse now supports finding a table via its summary text, using getTableWithSummary()
+    2. WebResponse now supports finding a table via its summary text, using getTableWithSummary().
         
 Problems corrected:
     1. Unnamed parameters are no longer submitted as part of a form request

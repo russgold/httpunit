@@ -26,6 +26,8 @@ import java.util.*;
 import org.xml.sax.*;
 import org.w3c.dom.*;
 
+import java.lang.reflect.*;
+
 /**
  * A response from a web server to an Http request.
  **/
@@ -148,10 +150,15 @@ public class WebResponse {
 
     /**
      * Returns a copy of the domain object model tree associated with this response.
+     * If the response is HTML, it will use a special parser which can transform HTML into an XML DOM.
      * @exception SAXException thrown if there is an error parsing the response.
      **/
     public Document getDOM() throws SAXException {
-        return (Document) getReceivedPage().getDOM();
+        if (isHTML()) {
+            return (Document) getReceivedPage().getDOM();
+        } else {
+            return getXMLDOM();
+        }
     }
 
 
@@ -347,10 +354,52 @@ public class WebResponse {
     }
 
 
+    private Document getXMLDOM() throws SAXException {
+        Document doc = null;
+
+        try {
+            Class parserClass = Class.forName("org.apache.xerces.parsers.DOMParser");
+            Constructor constructor = parserClass.getConstructor( null );
+            Object parser = constructor.newInstance( null );
+
+            Class[] parseMethodArgTypes = { InputSource.class };
+            Object[] parseMethodArgs = { new InputSource( new StringReader( _responseText ) ) };
+            Method parseMethod = parserClass.getMethod( "parse", parseMethodArgTypes );
+            parseMethod.invoke( parser, parseMethodArgs );
+
+            Method getDocumentMethod = parserClass.getMethod( "getDocument", null );
+            doc = (Document)getDocumentMethod.invoke( parser, null );
+        } catch (InvocationTargetException ex) {
+            Throwable tex = ex.getTargetException();
+            if (tex  instanceof SAXException) {
+                throw (SAXException)tex;
+            } else if (tex instanceof IOException) {
+                throw new RuntimeException( tex.toString() );
+            } else {
+                throw new IllegalStateException( "unexpected exception" );
+            }
+        } catch (NoSuchMethodException ex) {
+            throw new IllegalStateException( "parse method not found" );
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException( "parse method not public" );
+        } catch (InstantiationException ex) {
+            throw new IllegalStateException( "error instantiating parser" );
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException( "parser class not found" );
+        }
+
+        return doc;
+   }
+
+
     private void readHeaders( URLConnection connection ) {
         readContentTypeHeader( connection );
         try {
-            _responseCode = ((HttpURLConnection) connection).getResponseCode();
+            if (connection instanceof HttpURLConnection) {
+                _responseCode = ((HttpURLConnection) connection).getResponseCode();
+            } else {
+                _responseCode = HttpURLConnection.HTTP_OK;
+            }
         } catch (IOException e) {
         }
     }

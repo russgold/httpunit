@@ -141,7 +141,27 @@ public class WebForm {
      * Creates and returns a web request which will simulate the submission of this form with an unnamed submit button.
      **/
     public WebRequest getRequest() {
-        return getRequest( null );
+        return getRequest( (SubmitButton) null );
+    }
+
+
+    /**
+     * Creates and returns a web request which will simulate the submission of this form with a button with the specified name and value.
+     **/
+    public WebRequest getRequest( String submitButtonName, String submitButtonValue ) {
+        SubmitButton sb = getSubmitButton( submitButtonName, submitButtonValue );
+        if (sb == null) throw new IllegalSubmitButtonException( submitButtonName, submitButtonValue );
+        return getRequest( sb );
+    }
+
+
+    /**
+     * Creates and returns a web request which will simulate the submission of this form with a button with the specified name.
+     **/
+    public WebRequest getRequest( String submitButtonName ) {
+        SubmitButton sb = getSubmitButton( submitButtonName );
+        if (sb == null) throw new IllegalSubmitButtonException( submitButtonName, "" );
+        return getRequest( sb );
     }
 
 
@@ -677,16 +697,24 @@ class IllegalSubmitButtonException extends IllegalRequestParameterException {
 
 
     IllegalSubmitButtonException( SubmitButton button ) {
-        _button = button;
+        _name  = button.getName();
+        _value = button.getValue();
+    }
+
+
+    IllegalSubmitButtonException( String name, String value ) {
+        _name = name;
+        _value = value;
     }
 
 
     public String getMessage() {
-        return "Specified submit button (name=\"" + _button.getName() + "\" value=\"" + _button.getValue() + "\") not part of this form.";
+        return "Specified submit button (name=\"" + _name + "\" value=\"" + _value + "\") not part of this form.";
     }
 
 
-    private SubmitButton _button;
+    private String _name;
+    private String _value;
 
 }
 

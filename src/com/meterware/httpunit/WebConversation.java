@@ -82,22 +82,15 @@ public class WebConversation {
      * cookies as requested by the server.
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
-        HttpURLConnection connection = (HttpURLConnection) openConnection( request.getURL() );
+        URLConnection connection = openConnection( request.getURL() );
         request.completeRequest( connection );
         updateCookies( connection );
 
         if (connection.getHeaderField( "Location" ) != null) {
             delay( HttpUnitOptions.getRedirectDelay() );
             return getResponse( new RedirectWebRequest( request, connection.getHeaderField( "Location" ) ) );
-        } else if (connection.getHeaderField( "WWW-Authenticate" ) != null) {
-            throw new AuthorizationRequiredException( connection.getHeaderField( "WWW-Authenticate" ) );
-        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            throw new HttpInternalErrorException( request.getURLString() );
-        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new HttpNotFoundException( request.getURLString() );        
-        } else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
-            throw new HttpException( connection.getResponseCode(), request.getURLString() );        
         } else {
+            if (connection instanceof HttpURLConnection) validateHeaders( request, (HttpURLConnection) connection );
             WebResponse result = new WebResponse( this, request.getTarget(), request.getURL(), connection );
             if (result.isHTML()) {
                 removeSubFrames( request.getTarget() );
@@ -107,6 +100,19 @@ public class WebConversation {
                 for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
             }
             return result;
+        }
+    }
+
+
+    private void validateHeaders( WebRequest request, HttpURLConnection connection ) throws HttpException, IOException {
+        if (connection.getHeaderField( "WWW-Authenticate" ) != null) {
+            throw new AuthorizationRequiredException( connection.getHeaderField( "WWW-Authenticate" ) );
+        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+            throw new HttpInternalErrorException( request.getURLString() );
+        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+            throw new HttpNotFoundException( request.getURLString() );        
+        } else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
+            throw new HttpException( connection.getResponseCode(), request.getURLString() );
         }
     }
 
@@ -219,8 +225,8 @@ public class WebConversation {
         HttpURLConnection.setFollowRedirects( false );
     }
 
-    private HttpURLConnection openConnection( URL url ) throws MalformedURLException, IOException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    private URLConnection openConnection( URL url ) throws MalformedURLException, IOException {
+        URLConnection connection = url.openConnection();
         connection.setUseCaches( false );
         sendAuthorization( connection );
 	sendUserAgent( connection );

@@ -76,5 +76,25 @@ public class PseudoServerTest extends TestCase {
         assertEquals( "content type", "text/html", response.getContentType() );
     }
 
+
+
+    public void testRedirect() throws Exception {
+        String resourceName = "something/interesting";
+        String resourceValue = "the desired content\r\n";
+
+        String redirectName = "anOldOne";
+
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
+        ps.setResource( resourceName, resourceValue );
+        ps.setResource( redirectName, "" );
+        ps.addResourceHeader( redirectName, "Location: http://localhost:" + port + '/' + resourceName );
+
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.toString() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
 }
 
