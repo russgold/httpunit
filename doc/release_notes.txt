@@ -14,11 +14,18 @@ Revision History:
 08-Jan-01
 Acknowledgements:
     Thanks to Rocky Rhodes for finding the multiple cookie bug
+    Thanks to Scott Croco for correcting the response code problem
+    Thanks to Ken MacLeod for finding the UTF-8 bug.
+
 Additions:
     1. Initial implementation of file upload capability
     
 Problems corrected:
     1. Multiple cookies were not being sent correctly
+    2. When a response was received with a bad response code, it was treated either as a RuntimeException
+       or a file not found exception.
+    3. Creating a request from a form with an empty <select> tag was generating a SingleValuedParameterException.
+    4. Corrected IllegalArgumentException: sun.io.CharToByteUTF-8 that happened in JDK 1.1.x
     
 01-Jan-01 1.2.1
 Acknowledgements:

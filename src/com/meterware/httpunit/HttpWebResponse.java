@@ -45,10 +45,10 @@ class HttpWebResponse extends WebResponse {
      * @param url the url from which the response was received
      * @param inputStream the input stream from which the response can be read
      **/
-    HttpWebResponse( String target, URL url, URLConnection connection ) throws FileNotFoundException {
+    HttpWebResponse( String target, URL url, URLConnection connection ) throws IOException {
         super( target, url );
         readHeaders( connection );
-        loadResponseText( url, connection );
+        if (((HttpURLConnection) connection).getResponseCode() == HttpURLConnection.HTTP_OK) loadResponseText( url, connection );
     }
 
 

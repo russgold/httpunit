@@ -66,9 +66,27 @@ public class PseudoServerTest extends TestCase {
     }
 
 
+    public void testInternalError() throws Exception {
+        PseudoServer ps = new PseudoServer();
+        ps.setErrorResource( "error.htt", 501, "Internal error" );
+        int port = ps.getConnectedPort();
+
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/error.htt" );
+        try {
+            WebResponse response = wc.getResponse( request );
+            fail( "Should have rejected the request" );
+        } catch (HttpException e) {
+            assertEquals( "Response code", 501, e.getResponseCode() );
+        } finally {
+            ps.shutDown();
+        }
+    }
+
+
     public void testSimpleGet() throws Exception {
         String resourceName = "something/interesting";
-        String resourceValue = "the desired content\r\n";
+        String resourceValue = "the desired content";
 
         PseudoServer ps = new PseudoServer();
         ps.setResource( resourceName, resourceValue );
@@ -78,7 +96,7 @@ public class PseudoServerTest extends TestCase {
             WebConversation wc   = new WebConversation();
             WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
             WebResponse response = wc.getResponse( request );
-            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
         } finally {
             ps.shutDown();
@@ -86,10 +104,19 @@ public class PseudoServerTest extends TestCase {
     }
 
 
+    private String asBytes( String s ) {
+        StringBuffer sb = new StringBuffer();
+        char[] chars = s.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+          sb.append( Integer.toHexString( chars[i] ) ).append( " " );
+        }
+        return sb.toString();
+    }
+
 
     public void testRedirect() throws Exception {
         String resourceName = "something/redirected";
-        String resourceValue = "the desired content\r\n";
+        String resourceValue = "the desired content";
 
         String redirectName = "anOldOne";
 
@@ -103,7 +130,7 @@ public class PseudoServerTest extends TestCase {
             WebConversation wc   = new WebConversation();
             WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
             WebResponse response = wc.getResponse( request );
-            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
         } finally {
             ps.shutDown();
@@ -114,7 +141,7 @@ public class PseudoServerTest extends TestCase {
 
     public void testCookies() throws Exception {
         String resourceName = "something/baking";
-        String resourceValue = "the desired content\r\n";
+        String resourceValue = "the desired content";
 
         PseudoServer ps = new PseudoServer();
         int port = ps.getConnectedPort();
@@ -126,7 +153,7 @@ public class PseudoServerTest extends TestCase {
             WebConversation wc   = new WebConversation();
             WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
             WebResponse response = wc.getResponse( request );
-            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
             assertEquals( "number of cookies", 3, wc.getCookieNames().length );
             assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
@@ -140,7 +167,7 @@ public class PseudoServerTest extends TestCase {
 
     public void testOldCookies() throws Exception {
         String resourceName = "something/baking";
-        String resourceValue = "the desired content\r\n";
+        String resourceValue = "the desired content";
 
         PseudoServer ps = new PseudoServer();
         int port = ps.getConnectedPort();
@@ -151,7 +178,7 @@ public class PseudoServerTest extends TestCase {
             WebConversation wc   = new WebConversation();
             WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
             WebResponse response = wc.getResponse( request );
-            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
             assertEquals( "number of cookies", 1, wc.getCookieNames().length );
             assertEquals( "cookie 'CUSTOMER' value", "WILE_E_COYOTE", wc.getCookieValue( "CUSTOMER" ) );
@@ -165,7 +192,7 @@ public class PseudoServerTest extends TestCase {
         String resourceName = "tellMe";
         String name = "Charlie";
         final String prefix = "Hello there, ";
-        String expectedResponse = prefix + name + "\r\n";
+        String expectedResponse = prefix + name; 
 
         PseudoServer ps = new PseudoServer();
         int port = ps.getConnectedPort();
@@ -182,7 +209,7 @@ public class PseudoServerTest extends TestCase {
             request.setParameter( "name", name );
             WebResponse response = wc.getResponse( request );
             assertEquals( "Content type", "text/plain", response.getContentType() );
-            assertEquals( "Response", expectedResponse, response.getText() );
+            assertEquals( "Response", expectedResponse, response.getText().trim() );
         } finally {
             ps.shutDown();
         }

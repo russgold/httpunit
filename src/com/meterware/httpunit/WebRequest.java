@@ -372,7 +372,7 @@ public class WebRequest {
 
     private void validateParameterValues( String name, String[] values ) {
         if (_sourceForm == null) return;
-        if (values.length != 1 && !_sourceForm.isMultiValuedParameter( name )) {
+        if (values.length > 1 && !_sourceForm.isMultiValuedParameter( name )) {
             throw new SingleValuedParameterException( name );
         }
 

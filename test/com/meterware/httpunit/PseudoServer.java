@@ -90,6 +90,14 @@ public class PseudoServer {
 
 
     /**
+     * Defines a resource which will result in an error message.
+     **/
+    public void setErrorResource( String name, int errorCode, String errorMessage ) {
+        _resources.put( asResourceName( name ), new WebResource( errorCode, errorMessage ) );
+    }
+
+
+    /**
      * Enables the sending of the character set in the content-type header.
      **/
     public void setSendCharacterSet( String name, boolean enabled ) {
@@ -161,8 +169,6 @@ public class PseudoServer {
         String uri     = st.nextToken();
         String protocol = st.nextToken();
 
-
-
         if (!command.equals( "GET" ) && !command.equals( "POST" )) {
             sendResponse( pw, HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + command );
         } else {
@@ -170,6 +176,8 @@ public class PseudoServer {
                 WebResource resource = getResource( command, uri, br );
                 if (resource == null) {
                     sendResponse( pw, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
+                } else if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    sendResponse( pw, resource.getResponseCode(), resource.getContents() );
                 } else {
                     sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
                     sendLine( pw, "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );

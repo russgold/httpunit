@@ -8,10 +8,12 @@
 <LI><A HREF="#Cannot unzip">Why can't I unzip the download library?</A></LI>
 <LI><A HREF="#org.xml.sax">What is the org.xml.sax package?</A></LI>
 <LI><A HREF="#meterware.com">Where is meterware.com?</A></LI>
-<LI><A HREF="javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
-<LI><A HREF="https">Does HttpUnit support https?</A></LI>
-<LI><A HREF="proxy">Can I use HttpUnit through a proxy server?</A></LI>
-<LI><A HREF="charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
+<LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
+<LI><A HREF="#https">Does HttpUnit support https?</A></LI>
+<LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
+<LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
+<LI><A HREF="#utf8">HttpUnit fails with an IllegalArgumentException: sun.io.CharToByteUTF-8, what do I do?</A></LI>
+<LI><A HREF="#buttons">HttpUnit is not finding the buttons in my forms. What is wrong?</A></LI>
 </OL>
 
 
@@ -65,6 +67,21 @@ String rawName = request.getParameter( "name" );<br>
 String japaneseName = new String(name.getBytes("8859_1"),"EUC_JP");
 </code></blockquote>
 where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract the raw bytes from the parameter string.
+
+<A NAME="utf8"><H2>HttpUnit fails with an IllegalArgumentException:
+sun.io.CharToByteUTF-8, what do I do?</H2></A>
+JTidy requires bytes, not characters, and HttpUnit 1.2.1 sends it bytes in UTF-8
+encoding, which it obtains from the input page 
+using <code>getBytes( "UTF-8" )</code>. Unfortunately, Sun used the wrong
+encoding name in its JDK 1.1.x implementations, so this code 
+fails under JDK 1.1. This has been corrected in HttpUnit 1.2.2. 
+
+<A NAME="buttons"><H2>HttpUnit is not finding the buttons in my forms. What is wrong?</H2></A>
+This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
+JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and 
+will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them, 
+call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page. 
+Once you have corrected any errors, HttpUnit should see your form buttons.
 </BODY></HTML> 
 
 

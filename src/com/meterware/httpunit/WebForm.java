@@ -116,6 +116,7 @@ public class WebForm {
                     _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
                 }
             }
+            if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
         }
         return _buttonVector;
     }

@@ -42,8 +42,19 @@ class WebResource {
 
 
     WebResource( String contents, String contentType ) {
+        this( contents, contentType, HttpURLConnection.HTTP_OK );
+    }
+
+
+    WebResource( int responseCode, String responseText ) {
+        this( responseText, DEFAULT_CONTENT_TYPE, responseCode );
+    }
+
+
+    WebResource( String contents, String contentType, int responseCode ) {
         _contents    = contents;
         _contentType = contentType;
+        _responseCode = responseCode;
     }
 
 
@@ -92,6 +103,13 @@ class WebResource {
         }
     }
 
+
+    int getResponseCode() {
+        return _responseCode;
+    }
+
+
+    private int     _responseCode;
     private boolean _sendCharacterSet;
     private String  _contents;
     private String  _contentType;
