@@ -356,4 +356,11 @@ public class NormalizeURLTest extends HttpUnitTest {
     }
 
 
+    public void testSlashesInParameter() throws Exception {
+        String desiredUrl = "http://localhost:8888/bug2295681/TestServlet?abc=abc&aaa=%%%&bbb=---%2d%2F%*%aa&ccc=yahoo@yahoo.com&ddd=aaa/../../&eee=/.";
+        WebRequest request = new GetMethodWebRequest( desiredUrl );
+        assertEquals( "URL", desiredUrl, request.getURL().toExternalForm() );
+    }
+
+
 }

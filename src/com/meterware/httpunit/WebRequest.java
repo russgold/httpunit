@@ -116,10 +116,17 @@ public class WebRequest {
 
 
     private String getNormalizedURL( String url ) {
-        if (url.lastIndexOf( "//" ) > url.lastIndexOf( "://" ) + 1) return getNormalizedURL( stripDoubleSlashes( url ) );
-        if (url.indexOf( "/.." ) > 0) return getNormalizedURL( stripUpNavigation( url ) );
-        if (url.indexOf( "/./" ) > 0) return getNormalizedURL( stripInPlaceNavigation( url ) );
-        return url;
+        int questionIndex = url.indexOf( '?' );
+        if (questionIndex < 0) return getNormalizedPath( url );
+        return getNormalizedPath( url.substring( 0, questionIndex ) ) + url.substring( questionIndex );
+    }
+
+
+    private String getNormalizedPath( String path ) {
+        if (path.lastIndexOf( "//" ) > path.lastIndexOf( "://" ) + 1) return getNormalizedPath( stripDoubleSlashes( path ) );
+        if (path.indexOf( "/.." ) > 0) return getNormalizedPath( stripUpNavigation( path ) );
+        if (path.indexOf( "/./" ) > 0) return getNormalizedPath( stripInPlaceNavigation( path ) );
+        return path;
     }
 
 

@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+ 9-Sep-2004:
+   Problems fixed:
+       1. Slashes in URL parameters were being misinterpeted as navigation
+
  8-Sep-2004:
    Additions:
        1. ServletRunner and ServletUnitClient now support a getSession() method to return the HTTP session to be used
