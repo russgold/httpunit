@@ -62,6 +62,8 @@ public class WebClientTest extends HttpUnitTest {
             wc.getResponse( "http://no.such.host" );
             fail( "Should have rejected the request" );
         } catch (UnknownHostException e) {
+        } catch (IOException e) {
+            if (!(e.getCause() instanceof UnknownHostException)) throw e;
         }
     }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2002, Russell Gold
+* Copyright (c) 2001-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -57,7 +57,15 @@ public class MessageBodyWebRequest extends WebRequest {
      * Constructs a web request for a form submitted via a button.
      **/
     protected MessageBodyWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
-        super( sourceForm, button, x, y );
+        this( sourceForm, WebRequest.newParameterHolder( sourceForm ), button, x, y );
+    }
+
+
+    /**
+     * Constructs a web request for a form submitted via a button.
+     **/
+    protected MessageBodyWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
+        super( sourceForm, parameterHolder, button, x, y );
     }
 
 
@@ -65,7 +73,7 @@ public class MessageBodyWebRequest extends WebRequest {
      * Constructs a web request for a form submitted via script.
      **/
     protected MessageBodyWebRequest( WebForm sourceForm ) {
-        super( sourceForm );
+        super( sourceForm, WebRequest.newParameterHolder( sourceForm ) );
     }
 
 

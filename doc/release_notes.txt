@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+ 3-Jun-2004
+   Additions:
+        1. WebForm now supports the newUnvalidatedRequest method, which should be used in preference to
+           HttpUnitOptions.setParametersValidated( false ). This creates a web request copied from the form
+           but not tied to it, so that parameters can be set without validation.
+
 20-Apr-2004
     Problems fixed:
         1. PseudoServer now accepts a full http URL to permit testing of interaction with proxy servers.
@@ -484,7 +490,7 @@ Additions:
 
  2-Oct-2002 1.4.6
 Acknowledgements:
-    Thanks to Ville Skyttä for removing the test dependency on xerces.
+    Thanks to Ville Skyttï¿½ for removing the test dependency on xerces.
     Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.
     Thanks to Jin Zhao for help in expanding the search possibilities for links.
 
@@ -724,7 +730,7 @@ Acknowledgements:
         of link URLs with parameters and fragments.
     Thanks to Paul Frantz and Dave Glowacki for finding and fixing problems with parsing of link parameter names without values.
     Thanks to Didier Besset for new WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
-    Thanks to Peter Roßbach for catching some typos in the tutorial.
+    Thanks to Peter Roï¿½bach for catching some typos in the tutorial.
     Thanks to Benoit Xhenseval for adding a mechanism to handle HTML parser errors.
     Thanks to Benoit Xhenseval for optimizing the use of DOMs and StringBuffers.
     Thanks to Bradley Smith for implementing getParameterNames in ServletUnit.

@@ -218,6 +218,8 @@ public abstract class HttpUnitOptions {
 
     /**
      * Returns true if form parameter settings are checked.
+     *
+     * @deprecated use WebForm#newUnvalidatedRequest() to obtain a request without parameter validation.
      **/
     public static boolean getParameterValuesValidated() {
         return _parameterValuesValidated;
@@ -230,6 +232,8 @@ public abstract class HttpUnitOptions {
      * <b>Note:</b> this only applies to a WebRequest created after this setting is changed. A request created
      * with this option disabled will not only not be checked for correctness, its parameter submission
      * order will not be guaranteed, and changing parameters will not trigger Javascript onChange / onClick events.
+     *
+     * @deprecated use WebForm#newUnvalidatedRequest() to obtain a request without parameter validation.
      **/
     public static void setParameterValuesValidated( boolean validated ) {
         _parameterValuesValidated = validated;

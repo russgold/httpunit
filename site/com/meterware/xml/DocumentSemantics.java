@@ -106,7 +106,7 @@ public class DocumentSemantics {
             Object subElement = method.invoke( elementObject, NO_ARGS );
             interpretNode( child, subElement );
         } catch (NoSuchMethodException e) {
-            setContentsAsProperty( elementObject, beanInfo, child, child.getNodeName() );
+            setContentsAsProperty( elementObject, beanInfo, child, toPropertyName( child.getNodeName() ) );
         } catch (SecurityException e) {
             e.printStackTrace();  //To change body of catch statement use Options | File Templates.
         }

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -333,8 +333,8 @@ public class WebRequest {
     /**
      * Constructs a web request from a form.
      **/
-    protected WebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
-        this( sourceForm );
+    protected WebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
+        this( sourceForm, parameterHolder );
         if (button != null && button.isImageButton() && button.getName().length() > 0) {
             _button = button;
             _parameterHolder.selectImageButtonPosition( _button, x, y );
@@ -342,14 +342,14 @@ public class WebRequest {
     }
 
 
-    protected WebRequest( WebRequestSource requestSource ) {
-        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getPageFrame(), requestSource.getTarget(), newParameterHolder( requestSource ) );
+    protected WebRequest( WebRequestSource requestSource, ParameterHolder parameterHolder ) {
+        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getPageFrame(), requestSource.getTarget(), parameterHolder );
         _webRequestSource = requestSource;
         setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
     }
 
 
-    private static ParameterHolder newParameterHolder( WebRequestSource requestSource ) {
+    static ParameterHolder newParameterHolder( WebRequestSource requestSource ) {
         if (HttpUnitOptions.getParameterValuesValidated()) {
             return requestSource;
         } else {

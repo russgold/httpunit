@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -262,7 +262,39 @@ public class WebForm extends WebRequestSource {
         if (getMethod().equalsIgnoreCase( "post" )) {
             return new PostMethodWebRequest( this, button, x, y );
         } else {
-            return new GetMethodWebRequest( this, button, x, y );
+            return new GetMethodWebRequest( this, WebRequest.newParameterHolder( this ), button, x, y );
+        }
+    }
+
+
+    /**
+     * Creates and returns a web request which includes the specified button. If no button is specified, will include
+     * the default button, if any. No parameter validation will be done on the returned request and no scripts
+     * will be run when it is submitted.
+     **/
+    public WebRequest newUnvalidatedRequest( SubmitButton button ) {
+        return newUnvalidatedRequest( button, 0, 0 );
+    }
+
+
+    /**
+     * Creates and returns a web request which includes the specified button and position. If no button is specified,
+     * will include the default button, if any. No parameter validation will be done on the returned request
+     * and no scripts will be run when it is submitted.
+     **/
+    public WebRequest newUnvalidatedRequest( SubmitButton button, int x, int y ) {
+        if (button == null) button = getDefaultButton();
+
+        SubmitButton[] buttons = getSubmitButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setPressed( false );
+        }
+        button.setPressed( true );
+
+        if (getMethod().equalsIgnoreCase( "post" )) {
+            return new PostMethodWebRequest( this, new UncheckedParameterHolder( this ), button, x, y );
+        } else {
+            return new GetMethodWebRequest( this, new UncheckedParameterHolder( this ), button, x, y );
         }
     }
 
@@ -441,6 +473,15 @@ public class WebForm extends WebRequestSource {
      **/
     public WebRequest getRequest() {
         return getRequest( (SubmitButton) null );
+    }
+
+
+    /**
+     * Creates and returns a web request based on the current state of this form. No parameter validation will be done
+     * and there is no guarantee over the order of parameters transmitted.
+     */
+    public WebRequest newUnvalidatedRequest() {
+        return newUnvalidatedRequest( (SubmitButton) null );
     }
 
 

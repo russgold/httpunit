@@ -318,13 +318,12 @@ public class FormSubmitTest extends HttpUnitTest {
 
 
     public void testImageButtonNoValueUncheckedPositionalSubmit() throws Exception {
-        HttpUnitOptions.setParameterValuesValidated( false );
         defineWebPage( "Default", "<form method='GET' action='test.jsp'>" +
                                   "<input type='image' src='image.gif' name='aButton'>" +
                                   "</form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
-        WebRequest request = form.getRequest( form.getSubmitButton( "aButton" ), 20, 5 );
+        WebRequest request = form.newUnvalidatedRequest( form.getSubmitButton( "aButton" ), 20, 5 );
         assertEqualQueries( getHostPath() + "/test.jsp?aButton.x=20&aButton.y=5", request.getURL().toExternalForm() );
     }
 
@@ -443,18 +442,18 @@ public class FormSubmitTest extends HttpUnitTest {
         WebForm otherForm = other.getForms()[0];
         WebForm wrongForm = wrong.getForms()[0];
 
-        HttpUnitOptions.setParameterValuesValidated( true );
         form.getRequest( otherForm.getSubmitButtons()[0] );
 
-        HttpUnitOptions.setParameterValuesValidated( false );
-        form.getRequest( wrongForm.getSubmitButtons()[0] );
-
-        HttpUnitOptions.setParameterValuesValidated( true );
         try {
             form.getRequest( wrongForm.getSubmitButtons()[0] );
             fail( "Failed to reject illegal button" );
         } catch (IllegalRequestParameterException e) {
         }
+
+        form.newUnvalidatedRequest( wrongForm.getSubmitButtons()[0] );
+
+        HttpUnitOptions.setParameterValuesValidated( false );
+        form.getRequest( wrongForm.getSubmitButtons()[0] );
     }
 
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -51,7 +51,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-    public void testChoiceParameterValidationBypass() throws Exception {
+    public void testChoiceParameterValidationBypassDeprecated() throws Exception {
         HttpUnitOptions.setParameterValuesValidated( false );
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
@@ -69,6 +69,23 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
+    public void testChoiceParameterValidationBypass() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                       "<Select name=colors><Option>blue<Option>red</Select>" +
+                                       "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
+                                       "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
+                                       "<Input type=submit name=submit value=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebRequest request = page.getForms()[0].newUnvalidatedRequest();
+        request.setParameter( "noSuchControl", "green" );
+        request.setParameter( "colors", "green" );
+        request.setParameter( "fish", "purple" );
+        request.setParameter( "media", "CDRom" );
+        request.setParameter( "colors", new String[] { "blue", "red" } );
+        request.setParameter( "fish", new String[] { "red", "pink" } );
+    }
+
+
     public void testChoiceParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
@@ -77,7 +94,6 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
-        HttpUnitOptions.setParameterValuesValidated( true );
         validateSetParameterRejected( request, "noSuchControl", "green", "setting of non-existent control" );
         validateSetParameterRejected( request, "colors", "green", "setting of undefined value" );
         validateSetParameterRejected( request, "fish", "snapper", "setting of display value" );
@@ -95,6 +111,23 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testTextParameterValidationBypass() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                       "<Input type=text name=color>" +
+                                       "<Input type=password name=password>" +
+                                       "<Input type=hidden name=secret>" +
+                                       "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebRequest request = page.getForms()[0].newUnvalidatedRequest();
+        request.setParameter( "color", "green" );
+        request.setParameter( "password", "purple" );
+        request.setParameter( "secret", "value" );
+        request.setParameter( "colors", new String[] { "blue", "red" } );
+        request.setParameter( "fish", new String[] { "red", "pink" } );
+        request.setParameter( "secret", new String[] { "red", "pink" } );
+    }
+
+
+    public void testTextParameterValidationBypassDeprecated() throws Exception {
         HttpUnitOptions.setParameterValuesValidated( false );
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
@@ -120,7 +153,6 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
-        HttpUnitOptions.setParameterValuesValidated( true );
         request.setParameter( "color", "green" );
         request.setParameter( "password", "purple" );
         request.setParameter( "secret", "value" );
@@ -142,7 +174,6 @@ public class FormParametersTest extends HttpUnitTest {
         assertTrue( "Should have called 'secret' hidden", form.isHiddenParameter( "secret") );
 
         WebRequest request = form.getRequest();
-        HttpUnitOptions.setParameterValuesValidated( true );
         validateSetParameterRejected( request, "secret", new String[] { "red" }, "setting hidden field to wrong value" );
 
         form.getScriptableObject().setParameterValue( "secret", "new" );
@@ -155,7 +186,6 @@ public class FormParametersTest extends HttpUnitTest {
                                   "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
-        HttpUnitOptions.setParameterValuesValidated( true );
         try {
             request.setParameter( "secret", "zork" );
             fail( "Should have rejected set of unknown parameter" );
@@ -173,7 +203,6 @@ public class FormParametersTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
-        HttpUnitOptions.setParameterValuesValidated( true );
 
         assertEquals( "Number of parameters named 'password'", 1, form.getNumTextParameters( "password" ) );
         assertEquals( "Number of parameters named 'color'", 2, form.getNumTextParameters( "color" ) );
@@ -186,6 +215,19 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testRadioButtonValidationBypass() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                       "<Input type=radio name=color value=red>" +
+                                       "<Input type=radio name=color value=blue>" +
+                                       "<Input type=radio name=color value=green>" +
+                                       "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebRequest request = page.getForms()[0].newUnvalidatedRequest();
+        request.setParameter( "color", "black" );
+        request.setParameter( "color", new String[] { "blue", "red" } );
+    }
+
+
+    public void testRadioButtonValidationBypassDeprecated() throws Exception {
         HttpUnitOptions.setParameterValuesValidated( false );
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=radio name=color value=red>" +
@@ -207,7 +249,6 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
-        HttpUnitOptions.setParameterValuesValidated( true );
         assertEquals( "color options", new String[] { "red", "blue", "green" }, page.getForms()[0].getOptionValues( "color" ) );
         assertEquals( "color names", new String[] { "Crimson", "Aquamarine", "Chartreuse" }, page.getForms()[0].getOptions( "color" ) );
         request.setParameter( "color", "red" );
@@ -217,7 +258,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-    public void testCheckboxValidationBypass() throws Exception {
+    public void testCheckboxValidationBypassDeprecated() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=checkbox name=use_color>" +
                                        "<Input type=checkbox name=color value=red>" +
@@ -226,6 +267,19 @@ public class FormParametersTest extends HttpUnitTest {
         HttpUnitOptions.setParameterValuesValidated( false );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
+        request.setParameter( "use_color", "red" );
+        request.setParameter( "color", "green" );
+    }
+
+
+    public void testCheckboxValidationBypass() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                       "<Input type=checkbox name=use_color>" +
+                                       "<Input type=checkbox name=color value=red>" +
+                                       "<Input type=checkbox name=color value=blue>" +
+                                       "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebRequest request = page.getForms()[0].newUnvalidatedRequest();
         request.setParameter( "use_color", "red" );
         request.setParameter( "color", "green" );
     }
@@ -389,8 +443,7 @@ public class FormParametersTest extends HttpUnitTest {
         WebRequest wr = form.getRequest();
         assertEquals( "File from validated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
 
-        HttpUnitOptions.setParameterValuesValidated( false );
-        wr = form.getRequest();
+        wr = form.newUnvalidatedRequest();
         assertEquals( "File from unvalidated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
     }
 

@@ -104,9 +104,8 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</p
                     hidden parameters directly, HttpUnit stops you from doing it in your code as part of its validation
                     of parameters against the form containing them. If you have to change these values, you have a couple of choices:
                     <ul><li>Rather than setting the parameters directly on the form, call
-                    <a href="api/com/meterware/httpunit/HttpUnitOptions.html#setParameterValuesValidated(boolean)">
-                    <code>HttpUnitOptions.setParameterValuesValidated( false )</code></a> and then call
-                    <a href="api/com/meterware/httpunit/WebForm.html#getRequest()"><code>WebForm.getRequest()</code></a>
+                    <a href="api/com/meterware/httpunit/WebForm.html#newUnvalidatedRequest()">
+                    <code>WebForm.newUnvalidatedRequest()</code></a>
                     (specifying any submit button information if necessary) to obtain a <tt>WebRequest</tt> copied from
                     the form but not tied to it. You will then be able to set any values you like in this request.
                     Note that parameter order is not guaranteed when such a request is submitted, nor are any JavaScript events fired.</li>
