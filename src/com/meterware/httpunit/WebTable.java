@@ -89,7 +89,6 @@ public class WebTable {
     /**
      * Returns the contents of the specified table cell with a given ID
      * @return TableCell with given ID or null if ID is not found.
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public TableCell getTableCellWithID( String id ) {
         if (_cells == null) readTable();

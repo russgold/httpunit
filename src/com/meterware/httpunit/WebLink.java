@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
 
 /**
  * This class represents a link in an HTML page. Users of this class may examine the
- * structure of the link (as a DOM), or create a {@tag WebRequest} to simulate clicking
+ * structure of the link (as a DOM), or create a {@link WebRequest} to simulate clicking
  * on the link.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
