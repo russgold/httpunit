@@ -8,9 +8,14 @@ o Support reset button detection
 o Support _new frame tag
 o Documentation, Documentation
 
+JavaScript priorities:
+o Document.write
+o JavaScript URLs
+o Form.onreset and Form.reset
+
 Possibles:
 o replace JTidy with a simpler custom parser
-o support JavaScript
+
 
 Low priority:
 o history on web conversation
