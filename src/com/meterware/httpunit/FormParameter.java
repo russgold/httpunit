@@ -30,7 +30,7 @@ import java.util.Arrays;
  * Represents the aggregate of all form controls with a particular name.  This permits us to abstract setting
  * values so that changing a control type does not break a test.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 class FormParameter {
 
@@ -46,7 +46,7 @@ class FormParameter {
         if (_name == null) _name = control.getName();
         if (!_name.equalsIgnoreCase( control.getName() )) throw new RuntimeException( "all controls should have the same name" );
         if (control.isExclusive()) {
-            getRadioGroup().addRadioButton( (RadioButtonFormControl) control );
+            getRadioGroup( control.getForm() ).addRadioButton( (RadioButtonFormControl) control );
         } else {
             _controlList.add( control );
         }
@@ -178,9 +178,9 @@ class FormParameter {
     }
 
 
-    private RadioGroupFormControl getRadioGroup() {
+    private RadioGroupFormControl getRadioGroup( WebForm form ) {
         if (_group == null) {
-            _group = new RadioGroupFormControl();
+            _group = new RadioGroupFormControl( form );
             _controlList.add( _group );
         }
         return _group;

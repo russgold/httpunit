@@ -41,10 +41,12 @@ import org.xml.sax.SAXException;
 /**
  * This class represents an HTML page returned from a request.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class HTMLPage extends ParsedHTML {
+
+    private Scriptable _scriptable;
 
 
     public HTMLPage( WebResponse response, URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
@@ -227,7 +229,11 @@ public class HTMLPage extends ParsedHTML {
 
 
     Scriptable getScriptableObject() {
-        return new Scriptable();
+        if (_scriptable == null) {
+            _scriptable = new Scriptable();
+            _scriptable.setScriptEngine( getResponse().getScriptableObject().getScriptEngine( _scriptable ) );
+        }
+        return _scriptable;
     }
 
 //---------------------------------- private members --------------------------------

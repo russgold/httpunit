@@ -1,5 +1,4 @@
 package com.meterware.httpunit.scripting;
-
 /********************************************************************************************************************
  * $Id$
  *
@@ -24,7 +23,7 @@ package com.meterware.httpunit.scripting;
 /**
  * An interface for objects which will be accessible via scripting.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 abstract public class ScriptableDelegate {
 
@@ -34,6 +33,7 @@ abstract public class ScriptableDelegate {
         public void executeScript( String script ) {}
         public boolean performEvent( String eventScript ) { return true; }
         public String getURLContents( String urlString ) { return null; }
+        public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
     };
 
 
@@ -98,6 +98,11 @@ abstract public class ScriptableDelegate {
 
     public ScriptingEngine getScriptEngine() {
         return _scriptEngine != null ? _scriptEngine : NULL_SCRIPT_ENGINE;
+    }
+
+
+    public ScriptingEngine getScriptEngine( ScriptableDelegate child ) {
+        return getScriptEngine().newScriptingEngine( child );
     }
 
 }

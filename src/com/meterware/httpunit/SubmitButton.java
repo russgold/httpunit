@@ -45,7 +45,7 @@ public class SubmitButton extends Button {
      * submits the form.
      */
     public void click() throws IOException, SAXException  {
-        if (doOnClickEvent()) _form.submit( this );
+        if (doOnClickEvent()) getForm().submit( this );
     }
 
 

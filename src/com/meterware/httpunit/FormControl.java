@@ -19,10 +19,7 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.SelectionOptions;
-import com.meterware.httpunit.scripting.SelectionOption;
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.*;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -39,6 +36,8 @@ import java.io.IOException;
 
 /**
  * Represents a control in an HTML form.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 abstract class FormControl {
 
@@ -51,11 +50,13 @@ abstract class FormControl {
     private final boolean _disabled;
     private final String  _onChangeEvent;
     private final String  _onClickEvent;
+    private final WebForm _form;
 
     private Scriptable _scriptable;
 
 
-    FormControl() {
+    FormControl( WebForm form ) {
+        _form           = form;
         _id             = "";
         _name           = "";
         _valueAttribute = "";
@@ -66,7 +67,8 @@ abstract class FormControl {
     }
 
 
-    FormControl( Node node ) {
+    FormControl( WebForm form, Node node ) {
+        _form           = form;
         _id             = NodeUtils.getNodeAttribute( node, "id" );
         _name           = NodeUtils.getNodeAttribute( node, "name" );
         _valueAttribute = NodeUtils.getNodeAttribute( node, "value" );
@@ -106,11 +108,19 @@ abstract class FormControl {
     }
 
 
+    final protected WebForm getForm() {
+        return _form;
+    }
+
+
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
     ScriptableDelegate getScriptableObject() {
-        if (_scriptable == null) _scriptable = newScriptable();
+        if (_scriptable == null) {
+            _scriptable = newScriptable();
+            _scriptable.setScriptEngine( getForm().getScriptableObject().getScriptEngine( _scriptable ) );
+        }
         return _scriptable;
     }
 
@@ -263,9 +273,9 @@ abstract class FormControl {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return null;
         } else if (node.getNodeName().equals( "textarea" )) {
-            return new TextAreaFormControl( node );
+            return new TextAreaFormControl( form, node );
         } else if (node.getNodeName().equals( "select" )) {
-            return new SelectionFormControl( node );
+            return new SelectionFormControl( form, node );
         } else if (node.getNodeName().equalsIgnoreCase( "button" )) {
             final String type = NodeUtils.getNodeAttribute( node, "type", "submit" );
             if (type.equalsIgnoreCase( "submit" )) {
@@ -280,13 +290,13 @@ abstract class FormControl {
         } else {
             final String type = NodeUtils.getNodeAttribute( node, "type", "text" );
             if (type.equalsIgnoreCase( "text" ) || type.equalsIgnoreCase( "password" )) {
-                return new TextFieldFormControl( node );
+                return new TextFieldFormControl( form, node );
             } else if (type.equalsIgnoreCase( "hidden" )) {
-                return new HiddenFieldFormControl( node );
+                return new HiddenFieldFormControl( form, node );
             } else if (type.equalsIgnoreCase( "radio" )) {
-                return new RadioButtonFormControl( node );
+                return new RadioButtonFormControl( form, node );
             } else if (type.equalsIgnoreCase( "checkbox" )) {
-                return new CheckboxFormControl( node );
+                return new CheckboxFormControl( form, node );
             } else if (type.equalsIgnoreCase( "submit" ) || type.equalsIgnoreCase( "image" )) {
                 return new SubmitButton( form, node );
             } else if (type.equalsIgnoreCase( "button" )) {
@@ -294,15 +304,15 @@ abstract class FormControl {
             } else if (type.equalsIgnoreCase( "reset" )) {
                 return new ResetButton( form, node );
             } else if (type.equalsIgnoreCase( "file" )) {
-                return new FileSubmitFormControl( node );
+                return new FileSubmitFormControl( form, node );
             } else {
-                return new TextFieldFormControl( node );
+                return new TextFieldFormControl( form, node );
             }
         }
     }
 
 
-    class Scriptable extends ScriptableDelegate implements NamedDelegate {
+    class Scriptable extends ScriptableDelegate implements Input {
 
         public String getName() {
             return FormControl.this.getName();
@@ -367,8 +377,8 @@ class BooleanFormControl extends FormControl {
         }
     }
 
-    public BooleanFormControl( Node node ) {
-        super( node );
+    public BooleanFormControl( WebForm form, Node node ) {
+        super( form, node );
         _isChecked      = _isCheckedDefault = NodeUtils.isNodeAttributePresent( node, "checked" );
     }
 
@@ -436,8 +446,8 @@ class BooleanFormControl extends FormControl {
 
 class RadioButtonFormControl extends BooleanFormControl {
 
-    public RadioButtonFormControl( Node node ) {
-        super( node );
+    public RadioButtonFormControl( WebForm form, Node node ) {
+        super( form, node );
     }
 
 
@@ -462,7 +472,8 @@ class RadioGroupFormControl extends FormControl {
     private String[] _allowedValues;
 
 
-    public RadioGroupFormControl() {
+    public RadioGroupFormControl( WebForm form ) {
+        super( form );
     }
 
 
@@ -560,8 +571,8 @@ class RadioGroupFormControl extends FormControl {
 class CheckboxFormControl extends BooleanFormControl {
 
 
-    public CheckboxFormControl( Node node ) {
-        super( node );
+    public CheckboxFormControl( WebForm form, Node node ) {
+        super( form, node );
     }
 
 
@@ -609,8 +620,8 @@ class TextFormControl extends FormControl {
     private String[]   _defaultValue;
 
 
-    public TextFormControl( Node node, String defaultValue ) {
-        super( node );
+    public TextFormControl( WebForm form, Node node, String defaultValue ) {
+        super( form, node );
         _defaultValue = new String[] { defaultValue };
     }
 
@@ -693,16 +704,16 @@ class TextFormControl extends FormControl {
 
 
 class TextFieldFormControl extends TextFormControl {
-    public TextFieldFormControl( Node node ) {
-        super( node, NodeUtils.getNodeAttribute( node, "value" ) );
+    public TextFieldFormControl( WebForm form, Node node ) {
+        super( form, node, NodeUtils.getNodeAttribute( node, "value" ) );
     }
 
 }
 
 
 class HiddenFieldFormControl extends TextFieldFormControl {
-    public HiddenFieldFormControl( Node node ) {
-        super( node );
+    public HiddenFieldFormControl( WebForm form, Node node ) {
+        super( form, node );
     }
 
 
@@ -719,8 +730,8 @@ class HiddenFieldFormControl extends TextFieldFormControl {
 
 class TextAreaFormControl extends TextFormControl {
 
-    public TextAreaFormControl( Node node ) {
-        super( node, getDefaultValue( node ) );
+    public TextAreaFormControl( WebForm form, Node node ) {
+        super( form, node, getDefaultValue( node ) );
 
         if (!node.getNodeName().equalsIgnoreCase( "textarea" )) {
             throw new RuntimeException( "Not a textarea element" );
@@ -740,8 +751,8 @@ class FileSubmitFormControl extends FormControl {
     private UploadFileSpec _fileToUpload;
 
 
-    public FileSubmitFormControl( Node node ) {
-        super( node );
+    public FileSubmitFormControl( WebForm form, Node node ) {
+        super( form, node );
     }
 
 
@@ -790,8 +801,8 @@ class SelectionFormControl extends FormControl {
     private Options _selectionOptions;
 
 
-    SelectionFormControl( Node node ) {
-        super( node );
+    SelectionFormControl( WebForm form, Node node ) {
+        super( form, node );
         if (!node.getNodeName().equalsIgnoreCase( "select" )) throw new RuntimeException( "Not a select element" );
 
         _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );

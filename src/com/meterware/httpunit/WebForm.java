@@ -39,6 +39,8 @@ import org.xml.sax.SAXException;
  * This class represents a form in an HTML page. Users of this class may examine the parameters
  * defined for the form, the structure of the form (as a DOM), or the text of the form. They
  * may also create a {@link WebRequest} to simulate the submission of the form.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class WebForm extends WebRequestSource {
     private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
@@ -347,7 +349,10 @@ public class WebForm extends WebRequestSource {
      * Returns an object which provides scripting access to this form.
      **/
     public Scriptable getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
+        if (_scriptable == null) {
+            _scriptable = new Scriptable();
+            _scriptable.setScriptEngine( getBaseResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
+        }
         return _scriptable;
     }
 
@@ -427,7 +432,7 @@ public class WebForm extends WebRequestSource {
      * Records a parameter defined by including it in the destination URL.
      **/
     protected void addPresetParameter( String name, String value ) {
-        _presets.add( new PresetFormParameter( name, value ) );
+        _presets.add( new PresetFormParameter( this, name, value ) );
     }
 
 
@@ -796,7 +801,8 @@ public class WebForm extends WebRequestSource {
 
     class PresetFormParameter extends FormControl {
 
-        PresetFormParameter( String name, String value ) {
+        PresetFormParameter( WebForm form, String name, String value ) {
+            super( form );
             _name   = name;
             _value  = value;
         }

@@ -31,18 +31,16 @@ import org.xml.sax.SAXException;
  **/
 public class Button extends FormControl {
 
-    protected final WebForm  _form;
     private String _onClickEvent = "";
 
 
     Button( WebForm form ) {
-        _form = form;
+        super( form );
     }
 
 
     Button( WebForm form, Node node ) {
-        super( node );
-        _form = form;
+        super( form, node );
         _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
     }
 
@@ -67,12 +65,6 @@ public class Button extends FormControl {
     final
     protected boolean doOnClickEvent() {
         return _onClickEvent.length() == 0 || getScriptableObject().doEvent( _onClickEvent );
-    }
-
-
-    final
-    protected WebForm getForm() {
-        return _form;
     }
 
 

@@ -21,11 +21,7 @@ package com.meterware.httpunit.javascript;
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
-import com.meterware.httpunit.scripting.ScriptingEngine;
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-import com.meterware.httpunit.scripting.SelectionOption;
-import com.meterware.httpunit.scripting.SelectionOptions;
-import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -38,7 +34,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class JavaScript {
 
@@ -170,7 +166,7 @@ public class JavaScript {
 
 
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
-                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+                throws SAXException, PropertyException, JavaScriptException, NotAFunctionException {
             _scriptable = scriptable;
             _scriptable.setScriptEngine( this );
             if (parent != null) setParentScope( parent );
@@ -250,22 +246,47 @@ public class JavaScript {
         }
 
 
-        /**
-         * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
-         **/
-        final Scriptable toScriptable( ScriptableDelegate delegate )
-                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
-            if (delegate.getScriptEngine() instanceof Scriptable) {
-                return (Scriptable) delegate.getScriptEngine();
-            } else {
-                JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
-                element.initialize( this, delegate );
-                return element;
+        public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) {
+            try {
+//            return (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( child ) );
+                return (ScriptingEngine) toScriptable( child );
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException( e.toString() );
             }
         }
 
 
-        protected String getScriptableClassName( ScriptableDelegate delegate ) {
+        /**
+         * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
+         **/
+        final Scriptable toScriptable( ScriptableDelegate delegate ) {
+            if (delegate.getScriptEngine() instanceof Scriptable) {
+                return (Scriptable) delegate.getScriptEngine();
+            } else {
+                try {
+                    JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
+                    element.initialize( this, delegate );
+                    return element;
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new RhinoException( e );
+                }
+            }
+        }
+
+
+        private String getScriptableClassName( ScriptableDelegate delegate ) {
+            if (delegate instanceof WebResponse.Scriptable) return "Window";
+            if (delegate instanceof HTMLPage.Scriptable) return "Document";
+            if (delegate instanceof WebForm.Scriptable) return "Form";
+            if (delegate instanceof WebLink.Scriptable) return "Link";
+            if (delegate instanceof WebImage.Scriptable) return "Image";
+            if (delegate instanceof SelectionOptions) return "Options";
+            if (delegate instanceof SelectionOption) return "Option";
+            if (delegate instanceof Input) return "Control";
+
             throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
         }
 
@@ -296,6 +317,9 @@ public class JavaScript {
 
 
         public Document jsGet_document() {
+            if (_document == null) {
+                _document = (Document) toScriptable( getDelegate().getDocument() );
+            }
             return _document;
         }
 
@@ -327,8 +351,6 @@ public class JavaScript {
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
-            _document = (Document) Context.getCurrentContext().newObject( this, "Document" );
-            _document.initialize( this, getDelegate().getDocument() );
 
             _navigator = (Navigator) Context.getCurrentContext().newObject( this, "Navigator" );
             _navigator.setClientProperties( getDelegate().getClientProperties() );
@@ -383,11 +405,6 @@ public class JavaScript {
         }
 
 
-        protected String getScriptableClassName( ScriptableDelegate delegate ) {
-            return (delegate instanceof WebResponse.Scriptable) ? "Window" : super.getScriptableClassName( delegate );
-        }
-
-
         private WebResponse.Scriptable getDelegate() {
             return (WebResponse.Scriptable) _scriptable;
         }
@@ -406,78 +423,59 @@ public class JavaScript {
         }
 
 
-        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
-                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
-            super.initialize( parent, scriptable );
-            initializeLinks();
-            initializeForms();
-            initializeImages();
-        }
-
-
         public String jsGet_title() throws SAXException {
             return getDelegate().getTitle();
         }
 
 
-        public Scriptable jsGet_images() {
+        public Scriptable jsGet_images() throws SAXException{
+            if (_images == null) initializeImages();
             return _images;
         }
 
 
-        public Scriptable jsGet_links() {
+        public Scriptable jsGet_links() throws SAXException {
+            if (_links == null) initializeLinks();
             return _links;
         }
 
 
-        public Scriptable jsGet_forms() {
+        public Scriptable jsGet_forms() throws SAXException {
+            if (_forms == null) initializeForms();
             return _forms;
         }
 
 
-        private void initializeImages() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+        private void initializeImages() throws SAXException {
             WebImage.Scriptable scriptables[] = getDelegate().getImages();
             Image[] images = new Image[ scriptables.length ];
             for (int i = 0; i < images.length; i++) {
                 images[ i ] = (Image) toScriptable( scriptables[ i ] );
             }
-            _images = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _images = ElementArray.newElementArray( this );
             _images.initialize( images );
         }
 
 
-        private void initializeLinks() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+        private void initializeLinks() throws SAXException {
             WebLink.Scriptable scriptables[] = getDelegate().getLinks();
             Link[] links = new Link[ scriptables.length ];
             for (int i = 0; i < links.length; i++) {
                 links[ i ] = (Link) toScriptable( scriptables[ i ] );
             }
-            _links = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _links = ElementArray.newElementArray( this );
             _links.initialize( links );
         }
 
 
-        private void initializeForms() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+        private void initializeForms() throws SAXException {
             WebForm.Scriptable scriptables[] = getDelegate().getForms();
             Form[] forms = new Form[ scriptables.length ];
             for (int i = 0; i < forms.length; i++) {
                 forms[ i ] = (Form) toScriptable( scriptables[ i ] );
             }
-            _forms = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _forms = ElementArray.newElementArray( this );
             _forms.initialize( forms );
-        }
-
-
-        protected String getScriptableClassName( ScriptableDelegate delegate ) {
-            if (delegate instanceof WebForm.Scriptable) {
-                return "Form";
-            } else if (delegate instanceof WebLink.Scriptable) {
-                return "Link";
-            } else if (delegate instanceof WebImage.Scriptable) {
-                return "Image";
-            } else {
-                return super.getScriptableClassName( delegate );
-            }
         }
 
 
@@ -573,6 +571,19 @@ public class JavaScript {
         private JavaScriptEngine _contents[] = new HTMLElement[0];
 
 
+        static ElementArray newElementArray( Scriptable parent ) {
+            try {
+                return (ElementArray) Context.getCurrentContext().newObject( parent, "ElementArray" );
+            } catch (PropertyException e) {
+                throw new RhinoException( e );
+            } catch (NotAFunctionException e) {
+                throw new RhinoException( e );
+            } catch (JavaScriptException e) {
+                throw new RhinoException( e );
+            }
+        }
+
+
         public ElementArray() {
         }
 
@@ -660,11 +671,6 @@ public class JavaScript {
         }
 
 
-        protected String getScriptableClassName( ScriptableDelegate delegate ) {
-            return "Control";
-        }
-
-
         public String jsGet_action() {
             return getDelegate().getAction();
         }
@@ -739,10 +745,6 @@ public class JavaScript {
         }
 
 
-        protected String getScriptableClassName( ScriptableDelegate delegate ) {
-            return (delegate instanceof SelectionOptions) ? "Options" : super.getScriptableClassName( delegate );
-        }
-
     }
 
 
@@ -779,9 +781,6 @@ public class JavaScript {
         }
 
 
-        protected String getScriptableClassName( ScriptableDelegate delegate ) {
-            return "Option";
-        }
     }
 
 
@@ -843,4 +842,20 @@ public class JavaScript {
         }
     }
 
+}
+
+
+class RhinoException extends RuntimeException {
+
+    private Exception _cause;
+
+
+    public RhinoException( Exception cause ) {
+        _cause = cause;
+    }
+
+
+    public String getMessage() {
+        return "Rhino exception: " + _cause;
+    }
 }

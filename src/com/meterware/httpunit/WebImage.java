@@ -28,8 +28,9 @@ import org.w3c.dom.Node;
 
 
 /**
+ * Represents an image in an HTML document.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class WebImage extends FixedURLWebRequestSource {
 
@@ -83,7 +84,10 @@ public class WebImage extends FixedURLWebRequestSource {
      * Returns an object which provides scripting access to this link.
      **/
     public Scriptable getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
+        if (_scriptable == null) {
+            _scriptable = new Scriptable();
+            _scriptable.setScriptEngine( getBaseResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
+        }
         return _scriptable;
     }
 

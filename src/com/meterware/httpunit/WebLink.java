@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  * structure of the link (as a DOM), or create a {@link WebRequest} to simulate clicking
  * on the link.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
  **/
 public class WebLink extends FixedURLWebRequestSource {
@@ -157,7 +157,10 @@ public class WebLink extends FixedURLWebRequestSource {
      * Returns an object which provides scripting access to this link.
      **/
     Scriptable getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
+        if (_scriptable == null) {
+            _scriptable = new Scriptable();
+            _scriptable.setScriptEngine( getBaseResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
+        }
         return _scriptable;
     }
 

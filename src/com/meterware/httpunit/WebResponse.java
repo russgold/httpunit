@@ -560,8 +560,12 @@ public class WebResponse implements HTMLSegment {
         }
 
 
-        public HTMLPage.Scriptable getDocument() throws SAXException {
-            return getReceivedPage().getScriptableObject();
+        public HTMLPage.Scriptable getDocument() {
+            try {
+                return getReceivedPage().getScriptableObject();
+            } catch (SAXException e) {
+                throw new RuntimeException( e.toString() );
+            }
         }
 
 

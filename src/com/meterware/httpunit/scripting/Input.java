@@ -19,36 +19,19 @@ package com.meterware.httpunit.scripting;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
-
 /**
+ * An interface for scriptable delegates which represent form controls.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface ScriptingEngine {
+public interface Input extends NamedDelegate {
+
+    String getName();
 
 
-    /**
-     * Interprets the specified script, which may include global function definitions.
-     */
-    public void executeScript( String script );
+    Object get( String propertyName );
 
 
-    /**
-     * Interprets the specified script and returns a boolean result.
-     */
-    public boolean performEvent( String eventScript );
-
-
-    /**
-     * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
-     */
-    public String getURLContents( String urlString );
-
-
-    /**
-     * Returns a new scripting engine for the specified delegate.
-     */
-    public ScriptingEngine newScriptingEngine( ScriptableDelegate child );
+    void set( String propertyName, Object value );
 
 }
