@@ -50,7 +50,7 @@ public class ServletRunner {
     }
 
     /**
-     * Constructor which expects the full path to the web.xml for the 
+     * Constructor which expects the full path to the web.xml for the
      * application.
      *
      * @param webXMLFileSpec the full path to the web.xml file
@@ -62,7 +62,7 @@ public class ServletRunner {
 
 
     /**
-     * Constructor which expects the full path to the web.xml for the 
+     * Constructor which expects the full path to the web.xml for the
      * application and a context path under which to mount it.
      *
      * @param webXMLFileSpec the full path to the web.xml file
@@ -100,7 +100,7 @@ public class ServletRunner {
 
 
     private void completeInitialization( String contextPath ) {
-        _context = new ServletUnitContext( contextPath );
+        _context = new ServletUnitContext( contextPath, _application );
         _application.registerServlet( "*.jsp", _jspServletDescriptor.getClassName(), _jspServletDescriptor.getInitializationParameters( null, null ) );
     }
 

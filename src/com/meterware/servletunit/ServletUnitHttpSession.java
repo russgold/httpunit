@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003 Russell Gold
+* Copyright (c) 2000-2004 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -33,6 +33,14 @@ class ServletUnitHttpSession implements HttpSession {
 
 
     final static public String SESSION_COOKIE_NAME = "JSESSION";
+
+
+    private SessionListenerDispatcher _listenerDispatcher;
+
+
+    public ServletUnitHttpSession( SessionListenerDispatcher listenerDispatcher ) {
+        _listenerDispatcher = listenerDispatcher;
+    }
 
 
     /**
@@ -104,6 +112,7 @@ class ServletUnitHttpSession implements HttpSession {
      * Invalidates this session and unbinds any objects bound to it.
      **/
     public void invalidate() {
+        _listenerDispatcher.sendSessionDestroyed( this );
         _invalid = true;
         _values.clear();
     }

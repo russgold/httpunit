@@ -29,6 +29,7 @@ Problems fixed:
 Additions:
     1. Patch #890995 - Implemented ServletUnitHttpResponse.containsHeader
     2. Patch #890936 - Added ServletContextListener support
+    3. Added HttpSessionListener support
 
  4-Dec-2003
 Acknowledgements:

@@ -31,9 +31,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -178,6 +176,44 @@ public class WebXMLTest extends EventAwareTestCase {
             if (!(eventObject instanceof ServletContextEvent)) fail( "Event " + eventLabel + " did not include a servlet context event" );
         }
     }
+
+
+    public void testSessionLifecycleListeners() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        EventVerifier verifyContext = new HttpSessionEventVerifier();
+
+        wxs.addContextListener( ListenerClass3.class );
+        wxs.addContextListener( ListenerClass4.class );
+
+        clearEvents();
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+
+        ServletUnitClient client = sr.newClient();
+        InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+        verifyEvents();
+
+        expectEvent( "created", ListenerClass3.class, verifyContext );
+        expectEvent( "created", ListenerClass4.class );
+        HttpSession session = ic.getRequest().getSession();
+        verifyEvents();
+
+        expectEvent( "destroyed", ListenerClass3.class, verifyContext );
+        expectEvent( "destroyed", ListenerClass4.class );
+        session.invalidate();
+        verifyEvents();
+
+        sr.shutDown();
+    }
+
+
+    static class HttpSessionEventVerifier implements EventVerifier {
+
+        public void verifyEvent( String eventLabel, Object eventObject ) {
+            if (!(eventObject instanceof HttpSessionEvent)) fail( "Event " + eventLabel + " did not include an http session event" );
+        }
+    }
+
 
 
     private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException, ParserConfigurationException  {
@@ -434,11 +470,18 @@ public class WebXMLTest extends EventAwareTestCase {
         public void contextInitialized( ServletContextEvent event ) { sendEvent( "startup", this, event ); }
 
         public void contextDestroyed( ServletContextEvent event ) { sendEvent( "shutdown", this, event ); }
+
+        public void sessionCreated( HttpSessionEvent event ) { sendEvent( "created", this, event ); }
+
+        public void sessionDestroyed( HttpSessionEvent event ) { sendEvent( "destroyed", this, event ); }
     }
 
 
     static class ListenerClass1 extends EventDispatcher implements ServletContextListener {}
     static class ListenerClass2 extends EventDispatcher implements ServletContextListener {}
+
+    static class ListenerClass3 extends EventDispatcher implements HttpSessionListener {}
+    static class ListenerClass4 extends EventDispatcher implements HttpSessionListener {}
 
 }
 

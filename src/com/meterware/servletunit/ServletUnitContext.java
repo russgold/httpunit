@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -21,24 +21,34 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 
 
+import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.Hashtable;
 
 class ServletUnitContext {
 
+    private SessionListenerDispatcher _listenerDispatcher;
+
+
     ServletUnitContext() {
-        this( null );
+        this( null, new SessionListenerDispatcher() {
+            public void sendSessionCreated( HttpSession session ) {}
+            public void sendSessionDestroyed( HttpSession session ) {}
+        } );
     }
 
-    ServletUnitContext( String contextPath ) {
+
+    ServletUnitContext( String contextPath, SessionListenerDispatcher dispatcher ) {
         _contextPath = (contextPath != null ? contextPath : "");
+        _listenerDispatcher = dispatcher;
     }
 
 
 	Set getSessionIDs() {
 		return _sessions.keySet();
 	}
-	
+
+
     /**
      * Returns the session with the specified ID, if any.
      **/
@@ -51,8 +61,9 @@ class ServletUnitContext {
      * Creates a new session with a unique ID.
      **/
     ServletUnitHttpSession newSession() {
-        ServletUnitHttpSession result = new ServletUnitHttpSession();
+        ServletUnitHttpSession result = new ServletUnitHttpSession( _listenerDispatcher );
         _sessions.put( result.getId(), result );
+        _listenerDispatcher.sendSessionCreated( result );
         return result;
     }
 

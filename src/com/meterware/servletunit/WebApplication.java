@@ -29,9 +29,7 @@ import java.net.URL;
 import java.util.*;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,7 +46,7 @@ import org.xml.sax.SAXException;
  * @author <a href="balld@webslingerZ.com">Donald Ball</a>
  * @author <a href="jaydunning@users.sourceforge.net">Jay Dunning</a>
  **/
-class WebApplication {
+class WebApplication implements SessionListenerDispatcher {
 
     private final static SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
 
@@ -62,6 +60,8 @@ class WebApplication {
     private ArrayList _securityConstraints = new ArrayList();
 
     private ArrayList _contextListeners = new ArrayList();
+
+    private ArrayList _sessionListeners = new ArrayList();
 
     private boolean _useBasicAuthentication;
 
@@ -117,25 +117,24 @@ class WebApplication {
         extractSecurityConstraints( document );
         extractContextParameters( document );
         extractLoginConfiguration( document );
-        extractContextListeners( document );
+        extractListeners( document );
         notifyContextInitialized();
         _servletMapping.autoLoadServlets();
     }
 
 
-     private void extractContextListeners( Document document ) throws SAXException {
-         ServletContextListener listener;
+     private void extractListeners( Document document ) throws SAXException {
          NodeList nl = document.getElementsByTagName( "listener" );
          for (int i = 0; i < nl.getLength(); i++) {
              String listenerName = getChildNodeValue((Element) nl.item(i), "listener-class").trim();
              try {
-                 listener = (ServletContextListener) Class.forName(listenerName).newInstance();
-             } catch (Exception x) {
-                 throw new RuntimeException("Unable to load context listener " + listenerName, x);
-             } catch (Error x) {
+                 Object listener = Class.forName( listenerName ).newInstance();
+
+                 if (listener instanceof ServletContextListener) _contextListeners.add( listener );
+                 if (listener instanceof HttpSessionListener) _sessionListeners.add( listener );
+             } catch (Throwable x) {
                  throw new RuntimeException("Unable to load context listener " + listenerName, x);
              }
-             _contextListeners.add(listener);
          }
      }
 
@@ -307,8 +306,30 @@ class WebApplication {
         return _contextParameters;
     }
 
+//---------------------------------------- SessionListenerDispatcher methods -------------------------------------------
 
-//------------------------------------------------ private members ---------------------------------------------
+
+    public void sendSessionCreated( HttpSession session ) {
+        HttpSessionEvent event = new HttpSessionEvent( session );
+
+        for (Iterator i = _sessionListeners.iterator(); i.hasNext();) {
+            HttpSessionListener listener = (HttpSessionListener) i.next();
+            listener.sessionCreated( event );
+        }
+    }
+
+
+    public void sendSessionDestroyed( HttpSession session ) {
+        HttpSessionEvent event = new HttpSessionEvent( session );
+
+        for (Iterator i = _sessionListeners.iterator(); i.hasNext();) {
+            HttpSessionListener listener = (HttpSessionListener) i.next();
+            listener.sessionDestroyed( event );
+        }
+    }
+
+
+//--------------------------------------------------- private members --------------------------------------------------
 
 
     private void extractLoginConfiguration( Document document ) throws MalformedURLException, SAXException {
