@@ -58,8 +58,15 @@ class WebFrame {
 
 
     static String getTargetFrameName( String sourceFrameName, final String relativeName ) {
+        if (relativeName.equalsIgnoreCase( "_parent" )) return getParentFrameName( sourceFrameName );
         if (sourceFrameName.indexOf( ':' ) < 0) return relativeName;
-        return sourceFrameName.substring( 0, sourceFrameName.lastIndexOf( ':' ) ) + ':' + relativeName;
+        return getParentFrameName( sourceFrameName ) + ':' + relativeName;
+    }
+
+
+    static String getParentFrameName( String parentFrameName ) {
+        if (parentFrameName.indexOf( ':' ) < 0) return WebRequest.TOP_FRAME;
+        return parentFrameName.substring( 0, parentFrameName.lastIndexOf( ':' ) );
     }
 
 

@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -37,8 +37,8 @@ public class WebFrameTest extends HttpUnitTest {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-    
-    
+
+
     public static Test suite() {
         return new TestSuite( WebFrameTest.class );
     }
@@ -84,9 +84,18 @@ public class WebFrameTest extends HttpUnitTest {
 
     public void testFrameNames() throws Exception {
         WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
-        assertMatchingSet( "frame set names", 
+        assertMatchingSet( "frame set names",
                            new String[] { "red", "blue" },
                            response.getFrameNames() );
+    }
+
+
+    public void testParentTarget() throws Exception {
+        defineWebPage( "Target",  "This is another page with <a href=Form.html target='_parent'>one link</a>" );
+        _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse resp = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
+        resp = _wc.getResponse( resp.getLinks()[0].getRequest() );
+        assertMatchingSet( "Frames after third response", new String[] { "_top" }, _wc.getFrameNames() );
     }
 
 
@@ -121,7 +130,7 @@ public class WebFrameTest extends HttpUnitTest {
     public void testFrameURLBase() throws Exception {
         defineWebPage( "Deeper/Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
         defineWebPage( "Deeper/Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );
-        defineWebPage( "Deeper/Form",    "This is a page with a simple form: " + 
+        defineWebPage( "Deeper/Form",    "This is a page with a simple form: " +
                                   "<form action=submit><input name=name><input type=submit></form>" +
                                   "<a href=Linker.html target=red>a link</a>");
         defineResource( "Frames.html",
@@ -174,7 +183,7 @@ public class WebFrameTest extends HttpUnitTest {
     public void testUnnamedFrames() throws Exception {
         defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
         defineWebPage( "Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );
-        defineWebPage( "Form",    "This is a page with a simple form: " + 
+        defineWebPage( "Form",    "This is a page with a simple form: " +
                                   "<form action=submit><input name=name><input type=submit></form>" +
                                   "<a href=Linker.html target=red>a link</a>");
         defineResource( "Frames.html",
@@ -317,8 +326,8 @@ public class WebFrameTest extends HttpUnitTest {
         assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
     }
-    
-    
+
+
     public void testSelfTargetForm() throws Exception {
         defineWebPage( "Linker",  "<form action=redirect.html target=_self><input type=text name=sample value=z></form>" );
         defineResource( "redirect.html?sample=z", "", HttpURLConnection.HTTP_MOVED_PERM );
@@ -335,11 +344,11 @@ public class WebFrameTest extends HttpUnitTest {
     public void testSubFrameRedirect() throws Exception {
         defineResource( "Linker.html", "", HttpURLConnection.HTTP_MOVED_PERM );
         addResourceHeader( "Linker.html", "Location: " + getHostPath() + "/Target.html" );
-                        
+
         _wc.getResponse( getHostPath() + "/Frames.html" );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assertTrue( "Did not redirect", _wc.getFrameContents( "red" ).getURL().toExternalForm().endsWith( "Target.html" ) );
-        
+
     }
 
 
