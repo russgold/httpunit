@@ -49,6 +49,8 @@ public class DocumentSemantics {
     public static void build( Document document, Object documentRoot, String documentName ) {
         try {
             interpretNode( getRootNode( document ), documentRoot );
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException( "Error interpreting document: " + documentName + ": " + e.getTargetException() );
         } catch (Exception e) {
             throw new RuntimeException( "Error interpreting document: " + documentName + ": " + e );
         }
