@@ -262,6 +262,19 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    public void testUnsupportedEncoding() throws Exception {
+        defineResource( "SimplePage.html", "not much here" );
+        addResourceHeader( "SimplePage.html", "Content-type: text/plain; charset=BOGUS");
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Text", "not much here", simplePage.getText() );
+        assertEquals( "Character set", WebResponse.getDefaultEncoding(), simplePage.getCharacterSet() );
+    }
+
+
     public void testRefreshHeader() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title></head>\n" +

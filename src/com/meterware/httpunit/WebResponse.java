@@ -194,13 +194,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
     public String getCharacterSet() {
         if (_characterSet == null) {
             readContentTypeHeader();
-            if (_characterSet == null) _characterSet = getHeaderField( "Charset" );
-            if (_characterSet == null) _characterSet = HttpUnitOptions.getDefaultCharacterSet();
-            try {
-                "abcd".getBytes( _characterSet );
-            } catch (UnsupportedEncodingException e) {
-                _characterSet = getDefaultEncoding();
-            }
+            if (_characterSet == null) setCharacterSet( getHeaderField( "Charset" ) );
+            if (_characterSet == null) setCharacterSet( HttpUnitOptions.getDefaultCharacterSet() );
         }
         return _characterSet;
     }
@@ -900,12 +895,12 @@ public class WebResponse implements HTMLSegment, CookieSource {
                                                         : getHeaderField( "Content-type" );
         if (contentHeader == null) {
             _contentType = HttpUnitOptions.getDefaultContentType();
-            _characterSet = HttpUnitOptions.getDefaultCharacterSet();
+            setCharacterSet( HttpUnitOptions.getDefaultCharacterSet() );
             _contentHeader = _contentType + ";charset=" + _characterSet;
         } else {
             String[] parts = HttpUnitUtils.parseContentTypeHeader( contentHeader );
             _contentType = parts[0];
-            if (parts[1] != null) _characterSet = parts[1];
+            if (parts[1] != null) setCharacterSet( parts[1] );
         }
     }
 
@@ -962,6 +957,18 @@ public class WebResponse implements HTMLSegment, CookieSource {
             }
         }
         return (_defaultEncoding = System.getProperty( "file.encoding" ));
+    }
+
+
+    private void setCharacterSet( String characterSet ) {
+        if (characterSet == null) return;
+
+        try {
+            "abcd".getBytes( characterSet );
+            _characterSet = characterSet;
+        } catch (UnsupportedEncodingException e) {
+            _characterSet = getDefaultEncoding();
+        }
     }
 
 

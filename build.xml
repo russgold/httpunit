@@ -21,6 +21,7 @@
     <property name="build.dir" value="build" />
     <property name="build.classes" value="${build.dir}/classes" />
     <property name="test.classes" value="${build.dir}/testclasses" />
+    <property name="example.classes" value="${build.dir}/examples" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
 
     <property name="use.jtidy" value="" />
@@ -85,6 +86,21 @@
          <exclude name="**/NekoHTMLParser.java" unless="nekoHTML.present" />
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/javascript/*" unless="rhino.present" />
+    </javac>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Compiles the example code                                             -->
+<!--  ===================================================================  -->
+<target name="compile-examples" depends="compile">
+    <mkdir dir="${example.classes}" />
+    <javac srcdir="${examples.dir}" destdir="${example.classes}"
+           debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+         </classpath>
     </javac>
 </target>
 

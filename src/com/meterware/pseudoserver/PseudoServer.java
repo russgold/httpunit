@@ -208,7 +208,6 @@ public class PseudoServer {
                 if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     response.setResponse( resource.getResponseCode(), "" );
                 }
-                response.addHeader( "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
                 String[] headers = resource.getHeaders();
                 for (int i = 0; i < headers.length; i++) {
                     response.addHeader( headers[i] );

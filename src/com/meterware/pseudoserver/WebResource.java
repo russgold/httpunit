@@ -54,6 +54,7 @@ public class WebResource {
 
     public void addHeader( String header ) {
         _headers.addElement( header );
+        if (header.toLowerCase().startsWith( "content-type" )) _hasExplicitContentTypeHeader = true;
     }
 
 
@@ -87,8 +88,10 @@ public class WebResource {
 
 
     String[] getHeaders() {
-        String[] headers = new String[ _headers.size() ];
-        _headers.copyInto( headers );
+        final Vector effectiveHeaders = (Vector) _headers.clone();
+        if (!_hasExplicitContentTypeHeader) effectiveHeaders.add( getContentTypeHeader() );
+        String[] headers = new String[ effectiveHeaders.size() ];
+        effectiveHeaders.copyInto( headers );
         return headers;
     }
 
@@ -102,8 +105,8 @@ public class WebResource {
     }
 
 
-    String getContentType() {
-        return _contentType;
+    private String getContentTypeHeader() {
+        return "Content-type: " + _contentType + getCharacterSetParameter();
     }
 
 
@@ -147,6 +150,7 @@ public class WebResource {
     private boolean _sendCharacterSet;
     private String  _contentType = DEFAULT_CONTENT_TYPE;
     private String  _characterSet = DEFAULT_CHARACTER_SET;
+    private boolean _hasExplicitContentTypeHeader;
     private Vector  _headers = new Vector();
 }
 
