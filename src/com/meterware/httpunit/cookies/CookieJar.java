@@ -365,9 +365,9 @@ public class CookieJar {
 
 
         private int getDomainAttributeStatus( String domainAttribute, String sourceHost ) {
-            if (CookieProperties.isDomainMatchingStrict() && !domainAttribute.startsWith(".")) {
-                return CookieListener.DOMAIN_NO_STARTING_DOT;
-            } else if (domainAttribute.lastIndexOf('.') == 0) {
+            if (!domainAttribute.startsWith(".")) domainAttribute = '.' + domainAttribute;
+
+            if (domainAttribute.lastIndexOf('.') == 0) {
                 return CookieListener.DOMAIN_ONE_DOT;
             } else if (!sourceHost.endsWith( domainAttribute )) {
                 return CookieListener.DOMAIN_NOT_SOURCE_SUFFIX;

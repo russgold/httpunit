@@ -6,7 +6,7 @@ import java.util.Iterator;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2003, Russell Gold
+ * Copyright (c) 2003-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -46,21 +46,36 @@ public class CookieProperties {
     }
 
 
+    /**
+     * Returns true (the default) if cookies should be rejected if they specify a domain which is not a suffix
+     * of the host domain or does not contain all of the dots in that host domain name
+     * (see <a href="http://www.faqs.org/rfcs/rfc2965.html">RFC2965</a>).
+     */
     public static boolean isDomainMatchingStrict() {
         return _domainMatchingStrict;
     }
 
 
+    /**
+     * Specifies whether strict domain name matching must be followed.
+     */
     public static void setDomainMatchingStrict( boolean domainMatchingStrict ) {
         _domainMatchingStrict = domainMatchingStrict;
     }
 
 
+    /**
+     * Returns true (the default) if cookies should be rejected if they specify a path which is not a prefix
+     * of the request path (see <a href="http://www.faqs.org/rfcs/rfc2965.html">RFC2965</a>).
+     */
     public static boolean isPathMatchingStrict() {
         return _pathMatchingStrict;
     }
 
 
+    /**
+     * Specifies whether strict path name matching must be followed.
+     */
     public static void setPathMatchingStrict( boolean pathMatchingStrict ) {
         _pathMatchingStrict = pathMatchingStrict;
     }

@@ -2,7 +2,7 @@ package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -105,10 +105,10 @@ public class CookieTest extends TestCase {
 
 
     public void testCookieAcceptance() throws Exception {
-        checkAcceptance( 1, true, "www.meterware.com/servlets/special", null, null );
-        checkAcceptance( 2, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets" );
+        checkAcceptance( 1, true,  "www.meterware.com/servlets/special", null, null );
+        checkAcceptance( 2, true,  "www.meterware.com/servlets/special", ".meterware.com", "/servlets" );
         checkAcceptance( 3, false, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
-        checkAcceptance( 4, false, "www.meterware.com/servlets/special", "meterware.com", null );
+        checkAcceptance( 4, true,  "www.meterware.com/servlets/special", "meterware.com", null );
         checkAcceptance( 5, false, "www.meterware.com/servlets/special", "meterware", null );
         checkAcceptance( 6, false, "www.meterware.com/servlets/special", ".com", null );
         checkAcceptance( 7, false, "www.meterware.com/servlets/special", ".httpunit.org", null );
@@ -196,11 +196,10 @@ public class CookieTest extends TestCase {
         CookieProperties.setDomainMatchingStrict( false );
         checkAcceptance( 1, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
         checkAcceptance( 2, false, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
-        checkAcceptance( 3, true, "www.meterware.com/servlets/special", "meterware.com", "/servlets/special" );
 
         CookieProperties.setPathMatchingStrict( false );
-        checkAcceptance( 4, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
-        checkMatching( 5, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
+        checkAcceptance( 3, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkMatching( 4, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
     }
 
 
@@ -210,10 +209,9 @@ public class CookieTest extends TestCase {
 
         checkCallback( listener, 1, 0, "www.meterware.com/servlets/special", null, null );
         checkCallback( listener, 2, CookieListener.PATH_NOT_PREFIX, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
-        checkCallback( listener, 3, CookieListener.DOMAIN_NO_STARTING_DOT, "www.meterware.com/servlets/special", "meterware.com", null );
-        checkCallback( listener, 4, CookieListener.DOMAIN_ONE_DOT, "www.meterware.com/servlets/special", ".com", null );
-        checkCallback( listener, 5, CookieListener.DOMAIN_NOT_SOURCE_SUFFIX, "www.meterware.com/servlets/special", ".httpunit.org", null );
-        checkCallback( listener, 6, CookieListener.DOMAIN_TOO_MANY_LEVELS, "www.some.meterware.com/servlets/special", ".meterware.com", null );
+        checkCallback( listener, 3, CookieListener.DOMAIN_ONE_DOT, "www.meterware.com/servlets/special", ".com", null );
+        checkCallback( listener, 4, CookieListener.DOMAIN_NOT_SOURCE_SUFFIX, "www.meterware.com/servlets/special", ".httpunit.org", null );
+        checkCallback( listener, 5, CookieListener.DOMAIN_TOO_MANY_LEVELS, "www.some.meterware.com/servlets/special", ".meterware.com", null );
     }
 
 

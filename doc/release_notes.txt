@@ -22,7 +22,7 @@ Problems fixed:
     2. bug #883293 - typos in tutorial task 1 step 4
     3. bug #883301 - more typos in tutorial task 1 step 4
     4. bug #873169 - Cookie headers were generated with no space after the semicolon (unlike IE, Netscape, and Mozilla)
-    5. The CookieProperties.domainMatchingStrict flag now controls whether cookie domains without leading dots are accepted
+    5. Cookie domains without leading dots are now accepted, as per RFC 2965.
 
  4-Dec-2003
 Acknowledgements:

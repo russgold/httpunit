@@ -5,7 +5,7 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" />
     <property name="Name" value="HttpUnit" />
-    <property name="version" value="1.5.4" />
+    <property name="version" value="1.5.5" />
 
     <property name="debug" value="on" />
     <property name="deprecation" value="off" />
@@ -194,7 +194,7 @@ Build-Time: ${TSTAMP}
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}"
              destdir="${javadoc.dir}" author="true" version="true"
              windowtitle="${Name} ${version} API" doctitle="${Name}"
-             footer="Copyright &amp;copy; 2000-2003 Russell Gold. See &lt;a target=&quot;_top&quot; href=&quot;../license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
+             footer="Copyright &amp;copy; 2000-2004 Russell Gold. See &lt;a target=&quot;_top&quot; href=&quot;../license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
         <classpath refid="base.classpath"/>
     </javadoc>
 </target>
