@@ -238,6 +238,10 @@ public class WebForm {
 
         NamedNodeMap nnm = _node.getAttributes();
         String action = getValue( nnm.getNamedItem( "action" ) );
+        if (action.trim().length() == 0) {
+            action = this._baseURL.getFile();
+        }
+
         WebRequest result;
 
         if (getValue( nnm.getNamedItem( "method" ) ).equalsIgnoreCase( "post" )) {
