@@ -130,7 +130,7 @@ public class ServletRunner {
 
 
     private void completeInitialization( String contextPath ) {
-        _context = new ServletUnitContext( contextPath, _application );
+        _context = new ServletUnitContext( contextPath, _application.getServletContext(), _application );
         _application.registerServlet( "*.jsp", _jspServletDescriptor.getClassName(), _jspServletDescriptor.getInitializationParameters( null, null ) );
     }
 

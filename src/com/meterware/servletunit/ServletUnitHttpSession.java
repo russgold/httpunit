@@ -35,10 +35,12 @@ class ServletUnitHttpSession implements HttpSession {
     final static public String SESSION_COOKIE_NAME = "JSESSION";
 
 
+    private ServletContext _servletContext;
     private SessionListenerDispatcher _listenerDispatcher;
 
 
-    public ServletUnitHttpSession( SessionListenerDispatcher listenerDispatcher ) {
+    ServletUnitHttpSession( ServletContext servletContext, SessionListenerDispatcher listenerDispatcher ) {
+        _servletContext     = servletContext;
         _listenerDispatcher = listenerDispatcher;
     }
 
@@ -221,7 +223,7 @@ class ServletUnitHttpSession implements HttpSession {
      * @since 1.3
      **/
     public ServletContext getServletContext() {
-        return null;    // XXX implement me
+        return _servletContext;
     }
 
 //-------------------------------------------- package members -------------------------------------------------

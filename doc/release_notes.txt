@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+23-Sep-2004:
+   Additions:
+       1. ServletUnit now implements HttpSession.getServletContext().
+
 21-Sep-2004:
    Acknowledgements:
        Thanks to Bart Vanhaute for finding a fixing an infinite recursion problem with frame loading.

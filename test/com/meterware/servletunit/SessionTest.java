@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -22,11 +22,18 @@ package com.meterware.servletunit;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import javax.servlet.http.HttpSession;
+import javax.servlet.ServletContext;
+
 
 /**
  * Tests the HttpSession implementation.
  **/
 public class SessionTest extends ServletUnitTest {
+
+    private ServletUnitContext _context;
+    private ServletContext     _servletContext = new ServletUnitServletContext( null );
+
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -43,40 +50,49 @@ public class SessionTest extends ServletUnitTest {
     }
 
 
+    protected void setUp() throws Exception {
+        super.setUp();
+        _context = new ServletUnitContext( null, _servletContext, new SessionListenerDispatcher() {
+            public void sendSessionCreated( HttpSession session ) {}
+            public void sendSessionDestroyed( HttpSession session ) {}
+            public void sendAttributeAdded( HttpSession session, String name, Object value ) {}
+            public void sendAttributeReplaced( HttpSession session, String name, Object oldValue ) {}
+            public void sendAttributeRemoved( HttpSession session, String name, Object oldValue ) {}
+        } );
+
+    }
+
+
     public void testNoInitialState() throws Exception {
-        ServletUnitContext context = new ServletUnitContext();
-        assertNull( "Session with incorrect ID", context.getSession( "12345" ) );
+        assertNull( "Session with incorrect ID", _context.getSession( "12345" ) );
     }
 
 
     public void testCreateSession() throws Exception {
-        ServletUnitContext context = new ServletUnitContext();
-        ServletUnitHttpSession session = context.newSession();
+        ServletUnitHttpSession session = _context.newSession();
         assertNotNull( "Session is null", session );
         assertTrue( "Session is not marked as new", session.isNew() );
-        ServletUnitHttpSession session2 = context.newSession();
+        ServletUnitHttpSession session2 = _context.newSession();
         assertTrue( "New session has the same ID", !session.getId().equals( session2.getId() ) );
-        assertTrue( "Different session returned", session.equals( context.getSession( session.getId() ) ) );
+        assertTrue( "Different session returned", session.equals( _context.getSession( session.getId() ) ) );
     }
 
 
     public void testSessionState() throws Exception {
-        ServletUnitContext context = new ServletUnitContext();
-        ServletUnitHttpSession session = context.newSession();
+        ServletUnitHttpSession session = _context.newSession();
         long accessedAt = session.getLastAccessedTime();
         assertTrue( "Session is not marked as new", session.isNew() );
         try { Thread.sleep( 50 ); } catch (InterruptedException e) {};
-        assertEquals( "Initial access time", accessedAt, context.getSession( session.getId() ).getLastAccessedTime() );
+        assertEquals( "Initial access time", accessedAt, _context.getSession( session.getId() ).getLastAccessedTime() );
         session.access();
-        assertTrue( "Last access time not changed", accessedAt != context.getSession( session.getId() ).getLastAccessedTime() );
-        assertTrue( "Session is still marked as new", !context.getSession( session.getId() ).isNew() );
+        assertTrue( "Last access time not changed", accessedAt != _context.getSession( session.getId() ).getLastAccessedTime() );
+        assertTrue( "Session is still marked as new", !_context.getSession( session.getId() ).isNew() );
 
     }
 
 
     public void testSessionAttributes() throws Exception {
-        ServletUnitContext context = new ServletUnitContext();
-        ServletUnitHttpSession session = context.newSession();
+        ServletUnitHttpSession session = _context.newSession();
         session.setAttribute( "first", new Integer(1) );
         session.setAttribute( "second", "two" );
         session.setAttribute( "third", "III" );
@@ -86,6 +102,13 @@ public class SessionTest extends ServletUnitTest {
         session.removeAttribute( "third" );
         session.setAttribute( "first", null );
         assertMatchingSet( "Attribute names", new String[] { "second" }, toArray( session.getAttributeNames() ));
+    }
+
+
+    public void testSessionContext() throws Exception {
+        ServletUnitHttpSession session = _context.newSession();
+        assertNotNull( "No context returned", session.getServletContext() );
+        assertSame( "Owning context", _servletContext, session.getServletContext() );
     }
 
 

@@ -19,29 +19,18 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
-
-import javax.servlet.http.HttpSession;
+import javax.servlet.ServletContext;
 import java.util.*;
 import java.util.Hashtable;
 
 class ServletUnitContext {
 
     private SessionListenerDispatcher _listenerDispatcher;
+    private ServletContext _servletContext;
 
 
-    ServletUnitContext() {
-        this( null, new SessionListenerDispatcher() {
-            public void sendSessionCreated( HttpSession session ) {}
-            public void sendSessionDestroyed( HttpSession session ) {}
-            public void sendAttributeAdded( HttpSession session, String name, Object value ) {}
-            public void sendAttributeReplaced( HttpSession session, String name, Object oldValue ) {}
-            public void sendAttributeRemoved( HttpSession session, String name, Object oldValue ) {}
-        } );
-    }
-
-
-    ServletUnitContext( String contextPath, SessionListenerDispatcher dispatcher ) {
+    ServletUnitContext( String contextPath, ServletContext servletContext, SessionListenerDispatcher dispatcher ) {
+        _servletContext = servletContext;
         _contextPath = (contextPath != null ? contextPath : "");
         _listenerDispatcher = dispatcher;
     }
@@ -87,7 +76,7 @@ class ServletUnitContext {
      * Creates a new session with a unique ID.
      **/
     ServletUnitHttpSession newSession() {
-        ServletUnitHttpSession result = new ServletUnitHttpSession( _listenerDispatcher );
+        ServletUnitHttpSession result = new ServletUnitHttpSession( _servletContext, _listenerDispatcher );
         _sessions.put( result.getId(), result );
         _listenerDispatcher.sendSessionCreated( result );
         return result;

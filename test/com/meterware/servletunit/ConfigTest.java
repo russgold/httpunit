@@ -101,6 +101,16 @@ public class ConfigTest extends TestCase {
     }
 
 
+    public void testServletContextAccess() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "SimpleServlet", ConfigServlet.class.getName() );
+        ServletUnitClient client = sr.newClient();
+        InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+        ServletContext context = ic.getServlet().getServletConfig().getServletContext();
+        assertSame( "Context from session", context, ic.getRequest().getSession().getServletContext() );
+    }
+
+
     private void checkMimeType( ServletContext context, String fileName, String expectedMimeType ) {
         assertEquals( "mime type for " + fileName, expectedMimeType, context.getMimeType( fileName ) );
     }

@@ -1,7 +1,4 @@
 package com.meterware.servletunit;
-
-import javax.servlet.http.HttpSession;
-
 /********************************************************************************************************************
  * $Id$
  *
@@ -22,6 +19,7 @@ import javax.servlet.http.HttpSession;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import javax.servlet.http.HttpSession;
 
 /**
  *
