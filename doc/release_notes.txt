@@ -6,7 +6,6 @@ Known problems:
        This behavior matches that currently used by IE and Navigator.
     3. No order is guaranteed for parameters from forms, contrary to the HTML 4.01 spec
     4. No parameter validation is done for requests built from links
-    5. getMetaTagContent only returns the first matching meta tag.
 
 Limitations: HttpUnit does not support JavaScript
 
@@ -14,12 +13,14 @@ Revision History:
 
 24-Oct-2001
    Acknowledgements:
-       Thanks to Benoit Xhenseval for adding parameter detection in links, and handling of meta and link tags.
+       Thanks to Benoit Xhenseval for adding parameter detection in links and handling of meta and link tags.
 
    Additions:
        1. getParameter() and getParameterNames() now works for requests built from links with embedded parameters.
        2. WebResponse.getMetaTagContent can be used to obtain the content of a meta tag (see the Javadoc)
        3. WebResponse.getStylesheet can be used to obtain the path to the stylesheet associated with a page.
+       4. Added name attribute to WebLink
+       5. Added getLinkWithID and getLinkWithName to WebResponse
 
 19-Oct-2001
    Additions:

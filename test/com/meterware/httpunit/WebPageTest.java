@@ -276,6 +276,7 @@ public class WebPageTest extends HttpUnitTest {
                       "<meta Http-equiv=\"Expires\" content=\"now\"/>\n" +
                       "<meta name=\"robots\" content=\"index,follow\"/>" +
                       "<meta name=\"keywords\" content=\"test\"/>" +
+                      "<meta name=\"keywords\" content=\"demo\"/>" +
                       "</head>\n" +
                       "<body>This has no data\n" +
                       "</body></html>\n";
@@ -285,9 +286,9 @@ public class WebPageTest extends HttpUnitTest {
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
         WebResponse simplePage = wc.getResponse( request );
 
-        assertEquals( "robots meta tag","index,follow",simplePage.getMetaTagContent("name","robots"));
-        assertEquals( "keywords meta tag","test",simplePage.getMetaTagContent("name","keywords"));
-        assertEquals( "Expires meta tag","now",simplePage.getMetaTagContent("http-equiv","Expires"));
+        assertMatchingSet( "robots meta tag", new String[] {"index,follow"}, simplePage.getMetaTagContent("name","robots"));
+        assertMatchingSet( "keywords meta tag",new String[] {"test","demo"},simplePage.getMetaTagContent("name","keywords"));
+        assertMatchingSet( "Expires meta tag",new String[] {"now"},simplePage.getMetaTagContent("http-equiv","Expires"));
      }
 
     /**

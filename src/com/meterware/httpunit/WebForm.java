@@ -57,14 +57,6 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    /** 
-     * Returns the name of the form.
-     **/
-    public String getName() {
-        return NodeUtils.getNodeAttribute( getNode(), "name" );
-    }
-
-
     /**
      * Returns an array containing the names of the parameters defined for this form,
      * in the order in which they appear.

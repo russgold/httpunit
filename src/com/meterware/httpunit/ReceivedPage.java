@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -76,30 +76,33 @@ class ReceivedPage extends ParsedHTML {
 
 
     /**
-     * Retrieves the "content" of the first meta tag for a key pair attribute-attributeValue.
+     * Retrieves the "content" of the meta tags for a key pair attribute-attributeValue.
      * <code>
-     *  <meta name="robots" content="index,follow" />
-        <meta http-equiv="Expires" content="now" />
+     *  <meta name="robots" content="index" />
+     *  <meta name="robots" content="follow" />
+     *  <meta http-equiv="Expires" content="now" />
      * </code>
      * this can be used like this
      * <code>
-     *      getMetaTagContent("name","robots") will return "index,follow"
-     *      getMetaTagContent("http-equiv","Expires") will return "now"
+     *      getMetaTagContent("name","robots") will return { "index","follow" }
+     *      getMetaTagContent("http-equiv","Expires") will return { "now" }
      * </code>
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
-    public String getMetaTagContent(String attribute, String attributeValue) {
+    public String[] getMetaTagContent(String attribute, String attributeValue) {
+        Vector matches = new Vector();
         NodeList nl = ((Document) getDOM()).getElementsByTagName("meta");
         int length = nl.getLength();
-        if (length == 0) return "";
 
         for (int i = 0; i < length; i++) {
             if (attributeValue.equalsIgnoreCase(NodeUtils.getNodeAttribute(nl.item(i), attribute))) {
-                return NodeUtils.getNodeAttribute(nl.item(i), "content");
+                matches.addElement( NodeUtils.getNodeAttribute( nl.item(i), "content" ) );
             }
         }
-        return "";
+        String result[] = new String[ matches.size() ];
+        matches.copyInto( result );
+        return result;
     }
+
 
     private static Node getDOM( String pageText ) throws SAXException {
         try {

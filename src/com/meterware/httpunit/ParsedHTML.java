@@ -57,7 +57,8 @@ class ParsedHTML {
     public WebForm getFormWithID( String ID ) {
         WebForm[] forms = getForms();
         for (int i = 0; i < forms.length; i++) {
-            if (forms[i].getID().equalsIgnoreCase( ID )) return forms[i];
+            if (forms[i].getID().equals( ID )) return forms[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && forms[i].getID().equalsIgnoreCase( ID )) return forms[i];
         }
         return null;
     }
@@ -70,7 +71,8 @@ class ParsedHTML {
     public WebForm getFormWithName( String name ) {
         WebForm[] forms = getForms();
         for (int i = 0; i < forms.length; i++) {
-            if (forms[i].getName().equalsIgnoreCase( name )) return forms[i];
+            if (forms[i].getName().equals( name )) return forms[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && forms[i].getName().equalsIgnoreCase( name )) return forms[i];
         }
         return null;
     }
@@ -130,6 +132,34 @@ class ParsedHTML {
                     return links[i];
                 }
             }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the link found in the page with the specified ID.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebLink getLinkWithID( String ID ) {
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            if (links[i].getID().equals( ID )) return links[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && links[i].getID().equalsIgnoreCase( ID )) return links[i];
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the link found in the page with the specified name.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebLink getLinkWithName( String name ) {
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            if (links[i].getName().equals( name )) return links[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && links[i].getName().equalsIgnoreCase( name )) return links[i];
         }
         return null;
     }

@@ -108,20 +108,20 @@ public class WebResponse implements HTMLSegment {
     }
 
     /**
-     * Retrieves the "content" of the first meta tag for a key pair attribute-attributeValue.
+     * Retrieves the "content" of the meta tags for a key pair attribute-attributeValue.
      * <code>
-     * <meta name="robots" content="index,follow" />
-     * <meta http-equiv="Expires" content="now" />
+     *  <meta name="robots" content="index" />
+     *  <meta name="robots" content="follow" />
+     *  <meta http-equiv="Expires" content="now" />
      * </code>
-     * can be used as follows:
+     * this can be used like this
      * <code>
-     * getMetaTagContent("name","robots") will return "index,follow"
-     * getMetaTagContent("http-equiv","Expires") will return "now"
+     *      getMetaTagContent("name","robots") will return { "index","follow" }
+     *      getMetaTagContent("http-equiv","Expires") will return { "now" }
      * </code>
      * @exception SAXException thrown if there is an error parsing this response
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
-    public String getMetaTagContent(String attribute, String attributeValue) throws SAXException {
+    public String[] getMetaTagContent(String attribute, String attributeValue) throws SAXException {
         return getReceivedPage().getMetaTagContent(attribute, attributeValue);
     }
 
@@ -304,6 +304,24 @@ public class WebResponse implements HTMLSegment {
      **/
     public WebLink getLinkWithImageText( String text ) throws SAXException {
         return getReceivedPage().getLinkWithImageText( text );
+    }
+
+
+    /**
+     * Returns the link found in the page with the specified name.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebLink getLinkWithName( String name ) throws SAXException {
+        return getReceivedPage().getLinkWithName( name );
+    }
+
+
+    /**
+     * Returns the link found in the page with the specified ID.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebLink getLinkWithID( String ID ) throws SAXException {
+        return getReceivedPage().getLinkWithID( ID );
     }
 
 

@@ -37,6 +37,14 @@ public class WebRequestSource {
 
 
     /**
+     * Returns the name associated with this request source.
+     **/
+    public String getName() {
+        return NodeUtils.getNodeAttribute( _node, "name" );
+    }
+
+
+    /**
      * Returns the target for this request source.
      **/
     public String getTarget() {

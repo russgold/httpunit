@@ -58,9 +58,9 @@ public class WebLinkTest extends HttpUnitTest {
         defineResource( "SimplePage.html",
                         "<html><head><title>A Sample Page</title></head>\n" +
                         "<body>This has no forms but it does\n" +
-                        "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
+                        "have <a href=\"/other.html\" id=\"activeID\">an <b>active</b> link</A>\n" +
                         " and <a name=here>an anchor</a>\n" +
-                        "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
+                        "<a href=\"basic.html\" name=\"nextLink\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
                         "</body></html>\n" );
 
         WebConversation wc = new WebConversation();
@@ -118,6 +118,20 @@ public class WebLinkTest extends HttpUnitTest {
         HttpUnitOptions.setImagesTreatedAsAltText( false );
         link = _simplePage.getLinkWith( "Next -->" );
         assertNull( "the image link was found based on its hidden alt attribute", link );
+    }
+
+
+    public void testGetLinkByIDAndName() throws Exception {
+        WebLink link = _simplePage.getLinkWithID( "noSuchID" );
+        assertNull( "Non-existent link should not have been found", link );
+
+        link = _simplePage.getLinkWithID( "activeID" );
+        assertNotNull( "an active link was not found", link );
+        assertEquals( "active link URL", getHostPath() + "/other.html", link.getRequest().getURL().toExternalForm() );
+
+        link = _simplePage.getLinkWithName( "nextLink" );
+        assertNotNull( "the image link was not found", link );
+        assertEquals( "image link URL", getHostPath() + "/basic.html", link.getRequest().getURL().toExternalForm() );
     }
 
 
