@@ -11,6 +11,14 @@ Limitations:
 
 
 Revision History:
+ 13-Feb-2003
+Acknowledgements:
+    Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute
+
+Problems Fixed:
+    1. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
+       had previously been defined.
+
  5-Feb-2003
 Acknowledgements:
     Thanks to Navid Vahdat for ServletUnit fixes for invalid session handling and request dispatcher paths

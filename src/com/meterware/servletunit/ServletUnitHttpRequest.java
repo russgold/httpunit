@@ -473,13 +473,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      *
      * Stores an attribute in the context of this request.
      * Attributes are reset between requests.
-     *
-     * @exception IllegalStateException	if the specified attribute already has a value
-     *
      **/
     public void setAttribute( String key, Object o ) {
-        if (_attributes.get( key ) != null) throw new IllegalStateException( "Attribute '" + key + "' already has a value" );
-        _attributes.put( key, o );
+        if (o == null) _attributes.remove( key );
+        else _attributes.put( key, o );
     }
 
 

@@ -188,15 +188,21 @@ public class HttpServletRequestTest extends ServletUnitTest {
     public void testDuplicateAttributes() throws Exception {
         WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
         HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
-        Object value = new Integer(1);
 
-        request.setAttribute( "one", value );
+        request.setAttribute( "one", new Integer(1) );
+        request.setAttribute( "one", "One" );
+        assertEquals( "Revised attribute value", "One", request.getAttribute( "one" ) );
+    }
 
-        try {
-            request.setAttribute( "one", value );
-            fail( "Did not complain about illegal state" );
-        } catch (IllegalStateException e) {
-        }
+
+    public void testNullAttributeValue() throws Exception {
+        WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+
+        request.setAttribute( "one", "One" );
+        assertEquals( "Initial attribute value", "One", request.getAttribute( "one" ) );
+        request.setAttribute( "one", null );
+        assertNull( "Attribute 'one' should have been removed", request.getAttribute( "one" ) );
     }
 
 
