@@ -14,6 +14,10 @@ Thanks to Perry Doell for the methods to examine cookies on WebConversation
 Thanks to Ken Hygh for the proper handling of parameters with no specified type 
 
 Revision History:
+ 6-Oct-00
+Problems corrected:
+    1. Base tag is now handled to override defaults for page URL and target
+    
  5-Oct-00
 Problems corrected:
     1. Blank "src" attributes in FRAME nodes now correctly result in a blank page

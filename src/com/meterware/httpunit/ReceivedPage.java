@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.io.ByteArrayInputStream;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.Vector;
@@ -39,7 +40,8 @@ class ReceivedPage extends ParsedHTML {
 
 
     public ReceivedPage( URL url, String parentTarget, String pageText ) throws SAXException {
-        super( url, parentTarget, getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes() ), null ) ); 
+        super( url, parentTarget, getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes() ), null ) );
+        setBaseAttributes();
     }
 
 
@@ -55,6 +57,28 @@ class ReceivedPage extends ParsedHTML {
 
 
 //---------------------------------- private members --------------------------------
+
+
+    private void setBaseAttributes() throws SAXException {
+        NodeList nl = ((Document) getDOM()).getElementsByTagName( "base" );
+        if (nl.getLength() == 0) return;
+        try {
+            applyBaseAttributes( NodeUtils.getNodeAttribute( nl.item(0), "href" ), 
+                                 NodeUtils.getNodeAttribute( nl.item(0), "target" ) );
+        } catch (MalformedURLException e) {
+            throw new RuntimeException( "Unable to set document base: " + e );
+        }
+    }
+
+
+    private void applyBaseAttributes( String baseURLString, String baseTarget ) throws MalformedURLException {
+        if (baseURLString.length() > 0) {
+            this.setBaseURL( new URL( baseURLString ) );
+        }
+        if (baseTarget.length() > 0) {
+            this.setBaseTarget( baseTarget );
+        }
+    }
 
 
     private static Tidy getParser() {

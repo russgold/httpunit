@@ -141,7 +141,41 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "Title of next page", "Initial", thirdPage.getTitle() );
     }
 
+
+    public void testDocumentBase() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "alternate/Target", "Found me!" );
+        defineResource( "Initial.html", "<html><head><title>Test for Base</title>" +
+                                        "            <base href=\"" + getHostPath() + "/alternate/\"></head>" +
+                                        "      <body><a href=\"Target.html\">Go</a></body></html>" );
+
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/Initial.html" );
+        assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
+        WebLink link = initialPage.getLinks()[0];
+
+        WebRequest request = link.getRequest();
+        assertEquals( "Destination for link", getHostPath() + "/alternate/Target.html", request.getURL().toExternalForm() );
+        WebResponse nextPage = wc.getResponse( request );
+        assert( "Did not find the target", nextPage.toString().indexOf( "Found" ) >= 0 );
+    }
+
                               
+    public void testTargetBase() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "alternate/Target", "Found me!" );
+        defineResource( "Initial.html", "<html><head><title>Test for Base</title>" +
+                                        "            <base target=blue></head>" +
+                                        "      <body><a href=\"Target.html\">Go</a></body></html>" );
+
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/Initial.html" );
+        assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
+        WebLink link = initialPage.getLinks()[0];
+
+        WebRequest request = link.getRequest();
+        assertEquals( "Target for link", "blue", request.getTarget() );
+    }
+
+
     private WebResponse _simplePage;
 
 

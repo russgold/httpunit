@@ -30,10 +30,10 @@ import org.w3c.dom.*;
 class ParsedHTML {
 
 
-    ParsedHTML( URL pageURL, String parentTarget, Node rootNode ) {
-        _url = pageURL;
-        _rootNode = rootNode;
-        _parentTarget = parentTarget;
+    ParsedHTML( URL baseURL, String baseTarget, Node rootNode ) {
+        _baseURL    = baseURL;
+        _baseTarget = baseTarget;
+        _rootNode   = rootNode;
     }
 
 
@@ -44,7 +44,7 @@ class ParsedHTML {
         NodeList forms = NodeUtils.getElementsByTagName( _rootNode, "form" );
         WebForm[] result = new WebForm[ forms.getLength() ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = new WebForm( getURL(), _parentTarget, forms.item( i ) );
+            result[i] = new WebForm( _baseURL, _baseTarget, forms.item( i ) );
         }
 
         return result;
@@ -61,7 +61,7 @@ class ParsedHTML {
             for (int i = 0; i < nl.getLength(); i++) {
                 Node child = nl.item(i);
                 if (isLinkAnchor( child )) {
-                    list.addElement( new WebLink( getURL(), _parentTarget, child ) );
+                    list.addElement( new WebLink( _baseURL, _baseTarget, child ) );
                 }
             }
             _links = new WebLink[ list.size() ];
@@ -110,7 +110,7 @@ class ParsedHTML {
      * they appear.
      **/
     public WebTable[] getTables() {
-        return WebTable.getTables( getDOM(), _url, _parentTarget );
+        return WebTable.getTables( getDOM(), _baseURL, _baseTarget );
     }
 
 
@@ -142,33 +142,43 @@ class ParsedHTML {
     }
 
 
-    /**
-     * Returns the associated URL.
-     **/
-    public URL getURL() {
-        return _url;
-    }
-
-
-
 //---------------------------------- Object methods --------------------------------
 
 
     public String toString() {
-        return _url.toExternalForm() + System.getProperty( "line.separator" ) +
+        return _baseURL.toExternalForm() + System.getProperty( "line.separator" ) +
                _rootNode;
+    }
+
+
+//---------------------------------- protected members ------------------------------
+
+
+    /**
+     * Overrides the base URL for this HTML segment.
+     **/
+    protected void setBaseURL( URL baseURL ) {
+        _baseURL = baseURL;
+    }
+
+
+    /**
+     * Overrides the base target for this HTML segment.
+     **/
+    protected void setBaseTarget( String baseTarget ) {
+        _baseTarget = baseTarget;
     }
 
 
 //---------------------------------- private members --------------------------------
 
-    Node _rootNode;
+    private Node _rootNode;
 
-    WebLink[] _links;
+    private WebLink[] _links;
 
-    URL _url;
+    private URL _baseURL;
 
-    private String _parentTarget;    
+    private String _baseTarget;    
 
 
     private String getValue( Node node ) {
