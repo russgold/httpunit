@@ -320,7 +320,6 @@ public abstract class HttpUnitOptions {
 
 
     private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
-    private static final String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
 
     private static boolean _acceptGzip = true;
 

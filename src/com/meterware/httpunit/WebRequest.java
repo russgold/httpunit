@@ -20,7 +20,6 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -438,14 +437,6 @@ public class WebRequest {
         if (!_httpsProtocolSupportEnabled) {
             verifyHttpsSupport();
             _httpsProtocolSupportEnabled = true;
-        }
-    }
-
-
-    private static void listProviders() {
-        Provider[] list = Security.getProviders();
-        for (int i = 0; i < list.length; i++) {
-            System.out.println( "provider" + i + "=" + list[i] );
         }
     }
 

@@ -19,16 +19,21 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.*;
-import java.net.HttpURLConnection;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import com.meterware.httpunit.WebClient;
+import com.meterware.httpunit.WebResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import com.meterware.httpunit.*;
 
 /**
  * Tests support for the servlet configuration.

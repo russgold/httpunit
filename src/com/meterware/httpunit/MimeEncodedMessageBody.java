@@ -20,11 +20,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.InputStream;
-
-import java.util.Dictionary;
-import java.util.Enumeration;
+import java.io.OutputStream;
 
 /**
  * A POST-method message body which is MIME-encoded. This is used when uploading files, and is selected when the enctype

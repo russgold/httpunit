@@ -19,15 +19,9 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.HttpNotFoundException;
-import com.meterware.httpunit.HttpInternalErrorException;
-import com.meterware.httpunit.HttpUnitUtils;
-
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
@@ -36,9 +30,12 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
-import org.xml.sax.SAXException;
+import com.meterware.httpunit.HttpUnitUtils;
+import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.WebResponse;
+
 import org.xml.sax.InputSource;
-import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 
 /**

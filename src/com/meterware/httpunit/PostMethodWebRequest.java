@@ -19,15 +19,10 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.URL;
-
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 
 /**
@@ -132,11 +127,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 //---------------------------------- private members -------------------------------------
 
 
-    private InputStream _source;
     private MessageBody _body;
-
-    /** If true, non-form-based request will be MIME-encoded. **/
-    private boolean _mimeEncoded;
 
 }
 
