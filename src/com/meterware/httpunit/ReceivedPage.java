@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -36,6 +36,9 @@ import org.xml.sax.SAXException;
 
 /**
  * This class represents an HTML page returned from a request.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 class ReceivedPage extends ParsedHTML {
 
@@ -56,6 +59,47 @@ class ReceivedPage extends ParsedHTML {
         return nl.item(0).getFirstChild().getNodeValue();
     }
 
+    /**
+     * Returns the location of the linked stylesheet in the head
+     * <code>
+     * <link type="text/css" rel="stylesheet" href="/mystyle.css" />
+     * </code>
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public String getExternalStyleSheet() throws SAXException {
+        NodeList nl = ((Document) getDOM()).getElementsByTagName( "link" );
+        if (nl.getLength() == 0) return "";
+        if ("stylesheet".equalsIgnoreCase(NodeUtils.getNodeAttribute( nl.item(0), "rel" )))
+            return NodeUtils.getNodeAttribute( nl.item(0), "href" );
+        return "";
+    }
+
+
+    /**
+     * Retrieves the "content" of the first meta tag for a key pair attribute-attributeValue.
+     * <code>
+     *  <meta name="robots" content="index,follow" />
+        <meta http-equiv="Expires" content="now" />
+     * </code>
+     * this can be used like this
+     * <code>
+     *      getMetaTagContent("name","robots") will return "index,follow"
+     *      getMetaTagContent("http-equiv","Expires") will return "now"
+     * </code>
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public String getMetaTagContent(String attribute, String attributeValue) {
+        NodeList nl = ((Document) getDOM()).getElementsByTagName("meta");
+        int length = nl.getLength();
+        if (length == 0) return "";
+
+        for (int i = 0; i < length; i++) {
+            if (attributeValue.equalsIgnoreCase(NodeUtils.getNodeAttribute(nl.item(i), attribute))) {
+                return NodeUtils.getNodeAttribute(nl.item(i), "content");
+            }
+        }
+        return "";
+    }
 
     private static Node getDOM( String pageText ) throws SAXException {
         try {
@@ -85,7 +129,7 @@ class ReceivedPage extends ParsedHTML {
         NodeList nl = ((Document) getDOM()).getElementsByTagName( "base" );
         if (nl.getLength() == 0) return;
         try {
-            applyBaseAttributes( NodeUtils.getNodeAttribute( nl.item(0), "href" ), 
+            applyBaseAttributes( NodeUtils.getNodeAttribute( nl.item(0), "href" ),
                                  NodeUtils.getNodeAttribute( nl.item(0), "target" ) );
         } catch (MalformedURLException e) {
             throw new RuntimeException( "Unable to set document base: " + e );
@@ -105,7 +149,7 @@ class ReceivedPage extends ParsedHTML {
 
     private static Tidy getParser() {
         Tidy tidy = new Tidy();
-        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 ); 
+        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
         tidy.setQuiet( true );
         tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
         return tidy;

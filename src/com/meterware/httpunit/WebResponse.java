@@ -55,6 +55,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:DREW.VARNER@oracle.com">Drew Varner</a>
  * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 abstract
 public class WebResponse implements HTMLSegment {
@@ -92,6 +93,37 @@ public class WebResponse implements HTMLSegment {
         return getReceivedPage().getTitle();
     }
 
+
+    /**
+     * Returns the stylesheet linked in the head of the page.
+     * <code>
+     * <link type="text/css" rel="stylesheet" href="/mystyle.css" />
+     * </code>
+     * will return "/mystyle.css".
+     * @exception SAXException thrown if there is an error parsing this response
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public String getExternalStyleSheet() throws SAXException {
+        return getReceivedPage().getExternalStyleSheet();
+    }
+
+    /**
+     * Retrieves the "content" of the first meta tag for a key pair attribute-attributeValue.
+     * <code>
+     * <meta name="robots" content="index,follow" />
+     * <meta http-equiv="Expires" content="now" />
+     * </code>
+     * can be used as follows:
+     * <code>
+     * getMetaTagContent("name","robots") will return "index,follow"
+     * getMetaTagContent("http-equiv","Expires") will return "now"
+     * </code>
+     * @exception SAXException thrown if there is an error parsing this response
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public String getMetaTagContent(String attribute, String attributeValue) throws SAXException {
+        return getReceivedPage().getMetaTagContent(attribute, attributeValue);
+    }
 
     /**
      * Returns the target of the page.

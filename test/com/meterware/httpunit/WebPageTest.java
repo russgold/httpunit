@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -35,15 +35,18 @@ import org.w3c.dom.Document;
 
 
 /**
- * A unit test of the httpunit parsing classes.
+ * Unit tests for page structure, style, and headers.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class WebPageTest extends HttpUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+
+
     public static Test suite() {
         return new TestSuite( WebPageTest.class );
     }
@@ -59,8 +62,8 @@ public class WebPageTest extends HttpUnitTest {
         HttpUnitOptions.resetDefaultCharacterSet();
         HttpUnitOptions.setAutoRefresh( false );
     }
-	
-	
+
+
     public void testNoResponse() throws Exception {
         WebConversation wc = new WebConversation();
         try {
@@ -186,8 +189,8 @@ public class WebPageTest extends HttpUnitTest {
             public WebResource getPostResponse() {
                 try {
                     String name = getParameter( "name" )[0];
-                    WebResource result = new WebResource( "<html><body><table><tr><td>Hello, " + 
-                                                          new String( name.getBytes( "iso-8859-1" ), "iso-8859-8" ) + 
+                    WebResource result = new WebResource( "<html><body><table><tr><td>Hello, " +
+                                                          new String( name.getBytes( "iso-8859-1" ), "iso-8859-8" ) +
                                                           "</td></tr></table></body></html>" );
                     result.setCharacterSet( "iso-8859-8" );
                     result.setSendCharacterSet( true );
@@ -263,6 +266,49 @@ public class WebPageTest extends HttpUnitTest {
         assertNull( "No refresh request should have been found", simplePage.getRefreshRequest() );
      }
 
+    /**
+     * Test the meta tag content retrieval
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public void testMetaTag() throws Exception {
+        String refreshURL = getHostPath() + "/NextPage.html";
+        String page = "<html><head><title>Sample</title>" +
+                      "<meta Http-equiv=\"Expires\" content=\"now\"/>\n" +
+                      "<meta name=\"robots\" content=\"index,follow\"/>" +
+                      "<meta name=\"keywords\" content=\"test\"/>" +
+                      "</head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "robots meta tag","index,follow",simplePage.getMetaTagContent("name","robots"));
+        assertEquals( "keywords meta tag","test",simplePage.getMetaTagContent("name","keywords"));
+        assertEquals( "Expires meta tag","now",simplePage.getMetaTagContent("http-equiv","Expires"));
+     }
+
+    /**
+     * test the stylesheet retrieval
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public void testGetExternalStylesheet() throws Exception {
+        String refreshURL = getHostPath() + "/NextPage.html";
+        String page = "<html><head><title>Sample</title>" +
+                      "<link type=\"text/css\" rel=\"stylesheet\" href=\"/style.css\"/>" +
+                      "</head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Stylesheet","/style.css",simplePage.getExternalStyleSheet());
+     }
 
     private String toUnicode( String string ) {
         StringBuffer sb = new StringBuffer( );
