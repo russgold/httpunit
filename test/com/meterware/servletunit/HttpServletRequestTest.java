@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Locale;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -234,6 +235,38 @@ public class HttpServletRequestTest extends ServletUnitTest {
         wr = new GetMethodWebRequest( "http://localhost/simple?foo=bar" );
         request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         assertEquals("/simple", request.getRequestURI());
+    }
+
+
+    public void testDefaultLocale() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+        Locale[] expectedLocales = new Locale[] { Locale.getDefault() };
+        verifyLocales( request, expectedLocales );
+
+    }
+
+    private void verifyLocales(ServletUnitHttpRequest request, Locale[] expectedLocales) {
+        assertNotNull( "No default locale found", request.getLocale() );
+        assertEquals( "default locale", expectedLocales[0], request.getLocale() );
+
+        final Enumeration locales = request.getLocales();
+        assertNotNull( "local enumeration not returned", locales );
+        for (int i = 0; i < expectedLocales.length; i++) {
+            assertTrue( "Expected " + expectedLocales.length + " locales, only found " + i, locales.hasMoreElements() );
+            assertEquals( "Locale #" + (i+1), expectedLocales[i], locales.nextElement() );
+        }
+        assertFalse( "Too many locales returned", locales.hasMoreElements() );
+    }
+
+
+    public void testSpecifiedLocales() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");
+        wr.setHeaderField( "Accept-language", "fr, en;q=0.6, en-us;q=0.7" );
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+        verifyLocales( request, new Locale[] { Locale.FRENCH, Locale.US, Locale.ENGLISH } );
     }
 
 

@@ -16,6 +16,7 @@ Acknowledgements:
 
 Additions:
     1. document.write and writeln are now supported for embedded uses
+    2. ServletUnit now implements HttpServletRequest.getLocale() and getLocales()
 
 22-Oct-2002
 Acknowledgements:

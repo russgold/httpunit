@@ -29,12 +29,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.StringTokenizer;
-import java.util.Map;
-import java.util.Dictionary;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
@@ -50,6 +45,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
     private ServletInputStreamImpl _inputStream;
     private String                 _contentType;
+    private Vector _locales;
 
 
     /**
@@ -504,8 +500,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns the preferred Locale that the client will accept content in, based on the Accept-Language header.
      * If the client request doesn't provide an Accept-Language header, this method returns the default locale for the server.
      **/
-    public java.util.Locale getLocale() {
-        throw new RuntimeException( "getLocale not implemented" );
+    public Locale getLocale() {
+        return (Locale) getPreferredLocales().firstElement();
     }
 
 
@@ -516,7 +512,34 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * method returns an Enumeration containing one Locale, the default locale for the server.
      **/
     public java.util.Enumeration getLocales() {
-        throw new RuntimeException( "getLocales not implemented" );
+        return getPreferredLocales().elements();
+    }
+
+
+    /**
+     * Parses the accept-language header to obtain a vector of preferred locales
+     * @return the preferred locales, sorted by qvalue
+     */
+    private Vector getPreferredLocales() {
+        if (_locales == null) {
+            _locales = new Vector();
+            String languages = getHeader( "accept-language" );
+            if (languages == null) {
+                _locales.add( Locale.getDefault() );
+            } else {
+                 StringTokenizer st = new StringTokenizer( languages, "," );
+                 ArrayList al = new ArrayList();
+                 while (st.hasMoreTokens()) {
+                     String token = st.nextToken();
+                     al.add( new PrioritizedLocale( token ) );
+                 }
+                 Collections.sort( al );
+                 for (Iterator iterator = al.iterator(); iterator.hasNext();) {
+                     _locales.add( ((PrioritizedLocale) iterator.next()).getLocale() );
+                 }
+            }
+         }
+        return _locales;
     }
 
 
@@ -800,5 +823,49 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
     private void throwNotImplementedYet() {
         throw new RuntimeException( "Not implemented yet" );
+    }
+
+
+    static class PrioritizedLocale implements Comparable {
+
+        private Locale _locale;
+        private float  _priority;
+
+
+        PrioritizedLocale( String languageSpec ) {
+            int semiIndex = languageSpec.indexOf( ';' );
+            if (semiIndex < 0) {
+                _priority = 1;
+                _locale = parseLocale( languageSpec );
+            } else {
+                _priority = Float.parseFloat( languageSpec.substring( languageSpec.indexOf( '=', semiIndex )+1 ) );
+                _locale = parseLocale( languageSpec.substring( 0, semiIndex ) );
+            }
+        }
+
+
+        private Locale parseLocale( String range ) {
+            range = range.trim();
+            int dashIndex = range.indexOf( '-' );
+            if (dashIndex < 0) {
+                return new Locale( range );
+            } else {
+                return new Locale( range.substring( 0, dashIndex ), range.substring( dashIndex+1 ) );
+            }
+        }
+
+
+        public Locale getLocale() {
+            return _locale;
+        }
+
+
+        public int compareTo( Object o ) {
+            if (!(o instanceof PrioritizedLocale)) throw new IllegalArgumentException( "may only combine with other prioritized locales" );
+            PrioritizedLocale other = (PrioritizedLocale) o;
+            return _priority == other._priority ? _locale.getLanguage().compareTo( other._locale.getLanguage() )
+                                                : (_priority < other._priority ? +1 : -1 );
+        }
+
     }
 }
