@@ -249,6 +249,17 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testImageButtonNoValuePositionalSubmit() throws Exception {
+        defineWebPage( "Default", "<form method='GET' action='test.jsp'>" +
+                                  "<input type='image' src='image.gif' name='aButton'>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = form.getRequest( form.getSubmitButton( "aButton" ), 20, 5 );
+        assertEquals( getHostPath() + "/test.jsp?aButton.x=20&aButton.y=5", request.getURL().toExternalForm() );
+    }
+
+
     public void testSubmitButtonAttributes() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
