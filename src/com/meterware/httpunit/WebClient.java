@@ -113,7 +113,7 @@ public class WebClient implements FrameHolder {
      * any listeners or preferences which may have been set.
      **/
     public void clearContents() {
-        _frameContents = new Hashtable();
+        _frameContents = new FrameHolderImpl();
         _cookies = new Hashtable();
         _headers = new HeaderDictionary();
     }
@@ -123,14 +123,7 @@ public class WebClient implements FrameHolder {
      * Returns the name of the currently active frames.
      **/
     public String[] getFrameNames() {
-        Vector names = new Vector();
-        for (Enumeration e = _frameContents.keys(); e.hasMoreElements();) {
-            names.addElement( e.nextElement() );
-        }
-
-        String[] result = new String[ names.size() ];
-        names.copyInto( result );
-        return result;
+        return _frameContents.getFrameNames();
     }
 
 
@@ -339,7 +332,7 @@ public class WebClient implements FrameHolder {
 
 
     /** A map of frame names to current contents. **/
-    private Hashtable _frameContents = new Hashtable();
+    private FrameHolderImpl _frameContents = new FrameHolderImpl();
 
 
     /** A map of frame names to frames nested within them. **/
@@ -492,6 +485,38 @@ class RedirectWebRequest extends WebRequest {
     public String getMethod() {
         return "GET";
     }
+}
+
+
+
+class FrameHolderImpl {
+    private Hashtable _contents = new Hashtable();
+
+    void put( String targetName, WebResponse contents ) {
+        _contents.put( targetName, contents );
+    }
+
+
+    WebResponse get( String targetName ) {
+        return (WebResponse) _contents.get( targetName );
+    }
+
+    void remove( String targetName ) {
+        _contents.remove( targetName );
+    }
+
+
+    public String[] getFrameNames() {
+        Vector names = new Vector();
+        for (Enumeration e = _contents.keys(); e.hasMoreElements();) {
+            names.addElement( e.nextElement() );
+        }
+
+        String[] result = new String[ names.size() ];
+        names.copyInto( result );
+        return result;
+    }
+
 }
 
 

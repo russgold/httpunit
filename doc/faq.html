@@ -91,7 +91,7 @@ of choices:<ul>
 <li>If you call <code>HttpUnitOptions.setParameterValuesValidated( false )</code> before calling getRequest on your form,
 the request will be created with validation disabled and you will be able to set any values you like. Note that in such a case
 the order of parameters in the request is not guaranteed, in case your server cares about such things (servlets do not).
-<li>You can call <code>&lt;form&gt;.getScriptableObject().setParameterValue( &lt;name&gt;, &lt;valuem&gt; );</code> to change
+<li>You can call <code>&lt;form&gt;.getScriptableObject().setParameterValue( &lt;name&gt;, &lt;value&gt; );</code> to change
 the underlying value in the form. This will behave the way JavaScript does - resetting the form will now restore this value,
 rather than the original one.
 </ul>

@@ -51,12 +51,19 @@ class WebFrame {
     }
 
 
+    /**
+     * Given the qualified name of a frame and the name of a nested frame, returns the qualified name of the nested frame.
+     */
     static String getNestedFrameName( String parentFrameName, final String relativeName ) {
         if (parentFrameName.equalsIgnoreCase( WebRequest.TOP_FRAME )) return relativeName;
         return parentFrameName + ':' + relativeName;
     }
 
 
+    /**
+     * Returns the qualified name of a target frame.
+     *
+     */
     static String getTargetFrameName( String sourceFrameName, final String relativeName ) {
         if (relativeName.equalsIgnoreCase( "_parent" )) return getParentFrameName( sourceFrameName );
         if (sourceFrameName.indexOf( ':' ) < 0) return relativeName;
