@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2005, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -82,19 +82,19 @@ public class WebResource {
     }
 
 
-    WebResource( String contents, int responseCode ) {
+    public WebResource( String contents, int responseCode ) {
         this( contents, DEFAULT_CONTENT_TYPE, responseCode );
     }
 
 
-    WebResource( String contents, String contentType, int responseCode ) {
+    public WebResource( String contents, String contentType, int responseCode ) {
         _string      = contents;
         _contentType = contentType;
         _responseCode = responseCode;
     }
 
 
-    WebResource( byte[] contents, String contentType, int responseCode ) {
+    public WebResource( byte[] contents, String contentType, int responseCode ) {
         _contents    = contents;
         _contentType = contentType;
         _responseCode = responseCode;
