@@ -23,6 +23,7 @@ Additions:
 
 Problems fixed:
     1. When not using Latin-1 encoding, URL string characters *, _, and - were improperly being encoded
+    2. AuthorizationRequiredException was being thrown even when exceptions on error status was disabled
 
 
  4-Oct-2002
