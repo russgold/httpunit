@@ -24,11 +24,8 @@ import com.meterware.httpunit.HttpNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-
-import java.net.URL;
 import java.net.MalformedURLException;
-
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -50,13 +47,12 @@ import org.xml.sax.SAXException;
 
 
 /**
- * This class represents the information recorded about a single web 
+ * This class represents the information recorded about a single web
  * application. It is usually extracted from web.xml.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 class WebApplication {
-
 
     /**
      * Constructs a default application spec with no information.
@@ -65,41 +61,43 @@ class WebApplication {
         _contextPath = "";
     }
 
-    /**
-     * Constructs an application spec from an XML document.
-     */
-    WebApplication(Document document) throws MalformedURLException,SAXException {
-        this(document, null, "");
-    }
 
     /**
      * Constructs an application spec from an XML document.
      */
-    WebApplication(Document document, String contextPath) throws MalformedURLException,SAXException {
-        this(document, null, contextPath);
+    WebApplication( Document document ) throws MalformedURLException, SAXException {
+        this( document, null, "" );
     }
+
 
     /**
      * Constructs an application spec from an XML document.
      */
-    WebApplication(Document document, File file) throws MalformedURLException,SAXException {
-        this(document, null, "");
+    WebApplication( Document document, String contextPath ) throws MalformedURLException, SAXException {
+        this( document, null, contextPath );
     }
+
 
     /**
      * Constructs an application spec from an XML document.
      */
-    WebApplication(Document document, File file, String contextPath) throws MalformedURLException,SAXException {
+    WebApplication( Document document, File file, String contextPath ) throws MalformedURLException, SAXException {
         _contextDir = file;
         _contextPath = contextPath;
         registerServlets( document );
-        NodeList nl = document.getElementsByTagName( "security-constraint" );
-        for (int i = 0; i < nl.getLength(); i++) {
-            _securityConstraints.add( new SecurityConstraintImpl( (Element) nl.item(i) ) );
-        }
+        extractSecurityConstraints( document );
         extractContextParameters( document );
         extractLoginConfiguration( document );
     }
+
+
+    private void extractSecurityConstraints( Document document ) throws SAXException {
+        NodeList nl = document.getElementsByTagName( "security-constraint" );
+        for (int i = 0; i < nl.getLength(); i++) {
+            _securityConstraints.add( new SecurityConstraintImpl( (Element) nl.item( i ) ) );
+        }
+    }
+
 
     /**
      * Registers a servlet class to be run.
@@ -114,10 +112,10 @@ class WebApplication {
      **/
     void registerServlet( String resourceName, ServletConfiguration servletConfiguration ) {
         // FIXME - shouldn't everything start with one or the other?
-        if (!resourceName.startsWith("/") && !resourceName.startsWith("*")) {
-            resourceName = "/"+resourceName;
+        if (!resourceName.startsWith( "/" ) && !resourceName.startsWith( "*" )) {
+            resourceName = "/" + resourceName;
         }
-        _servletMapping.put( resourceName, servletConfiguration);
+        _servletMapping.put( resourceName, servletConfiguration );
     }
 
 
@@ -142,8 +140,8 @@ class WebApplication {
     }
 
 
-    private ServletConfiguration getServletConfiguration(URL url) {
-        if (!url.getFile().startsWith(_contextPath)) {
+    private ServletConfiguration getServletConfiguration( URL url ) {
+        if (!url.getFile().startsWith( _contextPath )) {
             return null;
         }
         String servletName = getServletName( getURLPath( url ) );
@@ -157,10 +155,10 @@ class WebApplication {
 
     private String getURLPath( URL url ) {
         String file = url.getFile();
-        if (_contextPath.equals("")) {
+        if (_contextPath.equals( "" )) {
             return file;
-        } else if (file.startsWith(_contextPath)) {
-            return file.substring(_contextPath.length());
+        } else if (file.startsWith( _contextPath )) {
+            return file.substring( _contextPath.length() );
         } else {
             return null;
         }
@@ -252,11 +250,10 @@ class WebApplication {
     final static private SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
 
 
-
-    private void extractLoginConfiguration( Document document ) throws MalformedURLException,SAXException {
+    private void extractLoginConfiguration( Document document ) throws MalformedURLException, SAXException {
         NodeList nl = document.getElementsByTagName( "login-config" );
         if (nl.getLength() == 1) {
-            final Element loginConfigElement = (Element) nl.item(0);
+            final Element loginConfigElement = (Element) nl.item( 0 );
             String authenticationMethod = getChildNodeValue( loginConfigElement, "auth-method", "BASIC" );
             _authenticationRealm = getChildNodeValue( loginConfigElement, "realm-name", "" );
             if (authenticationMethod.equalsIgnoreCase( "BASIC" )) {
@@ -275,9 +272,9 @@ class WebApplication {
     private void registerServlets( Document document ) throws SAXException {
         Hashtable nameToClass = new Hashtable();
         NodeList nl = document.getElementsByTagName( "servlet" );
-        for (int i = 0; i < nl.getLength(); i++) registerServletClass( nameToClass, (Element) nl.item(i) );
+        for (int i = 0; i < nl.getLength(); i++) registerServletClass( nameToClass, (Element) nl.item( i ) );
         nl = document.getElementsByTagName( "servlet-mapping" );
-        for (int i = 0; i < nl.getLength(); i++) registerServlet( nameToClass, (Element) nl.item(i) );
+        for (int i = 0; i < nl.getLength(); i++) registerServlet( nameToClass, (Element) nl.item( i ) );
     }
 
 
@@ -294,13 +291,13 @@ class WebApplication {
 
 
     private void extractContextParameters( Document document ) throws SAXException {
-       NodeList nl = document.getElementsByTagName( "context-param" );
-       for (int i = 0; i < nl.getLength(); i++) {
-           Element param = (Element)nl.item(i);
-           String name = getChildNodeValue(param, "param-name");
-           String value = getChildNodeValue(param, "param-value");
-           _contextParameters.put(name, value);
-       }
+        NodeList nl = document.getElementsByTagName( "context-param" );
+        for (int i = 0; i < nl.getLength(); i++) {
+            Element param = (Element) nl.item( i );
+            String name = getChildNodeValue( param, "param-name" );
+            String value = getChildNodeValue( param, "param-value" );
+            _contextParameters.put( name, value );
+        }
     }
 
 
@@ -312,7 +309,7 @@ class WebApplication {
     private static String getChildNodeValue( Element root, String childNodeName, String defaultValue ) throws SAXException {
         NodeList nl = root.getElementsByTagName( childNodeName );
         if (nl.getLength() == 1) {
-            return getTextValue( nl.item(0) );
+            return getTextValue( nl.item( 0 ) );
         } else if (defaultValue == null) {
             throw new SAXException( "Node <" + root.getNodeName() + "> has no child named <" + childNodeName + ">" );
         } else {
@@ -355,6 +352,7 @@ class WebApplication {
 //============================================= SecurityCheckServlet class =============================================
 
     static class SecurityCheckServlet extends HttpServlet {
+
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
             handleLogin( (ServletUnitHttpRequest) req, resp );
         }
@@ -386,9 +384,9 @@ class WebApplication {
         ServletConfiguration( Element servletElement ) throws SAXException {
             this( getChildNodeValue( servletElement, "servlet-class" ) );
             final NodeList initParams = servletElement.getElementsByTagName( "init-param" );
-            for (int i = initParams.getLength()-1; i >= 0; i--) {
-                _initParams.put( getChildNodeValue( (Element) initParams.item(i), "param-name" ),
-                                 getChildNodeValue( (Element) initParams.item(i), "param-value" ) );
+            for (int i = initParams.getLength() - 1; i >= 0; i--) {
+                _initParams.put( getChildNodeValue( (Element) initParams.item( i ), "param-name" ),
+                                 getChildNodeValue( (Element) initParams.item( i ), "param-value" ) );
             }
         }
 
@@ -403,7 +401,7 @@ class WebApplication {
         }
 
 
-        private String    _className;
+        private String _className;
         private Hashtable _initParams = new Hashtable();
     }
 
@@ -412,36 +410,51 @@ class WebApplication {
 
 
     interface SecurityConstraint {
+
         boolean controlsPath( String urlPath );
+
+
         boolean hasRole( String roleName );
     }
 
 
     static class NullSecurityConstraint implements SecurityConstraint {
-        public boolean controlsPath( String urlPath ) { return false; }
-        public boolean hasRole( String roleName ) { return true; }
+
+        public boolean controlsPath( String urlPath ) {
+            return false;
+        }
+
+
+        public boolean hasRole( String roleName ) {
+            return true;
+        }
     }
 
 
     static class SecurityConstraintImpl implements SecurityConstraint {
+
         SecurityConstraintImpl( Element root ) throws SAXException {
             final NodeList roleNames = root.getElementsByTagName( "role-name" );
-            for (int i = 0; i < roleNames.getLength(); i++) _roles.add( getTextValue( (Element) roleNames.item(i) ) );
+            for (int i = 0; i < roleNames.getLength(); i++) _roles.add( getTextValue( (Element) roleNames.item( i ) ) );
 
             final NodeList resources = root.getElementsByTagName( "web-resource-collection" );
-            for (int i = 0; i < resources.getLength(); i++) _resources.add( new WebResourceCollection( (Element) resources.item(i) ) );
+            for (int i = 0; i < resources.getLength(); i++) _resources.add( new WebResourceCollection( (Element) resources.item( i ) ) );
         }
+
 
         public boolean controlsPath( String urlPath ) {
             return getMatchingCollection( urlPath ) != null;
         }
 
+
         public boolean hasRole( String roleName ) {
             return _roles.contains( roleName );
         }
 
-        private ArrayList _roles     = new ArrayList();
+
+        private ArrayList _roles = new ArrayList();
         private ArrayList _resources = new ArrayList();
+
 
         public WebResourceCollection getMatchingCollection( String urlPath ) {
             for (Iterator i = _resources.iterator(); i.hasNext();) {
@@ -451,11 +464,14 @@ class WebApplication {
             return null;
         }
 
+
         class WebResourceCollection {
+
             WebResourceCollection( Element root ) throws SAXException {
                 final NodeList urlPatterns = root.getElementsByTagName( "url-pattern" );
-                for (int i = 0; i < urlPatterns.getLength(); i++) _urlPatterns.add( getTextValue( (Element) urlPatterns.item(i) ) );
+                for (int i = 0; i < urlPatterns.getLength(); i++) _urlPatterns.add( getTextValue( (Element) urlPatterns.item( i ) ) );
             }
+
 
             boolean controlsPath( String urlPath ) {
                 for (Iterator i = _urlPatterns.iterator(); i.hasNext();) {
@@ -465,9 +481,11 @@ class WebApplication {
                 return false;
             }
 
-            private ArrayList _urlPatterns  = new ArrayList();
+
+            private ArrayList _urlPatterns = new ArrayList();
         }
     }
+
 
     /**
      * A utility class for mapping servlets to url patterns. This implements the
@@ -477,65 +495,68 @@ class WebApplication {
      * @version $Revision$
      */
     class ServletMapping {
-    
+
         private final Map exactMatches = new HashMap();
         private final Map extensions = new HashMap();
         private final Map urlTree = new HashMap();
-    
-        void put(String mapping, ServletConfiguration servletConfiguration) {
-            if (mapping.indexOf('*') == -1) {
-                exactMatches.put(mapping, servletConfiguration);
-            } else if (mapping.startsWith("*.")) {
-                extensions.put(mapping.substring(2), servletConfiguration);
+
+
+        void put( String mapping, ServletConfiguration servletConfiguration ) {
+            if (mapping.indexOf( '*' ) == -1) {
+                exactMatches.put( mapping, servletConfiguration );
+            } else if (mapping.startsWith( "*." )) {
+                extensions.put( mapping.substring( 2 ), servletConfiguration );
             } else {
-                ParsedPath path = new ParsedPath(mapping);
+                ParsedPath path = new ParsedPath( mapping );
                 Map context = urlTree;
                 while (path.hasNext()) {
                     String part = path.next();
-                    if (part.equals("*")) {
-                        context.put("*", servletConfiguration);
+                    if (part.equals( "*" )) {
+                        context.put( "*", servletConfiguration );
                         return;
                     }
-                    if (!context.containsKey(part)) {
-                        context.put(part, new HashMap());
+                    if (!context.containsKey( part )) {
+                        context.put( part, new HashMap() );
                     }
-                    context = (Map)context.get(part);
+                    context = (Map) context.get( part );
                 }
-                context.put("/", servletConfiguration);
+                context.put( "/", servletConfiguration );
             }
         }
-    
-        ServletConfiguration get(String url) {
-            if (exactMatches.containsKey(url)) {
-                return (ServletConfiguration)exactMatches.get(url);
+
+
+        ServletConfiguration get( String url ) {
+            if (exactMatches.containsKey( url )) {
+                return (ServletConfiguration) exactMatches.get( url );
             }
-            ParsedPath path = new ParsedPath(url);
+            ParsedPath path = new ParsedPath( url );
             Map context = urlTree;
             while (path.hasNext()) {
                 String part = path.next();
-                if (!context.containsKey(part)) {
-                    if (context.containsKey("*")) {
-                        return (ServletConfiguration)context.get("*");
+                if (!context.containsKey( part )) {
+                    if (context.containsKey( "*" )) {
+                        return (ServletConfiguration) context.get( "*" );
                     } else {
-                        int index = url.lastIndexOf('.');
-                        if (index == -1 || index == url.length()-1) {
+                        int index = url.lastIndexOf( '.' );
+                        if (index == -1 || index == url.length() - 1) {
                             return null;
                         } else {
-                            return (ServletConfiguration)extensions.get(url.substring(index+1));
+                            return (ServletConfiguration) extensions.get( url.substring( index + 1 ) );
                         }
                     }
                 }
-                context = (Map)context.get(part);
+                context = (Map) context.get( part );
             }
-            if (context.containsKey("*")) {
-                return (ServletConfiguration)context.get("*");
+            if (context.containsKey( "*" )) {
+                return (ServletConfiguration) context.get( "*" );
             }
-            return (ServletConfiguration)context.get("/");
+            return (ServletConfiguration) context.get( "/" );
         }
-    
+
     }
 
 }
+
 
 /**
  * A utility class for parsing URLs into paths
@@ -548,17 +569,19 @@ class ParsedPath {
     private int position = 0;
     static final char seperator_char = '/';
 
+
     /**
      * Creates a new parsed path for the given path value
      *
      * @param path the path
      */
-    ParsedPath(String path) {
-        if (path.charAt(0) != seperator_char) {
-            throw new IllegalArgumentException("Illegal path '"+path+"', does not begin with "+seperator_char);
+    ParsedPath( String path ) {
+        if (path.charAt( 0 ) != seperator_char) {
+            throw new IllegalArgumentException( "Illegal path '" + path + "', does not begin with " + seperator_char );
         }
         this.path = path;
     }
+
 
     /**
      * Returns true if there are more parts left, otherwise false
@@ -567,15 +590,16 @@ class ParsedPath {
         return (position < path.length());
     }
 
+
     /**
      * Returns the next part in the path
      */
     public final String next() {
-        int offset = position+1;
-        while (offset < path.length() && path.charAt(offset) != seperator_char) {
+        int offset = position + 1;
+        while (offset < path.length() && path.charAt( offset ) != seperator_char) {
             offset++;
         }
-        String result = path.substring(position+1, offset);
+        String result = path.substring( position + 1, offset );
         position = offset;
         return result;
     }

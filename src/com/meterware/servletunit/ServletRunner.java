@@ -60,9 +60,11 @@ public class ServletRunner {
      *
      * @param webXMLFileSpec the full path to the web.xml file
      */
-    public ServletRunner( String webXMLFileSpec) throws IOException, SAXException {
-        this(webXMLFileSpec, null);
+    public ServletRunner( String webXMLFileSpec ) throws IOException, SAXException {
+        _context = new ServletUnitContext();
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ) );
     }
+
 
     /**
      * Constructor which expects the full path to the web.xml for the 
@@ -72,10 +74,11 @@ public class ServletRunner {
      * @param contextPath the context path
      */
     public ServletRunner( String webXMLFileSpec, String contextPath ) throws IOException, SAXException {
-        _context = new ServletUnitContext(contextPath);
-        File webXMLFile = new File(webXMLFileSpec);
-        _application = new WebApplication(HttpUnitUtils.newParser().parse( webXMLFileSpec ), webXMLFile.getParentFile().getParentFile(), _context.getContextPath());
+        _context = new ServletUnitContext( contextPath );
+        File webXMLFile = new File( webXMLFileSpec );
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ), webXMLFile.getParentFile().getParentFile(), _context.getContextPath() );
     }
+
 
     /**
      * Constructor which expects an input stream containing the web.xml for the application.
