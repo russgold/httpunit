@@ -24,6 +24,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.HttpUnitTest;
 import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.WebClient;
 
 import org.xml.sax.SAXException;
 
@@ -79,9 +80,9 @@ public class FormScriptingTest extends HttpUnitTest {
         assertEquals( "Initial state", null, form.getParameterValue( "ready" ) );
 
         response.getLinks()[ 0 ].click();
-        assertEquals( "Message 1", "form has 3 elements", response.popNextAlert() );
-        assertEquals( "Message 2", "value is Initial Text", response.popNextAlert() );
-        assertEquals( "Message 3", "index is 1", response.popNextAlert() );
+        assertEquals( "Message 1", "form has 3 elements", wc.popNextAlert() );
+        assertEquals( "Message 2", "value is Initial Text", wc.popNextAlert() );
+        assertEquals( "Message 3", "index is 1", wc.popNextAlert() );
 
         assertEquals( "Changed state", "on", form.getParameterValue( "ready" ) );
     }
@@ -166,14 +167,14 @@ public class FormScriptingTest extends HttpUnitTest {
         WebForm form = response.getFormWithName( "the_form" );
         assertEquals( "Initial state", "blue", form.getParameterValue( "color" ) );
 
-        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        assertEquals( "Alert message before change", null, wc.getNextAlert() );
         form.setParameter( "color", "red" );
-        assertEquals( "Alert after change", "color is now red", response.popNextAlert() );
+        assertEquals( "Alert after change", "color is now red", wc.popNextAlert() );
 
         assertEquals( "Changed state", "red", form.getParameterValue( "color" ) );
         response.getLinks()[ 0 ].click();
         assertEquals( "Final state", "green", form.getParameterValue( "color" ) );
-        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
+        assertEquals( "Alert message after JavaScript change", null, wc.getNextAlert() );
     }
 
 
@@ -196,7 +197,7 @@ public class FormScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
         response.getLinkWithName( "report" ).mouseOver();
-        verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "good" );
+        verifyCheckbox( /* default */ wc, false, /* checked */ false, /* value */ "good" );
 
         assertEquals( "initial parameter value", null, form.getParameterValue( "ready" ) );
         response.getLinkWithName( "set" ).mouseOver();
@@ -206,7 +207,7 @@ public class FormScriptingTest extends HttpUnitTest {
         response.getLinkWithName( "change" ).mouseOver();
         assertEquals( "final parameter value", null, form.getParameterValue( "ready" ) );
         response.getLinkWithName( "report" ).mouseOver();
-        verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "waiting" );
+        verifyCheckbox( /* default */ wc, false, /* checked */ false, /* value */ "waiting" );
         form.setParameter( "ready", "waiting" );
     }
 
@@ -228,15 +229,15 @@ public class FormScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
-        verifyCheckbox( response, /* default */ true,  /* checked */ true,  /* value */ "good" );
-        verifyCheckbox( response, /* default */ false, /* checked */ false, /* value */ "bad" );
+        verifyCheckbox( /* default */ wc, true,  /* checked */ true,  /* value */ "good" );
+        verifyCheckbox( /* default */ wc, false, /* checked */ false, /* value */ "bad" );
     }
 
 
-    private void verifyCheckbox( WebResponse response, boolean defaultChecked, boolean checked, String value ) throws SAXException {
-        assertEquals( "Message " + 1 + "-1", "checkbox ready default = " + defaultChecked, response.popNextAlert() );
-        assertEquals( "Message " + 1 + "-2", "checkbox ready checked = " + checked, response.popNextAlert() );
-        assertEquals( "Message " + 1 + "-3", "checkbox ready value = " + value, response.popNextAlert() );
+    private void verifyCheckbox( WebClient wc, boolean defaultChecked, boolean checked, String value ) throws SAXException {
+        assertEquals( "Message " + 1 + "-1", "checkbox ready default = " + defaultChecked, wc.popNextAlert() );
+        assertEquals( "Message " + 1 + "-2", "checkbox ready checked = " + checked, wc.popNextAlert() );
+        assertEquals( "Message " + 1 + "-3", "checkbox ready value = " + value, wc.popNextAlert() );
     }
 
 
@@ -254,18 +255,18 @@ public class FormScriptingTest extends HttpUnitTest {
         WebForm form = response.getFormWithName( "the_form" );
         assertEquals( "Initial state", null, form.getParameterValue( "color" ) );
 
-        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        assertEquals( "Alert message before change", null, wc.getNextAlert() );
         form.removeParameter( "color" );
-        assertEquals( "Alert message w/o change", null, response.getNextAlert() );
+        assertEquals( "Alert message w/o change", null, wc.getNextAlert() );
         form.setParameter( "color", "blue" );
-        assertEquals( "Alert after change", "color-blue is now true", response.popNextAlert() );
+        assertEquals( "Alert after change", "color-blue is now true", wc.popNextAlert() );
         form.removeParameter( "color" );
-        assertEquals( "Alert after change", "color-blue is now false", response.popNextAlert() );
+        assertEquals( "Alert after change", "color-blue is now false", wc.popNextAlert() );
 
         assertEquals( "Changed state", null, form.getParameterValue( "color" ) );
         response.getLinks()[ 0 ].click();
         assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
-        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
+        assertEquals( "Alert message after JavaScript change", null, wc.getNextAlert() );
     }
 
 
@@ -286,15 +287,15 @@ public class FormScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
-        verifyRadio( response, /* default */ true,  /* checked */ true,  /* value */ "good" );
-        verifyRadio( response, /* default */ false, /* checked */ false, /* value */ "bad" );
+        verifyRadio( /* default */ wc, true,  /* checked */ true,  /* value */ "good" );
+        verifyRadio( /* default */ wc, false, /* checked */ false, /* value */ "bad" );
     }
 
 
-    private void verifyRadio( WebResponse response, boolean defaultChecked, boolean checked, String value ) throws SAXException {
-        assertEquals( "Message " + 1 + "-1", "radio ready default = " + defaultChecked, response.popNextAlert() );
-        assertEquals( "Message " + 1 + "-2", "radio ready checked = " + checked, response.popNextAlert() );
-        assertEquals( "Message " + 1 + "-3", "radio ready value = " + value, response.popNextAlert() );
+    private void verifyRadio( WebClient wc, boolean defaultChecked, boolean checked, String value ) throws SAXException {
+        assertEquals( "Message " + 1 + "-1", "radio ready default = " + defaultChecked, wc.popNextAlert() );
+        assertEquals( "Message " + 1 + "-2", "radio ready checked = " + checked, wc.popNextAlert() );
+        assertEquals( "Message " + 1 + "-3", "radio ready value = " + value, wc.popNextAlert() );
     }
 
 
@@ -314,18 +315,18 @@ public class FormScriptingTest extends HttpUnitTest {
         WebForm form = response.getFormWithName( "the_form" );
         assertEquals( "Initial state", "red", form.getParameterValue( "color" ) );
 
-        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        assertEquals( "Alert message before change", null, wc.getNextAlert() );
         form.setParameter( "color", "red" );
-        assertEquals( "Alert message w/o change", null, response.getNextAlert() );
+        assertEquals( "Alert message w/o change", null, wc.getNextAlert() );
         form.setParameter( "color", "blue" );
-        assertEquals( "Alert after change", "color is now blue", response.popNextAlert() );
+        assertEquals( "Alert after change", "color is now blue", wc.popNextAlert() );
         form.setParameter( "color", "red" );
-        assertEquals( "Alert after change", "color is now red", response.popNextAlert() );
+        assertEquals( "Alert after change", "color is now red", wc.popNextAlert() );
 
         assertEquals( "Changed state", "red", form.getParameterValue( "color" ) );
         response.getLinks()[ 0 ].click();
         assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
-        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
+        assertEquals( "Alert message after JavaScript change", null, wc.getNextAlert() );
     }
 
 
@@ -339,7 +340,7 @@ public class FormScriptingTest extends HttpUnitTest {
                                   "<a href='#' name='doShow' onClick='alert( document.the_form.action );'>show</a>" );
         WebResponse page = wc.getResponse( getHostPath() + "/Default.html" );
         page.getLinkWithName( "doShow" ).click();
-        assertEquals( "Current action", "ask", page.popNextAlert() );
+        assertEquals( "Current action", "ask", wc.popNextAlert() );
         page.getLinkWithName( "doTell" ).click();
 
         WebRequest request = page.getForms()[0].getRequest();
@@ -369,7 +370,7 @@ public class FormScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
         form.submit();
-        assertEquals( "Alert message", "wrong color", response.popNextAlert() );
+        assertEquals( "Alert message", "wrong color", wc.popNextAlert() );
         assertSame( "Current response", response, wc.getCurrentPage() );
         form.setParameter( "color", "pink" );
         WebResponse newResponse = form.submit();
@@ -399,17 +400,17 @@ public class FormScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "1st message", "select has 2 options", response.popNextAlert() );
-        assertEquals( "2nd message", "select still has 2 options", response.popNextAlert() );
-        assertEquals( "3rd message", "select option 0 is red", response.popNextAlert() );
-        assertEquals( "4th message", "select 2nd option value is 3", response.popNextAlert() );
-        assertEquals( "5th message", "blue selected", response.popNextAlert() );
+        assertEquals( "1st message", "select has 2 options", wc.popNextAlert() );
+        assertEquals( "2nd message", "select still has 2 options", wc.popNextAlert() );
+        assertEquals( "3rd message", "select option 0 is red", wc.popNextAlert() );
+        assertEquals( "4th message", "select 2nd option value is 3", wc.popNextAlert() );
+        assertEquals( "5th message", "blue selected", wc.popNextAlert() );
 
         response.getLinks()[0].mouseOver();
-        assertEquals( "before change message", "selected #1", response.popNextAlert() );
+        assertEquals( "before change message", "selected #1", wc.popNextAlert() );
         response.getFormWithName( "the_form" ).setParameter( "choices", "1" );
         response.getLinks()[0].mouseOver();
-        assertEquals( "after change message", "selected #0", response.popNextAlert() );
+        assertEquals( "after change message", "selected #0", wc.popNextAlert() );
     }
 
 
@@ -435,16 +436,16 @@ public class FormScriptingTest extends HttpUnitTest {
         final WebForm form = response.getFormWithName( "the_form" );
         assertEquals( "Initial state", "blue", form.getParameterValue( "choices" ) );
 
-        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        assertEquals( "Alert message before change", null, wc.getNextAlert() );
         form.setParameter( "choices", "red" );
-        assertEquals( "Alert after change", "Selected index is 0", response.popNextAlert() );
+        assertEquals( "Alert after change", "Selected index is 0", wc.popNextAlert() );
         form.setParameter( "choices", "blue" );
-        assertEquals( "Alert after change", "Selected index is 1", response.popNextAlert() );
+        assertEquals( "Alert after change", "Selected index is 1", wc.popNextAlert() );
 
         assertEquals( "Initial state", "blue", form.getParameterValue( "choices" ) );
         response.getLinks()[ 0 ].click();
         assertEquals( "Final state", "red", form.getParameterValue( "choices" ) );
-        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
+        assertEquals( "Alert message after JavaScript change", null, wc.getNextAlert() );
     }
 
 

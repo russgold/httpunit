@@ -475,27 +475,27 @@ public class WebResponse implements HTMLSegment {
 
 //---------------------------------------- JavaScript methods ----------------------------------------
 
-    private LinkedList _alerts = new LinkedList();
-
     /**
      * Returns the next javascript alert without removing it from the queue.
+     * @deprecated use WebClient#getNextAlert. Will be removed in next release.
      */
     public String getNextAlert() {
-        return _alerts.isEmpty() ? null : (String) _alerts.getFirst();
+        return _client.getNextAlert();
     }
 
 
     /**
      * Returns the next javascript alert and removes it from the queue.
+     * @deprecated use WebClient#popNextAlert. Will be removed in next release.
      */
     public String popNextAlert() {
-        if (_alerts.isEmpty()) throw new IllegalStateException( "Tried to pop a non-existent alert" );
-        return (String) _alerts.removeFirst();
+        return _client.popNextAlert();
     }
 
 
     public Scriptable getScriptableObject() {
-        return new Scriptable();
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
     }
 
 
@@ -511,7 +511,7 @@ public class WebResponse implements HTMLSegment {
     public class Scriptable extends ScriptableDelegate {
 
         public void alert( String message ) {
-            _alerts.addLast( message );
+            _client.postAlert( message );
         }
 
 
@@ -612,8 +612,8 @@ public class WebResponse implements HTMLSegment {
 
 //------------------------------------------ package members ------------------------------------------------
 
-
-    final static WebResponse BLANK_RESPONSE = new DefaultWebResponse( "<html><head></head><body></body></html>" );
+    final static String      BLANK_HTML     = "<html><head><title>Blank</title></head><body></body></html>";
+    final static WebResponse BLANK_RESPONSE = new DefaultWebResponse( BLANK_HTML );
 
 
     /**
@@ -697,6 +697,8 @@ public class WebResponse implements HTMLSegment {
     private String _frameName;
 
     private WebClient _client;
+
+    private Scriptable _scriptable;
 
 
     protected void loadResponseText() throws IOException {
@@ -1087,7 +1089,17 @@ class DefaultWebResponse extends WebResponse {
 
 
     DefaultWebResponse( String text ) {
-        super( null, "", null );
+        this( null, null, text );
+    }
+
+
+    DefaultWebResponse( WebClient client, URL url, String text ) {
+        this( client, WebRequest.TOP_FRAME, url, text );
+    }
+
+
+    DefaultWebResponse( WebClient client, String target, URL url, String text ) {
+        super( client, target, url );
         _responseText = text;
     }
 

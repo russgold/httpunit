@@ -19,7 +19,6 @@ package com.meterware.httpunit.scripting;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import java.util.*;
 
 
 /**
@@ -29,9 +28,21 @@ import java.util.*;
 public interface ScriptingEngine {
 
 
+    /**
+     * Interprets the specified script, which may include global function definitions.
+     */
     public void executeScript( String script );
 
 
+    /**
+     * Interprets the specified script and returns a boolean result.
+     */
     public boolean performEvent( String eventScript );
+
+
+    /**
+     * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
+     */
+    public String getURLContents( String urlString );
 
 }

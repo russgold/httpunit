@@ -31,11 +31,9 @@ abstract public class ScriptableDelegate {
     private ScriptingEngine _scriptEngine;
 
     private static final ScriptingEngine NULL_SCRIPT_ENGINE = new ScriptingEngine() {
-        public void executeScript( String script ) {
-        }
-        public boolean performEvent( String eventScript ) {
-            return true;
-        }
+        public void executeScript( String script ) {}
+        public boolean performEvent( String eventScript ) { return true; }
+        public String getURLContents( String urlString ) { return null; }
     };
 
 
@@ -53,6 +51,15 @@ abstract public class ScriptableDelegate {
      **/
     public void runScript( String script ) {
         if (script.length() != 0) getScriptEngine().executeScript( script );
+    }
+
+
+    /**
+     * Evaluates the specified javascript URL.
+     **/
+    public String evaluateURL( String urlString ) {
+        if (urlString.length() == 0) return null;
+        return getScriptEngine().getURLContents( urlString );
     }
 
 

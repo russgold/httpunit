@@ -288,6 +288,7 @@ public class WebRequest {
 
     protected WebRequest( WebRequestSource requestSource ) {
         this( requestSource.getBaseURL(), requestSource.getRelativeURL(), requestSource.getTarget(), newParameterHolder( requestSource ) );
+        _webRequestSource = requestSource;
         setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
     }
 
@@ -306,7 +307,7 @@ public class WebRequest {
      **/
     private WebRequest( URL urlBase, String urlString, String target, ParameterHolder parameterHolder ) {
         _urlBase   = urlBase;
-        _urlString = escape( urlString );
+        _urlString = urlString.toLowerCase().startsWith( "http" ) ? escape( urlString ) : urlString;
         _target    = target;
         _parameterHolder = parameterHolder;
     }
@@ -421,6 +422,11 @@ public class WebRequest {
     final static String TOP_FRAME = "_top";
 
 
+   WebRequestSource getWebRequestSource() {
+        return _webRequestSource;
+    }
+
+
     Hashtable getHeaderDictionary() {
         if (_headers == null) {
             _headers = new Hashtable();
@@ -448,6 +454,7 @@ public class WebRequest {
     private String       _urlString;
     private String       _target = TOP_FRAME;
     private Hashtable    _headers;
+    private WebRequestSource _webRequestSource;
 
     private boolean      _httpsProtocolSupportEnabled;
 

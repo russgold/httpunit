@@ -334,6 +334,7 @@ public class WebForm extends WebRequestSource {
         return _scriptable;
     }
 
+
 //---------------------------------- WebRequestSource methods --------------------------------
 
     /**
@@ -375,6 +376,15 @@ public class WebForm extends WebRequestSource {
      **/
     public WebRequest getRequest() {
         return getRequest( (SubmitButton) null );
+    }
+
+
+    /**
+     * Returns the scriptable delegate.
+     */
+
+    ScriptableDelegate getScriptableDelegate() {
+        return getScriptableObject();
     }
 
 

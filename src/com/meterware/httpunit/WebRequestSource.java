@@ -20,6 +20,8 @@
  *******************************************************************************************************************/
 package com.meterware.httpunit;
 
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -87,6 +89,13 @@ public class WebRequestSource extends ParameterHolder {
      **/
     abstract
     public String[] getParameterValues( String name );
+
+
+    /**
+     * Returns the scriptable delegate.
+     */
+    abstract
+    ScriptableDelegate getScriptableDelegate();
 
 
     /**

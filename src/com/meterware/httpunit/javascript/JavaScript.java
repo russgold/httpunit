@@ -104,6 +104,19 @@ public class JavaScript {
             }
         }
 
+        /**
+         * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
+         */
+        public String getURLContents( String urlString ) {
+            try {
+                Object result = Context.getCurrentContext().evaluateString( this, urlString, "httpunit", 0, null );
+                return (result == null || result instanceof Undefined) ? null : result.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException( "Script '" + urlString + "' failed: " + e );
+            }
+        }
+
 
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {

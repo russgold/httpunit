@@ -96,15 +96,6 @@ public class WebLink extends WebRequestSource {
     }
 
 
-    /**
-     * Returns an object which provides scripting access to this link.
-     **/
-    public Scriptable getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
-        return _scriptable;
-    }
-
-
 //----------------------------------------- WebRequestSource methods ---------------------------------------------------
 
 
@@ -113,6 +104,14 @@ public class WebLink extends WebRequestSource {
      **/
     public WebRequest getRequest() {
         return new GetMethodWebRequest( this );
+    }
+
+
+    /**
+     * Returns the scriptable delegate.
+     */
+    ScriptableDelegate getScriptableDelegate() {
+        return getScriptableObject();
     }
 
 
@@ -262,6 +261,15 @@ public class WebLink extends WebRequestSource {
      **/
     WebLink( WebResponse response, URL baseURL, String parentTarget, Node node ) {
         super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), parentTarget );
+    }
+
+
+    /**
+     * Returns an object which provides scripting access to this link.
+     **/
+    Scriptable getScriptableObject() {
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
     }
 
 

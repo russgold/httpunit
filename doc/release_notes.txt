@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+23-Aug-2002
+Additions:
+    1. javascript URLs are now supported.
+
 22-Aug-2002
 
 Acknowledgements:
