@@ -11,6 +11,12 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
+21-May-01
+Additions:
+    1. selectFile now infers file content for zip extension
+    2. <button> tags are now recognized as submit buttons if their type is "submit"
+       or not specified.
+
 16-May-01
 Additions:
     1. selectFile now can infer file content type for the most common file extensions:

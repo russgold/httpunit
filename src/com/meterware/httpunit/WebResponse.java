@@ -308,8 +308,8 @@ public class WebResponse implements HTMLSegment {
 
     /**
      * Constructs a response object.
+     * @param target the name of the frame to hold the response
      * @param url the url from which the response was received
-     * @param inputStream the input stream from which the response can be read
      **/
     protected WebResponse( String target, URL url ) {
         _url = url;

@@ -117,10 +117,19 @@ public class WebForm {
     private Vector getSubmitButtonVector() {
         if (_buttonVector == null) {
             _buttonVector = new Vector();
+
             NodeList nl = ((Element) _node).getElementsByTagName( "input" );
             for (int i = 0; i < nl.getLength(); i++) {
                 if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
                     || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "image" )) {
+                    _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
+                }
+            }
+
+            nl = ((Element) _node).getElementsByTagName( "button" );
+            for (int i = 0; i < nl.getLength(); i++) {
+                if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
+                    || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "" )) {
                     _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
                 }
             }

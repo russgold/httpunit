@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -110,6 +110,19 @@ public class FormSubmitTest extends HttpUnitTest {
                                   "<Input type=text name=age value=12>" +
                                   "<Input type=submit name=update>" +
                                   "<Input type=submit name=recalculate>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton[] buttons = form.getSubmitButtons();
+        assertEquals( "num detected submit buttons", 2, buttons.length );
+    }
+
+                              
+    public void testButtonTagDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Button type=submit name=update></button>" +
+                                  "<button name=recalculate></button>" +
                                   "</form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
