@@ -156,6 +156,7 @@ public class FormParametersTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
+        assertEquals( "color options", new String[] { "red", "blue", "green" }, page.getForms()[0].getOptionValues( "color" ) );
         request.setParameter( "color", "red" );
         request.setParameter( "color", "blue" );
         validateSetParameterRejected( request, "color", "black", "setting radio buttons to unknown value" );

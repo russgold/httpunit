@@ -98,6 +98,24 @@ class HttpUnitTest extends TestCase {
     }
 
 
+    protected void assertEquals( String comment, Object[] expected, Object[] found ) {
+        if (!equals( expected, found )) {
+            fail( comment + " expected: " + asText( expected ) + " but found " + asText( found ) );
+        }
+    }
+
+    private boolean equals( Object[] first, Object[] second )
+    {
+        if (first.length != second.length) return false;
+        for (int i = 0; i < first.length; i++)
+        {
+            if (!first[i].equals( second[i] )) return false;
+        }
+        return true;
+    }
+
+
+
 
     protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
         Vector expectedItems = new Vector();

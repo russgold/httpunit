@@ -222,7 +222,7 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "parameter name", "colors", parameterNames[0] );
         assertMatchingSet( "Select defaults", new String[] { "red", "pink" }, form.getParameterValues( "colors" ) );
         assertMatchingSet( "Select options", new String[] { "blue", "red", "green", "salmon" }, form.getOptions( "colors" ) );
-        assertMatchingSet( "Select values", new String[] { "blue", "red", "green", "pink" }, form.getOptionValues( "colors" ) );
+        assertEquals( "Select values", new String[] { "blue", "red", "green", "pink" }, form.getOptionValues( "colors" ) );
         WebRequest request = form.getRequest();
         assertMatchingSet( "Request defaults", new String[] { "red", "pink" }, request.getParameterValues( "colors" ) );
         assertEquals( "URL", getHostPath() + "/ask?colors=red&colors=pink", request.getURL().toExternalForm() );

@@ -10,6 +10,11 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+ 2-Aug-2001
+    Problems Corrected:
+       1. Set-Cookie headers are now processed even on responses with 4xx and 5xx status
+       2. WebForm.getOptionValues now returns the options in the order listed in the form for both selections and radio buttons.
+
 31-Jul-2001
     Additions:
        1. Added ID property to SubmitButton and WebLink
@@ -35,7 +40,7 @@ Problems corrected:
        invoking getText or reading the input stream.
 
 Additions:
-    1. The Set_Cookie2 header is now handled
+    1. The Set-Cookie2 header is now handled
 
 19-Jul-2001
 Additions:

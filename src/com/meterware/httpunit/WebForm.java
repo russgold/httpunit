@@ -503,8 +503,8 @@ public class WebForm extends WebRequestSource {
      **/
     private String[] withNewValue( String[] group, String value ) {
         String[] result = new String[ group.length+1 ];
-        System.arraycopy( group, 0, result, 1, group.length );
-        result[0] = value;
+        System.arraycopy( group, 0, result, 0, group.length );
+        result[ group.length ] = value;
         return result;
     }
 

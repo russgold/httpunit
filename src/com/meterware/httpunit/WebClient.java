@@ -97,7 +97,7 @@ public class WebClient {
      * Defines a cookie to be sent to the server on every request.
      **/
     public void addCookie( String name, String value ) {
-	_cookies.put( name, value );
+        _cookies.put( name, value );
     }
 
 
@@ -216,8 +216,8 @@ public class WebClient {
      **/
     final
     protected void updateClient( WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        validateHeaders( response );
         updateCookies( response );
+        validateHeaders( response );
         if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
             getResponse( response.getRefreshRequest() );
         } else if (response.getHeaderField( "Location" ) == null) {
