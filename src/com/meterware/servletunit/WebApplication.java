@@ -109,6 +109,7 @@ class WebApplication {
      * Constructs an application spec from an XML document.
      */
     WebApplication( Document document, File file, String contextPath ) throws MalformedURLException, SAXException {
+        if (contextPath != null && contextPath.length() > 0 && !contextPath.startsWith( "/" )) throw new IllegalArgumentException( "Context path " + contextPath + " must start with '/'" );
         _contextDir = file;
         _contextPath = contextPath == null ? "" : contextPath;
         registerServlets( document );
