@@ -148,6 +148,7 @@ public class PseudoServerTest extends TestCase {
         ps.setResource( resourceName, resourceValue );
         ps.addResourceHeader( resourceName, "Set-Cookie: age=12, name=george" );
         ps.addResourceHeader( resourceName, "Set-Cookie: type=short" );
+        ps.addResourceHeader( resourceName, "Set-Cookie: funky=ab$==" );
 
         try {
             WebConversation wc   = new WebConversation();
@@ -155,10 +156,11 @@ public class PseudoServerTest extends TestCase {
             WebResponse response = wc.getResponse( request );
             assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
-            assertEquals( "number of cookies", 3, wc.getCookieNames().length );
+            assertEquals( "number of cookies", 4, wc.getCookieNames().length );
             assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
             assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
             assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );
+            assertEquals( "cookie 'funky' value", "ab$==", wc.getCookieValue( "funky" ) );
         } finally {
             ps.shutDown();
         }

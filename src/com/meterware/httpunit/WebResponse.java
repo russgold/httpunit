@@ -367,14 +367,26 @@ public class WebResponse {
     }
 
 
+
     private void recognizeOneCookie( String cookieSpec ) {
-        StringTokenizer st = new StringTokenizer( cookieSpec, "=;" );
-        String name = st.nextToken().trim();
-        if (st.hasMoreTokens()) {
-            String value = st.nextToken().trim();
-            _newCookies.put( name, value );
-        }
+        StringTokenizer st = new StringTokenizer( cookieSpec, ";" );
+        String token = st.nextToken().trim();
+        int i = token.indexOf("=");
+        if (i > -1) {
+            String name = token.substring(0, i).trim();
+            String value = stripQuote( token.substring( i+1, token.length() ).trim() );
+	    _newCookies.put( name, value );
+	}
     }
+
+
+    private String stripQuote( String value ) {
+        if (((value.startsWith("\"")) && (value.endsWith("\""))) ||
+            ((value.startsWith("'") && (value.endsWith("'"))))) {
+            return value.substring(1,value.length()-1);
+        }
+        return value;
+   }
 
 
     private void readContentTypeHeader() {

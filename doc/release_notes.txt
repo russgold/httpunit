@@ -11,7 +11,15 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
-08-Jan-01
+23-Mar-01
+Acknowledgements:
+    Thanks to Silvio Samadelli for improved cookie-recognition logic
+    
+Problems corrected:
+    1. Under JDK 1.3, error headers would sometimes cause a FileNotFoundException
+    2. Cookies containing '=' or wrapped in quotes are now recognized
+    
+08-Jan-01 1.2.2
 Acknowledgements:
     Thanks to Rocky Rhodes for finding the multiple cookie bug
     Thanks to Scott Croco for correcting the response code problem
