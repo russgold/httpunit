@@ -85,7 +85,7 @@ class WebApplication {
      */
     WebApplication( Document document, File file, String contextPath ) throws MalformedURLException, SAXException {
         _contextDir = file;
-        _contextPath = contextPath;
+        _contextPath = contextPath == null ? "" : contextPath;
         registerServlets( document );
         extractSecurityConstraints( document );
         extractContextParameters( document );
