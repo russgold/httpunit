@@ -39,13 +39,14 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
  **/
 class NekoHTMLParser implements HTMLParser {
 
 
     public void parse( HTMLPage page, URL pageURL, String pageText ) throws IOException, SAXException {
         try {
-            DOMParser parser = DOMParser.newParser(page);
+            DOMParser parser = DOMParser.newParser( page );
             parser.parse( new InputSource( new StringReader( pageText ) ) );
             page.setRootNode( parser.getDocument() );
         } catch (DOMParser.ScriptException e) {
@@ -57,6 +58,17 @@ class NekoHTMLParser implements HTMLParser {
     public String getCleanedText( String string ) {
         return (string == null) ? "" : string.replace( NBSP, ' ' );
     }
+
+
+    public boolean supportsPreserveTagCase() {
+        return true;
+    }
+
+
+    public boolean supportsReturnHTMLDocument() {
+        return true;
+    }
+
 
     final private static char NBSP = (char) 160;   // non-breaking space, defined by nekoHTML
 }
@@ -72,6 +84,12 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
     /** Filters property identifier. */
     protected static final String FILTERS = "http://cyberneko.org/html/properties/filters";
 
+    /** Element case settings. possible values: "upper", "lower", "match" */
+    protected static final String ELEMS = "http://cyberneko.org/html/properties/names/elems";
+
+    /** Attribute case settings. possible values: "upper", "lower", "no-change" */
+    protected static final String ATTRS = "http://cyberneko.org/html/properties/names/attrs";
+
 
     private HTMLPage _htmlPage;
     private ScriptableDelegate _scriptableObject;
@@ -82,9 +100,23 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
         configuration.setFeature( AUGMENTATIONS, true );
         final ScriptFilter javaScriptFilter = new ScriptFilter( configuration );
         configuration.setProperty( FILTERS, new XMLDocumentFilter[] { javaScriptFilter } );
-        final DOMParser domParser = new DOMParser( configuration, page );
-        javaScriptFilter.setParser( domParser );
-        return domParser;
+        if (HTMLParserFactory.isPreserveTagCase()) {
+            configuration.setProperty( ELEMS, "match" );
+            configuration.setProperty( ATTRS, "no-change" );
+        }
+
+        try {
+            final DOMParser domParser = new DOMParser( configuration, page );
+            domParser.setFeature( DEFER_NODE_EXPANSION, false );
+            if (HTMLParserFactory.isReturnHTMLDocument()) domParser.setProperty( DOCUMENT_CLASS_NAME, HTML_DOCUMENT_CLASS_NAME );
+            javaScriptFilter.setParser( domParser );
+            return domParser;
+        } catch (SAXNotRecognizedException e) {
+            throw new RuntimeException( e.toString() );
+        } catch (SAXNotSupportedException e) {
+            throw new RuntimeException( e.toString() );
+        }
+
     }
 
 
@@ -124,15 +156,6 @@ class DOMParser extends org.apache.xerces.parsers.DOMParser {
     DOMParser( HTMLConfiguration configuration, HTMLPage page ) {
         super( configuration );
         _htmlPage = page;
-
-        try {
-            setFeature( DEFER_NODE_EXPANSION, false );
-            setProperty( DOCUMENT_CLASS_NAME, HTML_DOCUMENT_CLASS_NAME );
-        } catch (SAXNotRecognizedException e) {
-            throw new RuntimeException( e.toString() );
-        } catch (SAXNotSupportedException e) {
-            throw new RuntimeException( e.toString() );
-        }
     }
 
 

@@ -61,17 +61,6 @@ public abstract class HttpUnitOptions {
     }
 
 
-    public static HTMLParser getHTMLParser() {
-        if (_nekoParser != null) {
-            return _nekoParser;
-        } else if (_jtidyParser != null) {
-            return _jtidyParser;
-        } else {
-            throw new RuntimeException( "No HTML parser found. Make sure that either nekoHTML.jar or Tidy.jar is in the in classpath" );
-        }
-    }
-
-
     /**
      * Returns true if HttpUnit is accepting and saving cookies. The default is to accept them.
      */
@@ -517,28 +506,10 @@ public abstract class HttpUnitOptions {
 
     private static boolean _exceptionsThrownOnScriptError = true;
 
-    private static HTMLParser _jtidyParser;
-
-    private static HTMLParser _nekoParser;
 
     static {
         _listeners = new Vector();
         reset();
 
-        try {
-            Class.forName( "org.w3c.tidy.Parser" );
-            _jtidyParser = (HTMLParser) Class.forName( "com.meterware.httpunit.JTidyHTMLParser" ).newInstance();
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        } catch (ClassNotFoundException e) {
-        }
-
-        try {
-            Class.forName( "org.cyberneko.html.HTMLConfiguration" );
-            _nekoParser = (HTMLParser) Class.forName( "com.meterware.httpunit.NekoHTMLParser" ).newInstance();
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        } catch (ClassNotFoundException e) {
-        }
     }
 }

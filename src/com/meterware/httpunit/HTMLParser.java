@@ -19,15 +19,16 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.net.URL;
 import java.io.IOException;
 
 /**
+ * A front end to a DOM parser that can handle HTML.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
  **/
 interface HTMLParser {
 
@@ -43,4 +44,16 @@ interface HTMLParser {
      * an HTML entity as a special character. This method should convert that character to normal text.
      */
     public String getCleanedText( String string );
+
+
+    /**
+     * Returns true if this parser supports preservation of the case of tag and attribute names.
+     */
+    public boolean supportsPreserveTagCase();
+
+
+    /**
+     * Returns true if this parser can return an HTMLDocument object.
+     */
+    public boolean supportsReturnHTMLDocument();
 }

@@ -260,7 +260,7 @@ public class HTMLPage extends ParsedHTML {
 
 
     public void parse( String text, URL pageURL ) throws SAXException, IOException {
-        HttpUnitOptions.getHTMLParser().parse( this, pageURL, text );
+        HTMLParserFactory.getHTMLParser().parse( this, pageURL, text );
     }
 
 

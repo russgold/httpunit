@@ -57,8 +57,10 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( WebClientTest.suite() );
         result.addTest( MessageBodyRequestTest.suite() );
         result.addTest( CookieTest.suite() );
-        if (HttpUnitOptions.getHTMLParser().getClass().getName().indexOf("Tidy") >= 0) result.addTest( JTidyPrintWriterTest.suite() );
-        if (HttpUnitOptions.getHTMLParser().getClass().getName().indexOf("NekoHTML") >= 0) result.addTest( NekoEnhancedScriptingTest.suite() );
+        result.addTest( ParserPropertiesTest.suite() );
+
+        if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("Tidy") >= 0) result.addTest( JTidyPrintWriterTest.suite() );
+        if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("NekoHTML") >= 0) result.addTest( NekoEnhancedScriptingTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.javascript.JavaScriptTestSuite" );

@@ -109,7 +109,7 @@ class NodeUtils {
                 return true;
             }
             public void processTextNodeValue( String value ) {
-                sb.append( HttpUnitOptions.getHTMLParser().getCleanedText( value ) );
+                sb.append( HTMLParserFactory.getHTMLParser().getCleanedText( value ) );
             }
         } );
         return sb.toString();

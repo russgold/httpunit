@@ -19,7 +19,6 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.SAXException;
 
@@ -48,6 +47,17 @@ class JTidyHTMLParser implements HTMLParser {
     public String getCleanedText( String string ) {
         return (string == null) ? "" : string.replace( NBSP, ' ' );
     }
+
+
+    public boolean supportsPreserveTagCase() {
+        return false;
+    }
+
+
+    public boolean supportsReturnHTMLDocument() {
+        return false;
+    }
+
 
     final private static char NBSP = (char) 160;   // non-breaking space, defined by JTidy
 

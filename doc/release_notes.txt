@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+19-Dec-2001
+    Thanks to Bernhard Wagner for adding some parser customization code.
+
+Additions:
+    You may call HTMLParserFactory.setPreserveTagCase and setReturnHTMLDocument to control whether the parser coerces
+    the case of tags and attributes or returns a HTMLDocument object, respectively.
+
 18-Dec-2001
 Acknowledgements:
     Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
