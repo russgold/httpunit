@@ -14,9 +14,13 @@ Revision History:
 20-Jul-2001
 Acknowledgements:
     Thanks to Drew Varner for more sophisticated cookie handling, including Set-Cookie2 code
+    Thanks to David Karr for pointing out the problem with status code 3xx responses and
+    suggesting a fix for it.
     
 Problems corrected:
     1. cookies with embedded commas and quotes are now handled
+    2. Status code 3xx responses no longer result in a null pointer exception when
+       invoking getText or reading the input stream.
     
 Additions:
     1. The Set_Cookie2 header is now handled

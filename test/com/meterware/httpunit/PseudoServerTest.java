@@ -76,7 +76,25 @@ public class PseudoServerTest extends HttpUnitTest {
     }
 
 
-    public void notestInternalErrorException() throws Exception {
+    public void testNotModifiedResponse() throws Exception {
+        PseudoServer ps = new PseudoServer();
+        ps.setErrorResource( "error.htm", 304, "Not Modified" );
+        int port = ps.getConnectedPort();
+
+        try {
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/error.htm" );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "Response code", 304, response.getResponseCode() );
+            response.getText();
+            response.getInputStream().read();
+        } finally {
+            ps.shutDown();
+        }
+    }
+
+
+    public void testInternalErrorException() throws Exception {
         PseudoServer ps = new PseudoServer();
         ps.setErrorResource( "error.htt", 501, "Internal error" );
         int port = ps.getConnectedPort();

@@ -220,6 +220,7 @@ public class WebResponse implements HTMLSegment {
      * Returns a buffered input stream for reading the contents of this reply.
      **/
     public InputStream getInputStream() throws IOException {
+        if (_inputStream == null) _inputStream = new ByteArrayInputStream( new byte[0] );
         return _inputStream;
     }
 
@@ -482,7 +483,7 @@ public class WebResponse implements HTMLSegment {
         if (_responseText != null) throw new IllegalStateException( "May only invoke loadResponseText once" );
         _responseText = "";
 
-        InputStream inputStream = _inputStream;
+        InputStream inputStream = getInputStream();
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[8 * 1024];
