@@ -9,7 +9,7 @@
 <LI><A HREF="#org.xml.sax">What is the org.xml.sax package?</A></LI>
 <LI><A HREF="#meterware.com">Where is meterware.com?</A></LI>
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
-<LI><A HREF="#https">Does HttpUnit support https?</A></LI>
+<LI><A HREF="sslfaq.html">Does HttpUnit support https?</A></LI>
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 <LI><A HREF="#utf8">HttpUnit fails with an IllegalArgumentException: sun.io.CharToByteUTF-8, what do I do?</A></LI>
@@ -38,11 +38,6 @@ lack of funds. I hope to correct this in the near future.
 Unfortunately, you can't. HttpUnit does not support any dialect of JavaScript. I have been shown a JavaScript library and it is possible 
 that I will one day add JavaScript support, but since I use it very little in my own development, and since it looks like a lot of work,
 it is not a major priority for me. If you feel ambitious enough to add JavaScript support yourself, I would be happy to accept submissions.
-
-<A NAME="https"><H2>Does HttpUnit support https?</H2></A>
-Yes, as long as you have the <A HREF="http://java.sun.com/products/jsse/">JSSE extension</A> installed. 
-Download this extension and install
-its three jars in your classpath.
 
 <A NAME="proxy"><H2>Can I use HttpUnit through a proxy server?</H2></A>
 Yes. HttpUnit uses java.net.HttpURLConnection, so the 

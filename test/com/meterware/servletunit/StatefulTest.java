@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -56,11 +56,11 @@ public class StatefulTest extends TestCase {
         ServletRunner sr = new ServletRunner();
         sr.registerServlet( resourceName, StatefulServlet.class.getName() );
 
-        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
+        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName );
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "No session found", response.toString() );
+        assertEquals( "requested resource", "No session found", response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
     }
 
@@ -71,7 +71,7 @@ public class StatefulTest extends TestCase {
         ServletRunner sr = new ServletRunner();
         sr.registerServlet( resourceName, StatefulServlet.class.getName() );
 
-        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName );
+        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
         request.setParameter( "color", "red" );
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
@@ -86,18 +86,81 @@ public class StatefulTest extends TestCase {
         sr.registerServlet( resourceName, StatefulServlet.class.getName() );
         WebClient wc = sr.newClient();
 
-        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName );
+        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
         request.setParameter( "color", "red" );
         WebResponse response = wc.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "You selected red", response.toString() );
+        assertEquals( "requested resource", "You selected red", response.getText() );
 
-        request = new PostMethodWebRequest( "http://localhost/" + resourceName );
+        request = new GetMethodWebRequest( "http://localhost/" + resourceName );
         response = wc.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "You posted red", response.toString() );
+        assertEquals( "requested resource", "You posted red", response.getText() );
+        assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
+
+
+    public void testInvocationContext() throws Exception {
+        final String resourceName = "something/interesting";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( resourceName, StatefulServlet.class.getName() );
+        ServletUnitClient suc = sr.newClient();
+
+        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
+        request.setParameter( "color", "red" );
+
+        InvocationContext ic = suc.newInvocation( request );
+        StatefulServlet ss = (StatefulServlet) ic.getServlet();
+        assertNull( "A session already exists", ss.getColor( ic.getRequest() ) );
+
+        ss.setColor( ic.getRequest(), "blue" );
+        assertEquals( "Color in session", "blue", ss.getColor( ic.getRequest() ) );
+    }
+
+
+    public void testInvocationCompletion() throws Exception {
+        final String resourceName = "something/interesting";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( resourceName, StatefulServlet.class.getName() );
+        ServletUnitClient suc = sr.newClient();
+
+        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
+        request.setParameter( "color", "red" );
+
+        InvocationContext ic = suc.newInvocation( request );
+        StatefulServlet ss = (StatefulServlet) ic.getServlet();
+        ss.setColor( ic.getRequest(), "blue" );
+        ss.writeSelectMessage( "blue", ic.getResponse().getWriter() );
+
+        WebResponse response = ic.getServletResponse();
+        assertEquals( "requested resource", "You selected blue", response.getText() );
+        assertEquals( "Returned cookie count", 1, response.getNewCookieNames().length );
+    }
+
+
+    public void testInvocationContextUpdate() throws Exception {
+        final String resourceName = "something/interesting";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( resourceName, StatefulServlet.class.getName() );
+        ServletUnitClient suc = sr.newClient();
+
+        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
+        request.setParameter( "color", "red" );
+
+        InvocationContext ic = suc.newInvocation( request );
+        StatefulServlet ss = (StatefulServlet) ic.getServlet();
+        ss.setColor( ic.getRequest(), "blue" );
+        suc.getResponse( ic );
+
+        WebResponse response = suc.getResponse( "http://localhost/" + resourceName );
+        assertNotNull( "No response received", response );
+        assertEquals( "content type", "text/plain", response.getContentType() );
+        assertEquals( "requested resource", "You posted blue", response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
     }
 
@@ -105,24 +168,38 @@ public class StatefulTest extends TestCase {
     static class StatefulServlet extends HttpServlet {
         static String RESPONSE_TEXT = "the desired content\r\n";
 
+        protected void doPost( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
+            resp.setContentType( "text/plain" );
+            writeSelectMessage( req.getParameter( "color" ), resp.getWriter() );
+            setColor( req, req.getParameter( "color" ) );
+        }
+                                                             
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
             resp.setContentType( "text/plain" );
             PrintWriter pw = resp.getWriter();
-            pw.print( "You selected " + req.getParameter( "color" ) );
-            req.getSession().putValue( "color", req.getParameter( "color" ) );
+            String color = getColor( req );
+            if (color == null) {
+                pw.print( "No session found" );
+            } else {
+                pw.print( "You posted " + color );
+            }
             pw.close();
         }
 
-        protected void doPost( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
-            resp.setContentType( "text/plain" );
-            HttpSession session = req.getSession( /* create */ false );
-            PrintWriter pw = resp.getWriter();
-            if (session == null) {
-                pw.print( "No session found" );
-            } else {
-                pw.print( "You posted " + session.getValue( "color" ) );
-            }
+        protected void writeSelectMessage( String color, PrintWriter pw ) throws IOException {
+            pw.print( "You selected " + color );
             pw.close();
+        }
+
+        protected void setColor( HttpServletRequest req, String color ) throws ServletException {
+            req.getSession().setAttribute( "color", color );
+        }
+
+
+        protected String getColor( HttpServletRequest req ) throws ServletException {
+            HttpSession session = req.getSession( /* create */ false );
+            if (session == null) return null;
+            return (String) session.getAttribute( "color" );
         }
 
     }

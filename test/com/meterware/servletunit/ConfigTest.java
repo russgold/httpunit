@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -59,7 +59,7 @@ public class ConfigTest extends TestCase {
         WebResponse response = wc.getResponse( "http://localhost/" + resourceName );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "servlet name is " + ConfigServlet.class.getName(), response.toString() );
+        assertEquals( "servlet name is " + ConfigServlet.class.getName(), response.getText() );
     }
 
 

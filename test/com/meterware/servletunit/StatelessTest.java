@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -74,7 +74,7 @@ public class StatelessTest extends TestCase {
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/html", response.getContentType() );
-        assertEquals( "requested resource", SimpleGetServlet.RESPONSE_TEXT, response.toString() );
+        assertEquals( "requested resource", SimpleGetServlet.RESPONSE_TEXT, response.getText() );
     }
 
 
@@ -89,7 +89,7 @@ public class StatelessTest extends TestCase {
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "You selected red", response.toString() );
+        assertEquals( "requested resource", "You selected red", response.getText() );
     }
 
 
@@ -103,7 +103,7 @@ public class StatelessTest extends TestCase {
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "You selected red", response.toString() );
+        assertEquals( "requested resource", "You selected red", response.getText() );
     }
 
     public void testSimplePost() throws Exception {
@@ -117,7 +117,7 @@ public class StatelessTest extends TestCase {
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "You posted red", response.toString() );
+        assertEquals( "requested resource", "You posted red", response.getText() );
     }
 
 

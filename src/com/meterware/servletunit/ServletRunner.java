@@ -68,7 +68,7 @@ public class ServletRunner {
     /**
      * Creates and returns a new web client that communicates with this servlet runner.
      **/
-    public WebClient newClient() {
+    public ServletUnitClient newClient() {
         return new ServletUnitClient( this );
     }
 

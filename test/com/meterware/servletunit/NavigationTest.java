@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -58,7 +58,7 @@ public class NavigationTest extends TestCase {
         WebClient wc = sr.newClient();
         WebResponse response = wc.getResponse( "http://localhost/origin" );
         assertNotNull( "No response received", response );
-        assertEquals( "requested resource", TargetServlet.RESPONSE_TEXT, response.toString() );
+        assertEquals( "requested resource", TargetServlet.RESPONSE_TEXT, response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
     }
 

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -175,8 +175,7 @@ public class ServletUnitServletContext implements ServletContext {
      * Writes the specified message to a servlet log file, usually an event log. 
      * The name and type of the servlet log file is specific to the servlet container.
      **/
-    public void log( String message ) {
-        System.out.println( "log: " + message );  // XXX change this to use something testable
+    public void log( String message ) {  // XXX change this to use something testable
     }
 
 
