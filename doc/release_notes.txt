@@ -15,10 +15,11 @@ Limitations:
 Revision History:
 27-Nov-2001
 Acknowledgements:
-    Thanks to Peter Rossbach for catching some typos in the tutorial.
+    Thanks to Peter Roﬂbach for catching some typos in the tutorial.
 
 Additions:
    1. The tutorial now includes an explanation of security testing in ServletUnit
+   2. Archives are now rooted with the build name
 
 26-Nov-2001
 Acknowledgements:

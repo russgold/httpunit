@@ -6,7 +6,6 @@
     <property name="name" value="httpunit" />
     <property name="Name" value="HttpUnit" />
     <property name="version" value="1.2.7" />
-    <property name="zip_version" value="1_2_7" />
 
     <property name="src.dir" value="src" />
     <property name="tstsrc.dir" value="test" />
@@ -21,6 +20,7 @@
     <property name="javadoc.dir" value="${docs.dir}/api" />
 
     <property name="dist.dir" value="dist" />
+    <property name="archive.dir" value="${dist.dir}/${name}-${version}" />
     <property name="classpath" value="" />
     <property name="web.dir" value="web" />
     <property name="packages" value="com.meterware.*" />
@@ -159,8 +159,8 @@
 <!--  Creates the distribution                                             -->
 <!--  ===================================================================  -->
 <target name="dist" depends="jar,javadocs,tutorial">
-    <mkdir dir="${dist.dir}" />
-    <copy todir="${dist.dir}" >
+    <mkdir dir="${archive.dir}" />
+    <copy todir="${archive.dir}" >
         <fileset dir="." >
             <include name="build.xml" />
             <include name="readme.txt" />
@@ -172,9 +172,9 @@
             <include name="doc/**/*.*" />
         </fileset>
     </copy>
-    <copy todir="${dist.dir}/lib" file="${jars.dir}/Tidy.jar" />
-    <replace file="${dist.dir}/index.html" token="var:dist " value="var:dist&gt;" />
-    <replace file="${dist.dir}/index.html" token="var:publish&gt;" value="var:publish " />
+    <copy todir="${archive.dir}/lib" file="${jars.dir}/Tidy.jar" />
+    <replace file="${archive.dir}/index.html" token="var:dist " value="var:dist&gt;" />
+    <replace file="${archive.dir}/index.html" token="var:publish&gt;" value="var:publish " />
 </target>
 
 
@@ -182,7 +182,7 @@
 <!--  Packages the distribution with ZIP                                   -->
 <!--  ===================================================================  -->
 <target name="dist-zip" depends="dist">
-    <zip zipfile="${name}_${zip_version}.zip" basedir="${dist.dir}" includes="**" />
+    <zip zipfile="${name}-${version}.zip" basedir="${dist.dir}" includes="**" />
 </target>
 
 
@@ -196,7 +196,7 @@
     </copy>
     <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " />
     <replace file="${web.dir}/index.html" token="var:publish " value="var:publish&gt;" />
-    <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${zip_version}" />
+    <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${version}" />
 </target>
 
 
@@ -204,7 +204,7 @@
 <!--  Packages the web site with ZIP                                       -->
 <!--  ===================================================================  -->
 <target name="publish-zip" depends="publish">
-    <zip zipfile="${name}_website_${zip_version}.zip" basedir="${web.dir}" includes="**" />
+    <zip zipfile="${name}_website_${version}.zip" basedir="${web.dir}" includes="**" />
 </target>
 
 
