@@ -5,8 +5,8 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
-    <property name="version" value="0.8.2" />
-    <property name="zip_version" value="0_8" /> 
+    <property name="version" value="0.9" />
+    <property name="zip_version" value="0_9" /> 
     <property name="src.dir" value="src" /> 
     <property name="examples.dir" value="examples" /> 
     <property name="lib.dir" value="lib" /> 
@@ -54,7 +54,7 @@
 <!--  Note: the classpath variable must be set on the command line         -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">
-    <java classname="com.meterware.httpunit.HttpUnitTest"
+    <java classname="com.meterware.httpunit.HttpUnitSuite"
           fork="yes" classpath="${build.classes};${classpath}" >
     </java>
 </target>

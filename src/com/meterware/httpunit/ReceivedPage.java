@@ -64,6 +64,15 @@ class ReceivedPage {
 
 
     /**
+     * Returns the top-level tables found in this page in the order in which
+     * they appear.
+     **/
+    public WebTable[] getTables() {
+        return WebTable.getTables( getDOM() );
+    }
+
+
+    /**
      * Returns a copy of the domain object model associated with this page.
      **/
     public Document getDOM() {

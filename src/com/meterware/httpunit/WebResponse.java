@@ -28,6 +28,15 @@ public class WebResponse {
 
 
     /**
+     * Returns the top-level tables found in this page in the order in which
+     * they appear.
+     **/
+    public WebTable[] getTables() {
+        return getReceivedPage().getTables();
+    }
+
+
+    /**
      * Returns a copy of the domain object model tree associated with this response.
      **/
     public Document getDOM() throws SAXException {
