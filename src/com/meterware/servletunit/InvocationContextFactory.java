@@ -1,5 +1,4 @@
 package com.meterware.servletunit;
-
 /********************************************************************************************************************
  * $Id$
  *
@@ -20,50 +19,25 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.WebRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Dictionary;
+
+import javax.servlet.http.Cookie;
 
 
 /**
+ * An interface for an object which acts as a factory of InvocationContexts
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-public interface InvocationContext {
-
+public interface InvocationContextFactory {
 
     /**
-     * Returns the request to be processed by the servlet.
+     * Creates and returns a new invocation context to test calling of servlet methods.
      **/
-    HttpServletRequest getRequest();
-
-
-    /**
-     * Returns the response which the servlet should modify during its operation.
-     **/
-    HttpServletResponse getResponse();
-
-
-    /**
-     * Returns the selected servlet, initialized to provide access to sessions
-     * and servlet context information.
-     **/
-    Servlet getServlet() throws ServletException;
-
-
-    /**
-     * Returns the final response from the servlet. Note that this method should
-     * only be invoked after all processing has been done to the servlet response.
-     **/
-    WebResponse getServletResponse();
-
-
-    /**
-     * Returns the target for the original request.
-     */
-    String getTarget();
+    public InvocationContext newInvocation( WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders ) throws IOException, MalformedURLException;
 
 }

@@ -4,12 +4,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -28,9 +28,11 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Dictionary;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 
 import org.apache.xerces.parsers.DOMParser;
 
@@ -84,7 +86,7 @@ public class ServletRunner {
      * @exception SAXException thrown if there is an error parsing the response
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
-        return _client.getResponse( request );
+        return getClient().getResponse( request );
     }
 
 
@@ -93,7 +95,7 @@ public class ServletRunner {
      * @exception SAXException thrown if there is an error parsing the response
      **/
     public WebResponse getResponse( String url ) throws MalformedURLException, IOException, SAXException {
-        return _client.getResponse( url );
+        return getClient().getResponse( url );
     }
 
 
@@ -101,11 +103,11 @@ public class ServletRunner {
      * Creates and returns a new web client that communicates with this servlet runner.
      **/
     public ServletUnitClient newClient() {
-        return new ServletUnitClient( this );
+        return ServletUnitClient.newClient( _factory );
     }
 
 
-//-------------------------------- package methods -------------------------------------
+//-------------------------------------------- package methods ---------------------------------------------------------
 
 
     Servlet getServlet( URL url ) throws ServletException {
@@ -122,7 +124,20 @@ public class ServletRunner {
 
     WebApplication    _application;
 
-    private ServletUnitClient  _client = new ServletUnitClient( this );
+    private ServletUnitClient  _client;
+
     private ServletUnitContext _context = new ServletUnitContext();
+
+    private InvocationContextFactory _factory = new InvocationContextFactory() {
+        public InvocationContext newInvocation( WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders ) throws IOException, MalformedURLException {
+            return new InvocationContextImpl( ServletRunner.this, request, clientCookies, clientHeaders );
+        }
+    };
+
+
+    private ServletUnitClient getClient() {
+        if (_client == null) _client = newClient();
+        return _client;
+    }
 
 }
