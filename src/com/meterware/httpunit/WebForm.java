@@ -133,7 +133,7 @@ public class WebForm extends WebRequestSource {
      * Convenience method which returns the button with the specified ID.
      */
     public Button getButtonWithID( String buttonID ) {
-        return getButton( Button.HAS_ID, buttonID );
+        return getButton( Button.WITH_ID, buttonID );
     }
 
 
