@@ -58,26 +58,6 @@ import org.xml.sax.SAXException;
 abstract
 public class WebResponse implements HTMLSegment {
 
-	/**
-	 * A version flag indicating a cookie is based on the
-	 * Internet Engineering Task Force's (IETF)
-	 * <a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</a>
-	 *
-	 * <br />
-	 * These cookies come from the <code>Set-Cookie:</code> header
-	 **/
-	public static final int IETF_RFC2109 = 0;
-
-	/**
-	 * A version flag indicating a cookie is based on the
-	 * Internet Engineering Task Force's (IETF)
-	 * <a href="http://www.ietf.org/rfc/rfc2965.txt">RFC 2965</a>
-	 *
-	 * <br />
-	 * These cookies come from the <code>Set-Cookie2:</code> header
-	 **/
-	public static final int IETF_RFC2965 = 1;
-
     /**
      * Returns a web response built from a URL connection. Provided to allow
      * access to WebResponse parsing without using a WebClient.
@@ -445,6 +425,26 @@ public class WebResponse implements HTMLSegment {
 //--------------------------------- private members --------------------------------------
 
 
+    /**
+     * A version flag indicating a cookie is based on the
+     * Internet Engineering Task Force's (IETF)
+     * <a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</a>
+     *
+     * <br />
+     * These cookies come from the <code>Set-Cookie:</code> header
+     **/
+    final private static int IETF_RFC2109 = 0;
+
+    /**
+     * A version flag indicating a cookie is based on the
+     * Internet Engineering Task Force's (IETF)
+     * <a href="http://www.ietf.org/rfc/rfc2965.txt">RFC 2965</a>
+     *
+     * <br />
+     * These cookies come from the <code>Set-Cookie2:</code> header
+     **/
+    final private static int IETF_RFC2965 = 1;
+
     final private static String DEFAULT_CONTENT_TYPE   = "text/plain";
     final private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
 
@@ -530,164 +530,164 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-	/**
-	 * Parses cookies from the <code>Set-Cookie</code> and the
-	 * <code>Set-Cookie2</code> header fields.
-	 * <p>
-	 * This class does not strictly follow the specifications, but
-	 * attempts to imitate the behavior of popular browsers. Specifically,
-	 * this method allows cookie values to contain commas, which the
-	 * Netscape standard does not allow for.
-	 * </p><p>
-	 * This method does not parse path,domain,expires or secure information
-	 * about the cookie.</p>
-	 *
-	 * @returns Hashtable a <code>Hashtable</code> of where the name of the
-	 *                    cookie is the key and the value of the cookie is
-	 *                    the value
-	 */
-	private Hashtable getNewCookies() {
-		if (_newCookies == null) {
-			_newCookies = new Hashtable();
-		}
-		String cookieHeader = getHeaderField( "Set-Cookie" );
-		if (cookieHeader != null) {
-			processCookieTokens( getCookieTokens(cookieHeader),IETF_RFC2109 );
-		}
-		String cookieHeader2 = getHeaderField( "Set-Cookie2" );
-		if (cookieHeader2 != null) {
-			processCookieTokens( getCookieTokens(cookieHeader2),IETF_RFC2965 );
-		}
-		return _newCookies;
-	}
+    /**
+     * Parses cookies from the <code>Set-Cookie</code> and the
+     * <code>Set-Cookie2</code> header fields.
+     * <p>
+     * This class does not strictly follow the specifications, but
+     * attempts to imitate the behavior of popular browsers. Specifically,
+     * this method allows cookie values to contain commas, which the
+     * Netscape standard does not allow for.
+     * </p><p>
+     * This method does not parse path,domain,expires or secure information
+     * about the cookie.</p>
+     *
+     * @returns Hashtable a <code>Hashtable</code> of where the name of the
+     *                    cookie is the key and the value of the cookie is
+     *                    the value
+     */
+    private Hashtable getNewCookies() {
+        if (_newCookies == null) {
+            _newCookies = new Hashtable();
+        }
+        String cookieHeader = getHeaderField( "Set-Cookie" );
+        if (cookieHeader != null) {
+            processCookieTokens( getCookieTokens(cookieHeader),IETF_RFC2109 );
+        }
+        String cookieHeader2 = getHeaderField( "Set-Cookie2" );
+        if (cookieHeader2 != null) {
+            processCookieTokens( getCookieTokens(cookieHeader2),IETF_RFC2965 );
+        }
+        return _newCookies;
+    }
 
 
-	private void processCookieTokens(Vector tokens,
-	                                    int version) {
-		// holds tokens that should be part of the value of
-		// the first token before it that contains an
-		// equals sign (=)
-		String tokensToAdd = "";
-		int numTokens = tokens.size();
-		for (int i=numTokens - 1; i >= 0; i--) {
-			String token = (String) tokens.get(i);
-			int equalsIndex = token.indexOf('=');
+    private void processCookieTokens(Vector tokens,
+                                        int version) {
+        // holds tokens that should be part of the value of
+        // the first token before it that contains an
+        // equals sign (=)
+        String tokensToAdd = "";
+        int numTokens = tokens.size();
+        for (int i=numTokens - 1; i >= 0; i--) {
+            String token = (String) tokens.get(i);
+            int equalsIndex = token.indexOf('=');
 
-			// if this token has an equals sign (=) in it
-			if (equalsIndex != -1) {
-				String name = token.substring(0,equalsIndex).trim();
-				// make sure we aren't using a cookie's attribute other
-				// than the name/value pair
-				if ( !isStringCookieAttribute(name,version) ) {
-					String value = token.substring(equalsIndex+1).trim();
-					_newCookies.put(name,value+tokensToAdd);
-				}
-				tokensToAdd = "";
-			}
+            // if this token has an equals sign (=) in it
+            if (equalsIndex != -1) {
+                String name = token.substring(0,equalsIndex).trim();
+                // make sure we aren't using a cookie's attribute other
+                // than the name/value pair
+                if ( !isStringCookieAttribute(name,version) ) {
+                    String value = token.substring(equalsIndex+1).trim();
+                    _newCookies.put(name,value+tokensToAdd);
+                }
+                tokensToAdd = "";
+            }
 
-			else {
-				// make sure we aren't counting a one word reserved
-				// cookie attribute value
-				if ( !isTokenReservedWord(token,version) ) {
-					tokensToAdd =  token + tokensToAdd;
-					String preceedingToken = (String) tokens.get(i - 1);
-					char lastChar = preceedingToken.charAt(preceedingToken.length()-1);
-					if (lastChar != '=') {
-						tokensToAdd = ","+ tokensToAdd;
-					}
-				}
-				// the token is a secure or discard flag for the cookie
-				else {
-					// just to be safe we should clear the tokens
-					// to append to the value of the cookie
-					tokensToAdd = "";
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Tokenizes a cookie header and returns the tokens in a
-	 * <code>Vector</code>.
-	 **/
-	private Vector getCookieTokens(String cookieHeader) {
-		StringReader sr = new StringReader(cookieHeader);
-		StreamTokenizer st = new StreamTokenizer(sr);
-		Vector tokens = new Vector();
-
-		// clear syntax tables of the StreamTokenizer
-		st.resetSyntax();
-
-		// set all characters as word characters
-		st.wordChars(0,Character.MAX_VALUE);
-
-		// set up characters for quoting
-		st.quoteChar(34); //double quotes
-		st.quoteChar(39); //single quotes
-
-		// set up characters to separate tokens
-		st.whitespaceChars(59,59); //semicolon
-		st.whitespaceChars(44,44); //comma
-
-		try {
-			while (st.nextToken() != StreamTokenizer.TT_EOF) {
-				tokens.add( st.sval.trim() );
-			}
-		}
-		catch (IOException ioe) {
-			// this will never happen with a StringReader
-		}
-		sr.close();
-		return tokens;
-	}
+            else {
+                // make sure we aren't counting a one word reserved
+                // cookie attribute value
+                if ( !isTokenReservedWord(token,version) ) {
+                    tokensToAdd =  token + tokensToAdd;
+                    String preceedingToken = (String) tokens.get(i - 1);
+                    char lastChar = preceedingToken.charAt(preceedingToken.length()-1);
+                    if (lastChar != '=') {
+                        tokensToAdd = ","+ tokensToAdd;
+                    }
+                }
+                // the token is a secure or discard flag for the cookie
+                else {
+                    // just to be safe we should clear the tokens
+                    // to append to the value of the cookie
+                    tokensToAdd = "";
+                }
+            }
+        }
+    }
 
 
-	private boolean isStringCookieAttribute(String string,
-	                                           int version) {
-		String stringLowercase = string.toLowerCase();
-		if (version == IETF_RFC2109) {
-			if ( stringLowercase.equals("path") ||
-				 stringLowercase.equals("domain") ||
-				 stringLowercase.equals("expires") ||
-				 stringLowercase.equals("comment") ||
-				 stringLowercase.equals("max-age") ||
-				 stringLowercase.equals("version") ) {
-				return true;
-			}
-		}
-		else if (version == IETF_RFC2965) {
-			if ( stringLowercase.equals("path") ||
-				 stringLowercase.equals("domain") ||
-				 stringLowercase.equals("comment") ||
-				 stringLowercase.equals("commenturl") ||
-				 stringLowercase.equals("max-age") ||
-				 stringLowercase.equals("version") ||
-				 stringLowercase.equals("$version") ||
-				 stringLowercase.equals("port") ) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Tokenizes a cookie header and returns the tokens in a
+     * <code>Vector</code>.
+     **/
+    private Vector getCookieTokens(String cookieHeader) {
+        StringReader sr = new StringReader(cookieHeader);
+        StreamTokenizer st = new StreamTokenizer(sr);
+        Vector tokens = new Vector();
+
+        // clear syntax tables of the StreamTokenizer
+        st.resetSyntax();
+
+        // set all characters as word characters
+        st.wordChars(0,Character.MAX_VALUE);
+
+        // set up characters for quoting
+        st.quoteChar(34); //double quotes
+        st.quoteChar(39); //single quotes
+
+        // set up characters to separate tokens
+        st.whitespaceChars(59,59); //semicolon
+        st.whitespaceChars(44,44); //comma
+
+        try {
+            while (st.nextToken() != StreamTokenizer.TT_EOF) {
+                tokens.add( st.sval.trim() );
+            }
+        }
+        catch (IOException ioe) {
+            // this will never happen with a StringReader
+        }
+        sr.close();
+        return tokens;
+    }
 
 
-	private boolean isTokenReservedWord(String token,
-	                                       int version) {
-		String tokenLowercase = token.toLowerCase();
-		if (version == IETF_RFC2109) {
-			if ( tokenLowercase.equals("secure") ) {
-				return true;
-			}
-		}
-		else if (version == IETF_RFC2965) {
-			if ( tokenLowercase.equals("discard") ||
-				 tokenLowercase.equals("secure") ) {
-				return true;
-			}
-		}
-		return false;
-	}
+    private boolean isStringCookieAttribute(String string,
+                                               int version) {
+        String stringLowercase = string.toLowerCase();
+        if (version == IETF_RFC2109) {
+            if ( stringLowercase.equals("path") ||
+                 stringLowercase.equals("domain") ||
+                 stringLowercase.equals("expires") ||
+                 stringLowercase.equals("comment") ||
+                 stringLowercase.equals("max-age") ||
+                 stringLowercase.equals("version") ) {
+                return true;
+            }
+        }
+        else if (version == IETF_RFC2965) {
+            if ( stringLowercase.equals("path") ||
+                 stringLowercase.equals("domain") ||
+                 stringLowercase.equals("comment") ||
+                 stringLowercase.equals("commenturl") ||
+                 stringLowercase.equals("max-age") ||
+                 stringLowercase.equals("version") ||
+                 stringLowercase.equals("$version") ||
+                 stringLowercase.equals("port") ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private boolean isTokenReservedWord(String token,
+                                           int version) {
+        String tokenLowercase = token.toLowerCase();
+        if (version == IETF_RFC2109) {
+            if ( tokenLowercase.equals("secure") ) {
+                return true;
+            }
+        }
+        else if (version == IETF_RFC2965) {
+            if ( tokenLowercase.equals("discard") ||
+                 tokenLowercase.equals("secure") ) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     private void readContentTypeHeader() {
