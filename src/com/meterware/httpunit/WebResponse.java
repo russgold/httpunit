@@ -20,17 +20,16 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
-import java.io.*;
-
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -39,7 +38,6 @@ import java.util.zip.GZIPInputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -95,7 +93,6 @@ public class WebResponse implements HTMLSegment {
      * </code>
      * will return "/mystyle.css".
      * @exception SAXException thrown if there is an error parsing this response
-     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public String getExternalStyleSheet() throws SAXException {
         return getReceivedPage().getExternalStyleSheet();
@@ -655,7 +652,7 @@ public class WebResponse implements HTMLSegment {
      * This method does not parse path,domain,expires or secure information
      * about the cookie.</p>
      *
-     * @returns Hashtable a <code>Hashtable</code> of where the name of the
+     * @return Hashtable a <code>Hashtable</code> of where the name of the
      *                    cookie is the key and the value of the cookie is
      *                    the value
      */
@@ -1033,24 +1030,5 @@ class DefaultWebResponse extends WebResponse {
 
 
     private String _responseText;
-}
-
-
-//==================================================================================================
-
-
-class NotHTMLException extends RuntimeException {
-
-    NotHTMLException( String contentType ) {
-        _contentType = contentType;
-    }
-
-
-    public String getMessage() {
-        return "The content type of the response is '" + _contentType + "': it must be 'text/html' in order to be recognized as HTML";
-    }
-
-
-    private String _contentType;
 }
 

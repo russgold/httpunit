@@ -55,13 +55,24 @@ public class StatelessTest extends TestCase {
 
         WebRequest request   = new GetMethodWebRequest( "http://localhost/nothing" );
         try {
-            WebResponse response = sr.getResponse( request );
+            sr.getResponse( request );
             fail( "Should have rejected the request" );
         } catch (HttpNotFoundException e) {
             assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
         }
     }
 
+
+    public void testServletCaching() throws Exception {
+        final String resourceName = "something/interesting";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( resourceName, AccessCountServlet.class.getName() );
+
+        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName );
+        assertEquals( "First reply", "1", sr.getResponse( request ).getText().trim() );
+        assertEquals( "Second reply", "2", sr.getResponse( request ).getText().trim() );
+    }
 
 
     public void testSimpleGet() throws Exception {
@@ -137,8 +148,6 @@ public class StatelessTest extends TestCase {
 
 
 
-
-
     static class SimpleGetServlet extends HttpServlet {
         static String RESPONSE_TEXT = "the desired content\r\n";
 
@@ -146,6 +155,18 @@ public class StatelessTest extends TestCase {
             resp.setContentType( "text/html" );
             PrintWriter pw = resp.getWriter();
             pw.print( RESPONSE_TEXT );
+            pw.close();
+        }
+    }
+
+
+    static class AccessCountServlet extends HttpServlet {
+        private int _numAccesses;
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
+            resp.setContentType( "text/plain" );
+            PrintWriter pw = resp.getWriter();
+            pw.print( String.valueOf( ++_numAccesses ) );
             pw.close();
         }
     }

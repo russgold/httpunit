@@ -119,16 +119,20 @@ class WebApplication {
     }
 
 
-    Servlet getServlet( URL url ) throws ServletException {
+    synchronized Servlet getServlet( URL url ) throws ServletException {
         final ServletConfiguration configuration = getServletConfiguration( url );
         if (configuration == null) throw new HttpNotFoundException( url );
 
         try {
             Class servletClass = Class.forName( configuration.getClassName() );
-            if (!Servlet.class.isAssignableFrom( servletClass )) throw new HttpInternalErrorException( url );
 
-            Servlet servlet = (Servlet) servletClass.newInstance();    // XXX cache instances - by class?
+            Servlet cachedServlet = (Servlet)_cachedServlets.get(servletClass);
+            if (cachedServlet != null) return cachedServlet;
+
+            if (!Servlet.class.isAssignableFrom( servletClass )) throw new HttpInternalErrorException( url );
+            Servlet servlet = (Servlet) servletClass.newInstance();
             servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams(), _contextParameters, _contextDir ) );
+            _cachedServlets.put( servletClass, servlet );
             return servlet;
         } catch (ClassNotFoundException e) {
             throw new HttpNotFoundException( url, e );
@@ -198,7 +202,7 @@ class WebApplication {
 
     /**
      * Returns true if the specified path may only be accesses by an authorized user.
-     * @param urlPath the application-relative path of the URL
+     * @param url the application-relative path of the URL
      */
     boolean requiresAuthorization( URL url ) {
         return getControllingConstraint( getURLPath( url ) ) != NULL_SECURITY_CONSTRAINT;
@@ -246,6 +250,8 @@ class WebApplication {
     private File _contextDir = null;
 
     private String _contextPath = null;
+
+    private HashMap _cachedServlets = new HashMap();
 
     final static private SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
 
@@ -309,7 +315,7 @@ class WebApplication {
     private static String getChildNodeValue( Element root, String childNodeName, String defaultValue ) throws SAXException {
         NodeList nl = root.getElementsByTagName( childNodeName );
         if (nl.getLength() == 1) {
-            return getTextValue( nl.item( 0 ) );
+            return getTextValue( nl.item( 0 ) ).trim();
         } else if (defaultValue == null) {
             throw new SAXException( "Node <" + root.getNodeName() + "> has no child named <" + childNodeName + ">" );
         } else {
@@ -320,7 +326,7 @@ class WebApplication {
 
     private static String getTextValue( Node node ) throws SAXException {
         Node textNode = node.getFirstChild();
-        if (textNode == null) throw new SAXException( "No value specified for <" + node.getNodeName() + "> node" );
+        if (textNode == null) return "";
         if (textNode.getNodeType() != Node.TEXT_NODE) throw new SAXException( "No text value found for <" + node.getNodeName() + "> node" );
         return textNode.getNodeValue();
     }
@@ -328,15 +334,6 @@ class WebApplication {
 
     private static boolean patternMatches( String urlPattern, String urlPath ) {
         return urlPattern.equals( urlPath );
-    }
-
-
-    private String asResourceName( String rawName ) {    // XXX remove me
-        if (rawName.startsWith( "/" )) {
-            return rawName;
-        } else {
-            return "/" + rawName;
-        }
     }
 
 
@@ -496,19 +493,18 @@ class WebApplication {
      */
     class ServletMapping {
 
-        private final Map exactMatches = new HashMap();
-        private final Map extensions = new HashMap();
-        private final Map urlTree = new HashMap();
-
+        private final Map _exactMatches = new HashMap();
+        private final Map _extensions = new HashMap();
+        private final Map _urlTree = new HashMap();
 
         void put( String mapping, ServletConfiguration servletConfiguration ) {
             if (mapping.indexOf( '*' ) == -1) {
-                exactMatches.put( mapping, servletConfiguration );
+                _exactMatches.put( mapping, servletConfiguration );
             } else if (mapping.startsWith( "*." )) {
-                extensions.put( mapping.substring( 2 ), servletConfiguration );
+                _extensions.put( mapping.substring( 2 ), servletConfiguration );
             } else {
                 ParsedPath path = new ParsedPath( mapping );
-                Map context = urlTree;
+                Map context = _urlTree;
                 while (path.hasNext()) {
                     String part = path.next();
                     if (part.equals( "*" )) {
@@ -526,11 +522,11 @@ class WebApplication {
 
 
         ServletConfiguration get( String url ) {
-            if (exactMatches.containsKey( url )) {
-                return (ServletConfiguration) exactMatches.get( url );
+            if (_exactMatches.containsKey( url )) {
+                return (ServletConfiguration) _exactMatches.get( url );
             }
             ParsedPath path = new ParsedPath( url );
-            Map context = urlTree;
+            Map context = _urlTree;
             while (path.hasNext()) {
                 String part = path.next();
                 if (!context.containsKey( part )) {
@@ -541,7 +537,7 @@ class WebApplication {
                         if (index == -1 || index == url.length() - 1) {
                             return null;
                         } else {
-                            return (ServletConfiguration) extensions.get( url.substring( index + 1 ) );
+                            return (ServletConfiguration) _extensions.get( url.substring( index + 1 ) );
                         }
                     }
                 }

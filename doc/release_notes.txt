@@ -11,6 +11,16 @@ Limitations:
 
 
 Revision History:
+16-May-2002
+Acknowledgements:
+    Thanks to James Murty for adding caching of servlet instances, a default mapping for servlet classes, and some XML
+    parsing cleanup.
+
+Additions:
+    1. ServletUnit now caches its servlet instances so that multiple invocations can use the same instance.  This more
+       closely matches the servlet spec.
+    2. Leading and trailing spaces in web.xml text nodes are now ignored.
+
 14-May-2002
 Additions:
     1. A <select> control with a size attribute may now have its value undefined. The specification does not require
