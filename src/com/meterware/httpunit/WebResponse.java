@@ -360,6 +360,24 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns the images found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebImage[] getImages() throws SAXException {
+        return getReceivedPage().getImages();
+    }
+
+
+    /**
+     * Returns the image found in the page with the specified src attribute.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebImage getImageWithSource( String source ) throws SAXException {
+        return getReceivedPage().getImageWithSource( source );
+    }
+
+
+    /**
      * Returns the top-level tables found in this page in the order in which
      * they appear.
      * @exception SAXException thrown if there is an error parsing the response.

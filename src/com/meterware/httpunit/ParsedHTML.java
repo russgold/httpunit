@@ -32,6 +32,7 @@ import org.w3c.dom.*;
 class ParsedHTML {
 
     private WebForm[] _forms;
+    private WebImage[] _images;
 
 
     ParsedHTML( URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
@@ -174,6 +175,35 @@ class ParsedHTML {
 
 
     /**
+     * Returns the images found in the page in the order in which they appear.
+     **/
+    public WebImage[] getImages() {
+        if (_images == null) {
+            NodeList images = NodeUtils.getElementsByTagName( _rootNode, "img" );
+
+            _images = new WebImage[ images.getLength() ];
+            for (int i = 0; i < _images.length; i++) {
+                _images[i] = new WebImage( this, _baseURL, images.item( i ) );
+            }
+        }
+        return _images;
+    }
+
+
+    /**
+     * Returns the image found in the page with the specified src attribute.
+     **/
+    public WebImage getImageWithSource( String source ) {
+        WebImage[] images = getImages();
+        for (int i = 0; i < images.length; i++) {
+            if (images[i].getSource().equals( source )) return images[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getSource().equalsIgnoreCase( source )) return images[i];
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the top-level tables found in this page in the order in which
      * they appear.
      **/
@@ -299,6 +329,20 @@ class ParsedHTML {
 
     interface TablePredicate {
         public boolean isTrue( WebTable table );
+    }
+
+
+    interface LinkPredicate {
+        public boolean isTrue( WebLink link );
+    }
+
+
+    WebLink getLinkSatisfyingPredicate( LinkPredicate predicate ) {
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            if (predicate.isTrue( links[ i ] )) return links[ i ];
+        }
+        return null;
     }
 
 

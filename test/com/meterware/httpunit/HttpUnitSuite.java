@@ -38,6 +38,7 @@ public class HttpUnitSuite {
         TestSuite result = new TestSuite();
         result.addTest( WebPageTest.suite() );
         result.addTest( WebLinkTest.suite() );
+        result.addTest( WebImageTest.suite() );
         result.addTest( HtmlTablesTest.suite() );
         result.addTest( WebFormTest.suite() );
         result.addTest( WebFrameTest.suite() );
