@@ -65,7 +65,6 @@ class WebApplication {
      */
     WebApplication( Document document ) throws MalformedURLException,SAXException {
         registerServlets( document );
-        registerServlet( "/j_security_check", SecurityCheckServlet.class.getName() );
         NodeList nl = document.getElementsByTagName( "security-constraint" );
         for (int i = 0; i < nl.getLength(); i++) {
             _securityConstraints.add( new SecurityConstraintImpl( (Element) nl.item(i) ) );
@@ -91,7 +90,7 @@ class WebApplication {
 
 
     Servlet getServlet( URL url ) throws ServletException {
-        final ServletConfiguration configuration = (ServletConfiguration) _servlets.get( getServletName( getURLPath( url ) ) );
+        final ServletConfiguration configuration = getServletConfiguration( url );
         if (configuration == null) throw new HttpNotFoundException( url );
 
         try {
@@ -107,6 +106,16 @@ class WebApplication {
             throw new HttpInternalErrorException( url, e );
         } catch (InstantiationException e) {
             throw new HttpInternalErrorException( url, e );
+        }
+    }
+
+
+    private ServletConfiguration getServletConfiguration(URL url) {
+        String servletName = getServletName( getURLPath( url ) );
+        if (servletName.endsWith( "j_security_check" )) {
+            return SECURITY_CHECK_CONFIGURATION;
+        } else {
+            return (ServletConfiguration) _servlets.get( servletName );
         }
     }
 
@@ -175,6 +184,8 @@ class WebApplication {
 
 //------------------------------------------------ private members ---------------------------------------------
 
+    private final static ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
+
     /** A mapping of resource names to servlet class names. **/
     private Hashtable _servlets = new Hashtable();
 
@@ -235,12 +246,12 @@ class WebApplication {
     }
 
 
-    private String getChildNodeValue( Element root, String childNodeName ) throws SAXException {
+    private static String getChildNodeValue( Element root, String childNodeName ) throws SAXException {
         return getChildNodeValue( root, childNodeName, null );
     }
 
 
-    private String getChildNodeValue( Element root, String childNodeName, String defaultValue ) throws SAXException {
+    private static String getChildNodeValue( Element root, String childNodeName, String defaultValue ) throws SAXException {
         NodeList nl = root.getElementsByTagName( childNodeName );
         if (nl.getLength() == 1) {
             return getTextValue( nl.item(0) );
@@ -307,7 +318,7 @@ class WebApplication {
 //============================================= ServletConfiguration class =============================================
 
 
-    class ServletConfiguration {
+    static class ServletConfiguration {
 
         public ServletConfiguration( String className ) {
             _className = className;
