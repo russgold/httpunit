@@ -61,7 +61,11 @@ class WebApplication implements SessionListenerDispatcher {
 
     private ArrayList _contextListeners = new ArrayList();
 
+    private ArrayList _contextAttributeListeners = new ArrayList();
+
     private ArrayList _sessionListeners = new ArrayList();
+
+    private ArrayList _sessionAttributeListeners = new ArrayList();
 
     private boolean _useBasicAuthentication;
 
@@ -131,7 +135,9 @@ class WebApplication implements SessionListenerDispatcher {
                  Object listener = Class.forName( listenerName ).newInstance();
 
                  if (listener instanceof ServletContextListener) _contextListeners.add( listener );
+                 if (listener instanceof ServletContextAttributeListener) _contextAttributeListeners.add( listener );
                  if (listener instanceof HttpSessionListener) _sessionListeners.add( listener );
+                 if (listener instanceof HttpSessionAttributeListener) _sessionAttributeListeners.add( listener );
              } catch (Throwable x) {
                  throw new RuntimeException("Unable to load context listener " + listenerName, x);
              }
@@ -162,6 +168,36 @@ class WebApplication implements SessionListenerDispatcher {
              listener.contextDestroyed( event );
          }
      }
+
+
+    void sendAttributeAdded( String name, Object value ) {
+        ServletContextAttributeEvent event = new ServletContextAttributeEvent( getServletContext(), name, value );
+
+        for (Iterator i = _contextAttributeListeners.iterator(); i.hasNext();) {
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) i.next();
+            listener.attributeAdded( event );
+        }
+    }
+
+
+    void sendAttributeReplaced( String name, Object value ) {
+        ServletContextAttributeEvent event = new ServletContextAttributeEvent( getServletContext(), name, value );
+
+        for (Iterator i = _contextAttributeListeners.iterator(); i.hasNext();) {
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) i.next();
+            listener.attributeReplaced( event );
+        }
+    }
+
+
+    void sendAttributeRemoved( String name, Object value ) {
+        ServletContextAttributeEvent event = new ServletContextAttributeEvent( getServletContext(), name, value );
+
+        for (Iterator i = _contextAttributeListeners.iterator(); i.hasNext();) {
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) i.next();
+            listener.attributeRemoved( event );
+        }
+    }
 
 
     private void extractSecurityConstraints( Document document ) throws SAXException {
@@ -329,6 +365,36 @@ class WebApplication implements SessionListenerDispatcher {
     }
 
 
+    public void sendAttributeAdded( HttpSession session, String name, Object value ) {
+        HttpSessionBindingEvent event = new HttpSessionBindingEvent( session, name, value );
+
+        for (Iterator i = _sessionAttributeListeners.iterator(); i.hasNext();) {
+            HttpSessionAttributeListener listener = (HttpSessionAttributeListener) i.next();
+            listener.attributeAdded( event );
+        }
+    }
+
+
+    public void sendAttributeReplaced( HttpSession session, String name, Object oldValue ) {
+        HttpSessionBindingEvent event = new HttpSessionBindingEvent( session, name, oldValue );
+
+        for (Iterator i = _sessionAttributeListeners.iterator(); i.hasNext();) {
+            HttpSessionAttributeListener listener = (HttpSessionAttributeListener) i.next();
+            listener.attributeReplaced( event );
+        }
+    }
+
+
+    public void sendAttributeRemoved( HttpSession session, String name, Object oldValue ) {
+        HttpSessionBindingEvent event = new HttpSessionBindingEvent( session, name, oldValue );
+
+        for (Iterator i = _sessionAttributeListeners.iterator(); i.hasNext();) {
+            HttpSessionAttributeListener listener = (HttpSessionAttributeListener) i.next();
+            listener.attributeRemoved( event );
+        }
+    }
+
+
 //--------------------------------------------------- private members --------------------------------------------------
 
 
@@ -440,6 +506,7 @@ class WebApplication implements SessionListenerDispatcher {
 
     final static int DONT_AUTOLOAD = Integer.MIN_VALUE;
     final static int ANY_LOAD_ORDER = Integer.MAX_VALUE;
+
 
     class ServletConfiguration {
 

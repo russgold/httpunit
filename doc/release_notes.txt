@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+14-Feb-2004
+Additions:
+    1. Added support for ServletContextAttributeListener and HttpSessionAttributeListener
+
 12-Feb-2004
 Acknowledgements:
     Thanks to Jarom Smith for finding some typos in the tutorial.

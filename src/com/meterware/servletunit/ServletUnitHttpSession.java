@@ -174,7 +174,15 @@ class ServletUnitHttpSession implements HttpSession {
      **/
     public void setAttribute( String name, Object value ) {
         if (_invalid) throw new IllegalStateException();
-        _values.put( name, value );
+
+        if (!_values.containsKey( name )) {
+            _values.put( name, value );
+            _listenerDispatcher.sendAttributeAdded( this, name, value );
+        } else {
+            Object oldValue = _values.get( name );
+            _values.put( name, value );
+            _listenerDispatcher.sendAttributeReplaced( this, name, oldValue );
+        }
     }
 
 
@@ -184,7 +192,11 @@ class ServletUnitHttpSession implements HttpSession {
      **/ 
     public void removeAttribute( String name ) {
         if (_invalid) throw new IllegalStateException();
-        _values.remove( name );
+        if (_values.containsKey( name )) {
+            Object oldValue = _values.get( name );
+            _values.remove( name );
+            _listenerDispatcher.sendAttributeRemoved( this, name, oldValue );
+        }
     }
 
 

@@ -34,4 +34,13 @@ interface SessionListenerDispatcher {
 
     void sendSessionDestroyed( HttpSession session );
 
+
+    void sendAttributeAdded( HttpSession session, String name, Object value );
+
+
+    void sendAttributeReplaced( HttpSession session, String name, Object oldValue );
+
+
+    void sendAttributeRemoved( HttpSession session, String name, Object oldValue );
+
 }

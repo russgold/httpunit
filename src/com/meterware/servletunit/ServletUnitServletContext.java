@@ -287,12 +287,21 @@ class ServletUnitServletContext implements ServletContext {
     }
 
     public void setAttribute( String name, Object attribute ) {
-        _attributes.put( name, attribute );
+        if (!_attributes.containsKey( name )) {
+            _attributes.put( name, attribute );
+            _application.sendAttributeAdded( name, attribute );
+        } else {
+            Object oldValue = _attributes.get( name );
+            _attributes.put( name, attribute );
+            _application.sendAttributeReplaced( name, oldValue );
+        }
     }
 
 
     public void removeAttribute( String name ) {
+        Object oldValue = _attributes.get( name );
         _attributes.remove( name );
+        _application.sendAttributeRemoved( name, oldValue );
     }
 
 

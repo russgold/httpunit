@@ -39,6 +39,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import junit.framework.TestSuite;
+import junit.framework.Assert;
 
 
 public class WebXMLTest extends EventAwareTestCase {
@@ -211,6 +212,126 @@ public class WebXMLTest extends EventAwareTestCase {
 
         public void verifyEvent( String eventLabel, Object eventObject ) {
             if (!(eventObject instanceof HttpSessionEvent)) fail( "Event " + eventLabel + " did not include an http session event" );
+        }
+    }
+
+
+    public void testSessionAttributeListeners() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        HttpSessionAttributeEventVerifier verifyAttribute = new HttpSessionAttributeEventVerifier();
+
+        wxs.addContextListener( ListenerClass5.class );
+        wxs.addContextListener( ListenerClass6.class );
+
+        clearEvents();
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+
+        ServletUnitClient client = sr.newClient();
+        InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+        HttpSession session = ic.getRequest().getSession();
+        verifyEvents();
+
+        verifyAttribute.expect( "one", new Integer(1) );
+        expectEvent( "added", ListenerClass5.class, verifyAttribute );
+        expectEvent( "added", ListenerClass6.class, verifyAttribute );
+        session.setAttribute( "one", new Integer(1) );
+        verifyEvents();
+
+        expectEvent( "replaced", ListenerClass5.class, verifyAttribute );
+        expectEvent( "replaced", ListenerClass6.class, verifyAttribute );
+        session.setAttribute( "one", "I" );
+        verifyEvents();
+
+        verifyAttribute.expect( "one", "I" );
+        expectEvent( "removed", ListenerClass5.class, verifyAttribute );
+        expectEvent( "removed", ListenerClass6.class );
+        session.removeAttribute( "one" );
+        verifyEvents();
+
+        sr.shutDown();
+    }
+
+
+    static class HttpSessionAttributeEventVerifier implements EventVerifier {
+
+        private String _name;
+        private Object _value;
+
+
+        public void verifyEvent( String eventLabel, Object eventObject ) {
+            if (!(eventObject instanceof HttpSessionBindingEvent)) fail( "Event " + eventLabel + " did not include an http session binding event" );
+            HttpSessionBindingEvent bindingChange = (HttpSessionBindingEvent) eventObject;
+            Assert.assertEquals( "Changed attribute name", _name, bindingChange.getName() );
+            Assert.assertEquals( "Changed attribute value", _value, bindingChange.getValue() );
+        }
+
+
+        public void expect( String name, Object value ) {
+            _name  = name;
+            _value = value;
+        }
+    }
+
+
+
+    public void testContextAttributeListeners() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        ContextAttributeEventVerifier verifyAttribute = new ContextAttributeEventVerifier();
+
+        wxs.addContextListener( ListenerClass7.class );
+        wxs.addContextListener( ListenerClass8.class );
+
+        clearEvents();
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
+
+        ServletUnitClient client = sr.newClient();
+        verifyAttribute.expect( "initialized", "SimpleGetServlet" );
+        expectEvent( "added", ListenerClass7.class, verifyAttribute );
+        expectEvent( "added", ListenerClass8.class, verifyAttribute );
+        InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+        ServletContext context = ic.getServlet().getServletConfig().getServletContext();
+        verifyEvents();
+
+        verifyAttribute.expect( "deux", new Integer(2) );
+        expectEvent( "added", ListenerClass7.class, verifyAttribute );
+        expectEvent( "added", ListenerClass8.class, verifyAttribute );
+        context.setAttribute( "deux", new Integer(2) );
+        verifyEvents();
+
+        expectEvent( "replaced", ListenerClass7.class, verifyAttribute );
+        expectEvent( "replaced", ListenerClass8.class, verifyAttribute );
+        context.setAttribute( "deux", "II" );
+        verifyEvents();
+
+        verifyAttribute.expect( "deux", "II" );
+        expectEvent( "removed", ListenerClass7.class, verifyAttribute );
+        expectEvent( "removed", ListenerClass8.class );
+        context.removeAttribute( "deux" );
+        verifyEvents();
+
+        sr.shutDown();
+    }
+
+
+    static class ContextAttributeEventVerifier implements EventVerifier {
+
+        private String _name;
+        private Object _value;
+
+
+        public void verifyEvent( String eventLabel, Object eventObject ) {
+            if (!(eventObject instanceof ServletContextAttributeEvent)) fail( "Event " + eventLabel + " did not include an http session binding event" );
+            ServletContextAttributeEvent bindingChange = (ServletContextAttributeEvent) eventObject;
+            Assert.assertEquals( "Changed attribute name", _name, bindingChange.getName() );
+            Assert.assertEquals( "Changed attribute value", _value, bindingChange.getValue() );
+        }
+
+
+        public void expect( String name, Object value ) {
+            _name  = name;
+            _value = value;
         }
     }
 
@@ -474,6 +595,18 @@ public class WebXMLTest extends EventAwareTestCase {
         public void sessionCreated( HttpSessionEvent event ) { sendEvent( "created", this, event ); }
 
         public void sessionDestroyed( HttpSessionEvent event ) { sendEvent( "destroyed", this, event ); }
+
+        public void attributeAdded( HttpSessionBindingEvent event ) { sendEvent( "added", this, event ); }
+
+        public void attributeRemoved( HttpSessionBindingEvent event ) { sendEvent( "removed", this, event ); }
+
+        public void attributeReplaced( HttpSessionBindingEvent event ) { sendEvent( "replaced", this, event ); }
+
+        public void attributeAdded( ServletContextAttributeEvent event ) { sendEvent( "added", this, event ); }
+
+        public void attributeRemoved( ServletContextAttributeEvent event ) { sendEvent( "removed", this, event ); }
+
+        public void attributeReplaced( ServletContextAttributeEvent event ) { sendEvent( "replaced", this, event ); }
     }
 
 
@@ -482,6 +615,12 @@ public class WebXMLTest extends EventAwareTestCase {
 
     static class ListenerClass3 extends EventDispatcher implements HttpSessionListener {}
     static class ListenerClass4 extends EventDispatcher implements HttpSessionListener {}
+
+    static class ListenerClass5 extends EventDispatcher implements HttpSessionAttributeListener {}
+    static class ListenerClass6 extends EventDispatcher implements HttpSessionAttributeListener {}
+
+    static class ListenerClass7 extends EventDispatcher implements ServletContextAttributeListener {}
+    static class ListenerClass8 extends EventDispatcher implements ServletContextAttributeListener {}
 
 }
 

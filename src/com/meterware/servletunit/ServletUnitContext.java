@@ -34,6 +34,9 @@ class ServletUnitContext {
         this( null, new SessionListenerDispatcher() {
             public void sendSessionCreated( HttpSession session ) {}
             public void sendSessionDestroyed( HttpSession session ) {}
+            public void sendAttributeAdded( HttpSession session, String name, Object value ) {}
+            public void sendAttributeReplaced( HttpSession session, String name, Object oldValue ) {}
+            public void sendAttributeRemoved( HttpSession session, String name, Object oldValue ) {}
         } );
     }
 
