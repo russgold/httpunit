@@ -75,6 +75,27 @@ public class WebConversation {
 	_cookies.put( name, value );
     }
 
+
+    /**
+     * Returns the name of all the active cookies which will be sent to the server.
+     **/
+    public String[] getCookieNames() {
+        String[] names = new String[ _cookies.size() ];
+        int i = 0;
+        for (Enumeration e = _cookies.keys(); e.hasMoreElements();) {
+            names[i++] = (String) e.nextElement();
+        }
+        return names;
+    }
+
+
+    /**
+     * Returns the value of the specified cookie.
+     **/
+    public String getCookieValue( String name ) {
+        return (String) _cookies.get( name );
+    }
+
     
     /**
      * Specifies the user agent identification. Used to trigger browser-specific server behavior.

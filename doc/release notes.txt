@@ -1,13 +1,25 @@
 HttpUnit release notes
 
-Known issues: none
+Known issues: Forms are not handled properly
+
+Limitations: HttpUnit does not support JavaScript
 
 Acknowledgements:
 Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
 Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink
+Thanks to Perry Doell for the methods to examine cookies on WebConversation
 
 Revision History:
-11-Sep-00
+25-Sep-00
+Problems corrected:
+    1. In the 15-Sep build, the value parameter for checkboxes was ignored in computing defaults and validating
+       parameter values - all checkboxes were assumed to have the value 'on' only
+    2. getTableStartingWith[Prefix] only checked the nested tables in cell (0,0) of each outer table
+
+Additions:
+    3. WebConversation now supports getCookieNames and getCookieValue to return the current cookies  
+
+15-Sep-00
 
 General:
     1. Non-breaking spaces are converted to spaces on any conversion to text
@@ -17,7 +29,7 @@ General:
        HttpUnitOptions.setParserWarningsEnabled( true )
     4. By default, WebRequest.setParameter will now throw IllegalRequestParameterException on any attempt
        to set a form parameter to a value not normally available from the browser. This checking can be
-       disabled via a call to HttpUnitOptions.setParameterValuesValidated( false ) 
+       disabled via a call to HttpUnitOptions.setParameterValuesValidated( false )
 Additions:
     1. WebResponse.getTitle() returns the HTML title of the page
     2. WebLink.getURLString() returns the URL string specified by the link in its href attribute
