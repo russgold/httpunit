@@ -161,11 +161,22 @@ class ParsedHTML {
     }
 
 
-
-    HTMLElement[] getElementsByName( String name ) {
+    /**
+     * Returns the HTML elements with the specified name.
+     */
+    public HTMLElement[] getElementsWithName( String name ) {
         loadElements();
         ArrayList elements = (ArrayList) _elementsByName.get( name );
         return elements == null ? NO_ELEMENTS : (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
+    }
+
+
+    /**
+     * Returns a list of HTML element names contained in this HTML section.
+     */
+    public String[] getElementNames() {
+        loadElements();
+        return (String[]) _elementsByName.keySet().toArray( new String[ _elementsByName.size() ] );
     }
 
 

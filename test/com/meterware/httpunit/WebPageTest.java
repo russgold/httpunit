@@ -449,4 +449,19 @@ public class WebPageTest extends HttpUnitTest {
         assertImplements( "element with id 'link1'", simplePage.getElementWithID( "link1" ), WebLink.class );
         assertImplements( "element with id '23'", simplePage.getElementWithID( "23" ), WebImage.class );
     }
+
+
+    public void testGetElementsByName() throws Exception {
+        defineResource( "SimplePage.html",
+                        "<html><head><title>A Sample Page</title></head>\n" +
+                        "<body><form name='aForm'><input name=color></form>" +
+                        "have <a id='link1' href='/other.html'>an <b>active</b> link</A>\n" +
+                        "<img id='23' src='/images/arrow.gif' ALT='Next -->' WIDTH=1 HEIGHT=4>\n" +
+                        "</body></html>\n" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        assertImplement( "element with name 'aForm'", simplePage.getElementsWithName( "aForm" ), WebForm.class );
+        assertImplement( "element with name 'color'", simplePage.getElementsWithName( "color" ), FormControl.class );
+    }
 }

@@ -221,7 +221,7 @@ public class HTMLPage extends ParsedHTML {
 
 
         public ScriptableDelegate[] getElementsByName( String name ) {
-            return getDelegates( HTMLPage.this.getElementsByName( name ) );
+            return getDelegates( HTMLPage.this.getElementsWithName( name ) );
         }
 
 

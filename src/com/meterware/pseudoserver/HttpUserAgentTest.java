@@ -142,6 +142,13 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
+    protected void assertImplement( String comment, Object[] objects, Class expectedClass ) {
+        for (int i = 0; i < objects.length; i++) {
+            assertImplements( comment, objects[i], expectedClass );
+        }
+    }
+
+
     protected void assertImplements( String comment, Object object, Class expectedClass ) {
         if (object == null) {
             fail( comment + " should be of class " + expectedClass.getName() + " but is null" );

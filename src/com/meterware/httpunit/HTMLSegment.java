@@ -37,6 +37,18 @@ public interface HTMLSegment {
 
 
     /**
+     * Returns the HTMLElements found in this segment with the specified name.
+     */
+    public HTMLElement[] getElementsWithName( String name ) throws SAXException;
+
+
+    /**
+     * Returns a list of HTML element names contained in this HTML section.
+     */
+    public String[] getElementNames() throws SAXException;
+
+
+    /**
      * Returns the forms found in this HTML segment in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the segment.
      **/
