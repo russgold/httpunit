@@ -1,4 +1,7 @@
 High priority:
+o behavior of request vs client headers does not match javascript - should possibly throw exception if any headers are not
+  settable on the request.
+
 o Writeable 'name' Javascript attribute
 o NoOp request when link is to same page w/o new parameters?
 o Disable content-type header in MIME encoding?

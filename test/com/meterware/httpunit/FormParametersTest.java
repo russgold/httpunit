@@ -279,6 +279,17 @@ public class FormParametersTest extends HttpUnitTest {
         } catch (IllegalRequestParameterException e) {
         }
 
+        form.toggleCheckbox( "color", "red" );
+        assertMatchingSet( "color checkboxes", new String[] { "red" }, form.getParameterValues( "color" ) );
+        form.setCheckbox( "color", "blue", true );
+        assertMatchingSet( "color checkboxes", new String[] { "red", "blue" }, form.getParameterValues( "color" ) );
+
+        try {
+            form.setCheckbox( "color", "green", true );
+            fail( "Did not forbid setting checkbox with unknown value" );
+        } catch (IllegalRequestParameterException e) {
+        }
+
     }
 
 

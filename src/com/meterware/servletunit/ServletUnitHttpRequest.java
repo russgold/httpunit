@@ -63,6 +63,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _headers = new WebClient.HeaderDictionary();
         _headers.addEntries( clientHeaders );
         _headers.addEntries( request.getHeaders() );
+        setCookiesFromHeader( _headers );
         _messageBody = messageBody;
         _secure = request.getURL().getProtocol().equalsIgnoreCase( "https" );
 
@@ -695,7 +696,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 //--------------------------------------------- package members ----------------------------------------------
 
 
-    void addCookie( Cookie cookie ) {
+    private void addCookie( Cookie cookie ) {
         _cookies.addElement( cookie );
         if (cookie.getName().equalsIgnoreCase( ServletUnitHttpSession.SESSION_COOKIE_NAME )) {
             _sessionID = cookie.getValue();
@@ -762,6 +763,20 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
     private void throwNotImplementedYet() {
         throw new RuntimeException( "Not implemented yet" );
+    }
+
+
+    private void setCookiesFromHeader( Dictionary clientHeaders ) {
+        String cookieHeader = (String) clientHeaders.get( "Cookie" );
+        if (cookieHeader == null) return;
+
+        StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
+        while (st.hasMoreTokens()) {
+            String name = st.nextToken();
+            if (st.hasMoreTokens()) {
+                addCookie( new Cookie( name, st.nextToken() ) );
+            }
+        }
     }
 
 

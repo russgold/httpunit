@@ -100,10 +100,36 @@ class FormParameter {
     }
 
 
+    public void toggleCheckbox( String value ) {
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            FormControl control = controls[i];
+            if (value.equals( control.getValueAttribute())) {
+                control.toggle();
+                return;
+            }
+        }
+        throw new IllegalCheckboxParameterException( _name + "/" + value , "toggleCheckbox" );
+    }
+
+
     public void setValue( boolean state ) {
         FormControl[] controls = getControls();
-        if (controls.length != 1) throw new IllegalCheckboxParameterException( _name, "toggleCheckbox" );
+        if (controls.length != 1) throw new IllegalCheckboxParameterException( _name, "setCheckbox" );
         controls[0].setState( state );
+    }
+
+
+    public void setValue( String value, boolean state ) {
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            FormControl control = controls[i];
+            if (value.equals( control.getValueAttribute())) {
+                control.setState( state );
+                return;
+            }
+        }
+        throw new IllegalCheckboxParameterException( _name + "/" + value , "setCheckbox" );
     }
 
 

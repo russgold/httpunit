@@ -548,6 +548,20 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Toggles the value of the specified checkbox parameter.
+     * @param name the name of the checkbox parameter
+     * @param value of the checkbox parameter
+     * @throws IllegalArgumentException if the specified parameter is not a checkbox or if there is no checkbox
+     *         with the specified name and value.
+     */
+    public void toggleCheckbox( String name, String value ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == null) throw new NoSuchParameterException( name );
+        parameter.toggleCheckbox( value );
+    }
+
+
+    /**
      * Sets the value of the specified checkbox parameter.
      * @param name the name of the checkbox parameter
      * @param state the new state of the checkbox
@@ -558,6 +572,21 @@ public class WebForm extends WebRequestSource {
         FormParameter parameter = getParameter( name );
         if (parameter == null) throw new NoSuchParameterException( name );
         parameter.setValue( state );
+    }
+
+
+    /**
+     * Sets the value of the specified checkbox parameter.
+     * @param name the name of the checkbox parameter
+     * @param value of the checkbox parameter
+     * @param state the new state of the checkbox
+     * @throws IllegalArgumentException if the specified parameter is not a checkbox or if there is no checkbox
+     *         with the specified name and value.
+     */
+    public void setCheckbox( String name, String value, boolean state ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == null) throw new NoSuchParameterException( name );
+        parameter.setValue( value, state );
     }
 
 

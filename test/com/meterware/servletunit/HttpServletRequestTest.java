@@ -236,10 +236,10 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
-    public void testSetCookies() throws Exception {
+    public void testSetCookieViaRequestHeader() throws Exception {
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+        wr.setHeaderField( "Cookie", "flavor=vanilla");
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
-        request.addCookie( new Cookie( "flavor", "vanilla" ) );
 
         Cookie[] cookies = request.getCookies();
         assertNotNull( "No cookies found", cookies );
@@ -273,13 +273,14 @@ public class HttpServletRequestTest extends ServletUnitTest {
      * will cause a session to be made available.
      */
     public void testRetrieveSession() throws Exception {
-        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
         ServletUnitContext context = new ServletUnitContext();
-
-        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         final ServletUnitHttpSession session = context.newSession();
         final String sessionID = session.getId();
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, sessionID ) );
+
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+        wr.setHeaderField( "Cookie", ServletUnitHttpSession.SESSION_COOKIE_NAME + '=' + sessionID);
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         assertEquals( "Requested session ID defined in request", sessionID, request.getRequestedSessionId() );
 
         assertSame( "Session returned when creation not requested", session, request.getSession( /* create */ false ) );
@@ -318,14 +319,14 @@ public class HttpServletRequestTest extends ServletUnitTest {
      * Obtains a new session, invalidates it, and verifies that
      */
     public void testSessionInvalidation() throws Exception {
-        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
         ServletUnitContext context = new ServletUnitContext();
-
         HttpSession originalSession = context.newSession();
         String originalID = originalSession.getId();
 
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+        wr.setHeaderField( "Cookie", ServletUnitHttpSession.SESSION_COOKIE_NAME + '=' + originalID);
+
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
         originalSession.setAttribute( "Initial", new Integer( 1 ) );
         Enumeration attributeNames = originalSession.getAttributeNames();
         assertTrue( attributeNames.hasMoreElements() );
@@ -347,18 +348,18 @@ public class HttpServletRequestTest extends ServletUnitTest {
      * Verifies that a request with a bad session ID causes a new session to be generated only when explicitly requested.
      */
     public void testGetSessionWithBadCookie() throws Exception {
-        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
         ServletUnitContext context = new ServletUnitContext();
-        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
-
         HttpSession originalSession = context.newSession();
         String originalID = originalSession.getId();
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
+
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+        wr.setHeaderField( "Cookie", ServletUnitHttpSession.SESSION_COOKIE_NAME + '=' + originalID);
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         request.getSession();
 
-        String badID = originalID + "BAD";
+        wr.setHeaderField( "Cookie", ServletUnitHttpSession.SESSION_COOKIE_NAME + '=' + (originalID + "BAD"));
         request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, badID ) );
 
         assertNull( "Unexpected session returned for bad cookie", request.getSession( false ) );
         assertNotNull( "Should have returned session when asked", request.getSession( true ));

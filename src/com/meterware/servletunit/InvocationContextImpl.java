@@ -26,10 +26,8 @@ import com.meterware.httpunit.WebResponse;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Stack;
-import java.util.StringTokenizer;
 
 import javax.servlet.*;
 
@@ -185,9 +183,6 @@ class InvocationContextImpl implements InvocationContext {
         URL requestURL  = request.getURL();
         final ServletUnitHttpRequest suhr = new ServletUnitHttpRequest( _application.getServletRequest( requestURL ), request,
                                                                         runner.getContext(), clientHeaders, messageBody );
-        Cookie[] cookies = getCookies( clientHeaders );
-        for (int i = 0; i < cookies.length; i++) suhr.addCookie( cookies[i] );
-
         if (_application.usesBasicAuthentication()) suhr.readBasicAuthentication();
         else if (_application.usesFormAuthentication()) suhr.readFormAuthentication();
 
@@ -198,7 +193,6 @@ class InvocationContextImpl implements InvocationContext {
         _contextStack.push( new ExecutionContext( suhr, new ServletUnitHttpResponse(),
                                                   _application.getServletRequest( _effectiveURL ) ) );
     }
-
 
 
     private URL computeEffectiveUrl( HttpServletRequest request, URL requestURL ) {
@@ -320,31 +314,11 @@ class InvocationContextImpl implements InvocationContext {
 //------------------------------ private members ---------------------------------------
 
 
-    final private static Cookie[] NO_COOKIES = new Cookie[0];
-
-
     private ServletUnitClient       _client;
     private WebApplication          _application;
     private String                  _target;
 
     private WebResponse             _webResponse;
-
-
-    private Cookie[] getCookies( Dictionary clientHeaders ) {
-        String cookieHeader = (String) clientHeaders.get( "Cookie" );
-        if (cookieHeader == null) return NO_COOKIES;
-        ArrayList cookies = new ArrayList();
-
-        StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
-        while (st.hasMoreTokens()) {
-            String name = st.nextToken();
-            if (st.hasMoreTokens()) {
-                String value = st.nextToken();
-                cookies.add( new Cookie( name, value ) );
-            }
-        }
-        return (Cookie[]) cookies.toArray( new Cookie[ cookies.size() ] );
-    }
 
 
     private ExecutionContext getContext() {

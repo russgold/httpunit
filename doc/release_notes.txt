@@ -13,9 +13,17 @@ Limitations:
 
 
 Revision History:
+14-Mar-2004
+    Additions:
+        1. RFE #909922: ServletUnit now supports HttpServletRequest.getHeaders
+        2. setCheckbox() and toggleCheckbox() have now been expanded to select one of a group of checkboxes by specifying
+           its name.
+    Problems fixed:
+        1. bug #872129: Cookie header set on a web request was ignored in servletunit
+
 9-Mar-2004
     Problems fixed:
-        1. Support JavaScript changing "disabled" attribute on form controls
+        1. bug #861866: Support JavaScript changing "disabled" attribute on form controls
         2. Forms defined after a <script> section which accessed document.forms would not be found if document.forms
            was also accessed in a subsequent <script> section after the new form definition.
     Notes:

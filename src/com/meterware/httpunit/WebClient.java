@@ -583,6 +583,12 @@ public class WebClient {
             }
         }
 
+
+        public boolean containsKey( Object key ) {
+            return super.containsKey( matchPreviousFieldName( key.toString() ) );
+        }
+
+
         public Object get( Object fieldName ) {
             return (String) super.get( matchPreviousFieldName( fieldName.toString() ) );
         }
