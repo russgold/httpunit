@@ -81,6 +81,25 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    public void testHtmlRequirement() throws Exception {
+        defineResource( "TextPage.txt", "Just text", "text/plain" );
+        defineResource( "SimplePage.html", "<html><head><title>A Sample Page</title></head><body>Something here</body></html>", "text/html" );
+        defineResource( "StructuredPage.html", "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML Basic 1.0//EN' 'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd'>" +
+                                               "<html><head><title>A Structured Page</title></head><body>Something here</body></html>", "text/xhtml" );
+        WebConversation wc = new WebConversation();
+        try {
+            wc.getResponse( getHostPath() + "/TextPage.txt" ).getReceivedPage().getTitle();
+            fail( "Should have rejected attempt to get a title from a text page" );
+        } catch (NotHTMLException e ) {}
+
+        WebResponse simplePage = wc.getResponse( getHostPath() + "/SimplePage.html" );
+        assertEquals( "HTML Title", "A Sample Page", simplePage.getReceivedPage().getTitle() );
+
+        WebResponse structuredPage = wc.getResponse( getHostPath() + "/StructuredPage.html" );
+        assertEquals( "XHTML Title", "A Structured Page", structuredPage.getReceivedPage().getTitle() );
+    }
+
+
     public void testTitle() throws Exception {
         defineResource( "SimplePage.html",
                         "<html><head><title>A Sample Page</title></head>\n" +
