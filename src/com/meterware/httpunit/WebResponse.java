@@ -20,7 +20,6 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -625,48 +624,48 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+    /**
+     *
+     */
     private void processCookieHeader( String cookieHeader, int version ) {
         if (cookieHeader == null) return;
-        Vector tokens = getCookieTokens(cookieHeader);
-        // holds tokens that should be part of the value of
-        // the first token before it that contains an
-        // equals sign (=)
+        Vector tokens = getCookieTokens( cookieHeader );
         String tokensToAdd = "";
-        int numTokens = tokens.size();
-        for (int i=numTokens - 1; i >= 0; i--) {
-            String token = (String) tokens.elementAt(i);
-            int equalsIndex = token.indexOf('=');
+        for (int i = tokens.size() - 1; i >= 0; i--) {
+            String token = (String) tokens.elementAt( i );
 
-            // if this token has an equals sign (=) in it
+            int equalsIndex = getEqualsIndex( token );
             if (equalsIndex != -1) {
-                String name = token.substring(0,equalsIndex).trim();
-                // make sure we aren't using a cookie's attribute other
-                // than the name/value pair
-                if ( !isStringCookieAttribute(name,version) ) {
-                    String value = token.substring(equalsIndex+1).trim();
-                    _newCookies.put(name,value+tokensToAdd);
+                String name = token.substring( 0, equalsIndex ).trim();
+                if (!isCookieAttribute( name, version )) {
+                    String value = token.substring( equalsIndex + 1 ).trim();
+                    _newCookies.put( name, value + tokensToAdd );
                 }
                 tokensToAdd = "";
+            } else if (isCookieReservedWord( token, version )) {
+                tokensToAdd = "";
+            } else {
+                tokensToAdd = token + tokensToAdd;
+                String preceedingToken = (String) tokens.elementAt( i - 1 );
+                char lastChar = preceedingToken.charAt( preceedingToken.length() - 1 );
+                if (lastChar != '=') {
+                    tokensToAdd = "," + tokensToAdd;
+                }
             }
+        }
+    }
 
-            else {
-                // make sure we aren't counting a one word reserved
-                // cookie attribute value
-                if ( !isTokenReservedWord(token,version) ) {
-                    tokensToAdd =  token + tokensToAdd;
-                    String preceedingToken = (String) tokens.elementAt(i - 1);
-                    char lastChar = preceedingToken.charAt(preceedingToken.length()-1);
-                    if (lastChar != '=') {
-                        tokensToAdd = ","+ tokensToAdd;
-                    }
-                }
-                // the token is a secure or discard flag for the cookie
-                else {
-                    // just to be safe we should clear the tokens
-                    // to append to the value of the cookie
-                    tokensToAdd = "";
-                }
-            }
+
+    /**
+     * Returns the index (if any) of the equals sign separating a cookie name from the its value.
+     * Equals signs at the end of the token are ignored in this calculation, since they may be
+     * part of a Base64-encoded value.
+     */
+    private int getEqualsIndex( String token ) {
+        if (!token.endsWith( "=" )) {
+            return token.indexOf( '=' );
+        } else {
+            return getEqualsIndex( token.substring( 0, token.length()-1 ) );
         }
     }
 
@@ -707,50 +706,40 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    private boolean isStringCookieAttribute(String string,
-                                               int version) {
+    private boolean isCookieAttribute( String string,
+                                             int version ) {
         String stringLowercase = string.toLowerCase();
         if (version == IETF_RFC2109) {
-            if ( stringLowercase.equals("path") ||
-                 stringLowercase.equals("domain") ||
-                 stringLowercase.equals("expires") ||
-                 stringLowercase.equals("comment") ||
-                 stringLowercase.equals("max-age") ||
-                 stringLowercase.equals("version") ) {
-                return true;
-            }
+            return stringLowercase.equals("path") ||
+                   stringLowercase.equals("domain") ||
+                   stringLowercase.equals("expires") ||
+                   stringLowercase.equals("comment") ||
+                   stringLowercase.equals("max-age") ||
+                   stringLowercase.equals("version");
+        } else if (version == IETF_RFC2965) {
+            return stringLowercase.equals("path") ||
+                   stringLowercase.equals("domain") ||
+                   stringLowercase.equals("comment") ||
+                   stringLowercase.equals("commenturl") ||
+                   stringLowercase.equals("max-age") ||
+                   stringLowercase.equals("version") ||
+                   stringLowercase.equals("$version") ||
+                   stringLowercase.equals("port");
+        } else {
+            return false;
         }
-        else if (version == IETF_RFC2965) {
-            if ( stringLowercase.equals("path") ||
-                 stringLowercase.equals("domain") ||
-                 stringLowercase.equals("comment") ||
-                 stringLowercase.equals("commenturl") ||
-                 stringLowercase.equals("max-age") ||
-                 stringLowercase.equals("version") ||
-                 stringLowercase.equals("$version") ||
-                 stringLowercase.equals("port") ) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
-    private boolean isTokenReservedWord(String token,
-                                           int version) {
-        String tokenLowercase = token.toLowerCase();
+    private boolean isCookieReservedWord( String token,
+                                         int version ) {
         if (version == IETF_RFC2109) {
-            if ( tokenLowercase.equals("secure") ) {
-                return true;
-            }
+            return token.equalsIgnoreCase( "secure" );
+        } else if (version == IETF_RFC2965) {
+            return token.equalsIgnoreCase( "discard" ) || token.equalsIgnoreCase( "secure" );
+        } else {
+            return false;
         }
-        else if (version == IETF_RFC2965) {
-            if ( tokenLowercase.equals("discard") ||
-                 tokenLowercase.equals("secure") ) {
-                return true;
-            }
-        }
-        return false;
     }
 
 

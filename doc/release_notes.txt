@@ -10,6 +10,10 @@ Known problems:
 Limitations: HttpUnit does not support JavaScript
 
 Revision History:
+12-Nov-2001
+Problems fixed:
+   1. WebSphere cookie values ending with "=" or "==" are now handled.
+
  9-Nov-2001
 
 Acknowledgements:
