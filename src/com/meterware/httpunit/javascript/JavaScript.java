@@ -228,6 +228,16 @@ public class JavaScript {
         }
 
 
+        public boolean jsFunction_confirm( String message ) {
+            return getDelegate().getConfirmationResponse( message );
+        }
+
+
+        public String jsFunction_prompt( String message, String defaultResponse ) {
+            return getDelegate().getUserResponse( message, defaultResponse );
+        }
+
+
         Scriptable toScriptable( ScriptableDelegate delegate ) {
             return null;
         }

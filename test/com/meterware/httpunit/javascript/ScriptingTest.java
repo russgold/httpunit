@@ -57,6 +57,47 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testConfirmationDialog() throws Exception {
+        defineWebPage( "OnCommand", "<a href='NextPage' id='go' onClick='return confirm( \"go on?\" );'>" );
+        defineResource( "NextPage", "Got the next page!" );
+
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.setDialogResponder( new DialogAdapter() {
+            public boolean getConfirmation( String confirmationPrompt ) {
+                assertEquals( "Confirmation prompt", "go on?", confirmationPrompt );
+                return false;
+            }
+        } );
+        wr.getLinkWithID( "go" ).click();
+        assertEquals( "Current page", wr, wc.getCurrentPage() );
+        wc.setDialogResponder( new DialogAdapter() );
+        wr.getLinkWithID( "go" ).click();
+        assertEquals( "Page after confirmation", "Got the next page!", wc.getCurrentPage().getText() );
+    }
+
+
+    public void testPromptDialog() throws Exception {
+        defineWebPage( "OnCommand", "<a href='NextPage' id='go' onClick='return \"yes\" == prompt( \"go on?\", \"no\" );'>" );
+        defineResource( "NextPage", "Got the next page!" );
+
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wr.getLinkWithID( "go" ).click();
+        assertEquals( "Current page", wr, wc.getCurrentPage() );
+
+        wc.setDialogResponder( new DialogAdapter() {
+            public String getUserResponse( String prompt, String defaultResponse ) {
+                assertEquals( "Confirmation prompt", "go on?", prompt );
+                assertEquals( "Default response", "no", defaultResponse );
+                return "yes";
+            }
+        } );
+        wr.getLinkWithID( "go" ).click();
+        assertEquals( "Page after confirmation", "Got the next page!", wc.getCurrentPage().getText() );
+    }
+
+
     public void testFunctionCallOnLoad() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "<!-- " +

@@ -11,6 +11,14 @@ Limitations:
 
 
 Revision History:
+21-Aug-2002
+
+Additions:
+    1. JavaScript - Window.confirm is now supported. By default, it always returns true. Users may change this by supplying an
+       implementation of DialogResponder to the WebClient.
+    2. JavScript - Window.prompt is now supported. By default, it always returns the default value. Users may change this by supplying an
+       implementation of DialogResponder to the WebClient.
+
 20-Aug-2002
 
 Problems fixed:

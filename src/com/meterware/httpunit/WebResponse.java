@@ -507,6 +507,16 @@ public class WebResponse implements HTMLSegment {
         }
 
 
+        public boolean getConfirmationResponse( String message ) {
+            return _client.getConfirmationResponse( message );
+        }
+
+
+        public String getUserResponse( String prompt, String defaultResponse ) {
+            return _client.getUserResponse( prompt, defaultResponse );
+        }
+
+
         public HTMLPage.Scriptable getDocument() throws SAXException {
             return getReceivedPage().getScriptableObject();
         }

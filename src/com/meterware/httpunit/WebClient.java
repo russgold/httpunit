@@ -254,6 +254,14 @@ public class WebClient {
     }
 
 
+    /**
+     * Specifies the object which will respond to all dialogs.
+     **/
+    public void setDialogResponder( DialogResponder responder ) {
+        _dialogResponder = responder;
+    }
+
+
 //------------------------------------------ protected members -----------------------------------
 
 
@@ -333,6 +341,19 @@ public class WebClient {
     }
 
 
+//------------------------------------------ package members ------------------------------------
+
+
+    boolean getConfirmationResponse( String message ) {
+        return _dialogResponder.getConfirmation( message );
+    }
+
+
+    String getUserResponse( String message, String defaultResponse ) {
+        return _dialogResponder.getUserResponse( message, defaultResponse );
+    }
+
+
 //------------------------------------------ private members -------------------------------------
 
 
@@ -350,6 +371,8 @@ public class WebClient {
     private boolean _exceptionsThrownOnErrorStatus = HttpUnitOptions.getExceptionsThrownOnErrorStatus();
 
     private List _clientListeners = new ArrayList();
+
+    private DialogResponder _dialogResponder = new DialogAdapter();
 
 
     /**
