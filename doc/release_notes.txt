@@ -17,6 +17,7 @@ Revision History:
 Additions:
     1. JUnitServlet now supports a value of 'xml' for the format parameter, generating a format compatible with
        ant's XMLResultFormatter
+    2. Form.getOptions() now works for radio buttons and checkboxes - as long as the desired name is located after the control.
 
  4-Apr-2003
 Acknowledgements:

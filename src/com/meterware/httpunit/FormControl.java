@@ -353,6 +353,8 @@ class BooleanFormControl extends FormControl {
     private String[] _value = new String[1];
 
     private final boolean _isCheckedDefault;
+    private String[] _displayedValue;
+
 
     protected ScriptableDelegate newScriptable() {
         return new Scriptable();
@@ -385,7 +387,16 @@ class BooleanFormControl extends FormControl {
 
     public BooleanFormControl( WebForm form, Node node ) {
         super( form, node );
+        _displayedValue = new String[] { readDisplayedValue( node ) };
         _isChecked      = _isCheckedDefault = NodeUtils.isNodeAttributePresent( node, "checked" );
+    }
+
+
+    private String readDisplayedValue( Node node ) {
+        Node nextSibling = node.getNextSibling();
+        while (nextSibling != null && nextSibling.getNodeType() != Node.TEXT_NODE && nextSibling.getNodeType() != Node.ELEMENT_NODE) nextSibling = nextSibling.getNextSibling();
+        if (nextSibling == null || nextSibling.getNodeType() != Node.TEXT_NODE) return "";
+        return nextSibling.getNodeValue();
     }
 
 
@@ -418,6 +429,11 @@ class BooleanFormControl extends FormControl {
      **/
     public String[] getOptionValues() {
         return (isReadOnly() && !isChecked()) ? NO_VALUE : toArray( getQueryValue() );
+    }
+
+
+    String[] getDisplayedOptions() {
+        return _displayedValue;
     }
 
 
@@ -506,6 +522,19 @@ class RadioGroupFormControl extends FormControl {
         FormControl[] buttons = getButtons();
         for (int i = 0; i < buttons.length; i++) {
             valueList.addAll( Arrays.asList( buttons[i].getOptionValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
+    }
+
+
+    /**
+     * Returns the options displayed for this radio button group.
+     */
+    String[] getDisplayedOptions() {
+        ArrayList valueList = new ArrayList();
+        FormControl[] buttons = getButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            valueList.addAll( Arrays.asList( buttons[i].getDisplayedOptions() ) );
         }
         return (String[]) valueList.toArray( new String[ valueList.size() ] );
     }

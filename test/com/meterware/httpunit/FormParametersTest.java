@@ -201,14 +201,15 @@ public class FormParametersTest extends HttpUnitTest {
 
     public void testRadioButtonValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
-                                       "<Input type=radio name=color value=red>" +
-                                       "<Input type=radio name=color value=blue>" +
-                                       "<Input type=radio name=color value=green>" +
+                                       "<Input type=radio name=color value=red>Crimson" +
+                                       "<Input type=radio name=color value=blue>Aquamarine" +
+                                       "<Input type=radio name=color value=green>Chartreuse" +
                                        "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
         assertEquals( "color options", new String[] { "red", "blue", "green" }, page.getForms()[0].getOptionValues( "color" ) );
+        assertEquals( "color names", new String[] { "Crimson", "Aquamarine", "Chartreuse" }, page.getForms()[0].getOptions( "color" ) );
         request.setParameter( "color", "red" );
         request.setParameter( "color", "blue" );
         validateSetParameterRejected( request, "color", "black", "setting radio buttons to unknown value" );
@@ -233,10 +234,11 @@ public class FormParametersTest extends HttpUnitTest {
     public void testCheckboxValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = 'ask?color='>" +
                                        "<Input type=checkbox name=use_color>" +
-                                       "<Input type=checkbox name=color value=red>" +
-                                       "<Input type=checkbox name=color value=blue>" +
+                                       "<Input type=checkbox name=color value=red>Scarlet" +
+                                       "<Input type=checkbox name=color value=blue>Turquoise" +
                                        "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        assertEquals( "Color values", new String[] { "Scarlet", "Turquoise" }, page.getForms()[0].getOptions( "color" ) );
         WebRequest request = page.getForms()[0].getRequest();
         request.setParameter( "use_color", "on" );
         request.removeParameter( "use_color" );
