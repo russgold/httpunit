@@ -13,71 +13,52 @@ Limitations:
 
 
 Revision History:
- 6-Jul-2003
-Additions:
-    1. WebResponse and TableCell now support getElementsWithName and getElementNames to look up HTML elements.
-Problems fixed:
-    1. gzip'ed responses were sometimes truncated.
-
-24-Jun-2003
-Additions:
-    1. rfe #721424: You can now set checkbox values in a form via: setCheckbox(name,boolean) or toggleCheckbox(name).
-                    These methods will throw an exception if the specified parameter is not a checkbox or if more than
-                    one control  has the name.
-    2. PseudoServer now permits setting the maximum protocol level. If it is 1.0, all responses will be forced to
-                    HTTP/1.0 no matter the protocol of the request.
-
-20-Jun-2003
+21-Aug-2003 1.5.4
 Acknowledgements:
-    Thanks to Brian O'Kelley for supplying a way to disable use of the proxy server.
-    Thanks to David Kilzer for submitting the WebLink.MATCH_TEXT predicate
-
-Additions:
-    1. rfe #751505: Add clearProxyServer() to disable the use of the proxy server
-    2. rfe #744360: Added getFirstMatchingForm and getMatchingForms() methods to WebResponse and HTMLSegment
-    3. rfe #756453: Made Button.isDisabled() method public
-    4: rfe #717752: Added WebLink.MATCH_TEXT predicate to match link text exactly
-
-17-Jun-2003
-Acknowledgements:
+    Thanks to David D. Kilzer for:
+         creating thorough tests for URLs containing navigation and showing a way to handle them, and
+         submitting the WebLink.MATCH_TEXT predicate.
     Thanks to Lloyd McKenzie for finding a problem with listing cookie names and suggesting a fix.
-
-Problems fixed:
-    1. bug #750846: Cannot retrieve all cookie names when both global and site-specific cookies are defined.
-    2. bug #744214: ServletUnit does not recognize subframes
+    Thanks to Brian O'Kelley for supplying a way to disable use of the proxy server.
 
 Additions:
-    1. rfe #723895: A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
-    2. It is now possible to define a CookieListener on CookieProperties to watch for cookie rejection events
+    Content and Parsing
+        1. WebResponse and TableCell now support getElementsWithName and getElementNames to look up HTML elements.
+        2. Form.getOptions() now works for radio buttons and checkboxes - as long as the desired name is located after the control.
+        3. rfe #723895: A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
+        4. It is now possible to define a CookieListener on CookieProperties to watch for cookie rejection events
+        5. rfe #751505: Add clearProxyServer() to disable the use of the proxy server
+        6. rfe #744360: Added getFirstMatchingForm and getMatchingForms() methods to WebResponse and HTMLSegment
+        7. rfe #756453: Made Button.isDisabled() method public
+        8: rfe #717752: Added WebLink.MATCH_TEXT predicate to match link text exactly
+        9. rfe #721424: You can now set checkbox values in a form via: setCheckbox(name,boolean) or toggleCheckbox(name).
+                        These methods will throw an exception if the specified parameter is not a checkbox or if more than
+                        one control  has the name.
+    ServletUnit
+       10. JUnitServlet now supports a value of 'xml' for the format parameter, generating a format compatible with
+           ant's XMLResultFormatter
+       11. You can now get the value of context parameters from a ServletRunner via the getContextParameter method
+    PseudoServer
+       12. PseudoServer now permits setting the maximum protocol level. If it is 1.0, all responses will be forced to
+                        HTTP/1.0 no matter the protocol of the request.
 
- 4-Jun-2003
-Additions:
-    1. You can now get the value of context parameters from a ServletRunner via the getContextParameter method
-
-23-May-2002
 Problems fixed:
-    1. bug #721989: scripts did not see id attributes of form controls.
-    2. bug #741965: cookies with explicit domain attributes are being rejected when their host is of the form HD
-                    where D is the explicit domain attribute and H contains a dot. Apparently, most browsers ignore this
-                    rule. Now, so does HttpUnit, if CookieProperties.setDomainMatchingStrict( false ) is called.
-
-22-May-2003
-Problems fixed:
-    1. bug #722788: WebForm.submit() was not invoking the 'onClick' event of the specified submit button.
-    2. bug #734133: javascript: URLs were ignored if "javascript:" is not all lower case.
-
- 2-May-2003
-Acknowledgements:
-    Thanks to David D. Kilzer for creating thorough tests for URLs containing navigation and showing a way to handle them.
-Additions:
-    1. JUnitServlet now supports a value of 'xml' for the format parameter, generating a format compatible with
-       ant's XMLResultFormatter
-    2. Form.getOptions() now works for radio buttons and checkboxes - as long as the desired name is located after the control.
-Problems fixed:
-    1. bug #717280: URLs with "../" in them were not resolved properly
-    2. bug #717640: <base> element was not being handled in the case when no host was specified.
-    3. When setting a selection control, HttpUnit would always select a value matching its first option if possible,
-       rather than taking the first valid value.
+    Content and Parsing
+        1. bug #717280: URLs with "../" in them were not resolved properly
+        2. bug #717640: <base> element was not being handled in the case when no host was specified.
+        3. When setting a selection control, HttpUnit would always select a value matching its first option if possible,
+           rather than taking the first valid value.
+        4. bug #722788: WebForm.submit() was not invoking the 'onClick' event of the specified submit button.
+        5. bug #721989: scripts did not see id attributes of form controls.
+        6. bug #741965: cookies with explicit domain attributes are being rejected when their host is of the form HD
+                        where D is the explicit domain attribute and H contains a dot. Apparently, most browsers ignore this
+                        rule. Now, so does HttpUnit, if CookieProperties.setDomainMatchingStrict( false ) is called.
+        7. bug #750846: Cannot retrieve all cookie names when both global and site-specific cookies are defined.
+        8. gzip'ed responses were sometimes truncated.
+    JavaScript
+        9. bug #734133: javascript: URLs were ignored if "javascript:" is not all lower case.
+   ServletUnit
+       10. bug #744214: ServletUnit does not recognize subframes
 
  4-Apr-2003 1.5.3
 Acknowledgements:

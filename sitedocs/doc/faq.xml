@@ -57,8 +57,11 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
         <faq id="uncheck">
             <question>How do I uncheck a checkbox?</question>
             <answer><![CDATA[The setParameter call lets you specify the values per parameter name. An unchecked checkbox has no value to transmit, so you would call:
-                    <pre><code>    form.setParameter( "checkbox-name", new String[0] );</code></pre>or
-                    <pre><code>    form.removeParameter( "checkbox-name" );</code></pre>]]></answer>
+                    <pre><code>    form.setParameter( "checkbox-name", new String[0] );</code></pre> or
+                    <pre><code>    form.removeParameter( "checkbox-name" );</code></pre>
+                    As of 1.5.4, you have alternatives. If the checkbox's name is unique, you can say:
+                    <pre><code>    form.setCheckbox( "checkbox-name", false );</code></pre> or
+                    <pre><code>    form.toggleCheckbox( "checkbox-name" );</code></pre>]]></answer>
         </faq>
         <faq id="hidden">
             <question>Why can't I change hidden parameter values?</question>
