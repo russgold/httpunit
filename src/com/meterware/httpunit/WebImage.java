@@ -41,8 +41,8 @@ public class WebImage extends FixedURLWebRequestSource {
     private String     _alt;
 
 
-    WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, Node node, String parentTarget ) {
-        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "src" ), parentTarget );
+    WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, Node node, FrameSelector sourceFrame, String defaultTarget ) {
+        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "src" ), sourceFrame, defaultTarget );
         _node = node;
         _parsedHTML = parsedHTML;
         _src = NodeUtils.getNodeAttribute( _node, "src" );

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -53,12 +53,12 @@ public class WebConversation extends WebClient {
     /**
      * Creates a web response object which represents the response to the specified web request.
      **/
-    protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException, IOException {
+    protected WebResponse newResponse( WebRequest request, FrameSelector targetFrame ) throws MalformedURLException, IOException {
         URLConnection connection = openConnection( getRequestURL( request ) );
         sendHeaders( connection, getHeaderFields( request.getURL() ) );
         sendHeaders( connection, request.getHeaderDictionary() );
         request.completeRequest( connection );
-        return new HttpWebResponse( this, frameName, request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
+        return new HttpWebResponse( this, targetFrame, request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
     }
 
 

@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import com.meterware.httpunit.HttpException;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.FrameSelector;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -42,8 +43,14 @@ import javax.servlet.http.HttpSession;
  **/
 class InvocationContextImpl implements InvocationContext {
 
-    private Stack _contextStack = new Stack();
-    private URL   _effectiveURL;
+    private Stack             _contextStack = new Stack();
+    private URL               _effectiveURL;
+
+    private ServletUnitClient _client;
+    private WebApplication    _application;
+    private FrameSelector       _frame;
+
+    private WebResponse       _webResponse;
 
 
     /**
@@ -96,17 +103,14 @@ class InvocationContextImpl implements InvocationContext {
                 cookie.setPath( _application.getContextPath() );
                 getResponse().addCookie( cookie );
             }
-            _webResponse = new ServletUnitWebResponse( _client, _target, _effectiveURL, getResponse(), _client.getExceptionsThrownOnErrorStatus() );
+            _webResponse = new ServletUnitWebResponse( _client, _frame, _effectiveURL, getResponse(), _client.getExceptionsThrownOnErrorStatus() );
         }
         return _webResponse;
     }
 
 
-    /**
-     * Returns the target for the original request.
-     */
-    public String getTarget() {
-        return _target;
+    public FrameSelector getFrame() {
+        return _frame;
     }
 
 
@@ -175,10 +179,10 @@ class InvocationContextImpl implements InvocationContext {
      * Constructs a servlet invocation context for a specified servlet container,
      * request, and cookie headers.
      **/
-    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, String target, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, FrameSelector frame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
         _client      = client;
         _application = runner.getApplication();
-        _target      = target;
+        _frame       = frame;
 
         URL requestURL  = request.getURL();
         final ServletUnitHttpRequest suhr = new ServletUnitHttpRequest( _application.getServletRequest( requestURL ), request,
@@ -309,17 +313,6 @@ class InvocationContextImpl implements InvocationContext {
             return _request;
         }
     }
-
-
-//------------------------------ private members ---------------------------------------
-
-
-    private ServletUnitClient       _client;
-    private WebApplication          _application;
-    private String                  _target;
-
-    private WebResponse             _webResponse;
-
 
     private ExecutionContext getContext() {
         return (ExecutionContext) _contextStack.lastElement();

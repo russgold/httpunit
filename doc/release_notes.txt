@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+13-Jun-2004
+   Problems fixed:
+        1. bug #737167: Nested frame names are now as specified, previous included names of parent frames.
+        2. Return from a request that wrote to a new frame is now the result of that request, was the original page.
+        3. Return from a request specifying an unknown frame now opens a new window; previously created a subframe
+           in the requesting window.
+
  3-Jun-2004
    Additions:
         1. WebForm now supports the newUnvalidatedRequest method, which should be used in preference to

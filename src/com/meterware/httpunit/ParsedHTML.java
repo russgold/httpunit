@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,21 +38,21 @@ class ParsedHTML {
 
     final static private HTMLElement[] NO_ELEMENTS = new HTMLElement[0];
 
-    private Node _rootNode;
+    private Node         _rootNode;
 
-    private URL _baseURL;
+    private URL          _baseURL;
 
-    private String _frameName;
+    private FrameSelector  _frame;
 
-    private String _baseTarget;
+    private String       _baseTarget;
 
-    private String _characterSet;
+    private String       _characterSet;
 
     private WebResponse  _response;
 
     private boolean      _updateElements = true;
 
-    private boolean _enableNoScriptNodes;
+    private boolean      _enableNoScriptNodes;
 
     /** map of element IDs to elements. **/
     private HashMap      _elementsByID = new HashMap();
@@ -83,9 +83,9 @@ class ParsedHTML {
     private WebFrame[]   _frames;
 
 
-    ParsedHTML( WebResponse response, String frameName, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
+    ParsedHTML( WebResponse response, FrameSelector frame, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
         _response     = response;
-        _frameName    = frameName;
+        _frame        = frame;
         _baseURL      = baseURL;
         _baseTarget   = baseTarget;
         _rootNode     = rootNode;
@@ -590,22 +590,22 @@ class ParsedHTML {
 
 
     private WebForm toWebForm( Element element ) {
-        return new WebForm( _response, _baseURL, _baseTarget, element, _characterSet );
+        return new WebForm( _response, _baseURL, element, _frame, _baseTarget, _characterSet );
     }
 
 
     private WebFrame toWebFrame( Element element ) {
-        return new WebFrame( _baseURL, element, _frameName );
+        return new WebFrame( _baseURL, element, _frame );
     }
 
 
     private WebFrame toWebIFrame( Element element ) {
-        return new WebIFrame( _baseURL, element, _frameName );
+        return new WebIFrame( _baseURL, element, _frame );
     }
 
 
     private WebLink toLinkAnchor( Element child ) {
-        return (!isWebLink( child )) ? null : new WebLink( _response, _baseURL, _baseTarget, child );
+        return (!isWebLink( child )) ? null : new WebLink( _response, _baseURL, child, _frame, _baseTarget );
     }
 
 
@@ -615,7 +615,7 @@ class ParsedHTML {
 
 
     private WebImage toWebImage( Element child ) {
-        return new WebImage( _response, this, _baseURL, child, _baseTarget );
+        return new WebImage( _response, this, _baseURL, child, _frame, _baseTarget );
     }
 
 
@@ -625,7 +625,7 @@ class ParsedHTML {
 
 
     private WebTable toWebTable( Element element ) {
-        return new WebTable( _response, _frameName, element, _baseURL, _baseTarget, _characterSet );
+        return new WebTable( _response, _frame, element, _baseURL, _baseTarget, _characterSet );
     }
 
 
@@ -945,8 +945,8 @@ class ParsedHTML {
 
     class WebIFrame extends WebFrame implements ContentConcealer {
 
-        public WebIFrame( URL baseURL, Node frameNode, String parentFrameName ) {
-            super( baseURL, frameNode, parentFrameName );
+        public WebIFrame( URL baseURL, Node frameNode, FrameSelector parentFrame ) {
+            super( baseURL, frameNode, parentFrame );
         }
     }
 

@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.FrameSelector;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -201,7 +202,7 @@ public class ServletRunner {
     private ServletUnitContext _context;
 
     private InvocationContextFactory _factory = new InvocationContextFactory() {
-        public InvocationContext newInvocation( ServletUnitClient client, String targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+        public InvocationContext newInvocation( ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
             return new InvocationContextImpl( client, ServletRunner.this, targetFrame, request, clientHeaders, messageBody );
         }
     };

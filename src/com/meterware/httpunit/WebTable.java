@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -230,7 +230,7 @@ public class WebTable extends HTMLElementBase {
 
     private Element     _dom;
     private URL         _url;
-    private String      _frameName;
+    private FrameSelector _frameName;
     private String      _baseTarget;
     private String      _characterSet;
     private WebResponse _response;
@@ -239,10 +239,10 @@ public class WebTable extends HTMLElementBase {
     private TableCell[][] _cells;
 
 
-    WebTable( WebResponse response, String frameName, Node domTreeRoot, URL sourceURL, String baseTarget, String characterSet ) {
+    WebTable( WebResponse response, FrameSelector frame, Node domTreeRoot, URL sourceURL, String baseTarget, String characterSet ) {
         super( domTreeRoot );
         _response     = response;
-        _frameName    = frameName;
+        _frameName    = frame;
         _dom          = (Element) domTreeRoot;
         _url          = sourceURL;
         _baseTarget   = baseTarget;

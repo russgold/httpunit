@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -54,7 +54,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
 
     public void testDefaultResponse() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
-        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, FrameSelector.TOP_FRAME, null, servletResponse );
         assertEquals( "Contents", "", response.getText() );
     }
 
@@ -66,7 +66,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         PrintWriter pw = servletResponse.getWriter();
         pw.println( "<html><head><title>Sample Page</title></head><body></body></html>" );
 
-        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, FrameSelector.TOP_FRAME, null, servletResponse );
         assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );
@@ -87,7 +87,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         pw.print( page );
         pw.close();
 
-        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, FrameSelector.TOP_FRAME, null, servletResponse );
         assertEquals( "Character set", "iso-8859-8", response.getCharacterSet() );
         assertEquals( "Title", hebrewTitle, response.getTitle() );
     }
@@ -99,7 +99,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         ServletOutputStream sos = servletResponse.getOutputStream();
         sos.println( "<html><head><title>Sample Page</title></head><body></body></html>" );
 
-        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, FrameSelector.TOP_FRAME, null, servletResponse );
         assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );

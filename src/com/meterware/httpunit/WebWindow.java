@@ -120,7 +120,7 @@ public class WebWindow {
         final RequestContext requestContext = new RequestContext();
         final WebResponse response = getSubframeResponse( request, requestContext );
         requestContext.runScripts();
-        return response == null ? null : getFrameContents( response.getFrameName() );
+        return response == null ? null : response.getWindow().getFrameContents( response.getFrame() ); // javascript might replace the response in its frame
     }
 
 
@@ -157,26 +157,20 @@ public class WebWindow {
         _client.tellListeners( request );
 
         WebResponse response = null;
-        final String frameName = getTargetFrame( request );
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
             response = WebResponse.createBlankResponse();
         } else if (!HttpUnitUtils.isJavaScriptURL( urlString )) {
-            response = _client.newResponse( request, frameName );
+            response = _client.newResponse( request, _frameContents.getTargetFrame( request ) );
         } else {
             WebRequestSource wrs = request.getWebRequestSource();
             String result = (wrs == null) ? getCurrentPage().getScriptableObject().evaluateExpression( urlString )
                                           : wrs.getScriptableDelegate().evaluateExpression( urlString );
-            if (result != null) response = new DefaultWebResponse( _client, frameName, request.getURL(), result );
+            if (result != null) response = new DefaultWebResponse( _client, _frameContents.getTargetFrame( request ), request.getURL(), result );
         }
 
         if (response != null) _client.tellListeners( response );
         return response;
-    }
-
-
-    String getTargetFrame( WebRequest request ) {
-        return _frameContents.getTargetFrame( request );
     }
 
 
@@ -197,6 +191,11 @@ public class WebWindow {
     }
 
 
+    boolean hasFrame( FrameSelector frame ) {
+        return _frameContents.get( frame ) != null;
+    }
+
+
     /**
      * Returns the response associated with the specified frame name.
      * Throws a runtime exception if no matching frame is defined.
@@ -205,6 +204,25 @@ public class WebWindow {
         WebResponse response = _frameContents.get( frameName );
         if (response == null) throw new NoSuchFrameException( frameName );
         return response;
+    }
+
+
+    /**
+     * Returns the response associated with the specified frame target.
+     * Throws a runtime exception if no matching frame is defined.
+     **/
+    WebResponse getFrameContents( FrameSelector targetFrame ) {
+        return _frameContents.getFrameContents( targetFrame );
+    }
+
+
+    WebResponse getSubframeContents( FrameSelector frame, String subFrameName ) {
+        return _frameContents.getSubframeContents( frame, subFrameName );
+    }
+
+
+    WebResponse getParentFrameContents( FrameSelector frame ) {
+        return _frameContents.getParentFrameContents( frame );
     }
 
 
@@ -218,7 +236,7 @@ public class WebWindow {
 
     WebWindow( WebClient client ) {
         _client = client;
-        _frameContents = new FrameHolder( _client, WebRequest.TOP_FRAME );
+        _frameContents = new FrameHolder( this );
         _name = NO_NAME + _client.getOpenWindows().length;
     }
 
@@ -231,7 +249,7 @@ public class WebWindow {
 
     void updateFrameContents( WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         response.setWindow( this );
-        _frameContents.updateFrames( response, response.getFrameName(), requestContext );
+        _frameContents.updateFrames( response, response.getFrame(), requestContext );
     }
 
 
@@ -258,6 +276,16 @@ public class WebWindow {
             && response.getResponseCode() >= HttpURLConnection.HTTP_MOVED_PERM
             && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
             && response.getHeaderField( "Location" ) != null;
+    }
+
+
+    FrameSelector getTopFrame() {
+        return _frameContents.getTopFrame();
+    }
+
+
+    FrameSelector getFrame( String target ) {
+        return _frameContents.getFrame( target );
     }
 
 }

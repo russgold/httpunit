@@ -38,8 +38,8 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
     private ArrayList _presetParameterList;
 
 
-    public FixedURLWebRequestSource( WebResponse response, Node node, URL baseURL, String destination, String pageFrame ) {
-        super( response, node, baseURL, destination, pageFrame );
+    public FixedURLWebRequestSource( WebResponse response, Node node, URL baseURL, String destination, FrameSelector frame, String defaultTarget ) {
+        super( response, node, baseURL, destination, frame, defaultTarget );
     }
 
 

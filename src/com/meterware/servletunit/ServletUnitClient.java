@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -64,9 +64,14 @@ public class ServletUnitClient extends WebClient {
      * Creates and returns a new invocation context to test calling of servlet methods.
      **/
     public InvocationContext newInvocation( WebRequest request ) throws IOException, MalformedURLException {
+        return newInvocation( request, FrameSelector.TOP_FRAME );
+    }
+
+
+    InvocationContext newInvocation( WebRequest request, FrameSelector frame ) throws IOException, MalformedURLException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeMessageBody( request, baos );
-        return _invocationContextFactory.newInvocation( this, getTargetFrame( request ), request, getHeaderFields( request.getURL() ), baos.toByteArray() );
+        return _invocationContextFactory.newInvocation( this, frame, request, getHeaderFields( request.getURL() ), baos.toByteArray() );
     }
 
 
@@ -76,8 +81,8 @@ public class ServletUnitClient extends WebClient {
      * servlet invocation unless that invocation results in a redirect request.
      **/
     public WebResponse getResponse( InvocationContext invocation ) throws MalformedURLException,IOException,SAXException {
-        updateMainWindow( invocation.getTarget(), invocation.getServletResponse() );
-        return getFrameContents( invocation.getTarget() );
+        updateMainWindow( invocation.getFrame(), invocation.getServletResponse() );
+        return getFrameContents( invocation.getFrame() );
     }
 
 
@@ -87,10 +92,10 @@ public class ServletUnitClient extends WebClient {
     /**
      * Creates a web response object which represents the response to the specified web request.
      **/
-    protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException,IOException {
+    protected WebResponse newResponse( WebRequest request, FrameSelector targetFrame ) throws MalformedURLException,IOException {
 
         try {
-            InvocationContext invocation = newInvocation( request );
+            InvocationContext invocation = newInvocation( request, targetFrame );
             invocation.service();
             return invocation.getServletResponse();
         } catch (ServletException e) {

@@ -36,6 +36,16 @@ public class WebRequest {
 
     private static URLStreamHandler JAVASCRIPT_STREAM_HANDLER = new JavascriptURLStreamHandler();
     private static URLStreamHandler HTTPS_STREAM_HANDLER = new HttpsURLStreamHandler();
+
+    private final ParameterHolder _parameterHolder;
+
+    private URL          _urlBase;
+    private FrameSelector  _sourceFrame;
+    private String       _requestTarget;
+    private String       _urlString;
+    private Hashtable    _headers;
+    private WebRequestSource _webRequestSource;
+
     private SubmitButton _button;
 
     /**
@@ -140,7 +150,7 @@ public class WebRequest {
     /**
      * Returns the frame from which this request originates.
      */
-    String getSourceFrame() {
+    FrameSelector getSourceFrame() {
         return _sourceFrame;
     }
 
@@ -326,7 +336,15 @@ public class WebRequest {
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
     protected WebRequest( URL urlBase, String urlString, String target ) {
-        this( urlBase, urlString, TOP_FRAME, target, new UncheckedParameterHolder() );
+        this( urlBase, urlString, FrameSelector.TOP_FRAME, target );
+    }
+
+
+    /**
+     * Constructs a web request using a base URL, a relative URL string, and a target.
+     **/
+    protected WebRequest( URL urlBase, String urlString, FrameSelector frame, String target ) {
+        this( urlBase, urlString, frame, target, new UncheckedParameterHolder() );
     }
 
 
@@ -343,7 +361,7 @@ public class WebRequest {
 
 
     protected WebRequest( WebRequestSource requestSource, ParameterHolder parameterHolder ) {
-        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getPageFrame(), requestSource.getTarget(), parameterHolder );
+        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getFrame(), requestSource.getTarget(), parameterHolder );
         _webRequestSource = requestSource;
         setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
     }
@@ -361,7 +379,7 @@ public class WebRequest {
     /**
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
-    private WebRequest( URL urlBase, String urlString, String sourceFrame, String requestTarget, ParameterHolder parameterHolder ) {
+    private WebRequest( URL urlBase, String urlString, FrameSelector sourceFrame, String requestTarget, ParameterHolder parameterHolder ) {
         _urlBase   = urlBase;
         _sourceFrame = sourceFrame;
         _requestTarget = requestTarget;
@@ -500,20 +518,6 @@ public class WebRequest {
         }
         return _headers;
     }
-
-
-//--------------------------------------- private members ------------------------------------
-
-
-    private final ParameterHolder _parameterHolder;
-
-    private URL          _urlBase;
-    private String       _sourceFrame;
-    private String       _requestTarget;
-    private String       _urlString;
-    private Hashtable    _headers;
-    private WebRequestSource _webRequestSource;
-
 
 }
 

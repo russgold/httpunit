@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -32,25 +32,106 @@ import org.xml.sax.SAXException;
  **/
 class FrameHolder {
 
+    /** Map from a frame selector to its corresponding web response. **/
     private Hashtable   _contents = new Hashtable();
-    private Hashtable   _subFrames = new Hashtable();
-    private String      _frameName;
+
+    /** Map from a frame selector to its subframe selectors. **/
+    private Hashtable   _subframes = new Hashtable();
+
+    /** The window which owns this frame holder. **/
+    private WebWindow _window;
+
+    /** The topmost frame in this frameholder. **/
+    private FrameSelector _topFrame;
 
 
-    FrameHolder( WebClient client, String name ) {
-        _frameName = name;
-        DefaultWebResponse blankResponse = new DefaultWebResponse( client, null, WebResponse.BLANK_HTML );
-        _contents.put( WebRequest.TOP_FRAME, blankResponse );
+    FrameHolder( WebWindow window ) {
+        _window = window;
+        _topFrame = FrameSelector.newTopFrame( window );
+        DefaultWebResponse blankResponse = new DefaultWebResponse( window.getClient(), null, WebResponse.BLANK_HTML );
+        _contents.put( _topFrame, blankResponse );
         HttpUnitOptions.getScriptingEngine().associate( blankResponse );
     }
 
 
+    FrameSelector getTopFrame() {
+        return _topFrame;
+    }
+
+
+    WebResponse getFrameContents( FrameSelector targetFrame ) {
+        if (targetFrame == FrameSelector.TOP_FRAME) targetFrame = getTopFrame();
+        WebResponse response = get( targetFrame );
+        if (response == null) throw new NoSuchFrameException( targetFrame.getName() );
+        return response;
+    }
+
+
+    WebResponse getSubframeContents( FrameSelector frame, String subFrameName ) {
+        FrameSelector[] subframes = (FrameSelector[]) _subframes.get( frame );
+        if (subframes == null) throw new NoSuchFrameException( subFrameName );
+
+        for (int i = 0; i < subframes.length; i++) {
+            FrameSelector subframe = subframes[i];
+            if (subframe.getName().equalsIgnoreCase( subFrameName ) ) return get( subframe );
+        }
+        throw new NoSuchFrameException( subFrameName );
+    }
+
+
+    WebResponse getParentFrameContents( FrameSelector frame ) {
+        return get( frame.getParent() == null ? _topFrame : frame.getParent() );
+    }
+
+
+    WebResponse get( FrameSelector targetFrame ) {
+        return (WebResponse) _contents.get( targetFrame );
+    }
+
+
     WebResponse get( String target ) {
-        final WebResponse response = (WebResponse) _contents.get( getFrameName( target ) );
-        if (response != null) return response;
-        for (Iterator iterator = _contents.keySet().iterator(); iterator.hasNext();) {
-            String name = (String) iterator.next();
-            if (name.endsWith( ':' + target )) return (WebResponse) _contents.get( name );
+        FrameSelector frame = getFrame( _topFrame, target );
+        return frame == null ? null : (WebResponse) _contents.get( frame );
+    }
+
+
+    FrameSelector getFrame( String target ) {
+        return getFrame( _topFrame, target );
+    }
+
+
+    private FrameSelector getFrame( FrameSelector rootFrame, String target ) {
+        if (target.equalsIgnoreCase( WebRequest.TOP_FRAME )) return _topFrame;
+        if (target.equalsIgnoreCase( rootFrame.getName() )) return rootFrame;
+
+        return lookupFrame( rootFrame, target );
+    }
+
+
+    private FrameSelector lookupFrame( FrameSelector rootFrame, String target ) {
+        FrameSelector result = getFromSubframe( rootFrame, target );
+        if (result != null) {
+            return result;
+        } else if (rootFrame.getName().equals( target )) {
+            return rootFrame;
+        } else if (rootFrame.getParent() != null) {
+            return lookupFrame( rootFrame.getParent(), target );
+        } else {
+            return null;
+        }
+    }
+
+
+    private FrameSelector getFromSubframe( FrameSelector rootFrame, String target ) {
+        FrameSelector[] subframes = (FrameSelector[]) _subframes.get( rootFrame );
+        if (subframes == null) return null;
+
+        for (int i = 0; i < subframes.length; i++) {
+            if (subframes[i].getName().equalsIgnoreCase( target )) return subframes[i];
+        }
+        for (int i = 0; i < subframes.length; i++) {
+            FrameSelector result = getFromSubframe( subframes[i], target );
+            if (result != null) return result;
         }
         return null;
     }
@@ -59,51 +140,45 @@ class FrameHolder {
     List getActiveFrameNames() {
         List result = new ArrayList();
         for (Enumeration e = _contents.keys(); e.hasMoreElements();) {
-            result.add( e.nextElement() );
+            result.add( ((FrameSelector) e.nextElement()).getName() );
         }
 
         return result;
     }
 
 
-    String getTargetFrame( WebRequest request ) {
+    /**
+     * Determines the frame in which the reply to a request will be stored.
+     */
+    FrameSelector getTargetFrame( WebRequest request ) {
         if (WebRequest.NEW_WINDOW.equalsIgnoreCase( request.getTarget() )) {
-            return WebRequest.TOP_FRAME;
+            return FrameSelector.NEW_FRAME;
         } else if (WebRequest.TOP_FRAME.equalsIgnoreCase( request.getTarget() )) {
-            return WebRequest.TOP_FRAME;
+            return _topFrame;
+        } else if (WebRequest.SAME_FRAME.equalsIgnoreCase( request.getTarget() )) {
+            return request.getSourceFrame();
+        } else if (WebRequest.PARENT_FRAME.equalsIgnoreCase( request.getTarget() )) {
+            return request.getSourceFrame().getParent();
+        } else if (request.getSourceFrame().getName().equalsIgnoreCase( request.getTarget() )) {
+            return request.getSourceFrame();
         } else {
-            final String computedTarget = getTargetFrameName( request.getSourceFrame(), request.getTarget() );
-            if (_contents.get( computedTarget ) != null) return computedTarget;
-            for (Iterator iterator = _contents.keySet().iterator(); iterator.hasNext();) {
-                String name = (String) iterator.next();
-                if (name.endsWith( ':' + request.getTarget() )) return name;
-            }
-            return request.getTarget();
+            FrameSelector targetFrame = getFrame( request.getSourceFrame(), request.getTarget() );
+            if (targetFrame == null) targetFrame =_window.getClient().findFrame( request.getTarget() );
+            return (targetFrame != null) ? targetFrame : FrameSelector.NEW_FRAME;
         }
     }
 
 
-    String getFrameName( String target ) {
-        if (WebRequest.TOP_FRAME.equalsIgnoreCase( target )) {
-            return _frameName;
-        } else if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
-            return _frameName;
-        } else {
-            return target;
-        }
-    }
-
-
-    void updateFrames( WebResponse response, String target, RequestContext requestContext ) throws MalformedURLException, IOException, SAXException {
-        removeSubFrames( target );
-        _contents.put( target, response );
+    void updateFrames( WebResponse response, FrameSelector frame, RequestContext requestContext ) throws MalformedURLException, IOException, SAXException {
+        removeSubFrames( frame );
+        _contents.put( frame, response );
 
         if (response.isHTML()) {
             if (!response.hasSubframes()) {
                 requestContext.addNewResponse( response );
             } else {
                 HttpUnitOptions.getScriptingEngine().associate( response );
-                createSubFrames( target, response.getFrameNames() );
+                createSubFrames( frame, response.getFrameSelectors() );
                 WebRequest[] requests = response.getFrameRequests();
                 for (int i = 0; i < requests.length; i++) response.getWindow().getSubframeResponse( requests[ i ], requestContext );
             }
@@ -111,32 +186,34 @@ class FrameHolder {
     }
 
 
-    private void removeSubFrames( String targetName ) {
-        String[] names = (String[]) _subFrames.get( targetName );
-        if (names == null) return;
-        for (int i = 0; i < names.length; i++) {
-            removeSubFrames( names[ i ] );
-            _contents.remove( names[ i ] );
-            _subFrames.remove( names[ i ] );
+    private void removeSubFrames( FrameSelector frame ) {
+        FrameSelector[] subframes = (FrameSelector[]) _subframes.get( frame );
+        if (subframes == null) return;
+
+        _subframes.remove( frame );
+        for (int i = 0; i < subframes.length; i++) {
+            removeSubFrames( subframes[ i ] );
+            _contents.remove( subframes[ i ] );
         }
     }
 
 
-    private void createSubFrames( String targetName, String[] frameNames ) {
-        _subFrames.put( targetName, frameNames );
-        for (int i = 0; i < frameNames.length; i++) {
-            _contents.put( frameNames[ i ], WebResponse.createBlankResponse() );
+    private void createSubFrames( FrameSelector frame, FrameSelector[] subframes ) {
+        _subframes.put( frame, subframes );
+        for (int i = 0; i < subframes.length; i++) {
+            _contents.put( subframes[ i ], WebResponse.createBlankResponse() );
         }
     }
+
 
     /**
-     * Returns the qualified name of a target frame.
+     * Given the qualified name of a frame and the name of a nested frame, returns the qualified name of the nested frame.
      */
-    private static String getTargetFrameName( String sourceFrameName, final String relativeName ) {
-        if (relativeName.equalsIgnoreCase( WebRequest.TOP_FRAME )) return WebRequest.TOP_FRAME;
-        if (sourceFrameName.indexOf( ':' ) < 0) return relativeName;
-        return WebFrame.getParentFrameName( sourceFrameName ) + ':' + relativeName;
+    static FrameSelector newNestedFrame( FrameSelector parentFrame, final String relativeName ) {
+        if (relativeName == null || relativeName.length() == 0) return new FrameSelector();
+        return new FrameSelector( relativeName, parentFrame );
     }
+
 
 }
 

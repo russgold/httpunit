@@ -131,6 +131,17 @@ public class WebClient {
 
 
     /**
+     * Returns the response associated with the specified frame name in the main window.
+     * Throws a runtime exception if no matching frame is defined.
+     *
+     * @since 1.5.5
+     **/
+    public WebResponse getFrameContents( FrameSelector targetFrame ) {
+        return _mainWindow.getFrameContents( targetFrame );
+    }
+
+
+    /**
      * Returns the resource specified by the request. Does not update the client or load included framesets.
      * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
      */
@@ -359,9 +370,11 @@ public class WebClient {
 
     /**
      * Creates a web response object which represents the response to the specified web request.
+     * @param request the request to which the response should be generated
+     * @param targetFrame the frame in which the response should be stored
      **/
     abstract
-    protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException, IOException;
+    protected WebResponse newResponse( WebRequest request, FrameSelector targetFrame ) throws MalformedURLException, IOException;
 
 
     /**
@@ -400,14 +413,8 @@ public class WebClient {
      * cookies and frames.  This method is required by ServletUnit, which cannot call the updateWindow method directly.
      **/
     final
-    protected void updateMainWindow( String target, WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        getMainWindow().updateWindow( target, response, new RequestContext() );
-    }
-
-
-    final
-    protected String getTargetFrame( WebRequest request ) {
-        return getMainWindow().getTargetFrame( request );
+    protected void updateMainWindow( FrameSelector frame, WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        getMainWindow().updateWindow( frame.getName(), response, new RequestContext() );
     }
 
 
@@ -452,14 +459,17 @@ public class WebClient {
 
 
     void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
-        WebWindow window = getTargetWindow( requestWindow, requestTarget );
-        if (window != null) {
-            window.updateFrameContents( response, requestContext );
-        } else {
-            window = new WebWindow( this );
+        if (response.getFrame() == FrameSelector.NEW_FRAME) {
+            WebWindow window = new WebWindow( this );
+            response.setFrame( window.getTopFrame() );
             window.updateFrameContents( response, requestContext );
             _openWindows.add( window );
             reportWindowOpened( window );
+        } else if (response.getFrame().getWindow() != null && response.getFrame().getWindow() != requestWindow) {
+            response.getFrame().getWindow().updateFrameContents( response, requestContext );
+        } else {
+            if (response.getFrame() == FrameSelector.TOP_FRAME) response.setFrame( requestWindow.getTopFrame() );
+            requestWindow.updateFrameContents( response, requestContext );
         }
     }
 
@@ -480,11 +490,6 @@ public class WebClient {
         if (_openWindows.isEmpty()) _openWindows.add( new WebWindow( this ) );
         if (window.equals( _mainWindow )) _mainWindow = (WebWindow) _openWindows.get(0);
         reportWindowClosed( window );
-    }
-
-
-    private WebWindow getTargetWindow( WebWindow requestWindow, String target ) {
-        return WebRequest.NEW_WINDOW.equalsIgnoreCase( target ) ? null : requestWindow;
     }
 
 
@@ -571,6 +576,16 @@ public class WebClient {
     }
 
 
+    FrameSelector findFrame( String target ) {
+        for (int i = 0; i < _openWindows.size(); i++) {
+            WebWindow webWindow = (WebWindow) _openWindows.get( i );
+            FrameSelector frame = webWindow.getFrame( target );
+            if (frame != null) return frame;
+        }
+        return null;
+    }
+
+
 //==================================================================================================
 
 
@@ -631,7 +646,7 @@ class RedirectWebRequest extends WebRequest {
 
 
     RedirectWebRequest( WebResponse response ) throws MalformedURLException {
-        super( response.getURL(), response.getHeaderField( "Location" ), response.getFrameName() );
+        super( response.getURL(), response.getHeaderField( "Location" ), response.getFrame(), response.getFrameName() );
     }
 
 

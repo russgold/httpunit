@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -44,6 +44,8 @@ public class WebWindowTest extends HttpUnitTest {
     public WebWindowTest( String name ) {
         super( name );
     }
+
+
     public void testNewTarget() throws Exception {
         defineResource( "goHere", "You made it!" );
         defineWebPage( "start", "<a href='goHere' id='go' target='_blank'>here</a>" );
@@ -52,11 +54,12 @@ public class WebWindowTest extends HttpUnitTest {
         assertEquals( "Number of initial windows", 1, wc.getOpenWindows().length );
         WebWindow main = wc.getMainWindow();
         WebResponse initialPage = main.getResponse( getHostPath() + "/start.html" );
-        initialPage.getLinkWithID( "go" ).click();
+        WebResponse newPage = initialPage.getLinkWithID( "go" ).click();
         assertEquals( "Number of windows after following link", 2, wc.getOpenWindows().length );
         assertEquals( "Main page in original window", initialPage, main.getCurrentPage() );
         WebWindow other = wc.getOpenWindows()[1];
         assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
+        assertEquals( "Return from open", "You made it!", newPage.getText() );
 
         main.close();
         assertTrue( "Original main window is not closed", main.isClosed() );
@@ -64,6 +67,40 @@ public class WebWindowTest extends HttpUnitTest {
 
         assertEquals( "Num open windows", 1, wc.getOpenWindows().length );
         assertEquals( "Main window", other, wc.getMainWindow() );
+    }
+
+
+    public void testUnknownTarget() throws Exception {
+        defineResource( "goHere", "You made it!" );
+        defineWebPage( "start", "<a href='goHere' id='go' target='somewhere'>here</a>" );
+
+        WebClient wc = new WebConversation();
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/start.html" );
+        initialPage.getLinkWithID( "go" ).click();
+        assertEquals( "Number of windows after following link", 2, wc.getOpenWindows().length );
+        WebWindow other = wc.getOpenWindows()[1];
+        assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
+    }
+
+
+    public void testTargetInAnotherWindow() throws Exception {
+        defineWebPage( "linker", "<a href='start.html' target='_blank'>start</a>" );
+        defineResource( "Frames.html", "<html>" +
+                        "<frameset cols=\"20%,80%\">" +
+                        "    <frame src=\"linker.html\" name=\"here\">" +
+                        "    <frame name=\"somewhere\">" +
+                        "</frameset></html>" );
+        defineResource( "goHere", "You made it!" );
+        defineWebPage( "start", "<a href='goHere' id='go' target='somewhere'>here</a>" );
+
+        WebClient wc = new WebConversation();
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/Frames.html" );
+        initialPage.getSubframeContents( "here" ).getLinkWith( "start" ).click();
+        assertEquals( "# Open windows", 2, wc.getOpenWindows().length );
+        WebWindow other = wc.getOpenWindows()[1];
+        WebResponse result = other.getCurrentPage().getLinkWithID( "go" ).click();
+        assertEquals( "New frame contents", "You made it!", result.getText() );
+        assertSame( "'somewhere' frame", result, initialPage.getSubframeContents( "somewhere") );
     }
 
 

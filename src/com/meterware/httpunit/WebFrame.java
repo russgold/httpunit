@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,6 +30,12 @@ import org.w3c.dom.Node;
  **/
 class WebFrame extends HTMLElementBase {
 
+    private FrameSelector _selector;
+
+    private Node        _element;
+
+    private URL         _baseURL;
+
 
     protected ScriptableDelegate newScriptable() {
         return null;
@@ -44,45 +50,33 @@ class WebFrame extends HTMLElementBase {
 //---------------------------------------- package methods -----------------------------------------
 
 
-    WebFrame( URL baseURL, Node frameNode, String parentFrameName ) {
+    WebFrame( URL baseURL, Node frameNode, FrameSelector parentFrame ) {
         super( frameNode );
         _element = frameNode;
         _baseURL = baseURL;
-        _name    = getFrameName( parentFrameName );
+        _selector = getFrameSelector( parentFrame );
     }
 
 
     String getFrameName() {
-        return _name;
+        return _selector.getName();
     }
 
 
-    private String getFrameName( String parentFrameName ) {
-        final String relativeName = super.getName();
-        if (relativeName.length() == 0) return toString();
-        else return getNestedFrameName( parentFrameName, relativeName );
+    FrameSelector getSelector() {
+        return _selector;
     }
 
 
-    /**
-     * Given the qualified name of a frame and the name of a nested frame, returns the qualified name of the nested frame.
-     */
-    static String getNestedFrameName( String parentFrameName, final String relativeName ) {
-        if (parentFrameName.equalsIgnoreCase( WebRequest.TOP_FRAME )) return relativeName;
-        return parentFrameName + ':' + relativeName;
-    }
-
-
-    static String getParentFrameName( String parentFrameName ) {
-        if (parentFrameName.indexOf( ':' ) < 0) return WebRequest.TOP_FRAME;
-        return parentFrameName.substring( 0, parentFrameName.lastIndexOf( ':' ) );
+    private FrameSelector getFrameSelector( FrameSelector parentFrame ) {
+        return FrameHolder.newNestedFrame( parentFrame, super.getName() );
     }
 
 
     WebRequest getInitialRequest() {
         return new GetMethodWebRequest( _baseURL,
                                         NodeUtils.getNodeAttribute( _element, "src" ),
-                                        getFrameName() );
+                                        _selector );
     }
 
 
@@ -90,14 +84,5 @@ class WebFrame extends HTMLElementBase {
         return NodeUtils.getNodeAttribute( _element, "src" ).length() > 0;
     }
 
-
-//----------------------------------- private fields and methods -----------------------------------
-
-
-    private Node   _element;
-
-    private URL    _baseURL;
-
-    private String _name;
 }
 

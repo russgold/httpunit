@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -44,12 +44,12 @@ class HttpWebResponse extends WebResponse {
 
     /**
      * Constructs a response object from an input stream.
-     * @param target the target window or frame to which the request should be directed
+     * @param frame the target window or frame to which the request should be directed
      * @param url the url from which the response was received
      * @param connection the URL connection from which the response can be read
      **/
-    HttpWebResponse( WebConversation client, String target, URL url, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
-        super( client, target, url );
+    HttpWebResponse( WebConversation client, FrameSelector frame, URL url, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
+        super( client, frame, url );
         readHeaders( connection );
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/

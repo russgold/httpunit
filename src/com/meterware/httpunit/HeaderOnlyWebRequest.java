@@ -77,4 +77,8 @@ public abstract class HeaderOnlyWebRequest extends WebRequest {
     }
 
 
+    HeaderOnlyWebRequest( URL urlBase, String urlString, FrameSelector frame ) {
+        super( urlBase, urlString, frame, frame.getName() );
+    }
+
 }

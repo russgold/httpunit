@@ -715,8 +715,8 @@ public class WebForm extends WebRequestSource {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebForm( WebResponse response, URL baseURL, String frameName, Node node, String characterSet ) {
-        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), frameName );
+    WebForm( WebResponse response, URL baseURL, Node node, FrameSelector frame, String defaultTarget, String characterSet ) {
+        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), frame, defaultTarget );
         _characterSet = characterSet;
     }
 

@@ -1,7 +1,7 @@
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2003, Russell Gold
+ * Copyright (c) 2001-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -31,6 +31,9 @@ import java.io.IOException;
 
 abstract
 public class WebRequestSource extends ParameterHolder implements HTMLElement {
+
+    private FrameSelector _frame;
+
 
     /**
      * Returns the ID associated with this request source.
@@ -68,10 +71,8 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
      * Returns the target for this request source.
      */
     public String getTarget() {
-        if (getSpecifiedTarget().length() == 0 || getSpecifiedTarget().equalsIgnoreCase( WebRequest.SAME_FRAME )) {
-            return _pageFrame;
-        } else if (getSpecifiedTarget().equalsIgnoreCase( WebRequest.PARENT_FRAME )) {
-            return WebFrame.getParentFrameName( _pageFrame );
+        if (getSpecifiedTarget().length() == 0) {
+            return _defaultTarget;
         } else {
             return getSpecifiedTarget();
         }
@@ -80,9 +81,18 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     /**
      * Returns the name of the frame containing this request source.
+     * @deprecated as of 1.5.5, use #getFrame
      */
     public String getPageFrame() {
-        return _pageFrame;
+        return _frame.getName();
+    }
+
+
+    /**
+     * Returns the frame containing this request source.
+     */
+    public FrameSelector getFrame() {
+        return _frame;
     }
 
 
@@ -163,16 +173,20 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 //----------------------------- protected members ---------------------------------------------
 
     /**
-     * Contructs a web form given the URL of its source page and the DOM extracted
-     * from that page.
+     * Contructs a web request source.
+     * @param response the response from which this request source was extracted
+     * @param node     the DOM subtree defining this request source
+     * @param baseURL  the URL on which to base all releative URL requests
+     * @param destination the relative URL to which requests will be directed
      **/
-    WebRequestSource( WebResponse response, Node node, URL baseURL, String destination, String pageFrame ) {
+    WebRequestSource( WebResponse response, Node node, URL baseURL, String destination, FrameSelector frame, String defaultTarget ) {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
-        _baseResponse = response;
-        _node         = node;
-        _baseURL      = baseURL;
-        _destination  = destination;
-        _pageFrame    = pageFrame;
+        _baseResponse  = response;
+        _node          = node;
+        _baseURL       = baseURL;
+        _destination   = destination;
+        _frame         = frame;
+        _defaultTarget = defaultTarget;
     }
 
 
@@ -228,11 +242,11 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     protected WebResponse getCurrentFrameContents() {
-        return getCurrentFrame( getBaseResponse().getWindow(), getPageFrame() );
+        return getCurrentFrame( getBaseResponse().getWindow(), _frame );
     }
 
 
-    private WebResponse getCurrentFrame( WebWindow window, String pageFrame ) {
+    private WebResponse getCurrentFrame( WebWindow window, FrameSelector pageFrame ) {
         return window.hasFrame( pageFrame ) ? window.getFrameContents( pageFrame ) : window.getCurrentPage();
     }
 
@@ -289,7 +303,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     private WebResponse    _baseResponse;
 
     /** The name of the frame in which the response containing this request source is rendered. **/
-    private String         _pageFrame;
+    private String         _defaultTarget;
 
     /** The URL of the page containing this entity. **/
     private URL            _baseURL;

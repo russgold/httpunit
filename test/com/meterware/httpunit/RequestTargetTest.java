@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -72,25 +72,38 @@ public class RequestTargetTest extends HttpUnitTest {
 	
 	
     public void testInheritedLinkTarget() throws Exception {
-        defineWebPage( "Initial", "Here is a <a href=\"SimpleLink.html\" target=\"subframe\">simple link</a>." );
+        defineResource( "Start.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"50%,50%\">" +
+                        "    <FRAME src=\"Initial.html\" name=\"red\">" +
+                        "    <FRAME name=\"blue\">" +
+                        "</FRAMESET></HTML>" );
+        defineWebPage( "Initial", "Here is a <a href=\"SimpleLink.html\" target=\"blue\">simple link</a>." );
         defineWebPage( "SimpleLink", "Here is <a href=\"Initial.html\">another simple link</a>." );
 
-        WebLink link = _wc.getResponse( getHostPath() + "/Initial.html" ).getLinks()[0];
-        assertEquals( "explicit link target", "subframe", link.getTarget() );
-        assertEquals( "request target", "subframe", link.getRequest().getTarget() );
+        _wc.getResponse( getHostPath() + "/Start.html" );
+        WebLink link = _wc.getFrameContents( "red" ).getLinks()[0];
+        assertEquals( "explicit link target", "blue", link.getTarget() );
+        assertEquals( "request target", "blue", link.getRequest().getTarget() );
 
         WebResponse response = _wc.getResponse( link.getRequest() );
-        assertEquals( "response target", "subframe", response.getFrameName() );
+        assertEquals( "response target", "blue", response.getFrameName() );
         link = response.getLinks()[0];
-        assertEquals( "inherited link target", "subframe", link.getTarget() );
+        assertEquals( "inherited link target", "blue", link.getTarget() );
     }
 	
 	
     public void testInheritedLinkTargetInTable() throws Exception {
+        defineResource( "Start.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"50%,50%\">" +
+                        "    <FRAME src=\"Initial.html\" name=\"red\">" +
+                        "    <FRAME name=\"subframe\">" +
+                        "</FRAMESET></HTML>" );
         defineWebPage( "Initial", "Here is a <a href=\"SimpleLink.html\" target=\"subframe\">simple link</a>." );
         defineWebPage( "SimpleLink", "Here is <table><tr><td><a href=\"Initial.html\">another simple link</a>.</td></tr></table>" );
 
-        WebLink link = _wc.getResponse( getHostPath() + "/Initial.html" ).getLinks()[0];
+        WebLink link = _wc.getResponse( getHostPath() + "/Start.html" ).getSubframeContents( "red" ).getLinks()[0];
         assertEquals( "explicit link target", "subframe", link.getTarget() );
         assertEquals( "request target", "subframe", link.getRequest().getTarget() );
 
@@ -144,6 +157,12 @@ public class RequestTargetTest extends HttpUnitTest {
 
 	
     public void testInheritedFormTarget() throws Exception {
+        defineResource( "Start.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"50%,50%\">" +
+                        "    <FRAME src=\"Initial.html\" name=\"red\">" +
+                        "    <FRAME name=\"subframe\">" +
+                        "</FRAMESET></HTML>" );
         defineWebPage( "Initial", "Here is a <a href=\"SimpleLink.html\" target=\"subframe\">simple link</a>." );
         defineWebPage( "SimpleLink", "Here is a simple form: " +
                                      "<form method=GET action = \"/servlet/Login\" target=\"subframe\"><B>" +
@@ -151,7 +170,7 @@ public class RequestTargetTest extends HttpUnitTest {
                                      "<br><Input type=submit value = \"Log in\">" +
                                      "</form>" );
 
-        WebLink link = _wc.getResponse( getHostPath() + "/Initial.html" ).getLinks()[0];
+        WebLink link = _wc.getResponse( getHostPath() + "/Start.html" ).getSubframeContents( "red" ).getLinks()[0];
         assertEquals( "explicit link target", "subframe", link.getTarget() );
         assertEquals( "request target", "subframe", link.getRequest().getTarget() );
 

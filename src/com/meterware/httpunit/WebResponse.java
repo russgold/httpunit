@@ -49,10 +49,12 @@ import org.xml.sax.SAXException;
 abstract
 public class WebResponse implements HTMLSegment, CookieSource {
 
+    private FrameSelector _frame;
+
+    private String  _baseTarget;
     private String  _refreshHeader;
     private boolean _hasSubframes;
     private URL     _baseURL;
-    private String  _baseTarget;
     private boolean _parsingPage;
 
 
@@ -61,7 +63,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * access to WebResponse parsing without using a WebClient.
      **/
     public static WebResponse newResponse( URLConnection connection ) throws IOException {
-        return new HttpWebResponse( null, "_top", connection.getURL(), connection, HttpUnitOptions.getExceptionsThrownOnErrorStatus() );
+        return new HttpWebResponse( null, FrameSelector.TOP_FRAME, connection.getURL(), connection, HttpUnitOptions.getExceptionsThrownOnErrorStatus() );
     }
 
 
@@ -125,7 +127,21 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * Returns the name of the frame containing this page.
      **/
     public String getFrameName() {
-        return _frameName;
+        return _frame.getName();
+    }
+
+
+    void setFrame( FrameSelector frame ) {
+        if (!_frame.getName().equals( frame.getName())) throw new IllegalArgumentException( "May not modify the frame name" );
+        _frame = frame;
+    }
+
+
+    /**
+     * Returns the frame containing this page.
+     */
+    FrameSelector getFrame() {
+        return _frame;
     }
 
 
@@ -265,13 +281,28 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     /**
+     * Returns the frames found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing this response
+     **/
+    FrameSelector[] getFrameSelectors() throws SAXException {
+        WebFrame[] frames = getFrames();
+        FrameSelector[] result = new FrameSelector[ frames.length ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = frames[i].getSelector();
+        }
+
+        return result;
+    }
+
+
+    /**
      * Returns the contents of the specified subframe of this frameset response.
      *
      * @param subFrameName the name of the desired frame as defined in the frameset.
      **/
     public WebResponse getSubframeContents( String subFrameName ) {
         if (_window == null) throw new NoSuchFrameException( subFrameName );
-        return _window.getFrameContents( WebFrame.getNestedFrameName( _frameName, subFrameName ) );
+        return _window.getSubframeContents( _frame, subFrameName );
     }
 
 
@@ -651,8 +682,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
             } else if (propertyName.equalsIgnoreCase( "top" )) {
                 return _window.getFrameContents( WebRequest.TOP_FRAME ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "parent" )) {
-                return getFrameName().equals( WebRequest.TOP_FRAME ) ? this
-                        : _window.getFrameContents( WebFrame.getParentFrameName( getFrameName() ) ).getScriptableObject();
+                return _window.getParentFrameContents( _frame ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
             } else if (propertyName.equalsIgnoreCase( "closed" )) {
@@ -695,7 +725,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
         public void setLocation( String relativeURL ) throws IOException, SAXException {
-            getWindow().getResponse( new GetMethodWebRequest( _pageURL, relativeURL, _frameName ) );
+            getWindow().getResponse( new GetMethodWebRequest( _pageURL, relativeURL, _frame.getName() ) );
         }
 
 
@@ -716,23 +746,24 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     /**
      * Constructs a response object.
-     * @param frameName the name of the frame to hold the response
+     * @param frame the frame to hold the response
      * @param url the url from which the response was received
      **/
-    protected WebResponse( WebClient client, String frameName, URL url ) {
+    protected WebResponse( WebClient client, FrameSelector frame, URL url ) {
         _client = client;
         _baseURL = _pageURL = url;
-        _baseTarget = _frameName = frameName;
+        _baseTarget = frame.getName();
+        _frame = frame;
     }
 
 
     /**
      * Constructs a response object.
-     * @param frameName the name of the frame to hold the response
+     * @param frame the frame to hold the response
      * @param url the url from which the response was received
      **/
-    protected WebResponse( WebClient client, String frameName, URL url, String text ) {
-        this( client, frameName, url );
+    protected WebResponse( WebClient client, FrameSelector frame, URL url, String text ) {
+        this( client, frame, url );
         _responseText = text;
     }
 
@@ -791,7 +822,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         _page = null;
         _contentType = contentType;
         _baseURL = null;
-        _baseTarget = null;
+        _baseTarget = _frame.getName();
         _refreshHeader = null;
         _hasSubframes = false;
 
@@ -852,8 +883,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private InputStream _inputStream;
 
     private final URL    _pageURL;
-
-    private final String _frameName;
 
     private final WebClient _client;
 
@@ -957,13 +986,13 @@ public class WebResponse implements HTMLSegment, CookieSource {
                 if (Character.isDigit( token.charAt(0) )) {
                     _refreshDelay = Integer.parseInt( token );
                 } else {
-                    _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( token ), _frameName );
+                    _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( token ), _frame.getName() );
                 }
             } catch (NumberFormatException e) {
                 System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
             }
         }
-        if (_refreshRequest == null) _refreshRequest = new GetMethodWebRequest( _pageURL, _pageURL.toString(), _frameName );
+        if (_refreshRequest == null) _refreshRequest = new GetMethodWebRequest( _pageURL, _pageURL.toString(), _frame.getName() );
     }
 
 
@@ -1021,7 +1050,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
             try {
                 _parsingPage = true;
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
-                _page = new HTMLPage( this, _frameName, _baseURL, _baseTarget, getCharacterSet() );
+                _page = new HTMLPage( this, _frame, _baseURL, _baseTarget, getCharacterSet() );
                 _page.parse( getText(), _pageURL );
                 if (_page == null) throw new IllegalStateException( "replaceText called in the middle of getReceivedPage()" );
             } catch (IOException e) {
@@ -1205,12 +1234,12 @@ class DefaultWebResponse extends WebResponse {
 
 
     DefaultWebResponse( WebClient client, URL url, String text ) {
-        this( client, WebRequest.TOP_FRAME, url, text );
+        this( client, FrameSelector.TOP_FRAME, url, text );
     }
 
 
-    DefaultWebResponse( WebClient client, String target, URL url, String text ) {
-        super( client, target, url, text );
+    DefaultWebResponse( WebClient client, FrameSelector frame, URL url, String text ) {
+        super( client, frame, url, text );
     }
 
 

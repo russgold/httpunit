@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2003, Russell Gold
+ * Copyright (c) 2001-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,10 +19,7 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebTable;
-import com.meterware.httpunit.HttpUnitUtils;
+import com.meterware.httpunit.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -255,7 +252,7 @@ public class JUnitServletTest extends TestCase {
     static class MyFactory implements InvocationContextFactory {
         private static ServletRunner _runner;
 
-        public InvocationContext newInvocation( ServletUnitClient client, String targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+        public InvocationContext newInvocation( ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
             return new InvocationContextImpl( client, _runner, targetFrame, request, clientHeaders, messageBody );
         }
     }

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2000-2002, Russell Gold
+ * Copyright (c) 2000-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,6 +20,7 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.FrameSelector;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,12 +37,12 @@ class ServletUnitWebResponse extends WebResponse {
 
     /**
      * Constructs a response object from a servlet response.
-     * @param target the target frame on which the response will be displayed
+     * @param frame the target frame on which the response will be displayed
      * @param url the url from which the response was received
      * @param response the response populated by the servlet
      **/
-    ServletUnitWebResponse( ServletUnitClient client, String target, URL url, HttpServletResponse response, boolean throwExceptionOnError ) throws IOException {
-        super( client, target, url );
+    ServletUnitWebResponse( ServletUnitClient client, FrameSelector frame, URL url, HttpServletResponse response, boolean throwExceptionOnError ) throws IOException {
+        super( client, frame, url );
         _response = (ServletUnitHttpResponse) response;
         /** make sure that any IO exception for HTML received page happens here, not later. **/
         if (getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST || !throwExceptionOnError) {
@@ -53,12 +54,12 @@ class ServletUnitWebResponse extends WebResponse {
 
     /**
      * Constructs a response object from a servlet response.
-     * @param target the target frame on which the response will be displayed
+     * @param frame the target frame on which the response will be displayed
      * @param url the url from which the response was received
      * @param response the response populated by the servlet
      **/
-    ServletUnitWebResponse( ServletUnitClient client, String target, URL url, HttpServletResponse response ) throws IOException {
-        this( client, target, url, response, true );
+    ServletUnitWebResponse( ServletUnitClient client, FrameSelector frame, URL url, HttpServletResponse response ) throws IOException {
+        this( client, frame, url, response, true );
     }
 
 

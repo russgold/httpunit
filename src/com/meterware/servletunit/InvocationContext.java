@@ -20,6 +20,7 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.FrameSelector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,9 +70,9 @@ public interface InvocationContext {
 
 
     /**
-     * Returns the target for the original request.
+     * Returns the target frame for the original request.
      */
-    String getTarget();
+    FrameSelector getFrame();
 
 
     /**

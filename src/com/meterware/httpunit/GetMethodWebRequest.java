@@ -73,8 +73,16 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
     /**
      * Constructs a web request for a link or image.
      **/
-    GetMethodWebRequest( FixedURLWebRequestSource sourceLink ) {
-        super( sourceLink );
+    GetMethodWebRequest( FixedURLWebRequestSource source ) {
+        super( source );
+    }
+
+
+    /**
+     * Constructs an initial web request for a frame.
+     **/
+    GetMethodWebRequest( URL urlBase, String urlString, FrameSelector frame ) {
+        super( urlBase, urlString, frame );
     }
 
 
