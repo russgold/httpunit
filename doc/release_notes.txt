@@ -14,10 +14,14 @@ Limitations:
 
 Revision History:
  2-May-2003
+Acknowledgements:
+    Thanks to David D. Kilzer for creating thorough tests for URLs containing navigation and showing a way to handle them.
 Additions:
     1. JUnitServlet now supports a value of 'xml' for the format parameter, generating a format compatible with
        ant's XMLResultFormatter
     2. Form.getOptions() now works for radio buttons and checkboxes - as long as the desired name is located after the control.
+Problems fixed:
+    1. bug #717280: Requests with "../" in them are not resolved properly
 
  4-Apr-2003
 Acknowledgements:

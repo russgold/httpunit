@@ -87,8 +87,49 @@ public class WebRequest {
                 }
                 HttpsProtocolSupport.verifyProtocolSupport( getURLString().substring( 0, getURLString().indexOf( ':' ) ) );
             }
-            return spec.startsWith( "?" ) ? new URL( base + spec ) : new URL( base, spec );
+            return spec.startsWith( "?" ) ? new URL( base + spec ) : newCombinedURL( base, spec );
         }
+    }
+
+
+    private URL newCombinedURL( final URL base, final String spec ) throws MalformedURLException {
+        if (base == null) return new URL( getNormalizedURL( spec ) );
+        else if (spec.startsWith( ".." )) return new URL( getNormalizedURL( getURLDirectory( base ) + spec ) );
+        else return new URL( base, getNormalizedURL( spec ) );
+    }
+
+
+    private String getURLDirectory( final URL base ) {
+        String url = base.toExternalForm();
+        int i = url.lastIndexOf( '/' );
+        return url.substring( 0, i+1 );
+    }
+
+
+    private String getNormalizedURL( String url ) {
+        if (url.lastIndexOf( "//" ) > url.indexOf( "://" ) + 1) return getNormalizedURL( stripDoubleSlashes( url ) );
+        if (url.indexOf( "/.." ) > 0) return getNormalizedURL( stripUpNavigation( url ) );
+        if (url.indexOf( "/." ) > 0) return getNormalizedURL( stripInPlaceNavigation( url ) );
+        return url;
+    }
+
+
+    private String stripInPlaceNavigation( String url ) {
+        int i = url.lastIndexOf( "/." );
+        return url.substring( 0, i+1 ) + url.substring( i+2 );
+     }
+
+
+    private String stripUpNavigation( String url ) {
+        int i = url.indexOf( "/.." );
+        int j = url.lastIndexOf( "/", i-1 );
+        return url.substring( 0, j+1 ) + url.substring( i+ 3 );
+    }
+
+
+    private String stripDoubleSlashes( String url ) {
+        int i = url.lastIndexOf( "//" );
+        return url.substring( 0, i ) + url.substring( i+1 );
     }
 
 
