@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+ 1-Oct-2003
+Acknowledgements:
+    Thanks to Patrick Lightbody for adding JavaScript support for the Style object
+
+Additions:
+    1. Added support for javascript HTMLElement.style property
+
 30-Sep-2003
 Problems fixed:
     1. HttpUnit no longer complains about not being able to find the Rhino jar (js.jar) is scripting is disabled

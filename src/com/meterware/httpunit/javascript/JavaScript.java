@@ -85,6 +85,7 @@ public class JavaScript {
             InvocationTargetException, ClassDefinitionException, PropertyException {
         ScriptableObject.defineClass( scope, Window.class );
         ScriptableObject.defineClass( scope, Document.class );
+        ScriptableObject.defineClass( scope, Style.class );
         ScriptableObject.defineClass( scope, Location.class );
         ScriptableObject.defineClass( scope, Navigator.class );
         ScriptableObject.defineClass( scope, Screen.class );
@@ -693,6 +694,27 @@ public class JavaScript {
     }
 
 
+    static public class Style extends JavaScriptEngine {
+
+        private String _display = "true";
+
+
+        public String getClassName() {
+            return "Style";
+        }
+
+
+        public String jsGet_display() {
+            return _display;
+        }
+
+
+        public void jsSet_display( String display ) {
+            _display = display;
+        }
+    }
+
+
     static public class Navigator extends JavaScriptEngine {
 
         private ClientProperties _clientProperties;
@@ -840,6 +862,7 @@ public class JavaScript {
 
     static public class HTMLElement extends JavaScriptEngine {
 
+        private Style _style;
         private Document _document;
 
 
@@ -853,10 +876,16 @@ public class JavaScript {
         }
 
 
+        public Style jsGet_style() {
+            return _style;
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
             _document = (Document) parent;
+            _style = (Style) Context.getCurrentContext().newObject( this, "Style" );
         }
 
     }
