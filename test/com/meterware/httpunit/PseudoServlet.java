@@ -21,6 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.util.Dictionary;
 
+import java.io.Reader;
+
 /**
  * A basic simulated servlet for testing the HttpUnit library.
  **/
@@ -33,17 +35,14 @@ public class PseudoServlet {
 
     /**
      * Returns a resource object as a result of a get request. 
-     * @param parameters a mapping of parameter names to arrays of value string.
-     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
-     *        which is the raw bytes of the request contents stored in a string.
      **/ 
-    public WebResource getResponse( String methodType, Dictionary parameters, Dictionary headers ) {
+    public WebResource getResponse( String methodType ) {
         if (methodType.equalsIgnoreCase( "GET" )) {
-            return getGetResponse( parameters, headers );
+            return getGetResponse();
         } else if (methodType.equalsIgnoreCase( "PUT" )) {
-            return getPutResponse( parameters, headers );
+            return getPutResponse();
         } else if (methodType.equalsIgnoreCase( "POST" )) {
-            return getPostResponse( parameters, headers );
+            return getPostResponse();
         } else {
             throw new RuntimeException( methodType + " not implemented" );
         }
@@ -52,35 +51,64 @@ public class PseudoServlet {
 
     /**
      * Returns a resource object as a result of a get request. 
-     * @param parameters a mapping of parameter names to arrays of value string.
-     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
-     *        which is the raw bytes of the request contents stored in a string.
      **/ 
-    public WebResource getGetResponse( Dictionary parameters, Dictionary headers ) {
+    public WebResource getGetResponse() {
         throw new RuntimeException( "get not implemented" );
     }
 
 
     /*
      * Returns a resource object as a result of a post request. 
-     * @param parameters a mapping of parameter names to arrays of value string.
-     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
-     *        which is the raw bytes of the request contents stored in a string.
      **/ 
-    public WebResource getPostResponse( Dictionary parameters, Dictionary headers ) {
+    public WebResource getPostResponse() {
         throw new RuntimeException( "post not implemented" );
     }
 
 
     /*
      * Returns a resource object as a result of a put request. 
-     * @param parameters a mapping of parameter names to arrays of value string.
-     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
-     *        which is the raw bytes of the request contents stored in a string.
      **/ 
-    public WebResource getPutResponse( Dictionary parameters, Dictionary headers ) {
+    public WebResource getPutResponse() {
         throw new RuntimeException( "put not implemented" );
     }
+
+
+    void init( HttpRequestStream requestStream ) {
+        _requestStream = requestStream;
+    }
+
+
+    /**
+     * Returns the header with the specified name. If no such header exists, will return null.
+     **/
+    protected String getHeader( String name ) {
+        return _requestStream.getHeader( name );
+    }
+
+
+    /**
+     * Returns the values for the parameter with the specified name. If no values exist
+     * will return null.
+     **/
+    protected String[] getParameter( String name ) {
+        return _requestStream.getParameter( name );
+    }
+
+
+    /**
+     * Returns a reader for the body of the request.
+     **/
+    protected Reader getReader() {
+        return _requestStream.getReader();
+    }
+
+
+    protected byte[] getBody() {
+        return _requestStream.getBody();
+    }
+
+
+    private HttpRequestStream _requestStream;
 }
 
 

@@ -44,8 +44,11 @@ class HttpWebResponse extends WebResponse {
      **/
     HttpWebResponse( String target, URL url, URLConnection connection ) throws IOException {
         super( target, url );
+        _connection = connection;
         readHeaders( connection );
-        if (_responseCode == HttpURLConnection.HTTP_OK) loadResponseText( url, connection );
+        if (_responseCode == HttpURLConnection.HTTP_OK && getContentType().startsWith( "text" )) {
+            loadResponseText( connection );
+        }
     }
 
 
@@ -69,10 +72,27 @@ class HttpWebResponse extends WebResponse {
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
      * which may be used to represent internal state of this object.
      **/
-    public String getText() {
+    public String getText() throws IOException {
+        if (_responseText == null) loadResponseText( _connection );
         return _responseText;
     }
     
+
+    /**
+     * Returns an input stream for reading the contents of this reply.
+     **/
+    public InputStream getInputStream() throws IOException {
+        if (_responseText != null) {
+            return new ByteArrayInputStream( _responseText.getBytes() );
+        } else {
+            return new BufferedInputStream( _connection.getInputStream() );
+        }
+    }
+
+    
+    public String toString() {
+        return "[headers=" + _headers + "; ??]";
+    }
     
 //-------------------------------------------- private members ------------------------------------------------
 
@@ -83,11 +103,13 @@ class HttpWebResponse extends WebResponse {
 
     private int    _responseCode = HttpURLConnection.HTTP_OK;
 
+    private URLConnection _connection;
+
     private String _responseText;
 
     private Hashtable _headers = new Hashtable();
 
-    private void loadResponseText( URL url, URLConnection connection ) throws IOException {
+    private void loadResponseText( URLConnection connection ) throws IOException {
         StringBuffer sb = new StringBuffer();
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

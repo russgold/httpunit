@@ -34,7 +34,7 @@ class WebResource {
 
     final static String DEFAULT_CONTENT_TYPE = "text/html";
 
-    final static String DEFAULT_CHARACTER_SET = "us-ascii";
+    final static String DEFAULT_CHARACTER_SET = "iso-8859-1";
 
     WebResource( String contents ) {
         this( contents, DEFAULT_CONTENT_TYPE );
@@ -47,11 +47,24 @@ class WebResource {
 
 
     WebResource( int responseCode, String responseText ) {
-        this( responseText, DEFAULT_CONTENT_TYPE, responseCode );
+        this( "", DEFAULT_CONTENT_TYPE, responseCode );
+        _responseText = responseText;
     }
 
 
     WebResource( String contents, String contentType, int responseCode ) {
+        _string      = contents;
+        _contentType = contentType;
+        _responseCode = responseCode;
+    }
+
+
+    WebResource( byte[] contents, String contentType ) {
+        this( contents, contentType, HttpURLConnection.HTTP_OK );
+    }
+
+
+    WebResource( byte[] contents, String contentType, int responseCode ) {
         _contents    = contents;
         _contentType = contentType;
         _responseCode = responseCode;
@@ -80,8 +93,12 @@ class WebResource {
     }
 
 
-    String getContents() {
-        return _contents;
+    byte[] getContents() throws UnsupportedEncodingException {
+        if (_string != null) {
+            return _string.getBytes( getCharacterSet() );
+        } else {
+            return _contents;
+        }
     }
 
 
@@ -108,16 +125,31 @@ class WebResource {
         return _responseCode;
     }
 
-
-    public String toString() {
-        return "WebResource [code=" + _responseCode + "; type = " + _contentType 
-	     + "; charset = " + _characterSet + "]\n" + _contents;
+    String getResponseText() {
+        return _responseText;
     }
 
 
+    public String toString() {
+        return "WebResource [code=" + _responseCode + "; type = " + _contentType 
+	     + "; charset = " + _characterSet + "]\n" + getContentsAsString();
+    }
+
+    private String getContentsAsString() {
+        if (_string != null) {
+            return _string;
+        } else {
+            return "<< hex bytes >>";
+        }
+    }
+
+
+    private byte[]  _contents;
+    private String  _string;
+
     private int     _responseCode;
     private boolean _sendCharacterSet;
-    private String  _contents;
+    private String  _responseText = "";
     private String  _contentType;
     private String  _characterSet = DEFAULT_CHARACTER_SET;
     private Vector  _headers = new Vector();

@@ -89,12 +89,51 @@ public class MessageBodyRequestTest extends HttpUnitTest {
     }
 
 
+    public void testDownloadRequest() throws Exception {
+        defineResource( "ReportData", new BodyEcho() );
+        byte[] binaryData = new byte[] { 0x01, 0x05, 0x0d, 0x0a, 0x02 };
+
+        InputStream source = new ByteArrayInputStream( binaryData );
+
+        WebConversation wc = new WebConversation();
+        WebRequest wr = new PutMethodWebRequest( getHostPath() + "/ReportData", source, "application/random" );
+        WebResponse response = wc.getResponse( wr );
+
+        byte[] download = getDownload( response );
+        assertEquals( "Body response", binaryData, download );
+    }
+
+
+    private byte[] getDownload( WebResponse response ) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        InputStream inputStream = response.getInputStream();
+
+        byte[] buffer = new byte[8 * 1024];
+        int count = 0;
+        do {
+            outputStream.write( buffer, 0, count );
+            count = inputStream.read( buffer, 0, buffer.length );
+        } while (count != -1);
+
+        inputStream.close();
+        return outputStream.toByteArray();
+    }
+
+
 }
 
 
 class BodyEcho extends PseudoServlet {
-    public WebResource getResponse( String method, Dictionary parameters, Dictionary headers ) {
-        return new WebResource( "\n" + method + "\n" + (String) headers.get( PseudoServlet.CONTENTS ), (String) headers.get( "CONTENT-TYPE" ) );
+    /**
+     * Returns a resource object as a result of a get request.
+     **/
+    public WebResource getResponse( String method ) {
+        String contentType = getHeader( "Content-type" );
+        if (contentType.startsWith( "text" )) {
+            return new WebResource( "\n" + method + "\n" + new String( getBody() ), contentType );
+        } else {
+            return new WebResource( getBody(), contentType );
+        }
     }
 }
 

@@ -16,6 +16,10 @@ Acknowledgements:
     Thanks to Tom Watkins, Deepa Dihr, Marcos Tarruella for their implementation of
        PutMethodWebRequest
 
+11-Jun-01
+Additions:
+    1. Added getInputStream method in WebResponse to support non-text responses.
+
  6-Jun-01
 Additions:
     1. Added ServletUnitClient and InvocationContext to servletunit to

@@ -79,6 +79,11 @@ class ServletUnitWebResponse extends WebResponse {
     public String getText() {
         return _response.getContents();
     }
+
+
+    public String toString() {
+        return "[ _response = " + _response + "]";
+    }
     
     
 //-------------------------------------------- private members ------------------------------------------------

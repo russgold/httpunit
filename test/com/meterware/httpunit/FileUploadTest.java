@@ -209,10 +209,10 @@ public class FileUploadTest extends HttpUnitTest {
 }
 
 
-class StringDataSource implements DataSource {
-    StringDataSource( String contentType, String contents ) {
+class ByteArrayDataSource implements DataSource {
+    ByteArrayDataSource( String contentType, byte[] body ) {
         _contentType = contentType;
-        _inputStream = new ByteArrayInputStream( contents.getBytes() );
+        _inputStream = new ByteArrayInputStream( body );
     }
 
 
@@ -243,12 +243,11 @@ class StringDataSource implements DataSource {
 
 
 class MimeEcho extends PseudoServlet {
-    public WebResource getPostResponse( Dictionary parameters, Dictionary headers ) {
+    public WebResource getPostResponse() {
         StringBuffer sb = new StringBuffer();
         try {
-            String contentType = (String) headers.get( "CONTENT-TYPE" );
-            String contents = (String) headers.get( PseudoServlet.CONTENTS );
-            DataSource ds = new StringDataSource( contentType, contents );
+            String contentType = getHeader( "Content-Type" );
+            DataSource ds = new ByteArrayDataSource( contentType, getBody() );
             MimeMultipart mm = new MimeMultipart( ds );
             int numParts = mm.getCount();
             for (int i = 0; i < numParts; i++) {

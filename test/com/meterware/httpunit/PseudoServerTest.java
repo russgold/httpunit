@@ -212,8 +212,8 @@ public class PseudoServerTest extends TestCase {
 
         try {
             ps.setResource( resourceName, new PseudoServlet() {
-                public WebResource getPostResponse( Dictionary parameters, Dictionary headers ) {
-                    return new WebResource( prefix + ((String[]) parameters.get( "name" ))[0], "text/plain" );
+                public WebResource getPostResponse() {
+                    return new WebResource( prefix + getParameter( "name" )[0], "text/plain" );
                 }
             } );
  
@@ -246,8 +246,8 @@ public class PseudoServerTest extends TestCase {
 
         try {
             ps.setResource( resourceName, new PseudoServlet() {
-                public WebResource getGetResponse( Dictionary parameters, Dictionary headers ) {
-		    String referer = (String) headers.get( "REFERER" );
+                public WebResource getGetResponse() {
+		            String referer = getHeader( "Referer" );
                     return new WebResource( referer == null ? "null" : referer, "text/plain" );
                 }
             } );

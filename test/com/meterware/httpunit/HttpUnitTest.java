@@ -136,6 +136,41 @@ class HttpUnitTest extends TestCase {
     }
 
 
+
+
+    protected void assertEquals( String comment, byte[] expected, byte[] actual )
+    {
+        if (!equals( expected, actual )) 
+        {
+            fail( comment + " expected:\n" + toString( expected ) + ", but was:\n" + toString( actual ) );
+        }
+    }
+
+
+    private boolean equals( byte[] first, byte[] second )
+    {
+        if (first.length != second.length) return false;
+        for (int i = 0; i < first.length; i++)
+        {
+            if (first[i] != second[i]) return false;
+        }
+        return true;
+    }
+
+
+    private String toString( byte[] message )
+    {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < message.length; i++) 
+        {
+            if (i != 0 && (i % 4) == 0) sb.append( ' ' );
+            if (message[i] >= 0 && message[i] < 16) sb.append( '0' );
+            sb.append( Integer.toHexString( 0xff & (int) message[i] ) );
+        }
+        return sb.toString();
+    }
+
+
 //---------------------------------------- private members -----------------------------------------
 
     private String _hostPath;

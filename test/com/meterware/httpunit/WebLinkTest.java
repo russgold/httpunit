@@ -156,7 +156,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebRequest request = link.getRequest();
         assertEquals( "Destination for link", getHostPath() + "/alternate/Target.html", request.getURL().toExternalForm() );
         WebResponse nextPage = wc.getResponse( request );
-        assert( "Did not find the target", nextPage.toString().indexOf( "Found" ) >= 0 );
+        assert( "Did not find the target", nextPage.getText().indexOf( "Found" ) >= 0 );
     }
 
                               

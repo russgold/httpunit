@@ -20,6 +20,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -148,8 +150,15 @@ public class WebResponse implements HTMLSegment {
      * which may be used to represent internal state of this object.
      **/
     abstract
-    public String getText();
+    public String getText() throws IOException;
     
+
+    /**
+     * Returns an input stream for reading the contents of this reply.
+     **/
+    abstract
+    public InputStream getInputStream() throws IOException;
+
     
     /**
      * Returns the names of the frames found in the page in the order in which they appear.
@@ -296,10 +305,8 @@ public class WebResponse implements HTMLSegment {
 
 //---------------------------------------- Object methods --------------------------------------------
 
-
-    public String toString() {
-        return getText();
-    }
+    abstract
+    public String toString();
 
 
 //----------------------------------------- protected members -----------------------------------------------
@@ -435,8 +442,12 @@ public class WebResponse implements HTMLSegment {
 
     private ReceivedPage getReceivedPage() throws SAXException {
         if (_page == null) {
-            if (!isHTML()) throw new NotHTMLException( getContentType() );
-            _page = new ReceivedPage( _url, _target, getText(), getCharacterSet() );
+            try {
+                if (!isHTML()) throw new NotHTMLException( getContentType() );
+                _page = new ReceivedPage( _url, _target, getText(), getCharacterSet() );
+            } catch (IOException e) {
+                throw new SAXException( e );
+            }
         }
         return _page;
     }
@@ -457,6 +468,8 @@ public class WebResponse implements HTMLSegment {
 
             Method getDocumentMethod = parserClass.getMethod( "getDocument", null );
             doc = (Document)getDocumentMethod.invoke( parser, null );
+        } catch (IOException e) {
+            throw new SAXException( e );
         } catch (InvocationTargetException ex) {
             Throwable tex = ex.getTargetException();
             if (tex  instanceof SAXException) {
@@ -519,6 +532,19 @@ class DefaultWebResponse extends WebResponse {
      **/
     public String getText() {
         return _responseText;
+    }
+
+
+    /**
+     * Returns an input stream for reading the contents of this reply.
+     **/
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream( _responseText.getBytes() );
+    }
+
+    
+    public String toString() {
+        return "DefaultWebResponse [" + _responseText + "]"; 
     }
     
     
