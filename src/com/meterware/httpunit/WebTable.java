@@ -79,7 +79,7 @@ public class WebTable extends HTMLElementBase {
      **/
     public String getCellAsText( int row, int column ) {
         TableCell cell = getTableCell( row, column );
-        return (cell == null) ? "" : cell.asText();
+        return (cell == null) ? "" : cell.getText();
     }
 
 
@@ -207,7 +207,7 @@ public class WebTable extends HTMLElementBase {
                 if (getCells()[i][j] == null) {
                     sb.append( "null" );
                 } else {
-                    sb.append( getCells()[i][j].asText() );
+                    sb.append( getCells()[i][j].getText() );
                 }
             }
             sb.append( eol );

@@ -71,4 +71,10 @@ public interface HTMLElement {
      * Returns the delegate which supports scripting this element.
      */
     ScriptableDelegate getScriptableDelegate();
+
+
+    /**
+     * Returns the contents of this element, converted to a string.
+     */
+    String getText();
 }

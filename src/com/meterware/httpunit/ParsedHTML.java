@@ -38,6 +38,8 @@ class ParsedHTML {
 
     final static private HTMLElement[] NO_ELEMENTS = new HTMLElement[0];
 
+    final static private String[] TEXT_ELEMENTS = { "p", "h1", "h2", "h3", "h4", "h5", "h6" };
+
     private Node         _rootNode;
 
     private URL          _baseURL;
@@ -72,6 +74,9 @@ class ParsedHTML {
 
     private ArrayList    _linkList = new ArrayList();
     private WebLink[]    _links;
+
+    private ArrayList      _blocksList = new ArrayList();
+    private BlockElement[] _blocks;
 
     private ArrayList    _appletList = new ArrayList();
     private WebApplet[]  _applets;
@@ -138,6 +143,19 @@ class ParsedHTML {
             _images = (WebImage[]) _imagesList.toArray( new WebImage[ _imagesList.size() ] );
         }
         return _images;
+    }
+
+
+    /**
+     * Returns the top-level block elements found in the page in the order in which they appear.
+     * @return
+     */
+    public BlockElement[] getTextBlocks() {
+        if (_blocks == null) {
+            loadElements();
+            _blocks = (BlockElement[]) _blocksList.toArray( new BlockElement[ _blocksList.size() ] );
+        }
+        return _blocks;
     }
 
 
@@ -328,19 +346,15 @@ class ParsedHTML {
     }
 
 
-    abstract static class HTMLElementFactory {
-        abstract HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element );
+    static class HtmlElementRecorder {
 
-        void recordElement( NodeUtils.PreOrderTraversal pot, Element element, ParsedHTML parsedHTML ) {
-            HTMLElement htmlElement = toHTMLElement( pot, parsedHTML, element );
+        protected void recordHtmlElement( NodeUtils.PreOrderTraversal pot, Node node, HTMLElement htmlElement ) {
             if (htmlElement != null) {
-                addToMaps( pot, element, htmlElement );
+                addToMaps( pot, node, htmlElement );
                 addToLists( pot, htmlElement );
             }
         }
 
-        protected boolean isRecognized( ClientProperties properties ) { return true; }
-        protected boolean addToContext() { return false; }
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
             for (Iterator i = pot.getContexts(); i.hasNext();) {
                 Object o = i.next();
@@ -348,12 +362,26 @@ class ParsedHTML {
             }
         }
 
-        protected void addToMaps( NodeUtils.PreOrderTraversal pot, Element element, HTMLElement htmlElement ) {
+        protected void addToMaps( NodeUtils.PreOrderTraversal pot, Node node, HTMLElement htmlElement ) {
             for (Iterator i = pot.getContexts(); i.hasNext();) {
                 Object o = i.next();
-                if (o instanceof ParsedHTML) ((ParsedHTML) o).addToMaps( element, htmlElement );
+                if (o instanceof ParsedHTML) ((ParsedHTML) o).addToMaps( node, htmlElement );
             }
         }
+
+    }
+
+
+    abstract static class HTMLElementFactory extends HtmlElementRecorder {
+        abstract HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element );
+
+        void recordElement( NodeUtils.PreOrderTraversal pot, Element element, ParsedHTML parsedHTML ) {
+            HTMLElement htmlElement = toHTMLElement( pot, parsedHTML, element );
+            recordHtmlElement( pot, element, htmlElement );
+        }
+
+        protected boolean isRecognized( ClientProperties properties ) { return true; }
+        protected boolean addToContext() { return false; }
 
         final protected ParsedHTML getParsedHTML( NodeUtils.PreOrderTraversal pot ) {
             return (ParsedHTML) getClosestContext( pot, ParsedHTML.class );
@@ -404,6 +432,13 @@ class ParsedHTML {
     static class WebLinkFactory extends HTMLElementFactory {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toLinkAnchor( element );
+        }
+    }
+
+
+    static class TextBlockFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toTextBlock( element );
         }
     }
 
@@ -559,6 +594,10 @@ class ParsedHTML {
         _htmlFactoryClasses.put( "script",   new ScriptFactory() );
         _htmlFactoryClasses.put( "noscript", new NoScriptFactory() );
 
+        for (int i = 0; i < TEXT_ELEMENTS.length; i++) {
+            _htmlFactoryClasses.put( TEXT_ELEMENTS[i], new TextBlockFactory() );
+        }
+
         for (Iterator i = Arrays.asList( FormControl.getControlElementTags() ).iterator(); i.hasNext();) {
             _htmlFactoryClasses.put( i.next(), new FormControlFactory() );
         }
@@ -584,7 +623,13 @@ class ParsedHTML {
 
                 return true;
             }
-            public void processTextNodeValue( String value ) {
+            public void processTextNode( NodeUtils.PreOrderTraversal pot, Node textNode ) {
+                if (textNode.getNodeValue().trim().length() == 0) return;
+
+                Node parent = textNode.getParentNode();
+                if (!parent.getNodeName().equalsIgnoreCase( "body" )) return;
+                if (pot.getClosestContext( ContentConcealer.class ) != null) return;
+                new HtmlElementRecorder().recordHtmlElement( pot, textNode, newTextBlock( textNode ) );
             }
         };
         NodeUtils.PreOrderTraversal nt = new NodeUtils.PreOrderTraversal( getRootNode() );
@@ -646,8 +691,18 @@ class ParsedHTML {
     }
 
 
-    private void addToMaps( Element element, HTMLElement htmlElement ) {
-        _elements.put( element, htmlElement );
+    private BlockElement toTextBlock( Element element ) {
+        return new BlockElement( _response, _frame, _baseURL, _baseTarget, element, _characterSet );
+    }
+
+
+    private BlockElement newTextBlock( Node textNode ) {
+        return new BlockElement( _response, _frame, _baseURL, _baseTarget, textNode, _characterSet );
+    }
+
+
+    private void addToMaps( Node node, HTMLElement htmlElement ) {
+        _elements.put( node, htmlElement );
         if (htmlElement.getID() != null) _elementsByID.put( htmlElement.getID(), htmlElement );
         if (htmlElement.getName() != null) addNamedElement( htmlElement.getName(), htmlElement );
     }
@@ -673,6 +728,7 @@ class ParsedHTML {
         if (element instanceof WebApplet) return _appletList;
         if (element instanceof WebTable) return _tableList;
         if (element instanceof WebFrame) return _frameList;
+        if (element instanceof BlockElement) return _blocksList;
         return null;
     }
 
@@ -758,6 +814,18 @@ class ParsedHTML {
         WebImage[] images = getImages();
         for (int i = 0; i < images.length; i++) {
             if (HttpUnitUtils.matches( altText, images[i].getAltText() )) return images[i];
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the first text block found in the page which matches the specified predicate and value.
+     */
+    public BlockElement getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) {
+        BlockElement[] blocks = getTextBlocks();
+        for (int i = 0; i < blocks.length; i++) {
+            if (predicate.matchesCriteria( blocks[i], criteria )) return blocks[i];
         }
         return null;
     }
@@ -854,6 +922,7 @@ class ParsedHTML {
         _applets = null;
         _tables = null;
         _frames = null;
+        _blocks = null;
         _updateElements = true;
     }
 

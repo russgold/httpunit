@@ -68,14 +68,21 @@ public class WebLink extends FixedURLWebRequestSource {
     /**
      * Returns the text value of this link.
      **/
-    public String asText() {
+    public String getText() {
         if (getNode().getNodeName().equalsIgnoreCase( "area" )) {
             return getAttribute( "alt" );
-        } else if (!getNode().hasChildNodes()) {
-            return "";
         } else {
-            return NodeUtils.asText( getNode().getChildNodes() ).trim();
+            return super.getText();
         }
+    }
+
+
+    /**
+     * Returns the text value of this link.
+     * @deprecated use #getText instead
+     **/
+    public String asText() {
+        return getText();
     }
 
 

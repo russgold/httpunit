@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -157,6 +157,13 @@ public interface HTMLSegment {
      * @exception SAXException thrown if there is an error parsing the segment.
      **/
     public WebApplet[] getApplets() throws SAXException;
+
+
+    /**
+     * Returns the top-level block elements found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     */
+    public BlockElement[] getTextBlocks() throws SAXException;
 
 
     /**

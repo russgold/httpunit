@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -281,17 +281,17 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertNotNull("there is a table",table);
         TableCell cell = table.getTableCellWithID("id1");
         assertNotNull("cell id1",cell);
-        assertEquals("Value of cell id1","value1",cell.asText());
+        assertEquals("Value of cell id1","value1",cell.getText());
         cell = table.getTableCellWithID("id2");
         assertNotNull("cell id2",cell);
-        assertEquals("Value of cell id2","value2",cell.asText());
+        assertEquals("Value of cell id2","value2",cell.getText());
 
         // test non existent cell id
         cell = table.getTableCellWithID("nonExistingID");
         assertNull("cell id2",cell);
 
         cell = (TableCell) page.getElementWithID( "id1" );
-        assertEquals( "value of cell found from page", "value1", cell.asText() );
+        assertEquals( "value of cell found from page", "value1", cell.getText() );
     }
 
     /**
@@ -299,8 +299,8 @@ public class HtmlTablesTest extends HttpUnitTest {
      */
     public void testCellTagName() throws Exception {
         WebTable table = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables()[0];
-        assertEquals("Tag name of header cell", table.getTableCell(0,0).getElement().getTagName().toUpperCase(), "TH");
-        assertEquals("Tag name of non-header cell", table.getTableCell(0,1).getElement().getTagName().toUpperCase(), "TD");
+        assertEquals("Tag name of header cell", table.getTableCell(0,0).getTagName().toUpperCase(), "TH");
+        assertEquals("Tag name of non-header cell", table.getTableCell(0,1).getTagName().toUpperCase(), "TD");
     }
 
     private WebConversation _wc;

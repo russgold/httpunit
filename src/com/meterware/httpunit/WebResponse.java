@@ -490,6 +490,20 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+    public BlockElement[] getTextBlocks() throws SAXException {
+        return getReceivedPage().getTextBlocks();
+    }
+
+
+    /**
+     * Returns the first link found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public BlockElement getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+        return getReceivedPage().getFirstMatchingTextBlock( predicate, criteria );
+    }
+
+
     /**
      * Returns a copy of the domain object model tree associated with this response.
      * If the response is HTML, it will use a special parser which can transform HTML into an XML DOM.

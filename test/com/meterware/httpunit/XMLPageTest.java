@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -24,6 +24,7 @@ import java.util.Iterator;
 import junit.framework.TestSuite;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * A test for the XML handling functionality.
@@ -33,8 +34,8 @@ public class XMLPageTest extends HttpUnitTest {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+
+
     public static TestSuite suite() {
         return new TestSuite( XMLPageTest.class );
     }
@@ -76,7 +77,7 @@ public class XMLPageTest extends HttpUnitTest {
                 }
                 return true;
             }
-            public void processTextNodeValue( String value ) {
+            public void processTextNode( NodeUtils.PreOrderTraversal traversal, Node textNode ) {
             }
         } );
         assertEquals( "Traversal result", "zero|xfirst|xsecond|xxnormal|xxsimple|xafter|end|", sb.toString() );

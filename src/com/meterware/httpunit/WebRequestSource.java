@@ -289,6 +289,20 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
 
+    /**
+     * Returns the text value of this block.
+     **/
+    public String getText() {
+        if (_node.getNodeType() == Node.TEXT_NODE) {
+            return _node.getNodeValue().trim();
+        } else if (_node == null || !_node.hasChildNodes()) {
+            return "";
+        } else {
+            return NodeUtils.asText( _node.getChildNodes() ).trim();
+        }
+    }
+
+
     String getAttribute( final String name, String defaultValue ) {
         return NodeUtils.getNodeAttribute( _node, name, defaultValue );
     }

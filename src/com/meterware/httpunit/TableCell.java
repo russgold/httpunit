@@ -30,9 +30,7 @@ import org.w3c.dom.Node;
 /**
  * A single cell in an HTML table.
  **/
-public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
-
-    private ScriptableDelegate _scriptable;
+public class TableCell extends BlockElement {
 
 
     /**
@@ -53,95 +51,10 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
 
     /**
      * Returns the text value of this cell.
-     **/
+     * @deprecated as of 1.5.5, use #getText()
+     */
     public String asText() {
-        return getCellContentsAsText( _element );
-    }
-
-    
-    /**
-     * Returns a copy of the domain object model associated with this HTML segment.
-     **/
-    public Node getDOM() {
-        return super.getDOM();
-    }
-
-    /**
-     * Returns the underlying HTML Element.
-     */
-    public Element getElement() {
-        return _element;
-    }
-
-//-------------------------------- HTMLElement methods ---------------------------------------
-
-
-    /**
-     * Returns the ID associated with this element. IDs are unique throughout the HTML document.
-     **/
-    public String getID() {
-        return getAttribute( "id" );
-    }
-
-
-    public String getClassName() {
-        return getAttribute( "class" );
-    }
-
-
-    /**
-     * Returns the name associated with this element.
-     **/
-    public String getName() {
-        return getAttribute( "name" );
-    }
-
-
-    /**
-     * Returns the title associated with this element.
-     **/
-    public String getTitle() {
-        return getAttribute( "title" );
-    }
-
-
-    /**
-     * Returns the delegate which supports scripting this element.
-     */
-    public ScriptableDelegate getScriptableDelegate() {
-        if (_scriptable == null) {
-            _scriptable = new HTMLElementScriptable( this );
-            _scriptable.setScriptEngine( getResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
-        }
-        return _scriptable;
-    }
-
-
-    public String getAttribute( final String name ) {
-        return NodeUtils.getNodeAttribute( _element, name );
-    }
-
-
-    /**
-     * Returns true if this element may have an attribute with the specified name.
-     */
-    public boolean isSupportedAttribute( String name ) {
-        return false;
-    }
-
-
-    public boolean equals( Object obj ) {
-        return obj instanceof TableCell && equals( (TableCell) obj );
-    }
-
-
-    private boolean equals( TableCell cell ) {
-        return _element.equals( cell._element );
-    }
-
-
-    public int hashCode() {
-        return _element.hashCode();
+        return getText();
     }
 
 
@@ -150,7 +63,6 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
 
     TableCell( WebResponse response, FrameSelector frame, Element cellNode, URL url, String parentTarget, String characterSet ) {
         super( response, frame, url, parentTarget, cellNode, characterSet );
-        _element = cellNode;
         _colSpan = getAttributeValue( cellNode, "colspan", 1 );
         _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );
     }
@@ -159,25 +71,9 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
 //----------------------------------- private fields and methods -----------------------------------
 
 
-    private Element _element;
     private int     _colSpan;
     private int     _rowSpan;
 
-    private String getCellContentsAsText( Node node ) {
-        if (node == null) {
-            return "";
-        } else if (!node.hasChildNodes()) {
-            return "";
-        } else {
-            return NodeUtils.asText( node.getChildNodes() );
-        }
-    }
-
-
-
-    private int getAttributeValue( Node node, String attributeName, int defaultValue ) {
-        return NodeUtils.getAttributeValue( node, attributeName, defaultValue );
-    }
 
 }
 

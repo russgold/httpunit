@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -55,7 +55,10 @@ class NodeUtils {
 
 
     public static String getNodeAttribute( Node node, String attributeName, String defaultValue ) {
-        Node attribute = node.getAttributes().getNamedItem( attributeName );
+        NamedNodeMap attributes = node.getAttributes();
+        if (attributes == null) return defaultValue;
+
+        Node attribute = attributes.getNamedItem( attributeName );
         return (attribute == null) ? defaultValue : attribute.getNodeValue();
     }
 
@@ -75,7 +78,7 @@ class NodeUtils {
         /**
          * Processes a text node.
          */
-        public void processTextNodeValue( String value );
+        public void processTextNode( PreOrderTraversal traversal, Node textNode );
     }
 
     /**
@@ -99,8 +102,8 @@ class NodeUtils {
                 }
                 return true;
             }
-            public void processTextNodeValue( String value ) {
-                sb.append( HTMLParserFactory.getHTMLParser().getCleanedText( value ) );
+            public void processTextNode( PreOrderTraversal traversal, Node textNode ) {
+                sb.append( HTMLParserFactory.getHTMLParser().getCleanedText( textNode.getNodeValue() ) );
             }
         };
         new PreOrderTraversal( rootNodes ).perform( action );
@@ -162,7 +165,7 @@ class NodeUtils {
                 } else {
                     Node node = (Node) object;
                     if (node.getNodeType() == Node.TEXT_NODE) {
-                        action.processTextNodeValue( node.getNodeValue() );
+                        action.processTextNode( this, node );
                     } else if (node.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     } else
