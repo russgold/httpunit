@@ -341,7 +341,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         defineWebPage( "encodedLinks", "<html><head><title>Encode Test</title></head>" +
                                        "<body>" +
-                                       "<a href='/request?arg0=0&arg1&arg0=2&valueless='>request</a>" +
+                                       "<a href='/request?arg0=0\n&arg1&arg0=2&valueless='>request</a>" +
                                        "</body></html>" );
         WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
         WebLink link = mapPage.getLinks()[0];

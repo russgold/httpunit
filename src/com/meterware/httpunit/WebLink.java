@@ -251,8 +251,8 @@ public class WebLink extends WebRequestSource {
         String value = ((index < 0) ? null
                            : ((index == param.length() - 1)
                                ? ""
-                               : HttpUnitUtils.decode( param.substring( index + 1 ) )));
-        String name = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
+                               : HttpUnitUtils.decode( param.substring( index + 1 ) ).trim() ));
+        String name = (index < 0) ? param.trim() : HttpUnitUtils.decode( param.substring( 0, index ) ).trim();
         map.put( name, withNewValue( (String[]) map.get( name ), value ) );
         list.add( new LinkParameter( name, value ) );
     }
