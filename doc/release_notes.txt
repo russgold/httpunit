@@ -13,6 +13,16 @@ Limitations:
 
 
 Revision History:
+9-Mar-2004
+    Problems fixed:
+        1. Support JavaScript changing "disabled" attribute on form controls
+    Notes:
+        1. Upgraded NekoHTML to 0.9.1
+        2. Upgraded Xerces to 2.5.0
+        3. Upgraded Rhino to 1.5R4.1
+
+
+Revision History:
 1-Mar-2004
     Acknowledgements:
         1. Thanks to Dan Frankow for supplying an implementation of ServletContext.getMimeType and correcting the
@@ -85,7 +95,7 @@ Acknowledgements:
     getAttribute() to handle any property defined in the underlying Node
 
 Additions:
-    1. HTMLElement now supports a getAttribute method to return the value of any named attribute.
+    1. Patch #795698: HTMLElement now supports a getAttribute method to return the value of any named attribute.
     2. PseudoServer can now received chunked requests, and will not send a "Content-Length" header if a
        "Transfer-Encoding: chunked" has been defined.
     3. Added support for javascript Input.tabindex and Text.maxlength properties (read-only)

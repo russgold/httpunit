@@ -57,31 +57,38 @@ public class HTMLParserListenerTest extends HttpUnitTest {
                         "<unknownTag>bla</unknownTag>" +
                         "</body></html>\n" );
 
-        WebConversation wc = new WebConversation();
-        final ErrorHandler errorHandler = new ErrorHandler();
-        HTMLParserFactory.addHTMLParserListener( errorHandler );
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/BadPage.html" );
-        wc.getResponse( request );
-        assertTrue( "Should have found problems", errorHandler.foundProblems() );
-        assertEquals( "Expected URL", request.getURL(), errorHandler.getBadURL() );
+        final ErrorHandler errorHandler = new ErrorHandler( /* expectProblems */ true );
+        try {
+            WebConversation wc = new WebConversation();
+            HTMLParserFactory.addHTMLParserListener( errorHandler );
+            WebRequest request = new GetMethodWebRequest( getHostPath() + "/BadPage.html" );
+            wc.getResponse( request );
+            assertTrue( "Should have found problems", errorHandler.foundProblems() );
+            assertEquals( "Expected URL", request.getURL(), errorHandler.getBadURL() );
+        } finally {
+            HTMLParserFactory.removeHTMLParserListener( errorHandler );
+        }
     }
 
 
     public void testGoodHTMLPage() throws Exception {
-        defineResource( "SimplePage.html",
-                        "<html>\n" +
-                        "<head><title>A Sample Page</title></head>\n" +
-                        "<body><p><b>Wrong embedded tags</b></p>\n" +
-                        "have <a blef=\"other.html?a=1&amp;b=2\">an invalid link</A>\n" +
-                        "<IMG SRC=\"/images/arrow.gif\" alt=\"\" WIDTH=1 HEIGHT=4>\n" +
-                        "</body></html>\n" );
+        final ErrorHandler errorHandler = new ErrorHandler( /* expectProblems */ false );
+        try {
+            defineResource( "SimplePage.html",
+                            "<html>\n" +
+                            "<head><title>A Sample Page</title></head>\n" +
+                            "<body><p><b>OK embedded tags</b></p>\n" +
+                            "have <a href=\"other.html?a=1&amp;b=2\">an OK link</A>\n" +
+                            "<IMG SRC=\"/images/arrow.gif\" alt=\"\" WIDTH=1 HEIGHT=4>\n" +
+                            "</body></html>\n" );
 
-        WebConversation wc = new WebConversation();
-        final ErrorHandler errorHandler = new ErrorHandler();
-        HTMLParserFactory.addHTMLParserListener( errorHandler );
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
-        wc.getResponse( request );
-        assertFalse( "Should not have found problems", errorHandler.foundProblems() );
+            WebConversation wc = new WebConversation();
+            HTMLParserFactory.addHTMLParserListener( errorHandler );
+            WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+            wc.getResponse( request );
+        } finally {
+            HTMLParserFactory.removeHTMLParserListener( errorHandler );
+        }
     }
 
 
@@ -98,8 +105,15 @@ public class HTMLParserListenerTest extends HttpUnitTest {
 
     static private class ErrorHandler implements HTMLParserListener {
 
+        private boolean _expectProblems;
         private boolean _foundProblems;
         private URL     _badURL;
+
+
+        public ErrorHandler( boolean expectProblems ) {
+            _expectProblems = expectProblems;
+        }
+
 
         public void warning( URL url, String msg, int line, int column ) {
             _foundProblems = true;
@@ -107,6 +121,7 @@ public class HTMLParserListenerTest extends HttpUnitTest {
         }
 
         public void error( URL url, String msg, int line, int column ) {
+            assertTrue( msg + " at line " + line + ", column " + column, _expectProblems );
             _foundProblems = true;
             _badURL = url;
         }
