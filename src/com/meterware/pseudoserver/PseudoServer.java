@@ -41,6 +41,8 @@ public class PseudoServer {
 
     /** Number of outstanding server sockets that must be present before trying to wait for one to be released. **/
     private static int _waitThreshhold = 10;
+    private final int _socketTimeout;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 1000;
 
 
     /**
@@ -80,6 +82,12 @@ public class PseudoServer {
 
 
     public PseudoServer() {
+        this( DEFAULT_SOCKET_TIMEOUT );
+    }
+
+
+    public PseudoServer( int socketTimeout ) {
+        _socketTimeout = socketTimeout;
         Thread t = new Thread() {
             public void run() {
                 while (_active) {
@@ -263,7 +271,7 @@ public class PseudoServer {
 
 
     private void serveRequests( Socket socket ) throws IOException {
-        socket.setSoTimeout( 1000 );
+        socket.setSoTimeout( _socketTimeout );
         socket.setTcpNoDelay( true );
 
         if (_debug) System.out.println( "** Created server thread: " + hashCode() );
