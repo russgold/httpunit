@@ -32,6 +32,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.TimeZone;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -39,6 +43,9 @@ import javax.servlet.http.HttpServletResponse;
 
 
 class ServletUnitHttpResponse implements HttpServletResponse {
+
+    // rfc1123-date is "Sun, 06 Nov 1994 08:49:37 GMT"
+    private static final String RFC1123_DATE_SPEC = "EEE, dd MMM yyyy hh:mm:ss z";
 
 
     /**
@@ -180,7 +187,11 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * value.
      **/
     public void setHeader( String name, String value ) {
-        _headers.put( name.toUpperCase(), value );
+        ArrayList values = new ArrayList();
+        values.add( value );
+        synchronized (_headers) {
+            _headers.put( name.toUpperCase(), values );
+        }
     }
 
 
@@ -192,12 +203,16 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * setting its value.
      **/
     public void setIntHeader( String name, int value ) {
-        throw new RuntimeException( "setIntHeader not implemented" );
+        setHeader( name, asHeaderValue( value ) );
+    }
+
+
+    private String asHeaderValue( int value ) {
+        return Integer.toString( value );
     }
 
 
     /**
-     *
      * Adds a field to the response header with the given name and
      * date-valued field.  The date is specified in terms of
      * milliseconds since the epoch.  If the date field had already
@@ -206,7 +221,15 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * presence of a header before setting its value.
      **/
     public void setDateHeader( String name, long date ) {
-        throw new RuntimeException( "setDateHeader not implemented" );
+        setHeader( name, asDateHeaderValue( date ) );
+    }
+
+
+    private String asDateHeaderValue( long date ) {
+        Date value = new Date( date );
+        SimpleDateFormat formatter = new SimpleDateFormat( RFC1123_DATE_SPEC );
+        formatter.setTimeZone( TimeZone.getTimeZone( "Greenwich Mean Time" ) );
+        return formatter.format( value );
     }
 
 
@@ -307,7 +330,15 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Adds a response header with the given name and value. This method allows response headers to have multiple values.
      **/
     public void addHeader( String name, String value ) {
-        throw new RuntimeException( "addHeader not implemented" );
+        synchronized (_headers) {
+            String key = name.toUpperCase();
+            ArrayList values = (ArrayList) _headers.get( key );
+            if (values == null) {
+                values = new ArrayList();
+                _headers.put( key, values );
+            }
+            values.add( value );
+        }
     }
 
 
@@ -315,7 +346,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Adds a response header with the given name and value. This method allows response headers to have multiple values.
      **/
     public void addIntHeader( String name, int value ) {
-        throw new RuntimeException( "addIntHeader not implemented" );
+        addHeader( name, asHeaderValue( value ) );
     }
 
 
@@ -323,7 +354,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Adds a response header with the given name and value. This method allows response headers to have multiple values.
      **/
     public void addDateHeader( String name, long value ) {
-        throw new RuntimeException( "addDateHeader not implemented" );
+        addHeader( name, asDateHeaderValue( value ) );
     }
 
 
@@ -472,9 +503,35 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      **/
     String getHeaderField( String name ) {
         if (!_headersComplete) completeHeaders();
-        return (String) _headers.get( name.toUpperCase() );
-    }
 
+        ArrayList values = null;
+        synchronized (_headers) {
+            values = (ArrayList) _headers.get( name.toUpperCase() );
+        }
+
+        return values == null ? null : (String) values.get( 0 );
+     }
+
+
+     /**
+     * Return an array of all the header values associated with the
+     * specified header name, or an zero-length array if there are no such
+     * header values.
+     *
+     * @param name Header name to look up
+     */
+    public String[] getHeaderFields(String name) {
+        if (!_headersComplete) completeHeaders();
+        ArrayList values = null;
+        synchronized (_headers) {
+            values = (ArrayList) _headers.get(name.toUpperCase());
+        }
+        if (values == null)
+            return (new String[0]);
+        String results[] = new String[values.size()];
+        return ((String[]) values.toArray(results));
+
+    }
 
 //------------------------------------------- private members ------------------------------------
 

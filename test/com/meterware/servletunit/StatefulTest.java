@@ -21,6 +21,8 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.util.Enumeration;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
@@ -118,6 +120,12 @@ public class StatefulTest extends TestCase {
 
         ss.setColor( ic.getRequest(), "blue" );
         assertEquals( "Color in session", "blue", ss.getColor( ic.getRequest() ) );
+
+        Enumeration e = ic.getRequest().getSession().getAttributeNames();
+        assertNotNull( "No attribute list returned", e );
+        assertTrue( "No attribute names in list", e.hasMoreElements() );
+        assertEquals( "First attribute name", "color", e.nextElement() );
+        assertTrue( "List did not end after one name", !e.hasMoreElements() );
     }
 
 
@@ -199,6 +207,7 @@ public class StatefulTest extends TestCase {
         protected String getColor( HttpServletRequest req ) throws ServletException {
             HttpSession session = req.getSession( /* create */ false );
             if (session == null) return null;
+
             return (String) session.getAttribute( "color" );
         }
 

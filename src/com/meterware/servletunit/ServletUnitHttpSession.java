@@ -185,7 +185,7 @@ class ServletUnitHttpSession implements HttpSession {
      **/
     public Enumeration getAttributeNames() {
         if (_isInvalid) throw new IllegalStateException();
-        throw new RuntimeException( "getValueNames not implemented" );
+        return _values.keys();
     }
 
 

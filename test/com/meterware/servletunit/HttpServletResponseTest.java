@@ -23,6 +23,8 @@ import java.io.*;
 
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -126,6 +128,53 @@ public class HttpServletResponseTest extends ServletUnitTest {
         }
     }
 
+
+    public void testSingleHeaders() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setContentType( "text/html" );
+
+        servletResponse.setHeader( "foo", "bar" );
+        String headerValue = servletResponse.getHeaderField( "foo" );
+        assertEquals( "header is wrong", "bar", headerValue );
+
+        servletResponse.setHeader( "foo", "baz" );
+        headerValue = servletResponse.getHeaderField( "foo" );
+        assertEquals( "header is wrong", "baz", headerValue );
+
+        servletResponse.setIntHeader( "three", 3 );
+        headerValue = servletResponse.getHeaderField( "three" );
+        assertEquals( "int header is wrong", "3", headerValue );
+
+        SimpleDateFormat df = new SimpleDateFormat( "MM/dd/yyyy z" );
+        Date d = df.parse( "12/9/1969 GMT" );
+        servletResponse.setDateHeader( "date", d.getTime() );
+        headerValue = servletResponse.getHeaderField( "date" );
+        assertEquals( "date header is wrong", "Tue, 09 Dec 1969 12:00:00 GMT", headerValue );
+    }
+
+
+    public void testMultipleHeaders() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setContentType( "text/html" );
+
+        SimpleDateFormat df = new SimpleDateFormat( "MM/dd/yyyy z" );
+        Date date = df.parse( "12/9/1969 GMT" );
+
+        servletResponse.addHeader( "list", "over-rideme" );
+        servletResponse.setHeader( "list", "foo" );
+        servletResponse.addIntHeader( "list", 3 );
+        servletResponse.addDateHeader( "list", date.getTime() );
+        String[] headerList = servletResponse.getHeaderFields( "list" );
+        assertEquals( "header is wrong", "foo", headerList[ 0 ] );
+        assertEquals( "header is wrong", "3", headerList[ 1 ] );
+        assertEquals( "header is wrong", "Tue, 09 Dec 1969 12:00:00 GMT", headerList[ 2 ] );
+
+        servletResponse.setHeader( "list", "monkeyboy" );
+        headerList = servletResponse.getHeaderFields( "list" );
+        assertEquals( "setHeader did not replace the list header", headerList.length, 1 );
+        assertEquals( "header is wrong", "monkeyboy", headerList[ 0 ] );
+
+    }
 
 }
 

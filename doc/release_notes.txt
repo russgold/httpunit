@@ -11,6 +11,16 @@ Limitations:
 
 
 Revision History:
+22-Aug-2002
+
+Acknowledgements:
+    Thanks to Michael Reardon for implementing the ServletUnit header method handling code and session.getAttributeNames
+
+Additions:
+    1. ServletUnit now supports HttpServletResponse header methods: setHeader, addHeader, setIntHeader, addIntHeader,
+       setDateHeader, and addDateHeader.
+    2. ServletUnit now supports HttpSession.getAttributeNames
+
 21-Aug-2002
 
 Additions:
