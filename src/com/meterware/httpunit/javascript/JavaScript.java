@@ -366,6 +366,8 @@ public class JavaScript {
 
     static public class Form extends HTMLElement {
 
+        private Scriptable _controls;
+
         public String getClassName() {
             return "Form";
         }
@@ -388,6 +390,22 @@ public class JavaScript {
             getDelegate().setAction( action );
         }
 
+
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
+                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+            super.initialize( parent, scriptable );
+            initializeControls();
+        }
+
+
+        private void initializeControls() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+            ScriptableDelegate scriptables[] = getDelegate().getControls();
+            Control[] controls = new Control[ scriptables.length ];
+            for (int i = 0; i < controls.length; i++) {
+                controls[ i ] = (Control) toScriptable( scriptables[ i ] );
+            }
+            _controls = Context.getCurrentContext().newArray( this, controls );
+        }
 
 
         private WebForm.Scriptable getDelegate() {

@@ -131,7 +131,7 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testSetFormFieldValue() throws Exception {
+    public void testSetFormTextValue() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad=\"document.realform.color.value='green'\">" +
                                             "<form name='realform'><input name='color' value='blue'></form>" +
@@ -140,6 +140,31 @@ public class ScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithName( "realform" );
         assertEquals( "color parameter value", "green", form.getParameterValue( "color" ) );
+    }
+
+
+    public void testSetFormTextOnChangeEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <input name='color' value='blue' " +
+                                            "         onChange='alert( \"color is now \" + document.the_form.color.value );'>" +
+                                            "</form>" +
+                                            "<a href='#' onClick='document.the_form.color.value=\"green\";'>green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        assertEquals( "Initial state", "blue", form.getParameterValue( "color" ) );
+
+        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        form.setParameter( "color", "red" );
+        assertEquals( "Alert after change", "color is now red", response.popNextAlert() );
+
+        assertEquals( "Changed state", "red", form.getParameterValue( "color" ) );
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Final state", "green", form.getParameterValue( "color" ) );
+        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
     }
 
 
@@ -357,6 +382,41 @@ public class ScriptingTest extends HttpUnitTest {
         response.getFormWithName( "the_form" ).setParameter( "choices", "1" );
         response.getLinks()[0].mouseOver();
         assertEquals( "after change message", "selected #0", response.popNextAlert() );
+    }
+
+
+    public void testFormSelectOnChangeEvent() throws Exception {
+        defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
+                                            "function selectOptionNum( the_select, index ) { \n" +
+                                            "  for (var i = 0; i < the_select.length; i++) {\n" +
+                                            "      the_select.options[i].selected = (i == index);\n" +
+                                            "  }\n" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                          "<body>" +
+                                          "<form name='the_form'>" +
+                                          "  <select name='choices' onChange='alert( \"Selected index is \" + document.the_form.choices.selectedIndex );'>" +
+                                          "    <option>red" +
+                                          "    <option selected>blue" +
+                                          "  </select>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='selectOptionNum( document.the_form.choices, 0 )'>reset</a>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        final WebForm form = response.getFormWithName( "the_form" );
+        assertEquals( "Initial state", "blue", form.getParameterValue( "choices" ) );
+
+        assertEquals( "Alert message before change", null, response.getNextAlert() );
+        form.setParameter( "choices", "red" );
+        assertEquals( "Alert after change", "Selected index is 0", response.popNextAlert() );
+        form.setParameter( "choices", "blue" );
+        assertEquals( "Alert after change", "Selected index is 1", response.popNextAlert() );
+
+        assertEquals( "Initial state", "blue", form.getParameterValue( "choices" ) );
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Final state", "red", form.getParameterValue( "choices" ) );
+        assertEquals( "Alert message after JavaScript change", null, response.getNextAlert() );
     }
 
 

@@ -435,6 +435,16 @@ public class WebForm extends WebRequestSource {
         public void setParameterValue( String name, String value ) {
             getParameter( name ).getScriptableObject().set( "value", value );
         }
+
+
+        public ScriptableDelegate[] getControls() {
+            FormControl[] controls = getFormControls();
+            ScriptableDelegate[] result = new ScriptableDelegate[ controls.length ];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = controls[i].getScriptableObject();
+            }
+            return result;
+        }
     }
 
 

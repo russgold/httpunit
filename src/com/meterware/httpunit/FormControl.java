@@ -508,10 +508,29 @@ class CheckboxFormControl extends BooleanFormControl {
 }
 
 
-class TextFormControl extends FormControl {
+abstract class ScalarFormControl extends FormControl {
 
-    private String[] _value = new String[1];
-    private String[] _defaultValue;
+    private final String  _onChangeEvent;
+
+
+    public ScalarFormControl( Node node ) {
+        super( node );
+        _onChangeEvent    = NodeUtils.getNodeAttribute( node, "onchange" );
+    }
+
+
+    protected void sendOnChangeEvent() {
+        if (_onChangeEvent.length() > 0) getScriptableObject().doEvent( _onChangeEvent );
+    }
+
+}
+
+
+class TextFormControl extends ScalarFormControl {
+
+    private String[]   _value = new String[1];
+    private String[]   _defaultValue;
+    private Scriptable _scriptable;
 
 
     public TextFormControl( Node node, String defaultValue ) {
@@ -538,7 +557,8 @@ class TextFormControl extends FormControl {
 
 
     public ScriptableDelegate getScriptableObject() {
-        return new Scriptable();
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
     }
 
 
@@ -549,12 +569,15 @@ class TextFormControl extends FormControl {
 
     void claimValue( List values ) {
         if (isReadOnly()) return;
+
+        String oldValue = getValues()[0];
         if (values.isEmpty()) {
             _value[0] = "";
         } else {
             _value[0] = (String) values.get(0);
             values.remove(0);
         }
+        if (!(oldValue.equals( _value[0] ))) sendOnChangeEvent();
     }
 
 
@@ -637,7 +660,7 @@ class TextAreaFormControl extends TextFormControl {
 }
 
 
-class FileSubmitFormControl extends FormControl {
+class FileSubmitFormControl extends ScalarFormControl {
 
     private UploadFileSpec _fileToUpload;
 
@@ -684,7 +707,7 @@ class FileSubmitFormControl extends FormControl {
 }
 
 
-class SelectionFormControl extends FormControl {
+class SelectionFormControl extends ScalarFormControl {
 
     private final boolean _multiSelect;
     private final boolean _listBox;
@@ -770,7 +793,8 @@ class SelectionFormControl extends FormControl {
 
 
     void claimUniqueValue( List values ) {
-        _selectionOptions.claimUniqueValues( values );
+        boolean changed = _selectionOptions.claimUniqueValues( values );
+        if (changed) sendOnChangeEvent();
     }
 
 
@@ -884,21 +908,23 @@ class SelectionFormControl extends FormControl {
         }
 
 
-        void claimUniqueValues( List values ) {
-            for (int i = 0; i < _options.length; i++) _options[i].setSelected( false );
-
+        boolean claimUniqueValues( List values ) {
+            boolean changed = false;
             int numMatches = 0;
             for (int i = 0; i < _options.length; i++) {
-                if (values.contains( _options[i].getValue() )) {
-                    _options[i].setSelected( true );
+                final boolean newValue = values.contains( _options[i].getValue() );
+                if (newValue != _options[i].isSelected()) changed = true;
+                _options[i].setSelected( newValue );
+                if (newValue) {
                     values.remove( _options[i].getValue() );
                     numMatches++;
-                    if (!_multiSelect) break;
+                    if (!_multiSelect) for (++i; i < _options.length; i++) _options[i].setSelected( false );
                 }
             }
             if (!_listBox && numMatches == 0) {
                 throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
             }
+            return changed;
         }
 
 

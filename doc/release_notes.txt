@@ -12,6 +12,10 @@ Limitations:
 
 
 Revision History:
+13-Aug-2002
+Additions:
+   1. The onChange event now works for Select controls, Text controls, and TextArea controls.
+
  9-Aug-2002
 Additions:
    1. The SubmitButton class now supports a click() method to submit the form using that button.
