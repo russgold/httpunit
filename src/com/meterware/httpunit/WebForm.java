@@ -118,6 +118,18 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Returns the button with the specified ID
+     */
+    public Button getButtonWithID( String buttonID ) {
+        Button[] buttons = getButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].getID().equalsIgnoreCase( buttonID )) return buttons[i];
+        }
+        return null;
+    }
+
+
+    /**
      * Returns an array containing the submit buttons defined for this form.
      **/
     public SubmitButton[] getSubmitButtons() {
@@ -319,6 +331,12 @@ public class WebForm extends WebRequestSource {
      * Resets all parameters to their initial values.
      */
     public void reset() {
+        String event = NodeUtils.getNodeAttribute( getNode(), "onreset" );
+        if (event.length() == 0 || getScriptableObject().doEvent( event )) resetControls();
+    }
+
+
+    private void resetControls() {
         FormControl[] controls = getFormControls();
         for (int i = 0; i < controls.length; i++) {
             controls[i].reset();
@@ -471,6 +489,11 @@ public class WebForm extends WebRequestSource {
 
         public void submit() throws IOException, SAXException {
             submitRequest( getScriptedSubmitRequest() );
+        }
+
+
+        public void reset() throws IOException, SAXException {
+            resetControls();
         }
 
 

@@ -4,14 +4,13 @@ o Provide customization for table to text
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Support IFRAME tag
-o Support reset button detection
 o Support _new frame tag
 o Documentation, Documentation
 
 JavaScript priorities:
 o Document.write
-o JavaScript URLs
-o Form.onreset and Form.reset
+o Javascript includes
+o Navigator object
 
 Possibles:
 o replace JTidy with a simpler custom parser

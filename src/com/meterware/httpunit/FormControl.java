@@ -269,6 +269,8 @@ abstract class FormControl {
             final String type = NodeUtils.getNodeAttribute( node, "type", "submit" );
             if (type.equalsIgnoreCase( "submit" )) {
                 return new SubmitButton( form, node );
+            } else if (type.equalsIgnoreCase( "reset" )) {
+                return new ResetButton( form, node );
             } else {
                 return new Button( form, node );
             }
@@ -289,7 +291,7 @@ abstract class FormControl {
             } else if (type.equalsIgnoreCase( "button" )) {
                 return new Button( form, node );
             } else if (type.equalsIgnoreCase( "reset" )) {
-                return new Button( form, node );
+                return new ResetButton( form, node );
             } else if (type.equalsIgnoreCase( "file" )) {
                 return new FileSubmitFormControl( node );
             } else {

@@ -26,32 +26,19 @@ import org.xml.sax.SAXException;
 
 
 /**
+ * Represents a form 'reset' button.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-public class Button extends FormControl {
+public class ResetButton extends Button {
 
-    protected final WebForm  _form;
-    private String _onClickEvent = "";
-
-
-    Button( WebForm form ) {
-        _form = form;
+    ResetButton( WebForm form ) {
+        super( form );
     }
 
 
-    Button( WebForm form, Node node ) {
-        super( node );
-        _form = form;
-        _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
-    }
-
-
-    /**
-     * Returns the value associated with this button.
-     **/
-    public String getValue() {
-        return getValueAttribute();
+    ResetButton( WebForm form, Node node ) {
+        super( form, node );
     }
 
 
@@ -59,32 +46,7 @@ public class Button extends FormControl {
      * Performs the action associated with clicking this button. For a submit button this typically
      * submits the form.
      */
-    public void click() throws IOException, SAXException  {
-        doOnClickEvent();
+    public void click() throws IOException, SAXException {
+        if (doOnClickEvent()) getForm().reset();
     }
-
-
-    final
-    protected boolean doOnClickEvent() {
-        return _onClickEvent.length() == 0 || getScriptableObject().doEvent( _onClickEvent );
-    }
-
-
-    final
-    protected WebForm getForm() {
-        return _form;
-    }
-
-
-//-------------------------------------------------- FormControl methods -----------------------------------------------
-
-
-    String[] getValues() {
-        return new String[ 0 ];
-    }
-
-
-    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
-    }
-
 }

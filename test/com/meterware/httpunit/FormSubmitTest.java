@@ -172,6 +172,22 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testResetButtonDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update>" +
+                                  "<Input type=reset id=clear>" +
+                                  "<Input type=button value=recalculate>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        form.setParameter( "age", "15" );
+        Button reset = form.getButtonWithID( "clear" );
+        reset.click();
+        assertEquals( "Value after reset", "12", form.getParameterValue( "age" ) );
+    }
+
+
     public void testDisabledSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +

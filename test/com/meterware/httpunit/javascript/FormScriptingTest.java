@@ -88,6 +88,51 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testResetViaScript() throws Exception {
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=text name=change value=color>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='document.spectrum.reset(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        WebForm form = response.getFormWithName( "spectrum" );
+        form.setParameter( "color", "blue" );
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Value after reset", "green", form.getParameterValue( "color" ) );
+    }
+
+
+    public void testOnResetEvent() throws Exception {
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt' onreset='alert( \"Ran the event\" );'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=reset id='clear'>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='document.spectrum.reset(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        WebForm form = response.getFormWithName( "spectrum" );
+
+        form.setParameter( "color", "blue" );
+        form.getButtonWithID( "clear" ).click();
+        assertEquals( "Value after reset", "green", form.getParameterValue( "color" ) );
+        assertEquals( "Alert message", "Ran the event", wc.popNextAlert() );
+
+        form.setParameter( "color", "blue" );
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Value after reset", "green", form.getParameterValue( "color" ) );
+        assertNull( "Event ran unexpectedly", wc.getNextAlert() );
+    }
+
+
     public void testSubmitViaScript() throws Exception {
         defineResource( "DoIt?color=green", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +

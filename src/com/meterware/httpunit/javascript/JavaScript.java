@@ -438,6 +438,11 @@ public class JavaScript {
         }
 
 
+        public void jsFunction_reset() throws IOException, SAXException {
+            getDelegate().reset();
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );

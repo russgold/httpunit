@@ -11,6 +11,12 @@ Limitations:
 
 
 Revision History:
+27-Aug-2002
+Additions:
+    1. Reset buttons may now be clicked to reset the form
+    2. WebForm supports getButtonWithID
+    3. JavaScript: Form now supports reset() and onReset event.
+
 23-Aug-2002
 Additions:
     1. javascript URLs are now supported.
