@@ -237,6 +237,7 @@ Build-Time: ${TSTAMP}
             <exclude name="**/activation.jar"/>
             <exclude name="**/mailapi.jar" />
             <include name="doc/**/*.*" />
+            <include name="doc/api/package-list" />
         </fileset>
     </copy>
 </target>
