@@ -25,13 +25,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Hashtable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.Map;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -214,138 +209,6 @@ public class WebXMLTest extends TestCase {
 
 //===============================================================================================================
 
-
-    static class WebXMLString {
-
-        String asText() {
-            StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n<web-app>\n" );
-            for (int i = _servlets.size()-1; i >=0; i--) {
-                result.append( "  <servlet>\n    <servlet-name>servlet_" ).append( i ).append( "</servlet-name>\n" );
-                result.append( "    <servlet-class>" ).append( ((Class) _servlets.get(i)).getName() ).append( "</servlet-class>\n" );
-                appendParams( result, "init-param", (Hashtable) _initParams.get( new Integer( i ) ) );
-                result.append( "  </servlet>\n" );
-            }
-            for (int i = _mappings.size()-1; i >=0; i--) {
-                result.append( "  <servlet-mapping>\n    <servlet-name>servlet_" ).append( i ).append( "</servlet-name>\n" );
-                result.append( "    <url-pattern>" ).append( _mappings.get(i) ).append( "</url-pattern>\n  </servlet-mapping>\n" );
-            }
-            for (Enumeration e = _resources.elements(); e.hasMoreElements();) {
-                result.append( ((WebResourceSpec) e.nextElement()).asText() );
-            }
-            result.append( _loginConfig );
-            result.append( "</web-app>" );
-            return result.toString();
-        }
-
-
-        private void appendParams( StringBuffer result, String tagName, Hashtable params ) {
-            if (params == null) return;
-            for (Iterator it = params.entrySet().iterator(); it.hasNext();) {
-                Map.Entry entry = (Map.Entry) it.next();
-                result.append( "    <" ).append( tagName ).append( ">\n      <param-name>" ).append( entry.getKey() );
-                result.append( "</param-name>\n      <param-value>" ).append( entry.getValue() ).append( "</param-value>\n    </" );
-                result.append( tagName ).append( ">\n" );
-            }
-        }
-
-
-        void addServlet( String urlPattern, Class servletClass ) {
-            _servlets.add( servletClass );
-            _mappings.add( urlPattern );
-        }
-
-        void addServlet( String urlPattern, Class servletClass, Properties initParams ) {
-            _initParams.put( new Integer( _servlets.size() ), initParams );
-            addServlet( urlPattern, servletClass );
-        }
-
-        void requireBasicAuthorization( String realmName ) {
-            _loginConfig = "  <login-config>\n" +
-                           "    <auth-method>BASIC</auth-method>\n" +
-                           "    <realm-name>" + realmName + "</realm-name>\n" +
-                           "  </login-config>\n";
-        }
-
-        void requireBasicAuthentication( String realmName ) {
-            _loginConfig = "  <login-config>\n" +
-                           "    <auth-method>BASIC</auth-method>\n" +
-                           "    <realm-name>" + realmName + "</realm-name>\n" +
-                           "  </login-config>\n";
-        }
-
-        void requireFormAuthentication( String realmName, String loginPagePath, String errorPagePath ) {
-            _loginConfig = "  <login-config>\n" +
-                           "    <auth-method>FORM</auth-method>\n" +
-                           "    <realm-name>" + realmName + "</realm-name>\n" +
-                           "    <form-login-config>" +
-                           "      <form-login-page>" + loginPagePath + "</form-login-page>\n" +
-                           "      <form-error-page>" + errorPagePath + "</form-error-page>\n" +
-                           "    </form-login-config>" +
-                           "  </login-config>\n";
-        }
-
-        void addSecureURL( String resourceName, String urlPattern ) {
-            getWebResource( resourceName ).addURLPattern( urlPattern );
-        }
-
-        void addAuthorizedRole( String resourceName, String roleName ) {
-            getWebResource( resourceName ).addAuthorizedRole( roleName );
-        }
-
-        private ArrayList _servlets = new ArrayList();
-        private ArrayList _mappings = new ArrayList();
-        private String    _loginConfig = "";
-        private Hashtable _resources = new Hashtable();
-        private Hashtable _initParams = new Hashtable();
-
-
-        private WebResourceSpec getWebResource( String resourceName ) {
-            WebResourceSpec result = (WebResourceSpec) _resources.get( resourceName );
-            if (result == null) {
-                result = new WebResourceSpec( resourceName );
-                _resources.put( resourceName, result );
-            }
-            return result;
-        }
-    }
-
-
-    static class WebResourceSpec {
-
-        WebResourceSpec( String name ) {
-            _name = name;
-        }
-
-        void addURLPattern( String urlPattern ) {
-            _urls.add( urlPattern );
-        }
-
-        void addAuthorizedRole( String roleName ) {
-            _roles.add( roleName );
-        }
-
-        String asText() {
-            StringBuffer sb = new StringBuffer();
-            sb.append( "  <security-constraint>\n" );
-            sb.append( "    <web-resource-collection>\n" );
-            sb.append( "      <web-resource-name>" ).append( _name ).append( "</web-resource-name>\n" );
-            for (Iterator i = _urls.iterator(); i.hasNext();) {
-                sb.append( "      <url-pattern>" ).append( i.next() ).append( "</url-pattern>\n" );
-            }
-            sb.append( "    </web-resource-collection>\n" );
-            sb.append( "    <auth-constraint>\n" );
-            for (Iterator i = _roles.iterator(); i.hasNext();) {
-                sb.append( "      <role-name>" ).append( i.next() ).append( "</role-name>\n" );
-            }
-            sb.append( "    </auth-constraint>\n" );
-            sb.append( "  </security-constraint>\n" );
-            return sb.toString();
-        }
-
-        private String _name;
-        private ArrayList _urls = new ArrayList();
-        private ArrayList _roles = new ArrayList();
-    }
 
 //===============================================================================================================
 
