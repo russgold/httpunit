@@ -31,7 +31,6 @@ import java.net.URLConnection;
 import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
@@ -999,21 +998,28 @@ public class WebResponse implements HTMLSegment, CookieSource {
         String refreshHeader = _refreshHeader != null ? _refreshHeader : getHeaderField( "Refresh" );
         if (refreshHeader == null) return;
 
-        StringTokenizer st = new StringTokenizer( refreshHeader, ";" );
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (token.length() == 0) continue;
-            try {
-                if (Character.isDigit( token.charAt(0) )) {
-                    _refreshDelay = Integer.parseInt( token );
-                } else {
-                    _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( token ), _frame.getName() );
-                }
-            } catch (NumberFormatException e) {
-                System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
-            }
+        int semicolonIndex = refreshHeader.indexOf( ';' );
+        if (semicolonIndex < 0) {
+            interpretRefreshHeaderElement( refreshHeader, refreshHeader );
+        } else {
+            interpretRefreshHeaderElement( refreshHeader.substring( 0, semicolonIndex ), refreshHeader );
+            interpretRefreshHeaderElement( refreshHeader.substring( semicolonIndex+1 ), refreshHeader );
         }
         if (_refreshRequest == null) _refreshRequest = new GetMethodWebRequest( _pageURL, _pageURL.toString(), _frame.getName() );
+    }
+
+
+    private void interpretRefreshHeaderElement( String token, String refreshHeader ) {
+        if (token.length() == 0) return;
+        try {
+            if (Character.isDigit( token.charAt(0) )) {
+                _refreshDelay = Integer.parseInt( token );
+            } else {
+                _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( token ), _frame.getName() );
+            }
+        } catch (NumberFormatException e) {
+            System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
+        }
     }
 
 
@@ -1024,7 +1030,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         } else {
             int splitIndex = text.indexOf( '=' );
             String value = text.substring( splitIndex+1 ).trim();
-            return HttpUnitUtils.stripQuotes( value );
+            return HttpUnitUtils.replaceEntities( HttpUnitUtils.stripQuotes( value ) );
         }
     }
 

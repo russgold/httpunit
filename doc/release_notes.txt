@@ -17,7 +17,9 @@ Revision History:
    Problems fixed:
        1. bug #805921: WebForm.selectImageButtonPosition was misleadingly public and should not have been used.
           It has been made package-private, and new means are provided to submit positional image buttons (see additions).
-       2. bug #982097: HTTP Urls not preserved in submit requests
+       2. bug #982097: http urls being used as request parameters were being mangled
+       3. bug #803041: HTML entity &amp; now recognized in refresh URL tag
+       4. bug #803095: Absolute URLs now supported in refresh URL tag
 
    Additions:
        1. rfe #766768: getText() methods now translate <br> tags as newlines.

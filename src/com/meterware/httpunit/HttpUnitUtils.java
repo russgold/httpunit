@@ -206,6 +206,24 @@ public class HttpUnitUtils {
     }
 
 
+    static String replaceEntities( String string ) {
+        int i = 0;
+        int ampIndex;
+        while ((ampIndex = string.indexOf( '&', i )) >= 0) {
+            int semiColonIndex = string.indexOf( ';', ampIndex+1 );
+            if (semiColonIndex < 0) continue;
+
+            String entityName = string.substring( ampIndex+1, semiColonIndex );
+            if (entityName.equalsIgnoreCase( "amp" )) {
+                string = string.substring( 0, ampIndex ) + '&' + string.substring( semiColonIndex+1 );
+                i = ampIndex + 1;
+            }
+
+        }
+        return string;
+    }
+
+
     static class ClasspathEntityResolver implements EntityResolver {
 
         public InputSource resolveEntity( String publicID, String systemID ) {
