@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 /**
@@ -30,8 +31,12 @@ import java.net.HttpURLConnection;
 public class HttpNotFoundException extends HttpException {
 
 
-    public HttpNotFoundException( String url ) {
-        super( HttpURLConnection.HTTP_NOT_FOUND, url );
+    public HttpNotFoundException( URL url ) {
+        super( HttpURLConnection.HTTP_NOT_FOUND, "Not found", url );
+    }
+
+    public HttpNotFoundException( URL url, Throwable t ) {
+        super( HttpURLConnection.HTTP_NOT_FOUND, t.toString(), url );
     }
 
 

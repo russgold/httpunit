@@ -67,6 +67,14 @@ class ServletUnitWebResponse extends WebResponse {
     }
 
 
+    /**
+     * Returns the response message associated with this response.
+     **/
+    public String getResponseMessage() {
+        return _response.getMessage();
+    }
+
+
     public String[] getHeaderFieldNames() {
         return _response.getHeaderFieldNames();
     }

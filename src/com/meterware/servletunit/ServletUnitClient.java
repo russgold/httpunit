@@ -24,6 +24,7 @@ import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.WebClient;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.GetMethodWebRequest;
 
 import java.io.IOException;
 
@@ -51,6 +52,14 @@ import org.xml.sax.SAXException;
 public class ServletUnitClient extends WebClient {
 
  
+    /**
+     * Creates and returns a new invocation context from a GET request.
+     **/
+    public InvocationContext newInvocation( String requestString ) throws MalformedURLException {
+        return newInvocation( new GetMethodWebRequest( requestString ) );
+    }
+
+
     /**
      * Creates and returns a new invocation context to test calling of servlet methods.
      **/
@@ -90,7 +99,7 @@ public class ServletUnitClient extends WebClient {
         try {
             invocation.getServlet().service( invocation.getRequest(), invocation.getResponse() );
         } catch (ServletException e) {
-            throw new HttpInternalErrorException( request.getURL().toExternalForm() );
+            throw new HttpInternalErrorException( request.getURL(), e );
         }
 
         return invocation.getServletResponse();

@@ -160,6 +160,13 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns the response message associated with this response.
+     **/
+    abstract
+    public String getResponseMessage();
+
+
+    /**
      * Returns the content type of this response.
      **/
     public String getContentType() {
@@ -948,6 +955,14 @@ class DefaultWebResponse extends WebResponse {
      **/
     public int getResponseCode() {
         return HttpURLConnection.HTTP_OK;
+    }
+
+
+    /**
+     * Returns the response message associated with this response.
+     **/
+    public String getResponseMessage() {
+        return "OK";
     }
 
 

@@ -54,7 +54,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 	
 	
-    public void testDisabledChoiceParameterValidation() throws Exception {
+    public void testChoiceParameterValidationBypass() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
                                        "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
@@ -72,7 +72,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
                               
-    public void testEnabledChoiceParameterValidation() throws Exception {
+    public void testChoiceParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
                                        "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
@@ -97,7 +97,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-    public void testDisabledTextParameterValidation() throws Exception {
+    public void testTextParameterValidationBypass() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
@@ -115,7 +115,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-    public void testEnabledTextParameterValidation() throws Exception {
+    public void testTextParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
@@ -153,7 +153,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-    public void testDisabledRadioButtonValidation() throws Exception {
+    public void testRadioButtonValidationBypass() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=radio name=color value=red>" +
                                        "<Input type=radio name=color value=blue>" +
@@ -167,7 +167,7 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
-    public void testEnabledRadioButtonValidation() throws Exception {
+    public void testRadioButtonValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=radio name=color value=red>" +
                                        "<Input type=radio name=color value=blue>" +
@@ -204,6 +204,42 @@ public class FormParametersTest extends HttpUnitTest {
         request.setParameter( "color", new String[] { "red", "blue" } );
         validateSetParameterRejected( request, "color", "on", "setting checkbox to an incorrect value" );
         validateSetParameterRejected( request, "color", new String[] { "green", "red" }, "setting checkbox to an incorrect value" );
+    }
+
+
+    public void testReadOnlyControls() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                       "<Input readonly type=checkbox name=color value=red checked>" +
+                                       "<Input type=checkbox name=color value=blue>" +
+                                       "<Input type=radio name=species value=hippo readonly>" +
+                                       "<Input type=radio name=species value=kangaroo checked>" +
+                                       "<Input type=radio name=species value=lemur>" +
+                                       "<textarea name='big' readonly rows=2 cols=40>stop me</textarea>" +
+                                       "<Input type=text name=age value=12 readonly value='12'>" +
+                                       "<Input type=submit name=change disabled></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = page.getForms()[0].getRequest();
+
+        assertMatchingSet( "selected color", new String[] { "red" }, form.getParameterValues( "color" ) );
+        assertEquals( "selected animal", "kangaroo", form.getParameterValue( "species" ) );
+        assertEquals( "age", "12", form.getParameterValue( "age" ) );
+
+        assertNull( "Found disabled button", form.getSubmitButton( "change" ) );
+        assertMatchingSet( "color choices", new String[] { "red", "blue" }, form.getOptionValues( "color" ) );
+        assertMatchingSet( "species choices", new String[] { "kangaroo", "lemur" }, form.getOptionValues( "species" ) );
+
+        validateSetParameterRejected( request, "color", "blue", "unchecking 'red'" );
+        validateSetParameterRejected( request, "color", new String[] { "blue" }, "unchecking 'red'" );
+        validateSetParameterRejected( request, "species", "hippo", "selecting 'hippo'" );
+        validateSetParameterRejected( request, "age", "15", "changing a disabled text parameter value" );
+        validateSetParameterRejected( request, "big", "go-go", "changing a disabled textarea parameter value" );
+
+        request.setParameter( "color", "red" );
+        request.setParameter( "color", new String[] { "red", "blue" } );
+        request.setParameter( "species", "lemur" );
+        request.setParameter( "age", "12" );
+        request.setParameter( "big", "stop me" );
     }
 
 

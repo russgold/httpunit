@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -120,7 +120,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * (&lt;body&gt;&lt;/body&gt;).
      **/
     public void sendError( int sc ) throws IOException {
-        throw new RuntimeException( "sendError not implemented" );
+        sendError( sc, "" );
     }
 
 
@@ -134,7 +134,14 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * (&lt;body&gt;&lt;/body&gt;).
      **/
     public void sendError(int sc, String msg) throws IOException {
-        throw new RuntimeException( "sendError not implemented" );
+        setStatus( sc );
+        _statusMessage = msg;
+
+        _writer = null;
+        _servletStream = null;
+
+        setContentType( "text/html" );
+        getWriter().println( "<html><head><title>" + msg + "</title></head><body>" + msg + "</body></html>" );
     }
 
 
@@ -145,8 +152,8 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * is an error, the <code>sendError</code> method should be used
      * instead.
      **/
-    public void setStatus(int sc) {
-        throw new RuntimeException( "setStatus not implemented" );
+    public void setStatus( int sc ) {
+        _status = sc;
     }
 
 
@@ -156,7 +163,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * use sendError(int, String). Sets the status code and message for this response.
      **/
     public void setStatus( int sc, String msg ) {
-        throw new RuntimeException( "setStatus not implemented" );
+        setStatus( sc );
     }
 
 
@@ -411,6 +418,14 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     }
 
 
+    /**
+     * Returns the message associated with this response's status.
+     **/
+    String getMessage() {
+        return _statusMessage;
+    }
+
+
     public String[] getHeaderFieldNames() {
         if (!_headersComplete) completeHeaders();
         Vector names = new Vector();
@@ -446,6 +461,8 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     private ByteArrayOutputStream _outputStream;
 
     private int _status = SC_OK;
+
+    private String _statusMessage = "OK";
 
     private Hashtable _headers = new Hashtable();
 

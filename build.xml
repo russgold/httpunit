@@ -25,7 +25,8 @@
     <property name="web.dir" value="web" /> 
     <property name="packages" value="com.meterware.*" /> 
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
-    
+    <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />
+
 <!-- =================================================================== -->
 <!-- Defines the classpath used for compilation and test.                -->
 <!-- =================================================================== -->
@@ -102,7 +103,21 @@
 </target>
 
 
-<!--  ===================================================================  --> 
+<!--  ===================================================================  -->
+<!--  Runs the test code                                                   -->
+<!--  ===================================================================  -->
+<target name="servlettest" depends="testcompile">
+    <java classname="${servlet.test.class}" fork="yes" >
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+             <pathelement location="${test.classes}" />
+         </classpath>
+    </java>
+</target>
+
+
+<!--  ===================================================================  -->
 <!--  Creates the jar archive                                              --> 
 <!--  ===================================================================  --> 
 <target name="jar" depends="compile">

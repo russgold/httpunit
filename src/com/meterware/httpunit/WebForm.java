@@ -136,22 +136,27 @@ public class WebForm extends WebRequestSource {
 
             NodeList nl = ((Element) getNode()).getElementsByTagName( "input" );
             for (int i = 0; i < nl.getLength(); i++) {
-                if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
-                    || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "image" )) {
+                if ((hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "image" ))
+                     && nl.item(i).getAttributes().getNamedItem( "disabled" ) == null) {
                     _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
                 }
             }
 
             nl = ((Element) getNode()).getElementsByTagName( "button" );
             for (int i = 0; i < nl.getLength(); i++) {
-                if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
-                    || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "" )) {
+                if ((hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "" ))
+                     && nl.item(i).getAttributes().getNamedItem( "disabled" ) == null) {
                     _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
                 }
             }
             if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
         }
         return _buttonVector;
+    }
+
+
+    private boolean hasMatchingAttribute( Node node, String attributeName, String attributeValue ) {
+        return NodeUtils.getNodeAttribute( node, attributeName ).equalsIgnoreCase( attributeValue );
     }
 
 
@@ -400,6 +405,17 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    /**
+     * Returns the values which *must* for the specified parameter name.
+     **/
+    String[] getRequiredValues( String name ) {
+        Object result = getParameterRequiredValues().get( name );
+        if (result instanceof String[]) return (String[]) result;
+        if (result instanceof String) return new String[] { (String) result };
+        return new String[0];
+    }
+
+
 //---------------------------------- private members --------------------------------
 
     /** The type of a parameter which accepts any text. **/
@@ -496,6 +512,46 @@ public class WebForm extends WebRequestSource {
         return _defaults;
     }
 
+    private Hashtable _required;
+
+    private Hashtable getParameterRequiredValues() {
+        if (_required == null) {
+            NamedNodeMap[] parameters = getParameters();
+            Hashtable required = new Hashtable();
+            for (int i = 0; i < parameters.length; i++) {
+                String name  = getValue( parameters[i].getNamedItem( "name" ) );
+                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
+                if (type == null || type.length() == 0) type = "TEXT";
+                if (parameters[i].getNamedItem( "readonly" ) == null) continue;
+
+                if (type.equals( "TEXT" ) || type.equals( "HIDDEN" ) || type.equals( "PASSWORD" )) {
+                    required.put( name, value );
+                } else if (type.equals( "RADIO" ) && parameters[i].getNamedItem( "checked" ) != null) {
+                    required.put( name, value );
+                } else if (type.equals( "CHECKBOX" ) && parameters[i].getNamedItem( "checked" ) != null) {
+                    if (value.length() == 0) value = "on";
+                    String[] currentDefaults = (String[]) required.get( name );
+                    if (currentDefaults == null) {
+                        required.put( name, new String[] { value } );
+                    } else {
+                        required.put( name, withNewValue( currentDefaults, value ) );
+                    }
+                }
+            }
+            HTMLSelectElement[] selections = getSelections();
+            for (int i = 0; i < selections.length; i++) {
+                if (selections[i].isDisabled()) required.put( selections[i].getName(), selections[i].getSelected() );
+            }
+            HTMLTextAreaElement[] textAreas = getTextAreas();
+            for (int i = 0; i < textAreas.length; i++) {
+                if (textAreas[i].isReadOnly()) required.put( textAreas[i].getName(), textAreas[i].getValue() );
+            }
+            _required = required;
+        }
+        return _required;
+    }
+
 
     private Hashtable getParameterOptions() {
         if (_options == null) {
@@ -520,7 +576,9 @@ public class WebForm extends WebRequestSource {
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null || type.length() == 0) type = "TEXT";
 
-                if (type.equals( "RADIO" ) || type.equals( "CHECKBOX" )) {
+                if ((type.equals( "RADIO" ) || type.equals( "CHECKBOX" ))
+                     && (parameters[i].getNamedItem( "readonly" ) == null
+                         || parameters[i].getNamedItem( "checked" ) != null)) {
                     if (value.length() == 0 && type.equals( "CHECKBOX" )) value = "on";
                     String[] radioOptions = (String[]) options.get( name );
                     if (radioOptions == null) {
@@ -739,6 +797,11 @@ public class WebForm extends WebRequestSource {
         }
 
 
+        boolean isDisabled() {
+            return _node.getAttributes().getNamedItem( "disabled" ) != null;
+        }
+
+
         private String getOptionValue( Node optionNode ) {
             NamedNodeMap nnm = optionNode.getAttributes();
             if (nnm.getNamedItem( "value" ) != null) {
@@ -776,6 +839,10 @@ public class WebForm extends WebRequestSource {
 
         String getValue() {
             return NodeUtils.asText(_node.getChildNodes() );
+        }
+
+        boolean isReadOnly() {
+            return _node.getAttributes().getNamedItem( "readonly" ) != null;
         }
     }
 

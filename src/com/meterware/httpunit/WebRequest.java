@@ -487,6 +487,12 @@ public class WebRequest {
 
     private void validateParameterValue( String name, String value ) {
         if (_sourceForm == null) return;
+        validateOneParameterValue( name, value );
+        validateRequiredValues( name, new String[] { value } );
+    }
+
+
+    private void validateOneParameterValue( String name, String value ) {
         if (_sourceForm.isTextParameter( name )) return;
         if (_sourceForm.isFileParameter( name )) throw new IllegalFileParameterException( name );
         if (!inArray( name, _sourceForm.getParameterNames() )) throw new NoSuchParameterException( name );
@@ -504,7 +510,16 @@ public class WebRequest {
             }
         }
 
-        for (int i = 0; i < values.length; i++) validateParameterValue( name, values[i] );
+        for (int i = 0; i < values.length; i++) validateOneParameterValue( name, values[i] );
+        validateRequiredValues( name, values );
+    }
+
+
+    private void validateRequiredValues( String name, String[] values ) {
+        String[] required = _sourceForm.getRequiredValues( name );
+        for (int i = 0; i < required.length; i++) {
+            if (!inArray( required[i], values )) throw new MissingParameterValueException( name, required[i], values );
+        }
     }
 
 
@@ -642,6 +657,41 @@ class IllegalParameterValueException extends IllegalRequestParameterException {
     private String   _parameterName;
     private String   _badValue;
     private String[] _allowedValues;
+}
+
+
+//============================= exception class MissingParameterValueException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to remove a required value from a form parameter.
+ **/
+class MissingParameterValueException extends IllegalRequestParameterException {
+
+
+    MissingParameterValueException( String parameterName, String missingValue, String[] proposed ) {
+        _parameterName  = parameterName;
+        _missingValue   = missingValue;
+        _proposedValues = proposed;
+    }
+
+
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer();
+        sb.append( "Parameter '" ).append( _parameterName ).append( "' must have the value '" );
+        sb.append( _missingValue ).append( "'. Attempted to set it to: { " );
+        for (int i = 0; i < _proposedValues.length; i++) {
+            if (i != 0) sb.append( ", " );
+            sb.append( _proposedValues[i] );
+        }
+        sb.append( " }" );
+        return sb.toString();
+    }
+
+
+    private String   _parameterName;
+    private String   _missingValue;
+    private String[] _proposedValues;
 }
 
 

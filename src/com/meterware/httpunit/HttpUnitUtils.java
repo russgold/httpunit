@@ -48,7 +48,7 @@ public class HttpUnitUtils {
      * Returns an interpretation of the specified URL-encoded string.
      * FIXME: currently assumes iso-8859-1 character set.
      **/
-    static String decode( String byteString ) {
+    public static String decode( String byteString ) {
         StringBuffer sb = new StringBuffer();
         char[] chars = byteString.toCharArray();
         char[] hexNum = { '0', '0', '0' };

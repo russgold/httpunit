@@ -43,6 +43,7 @@ public class ServletUnitSuite {
         suite.addTest( SessionTest.suite() );
         suite.addTest( NavigationTest.suite() );
         suite.addTest( ConfigTest.suite() );
+        suite.addTest( WebXMLTest.suite() );
         return suite;
     }
 

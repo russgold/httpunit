@@ -67,6 +67,14 @@ class HttpWebResponse extends WebResponse {
     }
 
 
+    /**
+     * Returns the response message associated with this response.
+     **/
+    public String getResponseMessage() {
+        return _responseMessage;
+    }
+
+
     public String[] getHeaderFieldNames() {
         Vector names = new Vector();
         for (Enumeration e = _headers.keys(); e.hasMoreElements();) {
@@ -98,22 +106,26 @@ class HttpWebResponse extends WebResponse {
     final private static String FILE_ENCODING = System.getProperty( "file.encoding" );
 
 
-    private int       _responseCode = HttpURLConnection.HTTP_OK;
+    private int       _responseCode    = HttpURLConnection.HTTP_OK;
+    private String    _responseMessage = "OK";
 
     private Hashtable _headers = new Hashtable();
 
     
-    private int getResponseCode( URLConnection connection, String statusHeader ) {
-        if (statusHeader == null) throw new HttpNotFoundException( connection.getURL().toExternalForm() );
+    private void readResponseHeader( URLConnection connection ) {
+        if (connection.getHeaderField(0) == null) throw new HttpNotFoundException( connection.getURL() );
 
-        StringTokenizer st = new StringTokenizer( statusHeader );
+        StringTokenizer st = new StringTokenizer( connection.getHeaderField(0) );
     	st.nextToken();
     	if (!st.hasMoreTokens()) {
-    	    return HttpURLConnection.HTTP_OK;
+    	    _responseCode = HttpURLConnection.HTTP_OK;
+            _responseMessage = "OK";
     	} else try {
-    	    return Integer.parseInt( st.nextToken() );
+    	    _responseCode = Integer.parseInt( st.nextToken() );
+            _responseMessage = st.hasMoreTokens() ? st.nextToken() : "";
     	} catch (NumberFormatException e) {
-    	    return HttpURLConnection.HTTP_INTERNAL_ERROR;
+    	    _responseCode = HttpURLConnection.HTTP_INTERNAL_ERROR;
+            _responseMessage = "Cannot parse response header";
     	}
     }
 
@@ -121,9 +133,10 @@ class HttpWebResponse extends WebResponse {
     private void readHeaders( URLConnection connection ) {
         loadHeaders( connection );
         if (connection instanceof HttpURLConnection) {
-            _responseCode = getResponseCode( connection, connection.getHeaderField(0) );
+            readResponseHeader( connection );
         } else {
             _responseCode = HttpURLConnection.HTTP_OK;
+            _responseMessage = "OK";
             if (connection.getContentType().startsWith( "text" )) {
                 setContentTypeHeader( connection.getContentType() + "; charset=" + FILE_ENCODING );
             }

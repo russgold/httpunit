@@ -99,11 +99,11 @@ public class StatelessTest extends TestCase {
         ServletRunner sr = new ServletRunner();
         sr.registerServlet( resourceName, ParameterServlet.class.getName() );
 
-        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName + "?color=red" );
+        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName + "?color=dark+red" );
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
-        assertEquals( "requested resource", "You selected red", response.getText() );
+        assertEquals( "requested resource", "You selected dark red", response.getText() );
     }
 
     public void testSimplePost() throws Exception {

@@ -33,6 +33,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.HttpUnitUtils;
 
 
 /**
@@ -338,8 +339,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * been read.
      **/
     public Enumeration getParameterNames() {
-        throwNotImplementedYet();
-        return null;
+        return _parameters.keys();
     }
 
 
@@ -647,15 +647,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private void addParameter( String name, String encodedValue ) {
         String[] values = (String[]) _parameters.get( name );
         if (values == null) {
-            _parameters.put( name, new String[] { decode( encodedValue ) } );
+            _parameters.put( name, new String[] { HttpUnitUtils.decode( encodedValue ) } );
         } else {
-            _parameters.put( name, extendedArray( values, decode( encodedValue ) ) );
+            _parameters.put( name, extendedArray( values, HttpUnitUtils.decode( encodedValue ) ) );
         }
-    }
-
-
-    private String decode( String encodedValue ) {
-        return encodedValue;     // FIXME
     }
 
 

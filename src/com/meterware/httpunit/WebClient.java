@@ -256,11 +256,11 @@ public class WebClient {
             throw new AuthorizationRequiredException( response.getHeaderField( "WWW-Authenticate" ) );
         } else if (!HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            throw new HttpInternalErrorException( response.getURL().toExternalForm() );
+            throw new HttpInternalErrorException( response.getURL() );
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new HttpNotFoundException( response.getURL().toExternalForm() );        
+            throw new HttpNotFoundException( response.getURL() );
         } else if (response.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
-            throw new HttpException( response.getResponseCode(), response.getURL().toExternalForm() );
+            throw new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
         }
     }
 

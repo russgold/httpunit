@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.util.Properties;
 import java.io.*;
+import java.net.URL;
 
 
 /**
@@ -36,19 +37,25 @@ public class HttpException extends RuntimeException {
     }
 
 
-    HttpException( int responseCode, String reason ) {
-        _reason = reason;
+    HttpException( int responseCode, String responseMessage, URL baseURL ) {
+        _responseMessage = responseMessage;
         _responseCode = responseCode;
+        _url = baseURL;
     }
 
 
     public String getMessage() {
         StringBuffer sb = new StringBuffer( "Error on HTTP request: " );
         sb.append( _responseCode );
-        if (_reason != null) {
+        if (_responseMessage != null) {
+            sb.append( " " );
+            sb.append( _responseMessage );
+            sb.append( "" );
+        }
+        if (_url != null) {
             sb.append( " [" );
-            sb.append( _reason );
-            sb.append( " ]" );
+            sb.append( _url.toExternalForm() );
+            sb.append( "]" );
         }
         return sb.toString();
     }
@@ -59,9 +66,15 @@ public class HttpException extends RuntimeException {
     }
 
 
-    private int _responseCode;
+    public String getResponseMessage() {
+        return _responseMessage;
+    }
 
-    private String _reason;
+
+    private int _responseCode;
+    private URL _url;
+
+    private String _responseMessage;
 
 
 }
