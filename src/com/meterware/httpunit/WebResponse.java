@@ -455,6 +455,15 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+     /**
+      * Returns all tables found in the page matching the specified criteria.
+      * @exception SAXException thrown if there is an error parsing the response.
+      **/
+     public WebTable[] getMatchingTables( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+         return getReceivedPage().getMatchingTables( predicate, criteria );
+     }
+
+
     /**
      * Returns the first table in the response which has the specified text as the full text of
      * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.

@@ -13,24 +13,31 @@ Limitations:
 
 
 Revision History:
+ 4-Apr-2003
+Acknowledgements:
+    Thanks to George Murnock for adding WebResponse.getMatchingTables()
+
+Additions:
+   11. WebResponse and TableCell now have getMatchingTables to return all tables matching the specified criteria.
+
  2-Apr-2003
 Acknowledgments:
     Thanks to Sergey Bondarenko for supplying a test for getElementsByTagName
     Thanks to Andrew Bickerton for showing how to handle responses with content-length 0
 
 Problems Fixed:
-    1. HttpUnit was delaying until a timeout when a zero-length response was received
+   17. HttpUnit was delaying until a timeout when a zero-length response was received
 
 Additions:
-    1. Added support for getElementsByTagName to Document and Form
+   10. Added support for getElementsByTagName to Document and Form
 
  1-Apr-2003
 Additions:
-    1. Added format parameter for JUnitServlet: values are "text" or "html"
+    9. Added format parameter for JUnitServlet: values are "text" or "html"
 
 Problems fixed:
-    1. HttpUnit now handles refresh headers without explicit URLs, defaulting to refreshing the containing page.
-    2. Bug #709979: Select.selectedIndex was returning -1 for a normal select box with no options explicitly selected.
+   15. HttpUnit now handles refresh headers without explicit URLs, defaulting to refreshing the containing page.
+   16. Bug #709979: Select.selectedIndex was returning -1 for a normal select box with no options explicitly selected.
 
 28-Mar-2003
 Acknowledgements:
@@ -41,28 +48,28 @@ Acknowledgements:
     Thanks to Mark Luty for supplying a test for the getElementsByName function.
 
 Additions:
-    1. Document.getElementsByName is now supported
+    8. Document.getElementsByName is now supported
 
 26-Mar-2003
 Problems fixed:
-    1. HttpUnit was chopping off javascript urls if they contained a '#' character.
+   14. HttpUnit was chopping off javascript urls if they contained a '#' character.
 
 24-Mar-2003
 Acknowledgements:
     Thanks to Andrew Bickerton for identifying the javascript parent frame update problem and suggesting a fix.
 
 Problems fixed:
-    1. Following a javascript link which updated a parent frame via manipulating the location was causing a 'NoSuchFrame'
+   13. Following a javascript link which updated a parent frame via manipulating the location was causing a 'NoSuchFrame'
        exception to be thrown.
 
  23-Mar-2003
 Problems fixed:
-    1. ServletUnit had not implemented HttpServletRequest.getURL();
-    2. ServletUnit was always supplying a charset parameter, even when not requested.
+   11. ServletUnit had not implemented HttpServletRequest.getURL();
+   12. ServletUnit was always supplying a charset parameter, even when not requested.
 
  20-Mar-2003
 Problems fixed:
-    1. ServletUnit had not implemented HttpServletRequest.getContentLength();
+   10. ServletUnit had not implemented HttpServletRequest.getContentLength();
 
  19-Mar-2003
 Acknowledgements:
@@ -70,26 +77,26 @@ Acknowledgements:
     Thanks to Andrew Bickerton for correcting the document.write append problem.
 
 Problems fixed:
-    1. ServletUnit was creating a new session if the current one was not valid, even if "create" was not specified.
-    2. calling document.write on a closed document was appending to rather than replacing its contents.
+    8. ServletUnit was creating a new session if the current one was not valid, even if "create" was not specified.
+    9. calling document.write on a closed document was appending to rather than replacing its contents.
 
 Additions:
-    1. PseudoServer now handles persistent connections.
-    2. ClientProperties now supports a listener which allows for the override of DNS mapping, allowing a client
+    6. PseudoServer now handles persistent connections.
+    7. ClientProperties now supports a listener which allows for the override of DNS mapping, allowing a client
        to supply an actual IP address for a host programatically. The original Host header will be retained.
 
  17-Mar-2003
 Problems fixed:
-    1. The Content-Length header was not being sent with requests in ServletUnit.
-    2. ServletUnit's HttpServletRequest.getIntHeader() always returned -1.
+    6. The Content-Length header was not being sent with requests in ServletUnit.
+    7. ServletUnit's HttpServletRequest.getIntHeader() always returned -1.
 
  16-Mar-2003
 Acknowledgements:
     Thanks to Brendan Boesen for adding a method to access session IDs in ServletUnitContext.
 
 Additions:
-    1. You can now get at the stored session IDs in ServletUnitContext.
-    2. ServletUnit now supports HttpServletRequest.getRequestDispatch()
+    4. You can now get at the stored session IDs in ServletUnitContext.
+    5. ServletUnit now supports HttpServletRequest.getRequestDispatch()
 
 Notes:
     1. The acceptCookies, acceptGzip, autoRefresh and autoForward properties have been moved from HttpUnitOptions to ClientProperties,
@@ -99,21 +106,21 @@ Notes:
 
  14-Mar-2003
 Problems fixed:
-    1. When loading a page triggered a script function which redirected to a new page in the same frame,
+    5. When loading a page triggered a script function which redirected to a new page in the same frame,
        the WebResponse returned from getResponse was the triggering page. It is now the redirected page.
 
  13-Mar-2003
 Additions:
-    1. Select.value is now supported.
-    2. Added WebForm.getButton() method using HTMLPredicate to permit more generalized button searches.
+    2. Select.value is now supported.
+    3. Added WebForm.getButton() method using HTMLPredicate to permit more generalized button searches.
 
  12-Mar-2003
 Acknowledgements:
     Thanks to Daniel Jasmin for fixing the handling of applet loading from archives.
 
 Problems fixed:
-    1. Applets were not loading properly from applets if a codebase was specified in the <applet> tag.
-    2. Bug #700889: Under certain cases, multiple <script> sections in a document caused a problem where only those HTML elements
+    3. Applets were not loading properly from applets if a codebase was specified in the <applet> tag.
+    4. Bug #700889: Under certain cases, multiple <script> sections in a document caused a problem where only those HTML elements
        defined before the first one were actually available to the scripts.
 
   9-Mar-2003

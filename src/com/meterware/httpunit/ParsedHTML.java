@@ -709,6 +709,15 @@ class ParsedHTML {
         return getTableSatisfyingPredicate( getTables(), predicate, criteria );
     }
 
+     /**
+      * Returns the tables in the response which match the specified predicate and value.
+      * Will recurse into any nested tables, as needed.
+      * @return the selected tables, or null if none are found
+      **/
+     public WebTable[] getMatchingTables( HTMLElementPredicate predicate, Object criteria ) {
+         return getTablesSatisfyingPredicate( getTables(), predicate, criteria );
+     }
+
 
     /**
      * Returns the first table in the response which has the specified text as the full text of
@@ -853,6 +862,39 @@ class ParsedHTML {
         return null;
     }
 
+
+     /**
+      * Returns the tables which match the specified criteria.
+      **/
+     private WebTable[] getTablesSatisfyingPredicate(WebTable[] tables, HTMLElementPredicate predicate, Object value) {
+         ArrayList matches = new ArrayList();
+         for (int i = 0; i < tables.length; i++) {
+             if (predicate.matchesCriteria(tables[i], value)) {
+                 matches.add(tables[i]);
+             }
+             for (int j = 0; j < tables[i].getRowCount(); j++) {
+                 for (int k = 0; k < tables[i].getColumnCount(); k++) {
+                     TableCell cell = tables[i].getTableCell(j, k);
+                     if (cell != null) {
+                         WebTable[] innerTables = cell.getTables();
+                         if (innerTables.length != 0) {
+                             WebTable[] result = getTablesSatisfyingPredicate(innerTables, predicate, value);
+                             if (result != null && result.length > 0) {
+                                 for (int l = 0; l < result.length; l++) {
+                                     matches.add(result[l]);
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+         }
+         if(matches.size() > 0) {
+             return (WebTable[]) matches.toArray( new WebTable[ matches.size() ] );
+         } else {
+             return null;
+         }
+     }
 
 
     class WebIFrame extends WebFrame implements ContentConcealer {
