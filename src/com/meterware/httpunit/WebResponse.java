@@ -426,17 +426,22 @@ public class WebResponse implements HTMLSegment {
 
     private WebFrame[] getFrames() throws SAXException {
         if (_frames == null) {
-            NodeList nl = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
             Vector list = new Vector();
-            for (int i = 0; i < nl.getLength(); i++) {
-                Node child = nl.item(i);
-                list.addElement( new WebFrame( getReceivedPage().getBaseURL(), child ) );
-            }
+            addFrameTags( list, "frame" );
             _frames = new WebFrame[ list.size() ];
             list.copyInto( _frames );
         }
 
         return _frames;
+    }
+
+
+    private void addFrameTags( Vector list, String frameTagName ) throws SAXException {
+        NodeList nl = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), frameTagName );
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node child = nl.item(i);
+            list.addElement( new WebFrame( getReceivedPage().getBaseURL(), child ) );
+        }
     }
 
 

@@ -19,6 +19,8 @@ Acknowledgements:
 11-Jun-01
 Additions:
     1. Added getInputStream method in WebResponse to support non-text responses.
+    2. Matching of text in web pages is now controlled by the HttpUnitOption property
+       'matchesIgnoreCase'. The default behavior is as before - matches are not case sensitive
 
  6-Jun-01
 Additions:

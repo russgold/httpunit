@@ -103,13 +103,12 @@ class ParsedHTML {
     public WebLink getLinkWith( String text ) {
         WebLink[] links = getLinks();
         for (int i = 0; i < links.length; i++) {
-            String linkText = NodeUtils.asText( links[i].getDOMSubtree().getChildNodes() ).toUpperCase();
-            if (linkText.indexOf( text.toUpperCase() ) >= 0) {
-                return links[i];
-            }
+            String linkText = NodeUtils.asText( links[i].getDOMSubtree().getChildNodes() );
+            if (contains( linkText, text )) return links[i];
         }
         return null;
     }
+
 
 
     /**
@@ -121,7 +120,10 @@ class ParsedHTML {
             NodeList nl = ((Element) links[i].getDOMSubtree()).getElementsByTagName( "img" );
             for (int j = 0; j < nl.getLength(); j++) {
                 NamedNodeMap nnm = nl.item(j).getAttributes();
-                if (text.equalsIgnoreCase( getValue( nnm.getNamedItem( "alt" ) ) )) {
+                if (text.equals( getValue( nnm.getNamedItem( "alt" ) ) )) {
+                    return links[i];
+                } else if (HttpUnitOptions.getMatchesIgnoreCase() &&
+                           text.equalsIgnoreCase( getValue( nnm.getNamedItem( "alt" ) ) )) {
                     return links[i];
                 }
             }
@@ -149,7 +151,7 @@ class ParsedHTML {
             public boolean isTrue( WebTable table ) {
                 table.purgeEmptyCells();
                 return table.getRowCount() > 0 &&
-                       table.getCellAsText(0,0).equalsIgnoreCase( text );
+                       matches( table.getCellAsText(0,0), text );
             }
         } );
     }
@@ -160,13 +162,12 @@ class ParsedHTML {
      * in its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableStartingWithPrefix( String text ) {
-        final String prefix = text.toUpperCase();
+    public WebTable getTableStartingWithPrefix( final String text ) {
         return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
             public boolean isTrue( WebTable table ) {
                 table.purgeEmptyCells();
                 return table.getRowCount() > 0 &&
-                       table.getCellAsText(0,0).toUpperCase().startsWith( prefix );
+                       hasPrefix( table.getCellAsText(0,0).toUpperCase(), text );
             }
         } );
     }
@@ -180,7 +181,7 @@ class ParsedHTML {
     public WebTable getTableWithSummary( final String summary ) {
         return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
             public boolean isTrue( WebTable table ) {
-                return table.getSummary().equalsIgnoreCase( summary );
+                return matches( table.getSummary(), summary );
             }
         } );
     }
@@ -194,7 +195,7 @@ class ParsedHTML {
     public WebTable getTableWithID( final String ID ) {
         return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
             public boolean isTrue( WebTable table ) {
-                return table.getID().equalsIgnoreCase( ID );
+                return matches( table.getID(), ID );
             }
         } );
     }
@@ -263,6 +264,33 @@ class ParsedHTML {
     private String _baseTarget;
 
     private String _characterSet;
+
+
+    private boolean contains( String string, String substring ) {
+        if (HttpUnitOptions.getMatchesIgnoreCase()) {
+            return string.toUpperCase().indexOf( substring.toUpperCase() ) >= 0;
+        } else {
+            return string.indexOf( substring ) >= 0;
+        }
+    }
+
+
+    private boolean hasPrefix( String string, String prefix ) {
+        if (HttpUnitOptions.getMatchesIgnoreCase()) {
+            return string.toUpperCase().startsWith( prefix.toUpperCase() );
+        } else {
+            return string.startsWith( prefix );
+        }
+    }
+
+
+    private boolean matches( String string1, String string2 ) {
+        if (HttpUnitOptions.getMatchesIgnoreCase()) {
+            return string1.equalsIgnoreCase( string2 );
+        } else {
+            return string1.equals( string2 );
+        }
+    }
 
 
     private String getValue( Node node ) {

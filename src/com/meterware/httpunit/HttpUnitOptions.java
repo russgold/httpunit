@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -106,6 +106,24 @@ public class HttpUnitOptions {
 
 
     /**
+     * If true, text matches in methods such as {@link HTMLFragment#getLinkWith} are
+     * case insensitive. The default is true (matches ignore case).
+     **/
+    public static boolean getMatchesIgnoreCase() {
+        return _matchesIgnoreCase;
+    }
+
+
+    /**
+     * If true, text matches in methods such as {@link HTMLFragment#getLinkWith} are
+     * case insensitive. The default is true (matches ignore case).
+     **/
+    public static void setMatchesIgnoreCase( boolean ignoreCase ) {
+        _matchesIgnoreCase = ignoreCase;
+    }
+
+
+    /**
      * Returns true if HTTP headers are to be dumped to system output.
      **/
     public static boolean isLoggingHttpHeaders() {
@@ -152,6 +170,8 @@ public class HttpUnitOptions {
     private static boolean _imagesTreatedAsAltText;
 
     private static boolean _loggingHttpHeaders;
+
+    private static boolean _matchesIgnoreCase = true;
 
     private static int _redirectDelay;
 

@@ -163,15 +163,22 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
-    private WebResponse getFrameWithURL( WebConversation wc, String urlString ) {
+    private String getNameOfFrameWithURL( WebConversation wc, String urlString ) {
         String[] names = wc.getFrameNames();
         for (int i = 0; i < names.length; i++) {
             WebResponse candidate = wc.getFrameContents( names[i] );
             if (candidate.getURL().toExternalForm().indexOf( urlString ) >= 0) {
-                return candidate;
+                return names[i];
             }
         }
         return null;
+    }
+
+
+    private WebResponse getFrameWithURL( WebConversation wc, String urlString ) {
+        String name = getNameOfFrameWithURL( wc, urlString );
+        if (name == null) return null;
+        return wc.getFrameContents( name );
     }
 
 

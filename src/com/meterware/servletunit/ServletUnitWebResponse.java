@@ -20,8 +20,10 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 
+import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
@@ -81,6 +83,14 @@ class ServletUnitWebResponse extends WebResponse {
     }
 
 
+    /**
+     * Returns an input stream for reading the contents of this reply.
+     **/
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream( getText().getBytes() );
+    }
+
+    
     public String toString() {
         return "[ _response = " + _response + "]";
     }
