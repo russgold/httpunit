@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Locale;
+import java.net.MalformedURLException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -206,19 +207,6 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
-    public void testSessionCreation() throws Exception {
-        WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
-        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
-
-        HttpSession session = request.getSession( /* create */ false );
-        assertNull( "Unexpected session found", session );
-
-        session = request.getSession();
-        assertNotNull( "No session created", session );
-        assertTrue( "Session not marked as new", session.isNew() );
-    }
-
-
     public void testDefaultCookies() throws Exception {
         WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
         HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
@@ -239,16 +227,42 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals( "Cookie value", "vanilla", cookies[0].getValue() );
     }
 
+    public void testGetSessionForFirstTime() throws MalformedURLException {
 
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+        ServletUnitContext context = new ServletUnitContext();
+        assertEquals( "Initial number of sessions in context", 0, context.getSessionIDs().size() );
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
+        assertNull( "New request should not have a request session ID", request.getRequestedSessionId() );
+        assertNull( "New request should not have a session", request.getSession( /* create */ false ) );
+        assertEquals( "Number of sessions in the context after request.getSession(false)", 0, context.getSessionIDs().size() );
+
+        HttpSession session = request.getSession();
+        assertNotNull( "No session created", session );
+        assertTrue( "Session not marked as new", session.isNew() );
+        assertEquals( "Number of sessions in context after request.getSession()", 1, context.getSessionIDs().size() );
+        assertSame( "Session with ID", session, context.getSession( session.getId() ) );
+        assertNull( "New request should still not have a request session ID", request.getRequestedSessionId() );
+    }
+
+
+    /**
+     * Verifies that even when session creation is not explicitly requested, the inclusion of a session cookie
+     * will cause a session to be made available.
+     */
     public void testRetrieveSession() throws Exception {
         WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
         ServletUnitContext context = new ServletUnitContext();
 
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, context.newSession().getId() ) );
+        final ServletUnitHttpSession session = context.newSession();
+        final String sessionID = session.getId();
+        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, sessionID ) );
+        assertEquals( "Requested session ID defined in request", sessionID, request.getRequestedSessionId() );
 
-        HttpSession session = request.getSession( /* create */ false );
-        assertNotNull( "No session created", session );
+        assertSame( "Session returned when creation not requested", session, request.getSession( /* create */ false ) );
+        assertSame( "Session returned when creation requested", session, request.getSession( true ) );
     }
 
 
@@ -282,6 +296,29 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
+    /**
+     * Verifies that a request with a bad session ID causes a new session to be generated only when explicitly requested.
+     */
+    public void testGetSessionWithBadCookie() throws Exception {
+        WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
+        ServletUnitContext context = new ServletUnitContext();
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
+
+        HttpSession originalSession = context.newSession();
+        String originalID = originalSession.getId();
+        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
+        request.getSession();
+
+        String badID = originalID + "BAD";
+        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
+        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, badID ) );
+
+        assertNull( "Unexpected session returned for bad cookie", request.getSession( false ) );
+        assertNotNull( "Should have returned session when asked", request.getSession( true ));
+        assertNotSame( "Created session", originalSession, request.getSession( true ) );
+    }
+
+
     public void testGetRequestURI() throws Exception {
         ServletUnitContext context = new ServletUnitContext();
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
@@ -303,6 +340,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
         verifyLocales( request, expectedLocales );
 
     }
+
 
     public void testSecureProperty() throws Exception {
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");

@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+ 16-Mar-2003
+Acknowledgements:
+    Thanks to Brendan Boesen for adding a method to access session IDs in ServletUnitContext.
+
+Additions:
+    1. You can now get at the stored session IDs in ServletUnitContext.
+
  14-Mar-2003
 Problems fixed:
     1. When loading a page triggered a script function which redirected to a new page in the same frame,

@@ -21,6 +21,7 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 
 
+import java.util.*;
 import java.util.Hashtable;
 
 class ServletUnitContext {
@@ -33,6 +34,10 @@ class ServletUnitContext {
         _contextPath = (contextPath != null ? contextPath : "");
     }
 
+	Set getSessionIDs() {
+		return _sessions.keySet();
+	}
+	
     /**
      * Returns the session with the specified ID, if any.
      **/
