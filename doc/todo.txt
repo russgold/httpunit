@@ -1,5 +1,7 @@
 o Integrate PUT method (written by Marcos Tarruella, et. al.)
 o Support <META HTTP_EQUIV=REFRESH tags>
+o Support reset button detection
+o Send parameters in proper (HTML-file) order
 o Add support for POST/PUT to contain user-specified data and content-type
   taken either from file or a string
 o Documentation, Documentation

@@ -49,6 +49,16 @@ public class PseudoServerTest extends TestCase {
     }
 
 
+    public void testNoSuchServer() throws Exception {
+        WebConversation wc = new WebConversation();
+
+        try {
+            WebResponse response = wc.getResponse( "http://no.such.host" );
+        } catch (HttpNotFoundException e) {
+        }
+    }
+
+
     public void testNotFound() throws Exception {
         PseudoServer ps = new PseudoServer();
         int port = ps.getConnectedPort();

@@ -10,6 +10,16 @@ Limitations: HttpUnit does not support JavaScript
 
                             
 Revision History:
+Acknowledgements:
+    Thanks to Rolf Schmidiger for corrected behavior when failing to find a site
+    
+31-May-01
+Problems corrected:
+    1. Now throws HttpNotFoundException rather than NullPointerException when
+       unable to connect to a web site
+    2. I/O exceptions when accessing a site are now thrown, rather than being
+       turned into RuntimeException.
+
 
 22-May-01
 Additions:

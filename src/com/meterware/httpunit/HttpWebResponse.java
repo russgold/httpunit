@@ -87,7 +87,7 @@ class HttpWebResponse extends WebResponse {
 
     private Hashtable _headers = new Hashtable();
 
-    private void loadResponseText( URL url, URLConnection connection ) throws FileNotFoundException {
+    private void loadResponseText( URL url, URLConnection connection ) throws IOException {
         StringBuffer sb = new StringBuffer();
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -111,13 +111,13 @@ class HttpWebResponse extends WebResponse {
                 e.fillInStackTrace();
                 throw e;
             }
-        } catch (IOException e) {
-            throw new RuntimeException( "Unable to retrieve data from URL: " + url.toExternalForm() + " (" + e + ")" );
         }
     }
 
 
-    private int getResponseCode( String statusHeader ) {
+    private int getResponseCode( URLConnection connection, String statusHeader ) {
+        if (statusHeader == null) throw new HttpNotFoundException( connection.getURL().toExternalForm() );
+
         StringTokenizer st = new StringTokenizer( statusHeader );
     	st.nextToken();
     	if (!st.hasMoreTokens()) {
@@ -159,7 +159,7 @@ class HttpWebResponse extends WebResponse {
     private void readHeaders( URLConnection connection ) {
         loadHeaders( connection );
         if (connection instanceof HttpURLConnection) {
-            _responseCode = getResponseCode( connection.getHeaderField(0) );
+            _responseCode = getResponseCode( connection, connection.getHeaderField(0) );
         } else {
             _responseCode = HttpURLConnection.HTTP_OK;
             if (getContentType().startsWith( "text" )) {
