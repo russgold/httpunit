@@ -90,7 +90,7 @@ public class ServletUnitClient extends WebClient {
     /**
      * Returns the session that would be used by the next request (if it asks for one).
      * @param create if true, will create a new session if no valid session is defined.
-     * @since 1.5.5
+     * @since 1.6
      */
     public HttpSession getSession( boolean create ) {
         HttpSession session = _invocationContextFactory.getSession( getCookieValue( ServletUnitHttpSession.SESSION_COOKIE_NAME ), create );

@@ -21,8 +21,11 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 
 /**
+ * An immutable class which describes the position of a frame in the window hierarchy.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ *
+ * @since 1.6
  **/
 public class FrameSelector {
 
@@ -34,7 +37,7 @@ public class FrameSelector {
     private FrameSelector _parent;
 
 
-    public FrameSelector() {
+    FrameSelector() {
         _name = super.toString();
     }
 

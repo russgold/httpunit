@@ -51,6 +51,7 @@ public interface InvocationContext {
 
     /**
      * Invokes the current servlet or filter.
+     * @since 1.6
      */
     void service() throws ServletException, IOException;
 
@@ -71,6 +72,7 @@ public interface InvocationContext {
 
     /**
      * Returns the target frame for the original request.
+     * @since 1.6
      */
     FrameSelector getFrame();
 
@@ -95,18 +97,21 @@ public interface InvocationContext {
 
     /**
      * Returns true if the current context is a filter, rather than a servlet.
+     * @since 1.6
      */
     boolean isFilterActive();
 
 
     /**
      * Returns the current active filter object. Only valid to call if {@link #isFilterActive} returns true.
+     * @since 1.6
      */
     Filter getFilter() throws ServletException;
 
 
     /**
      * Returns the current filter chain. Only valid to call if {@link #isFilterActive} returns true.
+     * @since 1.6
      */
     FilterChain getFilterChain();
 
@@ -121,6 +126,7 @@ public interface InvocationContext {
      *
      * @param request the request to pass to the next filter. May be a wrapper.
      * @param response the response object to pass to the next filter. May be a wrapper.
+     * @since 1.6
      */
     void pushFilter( ServletRequest request, ServletResponse response );
 

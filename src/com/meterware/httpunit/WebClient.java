@@ -135,7 +135,7 @@ public class WebClient {
      * Returns the response associated with the specified frame name in the main window.
      * Throws a runtime exception if no matching frame is defined.
      *
-     * @since 1.5.5
+     * @since 1.6
      **/
     public WebResponse getFrameContents( FrameSelector targetFrame ) {
         return _mainWindow.getFrameContents( targetFrame );
@@ -164,7 +164,7 @@ public class WebClient {
 
     /**
      * Defines a cookie to be sent to the server on every request.
-     * @deprecated as of 1.5.5, use #putCookie instead.
+     * @deprecated as of 1.6, use #putCookie instead.
      **/
     public void addCookie( String name, String value ) {
         _cookieJar.addCookie( name, value );
@@ -238,6 +238,8 @@ public class WebClient {
 
     /**
      * Specifies a proxy server to use, along with a user and password for authentication.
+     *
+     * @since 1.6
      */
     public void setProxyServer( String proxyHost, int proxyPort, String userName, String password ) {
         setProxyServer( proxyHost, proxyPort );

@@ -29,6 +29,8 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
  * Represents a block-level element such as a paragraph or table cell, which can contain other elements.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ *
+ * @since 1.6
  **/
 abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HTMLElement {
 

@@ -24,6 +24,7 @@ package com.meterware.httpunit;
  * An exception thrown when an action URL is not supported.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @since 1.6
  **/
 public class UnsupportedActionException extends RuntimeException {
 

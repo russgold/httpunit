@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2003, Russell Gold
+* Copyright (c) 2001-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,8 +30,10 @@ import java.util.Hashtable;
 
 /**
  * Represents a single HTTP request, extracted from the input stream.
+ *
+ * @since 1.6
  */
-public class HttpRequest extends ReceivedHttpMessage {
+class HttpRequest extends ReceivedHttpMessage {
 
     private String         _protocol;
     private String         _command;

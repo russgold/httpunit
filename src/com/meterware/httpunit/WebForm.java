@@ -75,7 +75,7 @@ public class WebForm extends WebRequestSource {
      * Will usually return the result of that submission; however, if the submit button's 'onclick'
      * or the form's 'onsubmit' event is triggered and
      * inhibits the submission, will return the updated contents of the frame containing this form.
-     * @since 1.5.5
+     * @since 1.6
      **/
     public WebResponse submit( SubmitButton button, int x, int y ) throws IOException, SAXException {
         return button.doOnClickEvent() ? doFormSubmit( button, x, y ) : getCurrentFrameContents();
@@ -84,7 +84,7 @@ public class WebForm extends WebRequestSource {
 
     /**
      * Submits this form using the web client from which it was originally obtained, ignoring any buttons defined for the form.
-     * @since 1.5.5
+     * @since 1.6
      **/
      public WebResponse submitNoButton() throws SAXException, IOException {
         return submit( SubmitButton.createFakeSubmitButton( this /* fake */ ) );
@@ -626,7 +626,7 @@ public class WebForm extends WebRequestSource {
     /**
      * Sets the single value of a file upload parameter in this form.
      * A more convenient way to do this than using {@link #setParameter(String,UploadFileSpec[])}
-     * @since 1.5.5
+     * @since 1.6
      */
     public void setParameter( String name, File file ) {
         setParameter( name, new UploadFileSpec[] { new UploadFileSpec( file ) } );
@@ -653,7 +653,7 @@ public class WebForm extends WebRequestSource {
      * @param value of the checkbox parameter
      * @throws IllegalArgumentException if the specified parameter is not a checkbox or if there is no checkbox
      *         with the specified name and value.
-     * @since 1.5.5
+     * @since 1.6
      */
     public void toggleCheckbox( String name, String value ) {
         FormParameter parameter = getParameter( name );
@@ -684,7 +684,7 @@ public class WebForm extends WebRequestSource {
      * @param state the new state of the checkbox
      * @throws IllegalArgumentException if the specified parameter is not a checkbox or if there is no checkbox
      *         with the specified name and value.
-     * @since 1.5.5
+     * @since 1.6
      */
     public void setCheckbox( String name, String value, boolean state ) {
         FormParameter parameter = getParameter( name );

@@ -10,308 +10,159 @@ Limitations:
     1. JDK 1.3.1 or higher is required
     2. JavaScript support does not include some DOM properties
     3. The JavaScript assignment Document.cookie= does not restrict the cookie by path and domain
+    4. Only table cells and explicit paragraphs are recognized as text blocks
 
 
 Revision History:
-27-Sep-2004:
-    Problems fixed:
-        1. bug #1032440: An explanatory exception is now thrown on an attempt to use a mailto: URL in a form submission
-
-24-Sep-2004:
-   Acknowledgements:
-       Thanks to Dave Brosius for adding hashCode to Cookie and QuerySpec
-
-   Problems fixed:
-       1. bug #1034067: ServletConfig.getServletName now returns the name specified in web.xml for registered servlets.
-   Additions:
-       1. patch #1026566 The Cookie class now implements hashCode properly.
-
-23-Sep-2004:
-   Additions:
-       1. ServletUnit now implements HttpSession.getServletContext().
-
-21-Sep-2004:
-   Acknowledgements:
-       Thanks to Bart Vanhaute for finding a fixing an infinite recursion problem with frame loading.
-
-   Problems fixed:
-       1. Proxy server settings no longer apply to the entire VM; however, accessing a proxy server is not thread-safe
-       2. bug #1029139: infinite recursion in frameset page when a frame has src="#"
-
-   Additions:
-       1. A username and password may now be specified when accessing a proxy server.
-
-12-Sep-2004:
-   Problems fixed:
-       1. bug #1025968: Cookies with max-age attribute will now expire (max-age=0 is treated as immediate expiration)
-10-Sep-2004:
-   Problems fixed:
-       1. bug #1013045: Form, Link, and Image id tags are now recognizable from JavaScript where a name tag would be
-
- 9-Sep-2004:
-   Problems fixed:
-       1. Slashes in URL parameters were being misinterpeted as navigation
-
- 8-Sep-2004:
-   Additions:
-       1. ServletRunner and ServletUnitClient now support a getSession() method to return the HTTP session to be used
-          by the next request or modified by the last request.
-
-25-Aug-2004:
-   Additions:
-       1. ServletRunner now takes a reference to a web.xml as a File object in its constructor.
-
-10-Aug-2004:
-   Additions:
-       1. rfe #901172: "application/xhtml+xml" is now recognized as a valid HTML "content-type"
-       2. Added convenience method setParameter( String, File ) to simplify file uploading
-
- 9-Aug-2004
-   Problems fixed:
-       1. When a form has no action specified and its URL contains parameters whose names match those of parameters
-          in the form, the form values are used instead.
-
- 8-Aug-2004
-   Thanks to Guillaume Dandurand <Guillaume.Dandurand@cn.ca> for supplying code to get the onload event when the page
-         is a frameset rather than a regular page.
-
-   Problems fixed:
-       1. A frameset 'onload' event is now invoked after all of its subframes have been loaded
-       2. ServletUnit's HttpServletRequest.getCookies() method was only returning the first cookie defined in the request
-
-   Additions:
-       1. Added preliminary support for lists
-
-28-Jul-2004
-   Additions:
-       1. rfe #986876: The WebClient.addCookie method has been deprecated, since its behavior is actually a bit confusing
-          and replaced with "putCookie" allowing subsequent the replacement of a cookie value defined by a previous
-          call to "putCookie."
-
-22-Jul-2004
-   Acknowledgements:
-       Thanks to Kazuaki Matsuhashi <matsuhashi@quick.co.jp> for correcting the handling of non-Latin link parameters
-
-   Problems fixed:
-       1. patch #995853: decode link parameters based on page character set
-
-21-Jul-2004
-   Acknowledgements:
-       Thanks to Darrell DeBoer <bigdaz@users.sourceforge.net> for providing a patch for select box functionality
-
-   Additions:
-       1. patch #879193: Select now behaves as a multiselect listbox if it has size > 1 or if multiple is set and the size is not set to 1.
-       2. patch #879193: The name of a select box may now be treated as an array of options.
-
-20-Jul-2004
-   Problems fixed:
-       1. bug #990914: WebFrame scriptables are now accessible by getElementById
-
- 9-Jul-2004
-   Additions:
-       1. rfe #974791: WebForm now supports submitNoButton to submit a form without any of its buttons. This permits
-          testing of server response to a Javascript-style submit without using JavaScript.
-
-   Problems fixed:
-       1. bug #986397: Subframe included fragments in their source attributes now ignore those fragments when generating requests.
-
-29-Jun-2004
-   Problems fixed:
-       1. bug #805921: WebForm.selectImageButtonPosition was misleadingly public and should not have been used.
-          It has been made package-private, and new means are provided to submit positional image buttons (see additions).
-       2. bug #982097: http urls being used as request parameters were being mangled
-       3. bug #803041: HTML entity &amp; now recognized in refresh URL tag
-       4. bug #803095: Absolute URLs now supported in refresh URL tag
-
-   Additions:
-       1. rfe #766768: getText() methods now translate <br> tags as newlines.
-       2. HttpUnit now catches an attempt to load an included script from a page included with "getResource" rather than
-          "getResponse."
-       3. Click positions on image buttons may now be specified using one of:
-          form.submit( button, x, y )
-          button.click( x, y )
-
-28-Jun-2004
-   Additions:
-       1. rfe #901172: "text/xhtml" is now recognized as a valid HTML "content-type"
-
-   Problems fixed:
-       1. bug #959918: Javascript setting of numeric values included trailing zeros after the decimal point.
-       2. bug #957882: URL path elements containing leading '.' were being stripped of those periods.
-       3. bug #830856: WebLink URLs broken across lines are now handled correctly
-
-27-Jun-2004
-   Thanks to Fabrizio Giustina for adding an entity-resolver to support local use of ServletUnit with a regular web.xml
-
-   Additions:
-       1. patch #915296: Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified, 
-          rather than connecting to the Sun website.
-       2. HTMLElement now supports a getText() method to return the text contents of any element
-       3. WebResponse now supports getTextBlocks and getFirstMatchingTextBlock to retrieve headers and paragraphs from a page.
-
-25-Jun-2004
-   Problems fixed:
-       1. bug #960307 meta tags within <noscript> tags were not being ignored when scripting was disabled
-
-24-Jun-2004
-   Problems fixed:
-       1. bug #978770 Clicking on a button outside of a form is now supported
-       2. bug #838947 Document.getElementById now returns null if no such element exists
-
-23-Jun-2004
-   Problems fixed:
-       1. bug #974380 When using a DNS listener, host header no longer includes ':-1' if the port is not specified
-
-22-Jun-2004
-   Problems fixed:
-       1. bug #964940 The Referer header was not being sent again if the original request was redirected
-
-21-Jun-2004
-   Problems fixed:
-       1. bug #974675 Javascript function Window.open did not honor "_self" tag for window name.
-
-18-Jun-2004
-   Additions:
-       1. Enhanced http logging to show target server, request header line, and received URL
-
-15-Jun-2004
-   Thanks to Phil Zampino for finding a fixing a problem in PseudoServer's handling of very long requests.
-
-   Problems fixed:
-        1. PseudoServer would hang when sent a very long request.
-
-13-Jun-2004
-   Problems fixed:
-        1. bug #737167: Nested frame names are now as specified, previous included names of parent frames.
-        2. Return from a request that wrote to a new frame is now the result of that request, was the original page.
-        3. Return from a request specifying an unknown frame now opens a new window; previously created a subframe
-           in the requesting window.
-
- 3-Jun-2004
-   Additions:
-        1. WebForm now supports the newUnvalidatedRequest method, which should be used in preference to
-           HttpUnitOptions.setParametersValidated( false ). This creates a web request copied from the form
-           but not tied to it, so that parameters can be set without validation.
-
-20-Apr-2004
-    Problems fixed:
-        1. PseudoServer now accepts a full http URL to permit testing of interaction with proxy servers.
-
-14-Mar-2004
-    Additions:
-        1. RFE #909922: ServletUnit now supports HttpServletRequest.getHeaders
-        2. setCheckbox() and toggleCheckbox() have now been expanded to select one of a group of checkboxes by specifying
-           its name.
-    Problems fixed:
-        1. bug #872129: Cookie header set on a web request was ignored in servletunit
-
-9-Mar-2004
-    Problems fixed:
-        1. bug #861866: Support JavaScript changing "disabled" attribute on form controls
-        2. Forms defined after a <script> section which accessed document.forms would not be found if document.forms
-           was also accessed in a subsequent <script> section after the new form definition.
-    Notes:
-        1. Upgraded NekoHTML to 0.9.1
-        2. Upgraded Xerces to 2.5.0
-        3. Upgraded Rhino to 1.5R4.1
-
-
-Revision History:
-1-Mar-2004
-    Acknowledgements:
-        1. Thanks to Dan Frankow for supplying an implementation of ServletContext.getMimeType and correcting the
-           implementation of HttpSession.setAttribute when the value is null
-        2. Thanks to Michael Corum for making the Button.disabled property settable from JavaScript.
-
-    Problems fixed:
-        1. ServletUnit now applies character encoding in interpreting post parameters
-        2. Patch #873911: ServletUnit now supports ServletContext.getMimeType
-        3. Patch #873914: ServletUnit HttpSession.setAttribute( name, null ) now properly removes the named attribute
-        4. Patch #812709: Support JavaScript changing "disabled" attribute on Buttons
-
-26-Feb-2004
-Additions:
-    1. Added support for filters
-
-14-Feb-2004
-Additions:
-    1. Added support for ServletContextAttributeListener and HttpSessionAttributeListener
-
-12-Feb-2004
+28-Sep-2004 1.6
 Acknowledgements:
-    Thanks to Jarom Smith for finding some typos in the tutorial.
-    Thanks to Jay Dunning for providing an implementation of HttpServletResponse.containsHeader
-                          and implementing support for ServletContextListeners.
-
-Problems fixed:
-    1. Window.open() using an empty name was replacing the main window rather than creating a new one.
-    2. bug #883293 - typos in tutorial task 1 step 4
-    3. bug #883301 - more typos in tutorial task 1 step 4
-    4. bug #873169 - Cookie headers were generated with no space after the semicolon (unlike IE, Netscape, and Mozilla)
-    5. Cookie domains without leading dots are now accepted, as per RFC 2965.
-
-Additions:
-    1. Patch #890995 - Implemented ServletUnitHttpResponse.containsHeader
-    2. Patch #890936 - Added ServletContextListener support
-    3. Added HttpSessionListener support
-
- 4-Dec-2003
-Acknowledgements:
+    Thanks to Chris Hane for making it easier to add support for javascript properties and for providing support for
+        getAttribute() to handle any property defined in the underlying Node.
+    Thanks to Patrick Lightbody for adding JavaScript support for the Style object
+    Thanks to Phil Zampino for finding a fixing a problem in PseudoServer's handling of very long requests.
     Thanks to Andrew Bickerton for adding the following JavaScript support:
         Form.length          - returns the number of controls in a form
         Control.type         - returns a test description of the control type
         Control.defaultValue - returns the default value for text controls
         Initial page tokenizing now skips JavaScript while looking for header tags
         Writing into an empty frame no longer corrupts all empty frames
-
-Problems fixed:
-    1. Using JavaScript to write into an empty frame could change all empty frames to the same value
-
-17-Oct-2003
-Problems fixed:
-    1. Bug #823433: document.cookie now defaults to the empty string, like IE and Mozilla, rather than null
-
- 1-Oct-2003
-Acknowledgements:
-    Thanks to Patrick Lightbody for adding JavaScript support for the Style object
-
-Additions:
-    1. Added support for javascript HTMLElement.style property
-
-30-Sep-2003
-Problems fixed:
-    1. HttpUnit no longer complains about not being able to find the Rhino jar (js.jar) is scripting is disabled
-       before any pages are read.
-
-16-Sep-2003
-Acknowledgements:
-    Thanks to Chris Hane for making it easier to add support for javascript properties and for providing support for
-    getAttribute() to handle any property defined in the underlying Node
+    Thanks to Jarom Smith for finding some typos in the tutorial.
+    Thanks to Jay Dunning for providing an implementation of HttpServletResponse.containsHeader
+        and implementing support for ServletContextListeners.
+    Thanks to Fabrizio Giustina for adding an entity-resolver to support local use of ServletUnit with a regular web.xml
+    Thanks to Kazuaki Matsuhashi for correcting the handling of non-Latin link parameters
+    Thanks to Dan Frankow for supplying an implementation of ServletContext.getMimeType and correcting the
+        implementation of HttpSession.setAttribute when the value is null
+    Thanks to Guillaume Dandurand for supplying code to get the onload event when the page
+        is a frameset rather than a regular page.
+    Thanks to Michael Corum for making the Button.disabled property settable from JavaScript.
+    Thanks to Darrell DeBoer for providing a patch for select box functionality
+    Thanks to Bart Vanhaute for finding a fixing an infinite recursion problem with frame loading.
+    Thanks to Dave Brosius for adding hashCode to Cookie and QuerySpec
 
 Additions:
-    1. Patch #795698: HTMLElement now supports a getAttribute method to return the value of any named attribute.
-    2. PseudoServer can now received chunked requests, and will not send a "Content-Length" header if a
-       "Transfer-Encoding: chunked" has been defined.
-    3. Added support for javascript Input.tabindex and Text.maxlength properties (read-only)
+    Content and Parsing
+         1. rfe #766768: getText() methods now translate <br> tags as newlines.
+         2. rfe #901172: content-types "text/xhtml" and "application/xhtml+xml" are now recognized as valid HTML
+         3. rfe #974791: WebForm now supports submitNoButton to submit a form without any of its buttons. This permits
+            testing of server response to a Javascript-style submit without using JavaScript.
+         4. rfe #986876: The WebClient.addCookie method has been deprecated, since its behavior is actually a bit confusing
+            and replaced with "putCookie" allowing subsequent the replacement of a cookie value defined by a previous
+            call to "putCookie."
+         5. patch #1026566 The Cookie class now implements hashCode properly.
+         6. patch #879193: The name of a select box may now be treated as an array of options.
+         7. patch #879193: Select now behaves as a multiselect listbox if it has size > 1 or if multiple is set and the size is not set to 1.
+         8. Patch #795698: HTMLElement now supports a getAttribute method to return the value of any named attribute.
+         9. WebResponse and TableCell now support getElementsWithAttribute to return all contained HTML elements
+            with a specified attribute.
+        10. setCheckbox() and toggleCheckbox() have now been expanded to select one of a group of checkboxes by specifying
+            its name.
+        11. WebForm now supports the newUnvalidatedRequest method, which should be used in preference to
+            HttpUnitOptions.setParametersValidated( false ). This creates a web request copied from the form
+            but not tied to it, so that parameters can be set without validation.
+        12. Enhanced http logging to show target server, request header line, and received URL
+        13. HTMLElement now supports a getText() method to return the text contents of any element
+        14. WebResponse now supports getTextBlocks and getFirstMatchingTextBlock to retrieve headers and paragraphs from a page.
+        15. HttpUnit now catches an attempt to load an included script from a page included with "getResource" rather than
+            "getResponse."
+        16. Click positions on image buttons may now be specified using one of:
+                form.submit( button, x, y )
+                button.click( x, y )
+        17. Added preliminary support for lists
+        18. Added convenience method setParameter( String, File ) to simplify file uploading
+        19. A username and password may now be specified when accessing a proxy server.
+    JavaScript
+        20. Added support for javascript Input.tabindex and Text.maxlength properties (read-only)
+        21. Added support for javascript HTMLElement.style property
+    ServletUnit
+        22. Patch #890995 - Implemented ServletUnitHttpResponse.containsHeader
+        23. Patch #890936 - Added ServletContextListener support
+        24. Added HttpSessionListener support
+        25. Added support for ServletContextAttributeListener and HttpSessionAttributeListener
+        26. Added support for filters
+        27. rfe #909922: ServletUnit now supports HttpServletRequest.getHeaders
+        28. patch #915296: Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified,
+            rather than connecting to the Sun website.
+        29. ServletRunner now takes a reference to a web.xml as a File object in its constructor.
+        30. ServletRunner and ServletUnitClient now support a getSession() method to return the HTTP session to be used
+            by the next request or modified by the last request.
+        31. ServletUnit now implements HttpSession.getServletContext().
+    PseudoServer
+        32. PseudoServer now pools its ServerSocket's in order to be more gracious regarding system resources. Pooling can
+            be controlled via the properties: socketReleaseWaitTime and waitThreshhold.
+        33. PseudoServer can now received chunked requests, and will not send a "Content-Length" header if a
+            "Transfer-Encoding: chunked" has been defined.
+        34. PseudoServer now accepts a full http URL to permit testing of interaction with proxy servers.
 
-11-Sep-2003
-Additions:
-    1. PseudoServer now pools its ServerSocket's in order to be more gracious regarding system resources. Pooling can
-       be controlled via the properties: socketReleaseWaitTime and waitThreshhold.
 Problems fixed:
-    1. The HeadMethodWebRequest was actually sending the GET method, as was any HeaderOnlyWebRequest.
-    2. PseudoServer now supports any method handled by a PseudoServlet. Previously, it only handled GET, POST, and PUT.
-       It is simple necessary to override the getResponse method to make this work.
-    3. Bug #804585: Undocumented method in API: the javascript documentation referred to the old location of the
-       getNextAlert and popNextAlert methods
-    4. Bug #804559: Documentation incomplete in download: removed the pending links from the incomplete user manual.
-    5. The tutorial referred to a method without specifying the object to which it belongs
-    6. The HeadMethodWebRequest was actually sending a GET method
+    Documentation
+         1. bug #804585: the javascript documentation referred to the old location of the
+                         getNextAlert and popNextAlert methods
+         2. bug #804559: unimplemented links have been removed from the incomplete user manual.
+         3. A number of typos in the tutorial have been corrected
+    Content and Parsing
+         4. bug #978770 Clicking on a button outside of a form is now supported
+         5. bug #838947 Document.getElementById now returns null if no such element exists
+         6. bug #957882: URL path elements containing leading '.' were being stripped of those periods.
+         7. bug #830856: WebLink URLs broken across lines are now handled correctly
+         8. bug #805921: WebForm.selectImageButtonPosition was misleadingly public and should not have been used.
+            It has been made package-private, and new means are provided to submit positional image buttons (see additions).
+         9. bug #982097: http urls being used as request parameters were being mangled
+        10. bug #803041: HTML entity &amp; now recognized in refresh URL tag
+        11. bug #803095: Absolute URLs now supported in refresh URL tag
+        12. bug #986397: Subframe included fragments in their source attributes now ignore those fragments when generating requests.
+        13. bug #990914: WebFrame scriptables are now accessible by getElementById
+        14. patch #995853: decode link parameters based on page character set
+        15. When a form has no action specified and its URL contains parameters whose names match those of parameters
+            in the form, the form values are used instead.
+        16. Slashes in URL parameters were being misinterpeted as navigation
+    Request handling
+        17. The HeadMethodWebRequest was actually sending the GET method, as was any HeaderOnlyWebRequest.
+        18. bug #964940 The Referer header was not being sent again if the original request was redirected
+        19. bug #974380 When using a DNS listener, host header no longer includes ':-1' if the port is not specified
+        20. bug #1032440: An explanatory exception is now thrown on an attempt to use a mailto: URL in a form submission
+    Cookie handling
+        21. bug #873169 - Cookie headers were generated with no space after the semicolon (unlike IE, Netscape, and Mozilla)
+        22. Cookie domains without leading dots are now accepted, as per RFC 2965.
+        23. bug #1025968: Cookies with max-age attribute will now expire (max-age=0 is treated as immediate expiration)
+    Frame handling
+        24. bug #737167: Nested frame names are now as specified, previous included names of parent frames.
+        25. Return from a request that wrote to a new frame is now the result of that request, was the original page.
+        26. Return from a request specifying an unknown frame now opens a new window; previously created a subframe
+            in the requesting window.
+        27. bug #1029139: infinite recursion in frameset page when a frame has src="#"
+    JavaScript
+        28. A frameset 'onload' event is now invoked after all of its subframes have been loaded
+        29. HttpUnit no longer complains about not being able to find the Rhino jar (js.jar) is scripting is disabled
+            before any pages are read.
+        30. bug #823433: document.cookie now defaults to the empty string, like IE and Mozilla, rather than null
+        31. Using JavaScript to write into an empty frame could change all empty frames to the same value
+        32. Window.open() using an empty name was replacing the main window rather than creating a new one.
+        33. Patch #812709: Support JavaScript changing "disabled" attribute on Buttons
+        34. bug #861866: Support JavaScript changing "disabled" attribute on form controls
+        35. Forms defined after a <script> section which accessed document.forms would not be found if document.forms
+            was also accessed in a subsequent <script> section after the new form definition.
+        36. bug #974675 Javascript function Window.open did not honor "_self" tag for window name.
+        37. bug #960307 meta tags within <noscript> tags were not being ignored when scripting was disabled
+        38. bug #959918: Javascript setting of numeric values included trailing zeros after the decimal point.
+        39. bug #1013045: Form, Link, and Image id tags are now recognizable from JavaScript where a name tag would be
+    ServletUnit
+        40. ServletUnit now applies character encoding in interpreting post parameters
+        41. Patch #873911: ServletContext.getMimeType is supported
+        42. Patch #873914: HttpSession.setAttribute( name, null ) now properly removes the named attribute
+        43. bug #872129: Cookie header set on a web request was ignored in servletunit
+        44. HttpServletRequest.getCookies() method was only returning the first cookie defined in the request
+        45. bug #1034067: ServletConfig.getServletName now returns the name specified in web.xml for registered servlets.
+    PseudoServer
+        46. PseudoServer now supports any method handled by a PseudoServlet. Previously, it only handled GET, POST, and PUT.
+            It is simply necessary to override the getResponse method to make this work.
+        47. PseudoServer would hang when sent a very long request.
 
-26-Aug-2003
-Additions:
-    1. WebResponse and TableCell now support getElementsWithAttribute to return all contained HTML elements with
-       the specified attribute.
+    Notes:
+        1. Upgraded NekoHTML to 0.9.1
+        2. Upgraded Xerces to 2.4.0
+        3. Upgraded Rhino to 1.5R4.1
+
 
 21-Aug-2003 1.5.4
 Acknowledgements:

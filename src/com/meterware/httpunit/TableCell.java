@@ -51,7 +51,7 @@ public class TableCell extends BlockElement {
 
     /**
      * Returns the text value of this cell.
-     * @deprecated as of 1.5.5, use #getText()
+     * @deprecated as of 1.6, use #getText()
      */
     public String asText() {
         return getText();

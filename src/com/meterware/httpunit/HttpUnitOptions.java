@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -219,7 +219,7 @@ public abstract class HttpUnitOptions {
     /**
      * Returns true if form parameter settings are checked.
      *
-     * @deprecated use WebForm#newUnvalidatedRequest() to obtain a request without parameter validation.
+     * @deprecated as of 1.6, use WebForm#newUnvalidatedRequest() to obtain a request without parameter validation.
      **/
     public static boolean getParameterValuesValidated() {
         return _parameterValuesValidated;
@@ -233,7 +233,7 @@ public abstract class HttpUnitOptions {
      * with this option disabled will not only not be checked for correctness, its parameter submission
      * order will not be guaranteed, and changing parameters will not trigger Javascript onChange / onClick events.
      *
-     * @deprecated use WebForm#newUnvalidatedRequest() to obtain a request without parameter validation.
+     * @deprecated as of 1.6, use WebForm#newUnvalidatedRequest() to obtain a request without parameter validation.
      **/
     public static void setParameterValuesValidated( boolean validated ) {
         _parameterValuesValidated = validated;

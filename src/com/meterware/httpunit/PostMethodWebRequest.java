@@ -124,7 +124,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
     }
 
 
-    public PostMethodWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
+    PostMethodWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
         super( sourceForm, parameterHolder, button, x, y );
     }
 

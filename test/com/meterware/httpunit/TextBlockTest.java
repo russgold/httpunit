@@ -113,13 +113,21 @@ public class TextBlockTest extends HttpUnitTest {
                         "<p id='unordered'><ul><li>Red<li>Green<li>Blue</ul></p>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/SimplePage.html" );
-        TextBlock paragraph = (TextBlock) response.getElementWithID( "ordered" );
-        WebList[] lists = paragraph.getLists();
-        assertTrue( "No lists found", lists.length > 0);
+        TextBlock paragraph1 = (TextBlock) response.getElementWithID( "ordered" );
+        WebList[] lists = paragraph1.getLists();
+        assertEquals( "Number of lists found", 1, lists.length);
         WebList orderedList = lists[0];
         assertEquals( "ordered list type", WebList.ORDERED_LIST, orderedList.getListType() );
         assertEquals( "ordered list size", 3, orderedList.getItems().length );
         assertEquals( "Second ordered list item", "Two", orderedList.getItems()[1].getText() );
+
+        TextBlock paragraph2 = (TextBlock) response.getElementWithID( "unordered" );
+        lists = paragraph2.getLists();
+        assertEquals( "Number of lists found", 1, lists.length);
+        WebList unorderedList = lists[0];
+        assertEquals( "bullet list type", WebList.BULLET_LIST, unorderedList.getListType() );
+        assertEquals( "bullet list size", 3, unorderedList.getItems().length );
+        assertEquals( "First bullet list item", "Red", unorderedList.getItems()[0].getText() );
     }
 
 

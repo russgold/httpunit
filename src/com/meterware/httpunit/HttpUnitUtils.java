@@ -68,6 +68,8 @@ public class HttpUnitUtils {
 
     /**
      * Returns an interpretation of the specified URL-encoded string, using the iso-8859-1 character set.
+     *
+     * @since 1.6
      **/
     public static String decode( String byteString ) {
         return decode( byteString, "iso-8859-1" );

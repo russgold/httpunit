@@ -86,7 +86,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     /**
      * Returns the name of the frame containing this request source.
-     * @deprecated as of 1.5.5, use #getFrame
+     * @deprecated as of 1.6, use #getFrame
      */
     public String getPageFrame() {
         return _frame.getName();

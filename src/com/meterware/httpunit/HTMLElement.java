@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -57,12 +57,16 @@ public interface HTMLElement {
     /**
      * Returns the value of the attribute of this element with the specified name.
      * Returns the empty string if no such attribute exists.
+     *
+     * @since 1.6
      */
     String getAttribute( String name );
 
 
     /**
      * Returns true if this element may have an attribute with the specified name.
+     *
+     * @since 1.6
      */
     boolean isSupportedAttribute( String name );
 
@@ -75,6 +79,8 @@ public interface HTMLElement {
 
     /**
      * Returns the contents of this element, converted to a string.
+     *
+     * @since 1.6
      */
     String getText();
 }

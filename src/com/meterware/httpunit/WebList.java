@@ -28,13 +28,19 @@ import java.util.ArrayList;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 /**
+ * Represents an HTML list.  Experimental.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @since 1.6
  **/
 public class WebList extends HTMLElementBase {
 
+    /** Indicator of an ordered list (HTML tag &lt;ol&gt;) */
+    public static final int ORDERED_LIST = 1;
 
-    public static int ORDERED_LIST = 0;
+    /** Indicator of a bullet list (HTML tag &lt;ul&gt;) */
+    public static final int BULLET_LIST = 2;
+
     private WebResponse _response;
     private FrameSelector _frame;
     private URL _baseURL;
@@ -42,10 +48,16 @@ public class WebList extends HTMLElementBase {
     private String _characterSet;
 
     private ArrayList _items = new ArrayList();
+    private int _listType;
 
 
     public WebList( WebResponse response, FrameSelector frame, URL baseURL, String baseTarget, Element element, String characterSet ) {
         super( element );
+        if (element.getNodeName().equalsIgnoreCase( "ol" )) {
+            _listType = ORDERED_LIST;
+        } else if (element.getNodeName().equalsIgnoreCase( "ul" )) {
+            _listType = BULLET_LIST;
+        }
         _response = response;
         _frame = frame;
         _baseURL = baseURL;
@@ -55,7 +67,7 @@ public class WebList extends HTMLElementBase {
 
 
     public int getListType() {
-        return 0;
+        return _listType;
     }
 
 

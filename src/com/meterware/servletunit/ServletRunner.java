@@ -55,7 +55,7 @@ public class ServletRunner {
     /**
      * Constructor which expects the full path to the web.xml for the
      * application.
-     * @deprecated as of 1.5.5, use {@link #ServletRunner(File)}
+     * @deprecated as of 1.6, use {@link #ServletRunner(File)}
      *
      * @param webXMLFileSpec the full path to the web.xml file
      */
@@ -68,7 +68,7 @@ public class ServletRunner {
     /**
      * Constructor which expects the full path to the web.xml for the
      * application and a context path under which to mount it.
-     * @deprecated as of 1.5.5, use {@link #ServletRunner(File,String)}
+     * @deprecated as of 1.6, use {@link #ServletRunner(File,String)}
      *
      * @param webXMLFileSpec the full path to the web.xml file
      * @param contextPath the context path
@@ -83,7 +83,7 @@ public class ServletRunner {
      * application.
      *
      * @param webXml the web.xml file
-     * @since 1.5.5
+     * @since 1.6
      */
     public ServletRunner( File webXml ) throws IOException, SAXException {
         _application = new WebApplication( HttpUnitUtils.newParser().parse( webXml ) );
@@ -97,7 +97,7 @@ public class ServletRunner {
      *
      * @param webXml the web.xml file
      * @param contextPath the context path
-     * @since 1.5.5
+     * @since 1.6
      */
     public ServletRunner( File webXml, String contextPath ) throws IOException, SAXException {
         _application = new WebApplication( HttpUnitUtils.newParser().parse( webXml ), webXml.getParentFile().getParentFile(), contextPath );
@@ -164,7 +164,7 @@ public class ServletRunner {
     /**
      * Returns the session to be used by the next request.
      * @param create if true, will create a new session if no valid session is defined.
-     * @since 1.5.5
+     * @since 1.6
      */
     public HttpSession getSession( boolean create ) {
         return getClient().getSession( create );

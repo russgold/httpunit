@@ -345,6 +345,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     /**
      * Returns the HTMLElements found with the specified attribute value.
+     * @since 1.6
      */
     public HTMLElement[] getElementsWithAttribute( String name, String value ) throws SAXException {
         return getReceivedPage().getElementsWithAttribute( name, value );
@@ -501,7 +502,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     /**
      * Returns an array of text blocks found in the page.
-     * @since 1.5.5
+     * @since 1.6
      */
     public TextBlock[] getTextBlocks() throws SAXException {
         return getReceivedPage().getTextBlocks();
@@ -510,7 +511,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     /**
      * Returns the text block after the specified block, if any.
-     * @since 1.5.5
+     * @since 1.6
      */
     public TextBlock getNextTextBlock( TextBlock block ) throws SAXException {
         return getReceivedPage().getNextTextBlock( block );
@@ -519,7 +520,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     /**
      * Returns the first link found in the page matching the specified criteria.
-     * @since 1.5.5
+     * @since 1.6
      * @exception SAXException thrown if there is an error parsing the response.
      **/
     public TextBlock getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) throws SAXException {

@@ -23,11 +23,12 @@ import org.w3c.dom.Node;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 /**
+ * A class which represents a block of text in a web page. Experimental.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @since 1.6
  **/
 public class TextBlock extends BlockElement {
 
@@ -43,6 +44,9 @@ public class TextBlock extends BlockElement {
     }
 
 
+    /**
+     * Returns any lists embedded in this text block.
+     */
     public WebList[] getLists() {
         return (WebList[]) (_lists.toArray( new WebList[ _lists.size() ] ) );
     }
@@ -53,7 +57,7 @@ public class TextBlock extends BlockElement {
     }
 
 
-    public String[] getFormats( int characterPosition ) {
+    String[] getFormats( int characterPosition ) {
         return null;
     }
 

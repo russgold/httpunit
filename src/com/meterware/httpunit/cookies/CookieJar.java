@@ -2,7 +2,7 @@ package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -85,7 +85,7 @@ public class CookieJar {
     /**
      * Defines a cookie to be sent to the server on every request. This bypasses the normal mechanism by which only
      * certain cookies are sent based on their host and path.
-     * @deprecated as of 1.5.5, use #setCookie
+     * @deprecated as of 1.6, use #putCookie
      **/
     public void addCookie( String name, String value ) {
         _globalCookies.add( new Cookie( name, value ) );
@@ -95,6 +95,7 @@ public class CookieJar {
     /**
      * Defines a cookie to be sent to the server on every request. This bypasses the normal mechanism by which only
      * certain cookies are sent based on their host and path.
+     * @since 1.6
      **/
     public void putCookie( String name, String value ) {
         for (Iterator iterator = _globalCookies.iterator(); iterator.hasNext();) {
