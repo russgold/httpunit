@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+  9-Mar-2003
+Additions:
+    1. <noscript> nodes now show their content if a <script> earlier in the page is not recognized.
+
   7-Mar-2003
 Acknowledgements:
     Thanks to Andrew Bickerton for correcting the handling of document.open for non-HTML pages and new pages with

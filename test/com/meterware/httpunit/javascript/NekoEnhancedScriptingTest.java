@@ -21,10 +21,8 @@ package com.meterware.httpunit.javascript;
  *******************************************************************************************************************/
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-import com.meterware.httpunit.HttpUnitTest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebLink;
+
+import com.meterware.httpunit.*;
 
 
 /**
@@ -108,6 +106,34 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
         assertNotNull( "No default script link found", wr.getLinkWith( "JavaScript Working" ) );
         assertNotNull( "No default script link found", wr.getLinkWith( "JavaScript 1.2 Working" ) );
         assertNull( "VBScript link found", wr.getLinkWith( "VBScript" ) );
+    }
+
+
+    public void testNoScriptSections() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><title>something</title></head>" +
+                                            "<body>" +
+                                            "<script language='JavaScript'>" +
+                                            "document.write( '<a id=here href=about:blank>' );" +
+                                            "document.writeln( document.title );" +
+                                            "document.write( '</a>' );" +
+                                            "</script>" +
+                                            "<noscript>" +
+                                            "<a href='#' id='there'>anything</a>" +
+                                            "</noscript>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebLink link = response.getLinkWithID( "here" );
+        assertNotNull( "The link was not found", link );
+        assertEquals( "Link contents", "something", link.asText() );
+        assertNull( "Should not have found link in noscript", response.getLinkWithID( "there" ) );
+
+        HttpUnitOptions.setScriptingEnabled( false );
+        response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        link = response.getLinkWithID( "there" );
+        assertNotNull( "The link was not found", link );
+        assertEquals( "Link contents", "anything", link.asText() );
+        assertNull( "Should not have found scripted link", response.getLinkWithID( "here" ) );
     }
 
 

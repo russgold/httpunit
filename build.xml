@@ -84,6 +84,7 @@
         <exclude name="**/JTidyHTMLParser.java" unless="jtidy.present" />
         <exclude name="**/ScriptFilter.java" unless="nekoHTML.present" />
         <exclude name="**/NekoHTMLParser.java" unless="nekoHTML.present" />
+        <exclude name="**/NekoDOMParser.java" unless="nekoHTML.present" />
         <exclude name="**/servletunit/*" unless="jsdk.present" />
         <exclude name="**/JUnitServlet.java" unless="junit.present" />
         <exclude name="**/javascript/*" unless="rhino.present" />

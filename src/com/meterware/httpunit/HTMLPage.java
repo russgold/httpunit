@@ -31,7 +31,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Vector;
 
 
@@ -69,43 +68,6 @@ public class HTMLPage extends ParsedHTML {
         NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "body" );
         if (nl.getLength() == 0) return "";
         return ((Element) nl.item(0)).getAttribute( "onload" );
-    }
-
-
-    /**
-     * Returns the contents of any script tags on the page, concatenated.
-     */
-    public String[] getScripts() throws SAXException {
-        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "script" );
-        ArrayList scripts = new ArrayList();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node scriptNode = nl.item(i);
-            String language = NodeUtils.getNodeAttribute( scriptNode, "language", null );
-            if (language != null && !language.startsWith( "JavaScript")) continue;
-            String scriptLocation = NodeUtils.getNodeAttribute( scriptNode, "src", null );
-            if (scriptLocation == null) {
-                scripts.add( NodeUtils.asText( scriptNode.getChildNodes() ) );
-            } else {
-                try {
-                    scripts.add( getIncludedScript( scriptLocation ) );
-                } catch (IOException e) {
-                    throw new RuntimeException( "Error loading included script: " + e );
-                }
-            }
-        }
-        return (String[]) scripts.toArray( new String[ scripts.size() ] );
-    }
-
-
-    /**
-     * Returns the contents of an included script, given its src attribute.
-     * @param srcAttribute
-     * @return the contents of the script.
-     * @throws IOException if there is a problem retrieving the script
-     */
-    String getIncludedScript( String srcAttribute ) throws IOException {
-        WebRequest req = new GetMethodWebRequest( getBaseURL(), srcAttribute );
-        return getResponse().getWindow().getResource( req ).getText();
     }
 
 

@@ -40,13 +40,14 @@ import org.cyberneko.html.filters.DefaultFilter;
  **/ 
 class ScriptFilter extends DefaultFilter {
 
-    protected static final String SCRIPT_TYPE = "javascript";
-
     /** The NekoHTML configuration. */
     private HTMLConfiguration _configuration;
 
     /** A string buffer to collect the script. */
     private StringBuffer _activeScriptBlock;
+
+    /** The name of the current script language. **/
+    private String _scriptLanguage;
 
     /** The system identifier of the source document. */
     private String _systemID = "";
@@ -55,7 +56,7 @@ class ScriptFilter extends DefaultFilter {
     private int _scriptIndex;
 
     /** The parser in which this filter is running. **/
-    private DOMParser _domParser;
+    private NekoDOMParser _domParser;
 
 
     /** Constructs a script object with the specified configuration. */
@@ -64,7 +65,7 @@ class ScriptFilter extends DefaultFilter {
     }
 
 
-    public void setParser( DOMParser domParser ) {
+    public void setParser( NekoDOMParser domParser ) {
         _domParser = domParser;
     }
 
@@ -77,11 +78,16 @@ class ScriptFilter extends DefaultFilter {
     }
 
 
+    /**
+     * Invoked for a start element. If the element is a <script>, overrides the normal behavior to begin collecting
+     * the script text.
+     */
     public void startElement( QName element, XMLAttributes attrs, Augmentations augs ) throws XNIException {
         if (!isSupportedScript( element, attrs )) {
             super.startElement( element, attrs, augs );
         } else {
             _activeScriptBlock = new StringBuffer();
+            _scriptLanguage = getScriptLanguage( attrs );
             String srcAttribute = attrs.getValue( "src" );
             if (srcAttribute != null) _activeScriptBlock.append( _domParser.getIncludedScript( srcAttribute ) );
         }
@@ -90,8 +96,13 @@ class ScriptFilter extends DefaultFilter {
 
     private boolean isSupportedScript( QName element, XMLAttributes attrs ) {
         if (!element.rawname.equalsIgnoreCase( "script" ) || attrs == null) return false;
-        String value = attrs.getValue( "language" );
-        return value == null || value.toLowerCase().startsWith( SCRIPT_TYPE );
+        String value = getScriptLanguage( attrs );
+        return _domParser.getScriptableDelegate().supportsScript( value );
+    }
+
+
+    private String getScriptLanguage( XMLAttributes attrs ) {
+        return attrs == null ? null : attrs.getValue( "language" );
     }
 
 
@@ -117,7 +128,7 @@ class ScriptFilter extends DefaultFilter {
         } else {
             try {
                 final String scriptText = _activeScriptBlock.toString();
-                String replacementText = getTranslatedScript( scriptText );
+                String replacementText = getTranslatedScript( _scriptLanguage, scriptText );
                 _configuration.pushInputSource( newInputSource( replacementText ) );
             } catch (IOException e) { // ignore
             } finally {
@@ -135,8 +146,8 @@ class ScriptFilter extends DefaultFilter {
     }
 
 
-    protected String getTranslatedScript( final String scriptText ) throws IOException {
-        return _domParser.getScriptableDelegate().runScript( scriptText );
+    protected String getTranslatedScript( final String language, final String scriptText ) throws IOException {
+        return _domParser.getScriptableDelegate().runScript( language, scriptText );
     }
 
 

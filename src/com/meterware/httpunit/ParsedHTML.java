@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 
 import java.net.URL;
 import java.util.*;
+import java.io.IOException;
 
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
@@ -46,6 +47,8 @@ class ParsedHTML {
     private WebResponse  _response;
 
     private boolean      _updateElements = true;
+
+    private boolean _enableNoScriptNodes;
 
     /** map of element IDs to elements. **/
     private HashMap      _elementsByID = new HashMap();
@@ -191,6 +194,55 @@ class ParsedHTML {
     }
 
 
+    private void interpretScriptElement( Element element ) {
+        String script = getScript( element );
+        if (script != null) {
+            try {
+                _updateElements = false;
+                String language = NodeUtils.getNodeAttribute( element, "language", null );
+                if (!getResponse().getScriptableObject().supportsScript( language )) _enableNoScriptNodes = true;
+                getResponse().getScriptableObject().runScript( language, script );
+            } finally {
+                setRootNode( _rootNode );
+            }
+        }
+    }
+
+
+    private String getScript( Node scriptNode ) {
+        String scriptLocation = NodeUtils.getNodeAttribute( scriptNode, "src", null );
+        if (scriptLocation == null) {
+            return NodeUtils.asText( scriptNode.getChildNodes() );
+        } else {
+            try {
+                return getIncludedScript( scriptLocation );
+            } catch (IOException e) {
+                throw new RuntimeException( "Error loading included script: " + e );
+            }
+        }
+    }
+
+
+    /**
+     * Returns the contents of an included script, given its src attribute.
+     * @param srcAttribute
+     * @return the contents of the script.
+     * @throws java.io.IOException if there is a problem retrieving the script
+     */
+    String getIncludedScript( String srcAttribute ) throws IOException {
+        WebRequest req = new GetMethodWebRequest( getBaseURL(), srcAttribute );
+        return getResponse().getWindow().getResource( req ).getText();
+    }
+
+
+    /**
+     * If noscript node content is enabled, returns null - otherwise returns a concealing element.
+     */
+    private HTMLElement toNoscriptElement( Element element ) {
+        return _enableNoScriptNodes ? null : new NoScriptElement( element );
+    }
+
+
     abstract static class HTMLElementFactory {
         abstract HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element );
 
@@ -271,6 +323,30 @@ class ParsedHTML {
     }
 
 
+    static class ScriptFactory extends HTMLElementFactory {
+
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return null;
+        }
+
+        void recordElement( NodeUtils.PreOrderTraversal pot, Element element, ParsedHTML parsedHTML ) {
+            parsedHTML.interpretScriptElement( element );
+        }
+    }
+
+
+    static class NoScriptFactory extends HTMLElementFactory {
+
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toNoscriptElement( element );
+        }
+
+        protected boolean addToContext() {
+            return true;
+        }
+    }
+
+
     static class WebFrameFactory extends HTMLElementFactory {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebFrame( element );
@@ -280,7 +356,7 @@ class ParsedHTML {
 
     static class WebIFrameFactory extends HTMLElementFactory {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
-            return parsedHTML.toWebFrame( element );
+            return parsedHTML.toWebIFrame( element );
         }
 
 
@@ -372,17 +448,19 @@ class ParsedHTML {
     private static HTMLElementFactory _defaultFactory = new DefaultElementFactory();
 
     static {
-        _htmlFactoryClasses.put( "a",      new WebLinkFactory() );
-        _htmlFactoryClasses.put( "area",   new WebLinkFactory() );
-        _htmlFactoryClasses.put( "form",   new WebFormFactory() );
-        _htmlFactoryClasses.put( "img",    new WebImageFactory() );
-        _htmlFactoryClasses.put( "applet", new WebAppletFactory() );
-        _htmlFactoryClasses.put( "table",  new WebTableFactory() );
-        _htmlFactoryClasses.put( "tr",     new TableRowFactory() );
-        _htmlFactoryClasses.put( "td",     new TableCellFactory() );
-        _htmlFactoryClasses.put( "th",     new TableCellFactory() );
-        _htmlFactoryClasses.put( "frame",  new WebFrameFactory() );
-        _htmlFactoryClasses.put( "iframe",  new WebIFrameFactory() );
+        _htmlFactoryClasses.put( "a",        new WebLinkFactory() );
+        _htmlFactoryClasses.put( "area",     new WebLinkFactory() );
+        _htmlFactoryClasses.put( "form",     new WebFormFactory() );
+        _htmlFactoryClasses.put( "img",      new WebImageFactory() );
+        _htmlFactoryClasses.put( "applet",   new WebAppletFactory() );
+        _htmlFactoryClasses.put( "table",    new WebTableFactory() );
+        _htmlFactoryClasses.put( "tr",       new TableRowFactory() );
+        _htmlFactoryClasses.put( "td",       new TableCellFactory() );
+        _htmlFactoryClasses.put( "th",       new TableCellFactory() );
+        _htmlFactoryClasses.put( "frame",    new WebFrameFactory() );
+        _htmlFactoryClasses.put( "iframe",   new WebIFrameFactory() );
+        _htmlFactoryClasses.put( "script",   new ScriptFactory() );
+        _htmlFactoryClasses.put( "noscript", new NoScriptFactory() );
 
         for (Iterator i = Arrays.asList( FormControl.getControlElementTags() ).iterator(); i.hasNext();) {
             _htmlFactoryClasses.put( i.next(), new FormControlFactory() );
@@ -402,7 +480,7 @@ class ParsedHTML {
             public boolean processElement( NodeUtils.PreOrderTraversal pot, Element element ) {
                 HTMLElementFactory factory = getHTMLElementFactory( element.getNodeName().toLowerCase() );
                 if (factory == null || !factory.isRecognized( getClientProperties() )) return true;
-                if (pot.getClosestContext( WebFrame.class ) != null) return true;
+                if (pot.getClosestContext( ContentConcealer.class ) != null) return true;
 
                 if (!_elements.containsKey( element )) factory.recordElement( pot, element, ParsedHTML.this );
                 if (factory.addToContext()) pot.pushContext( _elements.get( element ) );
@@ -433,6 +511,11 @@ class ParsedHTML {
 
     private WebFrame toWebFrame( Element element ) {
         return new WebFrame( _baseURL, element, _frameName );
+    }
+
+
+    private WebFrame toWebIFrame( Element element ) {
+        return new WebIFrame( _baseURL, element, _frameName );
     }
 
 
@@ -721,6 +804,33 @@ class ParsedHTML {
             }
         }
         return null;
+    }
+
+
+
+    class WebIFrame extends WebFrame implements ContentConcealer {
+
+        public WebIFrame( URL baseURL, Node frameNode, String parentFrameName ) {
+            super( baseURL, frameNode, parentFrameName );
+        }
+    }
+
+
+    class NoScriptElement extends HTMLElementBase implements ContentConcealer {
+
+        public NoScriptElement( Node node ) {
+            super( node );
+        }
+
+
+        protected ScriptableDelegate newScriptable() {
+            return null;
+        }
+
+
+        protected ScriptableDelegate getParentDelegate() {
+            return null;
+        }
     }
 
 }

@@ -31,11 +31,17 @@ abstract public class ScriptableDelegate {
 
 
     private static final ScriptingEngine NULL_SCRIPT_ENGINE = new ScriptingEngine() {
-        public String executeScript( String script ) { return ""; }
+        public boolean supportsScriptLanguage( String language ) { return false; }
+        public String executeScript( String language, String script ) { return ""; }
         public boolean performEvent( String eventScript ) { return true; }
         public String getURLContents( String urlString ) { return null; }
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
     };
+
+
+    public boolean supportsScript( String language ) {
+        return getScriptEngine().supportsScriptLanguage( language );
+    }
 
 
     /**
@@ -51,8 +57,8 @@ abstract public class ScriptableDelegate {
      * Executes the specified script, returning any intended replacement text.
      * @return the replacement text, which may be empty.
      **/
-    public String runScript( String script ) {
-        return (script.length() == 0) ? "" : getScriptEngine().executeScript( script );
+    public String runScript( String language, String script ) {
+        return (script.length() == 0) ? "" : getScriptEngine().executeScript( language, script );
     }
 
 

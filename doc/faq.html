@@ -10,24 +10,24 @@
 <LI><A HREF="#api-help">I don't understand how the ... API works.</A></LI>
 
 </ol><ol start=3>
+<LI><A HREF="#uncheck">How do I uncheck a checkbox?</A></LI>
 
+</ol><ol start=4>
 <LI><A HREF="sslfaq.html">Does HttpUnit support https?</A></LI>
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 <LI><A HREF="#badType">The server is not sending a valid content type. How do I test HTML pages anyway?</A></LI>
 
-</ol><ol start=7>
-
+</ol><ol start=8>
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
 <LI><A HREF="#hidden">Why can't I change hidden parameters?</A></LI>
 
-</ol><ol start=9>
-
+</ol><ol start=10>
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
 <li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
-</ol><ol start=12>
 
+</ol><ol start=13>
 <LI><A HREF="#session">How can I see the servlet session between calls?</A></LI>
 <li><a href="#JSP">Can I use JSPs with ServletUnit?</a></li>
 </OL>
@@ -47,6 +47,19 @@ You need to have xerces or another XML parser in your classpath. Xerces is inclu
 The best way to understand how the API works is to look at the samples in the <tt>test</tt> directory. This contains an example of just about
 every feature of the library and is used to verify that they continue to work.
 Of course, if you know a tech writer who would like to contribute to improving the documentation, that is always welcome.
+
+
+<h2>General Use</h2>
+
+<A NAME="uncheck"><h3>How do I uncheck a checkbox?</h3></A>
+The setParameter call lets you specify the values per parameter name. An unchecked checkbox has no value to transmit, so you would call:
+<pre><code>
+    form.setParameter( "checkbox-name", new String[0] );
+</code></pre>
+or
+<pre><code>
+    form.removeParameter( "checkbox-name" );
+</code></pre>
 
 
 <h2>Server Issues</h2>

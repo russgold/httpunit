@@ -106,7 +106,13 @@ public class JavaScript {
         protected JavaScriptEngine   _parent;
 
 
-        public String executeScript( String script ) {
+        public boolean supportsScriptLanguage( String language ) {
+            return language == null || language.toLowerCase().startsWith( "javascript" );
+        }
+
+
+        public String executeScript( String language, String script ) {
+            if (!supportsScriptLanguage( language )) return "";
             try {
                 script = script.trim();
                 if (script.startsWith( "<!--" )) {
