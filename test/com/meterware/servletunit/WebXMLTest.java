@@ -261,6 +261,7 @@ public class WebXMLTest extends TestCase {
         wxs.addServlet( "/baz/*", Servlet2.class );
         wxs.addServlet( "/catalog", Servlet3.class );
         wxs.addServlet( "*.bop", Servlet4.class );
+        wxs.addServlet( "/",     Servlet5.class );
         ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient wc = sr.newClient();
 
@@ -271,18 +272,13 @@ public class WebXMLTest extends TestCase {
         checkMapping( wc, "http://localhost/catalog",             Servlet3.class, "/catalog",             null );
         checkMapping( wc, "http://localhost/catalog/racecar.bop", Servlet4.class, "/catalog/racecar.bop", null );
         checkMapping( wc, "http://localhost/index.bop",           Servlet4.class, "/index.bop",           null );
-
-        try {
-            wc.newInvocation( "http://localhost/catalog/index.html" ).getServlet();
-            fail( "Should have gotten a 404" );
-        } catch (HttpNotFoundException e) {
-        }
+        checkMapping( wc, "http://localhost/something/else",      Servlet5.class, "/something/else",      null );
     }
 
 
     private void checkMapping( ServletUnitClient wc, final String url, final Class servletClass, final String expectedPath, final String expectedInfo ) throws IOException, ServletException {
         InvocationContext ic = wc.newInvocation( url );
-        assertTrue( servletClass.isInstance( ic.getServlet() ) );
+        assertTrue( "selected servlet is " + ic.getServlet() + " rather than " + servletClass, servletClass.isInstance( ic.getServlet() ) );
         assertEquals( "ServletPath for " + url, expectedPath, ic.getRequest().getServletPath() );
         assertEquals( "ServletInfo for " + url, expectedInfo, ic.getRequest().getPathInfo() );
     }
@@ -342,6 +338,7 @@ public class WebXMLTest extends TestCase {
     static class Servlet2 extends SimpleGetServlet {}
     static class Servlet3 extends SimpleGetServlet {}
     static class Servlet4 extends SimpleGetServlet {}
+    static class Servlet5 extends SimpleGetServlet {}
 
 }
 

@@ -591,9 +591,12 @@ class WebApplication {
         private final Map _exactMatches = new HashMap();
         private final Map _extensions = new HashMap();
         private final Map _urlTree = new HashMap();
+        private ServletMapping _defaultMapping;
 
         void put( String mapping, ServletConfiguration servletConfiguration ) {
-            if (mapping.startsWith( "*." )) {
+            if (mapping.equals( "/" )) {
+                _defaultMapping = new ServletMapping( servletConfiguration );
+            } else if (mapping.startsWith( "*." )) {
                 _extensions.put( mapping.substring( 2 ), new ServletMapping( servletConfiguration ) );
             } else if (!mapping.startsWith( "/" ) || !mapping.endsWith( "/*" )) {
                 _exactMatches.put( mapping, new ServletMapping( servletConfiguration ) );
@@ -647,6 +650,8 @@ class WebApplication {
             if (_extensions.containsKey( getExtension( url ))) return (ServletMapping) _extensions.get( getExtension( url ) );
 
             if (_urlTree.containsKey( "/" )) return (ServletMapping) _urlTree.get( "/" );
+
+            if (_defaultMapping != null) return _defaultMapping;
 
             final String prefix = "/servlet/";
             if (!url.startsWith( prefix )) return null;
