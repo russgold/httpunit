@@ -70,8 +70,16 @@ public class WebRequest {
      * Returns the final URL associated with this web request.
      **/
     public URL getURL() throws MalformedURLException {
-        if (getURLBase() == null) validateProtocol( getURLString() );
+        if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) validateProtocol( getURLString() );
         return new URL( getURLBase(), getURLString() );
+    }
+
+
+    /**
+     * Returns the target for this web request.
+     **/
+    public String getTarget() {
+        return _target;
     }
 
 
@@ -91,7 +99,15 @@ public class WebRequest {
      * Constructs a web request using a base URL and a relative URL string.
      **/
     protected WebRequest( URL urlBase, String urlString ) {
-        this( urlBase, urlString, null );
+        this( urlBase, urlString, (WebForm) null );
+    }
+
+
+    /**
+     * Constructs a web request using a base URL, a relative URL string, and a target.
+     **/
+    protected WebRequest( URL urlBase, String urlString, String target ) {
+        this( urlBase, urlString, target, null );
     }
 
 
@@ -99,9 +115,18 @@ public class WebRequest {
      * Constructs a web request using a base URL and a relative URL string.
      **/
     protected WebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
+        this( urlBase, urlString, TOP_FRAME, sourceForm );
+    }
+    
+
+    /**
+     * Constructs a web request using a base URL and a relative URL string.
+     **/
+    protected WebRequest( URL urlBase, String urlString, String target, WebForm sourceForm ) {
         _urlBase   = urlBase;
         _urlString = urlString;
         _sourceForm = sourceForm;
+        _target     = target;
     }
     
 
@@ -109,7 +134,7 @@ public class WebRequest {
      * Constructs a web request using a base request and a relative URL string.
      **/
     protected WebRequest( WebRequest baseRequest, String urlString ) throws MalformedURLException {
-        this( baseRequest.getURL(), urlString, null );
+        this( baseRequest.getURL(), urlString, (WebForm) null );
     }
     
 
@@ -153,14 +178,29 @@ public class WebRequest {
     }
 
     
+//---------------------------------- package members --------------------------------
+
+    /** The name of the topmost frame. **/
+    final static String TOP_FRAME = "_top";
+
+
 //--------------------------------------- private members ------------------------------------
 
-    private final static String PROTOCOL_HANDLER_PKGS = "java.protocol.handler.pkgs";
+    /** The name of the system parameter used by java.net to locate protocol handlers. **/
+    private final static String PROTOCOL_HANDLER_PKGS  = "java.protocol.handler.pkgs";
+
+    /** The name of the JSSE class which provides support for SSL. **/
+    private final static String SunJSSE_PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
+
+    /** The name of the JSSE class which supports the https protocol. **/
+    private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
+
 
     private URL       _urlBase;
     private String    _urlString;
     private Hashtable _parameters = new Hashtable();
     private WebForm   _sourceForm;
+    private String    _target = TOP_FRAME;
 
     private boolean   _httpsProtocolSupportEnabled;
 
@@ -233,32 +273,24 @@ public class WebRequest {
     }
 
 
-    private static boolean hasSSLProvider() {
+    private static boolean hasProvider( Class providerClass ) {
         Provider[] list = Security.getProviders();
         for (int i = 0; i < list.length; i++) {
-            if (list[i].getClass().getName().equals( SunJSSE_PROVIDER_CLASS )) return true;
+            if (list[i].getClass().equals( providerClass )) return true;
         }
         return false;
     }
 
-    private static String SunJSSE_PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
-    private static RuntimeException _httpsProblem;
-
-
-    static void verifyHttpsSupport() {
+    private static void verifyHttpsSupport() {
         if (System.getProperty( "java.version" ).startsWith( "1.1" )) {
             throw new RuntimeException( "https support requires Java 2" );
-        } else if (System.getProperty( PROTOCOL_HANDLER_PKGS ) == null) {
+        } else {
             try {
-                Class.forName( "com.sun.net.ssl.HttpsURLConnection" );
-                Method setMethod = System.class.getMethod( "setProperty", new Class[] { String.class, String.class } );
-                setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, "com.sun.net.ssl.internal.www.protocol" } );
-                if (!hasSSLProvider()) {
-                    throw new RuntimeException( "https support not enabled. Please edit <java-home>/lib/security/java.security to add the line: " +
-                                                "security.provider.2=com.sun.net.ssl.internal.ssl.Provider" );
-                }
+                Class providerClass = Class.forName( SunJSSE_PROVIDER_CLASS );
+                if (!hasProvider( providerClass )) Security.addProvider( (Provider) providerClass.newInstance() );
+                registerSSLProtocolHandler();
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException( "https support requires the Java Secure Sockets Extension. See http://java.sun.com/products/jsse/install.html" );
+                throw new RuntimeException( "https support requires the Java Secure Sockets Extension. See http://java.sun.com/products/jsse" );
             } catch (Throwable e) {
                 throw new RuntimeException( "Unable to enable https support. Make sure that you have installed JSSE " +
                                             "as described in http://java.sun.com/products/jsse/install.html: " + e );
@@ -267,18 +299,18 @@ public class WebRequest {
     }
 
 
-    // this does not work for some reason
-    static void unusedSetProviderDynamically() throws ClassNotFoundException, InstantiationException, IllegalAccessException { 
-        Security.addProvider( (Provider) Class.forName( SunJSSE_PROVIDER_CLASS ).newInstance() );
+    private static void registerSSLProtocolHandler() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException { 
+        String list = System.getProperty( PROTOCOL_HANDLER_PKGS );
+        Method setMethod = System.class.getMethod( "setProperty", new Class[] { String.class, String.class } );
+        if (list == null || list.length() == 0) {
+            setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER } );
+        } else if (list.indexOf( SSL_PROTOCOL_HANDLER ) < 0) {
+            setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER + " | " + list } );
+        }    
     }
 
 
 }
-
-
-
-
-
 
 
 //================================ exception class NoSuchParameterException =========================================
