@@ -1,4 +1,5 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.scripting;
+
 /********************************************************************************************************************
  * $Id$
  *
@@ -25,9 +26,9 @@ package com.meterware.httpunit;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-abstract public class ScriptableObject {
+abstract public class ScriptableDelegate {
 
-    private ScriptEngine _scriptEngine;
+    private ScriptingEngine _scriptEngine;
 
 
     /**
@@ -77,7 +78,7 @@ abstract public class ScriptableObject {
     /**
      * Specifies the scripting engine to be used.
      */
-    public void setScriptEngine( ScriptEngine scriptEngine ) {
+    public void setScriptEngine( ScriptingEngine scriptEngine ) {
         _scriptEngine = scriptEngine;
     }
 

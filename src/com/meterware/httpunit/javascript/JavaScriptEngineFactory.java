@@ -19,7 +19,7 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.ScriptingEngineFactory;
+import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.WebResponse;
 
 import java.lang.reflect.InvocationTargetException;

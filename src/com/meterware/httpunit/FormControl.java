@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.SelectionOptions;
 import com.meterware.httpunit.scripting.SelectionOption;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -82,7 +83,7 @@ abstract class FormControl {
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
-    public ScriptableObject getScriptableObject() {
+    public ScriptableDelegate getScriptableObject() {
         return new Scriptable();
     }
 
@@ -243,7 +244,7 @@ abstract class FormControl {
     }
 
 
-    class Scriptable extends ScriptableObject {
+    class Scriptable extends ScriptableDelegate {
     }
 
 }
@@ -452,7 +453,7 @@ class CheckboxFormControl extends BooleanFormControl {
     }
 
 
-    public ScriptableObject getScriptableObject() {
+    public ScriptableDelegate getScriptableObject() {
         return new Scriptable();
     }
 
@@ -536,7 +537,7 @@ class TextFormControl extends FormControl {
     }
 
 
-    public ScriptableObject getScriptableObject() {
+    public ScriptableDelegate getScriptableObject() {
         return new Scriptable();
     }
 
@@ -750,7 +751,7 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    public ScriptableObject getScriptableObject() {
+    public ScriptableDelegate getScriptableObject() {
         if (_scriptable == null) _scriptable = new Scriptable();
         return _scriptable;
     }
@@ -778,13 +779,17 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    class Option extends ScriptableObject implements SelectionOption {
+    static class Option extends ScriptableDelegate implements SelectionOption {
 
         private String  _text;
         private String  _value;
         private boolean _defaultSelected;
         private boolean _selected;
         private int     _index;
+
+
+        Option() {
+        }
 
 
         Option( String text, String value, boolean selected ) {
@@ -812,6 +817,14 @@ class SelectionFormControl extends FormControl {
  //------------------------- SelectionOption methods ------------------------------
 
 
+        public void initialize( String text, String value, boolean defaultSelected, boolean selected ) {
+            _text = text;
+            _value = value;
+            _defaultSelected = defaultSelected;
+            _selected = selected;
+        }
+
+
         public int getIndex() {
             return _index;
         }
@@ -819,6 +832,11 @@ class SelectionFormControl extends FormControl {
 
         public String getText() {
             return _text;
+        }
+
+
+        public void setText( String text ) {
+            _text = text;
         }
 
 
@@ -848,12 +866,9 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    class Options extends ScriptableObject implements SelectionOptions {
+    class Options extends ScriptableDelegate implements SelectionOptions {
 
         private Option[] _options;
-
-        private String[]  _text;
-        private String[]  _value;
 
 
         Options( Node selectionNode ) {
@@ -905,20 +920,16 @@ class SelectionFormControl extends FormControl {
 
 
         String[] getDisplayedText() {
-            if (_text == null) {
-                _text = new String[ _options.length ];
-                for (int i = 0; i < _text.length; i++) _text[i] = _options[i].getText();
-            }
-            return _text;
+            String[] displayedText = new String[ _options.length ];
+            for (int i = 0; i < displayedText.length; i++) displayedText[i] = _options[i].getText();
+            return displayedText;
         }
 
 
         String[] getValues() {
-            if (_value == null) {
-                _value = new String[ _options.length ];
-                for (int i = 0; i < _value.length; i++) _value[i] = _options[i].getValue();
-            }
-            return _value;
+            String[] values = new String[ _options.length ];
+            for (int i = 0; i < values.length; i++) values[i] = _options[i].getValue();
+            return values;
         }
 
 
@@ -935,6 +946,46 @@ class SelectionFormControl extends FormControl {
 
         public int getLength() {
             return _options.length;
+        }
+
+
+        public void setLength( int length ) {
+            if (length < 0 || length >= _options.length) return;
+            Option[] newArray = new Option[ length ];
+            System.arraycopy( _options, 0, newArray, 0, length );
+            _options = newArray;
+        }
+
+
+        public void put( int i, SelectionOption option ) {
+            if (i < 0) return;
+
+            if (option == null) {
+                if (i >= _options.length) return;
+                deleteOptionsEntry( i );
+            } else {
+                if (i >= _options.length) {
+                    i = _options.length;
+                    expandOptionsArray();
+                }
+                _options[i] = (Option) option;
+                _options[i].setIndex(i);
+            }
+        }
+
+
+        private void deleteOptionsEntry( int i ) {
+            Option[] newArray = new Option[ _options.length-1 ];
+            System.arraycopy( _options, 0, newArray, 0, i );
+            System.arraycopy( _options, i+1, newArray, i, newArray.length - i );
+            _options = newArray;
+        }
+
+
+        private void expandOptionsArray() {
+            Option[] newArray = new Option[ _options.length+1 ];
+            System.arraycopy( _options, 0, newArray, 0, _options.length );
+            _options = newArray;
         }
 
 

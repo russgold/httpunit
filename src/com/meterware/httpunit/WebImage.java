@@ -19,6 +19,8 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.net.URL;
 
 import org.w3c.dom.Node;
@@ -77,7 +79,7 @@ public class WebImage {
     }
 
 
-    public class Scriptable extends ScriptableObject {
+    public class Scriptable extends ScriptableDelegate {
 
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "src" )) {

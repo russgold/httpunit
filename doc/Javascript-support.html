@@ -93,19 +93,22 @@ as are the following DOM elements:
 <h3>Select</h3>
 <h4>properties</h4>
 <ul>
-<li>length - read-only - the number of options associated with the control</li>
-<li>selectedIndex - read-only - the index of the selected option</li>
-<li>options.length - read-only - the number of options associated with the control</li>
+<li>length         - read-only - the number of options associated with the control</li>
+<li>selectedIndex  - read-only - the index of the selected option</li>
+<li>options        - read-write - an array of the options associated with the control</li>
+<li>options.length - read-write - the number of options associated with the control</li>
 </ul>
 
 <h3>Option</h3>
+<h4>constructor</h4>
+You may construct an Option object and assign it to an element in the Select.options array
 <h4>properties</h4>
 <ul>
-<li>text - read-only - the display text associated with the option (listed after the &lt'option&gt; tag)</li>
-<li>value - read-write - the value associated with the option (from the 'value' attribute)</li>
+<li>text     - read-write - the display text associated with the option (listed after the &lt'option&gt; tag)</li>
+<li>value    - read-write - the value associated with the option (from the 'value' attribute)</li>
 <li>selected - read-write - true if this option is currently selected</li>
 <li>defaultSelected - read-only - true if this option is selected by default</li>
-<li>index - read-only - the index of this option in its select</li>
+<li>index    - read-only - the index of this option in its select</li>
 </ul>
 
 </body>

@@ -20,13 +20,15 @@ package com.meterware.httpunit.javascript;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.HTMLPage;
-import com.meterware.httpunit.ScriptEngine;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebImage;
-import com.meterware.httpunit.scripting.SelectionOptions;
+
+import com.meterware.httpunit.scripting.ScriptingEngine;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.SelectionOption;
+import com.meterware.httpunit.scripting.SelectionOptions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -73,9 +75,9 @@ public class JavaScript {
     }
 
 
-    abstract static class JavaScriptEngine extends ScriptableObject implements ScriptEngine {
+    abstract static class JavaScriptEngine extends ScriptableObject implements ScriptingEngine {
 
-        protected com.meterware.httpunit.ScriptableObject _scriptable;
+        protected ScriptableDelegate _scriptable;
 
 
         public void executeScript( String script ) {
@@ -100,7 +102,7 @@ public class JavaScript {
         }
 
 
-        void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             _scriptable = scriptable;
             _scriptable.setScriptEngine( this );
@@ -135,10 +137,10 @@ public class JavaScript {
 
         private Object convertIfNeeded( final Object property ) {
             if (property == null) return NOT_FOUND;
-            if (!(property instanceof com.meterware.httpunit.ScriptableObject)) return property;
+            if (!(property instanceof ScriptableDelegate)) return property;
 
             try {
-                return toScriptable( (com.meterware.httpunit.ScriptableObject) property );
+                return toScriptable( (ScriptableDelegate) property );
             } catch (PropertyException e) {
                 throw new RuntimeException( e.toString() );
             } catch (NotAFunctionException e) {
@@ -164,7 +166,7 @@ public class JavaScript {
          * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
          * This default implementation throws an exception.
          **/
-        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+        Scriptable toScriptable( ScriptableDelegate delegate )
                 throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
             throw new UnsupportedOperationException();
         }
@@ -197,7 +199,7 @@ public class JavaScript {
         }
 
 
-        void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
             _document = (Document) Context.getCurrentContext().newObject( this, "Document" );
@@ -212,7 +214,7 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate ) {
+        Scriptable toScriptable( ScriptableDelegate delegate ) {
             return null;
         }
 
@@ -235,7 +237,7 @@ public class JavaScript {
         }
 
 
-        void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
             initializeLinks();
@@ -294,7 +296,7 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+        Scriptable toScriptable( com.meterware.httpunit.scripting.ScriptableDelegate delegate )
                 throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
             JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
             element.initialize( this, delegate );
@@ -302,7 +304,7 @@ public class JavaScript {
         }
 
 
-        private String getScriptableClassName( com.meterware.httpunit.ScriptableObject delegate ) {
+        private String getScriptableClassName( ScriptableDelegate delegate ) {
             if (delegate instanceof WebForm.Scriptable) {
                 return "Form";
             } else if (delegate instanceof WebLink.Scriptable) {
@@ -310,7 +312,7 @@ public class JavaScript {
             } else if (delegate instanceof WebImage.Scriptable) {
                 return "Image";
             } else {
-                throw new IllegalArgumentException( "Unknown ScriptableObject class: " + delegate.getClass() );
+                throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
             }
         }
 
@@ -332,7 +334,7 @@ public class JavaScript {
         }
 
 
-        void initialize( JavaScriptEngine parent, com.meterware.httpunit.ScriptableObject scriptable )
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
             _document = (Document) parent;
@@ -369,7 +371,7 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+        Scriptable toScriptable( ScriptableDelegate delegate )
                 throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
             final Control control = (Control) Context.getCurrentContext().newObject( this, "Control" );
             control.initialize( this, delegate );
@@ -402,7 +404,7 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+        Scriptable toScriptable( ScriptableDelegate delegate )
                 throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
             JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
             element.initialize( this, delegate );
@@ -410,11 +412,11 @@ public class JavaScript {
         }
 
 
-        private String getScriptableClassName( com.meterware.httpunit.ScriptableObject delegate ) {
+        private String getScriptableClassName( ScriptableDelegate delegate ) {
             if (delegate instanceof SelectionOptions) {
                 return "Options";
             } else {
-                throw new IllegalArgumentException( "Unknown ScriptableObject class: " + delegate.getClass() );
+                throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
             }
         }
 
@@ -433,18 +435,33 @@ public class JavaScript {
         }
 
 
+        public void jsSet_length( int length ) {
+            getDelegate().setLength( length );
+        }
+
+
+        public void put( int i, Scriptable scriptable, Object object ) {
+            if (object == null) {
+                getDelegate().put( i, null );
+            } else {
+                if (!(object instanceof Option)) throw new IllegalArgumentException( "May only add an Option to this array" );
+                Option option = (Option) object;
+                getDelegate().put( i, option.getDelegate() );
+            }
+        }
+
+
         private SelectionOptions getDelegate() {
             return (SelectionOptions) _scriptable;
         }
 
 
-        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+        Scriptable toScriptable( ScriptableDelegate delegate )
                 throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
             JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, "Option" );
             element.initialize( this, delegate );
             return element;
         }
-
     }
 
 
@@ -455,6 +472,12 @@ public class JavaScript {
         }
 
 
+        public void jsConstructor( String text, String value, boolean defaultSelected, boolean selected ) {
+            _scriptable = WebResponse.newDelegate( "Option" );
+            getDelegate().initialize( text, value, defaultSelected, selected );
+        }
+
+
         public int jsGet_index() {
             return getDelegate().getIndex();
         }
@@ -462,6 +485,11 @@ public class JavaScript {
 
         public String jsGet_text() {
             return getDelegate().getText();
+        }
+
+
+        public void jsSet_text( String text ) {
+            getDelegate().setText( text );
         }
 
 
@@ -490,8 +518,9 @@ public class JavaScript {
         }
 
 
-        private SelectionOption getDelegate() {
+        SelectionOption getDelegate() {
             return (SelectionOption) _scriptable;
         }
     }
+
 }

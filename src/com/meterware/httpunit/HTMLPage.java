@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 
@@ -127,7 +129,7 @@ public class HTMLPage extends ParsedHTML {
     }
 
 
-    public class Scriptable extends ScriptableObject {
+    public class Scriptable extends ScriptableDelegate {
 
         public Object get( String propertyName ) {
             WebForm wf = getFormWithName( propertyName );

@@ -1,4 +1,6 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.scripting;
+import com.meterware.httpunit.WebResponse;
+
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,19 +21,17 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import java.util.*;
-
 
 /**
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-public interface ScriptEngine {
+public interface ScriptingEngineFactory {
 
 
-    public void executeScript( String script );
-
-
-    public boolean performEvent( String eventScript );
+    /**
+     * Associates a scripting engine with the specified HTML web response.
+     **/
+    public void associate( WebResponse response );
 
 }

@@ -23,11 +23,27 @@ import java.util.*;
 
 
 /**
+ * Represents an array of Options
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 public interface SelectionOptions {
 
+    /**
+     * Returns the length of this array
+     */
     int getLength();
+
+
+    /**
+     * Sets a new length to this array
+     */
+    void setLength( int length );
+
+
+    /**
+     * Specify the specified option
+     */
+    void put( int i, SelectionOption option );
 
 }

@@ -380,6 +380,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "<a href='#' onClick='selectOptionNum( document.the_form.choices, 2 )'>green</a>" +
                                             "<a href='#' onClick='selectOptionNum( document.the_form.choices, 0 )'>red</a>" +
                                             "<a href='#' onClick='document.the_form.choices.options[0].value=\"9\"'>red</a>" +
+                                            "<a href='#' onClick='document.the_form.choices.options[0].text=\"orange\"'>orange</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
@@ -392,6 +393,52 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "3rd selection", "1", form.getParameterValue( "choices" ) );
         response.getLinks()[2].click();
         assertEquals( "4th selection", "9", form.getParameterValue( "choices" ) );
+
+        assertMatchingSet( "Displayed options", new String[] { "red", "blue", "green", "azure" }, form.getOptions( "choices" ) );
+        response.getLinks()[3].click();
+        assertMatchingSet( "Modified options", new String[] { "orange", "blue", "green", "azure" }, form.getOptions( "choices" ) );
+    }
+
+
+    public void testFormSelectOverwriteOptions() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function rewriteSelect( the_select ) { \n" +
+                                            "  the_select.options[0] = new Option( 'apache', 'a' );\n" +
+                                            "  the_select.options[1] = new Option( 'comanche', 'c' );\n" +
+                                            "  the_select.options[2] = new Option( 'sioux', 'x' );\n" +
+                                            "  the_select.options[3] = new Option( 'iriquois', 'q' );\n" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <select name='choices'>" +
+                                            "    <option value='1'>red" +
+                                            "    <option value='2'>yellow" +
+                                            "    <option value='3' selected>blue" +
+                                            "    <option value='5'>green" +
+                                            "  </select>" +
+                                            "</form>" +
+                                            "<a href='#' onMouseOver='document.the_form.choices.options.length=3;'>shorter</a>" +
+                                            "<a href='#' onMouseOver='document.the_form.choices.options[1]=null;'>weed</a>" +
+                                            "<a href='#' onMouseOver='rewriteSelect( document.the_form.choices );'>replace</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        assertMatchingSet( "initial values", new String[] { "1", "2", "3", "5" }, form.getOptionValues( "choices" ) );
+        assertMatchingSet( "initial text", new String[] { "red", "yellow", "blue", "green" }, form.getOptions( "choices" ) );
+
+        response.getLinks()[0].mouseOver();
+        assertMatchingSet( "modified values", new String[] { "1", "2", "3" }, form.getOptionValues( "choices" ) );
+        assertMatchingSet( "modified text", new String[] { "red", "yellow", "blue" }, form.getOptions( "choices" ) );
+
+        response.getLinks()[1].mouseOver();
+        assertMatchingSet( "weeded values", new String[] { "1", "3" }, form.getOptionValues( "choices" ) );
+        assertMatchingSet( "weeded text", new String[] { "red", "blue" }, form.getOptions( "choices" ) );
+
+        response.getLinks()[2].mouseOver();
+        assertMatchingSet( "replaced values", new String[] { "a", "c", "x", "q" }, form.getOptionValues( "choices" ) );
+        assertMatchingSet( "replaced text", new String[] { "apache", "comanche", "sioux", "iriquois" }, form.getOptions( "choices" ) );
     }
 
 }

@@ -20,6 +20,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.httpunit.scripting.ScriptingEngineFactory;
+
 import java.util.Vector;
 
 /**

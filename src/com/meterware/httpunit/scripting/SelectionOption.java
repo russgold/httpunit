@@ -30,7 +30,7 @@ public interface SelectionOption {
     String getText();
 
 
-//    void setText( String text );
+    void setText( String text );
 
 
     String getValue();
@@ -49,5 +49,8 @@ public interface SelectionOption {
 
 
     int getIndex();
+
+
+    void initialize( String text, String value, boolean defaultSelected, boolean selected );
 
 }

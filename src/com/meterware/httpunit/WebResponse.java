@@ -20,6 +20,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -488,7 +490,16 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    public class Scriptable extends ScriptableObject {
+    public static ScriptableDelegate newDelegate( String delegateClassName ) {
+        if (delegateClassName.equalsIgnoreCase( "Option" )) {
+            return new SelectionFormControl.Option();
+        } else {
+            throw new IllegalArgumentException( "No such scripting class supported: " + delegateClassName );
+        }
+    }
+
+
+    public class Scriptable extends ScriptableDelegate {
 
         public void alert( String message ) {
             _alerts.addLast( message );

@@ -12,10 +12,17 @@ Limitations:
 
 
 Revision History:
+ 8-Aug-2002
+Changes:
+   1. The class com.meterware.httpunit.ScriptableObject has been renamed as com.meterware.httpunit.scripting.ScriptableDelegate
+
+Additions:
+    1. The Option object now supports a constructor and writing to the text property
+
  7-Aug-2002
 Additions:
     1. JavaScript: the Select control now supports the length, options, and selectedIndex properties
-    2. JavaScript: the Options object now supports the index, defaultSelected, selected (r/w), value (r/w) and
+    2. JavaScript: the Option object now supports the index, defaultSelected, selected (r/w), value (r/w) and
        text (read-only) properties
 
  6-Aug-2002

@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -411,7 +413,7 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableObject {
+    public class Scriptable extends ScriptableDelegate {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); }
 
@@ -593,7 +595,7 @@ class FormParameter {
     }
 
 
-    ScriptableObject getScriptableObject() {
+    ScriptableDelegate getScriptableObject() {
         return getControls()[0].getScriptableObject();
     }
 
