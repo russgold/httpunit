@@ -563,6 +563,16 @@ public class JavaScript {
         }
 
 
+        public String jsGet_href() {
+            return toString();
+        }
+
+
+        public void jsSet_href( String urlString ) throws SAXException, IOException {
+            _window.setLocation( urlString );
+        }
+
+
         /**
          * Returns the default value of this scriptable object. In this case, it returns simply the URL as a string.
          * Note that this method is necessary, since Rhino will only call the toString method directly if there are no
