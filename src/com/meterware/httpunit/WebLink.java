@@ -66,7 +66,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * Returns the text value of this link.
      **/
     public String asText() {
-        if (getNode().getNodeName().equals( "area" )) {
+        if (getNode().getNodeName().equalsIgnoreCase( "area" )) {
             return getAttribute( "alt" );
         } else if (!getNode().hasChildNodes()) {
             return "";

@@ -10,6 +10,16 @@ Limitations:
 
 
 Revision History:
+13-Oct-2002
+Notes:
+    1. The NekoHTML parser is now supported. If it is present in the classpath, it will be used in preference to JTidy.
+       Note that NekoHTML is a much more forgiving parser than JTidy, properly handling a lot of bad HTML that JTidy
+       cannot. In addition, the Document class that NekoHTML creates is of type HTMLDocument. On the other hand,
+       the HTMLErrorListener is not currently supporting the NekoHTML parser, although such support will be added if
+       it is really needed.  NekoHTML is the current preferred parser and will probably be required to support certain
+       JavaScript enhancements. Ultimately, it is possible that JTidy support will be dropped.
+    2. The version of xerces now included in the distribution is 2.2, which is required for NekoHTML.
+
 12-Oct-2002
 Acknowledgements:
     Thanks to Richard Harris for finding a case where the handling of JavaScript comments was not working.

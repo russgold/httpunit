@@ -59,7 +59,7 @@ public class HttpUnitSuite {
         result.addTest( PseudoServerTest.suite() );
         result.addTest( WebClientTest.suite() );
         result.addTest( MessageBodyRequestTest.suite() );
-        result.addTest( JTidyPrintWriterTest.suite() );
+        if (HttpUnitOptions.getHTMLParser().getClass().getName().indexOf("Tidy") >= 0) result.addTest( JTidyPrintWriterTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.javascript.JavaScriptTestSuite" );

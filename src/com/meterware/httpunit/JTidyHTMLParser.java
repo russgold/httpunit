@@ -1,4 +1,4 @@
-package com.meterware.httpunit.javascript;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,56 +19,49 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.scripting.ScriptingEngineFactory;
+import org.w3c.dom.Node;
+import org.w3c.tidy.Tidy;
+import org.xml.sax.SAXException;
+
+import java.net.URL;
+import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 
 
 /**
- * An implementation of the scripting engine factory which selects a Rhino-based implementation of JavaScript.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class JavaScriptEngineFactory implements ScriptingEngineFactory {
+public class JTidyHTMLParser implements HTMLParser {
 
-    public boolean isEnabled() {
+    public Node getDocument( URL url, String pageText ) throws IOException, SAXException {
         try {
-            Class.forName( "org.mozilla.javascript.Context" );
-            return true;
-        } catch (Exception e) {
-            System.err.println( "Rhino classes (js.jar) not found - Javascript disabled" );
-            return false;
+            return getParser( url ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null );
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException( "UTF-8 encoding failed" );
         }
     }
 
 
-    public void associate( WebResponse response ) {
-        try {
-            JavaScript.run( response );
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException( e.toString() );
+    public String getCleanedText( String string ) {
+        return (string == null) ? "" : string.replace( NBSP, ' ' );
+    }
+
+    final private static char NBSP = (char) 160;   // non-breaking space, defined by JTidy
+
+    final private static String UTF_ENCODING = "UTF-8";
+
+
+    private static Tidy getParser( URL url ) {
+        Tidy tidy = new Tidy();
+        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
+        tidy.setQuiet( true );
+        tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
+        if (!HttpUnitOptions.getHtmlErrorListeners().isEmpty()) {
+            tidy.setErrout(new JTidyPrintWriter( url ));
         }
+        return tidy;
     }
 
-
-    public void setThrowExceptionsOnError( boolean throwExceptions ) {
-        JavaScript.setThrowExceptionsOnError( throwExceptions );
-    }
-
-
-    public boolean isThrowExceptionsOnError() {
-        return JavaScript.isThrowExceptionsOnError();
-    }
-
-
-    public String[] getErrorMessages() {
-        return JavaScript.getErrorMessages();
-    }
-
-
-    public void clearErrorMessages() {
-        JavaScript.clearErrorMessages();
-    }
 }

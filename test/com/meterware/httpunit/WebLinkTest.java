@@ -33,7 +33,7 @@ import java.util.Enumeration;
 /**
  * Tests for the WebLink class.
  *
- * @author <a href="mailto:russgold@acm.org>Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org>Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com>Benoit Xhenseval</a>
  **/
 public class WebLinkTest extends HttpUnitTest {
@@ -166,7 +166,7 @@ public class WebLinkTest extends HttpUnitTest {
 
         WebResponse initialPage = wc.getResponse( getHostPath() + "/HasImage.html" );
         WebLink link = initialPage.getLinks()[0];
-        assertEquals( "Link text", "", link.asText() );
+        assertEquals( "Link text", "", link.asText().trim() );
         initialPage.getLinkWithImageText("Blah Blah");
     }
 

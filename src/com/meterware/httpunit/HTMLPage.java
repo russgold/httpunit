@@ -21,21 +21,17 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Vector;
-import java.util.ArrayList;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Vector;
 
 
 /**
@@ -49,7 +45,7 @@ public class HTMLPage extends ParsedHTML {
     private Scriptable _scriptable;
 
 
-    public HTMLPage( WebResponse response, URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
+    HTMLPage( WebResponse response, URL url, String parentTarget, String pageText, String characterSet ) throws IOException, SAXException {
         super( response, url, parentTarget, getDOM( url, pageText ), characterSet );
         setBaseAttributes();
     }
@@ -239,24 +235,8 @@ public class HTMLPage extends ParsedHTML {
 //---------------------------------- private members --------------------------------
 
 
-    private static Node getDOM( URL url, String pageText ) throws SAXException {
-        try {
-            return getParser( url ).parseDOM( new ByteArrayInputStream( pageText.getBytes( getUTFEncodingName() ) ), null );
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException( "UTF-8 encoding failed" );
-        }
-    }
-
-
-    private static String _utfEncodingName;
-
-    private static String getUTFEncodingName() {
-        if (_utfEncodingName == null) {
-            String versionNum = System.getProperty( "java.version" );
-            if (versionNum.startsWith( "1.1" )) _utfEncodingName = "UTF8";
-            else _utfEncodingName = "UTF-8";
-        }
-        return _utfEncodingName;
+    private static Node getDOM( URL url, String pageText ) throws IOException, SAXException {
+        return HttpUnitOptions.getHTMLParser().getDocument( url, pageText );
     }
 
 
@@ -281,16 +261,5 @@ public class HTMLPage extends ParsedHTML {
         }
     }
 
-
-    private static Tidy getParser( URL url ) {
-        Tidy tidy = new Tidy();
-        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
-        tidy.setQuiet( true );
-        tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
-        if (!HttpUnitOptions.getHtmlErrorListeners().isEmpty()) {
-            tidy.setErrout(new JTidyPrintWriter( url ));
-        }
-        return tidy;
-    }
 
 }

@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 /**
  * A response to a web request from a web server.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:DREW.VARNER@oracle.com">Drew Varner</a>
  * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
@@ -1088,7 +1088,8 @@ public class WebResponse implements HTMLSegment {
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
                 _page = new HTMLPage( this, _url, _frameName, getText(), getCharacterSet() );
             } catch (IOException e) {
-                throw new SAXException( e );
+                e.printStackTrace();
+                throw new RuntimeException( e.toString() );
             }
         }
         return _page;

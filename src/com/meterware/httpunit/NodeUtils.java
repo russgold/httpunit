@@ -109,7 +109,7 @@ class NodeUtils {
                 return true;
             }
             public void processTextNodeValue( String value ) {
-                sb.append( convertNBSP( value ) );
+                sb.append( HttpUnitOptions.getHTMLParser().getCleanedText( value ) );
             }
         } );
         return sb.toString();
@@ -136,15 +136,6 @@ class NodeUtils {
 
             pushNodeList( node.getChildNodes(), pendingNodes );
         }
-    }
-
-
-    final static private char NBSP = (char) 160;   // non-breaking space, defined by JTidy
-
-
-    private static String convertNBSP( String text ) {
-        if (text == null) return "";
-        return text.replace( NBSP, ' ' );
     }
 
 

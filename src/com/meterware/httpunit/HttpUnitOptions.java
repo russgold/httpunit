@@ -27,7 +27,7 @@ import java.util.Vector;
 /**
  * A collection of global options to control HttpUnit's behavior.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
@@ -58,6 +58,11 @@ public abstract class HttpUnitOptions {
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
         setExceptionsThrownOnScriptError( true );
+    }
+
+
+    public static HTMLParser getHTMLParser() {
+        return _htmlParser;
     }
 
 
@@ -506,10 +511,30 @@ public abstract class HttpUnitOptions {
 
     private static boolean _exceptionsThrownOnScriptError = true;
 
+    private static HTMLParser _htmlParser;
 
+    private static HTMLParser _jtidyParser;
+
+    private static HTMLParser _nekoParser;
 
     static {
         _listeners = new Vector();
         reset();
+
+        try {
+            _jtidyParser = (HTMLParser) Class.forName( "com.meterware.httpunit.JTidyHTMLParser" ).newInstance();
+        } catch (InstantiationException e) {
+        } catch (IllegalAccessException e) {
+        } catch (ClassNotFoundException e) {
+        }
+
+        try {
+            _nekoParser = (HTMLParser) Class.forName( "com.meterware.httpunit.NekoHTMLParser" ).newInstance();
+        } catch (InstantiationException e) {
+        } catch (IllegalAccessException e) {
+        } catch (ClassNotFoundException e) {
+        }
+
+        _htmlParser = (_nekoParser == null) ? _jtidyParser : _nekoParser;
     }
 }

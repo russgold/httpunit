@@ -272,9 +272,9 @@ abstract class FormControl {
     static FormControl newFormParameter( WebForm form, Node node ) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return null;
-        } else if (node.getNodeName().equals( "textarea" )) {
+        } else if (node.getNodeName().equalsIgnoreCase( "textarea" )) {
             return new TextAreaFormControl( form, node );
-        } else if (node.getNodeName().equals( "select" )) {
+        } else if (node.getNodeName().equalsIgnoreCase( "select" )) {
             return new SelectionFormControl( form, node );
         } else if (node.getNodeName().equalsIgnoreCase( "button" )) {
             final String type = NodeUtils.getNodeAttribute( node, "type", "submit" );
@@ -285,7 +285,7 @@ abstract class FormControl {
             } else {
                 return new Button( form, node );
             }
-        } else if (!node.getNodeName().equals( "input" )) {
+        } else if (!node.getNodeName().equalsIgnoreCase( "input" )) {
             return null;
         } else {
             final String type = NodeUtils.getNodeAttribute( node, "type", "text" );
@@ -991,8 +991,9 @@ class SelectionFormControl extends FormControl {
 
             _options = new Option[ nl.getLength() ];
             for (int i = 0; i < _options.length; i++) {
-                _options[i] = new Option( getValue( nl.item(i).getFirstChild() ),
-                                          getOptionValue( nl.item(i) ),
+                final String displayedText = getValue( nl.item(i).getFirstChild() ).trim();
+                _options[i] = new Option( displayedText,
+                                          getOptionValue( nl.item(i), displayedText ),
                                           nl.item(i).getAttributes().getNamedItem( "selected" ) != null );
                 _options[i].setIndex( this, i );
             }
@@ -1136,12 +1137,12 @@ class SelectionFormControl extends FormControl {
         }
 
 
-        private String getOptionValue( Node optionNode ) {
+        private String getOptionValue( Node optionNode, String displayedText ) {
             NamedNodeMap nnm = optionNode.getAttributes();
             if (nnm.getNamedItem( "value" ) != null) {
                 return getValue( nnm.getNamedItem( "value" ) );
             } else {
-                return getValue( optionNode.getFirstChild() );
+                return displayedText;
             }
         }
 

@@ -1,4 +1,4 @@
-package com.meterware.httpunit.javascript;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,56 +19,28 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.scripting.ScriptingEngineFactory;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
+import java.net.URL;
+import java.io.IOException;
 
 /**
- * An implementation of the scripting engine factory which selects a Rhino-based implementation of JavaScript.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class JavaScriptEngineFactory implements ScriptingEngineFactory {
+interface HTMLParser {
 
-    public boolean isEnabled() {
-        try {
-            Class.forName( "org.mozilla.javascript.Context" );
-            return true;
-        } catch (Exception e) {
-            System.err.println( "Rhino classes (js.jar) not found - Javascript disabled" );
-            return false;
-        }
-    }
+    /**
+     * Converts an HTML text string to a Document. Any error reporting will be annotated with the
+     * specified URL.
+     */
+    public Node getDocument( URL url, String pageText ) throws IOException, SAXException;
 
 
-    public void associate( WebResponse response ) {
-        try {
-            JavaScript.run( response );
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException( e.toString() );
-        }
-    }
-
-
-    public void setThrowExceptionsOnError( boolean throwExceptions ) {
-        JavaScript.setThrowExceptionsOnError( throwExceptions );
-    }
-
-
-    public boolean isThrowExceptionsOnError() {
-        return JavaScript.isThrowExceptionsOnError();
-    }
-
-
-    public String[] getErrorMessages() {
-        return JavaScript.getErrorMessages();
-    }
-
-
-    public void clearErrorMessages() {
-        JavaScript.clearErrorMessages();
-    }
+    /**
+     * Removes any string artifacts placed in the text by the parser. For example, a parser may choose to encode
+     * an HTML entity as a special character. This method should convert that character to normal text.
+     */
+    public String getCleanedText( String string );
 }

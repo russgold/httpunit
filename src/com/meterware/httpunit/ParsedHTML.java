@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import org.w3c.dom.*;
 
 /**
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 class ParsedHTML {
@@ -375,7 +375,7 @@ class ParsedHTML {
     private boolean isLinkAnchor( Node node ) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return false;
-        } else if (!node.getNodeName().equals( "a" ) && !node.getNodeName().equals( "area" )) {
+        } else if (!node.getNodeName().equalsIgnoreCase( "a" ) && !node.getNodeName().equalsIgnoreCase( "area" )) {
             return false;
         } else {
             return (node.getAttributes().getNamedItem( "href" ) != null);
