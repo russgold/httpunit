@@ -161,8 +161,8 @@ public class CookieTest extends TestCase {
         jar.updateCookies( newJar( "www.httpunit.org", "zero=go; domain=.httpunit.org" ) );
         jar.updateCookies( newJar( "meterware.com", "fourth=money" ) );
 
-        checkHeader( 1, jar, "first=ready;second=set;zero=nil", "www.meterware.com/servlets/standard/Count" );
-        checkHeader( 2, jar, "second=set;zero=nil", "www.meterware.com/servlets/special/Divide" );
+        checkHeader( 1, jar, "first=ready; second=set; zero=nil", "www.meterware.com/servlets/standard/Count" );
+        checkHeader( 2, jar, "second=set; zero=nil", "www.meterware.com/servlets/special/Divide" );
         checkHeader( 3, jar, "zero=go", "fancy.httpunit.org/servlets/AskMe" );
 
         HttpUserAgentTest.assertMatchingSet( "Cookie names",
@@ -183,7 +183,7 @@ public class CookieTest extends TestCase {
         jar.updateCookies( newJar( "www.meterware.com/servlets", "third=day" ) );
         jar.updateCookies( newJar( "www.meterware.com/servlets", "third=tomorrow" ) );
 
-        checkHeader( 1, jar, "first=ready;third=tomorrow", "www.meterware.com/servlets/standard" );
+        checkHeader( 1, jar, "first=ready; third=tomorrow", "www.meterware.com/servlets/standard" );
     }
 
 

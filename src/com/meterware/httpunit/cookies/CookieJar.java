@@ -155,13 +155,13 @@ public class CookieJar {
             Cookie cookie = (Cookie) i.next();
             if (!cookie.mayBeSentTo( targetURL )) continue;
             restrictedCookies.add( cookie.getName() );
-            if (sb.length() != 0) sb.append( ';' );
+            if (sb.length() != 0) sb.append( "; " );
             sb.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
         }
         for (Iterator i = _globalCookies.iterator(); i.hasNext();) {
             Cookie cookie = (Cookie) i.next();
             if (restrictedCookies.contains( cookie.getName() )) continue;
-            if (sb.length() != 0) sb.append( ';' );
+            if (sb.length() != 0) sb.append( "; " );
             sb.append( cookie.getName() ).append( '=' ).append( cookie.getValue() );
         }
         return sb.length() == 0 ? null : sb.toString();

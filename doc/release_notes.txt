@@ -21,6 +21,7 @@ Problems fixed:
     1. Window.open() using an empty name was replacing the main window rather than creating a new one.
     2. bug #883293 - typos in tutorial task 1 step 4
     3. bug #883301 - more typos in tutorial task 1 step 4
+    4. bug #873169 - Cookie headers were generated with no space after the semicolon (unlike IE, Netscape, and Mozilla)
 
  4-Dec-2003
 Acknowledgements:

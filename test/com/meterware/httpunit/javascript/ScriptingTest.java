@@ -683,7 +683,7 @@ public class ScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         wc.addCookie( "height", "tall" );
         wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Alert message 1", "cookies: age=12;height=tall", wc.popNextAlert() );
+        assertEquals( "Alert message 1", "cookies: age=12; height=tall", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
 
