@@ -34,7 +34,6 @@ import junit.runner.StandardTestSuiteLoader;
 import junit.framework.Test;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestResult;
-import junit.framework.TestCase;
 import junit.framework.TestFailure;
 
 
@@ -53,15 +52,27 @@ public class JUnitServlet extends HttpServlet {
 
 
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException {
-        response.setContentType( "text/html" );
+        ResultsFormatter formatter = getResultsFormatter( request.getParameter( "format" ) );
+        response.setContentType( formatter.getContentType() );
         final String testName = request.getParameter( "test" );
         if (testName == null || testName.length() == 0) {
             reportCannotRunTest( response.getWriter(), "No test class specified" );
         } else {
-            ServletTestRunner runner = new ServletTestRunner( testName, response.getWriter() );
+            ServletTestRunner runner = new ServletTestRunner( response.getWriter(), formatter );
+            runner.runTestSuite( testName );
         }
         response.getWriter().close();
     }
+
+
+    private ResultsFormatter getResultsFormatter( String formatterName ) {
+        if ("text".equalsIgnoreCase( formatterName )) {
+            return new TextResultsFormatter();
+        } else {
+            return new HTMLResultsFormatter();
+        }
+    }
+
 
     private InvocationContextFactory _factory;
 
@@ -72,24 +83,27 @@ public class JUnitServlet extends HttpServlet {
 
 
     class ServletTestRunner extends BaseTestRunner {
-        private String _elapsedTime;
         private PrintWriter _writer;
+        private ResultsFormatter _formatter;
 
 
-        public ServletTestRunner( String testClassName, PrintWriter writer ) {
-            _writer = writer;
-            _testClassName = testClassName;
-            Test suite = getTest( testClassName );
+        public ServletTestRunner( PrintWriter writer, ResultsFormatter formatter ) {
             ServletTestCase.setInvocationContextFactory( _factory );
+            _writer = writer;
+            _formatter = formatter;
+        }
+
+
+        void runTestSuite( String testClassName ) {
+            Test suite = getTest( testClassName );
 
             if (suite != null) {
-                _testResult = new TestResult();
-                _testResult.addListener( this );
+                TestResult testResult = new TestResult();
+                testResult.addListener( this );
                 long startTime= System.currentTimeMillis();
-                suite.run(_testResult);
+                suite.run( testResult );
                 long endTime= System.currentTimeMillis();
-                _elapsedTime = elapsedTimeAsString( endTime-startTime );
-                displayResults( _writer );
+                _formatter.displayResults( _writer, testClassName, elapsedTimeAsString( endTime-startTime ), testResult );
             }
         }
 
@@ -135,54 +149,155 @@ public class JUnitServlet extends HttpServlet {
             return new StandardTestSuiteLoader();
         }
 
+    }
 
-        void displayResults( PrintWriter writer ) {
-            writer.println( "<html><head><title>Test Suite: " + _testClassName + "</title>" );
+
+    static abstract class ResultsFormatter {
+        String getContentType() {
+            return "text/html";
+        }
+
+
+        void displayResults( PrintWriter writer, String testClassName, String elapsedTimeString, TestResult testResult ) {
+            displayHeader( writer, testClassName, getFormatted( testResult.runCount(), "test" ),
+                                   elapsedTimeString, testResult.wasSuccessful() ? "OK" : "Problems Occurred" );
+
+            if (!testResult.wasSuccessful()) {
+                displayProblems( writer, "failure", testResult.failureCount(), testResult.failures() );
+                displayProblems( writer, "error", testResult.errorCount(), testResult.errors() );
+            }
+            displayFooter( writer );
+        }
+
+
+        private String getFormatted( int count, String name ) {
+            return count + " " + name + (count == 1 ? "" : "s");
+        }
+
+
+        protected abstract void displayHeader( PrintWriter writer, String testClassName, String testCountText, String elapsedTimeString, String resultString );
+
+
+        protected abstract void displayFooter( PrintWriter writer );
+
+
+        protected void displayProblems( PrintWriter writer, String kind, int count, Enumeration enumeration ) {
+            if (count != 0) {
+                displayProblemTitle( writer, getFormatted( count, kind ) );
+                Enumeration e = enumeration;
+                for (int i = 1; e.hasMoreElements(); i++) {
+                    TestFailure failure = (TestFailure) e.nextElement();
+                    displayProblemDetailHeader( writer, i, failure.failedTest().toString() );
+                    if (failure.thrownException() instanceof AssertionFailedError) {
+                        displayProblemDetail( writer, failure.thrownException().getMessage() );
+                    } else {
+                        displayProblemDetail( writer, BaseTestRunner.getFilteredTrace( failure.thrownException() ) );
+                    }
+                    displayProblemDetailFooter( writer );
+                }
+            }
+        }
+
+
+        protected abstract void displayProblemTitle( PrintWriter writer, String title );
+
+
+        protected abstract void displayProblemDetailHeader( PrintWriter writer, int i, String testName );
+
+
+        protected abstract void displayProblemDetailFooter( PrintWriter writer );
+
+
+        protected abstract void displayProblemDetail( PrintWriter writer, String message );
+    }
+
+
+    static class TextResultsFormatter extends ResultsFormatter {
+
+        String getContentType() {
+            return "text/plain";
+        }
+
+
+        protected void displayHeader( PrintWriter writer, String testClassName, String testCountText,
+                                      String elapsedTimeString, String resultString ) {
+            writer.println( testClassName + " (" + testCountText + "): " + resultString );
+        }
+
+
+        protected void displayFooter( PrintWriter writer ) {
+        }
+
+
+        protected void displayProblemTitle( PrintWriter writer, String title ) {
+            writer.println();
+            writer.println( title + ':' );
+        }
+
+
+        protected void displayProblemDetailHeader( PrintWriter writer, int i, String testName ) {
+            writer.println( i + ". " + testName + ":" );
+        }
+
+
+        protected void displayProblemDetailFooter( PrintWriter writer ) {
+            writer.println();
+        }
+
+
+        protected void displayProblemDetail( PrintWriter writer, String message ) {
+            writer.println( message );
+        }
+    }
+
+
+    static class HTMLResultsFormatter extends ResultsFormatter {
+
+
+        protected void displayHeader( PrintWriter writer, String testClassName, String testCountText,
+                                      String elapsedTimeString, String resultString ) {
+            writer.println( "<html><head><title>Test Suite: " + testClassName + "</title>" );
             writer.println( "<style type='text/css'>" );
             writer.println( "<!--" );
             writer.println( "  td.detail { font-size:smaller; vertical-align: top }" );
             writer.println( "  -->" );
             writer.println( "</style></head><body>" );
             writer.println( "<table id='results' border='1'><tr>" );
-            writer.println( "<td>" + getFormatted( _testResult.runCount(), "test" ) + "</td>" );
-            writer.println( "<td>Time: " + _elapsedTime + "</td>" );
+            writer.println( "<td>" + testCountText + "</td>" );
+            writer.println( "<td>Time: " + elapsedTimeString + "</td>" );
+            writer.println( "<td>" + resultString + "</td></tr>" );
+        }
 
-            if (_testResult.wasSuccessful()) {
-                writer.println( "<td>OK</td></tr>" );
-            } else {
-                writer.println( "<td>Problems Occurred</td></tr>" );
-                displayProblems( writer, "failure", _testResult.failureCount(), _testResult.failures() );
-                displayProblems( writer, "error", _testResult.errorCount(), _testResult.errors() );
-            }
+
+        protected void displayFooter( PrintWriter writer ) {
             writer.println( "</table>" );
             writer.println( "</body></html>" );
         }
 
 
-        private void displayProblems( PrintWriter writer, String title, int count, Enumeration enumeration ) {
-            if (count != 0) {
-                writer.println( "<tr><td colspan=3>" + getFormatted( count, title ) + "</td></tr>" );
-                Enumeration e = enumeration;
-                for (int i = 1; e.hasMoreElements(); i++) {
-                    TestFailure failure = (TestFailure) e.nextElement();
-                    writer.println( "<tr><td class='detail' align='right'>" + i + "</td>" );
-                    writer.println( "<td class='detail'>" + failure.failedTest() + "</td><td class='detail'>" );
-                    if (failure.thrownException() instanceof AssertionFailedError) {
-                        writer.println( htmlEscape( failure.thrownException().getMessage() ) );
-                    } else {
-                        writer.println( htmlEscape( getFilteredTrace( failure.thrownException() ) ) );
-                    }
-                    writer.println( "</td></tr>" );
-                }
-            }
+        protected void displayProblemTitle( PrintWriter writer, String title ) {
+            writer.println( "<tr><td colspan=3>" + title + "</td></tr>" );
         }
+
+
+        protected void displayProblemDetailHeader( PrintWriter writer, int i, String testName ) {
+            writer.println( "<tr><td class='detail' align='right'>" + i + "</td>" );
+            writer.println( "<td class='detail'>" + testName + "</td><td class='detail'>" );
+        }
+
+
+        protected void displayProblemDetailFooter( PrintWriter writer ) {
+            writer.println( "</td></tr>" );
+        }
+
+
+        protected void displayProblemDetail( PrintWriter writer, String message ) {
+            writer.println( htmlEscape( message ) );
+        }
+
 
         private static final char LF = 10;
         private static final char CR = 13;
-
-        private String getFormatted( int count, String name ) {
-            return count + " " + name + (count == 1 ? "" : "s");
-        }
 
 
         private String htmlEscape( String s ) {
@@ -212,10 +327,6 @@ public class JUnitServlet extends HttpServlet {
             }
             return result.toString();
         }
-
-
-        private TestResult _testResult;
-        private String _testClassName;
     }
 
 }

@@ -89,6 +89,14 @@ public class JUnitServletTest extends TestCase {
     }
 
 
+    public void testAllTestsPassTextFormat() throws Exception {
+        ServletUnitClient client = newClient();
+        WebResponse wr = client.getResponse( "http://localhost/JUnit?format=text&test=" + PassingTests.class.getName() );
+        String expectedStart = PassingTests.class.getName() + " (1 test): OK";
+        assertTrue( "Results (" + wr.getText() + ") should start with '" + expectedStart, wr.getText().startsWith( expectedStart ) );
+    }
+
+
     public void testSomeFailures() throws Exception {
         ServletUnitClient client = newClient();
 
@@ -104,6 +112,16 @@ public class JUnitServletTest extends TestCase {
         assertEquals( "Failure index 1", "1", results[2][0] );
         assertEquals( "Failure index 2", "2", results[3][0] );
         assertTrue( "Test class not found", results[2][1].indexOf( '(' + FailingTests.class.getName() + ')' ) >= 0 );
+    }
+
+
+    public void testSomeFailuresTextFormat() throws Exception {
+        ServletUnitClient client = newClient();
+
+        WebResponse wr = client.getResponse( "http://localhost/JUnit?format=text&test=" + FailingTests.class.getName() );
+        String expectedStart = FailingTests.class.getName() + " (3 tests): Problems Occurred";
+        assertTrue( "Results (" + wr.getText() + ") should start with: " + expectedStart, wr.getText().startsWith( expectedStart ) );
+        assertTrue( "Results (" + wr.getText() + ") should contain: 2 failures", wr.getText().indexOf( "2 failures" ) >= 0 );
     }
 
 
