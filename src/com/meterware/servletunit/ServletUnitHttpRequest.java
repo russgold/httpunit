@@ -148,7 +148,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * in which case this method returns null.
      **/
     public Enumeration getHeaderNames() {
-        return null;
+        return _headers.keys();
     }
 
 

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2000-2002, Russell Gold
+ * Copyright (c) 2000-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -42,6 +42,8 @@ import junit.framework.TestSuite;
 
 /**
  * Tests support for stateless HttpServlets.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class StatelessTest extends TestCase {
 
@@ -76,12 +78,17 @@ public class StatelessTest extends TestCase {
     public void testServletCaching() throws Exception {
         final String resourceName = "something/interesting";
 
+        assertEquals( "Initial instances of servlet class", 0, AccessCountServlet.getNumInstances() );
         ServletRunner sr = new ServletRunner();
         sr.registerServlet( resourceName, AccessCountServlet.class.getName() );
 
         WebRequest request = new GetMethodWebRequest( "http://localhost/" + resourceName );
         assertEquals( "First reply", "1", sr.getResponse( request ).getText().trim() );
+        assertEquals( "Instances of servlet class after first call", 1, AccessCountServlet.getNumInstances() );
         assertEquals( "Second reply", "2", sr.getResponse( request ).getText().trim() );
+        assertEquals( "Instances of servlet class after first call", 1, AccessCountServlet.getNumInstances() );
+        sr.shutDown();
+        assertEquals( "Instances of servlet class after shutdown", 0, AccessCountServlet.getNumInstances() );
     }
 
 
@@ -218,6 +225,25 @@ public class StatelessTest extends TestCase {
     static class AccessCountServlet extends HttpServlet {
 
         private int _numAccesses;
+
+        private static int _numInstances = 0;
+
+
+        public void init() throws ServletException {
+            super.init();
+            _numInstances++;
+        }
+
+
+        public void destroy() {
+            super.destroy();
+            _numInstances--;
+        }
+
+
+        public static int getNumInstances() {
+            return _numInstances;
+        }
 
 
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {

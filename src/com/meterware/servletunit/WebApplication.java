@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, Russell Gold
+ * Copyright (c) 2001-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
  * This class represents the information recorded about a single web
  * application. It is usually extracted from web.xml.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="balld@webslingerZ.com">Donald Ball</a>
  **/
 class WebApplication {
@@ -123,6 +123,14 @@ class WebApplication {
             resourceName = "/" + resourceName;
         }
         _servletMapping.put( resourceName, servletConfiguration );
+    }
+
+
+    /**
+     * Calls the destroy method for every active servlet.
+     */
+    void destroyServlets() {
+        _servletMapping.destroyServlets();
     }
 
 
@@ -392,6 +400,11 @@ class WebApplication {
         }
 
 
+        synchronized void destroyServlet() {
+            if (_servlet != null) _servlet.destroy();
+        }
+
+
         String getClassName() {
             return _className;
         }
@@ -437,7 +450,7 @@ class WebApplication {
 
         SecurityConstraintImpl( Element root ) throws SAXException {
             final NodeList roleNames = root.getElementsByTagName( "role-name" );
-            for (int i = 0; i < roleNames.getLength(); i++) _roles.add( getTextValue( (Element) roleNames.item( i ) ) );
+            for (int i = 0; i < roleNames.getLength(); i++) _roles.add( getTextValue( roleNames.item( i ) ) );
 
             final NodeList resources = root.getElementsByTagName( "web-resource-collection" );
             for (int i = 0; i < resources.getLength(); i++) _resources.add( new WebResourceCollection( (Element) resources.item( i ) ) );
@@ -471,7 +484,7 @@ class WebApplication {
 
             WebResourceCollection( Element root ) throws SAXException {
                 final NodeList urlPatterns = root.getElementsByTagName( "url-pattern" );
-                for (int i = 0; i < urlPatterns.getLength(); i++) _urlPatterns.add( getTextValue( (Element) urlPatterns.item( i ) ) );
+                for (int i = 0; i < urlPatterns.getLength(); i++) _urlPatterns.add( getTextValue( urlPatterns.item( i ) ) );
             }
 
 
@@ -559,6 +572,11 @@ class WebApplication {
         String getPathInfo( String servletName ) {
             return null;
         }
+
+
+        public void destroyServlet() {
+            getConfiguration().destroyServlet();
+        }
     }
 
 
@@ -642,6 +660,22 @@ class WebApplication {
                 return urlFile;
             } else {
                 return urlFile.substring( 0, urlFile.indexOf( '?' ) );
+            }
+        }
+
+
+        public void destroyServlets() {
+            if (_defaultMapping != null) _defaultMapping.destroyServlet();
+            destroyServlets( _exactMatches );
+            destroyServlets( _extensions );
+            destroyServlets( _urlTree );
+        }
+
+
+        private void destroyServlets( Map exactMatches ) {
+            for (Iterator iterator = exactMatches.values().iterator(); iterator.hasNext();) {
+                ServletMapping servletMapping = (ServletMapping) iterator.next();
+                servletMapping.destroyServlet();
             }
         }
 

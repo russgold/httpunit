@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003 by Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,6 +38,8 @@ import junit.framework.TestSuite;
 
 /**
  * Tests the ServletUnitHttpRequest class.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class HttpServletRequestTest extends ServletUnitTest {
 
@@ -53,6 +55,25 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
     public HttpServletRequestTest( String name ) {
         super( name );
+    }
+
+
+    public void testHeaderAccess() throws Exception {
+        WebRequest wr   = new GetMethodWebRequest( "http://localhost/simple" );
+        wr.setHeaderField( "sample", "value" );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+        assertEquals( "sample header value", "value", request.getHeader( "sample") );
+
+        assertContains( "Header names", "sample", request.getHeaderNames() );
+    }
+
+
+    private void assertContains( String comment, String string, Enumeration headerNames ) {
+        while (headerNames != null && headerNames.hasMoreElements()) {
+            String name = (String) headerNames.nextElement();
+            if (name.equalsIgnoreCase( string )) return;
+        }
+        fail( comment + " does not contain " + string );
     }
 
 

@@ -11,6 +11,12 @@ Limitations:
 
 
 Revision History:
+ 3-Jan-2003
+Additions:
+    1. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked
+       through that servlet runner.
+    2. ServletUnit now supports HttpServletRequest.getHeaderNames
+
 30-Dec-2002
 Additions:
     1. Added support for document.getElementByID

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,13 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 
 import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebRequest;
@@ -41,6 +36,8 @@ import org.xml.sax.SAXException;
 
 /**
  * This class acts as a test environment for servlets.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class ServletRunner {
 
@@ -131,6 +128,15 @@ public class ServletRunner {
      **/
     public WebResponse getResponse( String url ) throws MalformedURLException, IOException, SAXException {
         return getClient().getResponse( url );
+    }
+
+
+    /**
+     * Shuts down the servlet container, returning any resources held by it.
+     * Calls the destroy method of each active servlet.
+     */
+    public void shutDown() {
+        _application.destroyServlets();
     }
 
 
