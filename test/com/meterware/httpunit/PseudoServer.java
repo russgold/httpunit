@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -245,7 +245,6 @@ public class PseudoServer {
 	    }
             header = br.readLine();
         }
-
         readContent( headers, br );
         return headers;
     }
@@ -262,6 +261,22 @@ public class PseudoServer {
         }
     }
 
+
+    private void printContent( char[] content ) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < content.length; i++) {
+            if (i == 0) {
+            } else if ((i % 40) == 0) {
+                sb.append( '\n' ); 
+            } else if (i % 4 == 0) {
+                sb.append( ' ' );
+            }
+            sb.append( Integer.toHexString( content[i] ) );
+        }
+        System.out.println( sb.toString() );
+    }
+      
+    
     private Dictionary getParameters( String content ) throws IOException {
         Hashtable parameters = new Hashtable();
 	if (content == null || content.trim().length() == 0) return parameters;

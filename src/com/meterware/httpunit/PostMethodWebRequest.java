@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -107,73 +107,11 @@ public class PostMethodWebRequest extends WebRequest {
 
     private MessageBody newMessageBody() {
         if (isMimeEncoded()) {
-            return newMimeEncodedMessageBody( this );
+            return new MimeEncodedMessageBody( this );
         } else {
             return new URLEncodedMessageBody( this );
         }
     }
-
-
-    private static Constructor _bodyConstructor;
-
-
-    static private MessageBody newMimeEncodedMessageBody( PostMethodWebRequest request ) {
-        try {
-            return (MessageBody) getMimeEncodedMessageBodyConstructor().newInstance( new Object[] { request } );
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException( "Programming error: no access to desired message body constructor. Please report this problem." );
-        } catch (InstantiationException e) {
-            throw new RuntimeException( "Programming error: message body class is abstract. Please report this problem." );
-        } catch (InvocationTargetException e) {
-            if (e.getTargetException() instanceof RuntimeException) {
-                throw (RuntimeException) e.getTargetException();
-            } else if (e.getTargetException() instanceof Error) {
-                throw (Error) e.getTargetException();
-            } else {
-                throw new RuntimeException( "Error during construction of MimeEncodedMessageBody: " + e.getTargetException() );
-            }
-            
-        }
-    }
-
-
-    static private Constructor getMimeEncodedMessageBodyConstructor() {
-        if (_bodyConstructor == null) {
-            try {
-                confirmJavaMail();
-                confirmJavaActivationFramework();
-                Class bodyClass = Class.forName( "com.meterware.httpunit.MimeEncodedMessageBody" );
-                _bodyConstructor = bodyClass.getConstructor( new Class[] { PostMethodWebRequest.class } );
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException( "Multi-part form support was not compiled.\n" +
-                                            "Please rebuild HttpUnit or obtain a version which has this capability included." );
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException( "Programming error: cannot find desired message body constructor. Please report this problem." );
-            }
-        }
-        return _bodyConstructor;
-    }
-
-
-    static private void confirmJavaMail() {
-        try {
-            Class.forName( "javax.mail.MessagingException" );
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException( "Multi-part form support requires the Java Mail and Java Activation Framework extensions.\n" +
-                                        "The Java Mail extension is not in your classpath." );
-        }
-    }
-
-
-    static private void confirmJavaActivationFramework() {
-        try {
-            Class.forName( "javax.activation.DataSource" );
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException( "Multi-part form support requires the Java Mail and Java Activation Framework extensions.\n" +
-                                        "The Java Activation Framework extension is not in your classpath." );
-        }
-    }
-
 
 }
 

@@ -11,7 +11,7 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
-23-Mar-01
+2-Apr-01
 Acknowledgements:
     Thanks to Silvio Samadelli for improved cookie-recognition logic
     
@@ -19,6 +19,8 @@ Problems corrected:
     1. Under JDK 1.3, error headers would sometimes cause a FileNotFoundException
     2. Cookies containing '=' or wrapped in quotes are now recognized
     3. The JavaDoc now correctly shows the public methods in TableCell used for handling nested tables.
+    4. The XML retrieval test is no longer run when Xerces is not in the classpath, rather than giving an error.
+    5. File upload capability no longer depends on JavaMail and JAF, although its test does
 
 Additions:
     1. The Referer header is now sent for requests derived from links and forms.
