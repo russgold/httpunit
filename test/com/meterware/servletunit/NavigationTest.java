@@ -92,6 +92,36 @@ public class NavigationTest extends TestCase {
     }
 
 
+    public void testForwardViaHttpServletRequest() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/target", TargetServlet.class );
+        wxs.addServlet( "/origin", FowarderServlet2.class );
+
+        ServletRunner sr = new ServletRunner( wxs.asInputStream(), "/context" );
+
+        WebClient wc = sr.newClient();
+        WebResponse response = wc.getResponse( "http://localhost/context/origin?color=green" );
+        assertNotNull( "No response received", response );
+        assertEquals( "Expected response", "color=green: path=/context/target", response.getText() );
+        assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
+
+
+    public void testForwardViaRelativePath() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/some/target", TargetServlet.class );
+        wxs.addServlet( "/some/origin", FowarderServlet3.class );
+
+        ServletRunner sr = new ServletRunner( wxs.asInputStream(), "/context" );
+
+        WebClient wc = sr.newClient();
+        WebResponse response = wc.getResponse( "http://localhost/context/some/origin?color=green" );
+        assertNotNull( "No response received", response );
+        assertEquals( "Expected response", "color=green: path=/context/some/target", response.getText() );
+        assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
+
+
     static class OriginServlet extends HttpServlet {
 
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
@@ -111,6 +141,24 @@ public class NavigationTest extends TestCase {
     }
 
 
+    static class FowarderServlet2 extends HttpServlet {
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
+            req.getRequestDispatcher( "/target" ).forward( req, resp );
+        }
+
+    }
+
+
+    static class FowarderServlet3 extends HttpServlet {
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
+            req.getRequestDispatcher( "target" ).forward( req, resp );
+        }
+
+    }
+
+
     static class IncluderServlet extends HttpServlet {
         static final String PREFIX = "expecting: ";
 
@@ -118,7 +166,6 @@ public class NavigationTest extends TestCase {
             resp.getWriter().print( PREFIX );
             getServletContext().getRequestDispatcher( "/target?color=blue" ).include( req, resp );
         }
-
     }
 
 

@@ -19,6 +19,7 @@ Acknowledgements:
 
 Additions:
     1. You can now get at the stored session IDs in ServletUnitContext.
+    2. ServletUnit now supports HttpServletRequest.getRequestDispatch()
 
 Notes:
     1. The acceptCookies, acceptGzip, autoRefresh and autoForward properties have been moved from HttpUnitOptions to ClientProperties,

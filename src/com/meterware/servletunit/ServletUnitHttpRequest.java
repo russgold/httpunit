@@ -35,6 +35,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.servlet.ServletInputStream;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 
 
 /**
@@ -560,7 +561,18 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * is that this method can take a relative path.
      **/
     public RequestDispatcher getRequestDispatcher( String path ) {
-        throw new RuntimeException( "getRequestDispatcher not implemented" );
+        try {
+            if (!path.startsWith( "/" )) path = combinedPath( getServletPath(), path );
+            return _servletRequest.getServlet().getServletConfig().getServletContext().getRequestDispatcher( path );
+        } catch (ServletException e) {
+            return null;
+        }
+    }
+
+
+    private String combinedPath( String basePath, String relativePath ) {
+        if (basePath.indexOf( '/' ) < 0) return relativePath;
+        return basePath.substring( 0, basePath.lastIndexOf( '/' ) ) + '/' + relativePath;
     }
 
 
@@ -725,7 +737,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     final static private String LOOPBACK_ADDRESS = "127.0.0.1";
 
     private WebRequest                 _request;
-    private ServletMetaData             _servletRequest;
+    private ServletMetaData            _servletRequest;
     private WebClient.HeaderDictionary _headers;
     private ServletUnitContext         _context;
     private ServletUnitHttpSession     _session;
