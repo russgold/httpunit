@@ -58,6 +58,7 @@
 <!--  Prepares the build directory                                         -->
 <!--  ===================================================================  -->
 <target name="prepare">
+    <tstamp />
     <mkdir dir="${build.dir}" />
 </target>
 
@@ -126,7 +127,12 @@
 <!--  ===================================================================  -->
 <target name="jar" depends="compile">
     <mkdir dir="${lib.dir}" />
-    <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.classes}" includes="com/**" />
+    <echo file="${build.dir}/info.txt" message="Manifest-Version: 1.0" />
+    <echo file="${build.dir}/info.txt" message="Sealed: false" append="yes" />
+    <echo file="${build.dir}/info.txt" message="HttpUnit-Version: ${version}" append="yes" />
+    <echo file="${build.dir}/info.txt" message="Build-Date: ${TODAY}" append="yes" />
+    <echo file="${build.dir}/info.txt" message="Build-Time: ${TSTAMP}" append="yes" />
+    <jar jarfile="${lib.dir}/${name}.jar" basedir="${build.classes}" includes="com/**" manifest="${build.dir}/info.txt" />
 </target>
 
 
