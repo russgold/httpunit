@@ -25,6 +25,7 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
 import java.io.IOException;
 import java.io.File;
 import java.net.URL;
+import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,6 +88,15 @@ public class WebForm extends WebRequestSource {
      **/
      public WebResponse submitNoButton() throws SAXException, IOException {
         return submit( SubmitButton.createFakeSubmitButton( this /* fake */ ) );
+    }
+
+
+    protected WebResponse submitRequest( String event, WebRequest request ) throws IOException, SAXException {
+        try {
+            return super.submitRequest( event, request );
+        } catch (UnknownServiceException e) {
+            throw new UnsupportedActionException( "HttpUnit does not support " + request.getURL().getProtocol() + " URLs in form submissions" );
+        }
     }
 
 

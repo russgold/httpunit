@@ -27,9 +27,13 @@ import org.xml.sax.SAXException;
 import java.net.URL;
 import java.util.StringTokenizer;
 import java.io.IOException;
-import java.io.File;
 
 
+/**
+ * Base class for objects which can be clicked to generate new web requests.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ */
 abstract
 public class WebRequestSource extends ParameterHolder implements HTMLElement {
 

@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+27-Sep-2004:
+    Problems fixed:
+        1. bug #1032440: An explanatory exception is now thrown on an attempt to use a mailto: URL in a form submission
+
 24-Sep-2004:
    Acknowledgements:
        Thanks to Dave Brosius for adding hashCode to Cookie and QuerySpec

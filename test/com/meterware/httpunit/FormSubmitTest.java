@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -536,6 +537,25 @@ public class FormSubmitTest extends HttpUnitTest {
 
         WebResponse response = form.submit();
         assertEquals( "posted parameters", "text_field-name*=a+value&apply=Apply", response.getText() );
+    }
+
+
+    public void testMailtoActionRejected() throws Exception {
+        defineWebPage( "abc/form", "<form name='test' action='mailto:russgold@httpunit.org'>" +
+                               "  <input type='text' name='text_field'>" +
+                               "  <input type='submit' name='apply' value='Apply'>" +
+                               "</form>" );
+
+        WebResponse wr  = _wc.getResponse( getHostPath() + "/abc/form.html" );
+        WebForm form    = wr.getForms()[0];
+        form.setParameter( "text_field", "a value" );
+
+        try {
+            form.submit();
+            fail( "Should have thrown an UnsupportedActionException" );
+        } catch (UnsupportedActionException success) {
+            assertTrue( "Did not include mention of bad URL type", success.getMessage().indexOf( "mailto" ) >= 0 );
+        }
     }
 
 
