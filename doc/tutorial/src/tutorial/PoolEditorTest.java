@@ -48,6 +48,7 @@ public class PoolEditorTest extends TestCase {
         ServletRunner sr = new ServletRunner( "web.xml" );
 
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
         WebForm form = response.getFormWithID( "pool" );
         assertNotNull( "No form found with ID 'pool'", form );
@@ -60,6 +61,7 @@ public class PoolEditorTest extends TestCase {
         ServletRunner sr = new ServletRunner( "web.xml" );
 
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
         WebForm form = response.getFormWithID( "pool" );
         assertNotNull( "No form found with ID 'pool'", form );
@@ -77,6 +79,7 @@ public class PoolEditorTest extends TestCase {
     public void testSubmitButtons() throws Exception {
         ServletRunner sr = new ServletRunner( "web.xml" );
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
         WebForm form = response.getFormWithID( "pool" );
@@ -97,6 +100,7 @@ public class PoolEditorTest extends TestCase {
 
         ServletRunner sr = new ServletRunner( "web.xml" );
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
         WebForm form = response.getFormWithID( "pool" );
@@ -116,6 +120,7 @@ public class PoolEditorTest extends TestCase {
     public void testPoolEntry() throws Exception {
         ServletRunner sr = new ServletRunner( "web.xml" );
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
 
         WebForm form = response.getFormWithID( "pool" );
@@ -140,6 +145,7 @@ public class PoolEditorTest extends TestCase {
     public void testPoolValidation() throws Exception {
         ServletRunner sr = new ServletRunner( "web.xml" );
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
         WebForm form = response.getFormWithID( "pool" );
         WebRequest request = form.getRequest( "save", "Open Pool" );
@@ -162,6 +168,7 @@ public class PoolEditorTest extends TestCase {
     public void testPoolOpenErrorDetection() throws Exception {
         ServletRunner sr = new ServletRunner( "web.xml" );
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
         WebForm form = response.getFormWithID( "pool" );
         WebRequest request = form.getRequest( "save", "Open Pool" );
@@ -184,6 +191,7 @@ public class PoolEditorTest extends TestCase {
     public void testGoodPoolOpen() throws Exception {
         ServletRunner sr = new ServletRunner( "web.xml" );
         ServletUnitClient client = sr.newClient();
+        client.setAuthorization( "aUser", "pool-admin" );
         WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
         WebForm form = response.getFormWithID( "pool" );
         WebRequest request = form.getRequest( "save", "Open Pool" );
