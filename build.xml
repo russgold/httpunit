@@ -5,8 +5,8 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
-    <property name="version" value="1.2.2" />
-    <property name="zip_version" value="1_2_2" /> 
+    <property name="version" value="1.2.4" />
+    <property name="zip_version" value="1_2_4" /> 
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
@@ -48,7 +48,7 @@
 <target name="compile" depends="prepare,check_for_optional_packages">
     <mkdir dir="${build.classes}" /> 
     <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
-           debug="on" deprecation="on" optimize="off">
+           debug="off" deprecation="on" optimize="off">
          <exclude name="**/servletunit/*" unless="jsdk.present" />
     </javac>
 </target>
@@ -59,7 +59,7 @@
 <!--  ===================================================================  --> 
 <target name="testcompile" depends="compile,check_for_optional_packages">
     <javac srcdir="${tstsrc.dir}" destdir="${build.classes}" classpath="${classpath}" 
-           debug="on" deprecation="on" optimize="off">
+           debug="off" deprecation="on" optimize="off">
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/FileUploadTest.java" unless="javamail.present" />
          <exclude name="**/XMLPageTest.java" unless="xerces.present" />

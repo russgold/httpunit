@@ -11,17 +11,7 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
-13-Apr-01
-Problems corrected:
-    1. Repeated requests to the same URL were not resending requests properly. This caused some problems with validation.
-    2. Now correctly passes the full specification of uploaded files, rather than just the name.
-
-Additions:
-    1. The GetMethodWebRequest and PostMethodWebRequest constructors which accept a target are now public.
-    2. Added getID to WebForm
-    3. Added getFormWithID to HTMLSegment interface
-
-3-Apr-01
+ 5-May-01 1.2.4
 Acknowledgements:
     Thanks to Jim Kimball for finding and fixing the redirection of subframes
     
@@ -30,6 +20,18 @@ Problems corrected:
     2. No longer capitalizes all header names; this was necessary for
        compatibility with those servers that do not understand case-insensitive
        header names.
+    3. Repeated requests to the same URL were not resending requests properly. 
+       This caused some problems with validation.
+    4. Now correctly passes the full specification of uploaded files, rather than just the name.
+
+Additions:
+    1. Transmitted headers as well as received headers are now shown when loggingHttpHeaders
+       is enabled.
+    2. The GetMethodWebRequest and PostMethodWebRequest constructors which accept a target 
+       are now public.
+    3. Added getID to WebForm
+    4. Added getFormWithID to HTMLSegment interface
+
 
 2-Apr-01 1.2.3
 Acknowledgements:
