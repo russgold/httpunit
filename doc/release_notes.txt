@@ -16,6 +16,7 @@ Revision History:
 28-Jun-2004
    Problems fixed:
        1. bug #959918: Javascript setting of numeric values included trailing zeros after the decimal point.
+       2. bug #957882: URL path elements containing leading '.' were being stripped of those periods.
 
 27-Jun-2004
    Thanks to Fabrizio Giustina for adding an entity-resolver to support local use of ServletUnit with a regular web.xml

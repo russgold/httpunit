@@ -118,13 +118,13 @@ public class WebRequest {
     private String getNormalizedURL( String url ) {
         if (url.lastIndexOf( "//" ) > url.indexOf( "://" ) + 1) return getNormalizedURL( stripDoubleSlashes( url ) );
         if (url.indexOf( "/.." ) > 0) return getNormalizedURL( stripUpNavigation( url ) );
-        if (url.indexOf( "/." ) > 0) return getNormalizedURL( stripInPlaceNavigation( url ) );
+        if (url.indexOf( "/./" ) > 0) return getNormalizedURL( stripInPlaceNavigation( url ) );
         return url;
     }
 
 
     private String stripInPlaceNavigation( String url ) {
-        int i = url.lastIndexOf( "/." );
+        int i = url.lastIndexOf( "/./" );
         return url.substring( 0, i+1 ) + url.substring( i+2 );
      }
 

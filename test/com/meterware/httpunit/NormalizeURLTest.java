@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2003, Russell Gold
+* Copyright (c) 2003-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -28,6 +28,7 @@ import java.net.URL;
 /**
  * Verifies handling of URLs with odd features.
  * @author <a href="mailto:ddkilzer@users.sourceforge.net">David D. Kilzer</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class NormalizeURLTest extends HttpUnitTest {
 
@@ -339,6 +340,12 @@ public class NormalizeURLTest extends HttpUnitTest {
     public void testHostnameSlash3Directory1Directory2() throws Exception {
         WebRequest request = new GetMethodWebRequest( "http://host.name////directory1////directory2////" );
         assertEquals( "URL", request.getURL().toExternalForm(), "http://host.name/directory1/directory2/" );
+    }
+
+
+    public void testPathElementLeadingDot() throws Exception {
+        WebRequest request = new GetMethodWebRequest( "http://host/context/.src/page" );
+        assertEquals( "URL", request.getURL().toExternalForm(), "http://host/context/.src/page" );
     }
 
 
