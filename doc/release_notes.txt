@@ -11,7 +11,14 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
-2-Apr-01
+3-Apr-01
+Acknowledgements:
+    Thanks to Jim Kimball for finding and fixing the redirection of subframes
+    
+Problems corrected:
+    1. Redirection with subframes was incorrectly targeted at the top frame.
+
+2-Apr-01 1.2.3
 Acknowledgements:
     Thanks to Silvio Samadelli for improved cookie-recognition logic
     

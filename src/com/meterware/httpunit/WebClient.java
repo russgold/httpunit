@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -68,7 +68,9 @@ public class WebClient {
         updateCookies( response );
         if (response.getHeaderField( "Location" ) != null) {
             delay( HttpUnitOptions.getRedirectDelay() );
-            return getResponse( new RedirectWebRequest( request, response.getHeaderField( "Location" ) ) );
+            return getResponse( new RedirectWebRequest( request, 
+                                                        response.getHeaderField( "Location" ),
+                                                        request.getTarget() ) );
         } else {
             updateFrames( response );
             return response;
@@ -300,8 +302,8 @@ public class WebClient {
 class RedirectWebRequest extends WebRequest {
 
 
-    RedirectWebRequest( WebRequest baseRequest, String relativeURL ) throws MalformedURLException {
-        super( baseRequest, relativeURL );
+    RedirectWebRequest( WebRequest baseRequest, String relativeURL, String target ) throws MalformedURLException {
+        super( baseRequest, relativeURL, target );
     }
 
 

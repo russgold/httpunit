@@ -176,8 +176,8 @@ public class WebRequest {
     /**
      * Constructs a web request using a base request and a relative URL string.
      **/
-    protected WebRequest( WebRequest baseRequest, String urlString ) throws MalformedURLException {
-        this( baseRequest.getURL(), urlString );
+    protected WebRequest( WebRequest baseRequest, String urlString, String target ) throws MalformedURLException {
+        this( baseRequest.getURL(), urlString, target );
     }
 
 
