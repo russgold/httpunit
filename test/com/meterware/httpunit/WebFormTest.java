@@ -122,8 +122,9 @@ public class WebFormTest extends HttpUnitTest {
         assertNotNull( parameters );
         assertMatchingSet( "form parameter names", new String[] { "first", "name", "second" }, parameters );
 
-        assertEquals( "First checkbox",  "",   form.getParameterValue( "first" ) );
+        assertNull( "First checkbox has a non-null value",  form.getParameterValue( "first" ) );
         assertEquals( "Second checkbox", "on", form.getParameterValue( "second" ) );
+        assertNull( "Found extraneous value for unknown parameter 'magic'", form.getParameterValue( "magic" ) );
         assertTrue( "Did not find parameter 'first'", form.hasParameterNamed( "first" ) );
         assertTrue( "Did not find parameter with prefix 'sec'", form.hasParameterStartingWithPrefix( "sec" ) );
         assertTrue( "Did not find parameter with prefix 'nam'", form.hasParameterStartingWithPrefix( "nam" ) );
@@ -230,6 +231,7 @@ public class WebFormTest extends HttpUnitTest {
         String[] parameterNames = form.getParameterNames();
         assertEquals( "num parameters", 1, parameterNames.length );
         assertEquals( "parameter name", "colors", parameterNames[0] );
+        assertTrue( "Found extraneous values for unknown parameter 'magic'", form.getParameterValues( "magic" ).length == 0 );
         assertMatchingSet( "Select defaults", new String[] { "red", "pink" }, form.getParameterValues( "colors" ) );
         assertMatchingSet( "Select options", new String[] { "blue", "red", "green", "salmon" }, form.getOptions( "colors" ) );
         assertEquals( "Select values", new String[] { "blue", "red", "green", "pink" }, form.getOptionValues( "colors" ) );

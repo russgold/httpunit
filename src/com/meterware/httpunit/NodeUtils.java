@@ -64,11 +64,14 @@ class NodeUtils {
 
 
     public static String getNodeAttribute( Node node, String attributeName, String defaultValue ) {
-        NamedNodeMap nnm = node.getAttributes();
-        Node attribute = nnm.getNamedItem( attributeName );
+        Node attribute = node.getAttributes().getNamedItem( attributeName );
         return (attribute == null) ? defaultValue : attribute.getNodeValue();
     }
 
+
+    static boolean isNodeAttributePresent( Node node, final String attributeName ) {
+        return node.getAttributes().getNamedItem( attributeName ) != null;
+    }
 
     /**
      * Converts the DOM trees rooted at the specified nodes to text, ignoring
@@ -125,5 +128,6 @@ class NodeUtils {
             }
         }
     }
+
 
 }

@@ -24,6 +24,9 @@ import java.net.URL;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -37,6 +40,7 @@ import org.w3c.dom.NodeList;
  * may also create a {@link WebRequest} to simulate the submission of the form.
  **/
 public class WebForm extends WebRequestSource {
+    private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
 
 
     /**
@@ -67,11 +71,7 @@ public class WebForm extends WebRequestSource {
      * Returns true if a parameter with given name exists in this form.
      **/
     public boolean hasParameterNamed( String soughtName ) {
-        FormControl[] parameters = getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getName().equals( soughtName )) return true;
-        }
-        return false;
+        return getFormParameters().containsKey( soughtName );
     }
 
 
@@ -79,10 +79,9 @@ public class WebForm extends WebRequestSource {
      * Returns true if a parameter starting with a given name exists,
      **/
     public boolean hasParameterStartingWithPrefix( String prefix ) {
-        FormControl[] parameters = getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            String name = parameters[i].getName();
-            if (name.startsWith( prefix )) return true;
+        String[] names = getParameterNames();
+        for (int i = 0; i < names.length; i++) {
+            if (names[i].startsWith( prefix )) return true;
         }
         return false;
     }
@@ -93,17 +92,29 @@ public class WebForm extends WebRequestSource {
      * in the order in which they appear.
      **/
     public String[] getParameterNames() {
-        Vector parameterNames = new Vector();
-        FormControl[] parameters = getParameters();
+        ArrayList parameterNames = new ArrayList( getFormParameters().keySet() );
+        return (String[]) parameterNames.toArray( new String[ parameterNames.size() ] );
+    }
 
-        for (int i = 0; i < parameters.length; i++) {
-            String name = parameters[i].getName();
-            if (!parameterNames.contains( name )) parameterNames.addElement( name );
+
+    /**
+     * Returns a map of parameter name to form parameter objects. Each form parameter object represents the set of form
+     * controls with a particular name.
+     */
+    private Map getFormParameters() {
+        if (_formParameters == null) {
+            _formParameters = new HashMap();
+            FormControl[] controls = getFormControls();
+            for (int i = 0; i < controls.length; i++) {
+                FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
+                if (parameter == null) {
+                    parameter = new FormParameter();
+                    _formParameters.put( controls[i].getName(), parameter );
+                }
+                parameter.addControl( controls[i] );
+            }
         }
-
-        String[] result = new String[ parameterNames.size() ];
-        parameterNames.copyInto( result );
-        return result;
+        return _formParameters;
     }
 
 
@@ -118,7 +129,6 @@ public class WebForm extends WebRequestSource {
         }
         return _submitButtons;
     }
-
 
 
     private Vector _buttonVector;
@@ -279,13 +289,8 @@ public class WebForm extends WebRequestSource {
 
         String[] parameterNames = getParameterNames();
         for (int i = 0; i < parameterNames.length; i++) {
-            if (parameterNames[i].length() > 0 && getParameterDefaults().get( parameterNames[i] ) != null) {
-                Object value = getParameterDefaults().get( parameterNames[i] );
-                if (value instanceof String) {
-                    request.setParameter( parameterNames[i], (String) value);
-                } else {
-                    request.setParameter( parameterNames[i], (String[]) value);
-                }
+            if (parameterNames[i].length() > 0 && !isFileParameter( parameterNames[i] )) {
+                request.setParameter( parameterNames[i], getParameterValues( parameterNames[i] ) );
             }
         }
 	    request.setHeaderField( "Referer", getBaseURL().toExternalForm() );
@@ -294,13 +299,11 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Returns the default value of the named parameter.
+     * Returns the default value of the named parameter.  If the parameter does not exist returns null.
      **/
     public String getParameterValue( String name ) {
-        Object result = getParameterDefaults().get( name );
-        if (result instanceof String) return (String) result;
-        if (result instanceof String[] && ((String[]) result).length > 0) return ((String[]) result)[0];
-        return "";
+        String[] values = getParameterValues( name );
+        return values.length == 0 ? null : values[0];
     }
 
 
@@ -308,10 +311,18 @@ public class WebForm extends WebRequestSource {
      * Returns the multiple default values of the named parameter.
      **/
     public String[] getParameterValues( String name ) {
-        Object result = getParameterDefaults().get( name );
-        if (result instanceof String) return new String[] { (String) result };
-        if (result instanceof String[]) return (String[]) result;
-        return new String[0];
+        ArrayList valueList = new ArrayList();
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            valueList.addAll( Arrays.asList( controls[i].getValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
+    }
+
+
+    private FormParameter getParameter( String name ) {
+        final FormParameter parameter = ((FormParameter) getFormParameters().get( name ));
+        return parameter != null ? parameter : UNKNOWN_PARAMETER;
     }
 
 
@@ -339,38 +350,38 @@ public class WebForm extends WebRequestSource {
      * Returns true if the named parameter accepts multiple values.
      **/
     public boolean isMultiValuedParameter( String name ) {
-        return FormControl.TYPE_MULTI_VALUED.equals( getParameterTypes().get( name ) );
-    }
-
-
-    /**
-     * Returns true if the named parameter accepts free-form text.
-     **/
-    public boolean isTextParameter( String name ) {
-        return FormControl.TYPE_TEXT.equals( getParameterTypes().get( name ) );
-    }
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isMultiValued()) return true;
+            if (!controls[i].isExclusive() && controls.length > 1) return true;
+        }
+        return false;
+     }
 
 
     /**
      * Returns the number of text parameters in this form with the specified name.
      **/
     public int getNumTextParameters( String name ) {
-        Object count = getTextParameterCounts().get( name );
-        if (count == null) return 0;
-        return ((Number) count ).intValue();
+        int result = 0;
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isTextControl()) result++;
+        }
+        return result;
     }
 
 
-    private Hashtable getTextParameterCounts() {
-        if (_textParameterCounts == null) {
-            Hashtable parameterCounts = new Hashtable();
-            FormControl[] parameters = getParameters();
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i].updateTextParameterCounts( parameterCounts );
-            }
-            _textParameterCounts = parameterCounts;
+
+    /**
+     * Returns true if the named parameter accepts free-form text.
+     **/
+    public boolean isTextParameter( String name ) {
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isTextControl()) return true;
         }
-        return _textParameterCounts;
+        return false;
     }
 
 
@@ -378,7 +389,11 @@ public class WebForm extends WebRequestSource {
      * Returns true if the named parameter accepts files for upload.
      **/
     public boolean isFileParameter( String name ) {
-        return FormControl.TYPE_FILE.equals( getParameterTypes().get( name ) );
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isFileParameter()) return true;
+        }
+        return false;
     }
 
 
@@ -418,20 +433,11 @@ public class WebForm extends WebRequestSource {
     /** The attributes of the form parameters. **/
     private FormControl[] _parameters;
 
-    /** The parameters with their default values. **/
-    private Hashtable      _defaults;
-
     /** The parameters with their displayed options. **/
     private Hashtable      _options;
 
     /** The parameters with their options. **/
     private Hashtable      _optionValues;
-
-    /** The parameters mapped to the type of data which they accept. **/
-    private Hashtable      _dataTypes;
-
-    /** The parameters mapped to their number of occurrences as text parameters. **/
-    private Hashtable      _textParameterCounts;
 
     /** The submit buttons in this form. **/
     private SubmitButton[] _submitButtons;
@@ -439,24 +445,15 @@ public class WebForm extends WebRequestSource {
     /** The character set in which the form will be submitted. **/
     private String         _characterSet;
 
+    /** A map of parameter names to form parameter objects. **/
+    private Map            _formParameters;
 
-    private Hashtable getParameterDefaults() {
-        if (_defaults == null) {
-            FormControl[] parameters = getParameters();
-            Hashtable defaults = new Hashtable();
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i].updateParameterDefaults( defaults );
-            }
-            _defaults = defaults;
-        }
-        return _defaults;
-    }
 
     private Hashtable _required;
 
     private Hashtable getParameterRequiredValues() {
         if (_required == null) {
-            FormControl[] parameters = getParameters();
+            FormControl[] parameters = getFormControls();
             Hashtable required = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
                 parameters[i].updateRequiredValues( required );
@@ -470,7 +467,7 @@ public class WebForm extends WebRequestSource {
     private Hashtable getParameterOptions() {
         if (_options == null) {
             Hashtable options = new Hashtable();
-            FormControl[] parameters = getParameters();
+            FormControl[] parameters = getFormControls();
             for (int i = 0; i < parameters.length; i++) {
                 parameters[i].updateParameterOptions( options );
             }
@@ -483,7 +480,7 @@ public class WebForm extends WebRequestSource {
     private Hashtable getParameterOptionValues() {
         if (_optionValues == null) {
             Hashtable options = new Hashtable();
-            FormControl[] parameters = getParameters();
+            FormControl[] parameters = getFormControls();
             for (int i = 0; i < parameters.length; i++) {
                 parameters[i].updateParameterOptionValues( options );
             }
@@ -493,26 +490,13 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    private Hashtable getParameterTypes() {
-        if (_dataTypes == null) {
-            FormControl[] parameters = getParameters();
-            Hashtable types = new Hashtable();
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i].updateParameterTypes( types );
-            }
-            _dataTypes = types;
-        }
-        return _dataTypes;
-    }
-
-
     /**
      * Returns an array of select control descriptors for this form.
      **/
     /**
      * Returns an array of form parameter attributes for this form.
      **/
-    private FormControl[] getParameters() {
+    private FormControl[] getFormControls() {
         if (_parameters == null) {
             Vector list = new Vector();
             if (getNode().hasChildNodes()) addFormParametersToList( getNode().getChildNodes(), list );
@@ -546,11 +530,19 @@ public class WebForm extends WebRequestSource {
 class FormParameter {
 
     void addControl( FormControl control ) {
-        _controls.add( control );
+        _controlList.add( control );
+        _controls = null;
     }
 
 
-    private ArrayList _controls = new ArrayList();
+    FormControl[] getControls() {
+        if (_controls == null) _controls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
+        return _controls;
+    }
+
+
+    private FormControl[] _controls;
+    private ArrayList _controlList = new ArrayList();
 }
 
 
