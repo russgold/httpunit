@@ -240,16 +240,7 @@ abstract class FormControl {
     }
 
 
-    class Scriptable implements ScriptableObject {
-
-        public Object get( String propertyName ) {
-            throw new RuntimeException( "Unknown property: " + propertyName );
-        }
-
-
-        public void set( String propertyName, Object value ) {
-            throw new RuntimeException( "Unknown property: " + propertyName );
-        }
+    class Scriptable extends ScriptableObject {
     }
 
 }

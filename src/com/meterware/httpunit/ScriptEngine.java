@@ -19,48 +19,16 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import java.util.*;
+
 
 /**
- * An interface for objects which will be accessible via scripting.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-abstract public class ScriptableObject {
-
-    private ScriptEngine _scriptEngine;
+public interface ScriptEngine {
 
 
-    /**
-     * Executes the specified scripted event.
-     **/
-    public void doEvent( String eventScript ) {
-        if (_scriptEngine == null) throw new IllegalStateException( "Script engine must be defined before running an event" );
-        _scriptEngine.executeScript( eventScript );
-    }
-
-
-    /**
-     * Returns the value of the named property. Will return null if the property does not exist.
-     **/
-    public Object get( String propertyName ) {
-        return null;
-    }
-
-
-    /**
-     * Sets the value of the named property. Will throw a runtime exception if the property does not exist or
-     * cannot accept the specified value.
-     **/
-    public void set( String propertyName, Object value ) {
-        throw new RuntimeException( "No such property: " + propertyName );
-    }
-
-
-    /**
-     * Specifies the scripting engine to be used.
-     */
-    public void setScriptEngine( ScriptEngine scriptEngine ) {
-        _scriptEngine = scriptEngine;
-    }
+    public void executeScript( String script );
 
 }

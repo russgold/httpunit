@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -40,10 +40,10 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
-class ReceivedPage extends ParsedHTML {
+public class HTMLPage extends ParsedHTML {
 
 
-    public ReceivedPage( URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
+    public HTMLPage( URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
         super( url, parentTarget, getDOM( url, pageText ), characterSet );
         setBaseAttributes();
     }
@@ -58,6 +58,26 @@ class ReceivedPage extends ParsedHTML {
         if (!nl.item(0).hasChildNodes()) return "";
         return nl.item(0).getFirstChild().getNodeValue();
     }
+
+
+    /**
+     * Returns the onLoad event script.
+     */
+    public String getOnLoadEvent() throws SAXException {
+        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "body" );
+        if (nl.getLength() == 0) return "";
+        return ((Element) nl.item(0)).getAttribute( "onload" );
+    }
+
+
+    /**
+     * Returns the contents of any script tags on the page, concatenated.
+     */
+    public String getScripts() throws SAXException {
+        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "script" );
+        return NodeUtils.asText( nl );
+    }
+
 
     /**
      * Returns the location of the linked stylesheet in the head
@@ -108,6 +128,41 @@ class ReceivedPage extends ParsedHTML {
     }
 
 
+    public class Scriptable extends ScriptableObject {
+
+        public Object get( String propertyName ) {
+            WebForm wf = getFormWithName( propertyName );
+            if (wf == null) return super.get( propertyName );
+            return wf.getScriptableObject();
+        }
+
+
+        public String getTitle() throws SAXException {
+            return HTMLPage.this.getTitle();
+        }
+
+
+        public WebForm.Scriptable[] getForms() {
+            WebForm[] forms = HTMLPage.this.getForms();
+            WebForm.Scriptable[] result = new WebForm.Scriptable[ forms.length ];
+            for (int i = 0; i < forms.length; i++) {
+                result[i] = forms[i].getScriptableObject();
+            }
+            return result;
+        }
+
+
+        Scriptable() {}
+    }
+
+
+    Scriptable getScriptableObject() {
+        return new Scriptable();
+    }
+
+//---------------------------------- private members --------------------------------
+
+
     private static Node getDOM( URL url, String pageText ) throws SAXException {
         try {
             return getParser( url ).parseDOM( new ByteArrayInputStream( pageText.getBytes( getUTFEncodingName() ) ), null );
@@ -115,9 +170,6 @@ class ReceivedPage extends ParsedHTML {
             throw new RuntimeException( "UTF-8 encoding failed" );
         }
     }
-
-
-//---------------------------------- private members --------------------------------
 
 
     private static String _utfEncodingName;

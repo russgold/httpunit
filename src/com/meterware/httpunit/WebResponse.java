@@ -33,6 +33,7 @@ import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.LinkedList;
 import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
@@ -453,6 +454,50 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+//---------------------------------------- JavaScript methods ----------------------------------------
+
+    private LinkedList _alerts = new LinkedList();
+
+    /**
+     * Returns the next javascript alert without removing it from the queue.
+     */
+    public String getNextAlert() {
+        return _alerts.isEmpty() ? null : (String) _alerts.getFirst();
+    }
+
+
+    /**
+     * Returns the next javascript alert and removes it from the queue.
+     */
+    public String popNextAlert() {
+        return (String) _alerts.removeFirst();
+    }
+
+
+    public Scriptable getScriptableObject() {
+        return new Scriptable();
+    }
+
+
+    public class Scriptable extends ScriptableObject {
+
+        public void alert( String message ) {
+            _alerts.addLast( message );
+        }
+
+
+        public HTMLPage.Scriptable getDocument() throws SAXException {
+            return getReceivedPage().getScriptableObject();
+        }
+
+
+        public void load() throws SAXException {
+            doEvent( getReceivedPage().getScripts() );
+            doEvent( getReceivedPage().getOnLoadEvent() );
+        }
+    }
+
+
 //---------------------------------------- Object methods --------------------------------------------
 
     abstract
@@ -586,7 +631,7 @@ public class WebResponse implements HTMLSegment {
 
     private WebFrame[] _frames;
 
-    private ReceivedPage _page;
+    private HTMLPage _page;
 
     private String _contentHeader;
 
@@ -863,11 +908,11 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    private ReceivedPage getReceivedPage() throws SAXException {
+    private HTMLPage getReceivedPage() throws SAXException {
         if (_page == null) {
             try {
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
-                _page = new ReceivedPage( _url, _frameName, getText(), getCharacterSet() );
+                _page = new HTMLPage( _url, _frameName, getText(), getCharacterSet() );
             } catch (IOException e) {
                 throw new SAXException( e );
             }

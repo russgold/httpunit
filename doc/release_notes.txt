@@ -12,6 +12,13 @@ Limitations:
 
 
 Revision History:
+24-Jul-2002
+Additions:
+    1. PseudoServer and associated classes are now publically available and in their own package, pseudoserver.
+    2. Experimental JavaScript is starting to be added: support is present for the following DOM objects:
+         Window  properties: self, window, document   methods: alert,  events: onLoad
+         Document properties: title, forms, <form name>
+
 15-Jul-2002
 Problems fixed:
     1. The "_parent" frame target should now be handled correctly.
