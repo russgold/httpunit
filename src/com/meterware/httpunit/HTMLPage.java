@@ -23,6 +23,7 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -77,7 +78,22 @@ public class HTMLPage extends ParsedHTML {
      */
     public String getScripts() throws SAXException {
         NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "script" );
-        return NodeUtils.asText( nl );
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node scriptNode = nl.item(i);
+            String src = NodeUtils.getNodeAttribute( scriptNode, "src", null );
+            if (src == null) {
+                sb.append( NodeUtils.asText( scriptNode.getChildNodes() ) );
+            } else {
+                try {
+                    WebRequest req = new GetMethodWebRequest( getBaseURL(), src );
+                    sb.append( getResponse().getClient().getResource( req ).getText() );
+                } catch (IOException e) {
+                    throw new RuntimeException( "Error loading included script: " + e );
+                }
+            }
+        }
+        return sb.toString();
     }
 
 

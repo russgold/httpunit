@@ -11,8 +11,12 @@ Limitations:
 
 
 Revision History:
+30-Aug-2002
+Additions:
+    1. Added support for included scripts using <script src=...>
+
 29-Aug-2002
-Acknolwedgements:
+Acknowledgements:
     Thanks to Geert Bevin for implementing ServletUnit support for HttpServletRequest.getParameterMap
 
 Additions:

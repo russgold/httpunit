@@ -222,8 +222,8 @@ public abstract class HttpUnitOptions {
 
     /**
      * If true, tells HttpUnit to throw an exception on any attempt to set a form parameter to a value
-     * which could not be set via the browser. The default is true (parameters are validated).
-     * Note: this only applies to a WebRequest created after this setting is changed. A request created
+     * which could not be set via the browser. The default is true (parameters are validated).<br>
+     * <b>Note:</b> this only applies to a WebRequest created after this setting is changed. A request created
      * with this option disabled will not only not be checked for correctness, its parameter submission
      * order will not be guaranteed, and changing parameters will not trigger Javascript onChange / onClick events.
      **/

@@ -79,7 +79,7 @@ public class WebClient {
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         tellListeners( request );
 
-        WebResponse response = getNextPage( request );
+        WebResponse response = getResource( request );
         if (response != null) {
             tellListeners( response );
             updateClient( response );
@@ -90,9 +90,10 @@ public class WebClient {
 
 
     /**
-     * Evaluates the request and returns the desired page. Will return null if the current target is to be unaffected.
+     * Returns the resource specified by the request. Does not update the client or load included framesets.
+     * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
      */
-    private WebResponse getNextPage( WebRequest request ) throws IOException {
+    public WebResponse getResource( WebRequest request ) throws IOException {
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
             return WebResponse.BLANK_RESPONSE;

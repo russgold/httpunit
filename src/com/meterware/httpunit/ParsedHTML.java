@@ -347,6 +347,11 @@ class ParsedHTML {
     }
 
 
+    WebResponse getResponse() {
+        return _response;
+    }
+
+
     interface TablePredicate {
         public boolean isTrue( WebTable table );
     }

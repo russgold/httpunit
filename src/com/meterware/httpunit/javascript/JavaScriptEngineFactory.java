@@ -44,6 +44,7 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
         try {
             JavaScript.run( response );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException( e.toString() );
         }
     }

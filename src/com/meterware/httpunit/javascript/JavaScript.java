@@ -88,6 +88,8 @@ public class JavaScript {
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
             } catch (JavaScriptException e) {
                 throw new RuntimeException( "Script '" + script + "' failed: " + e );
+            } catch (EcmaError e) {
+                throw new RuntimeException( "Syntax Error at line " + e.getLineNumber() + ": " + e.getLineSource() );
             }
         }
 
