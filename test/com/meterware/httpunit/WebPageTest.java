@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
 /**
  * Unit tests for page structure, style, and headers.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class WebPageTest extends HttpUnitTest {
@@ -225,6 +225,37 @@ public class WebPageTest extends HttpUnitTest {
         WebResponse formPage = wc.getResponse( getHostPath() + "/HebrewForm.html" );
         WebForm form = formPage.getForms()[0];
         WebRequest request = form.getRequest();
+        request.setParameter( "name", hebrewName );
+
+        WebResponse answer = wc.getResponse( request );
+        String[][] cells = answer.getTables()[0].asText();
+
+        assertEquals( "Message", "Hello, " + hebrewName, cells[0][0] );
+        assertEquals( "Character set", "iso-8859-8", answer.getCharacterSet() );
+    }
+
+
+    public void testEncodedRequestWithoutForm() throws Exception {
+        String hebrewName = "\u05d0\u05d1\u05d2\u05d3";
+        defineResource( "SayHello", new PseudoServlet() {
+            public WebResource getPostResponse() {
+                try {
+                    String name = getParameter( "name" )[0];
+                    WebResource result = new WebResource( "<html><body><table><tr><td>Hello, " +
+                                                          new String( name.getBytes( "iso-8859-1" ), "iso-8859-8" ) +
+                                                          "</td></tr></table></body></html>" );
+                    result.setCharacterSet( "iso-8859-8" );
+                    result.setSendCharacterSet( true );
+                    return result;
+                } catch (java.io.UnsupportedEncodingException e) {
+                    return null;
+                }
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        HttpUnitOptions.setDefaultCharacterSet( "iso-8859-8" );
+        WebRequest request = new PostMethodWebRequest( getHostPath() + "/SayHello" );
         request.setParameter( "name", hebrewName );
 
         WebResponse answer = wc.getResponse( request );

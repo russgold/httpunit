@@ -30,7 +30,7 @@ import java.net.URLEncoder;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 final class UncheckedParameterHolder extends ParameterHolder implements ParameterProcessor {
 
@@ -42,7 +42,7 @@ final class UncheckedParameterHolder extends ParameterHolder implements Paramete
 
 
     UncheckedParameterHolder() {
-        _characterSet = "iso-8859-1";
+        _characterSet = HttpUnitOptions.getDefaultCharacterSet();
     }
 
 
@@ -158,6 +158,11 @@ final class UncheckedParameterHolder extends ParameterHolder implements Paramete
 
     boolean isFileParameter( String name ) {
         return true;
+    }
+
+
+    String getCharacterSet() {
+        return _characterSet;
     }
 
 

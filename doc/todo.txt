@@ -1,3 +1,6 @@
+High priority:
+o Support cookie paths
+
 Medium priority:
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Check conformance with RFC 2109 - not currently sending $Version=1 string

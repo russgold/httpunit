@@ -17,6 +17,10 @@ Additions:
     1. The proxy server may now be specified by calling WebClient.setProxyServer. This should also ensure that the
        correct authorization header is sent.
 
+Problems fixed:
+    1. Requests created by calling the web request constructors directly, rather than being derived from an HTML page
+       were always using the Latin-1 encoding, rather than the user-specified default encoding.
+
 13-Oct-2002
 Notes:
     1. The NekoHTML parser is now supported. If it is present in the classpath, it will be used in preference to JTidy.

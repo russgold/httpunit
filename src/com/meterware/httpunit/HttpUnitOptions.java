@@ -115,8 +115,8 @@ public abstract class HttpUnitOptions {
 
 
     /**
-     * Sets the default character set for pages which do not specify one. By default, HttpUnit uses the platform
-     * default encoding.
+     * Sets the default character set for pages which do not specify one and for requests created without HTML sources.
+     * By default, HttpUnit uses the HTTP default encoding, iso-8859-1.
      **/
     public static void setDefaultCharacterSet( String characterSet ) {
         _characterSet = characterSet;
