@@ -19,6 +19,7 @@ Revision History:
 
    Problems fixed:
        1. A frameset 'onload' event is now invoked after all of its subframes have been loaded
+       2. ServletUnit's HttpServletRequest.getCookies() method was only returning the first cookie defined in the request
 
 28-Jul-2004
    Additions:

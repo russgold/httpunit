@@ -770,12 +770,18 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         String cookieHeader = (String) clientHeaders.get( "Cookie" );
         if (cookieHeader == null) return;
 
-        StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
+        StringTokenizer st = new StringTokenizer( cookieHeader, "," );
         while (st.hasMoreTokens()) {
-            String name = st.nextToken();
-            if (st.hasMoreTokens()) {
-                addCookie( new Cookie( name, st.nextToken() ) );
-            }
+            addOneCookie( st.nextToken() );
+        }
+    }
+
+
+    private void addOneCookie( String cookieDefinition ) {
+        StringTokenizer st = new StringTokenizer( cookieDefinition, "=;" );
+        String name = st.nextToken();
+        if (st.hasMoreTokens()) {
+            addCookie( new Cookie( name, st.nextToken() ) );
         }
     }
 

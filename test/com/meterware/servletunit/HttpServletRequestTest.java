@@ -238,14 +238,16 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
     public void testSetCookieViaRequestHeader() throws Exception {
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
-        wr.setHeaderField( "Cookie", "flavor=vanilla");
+        wr.setHeaderField( "Cookie", "flavor=vanilla,variety=sandwich");
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
 
         Cookie[] cookies = request.getCookies();
         assertNotNull( "No cookies found", cookies );
-        assertEquals( "Num cookies found", 1, cookies.length );
-        assertEquals( "Cookie name", "flavor", cookies[0].getName() );
-        assertEquals( "Cookie value", "vanilla", cookies[0].getValue() );
+        assertEquals( "Num cookies found", 2, cookies.length );
+        assertEquals( "Cookie 1 name", "flavor", cookies[0].getName() );
+        assertEquals( "Cookie 1 value", "vanilla", cookies[0].getValue() );
+        assertEquals( "Cookie 2 name", "variety", cookies[1].getName() );
+        assertEquals( "Cookie 2 value", "sandwich", cookies[1].getValue() );
     }
 
 
