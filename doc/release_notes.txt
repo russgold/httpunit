@@ -11,6 +11,14 @@ Limitations:
 
 
 Revision History:
+ 9-Apr-2002
+Acknowledgements:
+    Thanks to Yassen Damyanov for fixing a bug in the handling response headers
+
+Problems fixed:
+    1. Response headers were truncated to the first word only
+    2. The servletunit tutorial failed with a NullPointerException in the first step.
+
  8-Apr-2002
 Additions:
     1. It is now possible to set the value of a hidden field in a form using a mechanism which will support scripting in the future:

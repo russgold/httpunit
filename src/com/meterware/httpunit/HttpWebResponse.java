@@ -129,11 +129,20 @@ class HttpWebResponse extends WebResponse {
             _responseMessage = "OK";
     	} else try {
     	    _responseCode = Integer.parseInt( st.nextToken() );
-            _responseMessage = st.hasMoreTokens() ? st.nextToken() : "";
+            _responseMessage = getRemainingTokens( st );
     	} catch (NumberFormatException e) {
     	    _responseCode = HttpURLConnection.HTTP_INTERNAL_ERROR;
             _responseMessage = "Cannot parse response header";
     	}
+    }
+
+
+    private String getRemainingTokens( StringTokenizer st ) {
+        StringBuffer messageBuffer = new StringBuffer( st.hasMoreTokens() ? st.nextToken() : "" );
+        while (st.hasMoreTokens()) {
+            messageBuffer.append( ' ' ).append( st.nextToken() );
+        }
+        return messageBuffer.toString();
     }
 
 
