@@ -1,3 +1,6 @@
+o Integrate PUT method (written by Marcos Tarruella, et. al.)
+o Support <button> tags
+o Support <META HTTP_EQUIV=REFRESH tags>
 o Documentation, Documentation
 
 Possibles:

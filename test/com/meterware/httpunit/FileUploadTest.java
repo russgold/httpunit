@@ -241,6 +241,7 @@ class MimeEcho extends PseudoServlet {
 
     private void appendFileSpecs( String parameterName, StringBuffer sb, MimeBodyPart mbp ) throws IOException, MessagingException {
         String filename = mbp.getFileName();
+        filename = filename.substring( filename.lastIndexOf( File.separator )+1 );
         BufferedReader br = new BufferedReader( new StringReader( mbp.getContent().toString() ) );
         int numLines = 0;
         while (br.readLine() != null) numLines++;

@@ -69,7 +69,7 @@ class MimeEncodedMessageBody extends MessageBody {
 	    String name = (String) e.nextElement();
 	    WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );
             writeLn( outputStream, "--" + BOUNDARY );
-            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + spec.getFile().getName() + '"' );   // XXX need to handle non-ascii names here
+            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + spec.getFile().getAbsolutePath() + '"' );   // XXX need to handle non-ascii names here
 //          writeLn( outputStream, "Content-Type: application/octet-stream" );   // XXX want to support real content types
             writeLn( outputStream, "" );
 
