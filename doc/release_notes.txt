@@ -14,6 +14,11 @@ Limitations:
 
 
 Revision History:
+14-Oct-2004:
+    Problems fixed:
+        1. bug #1046597 tables nested inside paragraphs were not being seen by the enclosing page. This bug was introduced
+           in 1.6 and has now been corrected.
+
 13-Oct-2004:
     Acknowledgements:
         Thanks to Satish Kolli for fixing bug #1040770

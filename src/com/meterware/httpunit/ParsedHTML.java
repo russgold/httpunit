@@ -549,7 +549,11 @@ class ParsedHTML {
         protected boolean addToContext() { return true; }
 
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
-            getParsedHTML( pot ).addToList( htmlElement );
+            for (Iterator i = pot.getContexts(); i.hasNext();) {
+                Object o = i.next();
+                if (o instanceof ParsedHTML) ((ParsedHTML) o).addToList( htmlElement );
+                if (o instanceof TableCell) break;
+            }
         }
     }
 

@@ -265,6 +265,19 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "cell at 1,1",       "Value", cells[1][1] );
     }
 
+
+    public void testTableInParagraph() throws Exception {
+        defineWebPage( "Default", "<p>" +
+                                  "<table summary=little>" +
+                                  "<tr><td>a</td><td>b</td><td>Value</td></tr>" +
+                                  "<tr><td>c</td><td>d</td><td>Value</td></tr>" +
+                                  "</table></p>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        assertEquals( "Number of tables in paragraph", 1, page.getTextBlocks()[0].getTables().length );
+        assertEquals( "Number of tables in page", 1, page.getTables().length );
+    }
+
     /**
      * Get a specific cell with a given id in a WebTable
      **/
