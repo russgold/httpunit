@@ -51,7 +51,7 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
             <answer>Badly. Unfortunately, through JDK 1.3, HttpURLConnection (used by HttpUnit to access web servers) has no support for timeouts.
                     Supposedly, this is changed in JDK 1.4, but HttpUnit does not support the new feature as yet.</answer>
         </faq>
-        <faq>
+        <faq id="rejected cookies">
             <question>Why isn't HttpUnit seeing cookies from my site?</question>
             <answer><![CDATA[According to the <a href="http://www.faqs.org/rfcs/rfc2965.html">Cookie specification>/a>,
                     sites may specify a domain and path to restrict the scope of their cookies. These specifications
@@ -90,6 +90,14 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
                     <li>You can call <code>&lt;form&gt;.getScriptableObject().setParameterValue( &lt;name&gt;, &lt;value&gt; );</code> to change
                     the underlying value in the form. This will behave the way JavaScript does - resetting the form will now restore this value,
                     rather than the original one.</li></ul>]]></answer>
+        </faq>
+        <faq id="button click">
+            <question>How do I get the response when I click a button?</question>
+            <answer><![CDATA[When you call Button.click, a number of things can happen, depending on the definition of the button.
+                    Unfortunately, it is then impossible to predict what, if any, response is relevant. The method therefore
+                    does not return WebResponse. In most cases, it is the main window of your browser that you care about
+                    and you can always obtain that by calling
+                    <a href="api/com/meterware/httpunit/WebClient.html#getCurrentPage()"><code>client.getCurrentPage()</code></a>.]]</answer>
         </faq>
     </section>
 
