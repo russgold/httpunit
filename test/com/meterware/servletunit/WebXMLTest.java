@@ -60,7 +60,7 @@ public class WebXMLTest extends TestCase {
         wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
         File webXml = createWebXml( wxs );
 
-        ServletRunner sr = new ServletRunner( webXml.getAbsolutePath() );
+        ServletRunner sr = new ServletRunner( webXml );
         WebRequest request   = new GetMethodWebRequest( "http://localhost/SimpleServlet" );
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
@@ -126,6 +126,7 @@ public class WebXMLTest extends TestCase {
         ServletUnitClient client = sr.newClient();
         InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
         ServletConfig servletConfig = ic.getServlet().getServletConfig();
+        assertEquals( "Servlet name", "simple", servletConfig.getServletName() );
         assertNull( "init parameter 'gender' should be null", servletConfig.getInitParameter( "gender" ) );
         assertEquals( "init parameter via config", "red", ic.getServlet().getServletConfig().getInitParameter( "color" ) );
         assertEquals( "init parameter directly", "12", ((HttpServlet) ic.getServlet()).getInitParameter( "age" ) );

@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+24-Sep-2004:
+   Problems fixed:
+       1. bug #1034067: ServletConfig.getServletName now returns the name specified in web.xml for registered servlets.
+
 23-Sep-2004:
    Additions:
        1. ServletUnit now implements HttpSession.getServletContext().

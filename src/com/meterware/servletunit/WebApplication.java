@@ -573,7 +573,8 @@ class WebApplication implements SessionListenerDispatcher {
             if (_servlet == null) {
                 Class servletClass = Class.forName( getClassName() );
                 _servlet = (Servlet) servletClass.newInstance();
-                _servlet.init( new ServletUnitServletConfig( _servlet, WebApplication.this, getInitParams() ) );
+                String servletName = _servletName != null ? _servletName : _servlet.getClass().getName();
+                _servlet.init( new ServletUnitServletConfig( servletName, WebApplication.this, getInitParams() ) );
             }
 
             return _servlet;
