@@ -6,74 +6,27 @@ Known problems:
 
 Limitations:
     1. JDK 1.2 or higher is required
-    2. JavaScript support does not include document.write and some DOM properties
+    2. JavaScript support does not include Document.open() and some DOM properties
 
 
 Revision History:
-31-Oct-2002
-Problems fixed:
-    1. When a JavaScript event resulted in submitting a request and bypassed the normal mechanism, WebForm.submit and
-       WebLink.click() did not return the changed page.
-
-30-Oct-2002
+ 3-Nov-2002 1.5
 Acknowledgements:
-    Thanks to Troy Waldrep for fixing the JavaScript / HTML end-comment bug
+    Thanks to Ken Corbin for adding tests for disabled and read-only parameters.
+    Thanks to Geert Bevin for fixing a problem with generation of cookie headers that affects some servers.
+    Thanks to Richard Harris for adding support for the title attribute for links,
+           for adding the JavaScript Navigator.platform property,
+           for adding Javascript support for the Screen object,
+           for pointing out the value of retaining the same ScriptingEngine instance for a ScriptableDelegate,
+           for adding stubs for various unimplemented JavaScript Window properties.
+           and for finding a case where the handling of JavaScript comments was not working.
+    Thanks to Stefan Renz for describing the correct way to set up proxy servers in Java 2 and later.
+    Thanks to Troy Waldrep for help with the new handling of response statuses and messages.
+           and for fixing the JavaScript / HTML end-comment bug
+    Thanks to Andy Clark for help using the NekoHTML filter capability.
     Thanks to EdA-qa mort-ora-y for findind and fixing the MIME-encoding bug
 
-Problems fixed:
-    1. JavaScript ending with --> rather than the proper end-comment // --> was being treated as a syntax error
-    2. Bug #626822 Controls without names are no longer sent as part of a MIME-encoded message
-    3. Bug #618140 JavaScript access to the file submit control value was not working
 
-Additions:
-    1. Added the HeadMethodWebRequest class
-
-24-Oct-2002
-Acknowledgements:
-    Thanks to Andy Clark for help using the NekoHTML filter capability.
-
-Additions:
-    1. document.write and writeln are now supported for embedded uses
-    2. ServletUnit now implements HttpServletRequest.getLocale() and getLocales()
-
-22-Oct-2002
-Acknowledgements:
-    Thanks to Troy Waldrep for help with the new handling of response statuses and messages.
-
-Problems fixed:
-    1. A bad certificate on an https connection was incorrectly being flagged as a no-such-server exception. This
-       is fixed on JDK 1.4, due to a correct in the JDK. On previous versions of the JDK, HttpUnit is using a
-       workaround, which cannot detect the difference.
-
-Notes:
-    1. The exception HttpServerNotFoundException has been removed. When no server is found, HttpUnit now throws the
-       standard exception: java.net.UnknownHostException
-    2. The required jars are now included in the distribution, so it is not necessary to download them separately.
-       This was an oversight.
-
-21-Oct-2002
-Problems fixed:
-    1. The cookie fixes of 17-Oct had caused ServletUnit to see multiple servlets in an application with varying paths
-       as being in separate sessions.
-    2. ServletUnit now explicitly specifies its locale for generating dates as Locale.US to comply with RFC-1123
-
-17-Oct-2002
-Additions:
-    1. Cookies are now restricted by their origin server, rather than being sent on every request.
-    2. A new package com.meterware.httpunit.cookies, now exists to support the cookie functionality.
-
-14-Oct-2002
-Acknowledgements:
-    Thanks to Stefan Renz for describing the correct way to set up proxy servers in Java 2 and later.
-Additions:
-    1. The proxy server may now be specified by calling WebClient.setProxyServer. This should also ensure that the
-       correct authorization header is sent.
-
-Problems fixed:
-    1. Requests created by calling the web request constructors directly, rather than being derived from an HTML page
-       were always using the Latin-1 encoding, rather than the user-specified default encoding.
-
-13-Oct-2002
 Notes:
     1. The NekoHTML parser is now supported. If it is present in the classpath, it will be used in preference to JTidy.
        Note that NekoHTML is a much more forgiving parser than JTidy, properly handling a lot of bad HTML that JTidy
@@ -82,86 +35,78 @@ Notes:
        it is really needed.  NekoHTML is the current preferred parser and will probably be required to support certain
        JavaScript enhancements. Ultimately, it is possible that JTidy support will be dropped.
     2. The version of xerces now included in the distribution is 2.2, which is required for NekoHTML.
+    3. The exception HttpServerNotFoundException has been removed. When no server is found, HttpUnit now throws the
+       standard exception: java.net.UnknownHostException
+    4. The required jars are now included in the distribution, so it is not necessary to download them separately.
+       This was an oversight.
 
-12-Oct-2002
-Acknowledgements:
-    Thanks to Richard Harris for finding a case where the handling of JavaScript comments was not working.
 
 Problems fixed:
-    1. Under certain circumstances, the first line of a JavaScript section was being treated as though commented out.
+    Content and parsing
+        1. The cookie header was being generated with a space after each ";" separator.
+        2. AuthorizationRequiredException was being thrown even when exceptions on error status was disabled
+        3. A bad certificate on an https connection was incorrectly being flagged as a no-such-server exception. This
+           is fixed on JDK 1.4, due to a correct in the JDK. On previous versions of the JDK, HttpUnit is using a
+           workaround, which cannot detect the difference.
+        4. Bug #626822 Controls without names are no longer sent as part of a MIME-encoded message
+    Internationalization
+        5. When not using Latin-1 encoding, URL string characters *, _, and - were improperly being encoded
+        6. Requests created by calling the web request constructors directly, rather than being derived from an HTML page
+           were always using the Latin-1 encoding, rather than the user-specified default encoding.
+    JavaScript
+        7. Repeated requests for the same JavaScript domain objects returned new and different instances, thus
+           preventing identity tests.
+        8. Under certain circumstances, the first line of a JavaScript section was being treated as though commented out.
+        9. JavaScript ending with --> rather than the proper end-comment // --> was being treated as a syntax error
+       10. When a JavaScript event resulted in submitting a request and bypassed the normal mechanism, WebForm.submit and
+           WebLink.click() did not return the changed page.
+       11. Bug #618140 JavaScript access to the file submit control value was not working
+    ServletUnit
+       12. ServletUnit was not supporting mappings for the default servlet.
+       13. ServletUnit now explicitly specifies its locale for generating dates as Locale.US to comply with RFC-1123
 
-10-Oct-2002
-Problems fixed:
-    1. Window.open was implemented with parameters backwards in 8-Oct-2002 build
-    2. Window.opener property was not returning undefined value for non-top-level windows in 8-Oct-2002 build
 
 Additions:
-    1. Added support for Window.parent
-    2. Added support for Window.<subframe-name>
-    3. Added WebWindow.getOpenedWindow() to return a window by its name.
-    4. You may now close a window by calling window.close(). This will trigger any active listeners. If the window closed
-       the main window, another window will be promoted to that status.
-    5. Added support for Window.close() and Window.closed
+    Content and parsing enhancements:
+        1. WebForm now supports 'isReadOnlyParameter' and 'isDisabledParameter' which allow checking of the state of a
+           particular form parameter. Note that if multiple controls exist with the same name, these methods only return
+           true when all such controls are read-only or disabled, as appropriate.
+        2. RFE #614397 <input> parameters with unrecognized type fields are now treated as text fields. This appears
+           to match the behavior in most browsers.
+        3. Links, forms, and images now have a readable title property.
 
- 9-Oct-2002
-Acknowledgements:
-    Thanks to Richard Harris for adding stubs for various unimplemented JavaScript Window properties.
-Additions:
-    1. Added support for the following JavaScript Window properties: frames, name, opener, top
-    2. Added do-nothing stubs for the Window properties and functions: closed, close(), moveTo(), focus(), setTimeout()
-Problems fixed:
-    1. ServletUnit was not supporting mappings for the default servlet.
+    Web navigation enhancements:
+        4. Following the "_blank" target now creates a new web window, with its own set of frames. Following links or submitting
+           forms will update the window from which the request originated. Requests may also now be initiated from an open window.
+           The list of open windows is a property of the web client.
+        5. The mechanism for searching for tables has been expanded to permit arbitrary search criteria, similar to that
+           for links.
+        6. WebClient now supports a WebWindowListener which will be called when a new window is opened or closed.
+        7. Added WebWindow.getOpenedWindow() to return a window by its name.
+        8. You may now close a window by calling window.close(). This will trigger any active listeners. If the window closed
+           the main window, another window will be promoted to that status.
+        9. Added the HeadMethodWebRequest class to support HEAD method requests
 
- 8-Oct-2002
-Acknowledgements:
-    Thanks to Richard Harris for adding support for the title attribute for links,
-           for adding the JavaScript Navigator.platform property,
-           for adding Javascript support for the Screen object,
-           for pointing out the value of retaining the same ScriptingEngine instance for a ScriptableDelegate.
+    Security and state-management enhancements:
+       10. The proxy server may now be specified by calling WebClient.setProxyServer. This should also ensure that the
+           correct authorization header is sent.
+       11. Cookies are now restricted by their origin server, rather than being sent on every request.
+       12. A new package com.meterware.httpunit.cookies, now exists to support the cookie functionality.
 
-Additions:
-    1. Links, forms, and images now have a readable title property.
-    2. The navigator object now supports the readable 'platform' property.
-    3. The screen object is now supported, with properties availHeight and availWidth
-    4. The Window.open function is now supported
+    Scripting enhancements:
+       13. The navigator object now supports the readable 'platform' property.
+       14. The screen object is now supported, with properties availHeight and availWidth
+       15. Added support for Location.replace()
+       16. Added support for Window methods: open(), and close()
+       17. Added support for Window properties: closed, frames, name, opener, top, parent, and <subframe-name>
+       18. Added do-nothing stubs for the Window properties and functions: moveTo(), focus(), setTimeout()
+       19. document.write and writeln are now supported for processing a page while it is being loaded. This only
+           works if the default NekoHTML parser is being used.
 
-Problems fixed:
-    1. When not using Latin-1 encoding, URL string characters *, _, and - were improperly being encoded
-    2. AuthorizationRequiredException was being thrown even when exceptions on error status was disabled
-    3. Repeated requests for the same JavaScript domain objects returned new and different instances, thus
-       preventing identity tests.
+    ServletUnit enhancements:
+       20. RFE #585495 ServletUnit now supports HttpServletResponse.setContentLength.
+       21. ServletUnit now implements HttpServletRequest.getLocale() and getLocales()
 
-
- 4-Oct-2002
-Additions:
-    1. WebClient now supports a WebWindowListener which will be called when a new window is opened.
-
- 3-Oct-2002
-Acknowledgements:
-    Thanks to Geert Bevin for fixing a problem with generation of cookie headers that affects some servers.
-
-Additions:
-    1. Following the "_blank" target now creates a new web window, with its own set of frames. Following links or submitting
-       forms will update the window from which the request originated. Requests may also now be initiated from an open window.
-       The list of open windows is a property of the web client.
-    2. The mechanism for searching for tables has been expanded to permit arbitrary search criteria, similar to that
-       for links.
-
-Problems fixed:
-    1. The cookie header was being generated with a space after each ";" separator.
-
- 2-Oct-2002
-
-Acknowledgements:
-    Thanks to Ken Corbin for adding tests for disabled and read-only parameters.
-
-Additions:
-    1. WebForm now supports 'isReadOnlyParameter' and 'isDisabledParameter' which allow checking of the state of a
-       particular form parameter. Note that if multiple controls exist with the same name, these methods only return
-       true when all such controls are read-only or disabled, as appropriate.
-    2. RFE #585495 ServletUnit now supports HttpServletResponse.setContentLength.
-    3. RFE #614397 <input> parameters with unrecognized type fields are now treated as text fields. This appears
-       to match the behavior in most browsers.
 
  2-Oct-2002 1.4.6
 Acknowledgements:
