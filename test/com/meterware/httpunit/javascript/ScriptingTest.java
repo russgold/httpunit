@@ -426,6 +426,55 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testLocationReadableSubproperties() throws Exception {
+        defineResource( "Target.html", "You made it!" );
+        defineResource( "location.js", "function show() {" +
+                                           "alert('host is ' + window.location.host);" +
+                                           "alert('hostname is ' + document.location.hostname);" +
+                                           "alert('port is ' + window.location.port);" +
+                                           "alert('pathname is ' + window.location.pathname);" +
+                                           "alert('protocol is ' + document.location.protocol);" +
+                                           "alert('search is ' + window.location.search);" +
+                                           "}" );
+        defineResource( "simple/OnCommand.html?point=center",
+                        "<html><head><title>Amazing!</title>" +
+                        "<script language='JavaScript' src='/location.js'></script>" +
+                        "</head>" +
+                        "<body onLoad='show()'>" +
+                        "</body>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/simple/OnCommand.html?point=center" );
+        assertEquals( "Alert message 1", "host is " + getHostPath().substring( 7 ), wc.popNextAlert() );
+        assertEquals( "Alert message 2", "hostname is localhost", wc.popNextAlert() );
+        assertEquals( "Alert message 3", "port is " + getHostPort(), wc.popNextAlert() );
+        assertEquals( "Alert message 4", "pathname is /simple/OnCommand.html", wc.popNextAlert() );
+        assertEquals( "Alert message 5", "protocol is http:", wc.popNextAlert() );
+        assertEquals( "Alert message 6", "search is ?point=center", wc.popNextAlert() );
+    }
+
+
+    public void testLocationWriteableSubproperties() throws Exception {
+        defineResource( "Target.html", "You made it!" );
+        defineResource( "OnCommand.html?where=here", "You found it!" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title>" +
+                                          "</head>" +
+                                          "<body'>" +
+                                          "<a href='#' onMouseOver=\"window.location.pathname='/Target.html';\">go</a>" +
+                                          "<a href='#' onMouseOver=\"document.location.search='?where=here';\">go</a>" +
+                                          "</body>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].mouseOver();
+        assertEquals( "2nd page URL", getHostPath() + "/Target.html", wc.getCurrentPage().getURL().toExternalForm() );
+        assertEquals( "2nd page", "You made it!", wc.getCurrentPage().getText() );
+
+        response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[1].mouseOver();
+        assertEquals( "3rd page URL", getHostPath() + "/OnCommand.html?where=here", wc.getCurrentPage().getURL().toExternalForm() );
+        assertEquals( "3rd page", "You found it!", wc.getCurrentPage().getText() );
+    }
+
+
     public void testScriptDisabled() throws Exception {
         HttpUnitOptions.setScriptingEnabled( false );
         defineResource( "nothing.html", "Should get here" );

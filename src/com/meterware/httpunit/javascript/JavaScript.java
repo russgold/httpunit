@@ -605,6 +605,49 @@ public class JavaScript {
         }
 
 
+        public String jsGet_protocol() {
+            return _url.getProtocol() + ':';
+        }
+
+
+        public String jsGet_host() {
+            return _url.getHost() + ':' + _url.getPort();
+        }
+
+
+        public String jsGet_hostname() {
+            return _url.getHost();
+        }
+
+
+        public String jsGet_port() {
+            return String.valueOf( _url.getPort() );
+        }
+
+
+        public String jsGet_pathname() {
+            return _url.getPath();
+        }
+
+
+        public void jsSet_pathname( String newPath ) throws SAXException, IOException {
+            if (!newPath.startsWith( "/" )) newPath = '/' + newPath;
+            URL newURL = new URL( _url, newPath );
+            _window.setLocation( newURL.toExternalForm() );
+        }
+
+
+        public String jsGet_search() {
+            return '?' + _url.getQuery();
+        }
+
+
+        public void jsSet_search( String newSearch ) throws SAXException, IOException {
+            if (!newSearch.startsWith( "?" )) newSearch = '?' + newSearch;
+            _window.setLocation( jsGet_protocol() + "//" + jsGet_host() + jsGet_pathname() + newSearch );
+        }
+
+
         /**
          * Returns the default value of this scriptable object. In this case, it returns simply the URL as a string.
          * Note that this method is necessary, since Rhino will only call the toString method directly if there are no

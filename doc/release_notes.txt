@@ -10,6 +10,10 @@ Limitations:
 
 
 Revision History:
+29-Nov-2002
+Additions:
+    1. Added support for most subproperties of the Location object - mostly r/o, but some read/write
+
 27-Nov-2002
 Problems fixed:
     1. Bug #644642: changes to form parameters made from immediate scripts were being discarded

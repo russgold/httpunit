@@ -22,6 +22,7 @@ package com.meterware.pseudoserver;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -96,6 +97,11 @@ public class HttpUserAgentTest extends TestCase {
 
     protected String getHostPath() {
         return _hostPath;
+    }
+
+
+    protected int getHostPort() throws IOException {
+        return _server.getConnectedPort();
     }
 
 
