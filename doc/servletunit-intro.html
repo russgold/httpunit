@@ -91,15 +91,18 @@ updating the session correctly.
 You can test the response from the servlet as well, if you invoke the code which creates it:
 <PRE><CODE>
         StatefulServlet ss = (StatefulServlet) ic.getServlet();
+        ic.getResponse().setContentType( "text/plain" );
         ss.writeSelectMessage( "blue", ic.getResponse().getWriter() );
 
         WebResponse response = ic.getServletResponse();
         assertEquals( "requested resource", "You selected blue", response.getText() );
         assertEquals( "Returned cookie count", 1, response.getNewCookieNames().length );
 </CODE></PRE>
-Note that the response returned from <CODE>getServletResponse</CODE> is the actual one returned by the
-servlet, without any processing by the client. For example, if the request contains a bad status or
-a forward request, the client might do some additional processing, which is not done at this time.
+Note first that you must do all of the processing that the <code>service</code> method would have done if you take this
+approach. You may either call the <code>service</code> method itself, or a combination of other calls that will prepare
+the response in the fashion you wish to test. Not also that the response returned from <CODE>getServletResponse</CODE>
+is the actual one returned by the servlet, without any processing by the client. For example, if the request contains a
+bad status or a forward request, the client might do some additional processing, which is not done at this time.
 Of course, since the response extends <CODE>WebResponse</CODE>, all of the normal HTML parsing methods
 are available to examine it.
 
