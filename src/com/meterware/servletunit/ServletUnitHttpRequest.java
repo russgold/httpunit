@@ -243,17 +243,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * If create is false and the request has no valid HttpSession, this method returns null.
      **/
     public HttpSession getSession( boolean create ) {
-        if (_session == null && getRequestedSessionId() != null) {
-            _session = _context.getSession( getRequestedSessionId() );
-        }
-
-        if (_session != null && _session.isInvalid()) {
-            _session = null;
-        }
-
-        if (_session == null && create) {
-            _session = _context.newSession();
-        }
+        _session = _context.getValidSession( getRequestedSessionId(), _session, create );
         return _session;
     }
 

@@ -34,6 +34,8 @@ import com.meterware.httpunit.FrameSelector;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpSession;
+
 
 /**
  * This class acts as a test environment for servlets.
@@ -160,6 +162,16 @@ public class ServletRunner {
 
 
     /**
+     * Returns the session to be used by the next request.
+     * @param create if true, will create a new session if no valid session is defined.
+     * @since 1.5.5
+     */
+    public HttpSession getSession( boolean create ) {
+        return getClient().getSession( create );
+    }
+
+
+    /**
      * Returns the value of the named context parameter found in the application definition.
      */
     public String getContextParameter( String name ) {
@@ -231,6 +243,10 @@ public class ServletRunner {
     private InvocationContextFactory _factory = new InvocationContextFactory() {
         public InvocationContext newInvocation( ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
             return new InvocationContextImpl( client, ServletRunner.this, targetFrame, request, clientHeaders, messageBody );
+        }
+
+        public HttpSession getSession( String sessionId, boolean create ) {
+            return _context.getValidSession( sessionId, null, create );
         }
     };
 

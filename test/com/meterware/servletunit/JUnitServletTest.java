@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 
 import junit.framework.TestCase;
@@ -254,6 +255,11 @@ public class JUnitServletTest extends TestCase {
 
         public InvocationContext newInvocation( ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
             return new InvocationContextImpl( client, _runner, targetFrame, request, clientHeaders, messageBody );
+        }
+
+
+        public HttpSession getSession( String sessionId, boolean create ) {
+            return null;
         }
     }
 }

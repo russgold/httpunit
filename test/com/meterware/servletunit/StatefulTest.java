@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -102,6 +102,42 @@ public class StatefulTest extends TestCase {
         assertEquals( "content type", "text/plain", response.getContentType() );
         assertEquals( "requested resource", "You posted red", response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
+
+
+    public void testSessionPreloading() throws Exception {
+        final String resourceName1 = "something/interesting/start";
+        final String resourceName2 = "something/continue";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( resourceName1, StatefulServlet.class.getName() );
+        sr.registerServlet( resourceName2, StatefulServlet.class.getName() );
+        ServletUnitClient wc = sr.newClient();
+
+        wc.getSession( true ).setAttribute( "color", "green" );
+        WebRequest request = new GetMethodWebRequest( "http://localhost/" + resourceName2 );
+        WebResponse response = wc.getResponse( request );
+        assertNotNull( "No response received", response );
+        assertEquals( "content type", "text/plain", response.getContentType() );
+        assertEquals( "requested resource", "You posted green", response.getText() );
+        assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
+
+
+    public void testSessionAccess() throws Exception {
+        final String resourceName1 = "something/interesting/start";
+        final String resourceName2 = "something/continue";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( resourceName1, StatefulServlet.class.getName() );
+        sr.registerServlet( resourceName2, StatefulServlet.class.getName() );
+
+        WebRequest request = new PostMethodWebRequest( "http://localhost/" + resourceName1 );
+        request.setParameter( "color", "yellow" );
+        sr.getResponse( request );
+
+        assertNotNull( "No session was created", sr.getSession( false ) );
+        assertEquals( "Color attribute in session", "yellow", sr.getSession( false ).getAttribute( "color" ) );
     }
 
 

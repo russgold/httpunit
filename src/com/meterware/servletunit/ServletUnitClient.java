@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 
 import org.xml.sax.SAXException;
 
@@ -83,6 +84,18 @@ public class ServletUnitClient extends WebClient {
     public WebResponse getResponse( InvocationContext invocation ) throws MalformedURLException,IOException,SAXException {
         updateMainWindow( invocation.getFrame(), invocation.getServletResponse() );
         return getFrameContents( invocation.getFrame() );
+    }
+
+
+    /**
+     * Returns the session that would be used by the next request (if it asks for one).
+     * @param create if true, will create a new session if no valid session is defined.
+     * @since 1.5.5
+     */
+    public HttpSession getSession( boolean create ) {
+        HttpSession session = _invocationContextFactory.getSession( getCookieValue( ServletUnitHttpSession.SESSION_COOKIE_NAME ), create );
+        if (session != null) putCookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, session.getId() );
+        return session;
     }
 
 

@@ -53,6 +53,29 @@ class ServletUnitContext {
 
 
     /**
+     * Returns an appropriate session for a request. If no cached session is
+     * @param sessionId
+     * @param session the session cached by previous requests. May be null.
+     * @param create
+     * @return
+     */
+    ServletUnitHttpSession getValidSession( String sessionId, ServletUnitHttpSession session, boolean create ) {
+        if (session == null && sessionId != null) {
+            session = getSession( sessionId );
+        }
+
+        if (session != null && session.isInvalid()) {
+            session = null;
+        }
+
+        if (session == null && create) {
+            session = newSession();
+        }
+        return session;
+    }
+
+
+    /**
      * Returns the session with the specified ID, if any.
      **/
     ServletUnitHttpSession getSession( String id ) {

@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.FrameSelector;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Dictionary;
@@ -39,4 +40,9 @@ public interface InvocationContextFactory {
      **/
     public InvocationContext newInvocation( ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException;
 
+
+    /**
+     * Returns the session with the specified ID; if none exists or the session is invalid, will create a new session if the create flag is true.
+     */
+    public HttpSession getSession( String sessionId, boolean create );
 }

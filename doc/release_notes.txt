@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+ 8-Sep-2004:
+   Additions:
+       1. ServletRunner and ServletUnitClient now support a getSession() method to return the HTTP session to be used
+          by the next request or modified by the last request.
+
 25-Aug-2004:
    Additions:
        1. ServletRunner now takes a reference to a web.xml as a File object in its constructor.
