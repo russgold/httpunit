@@ -1,0 +1,92 @@
+<html>
+<head><title>JavaScript Support</title></head>
+<body>
+<p>
+JavaScript support is very basic at present. Inline deferred scripts (which define functions) are supported,
+as are the following DOM elements:
+
+<h3>Window</h3>
+<h4>properties</h4>
+<ul>
+<li>document - the associated Document object</li>
+<li>self - the Window itself</li>
+<li>window - a synonym for self</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onLoad - invoked when the page is loaded</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>alert() - queues up an alert message, accessible via WebResponse.getNextAlert() or popNextAlert()</li>
+</ul>
+
+<h3>Document</h3>
+<h4>properties</h4>
+<ul>
+<li>forms - an array of Form objects</li>
+<li>images - an array of Image objects</li>
+<li>links - an array of Link objects</li>
+<li>title - readonly. The title of the page</li>
+<li>&lt;name&gt; - the name of a form, image, or link</li>
+</ul>
+
+<h3>Form</h3>
+<h4>properties</h4>
+<ul>
+<li>document - the enclosing document</li>
+<li>&lt;name&gt; - the name of a control in the form</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onSubmit - invoked when the form.submit() is invoked</li>
+</ul>
+
+<h3>Image</h3>
+<h4>properties</h4>
+<ul>
+<li>src - read/write - the relative URL of the image</li>
+</ul>
+
+<h3>Link</h3>
+<h4>properties</h4>
+<ul>
+<li>href - readonly - the URL associated with the link</li>
+</ul>
+<h4>events</h4>
+<ul>
+<li>onClick - invoked when link.click() is invoked</li>
+<li>onMouseOver - invoked when link.mouseOver() is invoked<li>
+</ul>
+
+<h3>Text</h3>
+<h4>properties</h4>
+<ul>
+<li>value - read/write - the current text value</li>
+</ul>
+
+<h3>TextArea</h3>
+<h4>properties</h4>
+<ul>
+<li>value - read/write - the current text value</li>
+</ul>
+
+<h3>Hidden</h3>
+<h4>properties</h4>
+<ul>
+<li>value - read/write - the current text value</li>
+</ul>
+
+<h3>Password</h3>
+<h4>properties</h4>
+<ul>
+<li>value - read/write - the current text value</li>
+</ul>
+
+<h3>Checkbox</h3>
+<h4>properties</h4>
+<ul>
+<li>checked - read/write - the state of the checkbox</li>
+</ul>
+
+
