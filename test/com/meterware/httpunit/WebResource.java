@@ -105,7 +105,7 @@ class WebResource {
 
 
     String getCharacterSet() {
-        return _characterSet;
+        return HttpUnitUtils.stripQuotes( _characterSet );
     }
 
 

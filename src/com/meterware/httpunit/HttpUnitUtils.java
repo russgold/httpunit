@@ -37,11 +37,17 @@ public class HttpUnitUtils {
         while (st.hasMoreTokens()) {
             String parameter = st.nextToken();
             if (st.hasMoreTokens()) {
-                String value = st.nextToken();
+                String value = stripQuotes( st.nextToken() );
                 if (parameter.trim().equalsIgnoreCase( "charset" )) result[1] = value;
             }
         }
         return result;
+    }
+
+    static String stripQuotes( String value ) {
+        if (value.startsWith( "'" ) || value.startsWith( "\"" )) value = value.substring( 1 );
+        if (value.endsWith( "'" ) || value.endsWith( "\"" )) value = value.substring( 0, value.length()-1 );
+        return value;
     }
 
     /**

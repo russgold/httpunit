@@ -142,6 +142,23 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    public void testQuotedEncoding() throws Exception {
+        String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
+        String page = "<html><head><title>" + hebrewTitle + "</title></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+        setResourceCharSet( "SimplePage.html", "\"iso-8859-8\"", true );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Title", hebrewTitle, simplePage.getTitle() );
+        assertEquals( "Character set", "iso-8859-8", simplePage.getCharacterSet() );
+    }
+
+
     public void testUnspecifiedEncoding() throws Exception {
         String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
         String page = "<html><head><title>" + hebrewTitle + "</title></head>\n" +
