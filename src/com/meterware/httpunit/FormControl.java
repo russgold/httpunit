@@ -961,10 +961,11 @@ class SelectionFormControl extends FormControl {
         super( form, node );
         if (!node.getNodeName().equalsIgnoreCase( "select" )) throw new RuntimeException( "Not a select element" );
 
-        _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );
-        _listBox          = _multiSelect || NodeUtils.isNodeAttributePresent( node, "size" );
+        int size     = NodeUtils.getAttributeValue( node, "size", 0);
+        _multiSelect = NodeUtils.isNodeAttributePresent( node, "multiple" );
+        _listBox     = size > 1 || (_multiSelect && size != 1);
 
-        _selectionOptions = _multiSelect ? (Options) new MultiSelectOptions( node ) : (Options) new SingleSelectOptions( node );
+        _selectionOptions = _listBox ? (Options) new MultiSelectOptions( node ) : (Options) new SingleSelectOptions( node );
     }
 
 
@@ -1005,6 +1006,11 @@ class SelectionFormControl extends FormControl {
             } else {
                 return super.get( propertyName );
             }
+        }
+
+
+        public Object get(int index) {
+            return _selectionOptions.get( index );
         }
 
 

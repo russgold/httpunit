@@ -13,6 +13,14 @@ Limitations:
 
 
 Revision History:
+21-Jul-2004
+   Acknowledgements:
+       Thanks to Darrell DeBoer <bigdaz@users.sourceforge.net> for providing a patch for select box functionality
+
+   Additions:
+       1. patch #879193: Select now behaves as a multiselect listbox if it has size > 1 or if multiple is set and the size is not set to 1.
+       2. patch #879193: The name of a select box may now be treated as an array of options.
+
 20-Jul-2004
    Problems fixed:
        1. bug #990914: WebFrame scriptables are now accessible by getElementById

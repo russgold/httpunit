@@ -736,6 +736,7 @@ public class FormScriptingTest extends HttpUnitTest {
                                             "  alert( 'select 2nd option value is ' + choices.options[1].value )\n;" +
                                             "  if (choices.options[0].selected) alert( 'red selected' );\n" +
                                             "  if (choices.options[1].selected) alert( 'blue selected' );\n" +
+                                            "  if (choices[1].selected) alert( 'blue selected again' );\n" +
                                             "}\n" +
                                             "</script></head>" +
                                             "<body onLoad='viewSelect( document.the_form.choices )'>" +
@@ -754,12 +755,39 @@ public class FormScriptingTest extends HttpUnitTest {
         assertEquals( "3rd message", "select option 0 is red", wc.popNextAlert() );
         assertEquals( "4th message", "select 2nd option value is 3", wc.popNextAlert() );
         assertEquals( "5th message", "blue selected", wc.popNextAlert() );
+        assertEquals( "6th message", "blue selected again", wc.popNextAlert() );
 
         response.getLinks()[0].mouseOver();
         assertEquals( "before change message", "selected #1", wc.popNextAlert() );
         response.getFormWithName( "the_form" ).setParameter( "choices", "1" );
         response.getLinks()[0].mouseOver();
         assertEquals( "after change message", "selected #0", wc.popNextAlert() );
+    }
+
+
+    public void testFormSelectDefaults() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewSelect( form ) { \n" +
+                                            "  alert( 'first default index= '  + form.first.selectedIndex )\n;" +
+                                            "  alert( 'second default index= ' + form.second.selectedIndex )\n;" +
+                                            "  alert( 'third default index= '  + form.third.selectedIndex )\n;" +
+                                            "  alert( 'fourth default index= ' + form.fourth.selectedIndex )\n;" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                            "<body onLoad='viewSelect( document.the_form )'>" +
+                                            "<form name='the_form'>" +
+                                            "  <select name='first'><option value='1'>red<option value='3'>blue</select>" +
+                                            "  <select name='second' multiple><option value='1'>red<option value='3'>blue</select>" +
+                                            "  <select name='third' size=2><option value='1'>red<option value='3'>blue</select>" +
+                                            "  <select name='fourth' multiple size=1><option value='1'>red<option value='3'>blue</select>" +
+                                            "</form>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "1st message", "first default index= 0", wc.popNextAlert() );
+        assertEquals( "2nd message", "second default index= -1", wc.popNextAlert() );
+        assertEquals( "3rd message", "third default index= -1", wc.popNextAlert() );
+        assertEquals( "4th message", "fourth default index= 0", wc.popNextAlert() );
     }
 
 
