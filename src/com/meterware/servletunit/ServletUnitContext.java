@@ -26,7 +26,7 @@ import java.util.Hashtable;
 class ServletUnitContext {
 
     ServletUnitContext() {
-        _contextPath = "";
+        this( null );
     }
 
     ServletUnitContext(String contextPath) {

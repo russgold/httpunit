@@ -131,7 +131,7 @@ class InvocationContextImpl implements InvocationContext {
      * request, and cookie headers.
      **/
     InvocationContextImpl( ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
-        _application         = runner._application;
+        _application         = runner.getApplication();
         _requestURL          = request.getURL();
         _target              = request.getTarget();
 

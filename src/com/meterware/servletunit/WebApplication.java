@@ -104,8 +104,8 @@ class WebApplication {
     /**
      * Registers a servlet class to be run.
      **/
-    void registerServlet( String resourceName, String servletClassName ) {
-        registerServlet( resourceName, new ServletConfiguration( servletClassName ) );
+    void registerServlet( String resourceName, String servletClassName, Hashtable initParams ) {
+        registerServlet( resourceName, new ServletConfiguration( servletClassName, initParams ) );
     }
 
 
@@ -203,7 +203,7 @@ class WebApplication {
 
     File getResourceFile( String path ) {
         if (_contextDir == null) {
-            return null;
+            return new File( path.substring(1) );
         } else {
             return new File( _contextDir, path.substring(1) );
         }
@@ -355,8 +355,14 @@ class WebApplication {
 
     class ServletConfiguration {
 
-        public ServletConfiguration( String className ) {
+        ServletConfiguration( String className ) {
             _className = className;
+        }
+
+
+        ServletConfiguration( String className, Hashtable initParams ) {
+            _className = className;
+            if (initParams != null) _initParams = initParams;
         }
 
 

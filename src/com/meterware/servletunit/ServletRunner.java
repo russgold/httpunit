@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -47,8 +48,8 @@ public class ServletRunner {
      * Default constructor, which defines no servlets.
      */
     public ServletRunner() {
-        _context = new ServletUnitContext();
         _application = new WebApplication();
+        completeInitialization( null );
     }
 
     /**
@@ -58,8 +59,8 @@ public class ServletRunner {
      * @param webXMLFileSpec the full path to the web.xml file
      */
     public ServletRunner( String webXMLFileSpec ) throws IOException, SAXException {
-        _context = new ServletUnitContext();
         _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ) );
+        completeInitialization( null );
     }
 
 
@@ -71,9 +72,9 @@ public class ServletRunner {
      * @param contextPath the context path
      */
     public ServletRunner( String webXMLFileSpec, String contextPath ) throws IOException, SAXException {
-        _context = new ServletUnitContext( contextPath );
         File webXMLFile = new File( webXMLFileSpec );
-        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ), webXMLFile.getParentFile().getParentFile(), _context.getContextPath() );
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ), webXMLFile.getParentFile().getParentFile(), contextPath );
+        completeInitialization( contextPath );
     }
 
 
@@ -81,22 +82,37 @@ public class ServletRunner {
      * Constructor which expects an input stream containing the web.xml for the application.
      **/
     public ServletRunner( InputStream webXML ) throws IOException, SAXException {
-        this(webXML, null);
+        this( webXML, null );
     }
 
     /**
      * Constructor which expects an input stream containing the web.xml for the application.
      **/
     public ServletRunner( InputStream webXML, String contextPath ) throws IOException, SAXException {
-        _context = new ServletUnitContext(contextPath);
-        _application = new WebApplication( HttpUnitUtils.newParser().parse( new InputSource( webXML ) ), _context.getContextPath());
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( new InputSource( webXML ) ), contextPath );
+        completeInitialization( contextPath );
     }
+
 
     /**
      * Registers a servlet class to be run.
      **/
     public void registerServlet( String resourceName, String servletClassName ) {
-        _application.registerServlet( resourceName, servletClassName );
+        _application.registerServlet( resourceName, servletClassName, null );
+    }
+
+
+    private void completeInitialization( String contextPath ) {
+        _context = new ServletUnitContext( contextPath );
+        _application.registerServlet( "*.jsp", _jspServletDescriptor.getClassName(), _jspServletDescriptor.getInitializationParameters( null, null ) );
+    }
+
+
+    /**
+     * Registers a servlet class to be run, specifying initialization parameters.
+     **/
+    public void registerServlet( String resourceName, String servletClassName, Hashtable initParameters ) {
+        _application.registerServlet( resourceName, servletClassName, initParameters );
     }
 
 
@@ -126,6 +142,25 @@ public class ServletRunner {
     }
 
 
+    public static class JasperJSPServletDescriptor implements JSPServletDescriptor {
+
+        public String getClassName() {
+            return "org.apache.jasper.servlet.JspServlet";
+        }
+
+
+        public Hashtable getInitializationParameters( String classPath, String workingDirectory ) {
+            Hashtable params = new Hashtable();
+            if (classPath != null) params.put( "classpath", classPath );
+            if (workingDirectory != null) params.put( "scratchdir", workingDirectory );
+            return params;
+        }
+    }
+
+
+    public final static JSPServletDescriptor JASPER_DESCRIPTOR = new JasperJSPServletDescriptor();
+
+
 //-------------------------------------------- package methods ---------------------------------------------------------
 
 
@@ -134,9 +169,16 @@ public class ServletRunner {
     }
 
 
+    WebApplication getApplication() {
+        return _application;
+    }
+
+
 //---------------------------- private members ------------------------------------
 
-    WebApplication    _application;
+    private static JSPServletDescriptor _jspServletDescriptor = JASPER_DESCRIPTOR;
+
+    private WebApplication     _application;
 
     private ServletUnitClient  _client;
 
@@ -153,5 +195,6 @@ public class ServletRunner {
         if (_client == null) _client = newClient();
         return _client;
     }
+
 
 }

@@ -235,7 +235,7 @@ class ServletUnitServletContext implements ServletContext {
      * any reason (such as when the content is being made available from a .war archive).
      **/
     public String getRealPath( String path ) {
-        return null;  // XXX not implemented
+        return _application.getResourceFile( path ).getAbsolutePath();
     }
 
 

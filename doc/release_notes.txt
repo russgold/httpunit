@@ -13,6 +13,15 @@ Limitations:
 
 
 Revision History:
+23-Jun-2002
+Acknowledgements:
+    Thanks to Steve Heath for an example on how to make JSPs work with ServletUnit.
+
+Additions:
+    1. ServletUnit now supports ServletContext.getRealPath
+    2. ServletUnit now supports JSPs using Jasper. By default, JSPs are expected to be in the current working directory.
+       If an external web.xml file is specified, JSPs will be searched for in the application context directory.
+
 20-Jun-2002 1.4.1
 Acknowledgements:
     Thanks to Stefan Renz for finding the file control value bug and providing a fix.
@@ -31,7 +40,6 @@ Problems fixed:
     6. bug #570644: As of JDK 1.3.1-03, the behavior of HttpURLConnection was changed to throw an IOException when an
        error status is returned. This broke HttpUnit's handling of error codes. This has since been corrected.
 
-19-Jun-2002
 Additions:
     Content and parsing additions
         1. HttpUnit now sends Accept-encoding: gzip unless disabled by a call to HttpUnitOptions.setAcceptGzip( false )

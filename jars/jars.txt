@@ -4,7 +4,7 @@ Jars used:
 junit   3.7
 servlet 2.3
 xerces  1.2.3
-jtidy   04aug2000r5
+jtidy   04aug2000r7
 
 (for testing HttpUnit only)
 mail        (javamail 1.2)
