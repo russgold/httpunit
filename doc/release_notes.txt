@@ -12,6 +12,14 @@ Limitations:
 
 
 Revision History:
+17-Jun-2002
+Acknowledgements:
+    Thanks to Robert Watkins for the content length test.
+
+Additions:
+    1. An IO exception is thrown if the content length does not match the actual received length for a response and
+       content-length checking is enabled.
+
 21-May-2002
 Correction:
     1. ServletUnit supports urls beginning with "/servlet/" as referring to a servlet class name if not mapped to anything else.

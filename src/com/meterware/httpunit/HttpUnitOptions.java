@@ -43,6 +43,7 @@ public abstract class HttpUnitOptions {
         _matchesIgnoreCase = true;
         _autoRefresh = false;
         _autoRedirect = true;
+        _checkContentLength = false;
         _redirectDelay = 0;
         _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
@@ -98,6 +99,24 @@ public abstract class HttpUnitOptions {
      **/
     public static String getDefaultCharacterSet() {
         return _characterSet;
+    }
+
+
+    /**
+     * Returns true if HttpUnit will throw an exception when a message is only partially received. The default is
+     * to avoid such checks.
+     */
+    public static boolean isCheckContentLength() {
+        return _checkContentLength;
+    }
+
+
+    /**
+     * Specifies whether HttpUnit should throw an exception when the content length of a message does not match its
+     * actual received length. Defaults to false.
+     */
+    public static void setCheckContentLength( boolean checkContentLength ) {
+        _checkContentLength = checkContentLength;
     }
 
 
@@ -340,6 +359,8 @@ public abstract class HttpUnitOptions {
     private static boolean _autoRedirect = true;
 
     private static boolean _postIncludesCharset = false;
+
+    private static boolean _checkContentLength = false;
 
     private static int _redirectDelay;
 

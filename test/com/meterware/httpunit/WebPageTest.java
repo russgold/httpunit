@@ -338,4 +338,24 @@ public class WebPageTest extends HttpUnitTest {
         }
         return sb.toString();
     }
+
+
+    /**
+     * This test verifies that an IO exception is thrown when only a partial response is received.
+     */
+    public void testTruncatedPage() throws Exception {
+        HttpUnitOptions.setCheckContentLength( true );
+        String page = "abcdefghijklmnop";
+        defineResource( "alphabet.html", page, "text/plain" );
+        addResourceHeader( "alphabet.html", "Content-length: 26" );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/alphabet.html" );
+        try {
+            WebResponse simplePage = wc.getResponse( request );
+            String alphabet = simplePage.getText();
+            assertEquals( "Full string", "abcdefghijklmnopqrstuvwxyz", alphabet );
+        } catch (IOException e) {
+        }
+    }
 }

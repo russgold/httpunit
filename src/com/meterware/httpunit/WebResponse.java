@@ -158,6 +158,19 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns the content length of this response.
+     * @return the content length, if known, or -1.
+     */
+    public int getContentLength() {
+        if (_contentLength == UNINITIALIZED_INT) {
+            String length = getHeaderField( "Content-Length" );
+            _contentLength = (length == null) ? -1 : Integer.parseInt( length );
+        }
+        return _contentLength;
+       }
+
+
+    /**
      * Returns the content type of this response.
      **/
     public String getContentType() {
@@ -551,11 +564,15 @@ public class WebResponse implements HTMLSegment {
 
     final private static String HTML_CONTENT = "text/html";
 
+    final private static int UNINITIALIZED_INT = -2;
+
     private WebFrame[] _frames;
 
     private ReceivedPage _page;
 
     private String _contentHeader;
+
+    private int _contentLength = UNINITIALIZED_INT;
 
     private String _contentType;
 
@@ -600,6 +617,11 @@ public class WebResponse implements HTMLSegment {
             readMetaTags( bytes );
             _responseText = new String( bytes, getCharacterSet() );
             _inputStream  = new ByteArrayInputStream( bytes );
+
+            if (HttpUnitOptions.isCheckContentLength() && getContentLength() >= 0 && bytes.length != getContentLength()) {
+                throw new IOException("Truncated message. Expected length: " + getContentLength() +
+                                                       ", Actual length: " + bytes.length);
+            }
         } finally {
             inputStream.close();
         }
