@@ -15,6 +15,7 @@
     <property name="tstsrc.dir" value="test" />
     <property name="examples.dir" value="examples" />
     <property name="website.dir" value="site" />
+    <property name="quicksite.dir" value="../quicksite/src" />
     <property name="lib.dir" value="lib" />
     <property name="jars.dir" value="jars" />
 
@@ -22,6 +23,7 @@
     <property name="build.dir" value="build" />
     <property name="build.classes" value="${build.dir}/classes" />
     <property name="test.classes" value="${build.dir}/testclasses" />
+    <property name="quicksite.classes" value="${build.dir}/qsclasses" />
     <property name="website.classes" value="${build.dir}/siteclasses" />
     <property name="example.classes" value="${build.dir}/examples" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
@@ -268,18 +270,33 @@ Build-Time: ${TSTAMP}
 </target>
 
 
-<!--  ===================================================================  -->
-<!--  Compiles the website generator                                             -->
-<!--  ===================================================================  -->
-<target name="compile-site">
-    <mkdir dir="${website.classes}" />
-    <javac srcdir="${website.dir}" destdir="${website.classes}"
-           debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
-         <classpath>
-             <path refid="base.classpath" />
-         </classpath>
-    </javac>
-</target>
+    <!--  ===================================================================  -->
+    <!--  Compiles quicksite library                                           -->
+    <!--  ===================================================================  -->
+    <target name="compile-quicksite">
+        <mkdir dir="${quicksite.classes}" />
+        <javac srcdir="${quicksite.dir}" destdir="${quicksite.classes}"
+               debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+             <classpath>
+                 <path refid="base.classpath" />
+             </classpath>
+        </javac>
+    </target>
+
+
+    <!--  ===================================================================  -->
+    <!--  Compiles the website generator                                             -->
+    <!--  ===================================================================  -->
+    <target name="compile-site" depends="compile-quicksite">
+        <mkdir dir="${website.classes}" />
+        <javac srcdir="${website.dir}" destdir="${website.classes}"
+               debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
+             <classpath>
+                 <pathelement location="${quicksite.classes}" />
+                 <path refid="base.classpath" />
+             </classpath>
+        </javac>
+    </target>
 
 
 <!--  ===================================================================  -->
@@ -293,6 +310,7 @@ Build-Time: ${TSTAMP}
         <classpath>
             <path refid="base.classpath" />
             <pathelement location="${website.classes}" />
+            <pathelement location="${quicksite.classes}" />
         </classpath>
         <arg path="${web.dir}"/>
     </java>
