@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+ 9-Aug-2004
+   Problems fixed:
+       1. When a form has no action specified and its URL contains parameters whose names match those of parameters
+          in the form, the form values are used instead.
+
  8-Aug-2004
    Thanks to Guillaume Dandurand <Guillaume.Dandurand@cn.ca> for supplying code to get the onload event when the page
          is a frameset rather than a regular page.

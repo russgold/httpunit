@@ -523,9 +523,14 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Records a parameter defined by including it in the destination URL.
+     * Records a parameter defined by including it in the destination URL. Ignores any parameters whose name matches
+     * a form control.
      **/
     protected void addPresetParameter( String name, String value ) {
+        FormControl[] formControls = getFormControls();
+        for (int i = 0; i < formControls.length; i++) {
+            if (formControls[i].getName().equals( name)) return;
+        }
         _presets.add( new PresetFormParameter( this, name, value ) );
     }
 
