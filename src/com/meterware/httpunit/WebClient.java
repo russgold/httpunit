@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.IOException;
+import java.io.OutputStream;
 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -171,6 +172,14 @@ public class WebClient {
      **/
     abstract
     protected WebResponse newResponse( WebRequest request ) throws MalformedURLException, IOException;
+
+
+    /**
+     * Writes the message body for the request.
+     **/
+    final protected void writeMessageBody( WebRequest request, OutputStream stream ) throws IOException {
+        request.writeMessageBody( stream );
+    }
 
 
     /**

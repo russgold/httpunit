@@ -14,6 +14,7 @@ Revision History:
 24-Jan-2002
 Additions:
     1. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.
+    2. WebClient now exposes the protected method writeMessageBody to ease implementation of new subclasses
 
 23-Jan-2002
 Problems fixed:

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -331,6 +332,13 @@ public class WebRequest {
      * Performs any additional processing necessary to complete the request.
      **/
     protected void completeRequest( URLConnection connection ) throws IOException {
+    }
+
+
+    /**
+     * Writes the contents of the message body to the specified stream.
+     */
+    protected void writeMessageBody( OutputStream stream ) throws IOException {
     }
 
 

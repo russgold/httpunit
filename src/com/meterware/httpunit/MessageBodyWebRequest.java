@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2001-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -64,12 +64,17 @@ public class MessageBodyWebRequest extends WebRequest {
     /**
      * Subclasses must override this method to provide a message body for the
      * request.
-     **/ 
+     **/
     abstract
     protected MessageBody getMessageBody();
 
 
 //---------------------------------- WebRequest methods --------------------------------
+
+
+    protected void writeMessageBody( OutputStream stream ) throws IOException {
+        getMessageBody().writeTo( stream );
+    }
 
 
     /**
@@ -81,7 +86,7 @@ public class MessageBodyWebRequest extends WebRequest {
         connection.setDoOutput( true );
 
         OutputStream stream = connection.getOutputStream();
-        getMessageBody().writeTo( stream );
+        writeMessageBody( stream );
         stream.flush();
         stream.close();
     }
@@ -98,15 +103,15 @@ public class MessageBodyWebRequest extends WebRequest {
      * A method request message body read directly from an input stream.
      **/
     public static class InputStreamMessageBody extends MessageBody {
-    
-    
+
+
         public InputStreamMessageBody( MessageBodyWebRequest request, InputStream source, String contentType ) {
             super( request );
             _source = source;
             _contentType = contentType;
         }
-    
-    
+
+
         /**
          * Returns the content type of this message body.
          **/
@@ -125,11 +130,11 @@ public class MessageBodyWebRequest extends WebRequest {
                 outputStream.write( buffer, 0, count );
                 count = _source.read( buffer, 0, buffer.length );
             } while (count != -1);
-    
+
             _source.close();
         }
-    
-    
+
+
         private InputStream _source;
         private String      _contentType;
     }
