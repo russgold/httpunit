@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 
 import java.net.URL;
+import java.io.PrintWriter;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -60,6 +61,18 @@ public class JTidyPrintWriterTest extends HttpUnitTest implements HtmlErrorListe
         super.tearDown();
     }
 
+    /**
+     * Tidy seems to be returning number in a funny format... test if it is handled ok
+     **/
+    public void testLongLine() throws Exception {
+        URL url = new URL("http://localhost/blank.html");
+        PrintWriter p = new JTidyPrintWriter(url);
+        p.print("line 1234 column 1234");
+        p.print("line 1.234 column 1.234");
+        p.print("line 1.234.567 column 1.234.567");
+        p.print("line 1.2.34 column 12.34");
+        p.print("line 123..4 column 12..34");
+    }
 
     public void testWrongXHTMLPage() throws Exception {
         defineResource( "SimplePage.html",

@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+12-Dec-2001
+
+Problems fixed:
+    1. (bug #492003) JTidyPrintWriter fails to parse columns
+
  3-Dec-2001
 
 Acknowledgements:

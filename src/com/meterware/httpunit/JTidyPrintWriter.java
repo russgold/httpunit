@@ -70,6 +70,21 @@ class JTidyPrintWriter extends PrintWriter {
     }
 
     /**
+     * Tidy is apparently returning line number in a format x.xxx remove the dots
+     **/
+    private String removeDots(String string)
+    {
+        StringTokenizer tok = new StringTokenizer(string,".");
+        StringBuffer buf = new StringBuffer();
+        String elem;
+        while(tok.hasMoreElements()) {
+            elem = tok.nextToken();
+            buf.append(elem);
+        }
+        return buf.toString();
+    }
+
+    /**
      * Detects a new log if starting with "line", a warning if message starts with "Warning"
      * and an error if it starts with "Error"
      **/
@@ -83,11 +98,11 @@ class JTidyPrintWriter extends PrintWriter {
             // skip first "line"
             tok.nextToken();
             // get line
-            _line = Integer.parseInt(tok.nextToken());
+            _line = Integer.parseInt(removeDots(tok.nextToken()));
             // skip second "column"
             tok.nextToken();
             // get column
-            _column = Integer.parseInt(tok.nextToken());
+            _column = Integer.parseInt(removeDots(tok.nextToken()));
         } else if (s.startsWith("Warning")) {
             _error = false;
             _msg = s;
