@@ -20,32 +20,62 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
 
 /**
- * Tests for the package.
+ * This class acts as a test environment for servlets.
  **/
-public class ServletUnitSuite {
+class ServletUnitServletConfig implements ServletConfig {
 
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run( suite() );
-    }
-	
-	
-    public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( HttpServletRequestTest.suite() );
-        suite.addTest( HttpServletResponseTest.suite() );
-        suite.addTest( StatelessTest.suite() );
-        suite.addTest( StatefulTest.suite() );
-        suite.addTest( SessionTest.suite() );
-        suite.addTest( NavigationTest.suite() );
-        suite.addTest( ConfigTest.suite() );
-        return suite;
+
+    ServletUnitServletConfig( Servlet servlet ) {
+        _name = servlet.getClass().getName();
+        _initParameters = new Hashtable();
     }
 
 
+    /**
+     * Returns the value of the specified init parameter, or null if no such init parameter is defined.
+     **/
+    public String getInitParameter( String name ) {
+        return null;
+    }
+
+
+    /**
+     * Returns an enumeration over the names of the init parameters.
+     **/
+    public Enumeration getInitParameterNames() {
+        return _initParameters.keys();
+    }
+
+
+    /**
+     * Returns the current servlet context.
+     **/
+    public ServletContext getServletContext() {
+        return _context;
+    }
+
+
+    /**
+     * Returns the registered name of the servlet, or its class name if it is not registered.
+     **/
+    public java.lang.String getServletName() {
+        return _name;
+    }
+
+
+    private String _name;
+
+    private Hashtable _initParameters;
+
+
+    private ServletContext _context = new ServletUnitServletContext();
 }
-

@@ -105,7 +105,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Relative URLs are not permitted here.
      */
     public void sendRedirect( String location ) throws IOException {
-        throw new RuntimeException( "sendRedirect not implemented" );
+        setHeader( "Location", location );
     }
 
 

@@ -8,6 +8,10 @@ Limitations: HttpUnit does not support JavaScript
 
 
 Revision History:
+Additions:
+    1. Added getTableWithID method to WebResponse, ParsedHTML
+    2. Implemented support for sendRedirect, getServletContext in ServletUnit
+     
 21-Nov-00
 Additions:
     1. Introductory ServletUnit functionality (parameters and sessions, but no JSP, no redirect, no forwarding)

@@ -108,7 +108,9 @@ public class ServletRunner {
             HttpSession session = servletRequest.getSession( /* create */ false );
             if (session != null) ((ServletUnitHttpSession) session).access();
 
-            getServlet( request.getURL() ).service( servletRequest, servletResponse );
+            Servlet servlet = getServlet( request.getURL() );
+            servlet.init( new ServletUnitServletConfig( servlet ) );
+            servlet.service( servletRequest, servletResponse );
             session = servletRequest.getSession( /* create */ false );
             if (session != null && session.isNew()) {
                 servletResponse.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, session.getId() ) );

@@ -64,13 +64,25 @@
 
 
 <!--  ===================================================================  --> 
-<!--  Runs the test code                                                   -->
+<!--  Runs the test code (old)                                             -->
 <!--  Note: the classpath variable must be set on the command line         -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">
     <java classname="${test.class}"
           fork="yes" classpath="${build.classes};${classpath}" >
     </java>
+</target>
+
+
+<!--  ===================================================================  --> 
+<!--  Runs the test code using the junit task                              -->
+<!--  Note: the classpath variable must be set on the command line         -->
+<!--  ===================================================================  -->
+<target name="testn" depends="testcompile">
+    <junit fork="no" haltonfailure="yes" printsummary="true">
+        <classpath location="${build.classes}" />
+        <test name="${test.class}"/>
+    </junit>
 </target>
 
  
