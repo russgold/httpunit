@@ -26,9 +26,15 @@ import com.meterware.httpunit.WebResponse;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
-import javax.servlet.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -108,7 +114,7 @@ class InvocationContextImpl implements InvocationContext {
 
     public void pushIncludeRequest( RequestDispatcher rd, HttpServletRequest request, HttpServletResponse response ) throws ServletException {
         if (_servlet == null) throw new IllegalStateException( "Get the servlet for this context before pushing a request" );
-        _request = new IncludeRequestWrapper( request, rd );
+        _request = DispatchedRequestWrapper.createIncludeRequestWrapper( request, rd );
         _servletStack.push( _servlet );
         _servlet = ((RequestDispatcherImpl) rd).getServletMetaData().getServlet();
     }
@@ -116,15 +122,15 @@ class InvocationContextImpl implements InvocationContext {
 
     public void pushForwardRequest( RequestDispatcher rd, HttpServletRequest request, HttpServletResponse response ) throws ServletException {
         if (_servlet == null) throw new IllegalStateException( "Get the servlet for this context before pushing a request" );
-        _request = new ForwardRequestWrapper( request, rd );
+        _request = DispatchedRequestWrapper.createForwardRequestWrapper( request, rd );
         _servletStack.push( _servlet );
         _servlet = ((RequestDispatcherImpl) rd).getServletMetaData().getServlet();
     }
 
 
     public void popRequest() {
-        if (!( _request instanceof HttpServletRequestWrapper)) throw new IllegalStateException( "May not pop the initial request" );
-        _request = ((HttpServletRequestWrapper) _request).getBaseRequest();
+        if (!( _request instanceof DispatchedRequestWrapper)) throw new IllegalStateException( "May not pop the initial request" );
+        _request = ((DispatchedRequestWrapper) _request).getBaseRequest();
         _servlet = (Servlet) _servletStack.pop();
     }
 
@@ -194,115 +200,16 @@ class InvocationContextImpl implements InvocationContext {
     private Cookie[] getCookies( Dictionary clientHeaders ) {
         String cookieHeader = (String) clientHeaders.get( "Cookie" );
         if (cookieHeader == null) return NO_COOKIES;
-        Vector cookies = new Vector();
+        ArrayList cookies = new ArrayList();
 
         StringTokenizer st = new StringTokenizer( cookieHeader, "=;" );
         while (st.hasMoreTokens()) {
             String name = st.nextToken();
             if (st.hasMoreTokens()) {
                 String value = st.nextToken();
-                cookies.addElement( new Cookie( name, value ) );
+                cookies.add( new Cookie( name, value ) );
             }
         }
-        Cookie[] results = new Cookie[ cookies.size() ];
-        cookies.copyInto( results );
-        return results;
+        return (Cookie[]) cookies.toArray( new Cookie[ cookies.size() ] );
     }
 }
-
-
-class DispatchedRequestWrapper extends HttpServletRequestWrapper {
-
-    RequestContext _requestContext;
-
-    public DispatchedRequestWrapper( HttpServletRequest request, RequestDispatcher dispatcher ) {
-        super( request );
-        _requestContext = (RequestContext) dispatcher;
-        _requestContext.setParentRequest( request );
-    }
-
-
-    public String getParameter( String s ) {
-        return _requestContext.getParameter( s );
-    }
-
-
-    public Enumeration getParameterNames() {
-        return _requestContext.getParameterNames();
-    }
-
-
-    public String[] getParameterValues( String s ) {
-        return _requestContext.getParameterValues( s );
-    }
-
-
-    public Map getParameterMap() {
-        return _requestContext.getParameterMap();
-    }
-
-}
-
-
-class IncludeRequestWrapper extends DispatchedRequestWrapper {
-
-    final static String REQUEST_URI  = "javax.servlet.include.request_uri";
-    final static String CONTEXT_PATH = "javax.servlet.include.context_path";
-    final static String SERVLET_PATH = "javax.servlet.include.servlet_path";
-    final static String PATH_INFO    = "javax.servlet.include.path_info";
-    final static String QUERY_STRING = "javax.servlet.include.query_string";
-
-    private Hashtable _attributes = new Hashtable();
-
-
-    public IncludeRequestWrapper( HttpServletRequest request, RequestDispatcher dispatcher ) {
-        super( request, dispatcher );
-        _attributes.put( REQUEST_URI, ((RequestDispatcherImpl) dispatcher ).getRequestURI() );
-        _attributes.put( CONTEXT_PATH, request.getContextPath() );
-        _attributes.put( SERVLET_PATH, ((RequestDispatcherImpl) dispatcher ).getServletMetaData().getServletPath() );
-        final String pathInfo = ((RequestDispatcherImpl) dispatcher ).getServletMetaData().getPathInfo();
-        if (pathInfo != null) _attributes.put( PATH_INFO, pathInfo );
-    }
-
-
-    public Object getAttribute( String s ) {
-        Object result = _attributes.get( s );
-        return (result != null) ? result : super.getAttribute( s );
-    }
-
-}
-
-
-class ForwardRequestWrapper  extends DispatchedRequestWrapper {
-
-    private RequestDispatcherImpl _requestContext;
-
-    public ForwardRequestWrapper( HttpServletRequest request, RequestDispatcher dispatcher ) {
-        super( request, dispatcher );
-        _requestContext = (RequestDispatcherImpl) dispatcher;
-    }
-
-
-    public String getRequestURI() {
-        return _requestContext.getRequestURI();
-    }
-
-
-    public String getQueryString() {
-        return super.getQueryString();
-    }
-
-
-    public String getServletPath() {
-        return _requestContext.getServletMetaData().getServletPath();
-    }
-
-
-    public String getPathInfo() {
-        return _requestContext.getServletMetaData().getPathInfo();
-    }
-}
-
-
-
-

@@ -51,11 +51,11 @@ class RequestDispatcherImpl extends RequestContext implements RequestDispatcher 
 
     public void forward( ServletRequest request, ServletResponse response ) throws ServletException, IOException {
         ((ServletUnitHttpResponse) response).restartResponse();
-        _servletMetaData.getServlet().service( new ForwardRequestWrapper( (HttpServletRequest) request, this ), response );
+        _servletMetaData.getServlet().service( DispatchedRequestWrapper.createForwardRequestWrapper( (HttpServletRequest) request, this ), response );
     }
 
 
     public void include( ServletRequest request, ServletResponse response ) throws ServletException, IOException {
-        _servletMetaData.getServlet().service( new IncludeRequestWrapper( (HttpServletRequest) request, this ), response );
+        _servletMetaData.getServlet().service( DispatchedRequestWrapper.createIncludeRequestWrapper( (HttpServletRequest) request, this ), response );
     }
 }
