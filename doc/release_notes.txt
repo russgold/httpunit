@@ -14,6 +14,7 @@ Revision History:
 26-Sep-2002
 Problems fixed:
     1. A Javascript URL containing a question mark was incorrectly being URL-encoded.
+    2. HTML comments at the start of a JavaScript were not being completely ignored
 
 25-Sep-2002
 Problems fixed:

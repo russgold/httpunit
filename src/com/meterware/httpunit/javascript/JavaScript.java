@@ -112,11 +112,24 @@ public class JavaScript {
         public void executeScript( String script ) {
             try {
                 script = script.trim();
-                if (script.startsWith( "<!--" )) script = script.substring( 4 );
+                if (script.startsWith( "<!--" )) script = withoutFirstLine( script );
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
             } catch (Exception e) {
                 handleScriptException( e, "Script '" + script + "'" );
             }
+        }
+
+
+        private String withoutFirstLine( String script ) {
+            for (int i=0; i < script.length(); i++) {
+                if (isLineTerminator( script.charAt(i) )) return script.substring( i ).trim();
+            }
+            return "";
+        }
+
+
+        private boolean isLineTerminator( char c ) {
+            return c == 0x0A || c == 0x0D;
         }
 
 

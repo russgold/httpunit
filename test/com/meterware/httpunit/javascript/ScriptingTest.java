@@ -180,9 +180,9 @@ public class ScriptingTest extends HttpUnitTest {
 
     public void testFunctionCallOnLoad() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
-                                            "<!-- " +
+                                            "<!-- hide this\n" +
                                             "function sayCheese() { alert( \"Cheese!\" ); }" +
-                                            "// -->" +
+                                            "// end hiding -->" +
                                             "</script></head>" +
                                             "<body onLoad='sayCheese()'></body>" );
         WebConversation wc = new WebConversation();
