@@ -69,10 +69,27 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Submits this form using the web client from which it was originally obtained.
+     * Will usually return the result of that submission; however, if the submit button's 'onclick'
+     * or the form's 'onsubmit' event is triggered and
+     * inhibits the submission, will return the updated contents of the frame containing this form.
+     * @since 1.5.5
+     **/
+    public WebResponse submit( SubmitButton button, int x, int y ) throws IOException, SAXException {
+        return button.doOnClickEvent() ? doFormSubmit( button, x, y ) : getCurrentFrameContents();
+    }
+
+
+    /**
      * Submits the form without also invoking the button's "onclick" event.
      */
     WebResponse doFormSubmit( SubmitButton button ) throws IOException, SAXException {
         return submitRequest( getAttribute( "onsubmit" ), getRequest( button ) );
+    }
+
+
+    WebResponse doFormSubmit( SubmitButton button, int x, int y ) throws IOException, SAXException {
+        return submitRequest( getAttribute( "onsubmit" ), getRequest( button, x, y ) );
     }
 
 
@@ -481,7 +498,7 @@ public class WebForm extends WebRequestSource {
      * and there is no guarantee over the order of parameters transmitted.
      */
     public WebRequest newUnvalidatedRequest() {
-        return newUnvalidatedRequest( (SubmitButton) null );
+        return newUnvalidatedRequest( null );
     }
 
 
@@ -513,7 +530,7 @@ public class WebForm extends WebRequestSource {
     /**
      * Specifies the position at which an image button (if any) was clicked.
      **/
-    public void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
+    void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
         imageButton.setLocation( x, y );
     }
 

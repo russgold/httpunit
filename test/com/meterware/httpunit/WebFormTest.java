@@ -93,6 +93,19 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitFromPositionalButton() throws Exception {
+        defineResource( "ask?age=12&update=name&update.x=5&update.y=15", "You made it!", "text/plain" );
+        defineWebPage( "Default", "<form id='form' method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=image name=update value=name src=\"\">" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        SubmitButton button = page.getFormWithID( "form" ).getSubmitButton( "update" );
+        button.click( 5, 15 );
+        assertEquals( "Result of click", "You made it!", _wc.getCurrentPage().getText() );
+    }
+
+
     public void testFindNoForm() throws Exception {
         defineWebPage( "NoForms", "This has no forms but it does" +
                                   "have <a href=\"/other.html\">an active link</A>" +

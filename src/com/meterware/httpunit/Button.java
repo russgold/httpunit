@@ -77,8 +77,13 @@ public class Button extends FormControl {
      * For a submit button this typically submits the form.
      */
     public void click() throws IOException, SAXException {
-        if (isDisabled()) throw new IllegalStateException( "Button" + (getName().length() == 0 ? "" : " '" + getName() + "'") + " is disabled and may not be clicked." );
+        verifyButtonEnabled();
         if (doOnClickEvent()) doButtonAction();
+    }
+
+
+    protected void verifyButtonEnabled() {
+        if (isDisabled()) throw new IllegalStateException( "Button" + (getName().length() == 0 ? "" : " '" + getName() + "'") + " is disabled and may not be clicked." );
     }
 
 

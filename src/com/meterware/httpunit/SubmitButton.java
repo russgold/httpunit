@@ -41,6 +41,19 @@ public class SubmitButton extends Button {
     }
 
 
+    /**
+     * Performs the action associated with clicking this button after running any 'onClick' script.
+     * For a submit button this typically submits the form.
+     *
+     * @since 1.5.5
+     */
+    public void click( int x, int y ) throws IOException, SAXException {
+        if (!isImageButton()) throw new IllegalStateException( "May only specify positions for an image button" );
+        verifyButtonEnabled();
+        if (doOnClickEvent()) getForm().doFormSubmit( this, x, y );
+    }
+
+
 //--------------------------------- Button methods ----------------------------------------------
 
 
