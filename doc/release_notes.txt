@@ -16,10 +16,10 @@ Limitations:
 Revision History:
 28-Oct-2004:
     Acknowledgements:
-        Thanks to Vladimir Korenev for identifying the incorrect encoding in ServletUnit
+        Thanks to Vladimir Korenev for providing an implementation for style.visibility
 
     Problems fixed:
-        1. bug #1056275 There was a typo in the encoding type used by ServletUnit to decode parameters
+        1. patch #1046516 property style.visibility is now supported
 
 25-Oct-2004:
     Problems fixed:

@@ -719,7 +719,8 @@ public class JavaScript {
 
     static public class Style extends JavaScriptEngine {
 
-        private String _display = "visible";
+        private String _display    = "inline";
+        private String _visibility = "visible";
 
 
         public String getClassName() {
@@ -734,6 +735,16 @@ public class JavaScript {
 
         public void jsSet_display( String display ) {
             _display = display;
+        }
+
+
+        public String jsGet_visibility() {
+            return _visibility;
+        }
+
+
+        public void jsSet_visibility( String visibility ) {
+            _visibility = visibility;
         }
     }
 

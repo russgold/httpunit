@@ -643,11 +643,23 @@ public class ScriptingTest extends HttpUnitTest {
                 "  var element = document.getElementById( id );\n" +
                 "  element.style.display = value;\n" +
                 "}\n" +
+                "function showVisibility( id ) {" +
+                "  var element = document.getElementById( id );\n" +
+                "  alert( 'element with id ' + id + ' has style.visibility ' + element.style.visibility );\n" +
+                "}\n" +
+                "function setVisibility( id, value ) {" +
+                "  var element = document.getElementById( id );\n" +
+                "  element.style.visibility = value;\n" +
+                "}\n" +
                 "function doAll() {\n" +
-                "  setDisplay('test','hidden'); \n" +
+                "  setDisplay('test','inline'); \n" +
                 "  showDisplay('test');\n" +
-                "  setDisplay('test','visible'); \n" +
+                "  setDisplay('test','block'); \n" +
                 "  showDisplay('test');\n" +
+                "  setVisibility('test','hidden'); \n" +
+                "  showVisibility('test');\n" +
+                "  setVisibility('test','visible'); \n" +
+                "  showVisibility('test');\n" +
                 "}\n" +
                 "</script>" +
                 "</head><body onLoad='doAll();'>" +
@@ -655,8 +667,10 @@ public class ScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         wc.getResponse( getHostPath() + "/start.html" );
 
-        assertEquals( "element with id test has style.display hidden", wc.popNextAlert() );
-        assertEquals( "element with id test has style.display visible", wc.popNextAlert() );
+        assertEquals( "element with id test has style.display inline", wc.popNextAlert() );
+        assertEquals( "element with id test has style.display block", wc.popNextAlert() );
+        assertEquals( "element with id test has style.visibility hidden", wc.popNextAlert() );
+        assertEquals( "element with id test has style.visibility visible", wc.popNextAlert() );
     }
 
 
