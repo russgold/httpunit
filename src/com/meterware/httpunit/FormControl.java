@@ -656,6 +656,7 @@ class FileSubmitFormControl extends FormControl {
 
 class SelectionFormControl extends FormControl {
     private final boolean _multiSelect;
+    private final boolean _listBox;
     private final String[] _optionValues;
     private final String[] _displayedOptions;
 
@@ -669,6 +670,7 @@ class SelectionFormControl extends FormControl {
         if (!node.getNodeName().equalsIgnoreCase( "select" )) throw new RuntimeException( "Not a select element" );
 
         _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );
+        _listBox          = _multiSelect || NodeUtils.isNodeAttributePresent( node, "size" );
         _optionValues     = getInitialOptionValues( node );
         _displayedOptions = getInitialDisplayedOptions( node );
 
@@ -724,7 +726,7 @@ class SelectionFormControl extends FormControl {
             }
         }
 
-        if (!_multiSelect) {
+        if (!_listBox) {
             if (numMatches == 0) throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
         }
 
@@ -765,7 +767,7 @@ class SelectionFormControl extends FormControl {
             }
         }
 
-        if (!isMultiValued() && noneSelected && isSelected.length > 0) {
+        if (!_listBox && noneSelected && isSelected.length > 0) {
             isSelected[0] = true;
         }
         return isSelected;

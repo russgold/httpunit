@@ -263,6 +263,20 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testSizedSelect() throws Exception {
+        defineWebPage( "Default", "<form method=POST action = '/servlet/Login'>" +
+                                  "<Select name=poems><Option>limerick<Option>haiku</select>" +
+                                  "<Select name=songs size=2><Option>aria<Option>folk</select>" +
+                                  "<Input type=submit></form>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+
+        WebForm form = page.getForms()[0];
+        assertEquals( "Default poem", "limerick", form.getParameterValue( "poems" ) );
+        assertNull( "Default song should be null",  form.getParameterValue( "songs" ) );
+    }
+
+
     public void testMultiSelect() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Select multiple size=4 name=colors>" +

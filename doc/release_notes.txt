@@ -11,7 +11,12 @@ Limitations:
 
 
 Revision History:
- 9-Apr-2002
+14-May-2002
+Problems fixed:
+    1. A <select> control with a size attribute may now have its value undefined. The specification does not require
+       this behavior, but both IE 5.5 and Netscape 6.2 do this.
+
+ 9-May-2002
 Acknowledgements:
     Thanks to Yassen Damyanov for fixing a bug in the handling response headers
 
