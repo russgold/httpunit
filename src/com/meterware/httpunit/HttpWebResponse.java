@@ -27,8 +27,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+import java.util.Vector;
                       
 
 /**
@@ -62,6 +64,17 @@ class HttpWebResponse extends WebResponse {
      **/
     public int getResponseCode() {
         return _responseCode;
+    }
+
+
+    public String[] getHeaderFieldNames() {
+        Vector names = new Vector();
+        for (Enumeration e = _headers.keys(); e.hasMoreElements();) {
+            names.addElement( e.nextElement() );
+        }
+        String[] result = new String[ names.size() ];
+        names.copyInto( result );
+        return result;
     }
 
 

@@ -11,6 +11,10 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+19-Jul-2001
+Additions:
+    1. Added getHeaderFieldNames to WebResponse
+
 16-Jul-2001
 Acknowledgements:
     Thanks to Chris Stevenson for identifying a problem with forms lacking an action
@@ -21,7 +25,7 @@ Additions:
        calling getResponse. This will prevent HttpUnit from throwing an exception
        in such cases. You can still check the status of the response by calling
        WebResponse.getStatusCode()
-       
+    
 Problems corrected:
     1. Forms with no action now default to the originating page
 

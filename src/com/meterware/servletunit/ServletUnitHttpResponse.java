@@ -411,6 +411,18 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     }
 
 
+    public String[] getHeaderFieldNames() {
+        if (!_headersComplete) completeHeaders();
+        Vector names = new Vector();
+        for (Enumeration e = _headers.keys(); e.hasMoreElements();) {
+            names.addElement( e.nextElement() );
+        }
+        String[] result = new String[ names.size() ];
+        names.copyInto( result );
+        return result;
+    }
+
+
     /**
      * Returns the headers defined for this response.
      **/

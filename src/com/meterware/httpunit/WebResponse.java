@@ -169,6 +169,12 @@ public class WebResponse implements HTMLSegment {
     }
 
 
+    /**
+     * Returns the names of the header fields found in the response.
+     **/
+    abstract
+    public String[] getHeaderFieldNames();
+
 
     /**
      * Returns the value for the specified header field. If no such field is defined, will return null.
@@ -732,6 +738,11 @@ class DefaultWebResponse extends WebResponse {
      **/
     public int getResponseCode() {
         return HttpURLConnection.HTTP_OK;
+    }
+
+
+    public String[] getHeaderFieldNames() {
+        return new String[] { "Content-type" };
     }
 
 

@@ -67,6 +67,11 @@ class ServletUnitWebResponse extends WebResponse {
     }
 
 
+    public String[] getHeaderFieldNames() {
+        return _response.getHeaderFieldNames();
+    }
+
+
     /**
      * Returns the value for the specified header field. If no such field is defined, will return null.
      **/
