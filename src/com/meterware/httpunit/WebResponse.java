@@ -50,6 +50,22 @@ public class WebResponse {
 
 
     /**
+     * Returns the first link which contains the specified text.
+     **/
+    public WebLink getLinkWith( String text ) throws SAXException {
+        return getReceivedPage().getLinkWith( text );
+    }
+
+
+    /**
+     * Returns the first link which contains an image with the specified text as its 'alt' attribute.
+     **/
+    public WebLink getLinkWithImageText( String text ) throws SAXException {
+        return getReceivedPage().getLinkWithImageText( text );
+    }
+
+
+    /**
      * Returns the top-level tables found in this page in the order in which
      * they appear.
      * @exception SAXException thrown if there is an error parsing the response.

@@ -187,8 +187,38 @@ public class HtmlTablesTest extends TestCase {
 
         String[][] cells = rp.getTableStartingWith( "Red" ).asText();
         assertEquals( "Non-blank rows",    2, cells.length );
-        assertEquals( "Non-blank columns", 2, cells.length );
+        assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
+    }
+
+
+    public void testSpanOverEmptyColumns() throws Exception {
+        ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+                                            "<table summary=little>" +
+                                            "<tr><td colspan=2>Title</td><td>Data</td></tr>" +
+                                            "<tr><td>Name</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                            "<tr><td>Name</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                            "</table></body></html>" );
+
+        String[][] cells = rp.getTableStartingWith( "Title" ).asText();
+        assertEquals( "Non-blank rows",    3, cells.length );
+        assertEquals( "Non-blank columns", 2, cells[0].length );
+        assertEquals( "cell at 1,1",       "Value", cells[1][1] );
+    }
+
+
+    public void testSpanOverAllEmptyColumns() throws Exception {
+        ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+                                            "<table summary=little>" +
+                                            "<tr><td colspan=2>Title</td><td>Data</td></tr>" +
+                                            "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                            "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                            "</table></body></html>" );
+
+        String[][] cells = rp.getTableStartingWith( "Title" ).asText();
+        assertEquals( "Non-blank rows",    3, cells.length );
+        assertEquals( "Non-blank columns", 2, cells[0].length );
+        assertEquals( "cell at 1,1",       "Value", cells[1][1] );
     }
 
 

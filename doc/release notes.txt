@@ -2,12 +2,14 @@ HttpUnit release notes
 
 Known issues: none
 
-7-Aug-00
+8-Aug-00
 Problems corrected:
     1. Parsing a response would crash if there were no nodes inside a form
 Additions:
     1. WebResponse.getOptions and getOptionValues now return the displayed and parameter value options
        available to the user in a <select>
+    2. WebRespose.getLinkWith() and .getLinkWithImageText() can now be used to locate a link in a page
+       based on its text or the ALT text attribute of an enclosed image
 
 
 4-Aug-00 0.9.5

@@ -72,6 +72,39 @@ class ParsedHTML {
 
 
     /**
+     * Returns the first link which contains the specified text.
+     **/
+    public WebLink getLinkWith( String text ) {
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            String linkText = NodeUtils.asText( links[i].getDOMSubtree().getChildNodes() ).toUpperCase();
+            if (linkText.indexOf( text.toUpperCase() ) >= 0) {
+                return links[i];
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the first link which contains an image with the specified text as its 'alt' attribute.
+     **/
+    public WebLink getLinkWithImageText( String text ) {
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            NodeList nl = ((Element) links[i].getDOMSubtree()).getElementsByTagName( "img" );
+            for (int j = 0; j < nl.getLength(); j++) {
+                NamedNodeMap nnm = nl.item(j).getAttributes();
+                if (text.equalsIgnoreCase( getValue( nnm.getNamedItem( "alt" ) ) )) {
+                    return links[i];
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the top-level tables found in this page in the order in which
      * they appear.
      **/
@@ -125,10 +158,15 @@ class ParsedHTML {
     URL _url;
 
 
+    private String getValue( Node node ) {
+        return (node == null) ? "" : node.getNodeValue();
+    }
+
+
     /**
      * Returns true if the node is a link anchor node.
      **/
-    boolean isLinkAnchor( Node node ) {
+    private boolean isLinkAnchor( Node node ) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return false;
         } else if (!node.getNodeName().equals( "a" )) {

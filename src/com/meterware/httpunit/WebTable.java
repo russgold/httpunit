@@ -21,8 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
 import org.w3c.dom.*;
 
@@ -92,14 +91,43 @@ public class WebTable {
         int numColumnsWithText = 0;
         boolean rowHasText[] = new boolean[ getRowCount() ];
         boolean columnHasText[] = new boolean[ getColumnCount() ];
+        Hashtable spanningCells = new Hashtable();
 
+
+        // look for rows and columns with any text in a non-spanning cell
         for (int i = 0; i < rowHasText.length; i++) {
             for (int j = 0; j < columnHasText.length; j++) {
-                if (getTrimmedText( getCellAsText(i,j) ).length() != 0) {
+                if (getTrimmedText( getCellAsText(i,j) ).length() == 0) continue;
+                if (getTableCell(i,j).getColSpan() == 1 && getTableCell(i,j).getRowSpan() == 1) {
                     if (!rowHasText[i]) numRowsWithText++;
                     if (!columnHasText[j]) numColumnsWithText++;
                     rowHasText[i] = columnHasText[j] = true;
+                } else if (!spanningCells.containsKey( getTableCell(i,j) )) {
+                    spanningCells.put( getTableCell(i,j), new int[] { i, j } );
                 }
+            }
+        }
+
+        // look for requirements to keep spanning cells: special processing is needed if either:
+        // none of its rows already have text, or none of its columns already have text.
+        for (Enumeration e = spanningCells.keys(); e.hasMoreElements();) {
+            TableCell cell = (TableCell) e.nextElement();
+            int coords[]   = (int[]) spanningCells.get( cell );
+            boolean neededInRow = true;
+            boolean neededInCol = true;
+            for (int i = coords[0]; neededInRow && (i < coords[0] + cell.getRowSpan()); i++) {
+                neededInRow = !rowHasText[i]; 
+            }
+            for (int j = coords[1]; neededInCol && (j < coords[1] + cell.getColSpan()); j++) {
+                neededInCol = !columnHasText[j];
+            }
+            if (neededInRow) {
+                rowHasText[ coords[0] ] = true;
+                numRowsWithText++;
+            }
+            if (neededInCol) {
+                columnHasText[ coords[1] ] = true;
+                numColumnsWithText++;
             }
         }
 

@@ -29,17 +29,18 @@ import junit.framework.TestSuite;
  **/
 public class HttpUnitSuite {
 
-	public static void main(String args[]) {
+    public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
-	}
+    }
 	
 	
-	public static Test suite() {
+    public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest( HttpUnitTest.suite() );
+        suite.addTest( WebLinkTest.suite() );
         suite.addTest( HtmlTablesTest.suite() );
-		return suite;
-	}
+        suite.addTest( WebFormTest.suite() );
+        return suite;
+    }
 
 
 }
