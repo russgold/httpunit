@@ -13,7 +13,7 @@
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 <LI><A HREF="#utf8">HttpUnit fails with an IllegalArgumentException: sun.io.CharToByteUTF-8, what do I do?</A></LI>
-<LI><A HREF="#buttons">HttpUnit is not finding the buttons in my forms. What is wrong?</A></LI>
+<LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
 <LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
 </OL>
 
@@ -72,12 +72,12 @@ using <code>getBytes( "UTF-8" )</code>. Unfortunately, Sun used the wrong
 encoding name in its JDK 1.1.x implementations, so this code 
 fails under JDK 1.1. This has been corrected in HttpUnit 1.2.2. 
 
-<A NAME="buttons"><H2>HttpUnit is not finding the buttons in my forms. What is wrong?</H2></A>
+<A NAME="buttons"><H2>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</H2></A>
 This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
 JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and 
 will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them, 
 call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page. 
-Once you have corrected any errors, HttpUnit should see your form buttons.
+Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
 
 <A NAME="#reload"><H2>Why do I get java.lang.IllegalAccessError when calling getResponse()?</H2></A>
 This happens when you use HttpUnit and JTidy with one of the JUnit graphical test runners, which reloads 
