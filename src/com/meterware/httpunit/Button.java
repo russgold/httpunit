@@ -68,8 +68,11 @@ public class Button extends FormControl {
     }
 
 
-    final
-    protected boolean doOnClickEvent() {
+    /**
+     * Does the 'onClick' event defined for this button.
+     * @return true if subsequent actions should be performed.
+     */
+    final protected boolean doOnClickEvent() {
         return _onClickEvent.length() == 0 || getScriptableDelegate().doEvent( _onClickEvent );
     }
 

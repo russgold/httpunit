@@ -56,11 +56,19 @@ public class WebForm extends WebRequestSource {
 
     /**
      * Submits this form using the web client from which it was originally obtained.
-     * Will usually return the result of that submission; however, if the 'onsubmit' event is triggered and
-     * inhibits the submission, will return the updated contents of the frame containing this form. Note that
-     * this will not run any event associated with the specified submit button. Use SubmitButton#click for that.
+     * Will usually return the result of that submission; however, if the submit button's 'onclick'
+     * or the form's 'onsubmit' event is triggered and
+     * inhibits the submission, will return the updated contents of the frame containing this form.
      **/
     public WebResponse submit( SubmitButton button ) throws IOException, SAXException {
+        return button.doOnClickEvent() ? doFormSubmit( button ) : getCurrentFrameContents();
+    }
+
+
+    /**
+     * Submits the form without also invoking the button's "onclick" event.
+     */
+    WebResponse doFormSubmit( SubmitButton button ) throws IOException, SAXException {
         return submitRequest( getAttribute( "onsubmit" ), getRequest( button ) );
     }
 

@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+22-May-2003
+Problems fixed:
+    1. bug #722788: WebForm.submit() was not invoking the 'onClick' event of the specified submit button.
+
  2-May-2003
 Acknowledgements:
     Thanks to David D. Kilzer for creating thorough tests for URLs containing navigation and showing a way to handle them.

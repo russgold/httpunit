@@ -232,7 +232,7 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
-    public void donttestSubmitButtonScript() throws Exception {    // XXX not sure this is the desired behavior
+    public void testSubmitButtonScript() throws Exception {    // XXX not sure this is the desired behavior
         defineResource( "DoIt?color=green", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +
                                           "<body>" +

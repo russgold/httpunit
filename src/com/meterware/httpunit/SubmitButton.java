@@ -44,7 +44,7 @@ public class SubmitButton extends Button {
      * Perform the normal action of this button.
      */
     protected void doButtonAction() throws IOException, SAXException {
-        getForm().submit( this );
+        getForm().doFormSubmit( this );
     }
 
 
