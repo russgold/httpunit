@@ -22,6 +22,9 @@ package com.meterware.httpunit;
 import junit.framework.TestSuite;
 import org.xml.sax.SAXException;
 
+import java.io.StringReader;
+import java.io.BufferedReader;
+
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -56,6 +59,18 @@ public class TextBlockTest extends HttpUnitTest {
         BlockElement comment = response.getFirstMatchingTextBlock( BlockElement.MATCH_CLASS, "comment" );
         assertNotNull( "Did not find a comment paragraph", comment );
         assertEquals( "Comment paragraph", "But it does have three paragraphs", comment.getText() );
+    }
+
+
+    public void testTextConversion() throws Exception {
+        defineWebPage( "SimplePage",
+                        "<p>Here is a line<br>followed by another</p>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/SimplePage.html" );
+        BufferedReader br = new BufferedReader( new StringReader( response.getTextBlocks()[0].getText() ) );
+        assertEquals( "First line", "Here is a line", br.readLine() );
+        assertEquals( "Second line", "followed by another", br.readLine() );
+        br.readLine();
     }
 
 

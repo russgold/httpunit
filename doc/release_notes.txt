@@ -13,9 +13,13 @@ Limitations:
 
 
 Revision History:
+29-Jun-2004
+   Additions:
+       1. rfe #766768: getText() methods now translate <br> tags as newlines.
+
 28-Jun-2004
    Additions:
-       1. rfe #901172 "text/xhtml" is now recognized as a valid HTML "content-type"
+       1. rfe #901172: "text/xhtml" is now recognized as a valid HTML "content-type"
 
    Problems fixed:
        1. bug #959918: Javascript setting of numeric values included trailing zeros after the decimal point.

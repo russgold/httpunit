@@ -89,15 +89,12 @@ class NodeUtils {
         final StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
         NodeAction action = new NodeAction() {
             public boolean processElement( PreOrderTraversal traversal, Element node ) {
-                if (node.getNodeName().equalsIgnoreCase( "p" )) {
+                String nodeName = node.getNodeName().toLowerCase();
+                if (nodeName.equals( "p" ) || nodeName.equals( "br" ) || nodeName.equalsIgnoreCase( "tr" )) {
                     sb.append( "\n" );
-                } else if (node.getNodeName().equalsIgnoreCase( "tr" )) {
-                    sb.append( "\n" );
-                } else if (node.getNodeName().equalsIgnoreCase( "td" )) {
+                } else if (nodeName.equals( "td" ) || nodeName.equalsIgnoreCase( "th" )) {
                     sb.append( " | " );
-                } else if (node.getNodeName().equalsIgnoreCase( "th" )) {
-                    sb.append( " | " );
-                } else if (node.getNodeName().equalsIgnoreCase( "img" ) && HttpUnitOptions.getImagesTreatedAsAltText()) {
+                } else if (nodeName.equals( "img" ) && HttpUnitOptions.getImagesTreatedAsAltText()) {
                     sb.append( getNodeAttribute( node, "alt" ) );
                 }
                 return true;
