@@ -109,16 +109,24 @@ public class WebFormTest extends HttpUnitTest {
 
 
     public void testFormParameters() throws Exception {
-        WebForm form = _wc.getResponse( getHostPath() + "/OneForm.html" ).getForms()[0];
+        defineWebPage( "AForm", "<h2>Login required</h2>" +
+                                  "<form method=POST action = \"/servlet/Login\"><B>" +
+                                  "Enter the name 'master': <textarea Name=name>Something</textarea></B>" +
+                                  "<input type=\"checkbox\" name=first>Disabled" +
+                                  "<input type=\"checkbox\" name=second checked>Enabled" +
+                                  "<br><Input type=submit value = \"Log in\">" +
+                                  "</form>" );
+
+        WebForm form = _wc.getResponse( getHostPath() + "/AForm.html" ).getForms()[0];
         String[] parameters = form.getParameterNames();
         assertNotNull( parameters );
-        assertEquals( 3, parameters.length );
-        assertEquals( "name", parameters[0] );
+        assertMatchingSet( "form parameter names", new String[] { "first", "name", "second" }, parameters );
 
         assertEquals( "First checkbox",  "",   form.getParameterValue( "first" ) );
         assertEquals( "Second checkbox", "on", form.getParameterValue( "second" ) );
         assertTrue( "Did not find parameter 'first'", form.hasParameterNamed( "first" ) );
         assertTrue( "Did not find parameter with prefix 'sec'", form.hasParameterStartingWithPrefix( "sec" ) );
+        assertTrue( "Did not find parameter with prefix 'nam'", form.hasParameterStartingWithPrefix( "nam" ) );
     }
 
 
