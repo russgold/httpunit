@@ -12,13 +12,14 @@ Limitations:
 
 Revision History:
 
-28-Feb-2000
+ 1-Mar-2002
 Acknowledgements:
     Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
     Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
     Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit
     Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces
     Thanks to Oliver Imbusch for adding the WebClientListener behavior
+    Thanks to Peter Royal for correcting handling of long line numbers in JTidyWriter, based on locale
 
 Problems fixed:
     1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields

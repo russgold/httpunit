@@ -23,6 +23,9 @@ import java.util.StringTokenizer;
 import java.util.Enumeration;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 
 /**
  * Basic "parser" for the JTidy error output.  Will get the line and column number as well
@@ -30,8 +33,16 @@ import java.net.URL;
  * called or if a string starts with "line"
  *
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+ * @author <a href="mailto:proyal@managingpartners.com">Peter Royal</a>
  **/
 class JTidyPrintWriter extends PrintWriter {
+    /**
+     * DecimalFormat.getNumberInstance() should provide us with a proper formatter for the default locale. The
+     * integers returned from JTidy contain the appropriate decimal separator for the current locale.
+     */
+    private static final NumberFormat INTEGER_FORMAT = DecimalFormat.getNumberInstance();
+
+
     JTidyPrintWriter( URL pageURL ) {
         super(System.out);
         _url = pageURL;
@@ -70,21 +81,6 @@ class JTidyPrintWriter extends PrintWriter {
     }
 
     /**
-     * Tidy is apparently returning line number in a format x.xxx remove the dots
-     **/
-    private String removeDots(String string)
-    {
-        StringTokenizer tok = new StringTokenizer(string,".");
-        StringBuffer buf = new StringBuffer();
-        String elem;
-        while(tok.hasMoreElements()) {
-            elem = tok.nextToken();
-            buf.append(elem);
-        }
-        return buf.toString();
-    }
-
-    /**
      * Detects a new log if starting with "line", a warning if message starts with "Warning"
      * and an error if it starts with "Error"
      **/
@@ -98,11 +94,11 @@ class JTidyPrintWriter extends PrintWriter {
             // skip first "line"
             tok.nextToken();
             // get line
-            _line = Integer.parseInt(removeDots(tok.nextToken()));
+            _line = parseInteger(tok.nextToken());
             // skip second "column"
             tok.nextToken();
             // get column
-            _column = Integer.parseInt(removeDots(tok.nextToken()));
+            _column = parseInteger(tok.nextToken());
         } else if (s.startsWith("Warning")) {
             _error = false;
             _msg = s;
@@ -114,6 +110,16 @@ class JTidyPrintWriter extends PrintWriter {
             _msg += s;
         }
     }
+
+
+    private int parseInteger( String integer ) {
+        try {
+            return INTEGER_FORMAT.parse( integer ).intValue();
+        } catch (ParseException e) {
+            throw new NumberFormatException( "Unable to parse integer [int: " + integer + ", error: " + e.getMessage() );
+        }
+    }
+
 
     public void println() {
         if (!_logged) {

@@ -229,7 +229,7 @@ public class FormSubmitTest extends HttpUnitTest {
         assertEquals( getHostPath() + "/ask?age=12&update=name&update.x=10&update.y=15", request.getURL().toExternalForm() );
     }
 
-                              
+
     public void testSubmitButtonAttributes() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +

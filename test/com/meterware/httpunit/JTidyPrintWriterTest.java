@@ -68,10 +68,10 @@ public class JTidyPrintWriterTest extends HttpUnitTest implements HtmlErrorListe
         URL url = new URL("http://localhost/blank.html");
         PrintWriter p = new JTidyPrintWriter(url);
         p.print("line 1234 column 1234");
-        p.print("line 1.234 column 1.234");
-        p.print("line 1.234.567 column 1.234.567");
-        p.print("line 1.2.34 column 12.34");
-        p.print("line 123..4 column 12..34");
+        p.print("line 1,234 column 1,234");
+        p.print("line 1,234,567 column 1,234,567");
+        p.print("line 1,2,34 column 12,34");
+        p.print("line 123,,4 column 12,,34");
     }
 
     public void testWrongXHTMLPage() throws Exception {
