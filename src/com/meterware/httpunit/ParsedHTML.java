@@ -31,6 +31,8 @@ import org.w3c.dom.*;
  **/
 class ParsedHTML {
 
+    private WebForm[] _forms;
+
 
     ParsedHTML( URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
         _baseURL      = baseURL;
@@ -44,13 +46,15 @@ class ParsedHTML {
      * Returns the forms found in the page in the order in which they appear.
      **/
     public WebForm[] getForms() {
-        NodeList forms = NodeUtils.getElementsByTagName( _rootNode, "form" );
-        WebForm[] result = new WebForm[ forms.getLength() ];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new WebForm( _baseURL, _baseTarget, forms.item( i ), _characterSet );
-        }
+        if (_forms == null) {
+            NodeList forms = NodeUtils.getElementsByTagName( _rootNode, "form" );
 
-        return result;
+            _forms = new WebForm[ forms.getLength() ];
+            for (int i = 0; i < _forms.length; i++) {
+                _forms[i] = new WebForm( _baseURL, _baseTarget, forms.item( i ), _characterSet );
+            }
+        }
+        return _forms;
     }
 
 

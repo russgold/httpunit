@@ -12,9 +12,11 @@ Limitations:
 
 Revision History:
 14-May-2002
-Problems fixed:
+Additions:
     1. A <select> control with a size attribute may now have its value undefined. The specification does not require
        this behavior, but both IE 5.5 and Netscape 6.2 do this.
+    2. WebResponse.getForms now caches its result so that multiple calls will return the same set of objects.
+    3. WebClient.sendRequest is now available as an alias for WebRequest.getResponse
 
  9-May-2002
 Acknowledgements:

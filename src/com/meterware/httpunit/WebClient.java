@@ -59,6 +59,14 @@ public class WebClient implements FrameHolder {
 
 
     /**
+     * Submits a web request and returns a response. This is an alternate name for the getResponse method.
+     */
+    public WebResponse sendRequest( WebRequest request ) throws MalformedURLException, IOException, SAXException {
+        return getResponse( request );
+    }
+
+
+    /**
      * Submits a web request and returns a response, using all state developed so far as stored in
      * cookies as requested by the server.
      * @exception SAXException thrown if there is an error parsing the retrieved page
