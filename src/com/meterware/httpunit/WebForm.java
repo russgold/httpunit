@@ -105,13 +105,14 @@ public class WebForm extends WebRequestSource {
 
     /**
      * Returns a map of parameter name to form parameter objects. Each form parameter object represents the set of form
-     * controls with a particular name.
+     * controls with a particular name. Unnamed parameters are ignored.
      */
     private Map getFormParameters() {
         if (_formParameters == null) {
             _formParameters = new HashMap();
             FormControl[] controls = getFormControls();
             for (int i = 0; i < controls.length; i++) {
+                if (controls[i].getName().length() == 0) continue;
                 FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
                 if (parameter == null) {
                     parameter = new FormParameter();
@@ -142,20 +143,12 @@ public class WebForm extends WebRequestSource {
     private Vector getSubmitButtonVector() {
         if (_buttonVector == null) {
             _buttonVector = new Vector();
-
-            NodeList nl = ((Element) getNode()).getElementsByTagName( "input" );
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "image" )) {
-                    _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
-                }
+            FormControl[] controls = getFormControls();
+            for (int i = 0; i < controls.length; i++) {
+                FormControl control = controls[ i ];
+                if (control instanceof SubmitButton) _buttonVector.add( control );
             }
 
-            nl = ((Element) getNode()).getElementsByTagName( "button" );
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "" )) {
-                    _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
-                }
-            }
             if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
         }
         return _buttonVector;
@@ -281,6 +274,12 @@ public class WebForm extends WebRequestSource {
                 throw new DisabledSubmitButtonException( button );
             }
         }
+
+        SubmitButton[] buttons = getSubmitButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setPressed( false );
+        }
+        button.setPressed( true );
 
         if (getMethod().equalsIgnoreCase( "post" )) {
             return new PostMethodWebRequest( this, button );
@@ -488,7 +487,7 @@ public class WebForm extends WebRequestSource {
 
 
     private void addFormParametersToList( Node child, Vector list ) {
-        final FormControl formParameter = FormControl.newFormParameter( child );
+        final FormControl formParameter = FormControl.newFormParameter( this, child );
         if (formParameter != null) {
             list.addElement( formParameter );
         } else if (child.hasChildNodes()) {

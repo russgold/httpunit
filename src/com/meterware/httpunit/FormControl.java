@@ -149,13 +149,20 @@ abstract class FormControl {
     }
 
 
-    static FormControl newFormParameter( Node node ) {
+    static FormControl newFormParameter( WebForm form, Node node ) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return null;
         } else if (node.getNodeName().equals( "textarea" )) {
             return new TextAreaFormControl( node );
         } else if (node.getNodeName().equals( "select" )) {
             return new SelectionFormControl( node );
+        } else if (node.getNodeName().equals( "button" )) {
+            final String type = NodeUtils.getNodeAttribute( node, "type", "submit" );
+            if (type.equalsIgnoreCase( "submit" )) {
+                return new SubmitButton( form, node );
+            } else {
+                return null;
+            }
         } else if (!node.getNodeName().equals( "input" )) {
             return null;
         } else {
@@ -166,8 +173,8 @@ abstract class FormControl {
                 return new RadioButtonFormControl( node );
             } else if (type.equalsIgnoreCase( "checkbox" )) {
                 return new CheckboxFormControl( node );
-//            } else if (type.equalsIgnoreCase( "submit" ) || type.equalsIgnoreCase( "image" )) {
-//                return new SubmitButton( node );
+            } else if (type.equalsIgnoreCase( "submit" ) || type.equalsIgnoreCase( "image" )) {
+                return new SubmitButton( form, node );
             } else if (type.equalsIgnoreCase( "file" )) {
                 return new FileSubmitFormControl( node );
             } else {

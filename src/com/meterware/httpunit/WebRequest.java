@@ -243,7 +243,6 @@ public class WebRequest {
         setHeaderField( "Referer", sourceForm.getBaseURL().toExternalForm() );
 
         if (button != null && button.getName().length() > 0) {
-            _parameterCollection.setParameter( button.getName(), button.getValue() );
             if (button.isImageButton()) {
                 _imageButtonName = button.getName();
                 setSubmitPosition( 0, 0 );

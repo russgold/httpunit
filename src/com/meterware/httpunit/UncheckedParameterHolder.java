@@ -47,7 +47,7 @@ class UncheckedParameterHolder implements ParameterHolder {
         _characterSet = source.getCharacterSet();
         String[] names = source.getParameterNames();
         for (int i = 0; i < names.length; i++) {
-            if (names[i].length() > 0 && !source.isFileParameter( names[i] )) {
+            if (!source.isFileParameter( names[i] )) {
                 _parameters.put( names[i], source.getParameterValues( names[i] ) );
             }
         }

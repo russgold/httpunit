@@ -60,7 +60,7 @@ public class SubmitButton extends FormControl {
      * if the control is 'successful'.
      **/
     public String[] getValues() {
-        return isDisabled() ? NO_VALUE : toArray( getValueAttribute() );
+        return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValueAttribute() );
     }
 
 
@@ -85,10 +85,15 @@ public class SubmitButton extends FormControl {
 //------------------------------------------ package members ----------------------------------
 
 
-    SubmitButton( Node node ) {
+    SubmitButton( WebForm form, Node node ) {
         super( node );
         _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( "image" );
         _id = NodeUtils.getNodeAttribute( node, "id" );
+    }
+
+
+    public void setPressed( boolean pressed ) {
+        _pressed = pressed;
     }
 
 
@@ -97,6 +102,7 @@ public class SubmitButton extends FormControl {
 
     private final String   _id;
     private final boolean  _isImageButton;
+    private       boolean  _pressed;
     private       String[] _value = new String[1];
 
 
