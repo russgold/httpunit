@@ -347,7 +347,7 @@ public class WebForm extends WebRequestSource {
     /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    public void recordParameters( ParameterProcessor processor ) throws IOException {
+    void recordParameters( ParameterProcessor processor ) throws IOException {
         FormControl[] controls = getFormControls();
         for (int i = 0; i < controls.length; i++) {
             controls[i].addValues( processor, getCharacterSet() );
