@@ -37,7 +37,8 @@ that I will one day add JavaScript support, but since I use it very little in my
 it is not a major priority for me. If you feel ambitious enough to add JavaScript support yourself, I would be happy to accept submissions.
 
 <A NAME="https"><H2>Does HttpUnit support https?</H2></A>
-Yes, as long as you have the <A HREF="http://java.sun.com/products/jsse/">JSSE extension</A> installed. Download this extension and install
+Yes, as long as you have the <A HREF="http://java.sun.com/products/jsse/">JSSE extension</A> installed. 
+Download this extension and install
 its three jars in your classpath.
 
 <A NAME="proxy"><H2>Can I use HttpUnit through a proxy server?</H2></A>
@@ -47,13 +48,23 @@ proxies</A> will work. At some point HttpUnit may support this more directly, bu
 
 <A NAME="charset"><H2>Why isn't HttpUnit handling my non-English pages?</H2></A>
 Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform. 
-HttpUnit now correctly recognizes the charset parameter of the Content-type header which may specify an alternative character set;
+As of version 1.2.1, HttpUnit correctly recognizes the charset parameter of the Content-type header which may 
+specify an alternative character set;
 when none is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1. 
-Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers incorrectly use this as an indication that they should
+Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers incorrectly use this 
+as an indication that they should
 determine the character set in some other fashion.  To imitate this behavior, HttpUnit allows you to set the expected character
-set for future pages by calling HttpUnitOptions.setDefaultCharacterSet(). This setting will not apply to those pages for which the server specifies
+set for future pages by calling HttpUnitOptions.setDefaultCharacterSet(). This setting will not apply to those 
+pages for which the server specifies
 the character set.   
-
+<p>
+Non-English form handling is supported as well. Any parameter values entered into a form will be encoded as the same
+character set as the document containing the form. The server code will then have to handle those characters
+ appropriately. In Java, that would be converting them to Unicode with statements such as<blockquote><code>
+String rawName = request.getParameter( "name" );
+String japaneseName = new String(name.getBytes("8859_1"),"EUC_JP");
+</code></blockquote>
+where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract the raw bytes from the parameter string.
 </BODY></HTML> 
 
 
