@@ -376,7 +376,8 @@ public abstract class HttpUnitOptions {
         if (_scriptingEngine == null) {
             try {
                 Class factoryClass = Class.forName( _scriptEngineClassName );
-                _scriptingEngine = (ScriptingEngineFactory) factoryClass.newInstance();
+                final ScriptingEngineFactory factory = (ScriptingEngineFactory) factoryClass.newInstance();
+                _scriptingEngine = factory.isEnabled() ? factory : NULL_SCRIPTING_ENGINE_FACTORY;
             } catch (ClassNotFoundException e) {
                 disableScripting( e, "Unable to find scripting engine factory class " );
             } catch (InstantiationException e) {
@@ -416,6 +417,7 @@ public abstract class HttpUnitOptions {
     private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
 
     private static final ScriptingEngineFactory NULL_SCRIPTING_ENGINE_FACTORY = new ScriptingEngineFactory() {
+        public boolean isEnabled() { return false; }
         public void associate( WebResponse response ) {
         }
     };

@@ -19,24 +19,26 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-
-import org.mozilla.javascript.ClassDefinitionException;
-import org.mozilla.javascript.NotAFunctionException;
-import org.mozilla.javascript.PropertyException;
-import org.mozilla.javascript.JavaScriptException;
-import org.xml.sax.SAXException;
 
 /**
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 public class JavaScriptEngineFactory implements ScriptingEngineFactory {
+
+    public boolean isEnabled() {
+        try {
+            Class.forName( "org.mozilla.javascript.Context" );
+            return true;
+        } catch (Exception e) {
+            System.err.println( "Rhino classes (js.jar) not found - Javascript disabled" );
+            return false;
+        }
+    }
+
 
     public void associate( WebResponse response ) {
         try {

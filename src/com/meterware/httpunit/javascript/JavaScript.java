@@ -83,6 +83,8 @@ public class JavaScript {
 
         public void executeScript( String script ) {
             try {
+                script = script.trim();
+                if (script.startsWith( "<!--" )) script = script.substring( 4 );
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
             } catch (JavaScriptException e) {
                 throw new RuntimeException( "Script '" + script + "' failed: " + e );

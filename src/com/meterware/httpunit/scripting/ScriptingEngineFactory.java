@@ -28,6 +28,10 @@ import com.meterware.httpunit.WebResponse;
  **/
 public interface ScriptingEngineFactory {
 
+    /**
+     * Returns true if this engine is enabled.
+     */
+    public boolean isEnabled();
 
     /**
      * Associates a scripting engine with the specified HTML web response.

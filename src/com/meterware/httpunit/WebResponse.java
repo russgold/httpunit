@@ -481,6 +481,7 @@ public class WebResponse implements HTMLSegment {
      * Returns the next javascript alert and removes it from the queue.
      */
     public String popNextAlert() {
+        if (_alerts.isEmpty()) throw new IllegalStateException( "Tried to pop a non-existent alert" );
         return (String) _alerts.removeFirst();
     }
 

@@ -107,11 +107,28 @@ public class FormScriptingTest extends HttpUnitTest {
         defineResource( "DoIt?color=green", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +
                                           "<body>" +
-                                          "<form name=spectrum action='DoIt'>" +
+                                          "<form name=spectrum action='DoIt' onsubmit='return false;'>" +
                                           "  <input type=text name=color value=green>" +
                                           "  <input type=button id=submit value=submit onClick='this.form.submit();'>" +
                                           "</form>" +
                                           "<a href='#' onClick='document.spectrum.submit(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getFormWithName( "spectrum" ).getButtons()[0].click();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
+    public void testUpdateBeforeSubmit() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=red>" +
+                                          "  <input type=submit onClick='form.color.value=\"green\";'>" +
+                                          "</form>" +
                                           "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );

@@ -7,11 +7,16 @@ Known problems:
     3. The regression test "pseudo-server" does not appear to run properly under Unix.
 
 Limitations:
-    1. JavaScript support is incomplete
-    2. JDK 1.2 or higher is required
+    1. JDK 1.2 or higher is required
 
 
 Revision History:
+20-Aug-2002
+
+Problems fixed:
+    1. JavaScript - HTML comments were not supported
+    2. JavaScript - Errors were reported if Rhino was not present in the classpath
+
 19-Aug-2002
 
 Additions:

@@ -59,9 +59,9 @@ public class ScriptingTest extends HttpUnitTest {
 
     public void testFunctionCallOnLoad() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
-                                         //   "<!-- " +
+                                            "<!-- " +
                                             "function sayCheese() { alert( \"Cheese!\" ); }" +
-                                         //   "// -->" +
+                                            "// -->" +
                                             "</script></head>" +
                                             "<body onLoad='sayCheese()'></body>" );
         WebConversation wc = new WebConversation();
