@@ -73,6 +73,16 @@ public class PostMethodWebRequest extends WebRequest {
     }
 
 
+    /**
+     * Sets the file for a parameter upload in a web request.
+     **/
+    public void selectFile( String parameterName, File file, String contentType ) {
+        super.selectFile( parameterName, file, contentType );
+
+        _files.put( parameterName, new UploadFileSpec( file, contentType ) );
+    }
+
+
 //---------------------------------- WebRequest methods --------------------------------
 
 

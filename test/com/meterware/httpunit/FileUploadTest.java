@@ -158,7 +158,51 @@ public class FileUploadTest extends HttpUnitTest {
         WebRequest formSubmit = simplePage.getForms()[0].getRequest();
         formSubmit.selectFile( "message", file );
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "update=age&message.name=temp.txt&message.lines=2", encoding.getText().trim() );
+        assertEquals( "update=age&text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
+
+        file.delete();
+    }
+
+
+    public void testFileContentType() throws Exception {
+        File file = new File( "temp.gif" );
+        FileOutputStream fos = new FileOutputStream( file );
+        fos.write( new byte[] { 1, 2, 3, 4, 0x7f, 0x23 }, 0, 6 );
+        fos.close();
+
+        defineResource( "ListParams", new MimeEcho() );
+        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
+                                  "<Input type=file name=message>" +
+                                  "</form>" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        WebRequest formSubmit = simplePage.getForms()[0].getRequest();
+        formSubmit.selectFile( "message", file );
+        WebResponse encoding = wc.getResponse( formSubmit );
+        assertEquals( "image/gif:message.name=temp.gif&message.lines=1", encoding.getText().trim() );
+
+        file.delete();
+    }
+
+
+    public void testSpecifiedFileContentType() throws Exception {
+        File file = new File( "temp.new" );
+        FileOutputStream fos = new FileOutputStream( file );
+        fos.write( new byte[] { 1, 2, 3, 4, 0x7f, 0x23 }, 0, 6 );
+        fos.close();
+
+        defineResource( "ListParams", new MimeEcho() );
+        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
+                                  "<Input type=file name=message>" +
+                                  "</form>" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        WebRequest formSubmit = simplePage.getForms()[0].getRequest();
+        formSubmit.selectFile( "message", file, "x-application/new" );
+        WebResponse encoding = wc.getResponse( formSubmit );
+        assertEquals( "x-application/new:message.name=temp.new&message.lines=1", encoding.getText().trim() );
 
         file.delete();
     }
@@ -229,6 +273,7 @@ class MimeEcho extends PseudoServlet {
         if (mbp.getFileName() == null) {
             appendFieldValue( name, sb, mbp );
         } else {
+            sb.append( mbp.getContentType() ).append( ':' );
             appendFileSpecs( name, sb, mbp );
         }
     }

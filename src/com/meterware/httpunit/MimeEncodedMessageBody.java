@@ -69,8 +69,8 @@ class MimeEncodedMessageBody extends MessageBody {
 	    String name = (String) e.nextElement();
 	    WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );
             writeLn( outputStream, "--" + BOUNDARY );
-            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + spec.getFile().getAbsolutePath() + '"' );   // XXX need to handle non-ascii names here
-//          writeLn( outputStream, "Content-Type: application/octet-stream" );   // XXX want to support real content types
+            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + encode( name ) + "\"; filename=\"" + encode( spec.getFile().getAbsolutePath() ) + '"' );   // XXX need to handle non-ascii names here
+            writeLn( outputStream, "Content-Type: " + spec.getContentType() );
             writeLn( outputStream, "" );
 
             FileInputStream in = new FileInputStream( spec.getFile() );
@@ -90,6 +90,20 @@ class MimeEncodedMessageBody extends MessageBody {
 
     private final static String BOUNDARY = "--HttpUnit-part0-aSgQ2M";
     private final static byte[] CRLF     = { 0x0d, 0x0A };
+
+
+    private String encode( String string ) {
+        StringBuffer sb = new StringBuffer();
+        char[] chars = string.toCharArray();
+        for (int i = 0; i < chars.length; i++ ) {
+            if (chars[i] == '\\') {
+                sb.append( "\\\\" );    // accomodate MS-DOS file paths XXX is this safe??
+            } else {
+                sb.append( chars[i] );
+            }
+        }
+        return sb.toString();
+    }
 
 
     private void writeLn( OutputStream os, String value, String encoding ) throws IOException {

@@ -11,6 +11,18 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
+16-May-01
+Additions:
+    1. selectFile now can infer file content type for the most common file extensions:
+       text, txt, gif, jpg, jpeg, png, html, and htm.
+    2. A new version of selectFile allows explicit specification of file content type
+       which will override any inferred type.
+       
+Configuration changes:
+    1. The build.xml file has been changed to use a specified directory of dependant jars
+       rather than the system classpath. This requires at least ant 1.3. It is no longer
+       necessary to specify the classpath parameter when running the unit tests.
+
  5-May-01 1.2.4
 Acknowledgements:
     Thanks to Jim Kimball for finding and fixing the redirection of subframes
