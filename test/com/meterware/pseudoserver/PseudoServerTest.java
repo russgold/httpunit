@@ -21,10 +21,10 @@ package com.meterware.pseudoserver;
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import java.net.HttpURLConnection;
+import java.net.UnknownHostException;
 
 
 public class PseudoServerTest extends HttpUserAgentTest {
@@ -48,9 +48,9 @@ public class PseudoServerTest extends HttpUserAgentTest {
         WebConversation wc = new WebConversation();
 
         try {
-            WebResponse response = wc.getResponse( "http://no.such.host" );
+            wc.getResponse( "http://no.such.host" );
             fail( "Should have rejected the request" );
-        } catch (HttpServerNotFoundException e) {
+        } catch (UnknownHostException e) {
         }
     }
 
@@ -59,7 +59,7 @@ public class PseudoServerTest extends HttpUserAgentTest {
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/nothing.htm" );
         try {
-            WebResponse response = wc.getResponse( request );
+            wc.getResponse( request );
             fail( "Should have rejected the request" );
         } catch (HttpNotFoundException e) {
             assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
@@ -86,7 +86,7 @@ public class PseudoServerTest extends HttpUserAgentTest {
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/error.htm" );
         try {
-            WebResponse response = wc.getResponse( request );
+            wc.getResponse( request );
             fail( "Should have rejected the request" );
         } catch (HttpException e) {
             assertEquals( "Response code", 501, e.getResponseCode() );
@@ -131,16 +131,6 @@ public class PseudoServerTest extends HttpUserAgentTest {
         WebResponse response = wc.getResponse( request );
         assertEquals( "requested resource", resourceValue, response.getText().trim() );
         assertEquals( "content type", "text/html", response.getContentType() );
-    }
-
-
-    private String asBytes( String s ) {
-        StringBuffer sb = new StringBuffer();
-        char[] chars = s.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            sb.append( Integer.toHexString( chars[i] ) ).append( " " );
-        }
-        return sb.toString();
     }
 
 

@@ -19,7 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +26,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -37,7 +37,7 @@ import java.util.Vector;
 /**
  * A response from a web server to an Http request.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 class HttpWebResponse extends WebResponse {
 
@@ -122,7 +122,6 @@ class HttpWebResponse extends WebResponse {
 //------------------------------------- private members -------------------------------------
 
 
-    private final static String END_OF_LINE   = System.getProperty( "line.separator" );
     private final static String FILE_ENCODING = System.getProperty( "file.encoding" );
 
 
@@ -132,21 +131,32 @@ class HttpWebResponse extends WebResponse {
     private Hashtable _headers = new Hashtable();
 
 
-    private void readResponseHeader( URLConnection connection ) {
-        if (connection.getHeaderField(0) == null) throw new HttpServerNotFoundException( connection.getURL() );
 
-        StringTokenizer st = new StringTokenizer( connection.getHeaderField(0) );
-    	st.nextToken();
-    	if (!st.hasMoreTokens()) {
-    	    _responseCode = HttpURLConnection.HTTP_OK;
-            _responseMessage = "OK";
-    	} else try {
-    	    _responseCode = Integer.parseInt( st.nextToken() );
-            _responseMessage = getRemainingTokens( st );
-    	} catch (NumberFormatException e) {
-    	    _responseCode = HttpURLConnection.HTTP_INTERNAL_ERROR;
-            _responseMessage = "Cannot parse response header";
-    	}
+    private void readResponseHeader( HttpURLConnection connection ) throws IOException {
+        if (needStatusWorkaround()) {
+            _responseCode = connection.getResponseCode();
+            _responseMessage = connection.getResponseMessage();
+        } else {
+             if (connection.getHeaderField(0) == null) throw new UnknownHostException( connection.getURL().toExternalForm() );
+
+            StringTokenizer st = new StringTokenizer( connection.getHeaderField(0) );
+            st.nextToken();
+            if (!st.hasMoreTokens()) {
+                _responseCode = HttpURLConnection.HTTP_OK;
+                _responseMessage = "OK";
+            } else try {
+                _responseCode = Integer.parseInt( st.nextToken() );
+                _responseMessage = getRemainingTokens( st );
+            } catch (NumberFormatException e) {
+                _responseCode = HttpURLConnection.HTTP_INTERNAL_ERROR;
+                _responseMessage = "Cannot parse response header";
+            }
+        }
+    }
+
+    private boolean needStatusWorkaround() {
+        final String jdkVersion = System.getProperty( "java.version" );
+        return jdkVersion.startsWith( "1.2" ) || jdkVersion.startsWith( "1.3" );
     }
 
 
@@ -159,10 +169,10 @@ class HttpWebResponse extends WebResponse {
     }
 
 
-    private void readHeaders( URLConnection connection ) {
+    private void readHeaders( URLConnection connection ) throws IOException {
         loadHeaders( connection );
         if (connection instanceof HttpURLConnection) {
-            readResponseHeader( connection );
+            readResponseHeader( (HttpURLConnection) connection );
         } else {
             _responseCode = HttpURLConnection.HTTP_OK;
             _responseMessage = "OK";

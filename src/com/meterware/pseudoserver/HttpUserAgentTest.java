@@ -27,8 +27,8 @@ import junit.framework.TestCase;
 
 
 /**
- *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * A base class for test cases that use the pseudo server.
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class HttpUserAgentTest extends TestCase {
 
@@ -150,6 +150,16 @@ public class HttpUserAgentTest extends TestCase {
             sb.append( '"' ).append( args[ i ] ).append( '"' );
         }
         sb.append( "}" );
+        return sb.toString();
+    }
+
+
+    protected String asBytes( String s ) {
+        StringBuffer sb = new StringBuffer();
+        char[] chars = s.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            sb.append( Integer.toHexString( chars[i] ) ).append( " " );
+        }
         return sb.toString();
     }
 
