@@ -42,6 +42,15 @@ public class WebLink extends FixedURLWebRequestSource {
     /** Predicate to match part or all of a link's URL string. **/
     public final static HTMLElementPredicate MATCH_URL_STRING;
 
+    /** Predicate to match part or all of a link's contained text. **/
+    public final static HTMLElementPredicate MATCH_CONTAINED_TEXT;
+
+    /** Predicate to match a link's ID. **/
+    public final static HTMLElementPredicate MATCH_ID;
+
+    /** Predicate to match a link's name. **/
+    public final static HTMLElementPredicate MATCH_NAME;
+
     private Scriptable _scriptable;
 
 
@@ -160,6 +169,25 @@ public class WebLink extends FixedURLWebRequestSource {
             };
         };
 
+        MATCH_CONTAINED_TEXT = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.contains( ((WebLink) htmlElement).asText(), (String) criteria );
+            };
+        };
+
+
+        MATCH_ID = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.matches( ((WebLink) htmlElement).getID(), (String) criteria );
+            };
+        };
+
+
+        MATCH_NAME = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.matches( ((WebLink) htmlElement).getName(), (String) criteria );
+            };
+        };
 
     }
 

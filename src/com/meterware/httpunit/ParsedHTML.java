@@ -123,16 +123,12 @@ class ParsedHTML {
      * Returns the first link which contains the specified text.
      **/
     public WebLink getLinkWith( String text ) {
-        WebLink[] links = getLinks();
-        for (int i = 0; i < links.length; i++) {
-            if (HttpUnitUtils.contains( links[i].asText(), text )) return links[i];
-        }
-        return null;
+        return getFirstMatchingLink( WebLink.MATCH_CONTAINED_TEXT, text );
     }
 
 
     /**
-     * Returns the first link which contains an image with the specified text as its 'alt' attribute.
+     * Returns the link which contains the first image with the specified text as its 'alt' attribute.
      **/
     public WebLink getLinkWithImageText( String text ) {
         WebImage image = getImageWithAltText( text );
@@ -142,29 +138,17 @@ class ParsedHTML {
 
     /**
      * Returns the link found in the page with the specified ID.
-     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebLink getLinkWithID( String ID ) {
-        WebLink[] links = getLinks();
-        for (int i = 0; i < links.length; i++) {
-            if (links[i].getID().equals( ID )) return links[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && links[i].getID().equalsIgnoreCase( ID )) return links[i];
-        }
-        return null;
+        return getFirstMatchingLink( WebLink.MATCH_ID, ID );
     }
 
 
     /**
      * Returns the link found in the page with the specified name.
-     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebLink getLinkWithName( String name ) {
-        WebLink[] links = getLinks();
-        for (int i = 0; i < links.length; i++) {
-            if (links[i].getName().equals( name )) return links[i];
-            else if (HttpUnitOptions.getMatchesIgnoreCase() && links[i].getName().equalsIgnoreCase( name )) return links[i];
-        }
-        return null;
+        return getFirstMatchingLink( WebLink.MATCH_NAME, name );
     }
 
 
