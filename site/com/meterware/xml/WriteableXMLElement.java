@@ -27,9 +27,22 @@ package com.meterware.xml;
 public interface WriteableXMLElement {
 
     /**
+     * Returns the name of this element.
+     */
+    String getElementName();
+
+
+    /**
      * Returns the names of the attributes of this element in the order in which they should be displayed.
      */
     String[] getAttributeNames();
+
+
+    /**
+     * Returns true if the specified attribute should be written. Some attributes may be left implicit if they have
+     * their default values.
+     */
+    boolean isExplicitAttribute( String attributeName );
 
 
     /**
@@ -48,18 +61,4 @@ public interface WriteableXMLElement {
      * Returns any text contents of this element.
      */
     String getContents();
-
-
-    /**
-     * Returns true if the specified attribute should be written. Some attributes may be left implicit if they have
-     * their default values.
-     */
-    boolean isExplicitAttribute( String attributeName );
-
-
-    /**
-     * Resets the specified attribute to its default value. Implementations may use this rather than an explicit
-     * setter to decide whether to make an attribute explicit.
-     */
-    void resetAttribute( String attributeName );
 }

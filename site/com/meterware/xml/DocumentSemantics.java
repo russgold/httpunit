@@ -35,6 +35,7 @@ import java.beans.PropertyDescriptor;
 import java.util.Date;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 
 /**
@@ -43,8 +44,10 @@ import java.io.IOException;
  **/
 public class DocumentSemantics {
 
+    private final static String LINE_BREAK       = System.getProperty( "line.separator" );
     private static final Class[]  NO_ARG_CLASSES = new Class[0];
     private static final Object[] NO_ARGS        = new Object[0];
+    private static SimpleDateFormat DATE_FORMAT  = new SimpleDateFormat( "d-MMM-yyyy" );
 
     public static void build( Document document, Object documentRoot, String documentName ) {
         try {
@@ -169,6 +172,7 @@ public class DocumentSemantics {
             final PropertyDescriptor propertyDescriptor = getProperty( beanInfo, propertyName );
             if (propertyDescriptor == null) return "";
             Object result = propertyDescriptor.getReadMethod().invoke( template, NO_ARGS );
+            if (result instanceof Date) result = DATE_FORMAT.format( (Date) result );
             return result == null ? "" : result.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,6 +186,52 @@ public class DocumentSemantics {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( file );
         } catch (ParserConfigurationException e) {
             throw new RuntimeException( "Unable to create a parser for XML documents: " + e );
+        }
+    }
+
+
+    public static String generateXML( WriteableRootElement node ) {
+        StringBuffer sb = new StringBuffer( "<?xml version='1.0' ?>" ).append( LINE_BREAK );
+        appendElement( sb, node, "" );
+        return sb.toString();
+    }
+
+
+    private static void appendElement( StringBuffer sb, WriteableXMLElement element, String prefix ) {
+        sb.append( prefix ).append( '<' ).append( element.getElementName() );
+        String[] attributeNames = element.getAttributeNames();
+        for (int i = 0; i < attributeNames.length; i++) {
+            String attributeName = attributeNames[i];
+            if (element.isExplicitAttribute( attributeName )) {
+                sb.append( ' ' ).append( attributeName ).append( "='" ).append( getStringProperty( attributeName, element ) ).append( "'" );
+            }
+        }
+        boolean isEmpty = true;
+        final String contents = element.getContents();
+        if (contents != null) {
+            isEmpty = false;
+            sb.append( '>' );
+            sb.append( contents );
+            sb.append( "</" ).append( element.getElementName() ).append( '>' ).append( LINE_BREAK );
+        } else {
+            String[] nestedElementNames = element.getNestedElementNames();
+            for (int i = 0; i < nestedElementNames.length; i++) {
+                String nestedElementName = nestedElementNames[i];
+                WriteableXMLElement[] children = element.getNestedElements( nestedElementName );
+                for (int j = 0; j < children.length; j++) {
+                    WriteableXMLElement child = children[j];
+                    if (isEmpty) {
+                        isEmpty = false;
+                        sb.append( '>' ).append( LINE_BREAK );
+                    }
+                    appendElement( sb, child, prefix + "   " );
+                }
+            }
+            if (isEmpty) {
+                sb.append( "/>" ).append( LINE_BREAK );
+            } else {
+                sb.append( prefix ).append( "</" ).append( element.getElementName() ).append( '>' ).append( LINE_BREAK );
+            }
         }
     }
 
