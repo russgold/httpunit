@@ -1,5 +1,4 @@
 package com.meterware.httpunit;
-
 /********************************************************************************************************************
  * $Id$
  *
@@ -20,8 +19,7 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
-import java.util.*;
+import java.io.IOException;
 
 
 /**
@@ -29,5 +27,8 @@ import java.util.*;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 interface ParameterProcessor {
-    void addParameter( String name, String value, String characterSet );
+
+    void addParameter( String name, String value, String characterSet ) throws IOException;
+
+    void addFile( String parameterName, UploadFileSpec fileSpec ) throws IOException;
 }

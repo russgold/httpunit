@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -99,16 +99,12 @@ class HttpUnitTest extends TestCase {
     }
 
 
-    protected void assertEqualQueries( String query1, String query2 ) {
-        assertEquals( new QuerySpec( query1 ), new QuerySpec( query2 ) );
-    }
-
-
     protected void assertEquals( String comment, Object[] expected, Object[] found ) {
         if (!equals( expected, found )) {
             fail( comment + " expected: " + asText( expected ) + " but found " + asText( found ) );
         }
     }
+
 
     private boolean equals( Object[] first, Object[] second )
     {
@@ -201,45 +197,6 @@ class HttpUnitTest extends TestCase {
     private String _hostPath;
 
     private PseudoServer _server;
-
-    static class QuerySpec {
-        QuerySpec( String urlString ) {
-            if (urlString.indexOf( '?' ) < 0) {
-                _path = urlString;
-            } else {
-                _path = urlString.substring( 0, urlString.indexOf( '?' ) );
-            }
-            _fullString = urlString;
-
-            StringTokenizer st = new StringTokenizer( urlString.substring( urlString.indexOf( '?' )+ 1 ), "&" );
-            while (st.hasMoreTokens()) _parameters.addElement( st.nextToken() );
-	}
-
-	public String toString() {
-	    return _fullString;
-	}
-
-	public boolean equals( Object o ) {
-	    return getClass().equals( o.getClass() ) && equals( (QuerySpec) o );
-	}
-
-	private String _path;
-	private String _fullString;
-	private Vector _parameters = new Vector();
-
-	private boolean equals( QuerySpec o ) {
-	    if (!_path.equals( o._path )) {
-	        return false;
-	    } else if (_parameters.size() != o._parameters.size() ) {
-	        return false;
-	    } else {
-	        for (Enumeration e = o._parameters.elements(); e.hasMoreElements();) {
-	            if (!_parameters.contains( e.nextElement() )) return false;
-	        }
-	        return true;
-	    }
-	}
-    }
 
 
 }

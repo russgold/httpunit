@@ -21,6 +21,7 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 
 import java.util.Enumeration;
 
@@ -33,15 +34,21 @@ import java.util.Enumeration;
 interface ParameterHolder {
 
     /**
-     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
+     * Specifies the position at which an image button (if any) was clicked.
      **/
-    public void recordParameters( ParameterProcessor processor );
+    public void selectImageButtonPosition( SubmitButton imageButton, int x, int y );
 
 
     /**
-     * Returns an enumeration of all parameter names in this collection.
+     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    Enumeration getParameterNames();
+    public void recordParameters( ParameterProcessor processor ) throws IOException;
+
+
+    /**
+     * Returns an array of all parameter names in this collection.
+     **/
+    public String[] getParameterNames();
 
 
     /**
@@ -69,27 +76,13 @@ interface ParameterHolder {
 
 
     /**
+     * Sets the multiple values of a file upload parameter in a web request.
+     **/
+    void setParameter( String name, UploadFileSpec[] files );
+
+
+    /**
      * Returns true if the specified parameter is a file field.
      **/
     boolean isFileParameter( String name );
-
-
-    /**
-     * Sets the file for a parameter upload in a web request.
-     **/
-    void selectFile( String parameterName, File file );
-
-
-    /**
-     * Sets the file for a parameter upload in a web request.
-     **/
-    void selectFile( String parameterName, File file, String contentType );
-
-
-    /**
-     * Sets the file for a parameter upload in a web request.
-     **/
-    void selectFile( String parameterName, String fileName, InputStream inputStream, String contentType );
-
-
 }

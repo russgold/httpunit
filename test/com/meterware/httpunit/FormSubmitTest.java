@@ -77,7 +77,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
-        assertEqualQueries( getHostPath() + "/ask?age=12", request.getURL().toExternalForm() );
+        assertEquals( "Empty choice query", getHostPath() + "/ask?age=12", request.getURL().toExternalForm() );
     }
 
 
@@ -202,7 +202,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
-        assertEqualQueries( getHostPath() + "/ask?update=name&update.y=0&update.x=0&age=12", request.getURL().toExternalForm() );
+        assertEquals( "Query", getHostPath() + "/ask?age=12&update=name&update.x=0&update.y=0", request.getURL().toExternalForm() );
     }
 
                               
@@ -226,7 +226,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest( form.getSubmitButton( "update" ), 10, 15 );
-        assertEqualQueries( getHostPath() + "/ask?update=name&update.y=15&update.x=10&age=12", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/ask?age=12&update=name&update.x=10&update.y=15", request.getURL().toExternalForm() );
     }
 
                               
@@ -289,13 +289,13 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest( form.getSubmitButton( "update", "name" ) );
-        assertEqualQueries( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/ask?age=12&update=name", request.getURL().toExternalForm() );
 
         request = form.getRequest( "update", "name" );
-        assertEqualQueries( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/ask?age=12&update=name", request.getURL().toExternalForm() );
 
         request = form.getRequest( "update" );
-        assertEqualQueries( getHostPath() + "/ask?update=age&age=12", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/ask?age=12&update=age", request.getURL().toExternalForm() );
     }
 
                               
@@ -363,7 +363,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebForm form    = wr.getForms()[0];
         WebRequest req  = form.getRequest( "apply" );
         req.setParameter( "aTextField", "test" );
-        assertEqualQueries( getHostPath() + "/abc/form.html?apply=Apply&aTextField=test",
+        assertEquals( getHostPath() + "/abc/form.html?aTextField=test&apply=Apply",
                             req.getURL().toExternalForm() );
     }
 

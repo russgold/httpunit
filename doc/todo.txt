@@ -7,7 +7,6 @@ o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Support IFRAME tag
 o Support reset button detection
 o Support _new frame tag
-o Send parameters in proper (HTML-file) order
 o Documentation, Documentation
 
 Possibles:

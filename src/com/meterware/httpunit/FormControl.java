@@ -27,6 +27,9 @@ import org.w3c.dom.NodeList;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+import java.io.IOException;
 
 
 /**
@@ -137,7 +140,34 @@ abstract class FormControl {
     }
 
 
-    void updateRequiredValues( Hashtable required ) {
+    abstract void addValues( ParameterProcessor processor, String characterSet ) throws IOException;
+
+
+    /**
+     * Sets this control to the next compatible value from the list, removing it from the list.
+     **/
+    void claimValue( List values ) {
+    }
+
+
+    /**
+     * Sets this control to the next compatible value from the list, removing it from the list.
+     **/
+    void claimUniqueValue( List values ) {
+    }
+
+
+    /**
+     * Remove any required values for this control from the list, throwing an exception if they are missing.
+     **/
+    void claimRequiredValues( List values ) {
+    }
+
+
+    /**
+     * Specifies a file to be uploaded via this control.
+     **/
+    void claimUploadSpecification( List files ) {
     }
 
 
@@ -146,6 +176,15 @@ abstract class FormControl {
      **/
     protected String getValueAttribute() {
         return _valueAttribute;
+    }
+
+
+    /**
+     * Removes the specified required value from the list of values, throwing an exception if it is missing.
+     **/
+    final protected void claimValueIsRequired( List values, final String value ) {
+        if (!values.contains( value )) throw new MissingParameterValueException( getName(), value, (String[]) values.toArray( new String[ values.size() ]) );
+        values.remove( value );
     }
 
 
@@ -167,8 +206,10 @@ abstract class FormControl {
             return null;
         } else {
             final String type = NodeUtils.getNodeAttribute( node, "type", "text" );
-            if (type.equalsIgnoreCase( "text" ) || type.equalsIgnoreCase( "hidden" ) || type.equalsIgnoreCase( "password" )) {
+            if (type.equalsIgnoreCase( "text" ) || type.equalsIgnoreCase( "password" )) {
                 return new TextFieldFormControl( node );
+            } else if (type.equalsIgnoreCase( "hidden" )) {
+                return new HiddenFieldFormControl( node );
             } else if (type.equalsIgnoreCase( "radio" )) {
                 return new RadioButtonFormControl( node );
             } else if (type.equalsIgnoreCase( "checkbox" )) {
@@ -207,6 +248,11 @@ class BooleanFormControl extends FormControl {
     }
 
 
+    public void setChecked( boolean checked ) {
+        _isChecked = checked;
+    }
+
+
     /**
      * Returns the current value(s) associated with this control. These values will be transmitted to the server
      * if the control is 'successful'.
@@ -221,6 +267,24 @@ class BooleanFormControl extends FormControl {
      **/
     public String[] getOptionValues() {
         return (isReadOnly() && !isChecked()) ? NO_VALUE : toArray( getQueryValue() );
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        if (isChecked()) processor.addParameter( getName(), getQueryValue(), characterSet );
+    }
+
+
+    /**
+     * Remove any required values for this control from the list, throwing an exception if they are missing.
+     **/
+    void claimRequiredValues( List values ) {
+        if (isValueRequired()) claimValueIsRequired( values, getQueryValue() );
+    }
+
+
+    protected boolean isValueRequired() {
+        return isReadOnly() && isChecked();
     }
 
 
@@ -253,26 +317,106 @@ class RadioButtonFormControl extends BooleanFormControl {
     String getQueryValue() {
         return getValueAttribute();
     }
+}
 
 
-    void updateRequiredValues( Hashtable required ) {
-        if (isReadOnly() && isChecked()) {
-            required.put( getName(), getQueryValue() );
+class RadioGroupFormControl extends FormControl {
+
+    private List _buttonList = new ArrayList();
+    private RadioButtonFormControl[] _buttons;
+    private String[] _allowedValues;
+
+
+    public RadioGroupFormControl() {
+    }
+
+    void addRadioButton( RadioButtonFormControl control ) {
+        _buttonList.add( control );
+        _buttons = null;
+        _allowedValues = null;
+    }
+
+
+    public String[] getValues() {
+        for (int i = 0; i < getButtons().length; i++) {
+            if (getButtons()[i].isChecked()) return getButtons()[i].getValues();
         }
+        return NO_VALUE;
+    }
+
+
+    /**
+     * Returns the option values defined for this radio button group.
+     **/
+    public String[] getOptionValues() {
+        ArrayList valueList = new ArrayList();
+        FormControl[] buttons = getButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            valueList.addAll( Arrays.asList( buttons[i].getOptionValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        for (int i = 0; i < getButtons().length; i++) getButtons()[i].addValues( processor, characterSet );
+    }
+
+
+    /**
+     * Remove any required values for this control from the list, throwing an exception if they are missing.
+     **/
+    void claimRequiredValues( List values ) {
+        for (int i = 0; i < getButtons().length; i++) {
+            getButtons()[i].claimRequiredValues( values );
+        }
+    }
+
+
+    void claimUniqueValue( List values ) {
+        int matchingButtonIndex = -1;
+        for (int i = 0; i < getButtons().length && matchingButtonIndex < 0; i++) {
+            if (!getButtons()[i].isReadOnly() && values.contains( getButtons()[i].getQueryValue() )) matchingButtonIndex = i;
+        }
+        if (matchingButtonIndex <0) throw new IllegalParameterValueException( getButtons()[0].getName(), (String) values.get(0), getAllowedValues() );
+
+        for (int i = 0; i < getButtons().length; i++) {
+            if (!getButtons()[i].isReadOnly()) getButtons()[i].setChecked( i == matchingButtonIndex );
+        }
+        values.remove( getButtons()[ matchingButtonIndex ].getQueryValue() );
+    }
+
+
+    private String[] getAllowedValues() {
+        if (_allowedValues == null) {
+            _allowedValues = new String[ getButtons().length ];
+            for (int i = 0; i < _allowedValues.length; i++) {
+                _allowedValues[i] = getButtons()[i].getQueryValue();
+            }
+        }
+        return _allowedValues;
+    }
+
+
+    private RadioButtonFormControl[] getButtons() {
+        if (_buttons == null) _buttons = (RadioButtonFormControl[]) _buttonList.toArray( new RadioButtonFormControl[ _buttonList.size() ] );
+        return _buttons;
     }
 }
 
 
 class CheckboxFormControl extends BooleanFormControl {
+
+
     public CheckboxFormControl( Node node ) {
         super( node );
     }
 
 
-    void updateRequiredValues( Hashtable required ) {
-        if (isReadOnly() && isChecked()) {
-            addValue( required, getName(), getQueryValue() );
-        }
+    void claimUniqueValue( List values ) {
+        if (isValueRequired()) return;
+        setChecked( values.contains( getQueryValue() ) );
+        if (isChecked()) values.remove( getQueryValue() );
     }
 
 
@@ -334,8 +478,29 @@ class TextFormControl extends FormControl {
     }
 
 
-    void updateRequiredValues( Hashtable required ) {
-        if (isReadOnly()) required.put( getName(), _defaultValue );
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        if (getName().length() > 0) processor.addParameter( getName(), getValues()[0], characterSet );
+    }
+
+
+    void claimValue( List values ) {
+        if (isReadOnly()) return;
+        if (values.isEmpty()) {
+            _value[0] = "";
+        } else {
+            _value[0] = (String) values.get(0);
+            values.remove(0);
+        }
+    }
+
+
+    void claimRequiredValues( List values ) {
+        if (isReadOnly()) claimValueIsRequired( values );
+    }
+
+
+    protected void claimValueIsRequired( List values ) {
+        claimValueIsRequired( values, _defaultValue[0] );
     }
 }
 
@@ -343,6 +508,23 @@ class TextFormControl extends FormControl {
 class TextFieldFormControl extends TextFormControl {
     public TextFieldFormControl( Node node ) {
         super( node, NodeUtils.getNodeAttribute( node, "value" ) );
+    }
+
+}
+
+
+class HiddenFieldFormControl extends TextFieldFormControl {
+    public HiddenFieldFormControl( Node node ) {
+        super( node );
+    }
+
+
+    void claimRequiredValues( List values ) {
+        claimValueIsRequired( values );
+    }
+
+
+    void claimValue( List values ) {
     }
 
 }
@@ -368,6 +550,9 @@ class TextAreaFormControl extends TextFormControl {
 
 class FileSubmitFormControl extends FormControl {
 
+    private UploadFileSpec _fileToUpload;
+
+
     public FileSubmitFormControl( Node node ) {
         super( node );
     }
@@ -383,6 +568,26 @@ class FileSubmitFormControl extends FormControl {
 
     public String[] getValues() {
         return null;   // XXX what should this really do?
+    }
+
+
+    /**
+     * Specifies a number of file upload specifications for this control.
+     **/
+    void claimUploadSpecification( List files ) {
+        if (files.isEmpty()) {
+            _fileToUpload = null;
+        } else {
+            _fileToUpload = (UploadFileSpec) files.get(0);
+            files.remove(0);
+        }
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        if (!isDisabled() && _fileToUpload != null) {
+            processor.addFile( getName(), _fileToUpload );
+        }
     }
 }
 
@@ -431,6 +636,40 @@ class SelectionFormControl extends FormControl {
 
     void updateRequiredParameters( Hashtable required ) {
         if (isReadOnly()) required.put( getName(), getValues() );
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        for (int i = 0; i < getValues().length; i++) {
+            processor.addParameter( getName(), getValues()[i], characterSet );
+        }
+    }
+
+
+    void claimUniqueValue( List values ) {
+        boolean[] matches = new boolean[ _optionValues.length ];
+        int numMatches = 0;
+        for (int i = 0; i < matches.length; i++) {
+            matches[i] = values.contains( _optionValues[i] );
+            if (matches[i]) {
+                numMatches++;
+                if (!_multiSelect) break;
+            }
+        }
+
+        if (!_multiSelect) {
+            if (numMatches == 0) throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
+
+        }
+
+        ArrayList newValues = new ArrayList( matches.length );
+        for (int i = 0; i < matches.length; i++) {
+            if (matches[i]) {
+                values.remove( _optionValues[i] );
+                newValues.add( _optionValues[i] );
+            }
+        }
+        _values = (String[]) newValues.toArray( new String[ values.size() ] );
     }
 
 
@@ -491,6 +730,73 @@ class SelectionFormControl extends FormControl {
         return (value == null) ? "" : value;
     }
 
+}
+//============================= exception class IllegalParameterValueException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+ **/
+class IllegalParameterValueException extends IllegalRequestParameterException {
+
+
+    IllegalParameterValueException( String parameterName, String badValue, String[] allowed ) {
+        _parameterName = parameterName;
+        _badValue      = badValue;
+        _allowedValues = allowed;
+    }
+
+
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
+        sb.append( "May not set parameter '" ).append( _parameterName ).append( "' to '" );
+        sb.append( _badValue ).append( "'. Value must be one of: { " );
+        for (int i = 0; i < _allowedValues.length; i++) {
+            if (i != 0) sb.append( ", " );
+            sb.append( _allowedValues[i] );
+        }
+        sb.append( " }" );
+        return sb.toString();
+    }
+
+
+    private String   _parameterName;
+    private String   _badValue;
+    private String[] _allowedValues;
+}
+
+//============================= exception class MissingParameterValueException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to remove a required value from a form parameter.
+ **/
+class MissingParameterValueException extends IllegalRequestParameterException {
+
+
+    MissingParameterValueException( String parameterName, String missingValue, String[] proposed ) {
+        _parameterName  = parameterName;
+        _missingValue   = missingValue;
+        _proposedValues = proposed;
+    }
+
+
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
+        sb.append( "Parameter '" ).append( _parameterName ).append( "' must have the value '" );
+        sb.append( _missingValue ).append( "'. Attempted to set it to: { " );
+        for (int i = 0; i < _proposedValues.length; i++) {
+            if (i != 0) sb.append( ", " );
+            sb.append( _proposedValues[i] );
+        }
+        sb.append( " }" );
+        return sb.toString();
+    }
+
+
+    private String   _parameterName;
+    private String   _missingValue;
+    private String[] _proposedValues;
 }
 
 

@@ -85,36 +85,6 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
 
     /**
-     * Sets the file for a parameter upload in a web request.
-     **/
-    public void selectFile( String parameterName, File file ) {
-        super.selectFile( parameterName, file );
-
-        _files.put( parameterName, new UploadFileSpec( file ) );
-    }
-
-
-    /**
-     * Sets the file for a parameter upload in a web request.
-     **/
-    public void selectFile( String parameterName, File file, String contentType ) {
-        super.selectFile( parameterName, file, contentType );
-
-        _files.put( parameterName, new UploadFileSpec( file, contentType ) );
-    }
-
-
-    /**
-     * Sets the file for a parameter upload in a web request.
-     **/
-    public void selectFile( String parameterName, String fileName, InputStream inputStream, String contentType ) {
-        super.selectFile( parameterName, fileName, inputStream, contentType );
-
-        _files.put( parameterName, new UploadFileSpec( fileName, inputStream, contentType ) );
-    }
-
-
-    /**
      * Returns true if selectFile may be called with this parameter.
      */
     protected boolean maySelectFile( String parameterName )
@@ -149,23 +119,14 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
     /**
      * Constructs a web request for a form.
      **/
-    PostMethodWebRequest( WebForm sourceForm, SubmitButton button ) {
-        super( sourceForm, button );
+    PostMethodWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
+        super( sourceForm, button, x, y );
     }
-
-
-    /**
-     * Returns a mapping of file parameters to upload specs.
-     **/
-    Dictionary getSelectedFiles() {
-        return (Dictionary) _files.clone();
-    }
-
 
 
 //---------------------------------- private members -------------------------------------
 
-    private Hashtable _files = new Hashtable();
+
     private InputStream _source;
     private MessageBody _body;
 

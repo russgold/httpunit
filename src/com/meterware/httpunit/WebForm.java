@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Iterator;
+import java.io.IOException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -39,7 +41,7 @@ import org.w3c.dom.NodeList;
  * defined for the form, the structure of the form (as a DOM), or the text of the form. They
  * may also create a {@link WebRequest} to simulate the submission of the form.
  **/
-public class WebForm extends WebRequestSource {
+public class WebForm extends WebRequestSource implements ParameterHolder {
     private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
 
 
@@ -57,21 +59,6 @@ public class WebForm extends WebRequestSource {
     public String getAction() {
         return NodeUtils.getNodeAttribute( getNode(), "action" );
      }
-
-
-    /**
-     * Returns the character set encoding for this form.
-     **/
-    public String getCharacterSet() {
-        return _characterSet;
-    }
-
-
-    /**
-     * Sets the value of a parameter in this form.
-     **/
-    public void setParameter( String name, String value ) {
-    }
 
 
     /**
@@ -95,37 +82,6 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Returns an array containing the names of the parameters defined for this form.
-     **/
-    public String[] getParameterNames() {
-        ArrayList parameterNames = new ArrayList( getFormParameters().keySet() );
-        return (String[]) parameterNames.toArray( new String[ parameterNames.size() ] );
-    }
-
-
-    /**
-     * Returns a map of parameter name to form parameter objects. Each form parameter object represents the set of form
-     * controls with a particular name. Unnamed parameters are ignored.
-     */
-    private Map getFormParameters() {
-        if (_formParameters == null) {
-            _formParameters = new HashMap();
-            FormControl[] controls = getFormControls();
-            for (int i = 0; i < controls.length; i++) {
-                if (controls[i].getName().length() == 0) continue;
-                FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
-                if (parameter == null) {
-                    parameter = new FormParameter();
-                    _formParameters.put( controls[i].getName(), parameter );
-                }
-                parameter.addControl( controls[i] );
-            }
-        }
-        return _formParameters;
-    }
-
-
-    /**
      * Returns an array containing the submit buttons defined for this form.
      **/
     public SubmitButton[] getSubmitButtons() {
@@ -135,28 +91,6 @@ public class WebForm extends WebRequestSource {
             buttons.copyInto( _submitButtons );
         }
         return _submitButtons;
-    }
-
-
-    private Vector _buttonVector;
-
-    private Vector getSubmitButtonVector() {
-        if (_buttonVector == null) {
-            _buttonVector = new Vector();
-            FormControl[] controls = getFormControls();
-            for (int i = 0; i < controls.length; i++) {
-                FormControl control = controls[ i ];
-                if (control instanceof SubmitButton) _buttonVector.add( control );
-            }
-
-            if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
-        }
-        return _buttonVector;
-    }
-
-
-    private boolean hasMatchingAttribute( Node node, String attributeName, String attributeValue ) {
-        return NodeUtils.getNodeAttribute( node, attributeName ).equalsIgnoreCase( attributeValue );
     }
 
 
@@ -209,14 +143,6 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Creates and returns a web request which will simulate the submission of this form with an unnamed submit button.
-     **/
-    public WebRequest getRequest() {
-        return getRequest( (SubmitButton) null );
-    }
-
-
-    /**
      * Creates and returns a web request which will simulate the submission of this form with a button with the specified name and value.
      **/
     public WebRequest getRequest( String submitButtonName, String submitButtonValue ) {
@@ -236,14 +162,12 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    private SubmitButton getDefaultButton() {
-        if (getSubmitButtons().length == 1) {
-            return getSubmitButtons()[0];
-        } else if (getSubmitButtonVector().contains( SubmitButton.UNNAMED_BUTTON )) {
-            return getSubmitButton( "" );
-        } else {
-            return null;
-        }
+    /**
+     * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
+     * If the button is null, simulates the pressing of the default button.
+     **/
+    public WebRequest getRequest( SubmitButton button ) {
+        return getRequest( button, 0, 0 );
     }
 
 
@@ -252,17 +176,6 @@ public class WebForm extends WebRequestSource {
      * If the button is null, simulates the pressing of the default button.
      **/
     public WebRequest getRequest( SubmitButton button, int x, int y ) {
-        WebRequest request = getRequest( button );
-        request.setSubmitPosition( x, y );
-        return request;
-    }
-
-
-    /**
-     * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
-     * If the button is null, simulates the pressing of the default button.
-     **/
-    public WebRequest getRequest( SubmitButton button ) {
         if (button == null) button = getDefaultButton();
 
         if (HttpUnitOptions.getParameterValuesValidated()) {
@@ -282,17 +195,10 @@ public class WebForm extends WebRequestSource {
         button.setPressed( true );
 
         if (getMethod().equalsIgnoreCase( "post" )) {
-            return new PostMethodWebRequest( this, button );
+            return new PostMethodWebRequest( this, button, x, y );
         } else {
-            return new GetMethodWebRequest( this, button );
+            return new GetMethodWebRequest( this, button, x, y );
         }
-    }
-
-
-    String getRelativeURL() {
-        String action = getAction();
-        if (action.trim().length() == 0) action = getBaseURL().getFile();
-        return action;
     }
 
 
@@ -302,25 +208,6 @@ public class WebForm extends WebRequestSource {
     public String getParameterValue( String name ) {
         String[] values = getParameterValues( name );
         return values.length == 0 ? null : values[0];
-    }
-
-
-    /**
-     * Returns the multiple default values of the named parameter.
-     **/
-    public String[] getParameterValues( String name ) {
-        ArrayList valueList = new ArrayList();
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            valueList.addAll( Arrays.asList( controls[i].getValues() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
-    }
-
-
-    private FormParameter getParameter( String name ) {
-        final FormParameter parameter = ((FormParameter) getFormParameters().get( name ));
-        return parameter != null ? parameter : UNKNOWN_PARAMETER;
     }
 
 
@@ -341,12 +228,7 @@ public class WebForm extends WebRequestSource {
      * Returns the option values defined for the specified parameter name.
      **/
     public String[] getOptionValues( String name ) {
-        ArrayList valueList = new ArrayList();
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            valueList.addAll( Arrays.asList( controls[i].getOptionValues() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
+        return getParameter( name ).getOptionValues();
     }
 
 
@@ -390,6 +272,23 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Returns true if this form is to be submitted using mime encoding (the default is URL encoding).
+     **/
+    public boolean isSubmitAsMime() {
+        return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( getNode(), "enctype" ) );
+    }
+
+//---------------------------------- WebRequestSource methods --------------------------------
+
+    /**
+     * Returns the character set encoding for this form.
+     **/
+    public String getCharacterSet() {
+        return _characterSet;
+    }
+
+
+    /**
      * Returns true if the named parameter accepts files for upload.
      **/
     public boolean isFileParameter( String name ) {
@@ -402,10 +301,94 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Returns true if this form is to be submitted using mime encoding (the default is URL encoding).
+     * Returns an array containing the names of the parameters defined for this form.
      **/
-    public boolean isSubmitAsMime() {
-        return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( getNode(), "enctype" ) );
+    public String[] getParameterNames() {
+        ArrayList parameterNames = new ArrayList( getFormParameters().keySet() );
+        return (String[]) parameterNames.toArray( new String[ parameterNames.size() ] );
+    }
+
+
+    /**
+     * Returns the multiple default values of the named parameter.
+     **/
+    public String[] getParameterValues( String name ) {
+        ArrayList valueList = new ArrayList();
+        FormControl[] controls = getParameter( name ).getControls();
+        for (int i = 0; i < controls.length; i++) {
+            valueList.addAll( Arrays.asList( controls[i].getValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
+    }
+
+
+    String getRelativeURL() {
+        String action = getAction();
+        if (action.trim().length() == 0) action = getBaseURL().getFile();
+        return action;
+    }
+
+
+    /**
+     * Creates and returns a web request which will simulate the submission of this form with an unnamed submit button.
+     **/
+    public WebRequest getRequest() {
+        return getRequest( (SubmitButton) null );
+    }
+
+
+//---------------------------------- ParameterHolder methods --------------------------------
+
+
+    /**
+     * Specifies the position at which an image button (if any) was clicked.
+     **/
+    public void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
+        imageButton.setLocation( x, y );
+    }
+
+
+    /**
+     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
+     **/
+    public void recordParameters( ParameterProcessor processor ) throws IOException {
+        FormControl[] controls = getFormControls();
+        for (int i = 0; i < controls.length; i++) {
+            controls[i].addValues( processor, getCharacterSet() );
+        }
+    }
+
+
+    /**
+     * Removes a parameter name from this collection.
+     **/
+    public void removeParameter( String name ) {
+        setParameter( name, NO_VALUES );
+    }
+
+
+    /**
+     * Sets the multiple values of a file upload parameter in a web request.
+     **/
+    public void setParameter( String name, UploadFileSpec[] files ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == null) throw new NoSuchParameterException( name );
+        parameter.setFiles( files );
+    }
+
+
+    /**
+     * Sets the value of a parameter in this form.
+     **/
+    public void setParameter( String name, String value ) {
+        setParameter( name, new String[] { value } );
+    }
+
+
+    public void setParameter( String name, final String[] values ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == null) throw new NoSuchParameterException( name );
+        parameter.setValues( values );
     }
 
 
@@ -421,18 +404,9 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    /**
-     * Returns the values which *must* for the specified parameter name.
-     **/
-    String[] getRequiredValues( String name ) {
-        Object result = getParameterRequiredValues().get( name );
-        if (result instanceof String[]) return (String[]) result;
-        if (result instanceof String) return new String[] { (String) result };
-        return new String[0];
-    }
-
-
 //---------------------------------- private members --------------------------------
+
+    private final static String[] NO_VALUES = new String[0];
 
     /** The attributes of the form parameters. **/
     private FormControl[] _parameters;
@@ -446,22 +420,32 @@ public class WebForm extends WebRequestSource {
     /** A map of parameter names to form parameter objects. **/
     private Map            _formParameters;
 
-    /** A map of parameter names to their required values. **/
-    private Hashtable _required;
+    private Vector _buttonVector;
 
-
-    private Hashtable getParameterRequiredValues() {
-        if (_required == null) {
-            FormControl[] parameters = getFormControls();
-            Hashtable required = new Hashtable();
-            for (int i = 0; i < parameters.length; i++) {
-                parameters[i].updateRequiredValues( required );
-            }
-            _required = required;
+    private SubmitButton getDefaultButton() {
+        if (getSubmitButtons().length == 1) {
+            return getSubmitButtons()[0];
+        } else if (getSubmitButtonVector().contains( SubmitButton.UNNAMED_BUTTON )) {
+            return getSubmitButton( "" );
+        } else {
+            return null;
         }
-        return _required;
     }
 
+
+    private Vector getSubmitButtonVector() {
+        if (_buttonVector == null) {
+            _buttonVector = new Vector();
+            FormControl[] controls = getFormControls();
+            for (int i = 0; i < controls.length; i++) {
+                FormControl control = controls[ i ];
+                if (control instanceof SubmitButton) _buttonVector.add( control );
+            }
+
+            if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
+        }
+        return _buttonVector;
+    }
 
 
     /**
@@ -476,6 +460,34 @@ public class WebForm extends WebRequestSource {
         }
 
         return _parameters;
+    }
+
+
+    private FormParameter getParameter( String name ) {
+        final FormParameter parameter = ((FormParameter) getFormParameters().get( name ));
+        return parameter != null ? parameter : UNKNOWN_PARAMETER;
+    }
+
+
+    /**
+     * Returns a map of parameter name to form parameter objects. Each form parameter object represents the set of form
+     * controls with a particular name. Unnamed parameters are ignored.
+     */
+    private Map getFormParameters() {
+        if (_formParameters == null) {
+            _formParameters = new HashMap();
+            FormControl[] controls = getFormControls();
+            for (int i = 0; i < controls.length; i++) {
+                if (controls[i].getName().length() == 0) continue;
+                FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
+                if (parameter == null) {
+                    parameter = new FormParameter();
+                    _formParameters.put( controls[i].getName(), parameter );
+                }
+                parameter.addControl( controls[i] );
+            }
+        }
+        return _formParameters;
     }
 
 
@@ -501,8 +513,14 @@ public class WebForm extends WebRequestSource {
 class FormParameter {
 
     void addControl( FormControl control ) {
-        _controlList.add( control );
         _controls = null;
+        if (_name == null) _name = control.getName();
+        if (!_name.equalsIgnoreCase( control.getName() )) throw new RuntimeException( "all controls should have the same name" );
+        if (control.isExclusive()) {
+            getRadioGroup().addRadioButton( (RadioButtonFormControl) control );
+        } else {
+            _controlList.add( control );
+        }
     }
 
 
@@ -512,11 +530,132 @@ class FormParameter {
     }
 
 
+    void setValues( String[] values ) {
+        ArrayList list = new ArrayList( values.length );
+        list.addAll( Arrays.asList( values ) );
+        for (int i = 0; i < getControls().length; i++) getControls()[i].claimRequiredValues( list );
+        for (int i = 0; i < getControls().length; i++) getControls()[i].claimUniqueValue( list );
+        for (int i = 0; i < getControls().length; i++) getControls()[i].claimValue( list );
+        if (!list.isEmpty()) throw new UnusedParameterValueException( _name, (String) list.get(0) );
+    }
+
+
+    void setFiles( UploadFileSpec[] fileArray ) {
+        ArrayList list = new ArrayList( fileArray.length );
+        list.addAll( Arrays.asList( fileArray ) );
+        for (int i = 0; i < getControls().length; i++) getControls()[i].claimUploadSpecification( list );
+        if (!list.isEmpty()) throw new UnusedUploadFileException( _name, fileArray.length - list.size(), fileArray.length );
+    }
+
+
+    String[] getOptionValues() {
+        ArrayList valueList = new ArrayList();
+        for (int i = 0; i < getControls().length; i++) {
+            valueList.addAll( Arrays.asList( getControls()[i].getOptionValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
+    }
+
+
     private FormControl[] _controls;
     private ArrayList _controlList = new ArrayList();
+    private RadioGroupFormControl _group;
+    private String _name;
+
+    private RadioGroupFormControl getRadioGroup() {
+        if (_group == null) {
+            _group = new RadioGroupFormControl();
+            _controlList.add( _group );
+        }
+        return _group;
+    }
 }
 
 
+//================================ exception class NoSuchParameterException =========================================
+
+
+/**
+ * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+ **/
+class NoSuchParameterException extends IllegalRequestParameterException {
+
+
+    NoSuchParameterException( String parameterName ) {
+        _parameterName = parameterName;
+    }
+
+
+    public String getMessage() {
+        return "No parameter named '" + _parameterName + "' is defined in the form";
+    }
+
+
+    private String _parameterName;
+
+}
+
+
+//============================= exception class UnusedParameterValueException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+ **/
+class UnusedParameterValueException extends IllegalRequestParameterException {
+
+
+    UnusedParameterValueException( String parameterName, String badValue ) {
+        _parameterName = parameterName;
+        _badValue      = badValue;
+    }
+
+
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
+        sb.append( "Attempted to assign to parameter '" ).append( _parameterName );
+        sb.append( "' the extraneous value '" ).append( _badValue ).append( "'." );
+        return sb.toString();
+    }
+
+
+    private String   _parameterName;
+    private String   _badValue;
+}
+
+
+//============================= exception class UnusedUploadFileException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to upload more files than permitted by the form.
+ **/
+class UnusedUploadFileException extends IllegalRequestParameterException {
+
+
+    UnusedUploadFileException( String parameterName, int numFilesExpected, int numFilesSupplied ) {
+        _parameterName = parameterName;
+        _numExpected   = numFilesExpected;
+        _numSupplied   = numFilesSupplied;
+    }
+
+
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer( HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE );
+        sb.append( "Attempted to upload " ).append( _numSupplied ).append( " files using parameter '" ).append( _parameterName );
+        if (_numExpected == 0) {
+            sb.append( "' which is not a file parameter." );
+        } else {
+            sb.append( "' which only has room for " ).append( _numExpected ).append( '.' );
+        }
+        return sb.toString();
+    }
+
+
+    private String _parameterName;
+    private int    _numExpected;
+    private int    _numSupplied;
+}
 
 
 //============================= exception class IllegalUnnamedSubmitButtonException ======================================

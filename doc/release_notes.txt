@@ -4,8 +4,7 @@ Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
     2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
-    3. No order is guaranteed for parameters from forms, contrary to the HTML 4.01 spec
-    4. No parameter validation is done for requests built from links
+    3. No parameter validation is done for requests built from links
 
 Limitations:
     1. HttpUnit does not support JavaScript
@@ -13,7 +12,25 @@ Limitations:
 
 
 Revision History:
+14-Jan-2002
+
+Problems fixed:
+    1. Parameters are now submitted in the order specified in the form, as long as parameter validation is not turned off.
+    2. It is no longer permitted to change hidden parameters with parameter validation enabled.
+
+Additions:
+    1. HttpUnit now handles multiple file form controls with the same name.
+    2. It is now possible to set values for a form directly into the form. All such changes will be validated.
+       These will be used by any requests derived from the form.
+
+Notes:
+    1. Parameter validation is now handled by the form. Requests created from the form while parameter validation is
+       enabled will share the variable space of the form and therefore be validated. Requests created while validation
+       is disabled will have their own variable space, which is initialized to that of the form.
+
 10-Jan-2002
+
+Problems fixed:
     1. Empty cookies were not being recognized.
 
 12-Dec-2001

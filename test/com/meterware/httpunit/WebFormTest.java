@@ -130,8 +130,8 @@ public class WebFormTest extends HttpUnitTest {
         assertTrue( "Did not find parameter with prefix 'nam'", form.hasParameterStartingWithPrefix( "nam" ) );
 
         assertEquals( "Original text area value", "Something", form.getParameterValue( "name" ) );
-//        form.setParameter( "name", "Something Else" );
-//        assertEquals( "Changed text area value", "Something Else", form.getParameterValue( "name" ) );
+        form.setParameter( "name", "Something Else" );
+        assertEquals( "Changed text area value", "Something Else", form.getParameterValue( "name" ) );
     }
 
 
@@ -159,6 +159,16 @@ public class WebFormTest extends HttpUnitTest {
         WebRequest request = form.getRequest();
         assertEquals( "surprise", request.getParameter( "secret" ) );
         assertEquals( "nothing", request.getParameter( "typeless" ) );
+        form.setParameter( "secret", "surprise" );
+        assertEquals( "surprise", request.getParameter( "secret" ) );
+
+        try {
+            form.setParameter( "secret", "illegal" );
+            fail( "Should have rejected change to hidden parameter 'secret'" );
+        } catch (IllegalRequestParameterException e) {
+        }
+
+        assertEquals( "surprise", request.getParameter( "secret" ) );
     }
 
 
@@ -200,6 +210,16 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "Default name", "", form.getParameterValue( "name" ) );
         assertEquals( "Default sex", "female", form.getParameterValue( "sex" ) );
         WebRequest request = form.getRequest();
+
+        form.setParameter( "sex", "neuter" );
+        assertEquals( "New value for sex", "neuter", form.getParameterValue( "sex" ) );
+
+        try {
+            form.setParameter( "sex", "illegal" );
+            fail( "Should have rejected change to radio parameter 'sex'" );
+        } catch (IllegalRequestParameterException e) {
+        }
+        assertEquals( "Preserved value for sex", "neuter", form.getParameterValue( "sex" ) );
     }
 
 
@@ -220,6 +240,15 @@ public class WebFormTest extends HttpUnitTest {
         WebRequest request = form.getRequest();
         assertEquals( "Submitted color", "red", request.getParameter( "color" ) );
         assertEquals( "Submitted text",  "Sample text", request.getParameter( "text" ) );
+
+        form.setParameter( "color", "green" );
+        assertEquals( "New select value", "green", form.getParameterValue( "color" ) );
+
+        try {
+            form.setParameter( "color", new String[] { "red", "green" } );
+            fail( "Should have rejected set with multiple values" );
+        } catch (IllegalRequestParameterException e) {
+        }
     }
 
 
@@ -242,6 +271,18 @@ public class WebFormTest extends HttpUnitTest {
         WebRequest request = form.getRequest();
         assertMatchingSet( "Request defaults", new String[] { "red", "pink" }, request.getParameterValues( "colors" ) );
         assertEquals( "URL", getHostPath() + "/ask?colors=red&colors=pink", request.getURL().toExternalForm() );
+
+
+        form.setParameter( "colors", "green" );
+        assertEquals( "New select value", new String[] { "green" }, form.getParameterValues( "colors" ) );
+        form.setParameter( "colors", new String[] { "blue", "pink" } );
+        assertEquals( "New select value", new String[] { "blue", "pink" }, form.getParameterValues( "colors" ) );
+
+        try {
+            form.setParameter( "colors", new String[] { "red", "colors" } );
+            fail( "Should have rejected set with bad values" );
+        } catch (IllegalRequestParameterException e) {
+        }
     }
 
                               
@@ -267,7 +308,7 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
-    public void testCheckboxDefaults() throws Exception {
+    public void testCheckboxControls() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=checkbox name=ready value=yes checked>" +
                                   "<Input type=checkbox name=color value=red checked>" +
@@ -283,6 +324,15 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "ready state", "yes", form.getParameterValue( "ready" ) );
         assertMatchingSet( "default genders allowed", new String[] { "male" }, form.getParameterValues( "gender" ) );
         assertMatchingSet( "default colors", new String[] { "red", "blue" }, form.getParameterValues( "color" ) );
+
+        form.setParameter( "color", "red" );
+        assertMatchingSet( "default colors", new String[] { "red" }, form.getParameterValues( "color" ) );
+        try {
+            form.setParameter( "color", new String[] { "red", "purple" } );
+            fail( "Should have rejected set with bad values" );
+        } catch (IllegalRequestParameterException e) {
+        }
+
     }
 
 

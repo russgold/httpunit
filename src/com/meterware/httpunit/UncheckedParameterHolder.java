@@ -21,6 +21,7 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -55,9 +56,18 @@ class UncheckedParameterHolder implements ParameterHolder {
 
 
     /**
+     * Specifies the position at which an image button (if any) was clicked.
+     **/
+    public void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
+        setParameter( imageButton.getName() + ".x", Integer.toString( x ) );
+        setParameter( imageButton.getName() + ".y", Integer.toString( y ) );
+    }
+
+
+    /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    public void recordParameters( ParameterProcessor processor ) {
+    public void recordParameters( ParameterProcessor processor ) throws IOException {
         Enumeration e = _parameters.keys();
 
         while (e.hasMoreElements()) {
@@ -68,13 +78,16 @@ class UncheckedParameterHolder implements ParameterHolder {
             } else if (value instanceof String[]) {
                 String[] values = (String[]) value;
                 for (int i = 0; i < values.length; i++) processor.addParameter( name, values[i], _characterSet );
+            } else if (value instanceof UploadFileSpec[]) {
+                UploadFileSpec[] files = (UploadFileSpec[]) value;
+                for (int i = 0; i < files.length; i++) processor.addFile( name, files[i] );
             }
         }
     }
 
 
-    public Enumeration getParameterNames() {
-        return _parameters.keys();
+    public String[] getParameterNames() {
+        return (String[]) _parameters.keySet().toArray( new String[ _parameters.size() ] );
     }
 
 
@@ -88,7 +101,7 @@ class UncheckedParameterHolder implements ParameterHolder {
         Object result = _parameters.get( name );
         if (result instanceof String) return new String[] { (String) result };
         if (result instanceof String[]) return (String[]) result;
-        if (result instanceof WebRequest.UploadFileSpec) return new String[] { result.toString() };
+        if (result instanceof UploadFileSpec) return new String[] { result.toString() };
         return NO_VALUES;
     }
 
@@ -108,19 +121,12 @@ class UncheckedParameterHolder implements ParameterHolder {
     }
 
 
+    public void setParameter( String name, UploadFileSpec[] files ) {
+        _parameters.put( name, files );
+    }
+
+
     public boolean isFileParameter( String name ) {
         return false;
-    }
-
-
-    public void selectFile( String parameterName, File file ) {
-    }
-
-
-    public void selectFile( String parameterName, File file, String contentType ) {
-    }
-
-
-    public void selectFile( String parameterName, String fileName, InputStream inputStream, String contentType ) {
     }
 }

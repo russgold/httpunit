@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import java.io.IOException;
+
 import org.w3c.dom.Node;
 
 /**
@@ -64,6 +66,17 @@ public class SubmitButton extends FormControl {
     }
 
 
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        if (_pressed && !isDisabled() && getName().length() > 0 && getValueAttribute().length() > 0) {
+            processor.addParameter( getName(), getValueAttribute(), characterSet );
+            if (_isImageButton) {
+                processor.addParameter( getName() + ".x", Integer.toString( _x ), characterSet );
+                processor.addParameter( getName() + ".y", Integer.toString( _y ), characterSet );
+            }
+        }
+    }
+
+
 //------------------------------------ Object methods ----------------------------------------
 
 
@@ -97,12 +110,20 @@ public class SubmitButton extends FormControl {
     }
 
 
+    public void setLocation( int x, int y ) {
+        _x = x;
+        _y = y;
+    }
+
+
 //------------------------------------------ private members ----------------------------------
 
 
     private final String   _id;
     private final boolean  _isImageButton;
     private       boolean  _pressed;
+    private       int      _x;
+    private       int      _y;
     private       String[] _value = new String[1];
 
 

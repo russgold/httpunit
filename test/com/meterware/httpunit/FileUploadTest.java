@@ -67,7 +67,7 @@ public class FileUploadTest extends HttpUnitTest {
         WebResponse simplePage = wc.getResponse( request );
         WebRequest formSubmit = simplePage.getForms()[0].getRequest();
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEqualQueries( "http://dummy?update=age&age=12", "http://dummy?" + encoding.getText().trim() );
+        assertEquals( "http://dummy?age=12&update=age", "http://dummy?" + encoding.getText().trim() );
     }
 
 
@@ -86,7 +86,7 @@ public class FileUploadTest extends HttpUnitTest {
         try {
             formSubmit.setParameter( "message", "text/plain" );
             fail( "Should not allow setting of a file parameter to a text value" );
-        } catch (IllegalFileParameterException e) {
+        } catch (IllegalRequestParameterException e) {
         }
     }
 
@@ -150,9 +150,76 @@ public class FileUploadTest extends HttpUnitTest {
         WebRequest formSubmit = simplePage.getForms()[0].getRequest();
         formSubmit.selectFile( "message", file );
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "update=age&text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
+        assertEquals( "text/plain:message.name=temp.txt&message.lines=2&update=age", encoding.getText().trim() );
 
         file.delete();
+    }
+
+
+    public void testMultiFileSubmit() throws Exception {
+        File file = new File( "temp.txt" );
+        FileWriter fw = new FileWriter( file );
+        PrintWriter pw = new PrintWriter( fw );
+        pw.println( "Not much text" );
+        pw.println( "But two lines" );
+        pw.close();
+
+        File file2 = new File( "temp2.txt" );
+        fw = new FileWriter( file2 );
+        pw = new PrintWriter( fw );
+        pw.println( "Even less text on one line" );
+        pw.close();
+
+        defineResource( "ListParams", new MimeEcho() );
+        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
+                                  "<Input type=file name=message>" +
+                                  "<Input type=file name=message>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "</form>" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        WebRequest formSubmit = simplePage.getForms()[0].getRequest();
+        formSubmit.setParameter( "message", new UploadFileSpec[] { new UploadFileSpec( file ), new UploadFileSpec( file2, "text/more" ) } );
+        WebResponse encoding = wc.getResponse( formSubmit );
+        assertEquals( "text/plain:message.name=temp.txt&message.lines=2&text/more:message.name=temp2.txt&message.lines=1&update=age", encoding.getText().trim() );
+
+        file.delete();
+        file2.delete();
+    }
+
+
+    public void testIllegalMultiFileSubmit() throws Exception {
+        File file = new File( "temp.txt" );
+        FileWriter fw = new FileWriter( file );
+        PrintWriter pw = new PrintWriter( fw );
+        pw.println( "Not much text" );
+        pw.println( "But two lines" );
+        pw.close();
+
+        File file2 = new File( "temp2.txt" );
+        fw = new FileWriter( file2 );
+        pw = new PrintWriter( fw );
+        pw.println( "Even less text on one line" );
+        pw.close();
+
+        defineResource( "ListParams", new MimeEcho() );
+        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
+                                  "<Input type=file name=message>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "</form>" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        WebRequest formSubmit = simplePage.getForms()[0].getRequest();
+        try {
+            formSubmit.setParameter( "message", new UploadFileSpec[] { new UploadFileSpec( file ), new UploadFileSpec( file2, "text/more" ) } );
+            fail( "Permitted two files on a single file parameter" );
+        } catch (IllegalRequestParameterException e) {
+        }
+
+        file.delete();
+        file2.delete();
     }
 
 
@@ -170,7 +237,7 @@ public class FileUploadTest extends HttpUnitTest {
         WebRequest formSubmit = simplePage.getForms()[0].getRequest();
         formSubmit.selectFile( "message", "temp.txt", bais, "text/plain" );
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "update=age&text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
+        assertEquals( "text/plain:message.name=temp.txt&message.lines=2&update=age", encoding.getText().trim() );
     }
 
 
@@ -183,7 +250,7 @@ public class FileUploadTest extends HttpUnitTest {
         formSubmit.setMimeEncoded( true );
         formSubmit.selectFile( "message", "temp.txt", bais, "text/plain" );
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEqualQueries( "text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
+        assertEquals( "text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
     }
 
 

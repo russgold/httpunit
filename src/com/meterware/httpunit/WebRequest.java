@@ -38,13 +38,14 @@ import java.net.URLEncoder;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
+import java.util.Arrays;
 
 /**
  * A request sent to a web server.
  **/
 abstract
 public class WebRequest {
-
 
     /**
      * Sets the value of a header to be sent with this request. A header set here will override any matching header set
@@ -101,8 +102,7 @@ public class WebRequest {
      * Sets the value of a parameter in a web request.
      **/
     public void setParameter( String name, String value ) {
-        if (HttpUnitOptions.getParameterValuesValidated()) validateParameterValue( name, value );
-        _parameterCollection.setParameter( name, value );
+        _parameterHolder.setParameter( name, value );
     }
 
 
@@ -110,8 +110,17 @@ public class WebRequest {
      * Sets the multiple values of a parameter in a web request.
      **/
     public void setParameter( String name, String[] values ) {
-        if (HttpUnitOptions.getParameterValuesValidated()) validateParameterValues( name, values );
-        _parameterCollection.setParameter( name, values );
+        _parameterHolder.setParameter( name, values );
+    }
+
+
+    /**
+     * Sets the multiple values of a file upload parameter in a web request.
+     **/
+    public void setParameter( String parameterName, UploadFileSpec[] files ) {
+        if (!maySelectFile( parameterName )) throw new IllegalNonFileParameterException( parameterName );
+        if (!isMimeEncoded()) throw new MultipartFormRequiredException();
+        _parameterHolder.setParameter( parameterName, files );
     }
 
 
@@ -119,7 +128,7 @@ public class WebRequest {
      * Returns true if the specified parameter is a file field.
      **/
     public boolean isFileParameter( String name ) {
-        return _sourceForm != null && _sourceForm.isFileParameter( name );
+        return _parameterHolder.isFileParameter( name );
     }
 
 
@@ -127,8 +136,7 @@ public class WebRequest {
      * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, File file ) {
-        assertFileParameter( parameterName );
-        if (!isMimeEncoded()) throw new MultipartFormRequiredException();
+        setParameter( parameterName, new UploadFileSpec[] { new UploadFileSpec( file ) } );
     }
 
 
@@ -136,8 +144,7 @@ public class WebRequest {
      * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, File file, String contentType ) {
-        assertFileParameter( parameterName );
-        if (!isMimeEncoded()) throw new MultipartFormRequiredException();
+        setParameter( parameterName, new UploadFileSpec[] { new UploadFileSpec( file, contentType ) } );
     }
 
 
@@ -145,25 +152,25 @@ public class WebRequest {
      * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, String fileName, InputStream inputStream, String contentType ) {
-        assertFileParameter( parameterName );
-    }
-
-
-    /**
-     * Throws an exception if the specified parameter may not be set as a file.
-     */
-    private void assertFileParameter( String parameterName )
-    {
-        if (!maySelectFile( parameterName )) throw new IllegalNonFileParameterException( parameterName );
-        if (!isMimeEncoded()) throw new MultipartFormRequiredException();
+        setParameter( parameterName, new UploadFileSpec[] { new UploadFileSpec( fileName, inputStream, contentType ) } );
     }
 
 
     /**
      * Returns an enumeration of all parameters in this web request.
+     * @deprecated use getRequestParameterNames instead
      **/
     public Enumeration getParameterNames() {
-        return _parameterCollection.getParameterNames();
+        return new Vector( Arrays.asList( _parameterHolder.getParameterNames() ) ).elements();
+    }
+
+
+    /**
+     * Returns an array of all parameter names in this web request.
+     * @since 1.3.1
+     **/
+    public String[] getRequestParameterNames() {
+        return _parameterHolder.getParameterNames();
     }
 
 
@@ -182,7 +189,7 @@ public class WebRequest {
      * Returns the multiple default values of the named parameter.
      **/
     public String[] getParameterValues( String name ) {
-        return _parameterCollection.getParameterValues( name );
+        return _parameterHolder.getParameterValues( name );
     }
 
 
@@ -190,7 +197,7 @@ public class WebRequest {
      * Removes a parameter from this web request.
      **/
     public void removeParameter( String name ) {
-        _parameterCollection.removeParameter( name );
+        _parameterHolder.removeParameter( name );
     }
 
 
@@ -223,40 +230,52 @@ public class WebRequest {
 
 
     /**
+     * Constructs a web request using a base request and a relative URL string.
+     **/
+    protected WebRequest( WebRequest baseRequest, String urlString, String target ) throws MalformedURLException {
+        this( baseRequest.getURL(), urlString, target );
+    }
+
+
+    /**
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
     protected WebRequest( URL urlBase, String urlString, String target ) {
-        _urlBase   = urlBase;
-        _urlString = urlString;
-        _target    = target;
+        this( urlBase, urlString, target, new UncheckedParameterHolder() );
     }
 
 
     /**
      * Constructs a web request from a form.
      **/
-    protected WebRequest( WebForm sourceForm, SubmitButton button ) {
-        this( sourceForm.getBaseURL(), sourceForm.getRelativeURL(), sourceForm.getTarget() );
+    protected WebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
+        this( sourceForm.getBaseURL(), sourceForm.getRelativeURL(), sourceForm.getTarget(), newParameterHolder( sourceForm ) );
         _sourceForm   = sourceForm;
-        _parameterCollection = new UncheckedParameterHolder( sourceForm );
-
-        setHeaderField( "Referer", sourceForm.getBaseURL().toExternalForm() );
-
-        if (button != null && button.getName().length() > 0) {
-            if (button.isImageButton()) {
-                _imageButtonName = button.getName();
-                setSubmitPosition( 0, 0 );
-            }
+        if (button != null && button.isImageButton() && button.getName().length() > 0) {
+            _parameterHolder.selectImageButtonPosition( button, x, y );
         }
 
+        setHeaderField( "Referer", sourceForm.getBaseURL().toExternalForm() );
+    }
+
+
+    private static ParameterHolder newParameterHolder( WebForm requestSource ) {
+        if (HttpUnitOptions.getParameterValuesValidated()) {
+            return requestSource;
+        } else {
+            return new UncheckedParameterHolder( requestSource );
+        }
     }
 
 
     /**
-     * Constructs a web request using a base request and a relative URL string.
+     * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
-    protected WebRequest( WebRequest baseRequest, String urlString, String target ) throws MalformedURLException {
-        this( baseRequest.getURL(), urlString, target );
+    private WebRequest( URL urlBase, String urlString, String target, ParameterHolder parameterHolder ) {
+        _urlBase   = urlBase;
+        _urlString = urlString;
+        _target    = target;
+        _parameterHolder = parameterHolder;
     }
 
 
@@ -327,24 +346,26 @@ public class WebRequest {
 
     final
     protected String getParameterString() {
-        URLEncodedString encoder = new URLEncodedString();
-        _parameterCollection.recordParameters( encoder );
-        return encoder.getString();
+        try {
+            URLEncodedString encoder = new URLEncodedString();
+            _parameterHolder.recordParameters( encoder );
+            return encoder.getString();
+        } catch (IOException e) {
+            throw new RuntimeException( "Programming error: " + e );   // should never happen
+        }
     }
 
+
+    final
+    protected ParameterHolder getParameterHolder() {
+        return _parameterHolder;
+    }
 
 
 //---------------------------------- package members --------------------------------
 
     /** The name of the topmost frame. **/
     final static String TOP_FRAME = "_top";
-
-
-    void setSubmitPosition( int x, int y ) {
-        if (_imageButtonName == null) return;
-        _parameterCollection.setParameter( _imageButtonName + ".x", Integer.toString( x ) );
-        _parameterCollection.setParameter( _imageButtonName + ".y", Integer.toString( y ) );
-    }
 
 
     Hashtable getHeaderDictionary() {
@@ -356,83 +377,8 @@ public class WebRequest {
     }
 
 
-    static class UploadFileSpec {
-        UploadFileSpec( File file ) {
-            _file = file;
-            guessContentType();
-        }
-
-
-        UploadFileSpec( File file, String contentType ) {
-            _file = file;
-            _contentType = contentType;
-        }
-
-
-        UploadFileSpec( String fileName, InputStream inputStream, String contentType ) {
-            _fileName = fileName;
-            _inputStream = inputStream;
-            _contentType = contentType;
-        }
-
-
-        InputStream getInputStream() throws IOException {
-            if (_inputStream == null) {
-                _inputStream = new FileInputStream( _file );
-            }
-            return _inputStream;
-        }
-
-
-        String getFileName() {
-            if (_fileName == null) {
-                _fileName = _file.getAbsolutePath();
-            }
-            return _fileName;
-        }
-
-
-        String getContentType() {
-            return _contentType;
-        }
-
-        private File _file;
-
-        private InputStream _inputStream;
-
-        private String _fileName;
-
-        private String _contentType = "text/plain";
-
-        private static String[][] CONTENT_EXTENSIONS = {
-            { "text/plain",               "txt", "text" },
-            { "text/html",                "htm", "html" },
-            { "image/gif",                "gif" },
-            { "image/jpeg",               "jpg", "jpeg" },
-            { "image/png",                "png" },
-            { "application/octet-stream", "zip" }
-        };
-
-
-        private void guessContentType() {
-            String extension = getExtension( _file.getName() );
-            for (int i = 0; i < CONTENT_EXTENSIONS.length; i++) {
-                for (int j=1; j < CONTENT_EXTENSIONS[i].length; j++) {
-                    if (extension.equalsIgnoreCase( CONTENT_EXTENSIONS[i][j] )) {
-                        _contentType = CONTENT_EXTENSIONS[i][0];
-                        return;
-                    }
-                }
-            }
-        }
-
-        private String getExtension( String fileName ) {
-            return fileName.substring( fileName.lastIndexOf( '.' ) + 1 );
-        }
-    }
-
-
 //--------------------------------------- private members ------------------------------------
+
 
     /** The name of the system parameter used by java.net to locate protocol handlers. **/
     private final static String PROTOCOL_HANDLER_PKGS  = "java.protocol.handler.pkgs";
@@ -443,62 +389,15 @@ public class WebRequest {
     /** The name of the JSSE class which supports the https protocol. **/
     private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
 
-    private UncheckedParameterHolder _parameterCollection = new UncheckedParameterHolder();
+    private final ParameterHolder _parameterHolder;
 
     private URL          _urlBase;
     private String       _urlString;
     private WebForm      _sourceForm;
-    private String       _imageButtonName;
     private String       _target = TOP_FRAME;
     private Hashtable    _headers;
 
     private boolean      _httpsProtocolSupportEnabled;
-
-
-    private void validateParameterValue( String name, String value ) {
-        if (_sourceForm == null) return;
-        validateOneParameterValue( name, value );
-        validateRequiredValues( name, new String[] { value } );
-    }
-
-
-    private void validateOneParameterValue( String name, String value ) {
-        if (_sourceForm.isTextParameter( name )) return;
-        if (_sourceForm.isFileParameter( name )) throw new IllegalFileParameterException( name );
-        if (!inArray( name, _sourceForm.getParameterNames() )) throw new NoSuchParameterException( name );
-        if (!inArray( value, _sourceForm.getOptionValues( name ) )) throw new IllegalParameterValueException( name, value, _sourceForm.getOptionValues( name ) );
-    }
-
-
-    private void validateParameterValues( String name, String[] values ) {
-        if (_sourceForm == null) return;
-        if (values.length > 1 && !_sourceForm.isMultiValuedParameter( name )) {
-            if (!_sourceForm.isTextParameter( name ) || _sourceForm.getNumTextParameters( name ) == 1) {
-                throw new SingleValuedParameterException( name );
-            } else if (values.length > _sourceForm.getNumTextParameters( name )) {
-                throw new TextParameterCountException( name, _sourceForm.getNumTextParameters( name ) );
-            }
-        }
-
-        for (int i = 0; i < values.length; i++) validateOneParameterValue( name, values[i] );
-        validateRequiredValues( name, values );
-    }
-
-
-    private void validateRequiredValues( String name, String[] values ) {
-        String[] required = _sourceForm.getRequiredValues( name );
-        for (int i = 0; i < required.length; i++) {
-            if (!inArray( required[i], values )) throw new MissingParameterValueException( name, required[i], values );
-        }
-    }
-
-
-    private boolean inArray( String candidate, String[] values ) {
-        for (int i = 0; i < values.length; i++) {
-            if (candidate.equals( values[i] )) return true;
-        }
-        return false;
-    }
 
 
     private void validateProtocol( String urlString ) {
@@ -591,6 +490,11 @@ class URLEncodedString implements ParameterProcessor {
     }
 
 
+    public void addFile( String parameterName, UploadFileSpec fileSpec ) {
+        throw new RuntimeException( "May not URL-encode a file upload request" );
+    }
+
+
     /**
      * Returns a URL-encoded version of the string, including all eight bits, unlike URLEncoder, which strips the high bit.
      **/
@@ -622,171 +526,6 @@ class URLEncodedString implements ParameterProcessor {
             }
         }
     }
-
-
-}
-
-//================================ exception class NoSuchParameterException =========================================
-
-
-/**
- * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
- **/
-class NoSuchParameterException extends IllegalRequestParameterException {
-
-
-    NoSuchParameterException( String parameterName ) {
-        _parameterName = parameterName;
-    }
-
-
-    public String getMessage() {
-        return "No parameter named '" + _parameterName + "' is defined in the form";
-    }
-
-
-    private String _parameterName;
-
-}
-
-
-//============================= exception class IllegalParameterValueException ======================================
-
-
-/**
- * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
- **/
-class IllegalParameterValueException extends IllegalRequestParameterException {
-
-
-    IllegalParameterValueException( String parameterName, String badValue, String[] allowed ) {
-        _parameterName = parameterName;
-        _badValue      = badValue;
-        _allowedValues = allowed;
-    }
-
-
-    public String getMessage() {
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
-        sb.append( "May not set parameter '" ).append( _parameterName ).append( "' to '" );
-        sb.append( _badValue ).append( "'. Value must be one of: { " );
-        for (int i = 0; i < _allowedValues.length; i++) {
-            if (i != 0) sb.append( ", " );
-            sb.append( _allowedValues[i] );
-        }
-        sb.append( " }" );
-        return sb.toString();
-    }
-
-
-    private String   _parameterName;
-    private String   _badValue;
-    private String[] _allowedValues;
-}
-
-
-//============================= exception class MissingParameterValueException ======================================
-
-
-/**
- * This exception is thrown on an attempt to remove a required value from a form parameter.
- **/
-class MissingParameterValueException extends IllegalRequestParameterException {
-
-
-    MissingParameterValueException( String parameterName, String missingValue, String[] proposed ) {
-        _parameterName  = parameterName;
-        _missingValue   = missingValue;
-        _proposedValues = proposed;
-    }
-
-
-    public String getMessage() {
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
-        sb.append( "Parameter '" ).append( _parameterName ).append( "' must have the value '" );
-        sb.append( _missingValue ).append( "'. Attempted to set it to: { " );
-        for (int i = 0; i < _proposedValues.length; i++) {
-            if (i != 0) sb.append( ", " );
-            sb.append( _proposedValues[i] );
-        }
-        sb.append( " }" );
-        return sb.toString();
-    }
-
-
-    private String   _parameterName;
-    private String   _missingValue;
-    private String[] _proposedValues;
-}
-
-
-//============================= exception class SingleValuedParameterException ======================================
-
-
-/**
- * This exception is thrown on an attempt to set a single-valued parameter to multiple values.
- **/
-class SingleValuedParameterException extends IllegalRequestParameterException {
-
-
-    SingleValuedParameterException( String parameterName ) {
-        _parameterName = parameterName;
-    }
-
-
-    public String getMessage() {
-        return "Parameter '" + _parameterName + "' may only have one value.";
-    }
-
-
-    private String _parameterName;
-
-}
-
-
-/**
- * This exception is thrown on an attempt to set a text parameter to more values than are allowed.
- **/
-class TextParameterCountException extends IllegalRequestParameterException {
-
-
-    TextParameterCountException( String parameterName, int numAllowed ) {
-        _parameterName = parameterName;
-        _numAllowed    = numAllowed;
-    }
-
-
-    public String getMessage() {
-        return "Parameter '" + _parameterName + "' may have no more than " + _numAllowed + " values.";
-    }
-
-
-    private String _parameterName;
-    private int    _numAllowed;
-
-}
-
-
-//============================= exception class IllegalFileParameterException ======================================
-
-
-/**
- * This exception is thrown on an attempt to set a file parameter to a text value.
- **/
-class IllegalFileParameterException extends IllegalRequestParameterException {
-
-
-    IllegalFileParameterException( String parameterName ) {
-        _parameterName = parameterName;
-    }
-
-
-    public String getMessage() {
-        return "Parameter '" + _parameterName + "' is a file parameter and may not be set to a text value.";
-    }
-
-
-    private String _parameterName;
 
 }
 
@@ -831,6 +570,5 @@ class MultipartFormRequiredException extends IllegalRequestParameterException {
     public String getMessage() {
         return "The request does not use multipart/form-data encoding, and cannot be used to upload files ";
     }
-
 
 }

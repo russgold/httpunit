@@ -90,8 +90,8 @@ public class MessageBodyWebRequest extends WebRequest {
     /**
      * Constructs a web request for a form.
      **/
-    MessageBodyWebRequest( WebForm sourceForm, SubmitButton button ) {
-        super( sourceForm, button );
+    MessageBodyWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
+        super( sourceForm, button, x, y );
     }
 
 

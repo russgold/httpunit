@@ -58,39 +58,9 @@ class MimeEncodedMessageBody extends MessageBody {
      * Transmits the body of this request as a sequence of bytes.
      **/
     void writeTo( OutputStream outputStream ) throws IOException {
-        for (Enumeration e = getRequest().getParameterNames(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
-            String[] values = getRequest().getParameterValues( name );
-            for (int i = 0; i < values.length; i++) {
-                writeLn( outputStream, "--" + BOUNDARY );
-                writeLn( outputStream, "Content-Disposition: form-data; name=\"" + name + '"' );  // XXX need to handle non-ascii names here
-                writeLn( outputStream, "Content-Type: text/plain; charset=" + getRequest().getCharacterSet() );
-                writeLn( outputStream, "" );
-                writeLn( outputStream, values[ i ], getRequest().getCharacterSet() );
-            }
-        }
-
-        Dictionary files = getPostRequest().getSelectedFiles();
-        byte[] buffer = new byte[ 8 * 1024 ];
-        for (Enumeration e = files.keys(); e.hasMoreElements();) {
-            String name = (String) e.nextElement();
-            WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );
-            writeLn( outputStream, "--" + BOUNDARY );
-            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + encode( name ) + "\"; filename=\"" + encode( spec.getFileName() ) + '"' );   // XXX need to handle non-ascii names here
-            writeLn( outputStream, "Content-Type: " + spec.getContentType() );
-            writeLn( outputStream, "" );
-
-            InputStream in = spec.getInputStream();
-            int count = 0;
-            do {
-                outputStream.write( buffer, 0, count );
-                count = in.read( buffer, 0, buffer.length );
-            } while (count != -1);
-
-            in.close();
-            writeLn( outputStream, "" );
-        }
-        writeLn( outputStream, "--" + BOUNDARY + "--" );
+        MimeEncoding encoding = new MimeEncoding( outputStream );
+        getRequest().getParameterHolder().recordParameters( encoding );
+        encoding.sendClose();
     }
 
 
@@ -120,6 +90,50 @@ class MimeEncodedMessageBody extends MessageBody {
 
     private void writeLn( OutputStream os, String value ) throws IOException {
         writeLn( os, value, getRequest().getCharacterSet() );
+    }
+
+
+    class MimeEncoding implements ParameterProcessor {
+
+        public MimeEncoding( OutputStream outputStream ) {
+            _outputStream = outputStream;
+        }
+
+
+        public void sendClose() throws IOException {
+            writeLn( _outputStream, "--" + BOUNDARY + "--" );
+        }
+
+
+        public void addParameter( String name, String value, String characterSet ) throws IOException {
+            writeLn( _outputStream, "--" + BOUNDARY );
+            writeLn( _outputStream, "Content-Disposition: form-data; name=\"" + name + '"' );  // XXX need to handle non-ascii names here
+            writeLn( _outputStream, "Content-Type: text/plain; charset=" + getRequest().getCharacterSet() );
+            writeLn( _outputStream, "" );
+            writeLn( _outputStream, value, getRequest().getCharacterSet() );
+        }
+
+
+        public void addFile( String name, UploadFileSpec spec ) throws IOException {
+            byte[] buffer = new byte[ 8 * 1024 ];
+
+            writeLn( _outputStream, "--" + BOUNDARY );
+            writeLn( _outputStream, "Content-Disposition: form-data; name=\"" + encode( name ) + "\"; filename=\"" + encode( spec.getFileName() ) + '"' );   // XXX need to handle non-ascii names here
+            writeLn( _outputStream, "Content-Type: " + spec.getContentType() );
+            writeLn( _outputStream, "" );
+
+            InputStream in = spec.getInputStream();
+            int count = 0;
+            do {
+                _outputStream.write( buffer, 0, count );
+                count = in.read( buffer, 0, buffer.length );
+            } while (count != -1);
+
+            in.close();
+            writeLn( _outputStream, "" );
+        }
+
+        private OutputStream _outputStream;
     }
 
 }
