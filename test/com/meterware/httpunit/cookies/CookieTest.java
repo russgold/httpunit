@@ -121,7 +121,7 @@ public class CookieTest extends TestCase {
         CookieJar jar = newJar( urlString, specifiedDomain, specifiedPath );
 
         if (shouldAccept) {
-            assertNotNull( "Rejected cookie " + index, jar.getCookie( "name" ) );
+            assertNotNull( "Rejected cookie " + index + "( " + specifiedDomain + " from " + urlString + ")", jar.getCookie( "name" ) );
         } else {
             assertNull( "Cookie " + index + " should have been rejected", jar.getCookie( "name" ) );
         }
@@ -196,10 +196,11 @@ public class CookieTest extends TestCase {
         CookieProperties.setDomainMatchingStrict( false );
         checkAcceptance( 1, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
         checkAcceptance( 2, false, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkAcceptance( 3, true, "www.meterware.com/servlets/special", "meterware.com", "/servlets/special" );
 
         CookieProperties.setPathMatchingStrict( false );
-        checkAcceptance( 3, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
-        checkMatching( 4, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
+        checkAcceptance( 4, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkMatching( 5, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
     }
 
 
