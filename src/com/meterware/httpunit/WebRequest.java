@@ -586,7 +586,8 @@ class URLEncodedString implements ParameterProcessor {
                         result.append( '+' );
                     } else if ((candidate >= 'A' && candidate <= 'Z') ||
                                (candidate >= 'a' && candidate <= 'z') ||
-                               (candidate == '.') ||
+                               (candidate == '.') || (candidate == '-' ) ||
+                               (candidate == '*') || (candidate == '_') ||
                                (candidate >= '0' && candidate <= '9')) {
                         result.append( (char) rawBytes[i] );
                     } else if (candidate < 16) {

@@ -196,9 +196,13 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "<!-- hide this\n" +
                                             "function sayCheese() { alert( \"Cheese!\" ); }" +
-                                            "// end hiding -->" +
+                                            "// end hiding -->\n" +
                                             "</script></head>" +
-                                            "<body onLoad='sayCheese()'></body>" );
+                                            "<body'><script language='JavaScript'>\n" +
+                                            "<!-- hide this\n" +
+                                            "sayCheese();" +
+                                            "// end hiding -->" +
+                                            "</script></body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );

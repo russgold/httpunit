@@ -29,6 +29,10 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import com.meterware.pseudoserver.PseudoServlet;
+import com.meterware.pseudoserver.WebResource;
 
 
 /**
@@ -484,6 +488,26 @@ public class FormSubmitTest extends HttpUnitTest {
         req.setParameter( "aTextField", "test" );
         assertEquals( getHostPath() + "/abc/go?size=3&time=now",
                             req.getURL().toExternalForm() );
+    }
+
+
+    public void testPostParameterEncoding() throws Exception {
+        defineWebPage( "abc/form", "<form name=\"test\" method='POST' action='/doit'>" +
+                               "  <input type='text' name='text_field-name*'>" +
+                               "  <input type='submit' name='apply' value='Apply'>" +
+                               "</form>" );
+        setResourceCharSet( "abc/form.html", "iso-8859-3", true );
+        defineResource( "doit", new PseudoServlet() {
+            public WebResource getPostResponse() throws IOException {
+                return new WebResource( new String( getBody() ) );
+            }
+        } );
+
+        WebResponse wr  = _wc.getResponse( getHostPath() + "/abc/form.html" );
+        WebForm form    = wr.getForms()[0];
+        form.setParameter( "text_field-name*", "a value" );
+        WebResponse response = form.submit();
+        assertEquals( "posted parameters", "text_field-name*=a+value&apply=Apply", response.getText() );
     }
 
 

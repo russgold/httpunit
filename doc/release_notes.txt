@@ -21,6 +21,9 @@ Additions:
     2. The navigator object now supports the readable 'platform' property.
     3. The screen object is now supported, with properties availHeight and availWidth
 
+Problems fixed:
+    1. When not using Latin-1 encoding, URL string characters *, _, and - were improperly being encoded
+
 
  4-Oct-2002
 Additions:
