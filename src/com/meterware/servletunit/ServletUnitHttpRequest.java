@@ -19,7 +19,6 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebClient;
 import com.meterware.httpunit.Base64;
@@ -47,12 +46,15 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private String                 _contentType;
     private Vector                 _locales;
     private boolean                _secure;
+    private RequestContext         _requestContext;
 
 
     /**
      * Constructs a ServletUnitHttpRequest from a WebRequest object.
      **/
     ServletUnitHttpRequest( ServletRequest servletRequest, WebRequest request, ServletUnitContext context, Dictionary clientHeaders, byte[] messageBody ) throws MalformedURLException {
+        if (context == null) throw new IllegalArgumentException( "Context must not be null" );
+
         _servletRequest = servletRequest;
         _request = request;
         _context = context;
@@ -62,13 +64,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _messageBody = messageBody;
         _secure = request.getURL().getProtocol().equalsIgnoreCase( "https" );
         _contentType = (String) _headers.get( "Content-Type" );
-        if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
-        String file = request.getURL().getFile();
-        if (file.indexOf( '?' ) >= 0) loadParameters( file.substring( file.indexOf( '?' )+1 ) );
-        if (_messageBody == null) return;
-        if (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 ) {
-            loadParameters( new String( _messageBody ) );
+        _requestContext = new RequestContext( request.getURL() );
+        if (_messageBody != null && (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 )) {
+            _requestContext.loadParameters( new String( _messageBody ) );
         }
     }
 
@@ -222,12 +221,9 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns the part of this request's URL from the protocol name up to the query string in the first line of the HTTP request.
      **/
     public String getRequestURI() {
-        try {
-            return _request.getURL().getPath();
-        } catch (MalformedURLException e) {
-            return null;
-        }
+        return _requestContext.getRequestURI();
     }
+
 
     /**
      * Returns the current HttpSession associated with this request or, if there is no current session
@@ -357,7 +353,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * been read.
      **/
     public Enumeration getParameterNames() {
-        return _parameters.keys();
+        return _requestContext.getParameterNames();
     }
 
 
@@ -391,7 +387,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * containing the values of a query string or posted form.
      **/
     public String[] getParameterValues( String name ) {
-        return (String[]) _parameters.get( name );
+        return _requestContext.getParameterValues( name );
     }
 
 
@@ -612,7 +608,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * but does not end with a "/" character. For servlets in the default (root) context,
      * this method returns "".
      **/
-    public java.lang.String getContextPath() {
+    public String getContextPath() {
         return _context.getContextPath();
     }
 
@@ -627,7 +623,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * @since 1.3
      **/
     public Map getParameterMap() {
-        return _parameters;
+        return _requestContext.getParameterMap();
     }
 
 
@@ -732,6 +728,17 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
+    void pushRequestContext( RequestContext requestContext ) {
+        requestContext.setParentContext( _requestContext );
+        _requestContext = requestContext;
+    }
+
+
+    void popRequestContext() {
+        _requestContext = _requestContext.getParentContext();
+    }
+
+
 
 //--------------------------------------------- private members ----------------------------------------------
 
@@ -745,82 +752,12 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private ServletUnitContext         _context;
     private ServletUnitHttpSession     _session;
     private Hashtable                  _attributes = new Hashtable();
-    private Hashtable                  _parameters = new Hashtable();
     private Vector                     _cookies    = new Vector();
     private String                     _sessionID;
     private byte[]                     _messageBody;
 
     private String                     _userName;
     private String[]                   _roles;
-
-
-    final static private int STATE_INITIAL     = 0;
-    final static private int STATE_HAVE_NAME   = 1;
-    final static private int STATE_HAVE_EQUALS = 2;
-    final static private int STATE_HAVE_VALUE  = 3;
-
-
-    /**
-     * This method employs a state machine to parse a parameter query string.
-     * The transition rules are as follows:
-     *    State  \          text         '='           '&'
-     *    initial:         have_name      -           initial
-     *    have_name:          -         have_equals   initial
-     *    have_equals:     have_value     -           initial
-     *    have_value:         -         initial       initial
-     * actions occur on the following transitions:
-     *    initial -> have_name:   save token as name
-     *    have_equals -> initial: record parameter with null value
-     *    have_value  -> initial: record parameter with value
-     **/
-    private void loadParameters( String queryString ) {
-        if (queryString.length() == 0) return;
-        StringTokenizer st = new StringTokenizer( queryString, "&=", /* return tokens */ true );
-        int state = STATE_INITIAL;
-        String name  = null;
-        String value = null;
-
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (token.equals( "&" )) {
-                state = STATE_INITIAL;
-                if (name != null && value != null) addParameter( name, value );
-                name  = value = null;
-            } else if (token.equals( "=" )) {
-                if (state == STATE_HAVE_NAME) {
-                    state = STATE_HAVE_EQUALS;
-                } else if (state == STATE_HAVE_VALUE) {
-                    state = STATE_INITIAL;
-                }
-            } else if (state == STATE_INITIAL) {
-                name = HttpUnitUtils.decode( token );
-                value = "";
-                state = STATE_HAVE_NAME;
-            } else {
-                value = HttpUnitUtils.decode( token );
-                state = STATE_HAVE_VALUE;
-            }
-        }
-        if (name != null && value != null) addParameter( name, value );
-    }
-
-
-    private void addParameter( String name, String encodedValue ) {
-        String[] values = (String[]) _parameters.get( name );
-        if (values == null) {
-            _parameters.put( name, new String[] { encodedValue } );
-        } else {
-            _parameters.put( name, extendedArray( values, encodedValue ) );
-        }
-    }
-
-
-    private String[] extendedArray( String[] baseArray, String newValue ) {
-        String[] result = new String[ baseArray.length+1 ];
-        System.arraycopy( baseArray, 0, result, 0, baseArray.length );
-        result[ baseArray.length ] = newValue;
-        return result;
-    }
 
 
     private void throwNotImplementedYet() {
@@ -871,3 +808,5 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
     }
 }
+
+

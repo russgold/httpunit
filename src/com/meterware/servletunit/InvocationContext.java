@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.RequestDispatcher;
+
 import java.io.IOException;
 
 
@@ -67,5 +69,17 @@ public interface InvocationContext {
      * Returns the target for the original request.
      */
     String getTarget();
+
+
+    /**
+     * Adds a request dispatcher to this context.
+     */
+    void pushIncludedContext( RequestDispatcher rd );
+
+
+    /**
+     * Removes the top request dispatcher from this context.
+     */
+    void popContext();
 
 }

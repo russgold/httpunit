@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -136,12 +136,36 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
-    protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
-        Vector expectedItems = new Vector();
+    protected void assertMatchingSet( String comment, Object[] expected, Enumeration found ) {
         Vector foundItems = new Vector();
+        while (found.hasMoreElements()) foundItems.addElement( found.nextElement() );
+
+        assertMatchingSet( comment, expected, foundItems );
+    }
+
+
+    private void assertMatchingSet( String comment, Object[] expected, Vector foundItems ) {
+        Vector expectedItems = new Vector();
+        for (int i = 0; i < expected.length; i++) expectedItems.addElement( expected[ i ] );
+        for (int i = 0; i < expected.length; i++) {
+            if (!foundItems.contains( expected[ i ] )) {
+                fail( comment + ": expected " + asText( expected ) + " but missing " + expected[ i ] );
+            } else {
+                foundItems.removeElement( expected[ i ] );
+            }
+        }
+
+        if (!foundItems.isEmpty()) fail( comment + ": expected " + asText( expected ) + " but found superfluous" + foundItems.firstElement() );
+    }
+
+
+    protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
+        Vector foundItems = new Vector();
+        for (int i = 0; i < found.length; i++) foundItems.addElement( found[ i ] );
+
+        Vector expectedItems = new Vector();
 
         for (int i = 0; i < expected.length; i++) expectedItems.addElement( expected[ i ] );
-        for (int i = 0; i < found.length; i++) foundItems.addElement( found[ i ] );
 
         for (int i = 0; i < expected.length; i++) {
             if (!foundItems.contains( expected[ i ] )) {

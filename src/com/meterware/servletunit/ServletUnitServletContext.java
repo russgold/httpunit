@@ -152,7 +152,7 @@ class ServletUnitServletContext implements ServletContext {
     public javax.servlet.RequestDispatcher getRequestDispatcher( String path ) {
         try {
             URL url = new URL( "http", "localhost", _application.getContextPath() + path );
-            return new RequestDispatcherImpl( _application.getServletRequest( url ).getServlet() );
+            return new RequestDispatcherImpl( _application, url );
         } catch (ServletException e) {
             return null;
         } catch (MalformedURLException e) {

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
  **/
 public class ServletUnitSuite extends ConditionalTestSuite {
 
-    public static void main(String args[]) {
+    public static void main( String args[] ) {
         junit.textui.TestRunner.run( suite() );
     }
 	

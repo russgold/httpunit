@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,6 +20,7 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 import java.io.IOException;
+import java.net.URL;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
@@ -30,15 +31,16 @@ import javax.servlet.Servlet;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-class RequestDispatcherImpl implements RequestDispatcher {
+class RequestDispatcherImpl extends RequestContext implements RequestDispatcher {
 
     private Servlet _servlet;
 
 
-    public RequestDispatcherImpl( Servlet servlet ) {
-        _servlet = servlet;
+    public RequestDispatcherImpl( WebApplication application, URL url ) throws ServletException {
+        super( url );
+         _servlet = application.getServletRequest( url ).getServlet();
     }
 
 

@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,6 +107,16 @@ class InvocationContextImpl implements InvocationContext {
      */
     public String getTarget() {
         return _target;
+    }
+
+
+    public void pushIncludedContext( RequestDispatcher rd ) {
+        _request.pushRequestContext( (RequestContext) rd );
+    }
+
+
+    public void popContext() {
+        _request.popRequestContext();
     }
 
 
