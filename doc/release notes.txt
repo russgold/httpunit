@@ -1,6 +1,6 @@
 HttpUnit release notes
 
-Known issues: Forms are mostly ignored, except that you can find their names
+Known issues: Frames are mostly ignored, except that you can find their names
 
 Limitations: HttpUnit does not support JavaScript
 
