@@ -12,6 +12,9 @@ Limitations:
 
 Revision History:
  1-Oct-2002
+Problems fixed:
+    1. Bug #617065: using Javascript to set an option in a drop-down box does not unset other options.
+
 Additions:
     1. Added support for the Navigator object.
     2. Created a ClientProperties object to hold per-client properties. Each new web client is initialized from the

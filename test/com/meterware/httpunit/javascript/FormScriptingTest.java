@@ -551,7 +551,7 @@ public class FormScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function selectOptionNum( the_select, index ) { \n" +
                                             "  for (var i = 0; i < the_select.length; i++) {\n" +
-                                            "      the_select.options[i].selected = (i == index);\n" +
+                                            "      if (i == index) the_select.options[i].selected = true;\n" +
                                             "  }\n" +
                                             "}\n" +
                                             "</script></head>" +

@@ -887,6 +887,7 @@ class SelectionFormControl extends FormControl {
         private boolean _defaultSelected;
         private boolean _selected;
         private int     _index;
+        private Options _container;
 
 
         Option() {
@@ -910,7 +911,8 @@ class SelectionFormControl extends FormControl {
         }
 
 
-        void setIndex( int index ) {
+        void setIndex( Options container, int index ) {
+            _container = container;
             _index = index;
         }
 
@@ -958,6 +960,7 @@ class SelectionFormControl extends FormControl {
 
         public void setSelected( boolean selected ) {
             _selected = selected;
+            if (selected) _container.optionSet( _index );
         }
 
 
@@ -980,7 +983,7 @@ class SelectionFormControl extends FormControl {
                 _options[i] = new Option( getValue( nl.item(i).getFirstChild() ),
                                           getOptionValue( nl.item(i) ),
                                           nl.item(i).getAttributes().getNamedItem( "selected" ) != null );
-                _options[i].setIndex(i);
+                _options[i].setIndex( this, i );
             }
         }
 
@@ -1082,7 +1085,16 @@ class SelectionFormControl extends FormControl {
                     expandOptionsArray();
                 }
                 _options[i] = (Option) option;
-                _options[i].setIndex(i);
+                _options[i].setIndex( this, i );
+                if (option.isSelected()) ensureUniqueOption(i);
+            }
+        }
+
+
+        private void ensureUniqueOption( int i ) {
+            if (_multiSelect) return;
+            for (int j = 0; j < _options.length; j++) {
+                _options[j]._selected = (i == j);
             }
         }
 
@@ -1104,6 +1116,12 @@ class SelectionFormControl extends FormControl {
 
         public Object get( int index ) {
             return _options[ index ];
+        }
+
+
+        /** Invoked when an option is set true. **/
+        void optionSet( int i ) {
+            ensureUniqueOption(i);
         }
 
 
