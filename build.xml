@@ -151,6 +151,7 @@
          <classpath>
              <path refid="base.classpath" />
              <pathelement location="${build.classes}" />
+             <pathelement location="META-INF" />
              <pathelement location="${test.classes}" />
          </classpath>
     </java>
