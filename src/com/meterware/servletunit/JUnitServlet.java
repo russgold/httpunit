@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001, Russell Gold
+ * Copyright (c) 2001-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,12 +38,17 @@ import junit.framework.TestFailure;
 
 
 /**
- * A base class for a servlet which can run unit tests inside a servlet context.
+ * A servlet which can run unit tests inside a servlet context.  It may be extended to provide InvocationContext-access
+ * to such tests if a container-specific implementation of InvocationContextFactory is provided.
+ * Combined with ServletTestCase, this would permit
+ * in-container tests of servlets in a fashion similar to that supported by ServletUnit.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract
 public class JUnitServlet extends HttpServlet {
+
+    public JUnitServlet() {
+    }
 
 
     protected JUnitServlet( InvocationContextFactory factory ) {
