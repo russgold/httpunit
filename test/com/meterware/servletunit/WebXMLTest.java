@@ -70,7 +70,9 @@ public class WebXMLTest extends TestCase {
 
 
     private File createWebXml( WebXMLString wxs ) throws IOException {
-        File webXml = new File( "examples/META-INF/web.xml" );
+        File dir = new File( "build/META-INF" );
+        dir.mkdirs();
+        File webXml = new File( dir, "web.xml" );
         FileOutputStream fos = new FileOutputStream( webXml );
         fos.write( wxs.asText().getBytes() );
         fos.close();
