@@ -26,8 +26,9 @@
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
 <li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
+<li><a href="#text">I called document.write() in my page, but getText() does not show the results! Why not?</a></li>
 
-</ol><ol start=13>
+</ol><ol start=14>
 <LI><A HREF="#session">How can I see the servlet session between calls?</A></LI>
 <li><a href="#JSP">Can I use JSPs with ServletUnit?</a></li>
 </OL>
@@ -130,6 +131,9 @@ If you call<blockquote><code>HttpUnitOptions.setExceptionsThrownOnScriptError( f
 recorded but will not throw exceptions.
 You can see the list of problems detected by calling<blockquote><code>HttpUnitOptions.getScriptErrorMessages();</code></blockquote>
 
+<a name="#text">I called document.write() in my page, but getText() does not show the results! Why not?</a>
+At present, the execution of scripts only affects the parsed result. WebResponse.getText() shows the <i>original</i>
+text in the page. You will see the changed text only if you examine text inside a parsed item such as a form, link, or table.
 
 <h2>ServletUnit usage</h2>
 
