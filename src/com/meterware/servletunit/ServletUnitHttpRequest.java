@@ -65,6 +65,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _messageBody = messageBody;
         _secure = request.getURL().getProtocol().equalsIgnoreCase( "https" );
         _contentType = (String) _headers.get( "Content-Type" );
+        if (_headers.get( "Content-Length") == null) _headers.put( "Content-Length", Integer.toString( messageBody.length ) );
 
         _requestContext = new RequestContext( request.getURL() );
         if (_messageBody != null && (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 )) {
@@ -114,7 +115,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * this method throws a NumberFormatException.
      **/
     public int getIntHeader( String name ) {
-        return -1;
+        return Integer.parseInt( getHeader( name ) );
     }
 
 

@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+ 17-Mar-2003
+Problems fixed:
+    1. The Content-Length header was not being sent with requests in ServletUnit.
+    2. ServletUnit's HttpServletRequest.getIntHeader() always returned -1.
+
  16-Mar-2003
 Acknowledgements:
     Thanks to Brendan Boesen for adding a method to access session IDs in ServletUnitContext.

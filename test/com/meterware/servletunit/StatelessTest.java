@@ -19,16 +19,9 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.HttpNotFoundException;
-import com.meterware.httpunit.PostMethodWebRequest;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 
 import javax.servlet.ServletException;
@@ -194,6 +187,21 @@ public class StatelessTest extends TestCase {
     }
 
 
+    public void testStreamBasedPost() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "ReportData", BodyEcho.class.getName() );
+
+        String sourceData = "This is an interesting test\nWith two lines";
+        InputStream source = new ByteArrayInputStream( sourceData.getBytes( "iso-8859-1" ) );
+
+        WebClient wc = sr.newClient();
+        WebRequest wr = new PostMethodWebRequest( "http://localhost/ReportData", source, "text/sample" );
+        WebResponse response = wc.getResponse( wr );
+        assertEquals( "Body response", sourceData.length() + "\n" + sourceData, response.getText() );
+        assertEquals( "Content-type", "text/sample", response.getContentType() );
+    }
+
+
     public void testRequestInputStream() throws Exception {
         ServletRunner sr = new ServletRunner();
         WebRequest request = new PostMethodWebRequest( "http://localhost/servlet/" + ParameterServlet.class.getName() );
@@ -280,6 +288,30 @@ public class StatelessTest extends TestCase {
 
     }
 
+
+    static class BodyEcho extends HttpServlet {
+        /**
+         * Returns a resource object as a result of a get request.
+         **/
+        protected void doPost( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
+            int length = req.getIntHeader( "Content-length" );
+            String contentType = req.getHeader( "Content-type" );
+            resp.setContentType( contentType );
+
+            InputStreamReader isr = new InputStreamReader( req.getInputStream() );
+            BufferedReader br = new BufferedReader( isr );
+            resp.getWriter().print( length );
+
+            String line = br.readLine();
+            while (line != null) {
+                resp.getWriter().print( "\n" );
+                resp.getWriter().print( line );
+                line = br.readLine();
+            }
+            resp.getWriter().flush();
+            resp.getWriter().close();
+        }
+    }
 
     static class FormSubmissionServlet extends HttpServlet {
 
