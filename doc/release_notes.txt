@@ -2,7 +2,7 @@ HttpUnit release notes
 
 Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
-    2. The "_self" target only works for links
+    2. The "_self" target only works for links, not forms
 
 Limitations: HttpUnit does not support JavaScript
 
@@ -16,9 +16,13 @@ Thanks to Gabriel Hauser for finding a bug in the handling of parameter defaults
 
 Revision History:
 25-Oct-00
+Additions:
+    1. Forms with multiple buttons are now supported, using the SubmitButton class.
+        
 Problems corrected:
     1. Unnamed parameters are no longer submitted as part of a form request
     2. Searching for tables beginning with a string no longer aborts with NullPointerException if the table is missing cells
+    3. A problem which caused WebResponse.java to fail compilation under JDK 1.1 has been corrected
 
 17-Oct-00 1.1
 Additions:

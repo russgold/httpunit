@@ -75,17 +75,105 @@ public class WebForm {
 
 
     /**
-     * Creates and returns a web request which will simulate the submission of this form.
+     * Returns an array containing the submit buttons defined for this form.
+     **/
+    public SubmitButton[] getSubmitButtons() {
+        if (_submitButtons == null) {
+            Vector buttons = getSubmitButtonVector();
+            _submitButtons = new SubmitButton[ buttons.size() ];
+            buttons.copyInto( _submitButtons );
+        }
+        return _submitButtons;
+    }
+
+
+
+    private Vector _buttonVector;
+
+    private Vector getSubmitButtonVector() {
+        if (_buttonVector == null) {
+            _buttonVector = new Vector();
+            NodeList nl = ((Element) _node).getElementsByTagName( "input" );
+            for (int i = 0; i < nl.getLength(); i++) {
+                if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
+                    || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "image" )) {
+                    _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
+                }
+            }
+        }
+        return _buttonVector;
+    }
+
+
+    /**
+     * Returns the submit button defined in this form with the specified name.
+     * If more than one such button exists, will return the first found.
+     * If no such button is found, will return null.
+     **/
+    public SubmitButton getSubmitButton( String name ) {
+        SubmitButton[] buttons = getSubmitButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].getName().equals( name )) {
+                return buttons[i];
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the submit button defined in this form with the specified name and value.
+     * If more than one such button exists, will return the first found.
+     * If no such button is found, will return null.
+     **/
+    public SubmitButton getSubmitButton( String name, String value ) {
+        SubmitButton[] buttons = getSubmitButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].getName().equals( name ) && buttons[i].getValue().equals( value )) {
+                return buttons[i];
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Creates and returns a web request which will simulate the submission of this form with an unnamed submit button.
      **/
     public WebRequest getRequest() {
+        return getRequest( null );
+    }
+
+
+    /**
+     * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
+     * If the button is null, simulates the pressing of an unnamed button.
+     **/
+    public WebRequest getRequest( SubmitButton button ) {
+        if (button == null) {
+            if (getSubmitButtons().length == 1) {
+                button = getSubmitButtons()[0];
+            } else if (getSubmitButtonVector().contains( SubmitButton.UNNAMED_BUTTON )) {
+                button = getSubmitButton( "" );
+            }
+        }
+
+        if (HttpUnitOptions.getParameterValuesValidated()) {
+            if (button == null) {
+                throw new IllegalUnnamedSubmitButtonException();
+            } else if (!getSubmitButtonVector().contains( button )) {  
+                throw new IllegalSubmitButtonException( button );
+            }
+        }
+
         NamedNodeMap nnm = _node.getAttributes();
         String action = getValue( nnm.getNamedItem( "action" ) );
         WebRequest result;
 
         if (getValue( nnm.getNamedItem( "method" ) ).equalsIgnoreCase( "post" )) {
-            result = new PostMethodWebRequest( _baseURL, action, getTarget(), this );
+            result = new PostMethodWebRequest( _baseURL, action, getTarget(), this, button );
         } else {
-            result = new GetMethodWebRequest( _baseURL, action, getTarget(), this );
+            result = new GetMethodWebRequest( _baseURL, action, getTarget(), this, button );
         }
 
         String[] parameterNames = getParameterNames();
@@ -100,7 +188,6 @@ public class WebForm {
             }
         }
         return result;
-
     }
 
 
@@ -219,9 +306,11 @@ public class WebForm {
     /** The target in which the parent response is to be rendered. **/
     private String         _parentTarget;
 
+    /** The submit buttons in this form. **/
+    private SubmitButton[] _submitButtons;
+
     /** The selections in this form. **/
     private HTMLSelectElement[] _selections;
-
 
     /** The text areas in this form. **/
     private HTMLTextAreaElement[] _textAreas;
@@ -539,7 +628,50 @@ public class WebForm {
         }
     }
 
+}
 
+
+//============================= exception class IllegalUnnamedSubmitButtonException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+ **/
+class IllegalUnnamedSubmitButtonException extends IllegalRequestParameterException {
+
+
+    IllegalUnnamedSubmitButtonException() {
+    }
+
+
+    public String getMessage() {
+        return "This form has no unnamed buttons";
+    }
 
 }
+
+
+//============================= exception class IllegalSubmitButtonException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+ **/
+class IllegalSubmitButtonException extends IllegalRequestParameterException {
+
+
+    IllegalSubmitButtonException( SubmitButton button ) {
+        _button = button;
+    }
+
+
+    public String getMessage() {
+        return "Specified submit button (name=\"" + _button.getName() + "\" value=\"" + _button.getValue() + "\") not part of this form.";
+    }
+
+
+    private SubmitButton _button;
+
+}
+
 

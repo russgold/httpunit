@@ -57,6 +57,7 @@ public class FormSubmitTest extends HttpUnitTest {
     public void testSubmitString() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age>" +
+                                  "<Input type=submit value=Go>" +
                                   "</form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
@@ -69,11 +70,154 @@ public class FormSubmitTest extends HttpUnitTest {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text value=dontSend>" +
                                   "<Input type=text name=age>" +
-                                  "</form>" );
+                                  "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         request.setParameter( "age", "23" );
         assertEquals( getHostPath() + "/ask?age=23", request.getURL().toExternalForm() );
+    }
+
+
+    public void testSubmitButtonDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update>" +
+                                  "<Input type=submit name=recalculate>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton[] buttons = form.getSubmitButtons();
+        assertEquals( "num detected submit buttons", 2, buttons.length );
+    }
+
+                              
+    public void testImageButtonDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=image name=update src=\"\">" +
+                                  "<Input type=image name=recalculate src=\"\">" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton[] buttons = form.getSubmitButtons();
+        assertEquals( "num detected submit buttons", 2, buttons.length );
+    }
+
+                              
+    public void testSubmitButtonAttributes() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton[] buttons = form.getSubmitButtons();
+        assertEquals( "num detected submit buttons", 1, buttons.length );
+        assertEquals( "submit button name", "update", buttons[0].getName() );
+        assertEquals( "submit button value", "age", buttons[0].getValue() );
+    }
+
+                              
+    public void testSubmitButtonSelectionByName() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "<Input type=submit name=recompute value=age>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton button = form.getSubmitButton( "zork" );
+        assertNull( "Found a non-existent button", button );
+        button = form.getSubmitButton( "update" );
+        assertNotNull( "Didn't find the desired button", button );
+        assertEquals( "submit button name", "update", button.getName() );
+        assertEquals( "submit button value", "age", button.getValue() );
+    }
+
+                              
+    public void testSubmitButtonSelectionByNameAndValue() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "<Input type=submit name=update value=name>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton button = form.getSubmitButton( "update" );
+        assertNotNull( "Didn't find the desired button", button );
+        assertEquals( "submit button name", "update", button.getName() );
+        assertEquals( "submit button value", "age", button.getValue() );
+        button = form.getSubmitButton( "update", "name" );
+        assertNotNull( "Didn't find the desired button", button );
+        assertEquals( "submit button name", "update", button.getName() );
+        assertEquals( "submit button value", "name", button.getValue() );
+    }
+
+                              
+    public void testNamedButtonSubmitString() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "<Input type=submit name=update value=name>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = form.getRequest( form.getSubmitButton( "update", "name" ) );
+        assertEquals( getHostPath() + "/ask?update=name&age=12", request.getURL().toExternalForm() );
+    }
+
+                              
+    public void testUnnamedButtonSubmit() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "<Input type=submit name=update value=name>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        try {
+            WebRequest request = form.getRequest();
+            fail( "Should not allow submit with unnamed button" );
+        } catch (IllegalRequestParameterException e) {
+        } 
+    }
+
+                              
+    public void testForeignSubmitButtonDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "<Input type=submit name=update value=name>" +
+                                  "</form>" );
+        defineWebPage( "Dupl",    "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update value=age>" +
+                                  "<Input type=submit name=update value=name>" +
+                                  "</form>" );
+        defineWebPage( "Wrong",   "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=save value=age>" +
+                                  "</form>" );
+        WebResponse other  = _wc.getResponse( getHostPath() + "/Dupl.html" );
+        WebResponse page   = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse wrong  = _wc.getResponse( getHostPath() + "/Wrong.html" );
+
+        WebForm form = page.getForms()[0];
+        WebForm otherForm = other.getForms()[0];
+        WebForm wrongForm = wrong.getForms()[0];
+
+        HttpUnitOptions.setParameterValuesValidated( true );
+        WebRequest request = form.getRequest( otherForm.getSubmitButtons()[0] );
+
+        HttpUnitOptions.setParameterValuesValidated( false );
+        request = form.getRequest( wrongForm.getSubmitButtons()[0] );
+
+        HttpUnitOptions.setParameterValuesValidated( true );
+        try {
+            request = form.getRequest( wrongForm.getSubmitButtons()[0] );
+            fail( "Failed to reject illegal button" );
+        } catch (IllegalRequestParameterException e) {
+        }
     }
 
                               

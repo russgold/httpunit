@@ -210,6 +210,13 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "Non-blank rows",    2, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
+
+        wt = page.getTableWithSummary( "Inner One" );
+        assertNotNull( "Did not find table starting with summary 'Inner One'", wt );
+        cells = wt.asText();
+        assertEquals( "Total rows",    3, cells.length );
+        assertEquals( "Total columns", 2, cells[0].length );
+        assertEquals( "cell at 2,0",       "Blue", cells[2][0] );
     }
 
 

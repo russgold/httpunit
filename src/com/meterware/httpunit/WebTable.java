@@ -150,7 +150,7 @@ public class WebTable {
 
 
     /**
-     * Returns a rendering of the table with all cells converted to text.
+     * Returns a rendering of this table with all cells converted to text.
      **/
     public String[][] asText() {
         String[][] result = new String[ getRowCount() ][ getColumnCount() ];
@@ -161,6 +161,14 @@ public class WebTable {
             }
         }
         return result;
+    }
+
+
+    /**
+     * Returns the summary attribute associated with this table.
+     **/
+    public String getSummary() {
+        return NodeUtils.getNodeAttribute( _dom, "summary" );
     }
 
 

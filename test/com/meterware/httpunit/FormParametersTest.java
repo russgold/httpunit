@@ -59,7 +59,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
                                        "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
                                        "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                       "</form>" );
+                                       "<Input type=submit name=submit value=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
@@ -77,7 +77,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
                                        "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
                                        "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                       "</form>" );
+                                       "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
@@ -102,7 +102,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
                                        "<Input type=hidden name=secret>" +
-                                       "</form>" );
+                                       "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
@@ -120,7 +120,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
                                        "<Input type=hidden name=secret>" +
-                                       "</form>" );
+                                       "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
@@ -138,7 +138,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=radio name=color value=red>" +
                                        "<Input type=radio name=color value=blue>" +
                                        "<Input type=radio name=color value=green>" +
-                                       "</form>" );
+                                       "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
@@ -152,7 +152,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=radio name=color value=red>" +
                                        "<Input type=radio name=color value=blue>" +
                                        "<Input type=radio name=color value=green>" +
-                                       "</form>" );
+                                       "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
@@ -168,7 +168,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=checkbox name=use_color>" +
                                        "<Input type=checkbox name=color value=red>" +
                                        "<Input type=checkbox name=color value=blue>" +
-                                       "</form>" );
+                                       "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );

@@ -99,7 +99,7 @@ public class WebRequest {
      * Constructs a web request using a base URL and a relative URL string.
      **/
     protected WebRequest( URL urlBase, String urlString ) {
-        this( urlBase, urlString, (WebForm) null );
+        this( urlBase, urlString, TOP_FRAME );
     }
 
 
@@ -107,26 +107,19 @@ public class WebRequest {
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
     protected WebRequest( URL urlBase, String urlString, String target ) {
-        this( urlBase, urlString, target, null );
-    }
-
-
-    /**
-     * Constructs a web request using a base URL and a relative URL string.
-     **/
-    protected WebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
-        this( urlBase, urlString, TOP_FRAME, sourceForm );
-    }
-    
-
-    /**
-     * Constructs a web request using a base URL and a relative URL string.
-     **/
-    protected WebRequest( URL urlBase, String urlString, String target, WebForm sourceForm ) {
         _urlBase   = urlBase;
         _urlString = urlString;
-        _sourceForm = sourceForm;
-        _target     = target;
+        _target    = target;
+    }
+
+
+    /**
+     * Constructs a web request from a form.
+     **/
+    protected WebRequest( URL urlBase, String urlString, String target, WebForm sourceForm, SubmitButton button ) {
+        this( urlBase, urlString, target );
+        _sourceForm   = sourceForm;
+        _submitButton = button;
     }
     
 
@@ -134,7 +127,7 @@ public class WebRequest {
      * Constructs a web request using a base request and a relative URL string.
      **/
     protected WebRequest( WebRequest baseRequest, String urlString ) throws MalformedURLException {
-        this( baseRequest.getURL(), urlString, (WebForm) null );
+        this( baseRequest.getURL(), urlString );
     }
     
 
@@ -165,7 +158,13 @@ public class WebRequest {
     final
     protected String getParameterString() {
         StringBuffer sb = new StringBuffer();
-        for (Enumeration e = _parameters.keys(); e.hasMoreElements();) {
+        Enumeration e = _parameters.keys();
+
+        if (_submitButton != null && _submitButton.getName().length() > 0) {
+            appendParameter( sb, _submitButton.getName(), _submitButton.getValue(), e.hasMoreElements() );
+        }
+
+        while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
             Object value = _parameters.get( name );
             if (value instanceof String) {
@@ -196,13 +195,14 @@ public class WebRequest {
     private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
 
 
-    private URL       _urlBase;
-    private String    _urlString;
-    private Hashtable _parameters = new Hashtable();
-    private WebForm   _sourceForm;
-    private String    _target = TOP_FRAME;
+    private URL          _urlBase;
+    private String       _urlString;
+    private Hashtable    _parameters = new Hashtable();
+    private WebForm      _sourceForm;
+    private SubmitButton _submitButton;
+    private String       _target = TOP_FRAME;
 
-    private boolean   _httpsProtocolSupportEnabled;
+    private boolean      _httpsProtocolSupportEnabled;
 
 
     private void appendParameters( StringBuffer sb, String name, String[] values, boolean moreToCome ) {

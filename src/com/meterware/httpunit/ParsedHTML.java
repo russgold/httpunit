@@ -135,6 +135,16 @@ class ParsedHTML {
     
     
     /**
+     * Returns the first table in the response which has the specified text as its summary attribute. 
+     * Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableWithSummary( String summary ) {
+        return getTableWithSummary( summary, getTables() );
+    }
+    
+    
+    /**
      * Returns a copy of the domain object model associated with this page.
      **/
     public Node getDOM() {
@@ -258,6 +268,33 @@ class ParsedHTML {
                             WebTable[] innerTables = cell.getTables();
                             if (innerTables.length != 0) {
                                 WebTable result = getTableStartingWithPrefix( text, innerTables );
+                                if (result != null) return result;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+    /**
+     * Returns the table with the specified text in its summary attribute.
+     **/
+    private WebTable getTableWithSummary( String summary, WebTable[] tables ) {
+        for (int i = 0; i < tables.length; i++) {
+            if (tables[i].getSummary().equalsIgnoreCase( summary )) {
+                return tables[i];
+            } else {
+                for (int j = 0; j < tables[i].getRowCount(); j++) {
+                    for (int k = 0; k < tables[i].getColumnCount(); k++) {
+                        TableCell cell = tables[i].getTableCell(j,k);
+                        if (cell != null) {
+                            WebTable[] innerTables = cell.getTables();
+                            if (innerTables.length != 0) {
+                                WebTable result = getTableWithSummary( summary, innerTables );
                                 if (result != null) return result;
                             }
                         }

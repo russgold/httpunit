@@ -180,6 +180,18 @@ public class WebResponse {
 
 
     /**
+     * Returns the first table in the response which has the specified text as its summary attribute. 
+     * Will recurse into any nested tables, as needed.
+     * Case is ignored.
+     * @exception SAXException thrown if there is an error parsing the response.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableWithSummary( String text ) throws SAXException {
+        return getReceivedPage().getTableWithSummary( text );
+    }
+
+
+    /**
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
      * which may be used to represent internal state of this object.
      **/
@@ -259,11 +271,15 @@ public class WebResponse {
 
     private int    _responseCode;
 
-    final private URL    _url;
 
-    final private WebConversation _conversation;
+    // the following variables are essentially final; however, the JDK 1.1 compiler does not handle final variables properly with
+    // multiple constructors that call each other, so the final qualifiers have been removed.
 
-    final private String _target;
+    private URL    _url;
+
+    private WebConversation _conversation;
+
+    private String _target;
 
 
     /**

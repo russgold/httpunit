@@ -58,8 +58,8 @@ public class PostMethodWebRequest extends WebRequest {
     /**
      * Constructs a web request for a form.
      **/
-    PostMethodWebRequest( URL urlBase, String urlString, String target, WebForm sourceForm ) {
-        super( urlBase, urlString, target, sourceForm );
+    PostMethodWebRequest( URL urlBase, String urlString, String target, WebForm sourceForm, SubmitButton button ) {
+        super( urlBase, urlString, target, sourceForm, button );
     }
 
 

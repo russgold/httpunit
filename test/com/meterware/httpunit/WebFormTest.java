@@ -145,7 +145,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<Select name=color><Option>blue<Option selected>red \n" +
                                   "<Option>green</select>" +
                                   "<TextArea name=\"text\">Sample text</TextArea>" +
-                                  "</form>" );
+                                  "<Input type=submit></form>" );
 
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
 
@@ -165,7 +165,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<Select multiple size=4 name=colors>" +
                                   "<Option>blue<Option selected>red \n" +
                                   "<Option>green<Option value=\"pink\" selected>salmon</select>" +
-                                  "</form>" );
+                                  "<Input type=submit></form>" );
 
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
@@ -186,7 +186,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<Select name=colors><Option>blue<Option>red</Select>" +
                                   "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
                                   "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                  "</form>" );
+                                  "<Input type=submit></form>" );
 
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
 
@@ -210,7 +210,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<Input type=checkbox name=color value=blue checked>" +
                                   "<Input type=checkbox name=gender value=male checked>" +
                                   "<Input type=checkbox name=gender value=female>" +
-                                  "</form>" );
+                                  "<Input type=submit></form>" );
 
         WebResponse response = _wc.getResponse( getHostPath() + "/Default.html" );
         assertNotNull( response.getForms() );

@@ -19,64 +19,77 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.MalformedURLException;
 import java.net.URL;
 
+import java.util.*;
+
+import org.w3c.dom.*;
+
 /**
- * An HTTP request using the GET method.
+ * This class represents a suubmit button in an HTML form.
  **/
-public class GetMethodWebRequest extends WebRequest {
+public class SubmitButton {
 
-    
-    /**
-     * Constructs a web request using a specific absolute url string.
-     **/
-    public GetMethodWebRequest( String urlString ) {
-        super( urlString );
-    }
+    public static SubmitButton UNNAMED_BUTTON = new SubmitButton();
 
 
     /**
-     * Constructs a web request using a base URL and a relative url string.
+     * Returns the name of this submit button.
      **/
-    public GetMethodWebRequest( URL urlBase, String urlString ) {
-        super( urlBase, urlString );
-    }
-
-
-//--------------------------------------- package members ---------------------------------------------
-
-
-    /**
-     * Constructs a web request with a specific target.
-     **/
-    GetMethodWebRequest( URL urlBase, String urlString, String target ) {
-        super( urlBase, urlString, target );
+    public String getName() {
+        return _name;
     }
 
 
     /**
-     * Constructs a web request for a form.
+     * Returns the value associated with this submit button.
      **/
-    GetMethodWebRequest( URL urlBase, String urlString, String target, WebForm sourceForm, SubmitButton button ) {
-        super( urlBase, urlString, target, sourceForm, button );
+    public String getValue() {
+        return _value;
     }
 
 
-//------------------------------------- protected members ---------------------------------------------
-
-
-    protected String getURLString() {
-        if (hasNoParameters()) {
-            return super.getURLString();
-        } else {
-            return super.getURLString() + "?" + getParameterString();
-        }
+    public String toString() {
+        return "Submit with " + getName() + "=" + getValue();
     }
 
 
+    public int hashCode() {
+        return getName().hashCode() + getValue().hashCode();
+    }
+
+
+    public boolean equals( Object o ) {
+        return getClass().equals( o.getClass() ) && equals( (SubmitButton) o );
+    }
+
+
+//------------------------------------------ package members ----------------------------------
+
+
+    SubmitButton( Node node ) {
+        _node  = node;
+        _name  = NodeUtils.getNodeAttribute( node, "name" );
+        _value = NodeUtils.getNodeAttribute( _node, "value" );
+    }
+
+
+//------------------------------------------ private members ----------------------------------
+
+    Node    _node;
+    String  _name;
+    String  _value;
+
+
+    private SubmitButton() {
+        _name  = "";
+        _value = "";
+    }
+
+
+    private boolean equals( SubmitButton button ) {
+        return getName().equals( button.getName() ) &&
+                  (getName().length() == 0 || getValue().equals( button.getValue() ));
+    }
 }
-
-
-
 
