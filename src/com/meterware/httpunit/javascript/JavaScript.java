@@ -541,8 +541,9 @@ public class JavaScript {
 
 
         public void jsFunction_close() {
-            getDelegate().replaceText( getWriteBuffer().toString(), _mimeType == null ? "text/html" : _mimeType );
-            getWriteBuffer().setLength(0);
+            if (getDelegate().replaceText( getWriteBuffer().toString(), _mimeType == null ? "text/html" : _mimeType )) {
+                getWriteBuffer().setLength(0);
+            }
         }
 
 

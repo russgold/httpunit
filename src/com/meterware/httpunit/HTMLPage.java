@@ -199,8 +199,8 @@ public class HTMLPage extends ParsedHTML {
         Scriptable() {}
 
 
-        public void replaceText( String text, String contentType ) {
-            getResponse().replaceText( text, contentType );
+        public boolean replaceText( String text, String contentType ) {
+            return getResponse().replaceText( text, contentType );
         }
 
 

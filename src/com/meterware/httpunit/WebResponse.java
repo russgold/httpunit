@@ -728,8 +728,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    void replaceText( String text, String contentType ) {
-        if (_parsingPage) return;
+    boolean replaceText( String text, String contentType ) {
+        if (_parsingPage) return false;
         _responseText = text;
         _inputStream = null;
         _page = null;
@@ -746,6 +746,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         } catch (MalformedURLException e) {
             throw new RuntimeException( "Failure while attempting to reparse text: " + e );
         }
+        return true;
     }
 
 
