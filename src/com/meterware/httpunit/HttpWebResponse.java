@@ -133,7 +133,7 @@ class HttpWebResponse extends WebResponse {
 
 
     private void readResponseHeader( URLConnection connection ) {
-        if (connection.getHeaderField(0) == null) throw new HttpNotFoundException( connection.getURL() );
+        if (connection.getHeaderField(0) == null) throw new HttpServerNotFoundException( connection.getURL() );
 
         StringTokenizer st = new StringTokenizer( connection.getHeaderField(0) );
     	st.nextToken();

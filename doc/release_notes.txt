@@ -20,6 +20,10 @@ Problems fixed:
 
 Additions:
     1. The forms, images, links, and Form.elements arrays now handle string indexes
+    2. When no response is received from a server, HttpUnit will now throw HttpServerNotFoundException, which is a
+       subclass of HttpNotFoundException. This should aid in diagnosing response failures.
+    3. When a 404 (not found status) is received from a server, the accompanying message is now available
+       from HttpNotFoundException.getResponseMessage().
 
 30-Aug-2002 1.4.5
 Acknowledgements:

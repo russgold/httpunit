@@ -499,7 +499,7 @@ class WebApplication {
 
 
         public Servlet getServlet() throws ServletException {
-            if (getConfiguration() == null) throw new HttpNotFoundException( _url );
+            if (getConfiguration() == null) throw new HttpNotFoundException( "No servlet mapping defined", _url );
 
             try {
                 return getConfiguration().getServlet();
@@ -617,7 +617,7 @@ class WebApplication {
 
         ServletRequest get( URL url ) {
             String file = url.getFile();
-            if (!file.startsWith( _contextPath )) throw new HttpNotFoundException( url );
+            if (!file.startsWith( _contextPath )) throw new HttpNotFoundException( "File path does not begin with '" + _contextPath + "'", url );
 
             String servletName = getServletName( file.substring( _contextPath.length() ) );
 

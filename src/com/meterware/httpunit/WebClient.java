@@ -434,7 +434,7 @@ public class WebClient {
             if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
                 throw new HttpInternalErrorException( response.getURL() );
             } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-                throw new HttpNotFoundException( response.getURL() );
+                throw new HttpNotFoundException( response.getResponseMessage(), response.getURL() );
             } else if (response.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 throw new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
             }

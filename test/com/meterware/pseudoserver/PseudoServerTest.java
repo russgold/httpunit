@@ -19,13 +19,7 @@ package com.meterware.pseudoserver;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.HttpNotFoundException;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.HttpException;
-import com.meterware.httpunit.PostMethodWebRequest;
+import com.meterware.httpunit.*;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -55,7 +49,8 @@ public class PseudoServerTest extends HttpUserAgentTest {
 
         try {
             WebResponse response = wc.getResponse( "http://no.such.host" );
-        } catch (HttpNotFoundException e) {
+            fail( "Should have rejected the request" );
+        } catch (HttpServerNotFoundException e) {
         }
     }
 
@@ -68,6 +63,7 @@ public class PseudoServerTest extends HttpUserAgentTest {
             fail( "Should have rejected the request" );
         } catch (HttpNotFoundException e) {
             assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
+            assertEquals( "Response message", "unable to find /nothing.htm", e.getResponseMessage() );
         }
     }
 

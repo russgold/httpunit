@@ -30,13 +30,13 @@ import java.net.URL;
  **/
 public class HttpNotFoundException extends HttpException {
 
-
-    public HttpNotFoundException( URL url ) {
-        super( HttpURLConnection.HTTP_NOT_FOUND, "Not found", url );
+    public HttpNotFoundException( String responseMessage, URL baseURL ) {
+        super( HttpURLConnection.HTTP_NOT_FOUND, responseMessage, baseURL );
     }
 
+
     public HttpNotFoundException( URL url, Throwable t ) {
-        super( HttpURLConnection.HTTP_NOT_FOUND, t.toString(), url );
+        this( t.toString(), url );
     }
 
 
