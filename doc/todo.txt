@@ -1,5 +1,4 @@
-o Add simulated http server for unit testing
 o Support Frames
-o Support digest HTTP Authentication
+o Support digest HTTP Authentication (?)
 o Documentation, Documentation
 

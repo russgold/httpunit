@@ -44,15 +44,6 @@ public class GetMethodWebRequest extends WebRequest {
     }
 
 
-    public URL getURL() throws MalformedURLException {
-        if (hasNoParameters()) {
-            return new URL( getURLBase(), getURLString() );
-        } else {
-            return new URL( getURLBase(), getURLString() + "?" + getParameterString() );
-        }
-    }
-
-
 //--------------------------------------- package members ---------------------------------------------
 
 
@@ -61,6 +52,18 @@ public class GetMethodWebRequest extends WebRequest {
      **/
     GetMethodWebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
         super( urlBase, urlString, sourceForm );
+    }
+
+
+//------------------------------------- protected members ---------------------------------------------
+
+
+    protected String getURLString() {
+        if (hasNoParameters()) {
+            return super.getURLString();
+        } else {
+            return super.getURLString() + "?" + getParameterString();
+        }
     }
 
 

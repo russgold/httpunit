@@ -10,6 +10,12 @@ Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse an
 Thanks to Perry Doell for the methods to examine cookies on WebConversation
 
 Revision History:
+28-Sep-00
+Additions:
+    1. PseudoServer class is now used by unit tests to handle requests. This will enable development of frames capability
+    2. Https support is now built in; however, it depends on the JSSE extension (not included). 
+       See http://java.sun.com/products/jsse and be careful to follow the installation instructions
+    
 25-Sep-00
 Problems corrected:
     1. In the 15-Sep build, the value parameter for checkboxes was ignored in computing defaults and validating

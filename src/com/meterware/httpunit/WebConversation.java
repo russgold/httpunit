@@ -200,12 +200,6 @@ class RedirectWebRequest extends WebRequest {
 
     RedirectWebRequest( WebRequest baseRequest, String relativeURL ) throws MalformedURLException {
         super( baseRequest, relativeURL );
-    }
-
-
-    public URL getURL() throws MalformedURLException {
-        return new URL( getURLBase(), getURLString() );
-    }
-    
+    }    
     
 }

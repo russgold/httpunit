@@ -10,7 +10,8 @@
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
-    <property name="lib.dir" value="lib" /> 
+    <property name="lib.dir" value="lib" />
+    <property name="jars.dir" value="" /> 
     <property name="docs.dir" value="doc" /> 
     <property name="build.dir" value="build" /> 
     <property name="build.classes" value="${build.dir}/classes" /> 
@@ -98,7 +99,8 @@
     <copydir src="${src.dir}" dest="${dist.dir}/src" /> 
     <copydir src="${tstsrc.dir}" dest="${dist.dir}/test" includes="**/httpunit/*" /> 
     <copydir src="${examples.dir}" dest="${dist.dir}/examples" /> 
-    <copydir src="${lib.dir}" dest="${dist.dir}/lib" /> 
+    <copydir src="${lib.dir}" dest="${dist.dir}/lib" />
+    <copydir src="${jars.dir}" dest="${dist.dir}/lib" includes="Tidy.jar" /> 
     <copyfile src="build.xml" dest="${dist.dir}/build.xml" /> 
     <copydir src="${docs.dir}" dest="${dist.dir}/doc" /> 
     <copyfile src="readme.txt" dest="${dist.dir}/readme.txt" /> 

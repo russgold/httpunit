@@ -43,11 +43,6 @@ public class PostMethodWebRequest extends WebRequest {
 //---------------------------------- WebRequest methods --------------------------------
 
 
-    public URL getURL() throws MalformedURLException {
-        return new URL( getURLBase(), getURLString() );
-    }
-
-
     protected void completeRequest( URLConnection connection ) throws IOException {
         connection.setDoInput( true );
         connection.setDoOutput( true );

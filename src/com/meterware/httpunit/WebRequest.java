@@ -3,6 +3,9 @@ package com.meterware.httpunit;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.lang.reflect.*;
+import java.security.Provider;
+import java.security.Security;
 
 /**
  * A request sent to a web server.
@@ -66,8 +69,10 @@ public class WebRequest {
     /**
      * Returns the final URL associated with this web request.
      **/
-    abstract
-    public URL getURL() throws MalformedURLException;
+    public URL getURL() throws MalformedURLException {
+        if (getURLBase() == null) validateProtocol( getURLString() );
+        return new URL( getURLBase(), getURLString() );
+    }
 
 
 
@@ -121,7 +126,6 @@ public class WebRequest {
     }
 
 
-    final
     protected String getURLString() {
         return _urlString;
     }
@@ -151,10 +155,14 @@ public class WebRequest {
     
 //--------------------------------------- private members ------------------------------------
 
+    private final static String PROTOCOL_HANDLER_PKGS = "java.protocol.handler.pkgs";
+
     private URL       _urlBase;
     private String    _urlString;
     private Hashtable _parameters = new Hashtable();
     private WebForm   _sourceForm;
+
+    private boolean   _httpsProtocolSupportEnabled;
 
 
     private void appendParameters( StringBuffer sb, String name, String[] values, boolean moreToCome ) {
@@ -197,7 +205,80 @@ public class WebRequest {
     }
 
 
+    private void validateProtocol( String urlString ) {
+        String protocol = urlString.substring( 0, urlString.indexOf( ':' ) );
+        if (protocol.length() == 0) {
+            throw new RuntimeException( "No protocol specified in URL '" + urlString + "'" );
+        } else if (protocol.equalsIgnoreCase( "http" )) {
+            return;
+        } else if (protocol.equalsIgnoreCase( "https" )) {
+            validateHttpsProtocolSupport();
+        }
+    }
+
+
+    void validateHttpsProtocolSupport() {
+        if (!_httpsProtocolSupportEnabled) {
+            verifyHttpsSupport();
+            _httpsProtocolSupportEnabled = true;
+        }
+    }
+
+
+    private static void listProviders() {
+        Provider[] list = Security.getProviders();
+        for (int i = 0; i < list.length; i++) {
+            System.out.println( "provider" + i + "=" + list[i] );
+        }
+    }
+
+
+    private static boolean hasSSLProvider() {
+        Provider[] list = Security.getProviders();
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].getClass().getName().equals( SunJSSE_PROVIDER_CLASS )) return true;
+        }
+        return false;
+    }
+
+    private static String SunJSSE_PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
+    private static RuntimeException _httpsProblem;
+
+
+    static void verifyHttpsSupport() {
+        if (System.getProperty( "java.version" ).startsWith( "1.1" )) {
+            throw new RuntimeException( "https support requires Java 2" );
+        } else if (System.getProperty( PROTOCOL_HANDLER_PKGS ) == null) {
+            try {
+                Class.forName( "com.sun.net.ssl.HttpsURLConnection" );
+                Method setMethod = System.class.getMethod( "setProperty", new Class[] { String.class, String.class } );
+                setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, "com.sun.net.ssl.internal.www.protocol" } );
+                if (!hasSSLProvider()) {
+                    throw new RuntimeException( "https support not enabled. Please edit <java-home>/lib/security/java.security to add the line: " +
+                                                "security.provider.2=com.sun.net.ssl.internal.ssl.Provider" );
+                }
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException( "https support requires the Java Secure Sockets Extension. See http://java.sun.com/products/jsse/install.html" );
+            } catch (Throwable e) {
+                throw new RuntimeException( "Unable to enable https support. Make sure that you have installed JSSE " +
+                                            "as described in http://java.sun.com/products/jsse/install.html: " + e );
+            }
+        }
+    }
+
+
+    // this does not work for some reason
+    static void unusedSetProviderDynamically() throws ClassNotFoundException, InstantiationException, IllegalAccessException { 
+        Security.addProvider( (Provider) Class.forName( SunJSSE_PROVIDER_CLASS ).newInstance() );
+    }
+
+
 }
+
+
+
+
+
 
 
 //================================ exception class NoSuchParameterException =========================================
