@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2003, Russell Gold
+ * Copyright (c) 2003-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -103,14 +103,25 @@ abstract class ReceivedHttpMessage {
 
 
     private void readMessageBody( InputStream inputStream ) throws IOException {
-        if ("chunked".equalsIgnoreCase( getHeader( "Transfer-Encoding") )) {
+        if ("chunked".equalsIgnoreCase( getHeader( "Transfer-Encoding" ) )) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            while (getNextChunkLength( inputStream ) > 0) { baos.write( readDelimitedChunk( inputStream ) ); }
+            while (getNextChunkLength( inputStream ) > 0) {
+                baos.write( readDelimitedChunk( inputStream ) );
+            }
             flushChunkTrailer( inputStream );
             _requestBody = baos.toByteArray();
         } else {
-            _requestBody = new byte[ getContentLength() ];
-            inputStream.read( _requestBody );
+            int totalExpected = getContentLength();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream( totalExpected );
+            byte[] buffer = new byte[1024];
+            int total = 0;
+            int count = -1;
+            while ((total < totalExpected) && ((count = inputStream.read( buffer )) != -1)) {
+                baos.write( buffer, 0, count );
+                total += count;
+            }
+            baos.flush();
+            _requestBody = baos.toByteArray();
         }
         _reader = new InputStreamReader( new ByteArrayInputStream( _requestBody ) );
     }
@@ -169,3 +180,4 @@ abstract class ReceivedHttpMessage {
 
 
 }
+

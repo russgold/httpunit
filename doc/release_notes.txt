@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+15-Jun-2004
+   Thanks to Phil Zampino for finding a fixing a problem in PseudoServer's handling of very long requests.
+
+   Problems fixed:
+        1. PseudoServer would hang when sent a very long request.
+
 13-Jun-2004
    Problems fixed:
         1. bug #737167: Nested frame names are now as specified, previous included names of parent frames.
