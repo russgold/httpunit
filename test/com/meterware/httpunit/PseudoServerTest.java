@@ -190,6 +190,7 @@ public class PseudoServerTest extends TestCase {
     }
 
 
+
     public void testPseudoServlet() throws Exception {
         String resourceName = "tellMe";
         String name = "Charlie";
@@ -212,6 +213,47 @@ public class PseudoServerTest extends TestCase {
             WebResponse response = wc.getResponse( request );
             assertEquals( "Content type", "text/plain", response.getContentType() );
             assertEquals( "Response", expectedResponse, response.getText().trim() );
+        } finally {
+            ps.shutDown();
+        }
+    }
+
+
+    public void testRefererHeader() throws Exception {
+        String resourceName = "tellMe";
+        String linkSource = "fromLink";
+	String formSource = "fromForm";
+	
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
+
+        String page0 = "http://localhost:" + port + '/' + resourceName;
+	String page1 = "http://localhost:" + port + '/' + linkSource;
+	String page2 = "http://localhost:" + port + '/' + formSource;
+	
+        ps.setResource( linkSource, "<html><head></head><body><a href=\"tellMe\">Go</a></body></html>" );
+	ps.setResource( formSource, "<html><body><form action=\"tellMe\"><input type=submit></form></body></html>" );
+
+        try {
+            ps.setResource( resourceName, new PseudoServlet() {
+                public WebResource getGetResponse( Dictionary parameters, Dictionary headers ) {
+		    String referer = (String) headers.get( "REFERER" );
+                    return new WebResource( referer == null ? "null" : referer, "text/plain" );
+                }
+            } );
+ 
+            WebConversation wc   = new WebConversation();
+            WebResponse response = wc.getResponse( page0 );
+            assertEquals( "Content type", "text/plain", response.getContentType() );
+            assertEquals( "Default Referer header", "null", response.getText().trim() );
+
+	    response = wc.getResponse( page1 );
+	    response = wc.getResponse( response.getLinks()[0].getRequest() );
+	    assertEquals( "Link Referer header", page1, response.getText().trim() );
+
+	    response = wc.getResponse( page2 );
+	    response = wc.getResponse( response.getForms()[0].getRequest() );
+	    assertEquals( "Form Referer header", page2, response.getText().trim() );
         } finally {
             ps.shutDown();
         }

@@ -266,6 +266,16 @@ public class WebRequest {
     }
 
 
+    void setRequestHeader( String headerName, String headerValue ) {
+        _headers.put( headerName.toUpperCase(), headerValue );
+    }
+
+
+    Dictionary getHeaders() {
+        return _headers;
+    }
+
+
     static class UploadFileSpec {
         UploadFileSpec( File file ) {
             _file = file;
@@ -311,6 +321,7 @@ public class WebRequest {
     private WebForm      _sourceForm;
     private String       _imageButtonName;
     private String       _target = TOP_FRAME;
+    private Hashtable    _headers = new Hashtable();
 
     private boolean      _httpsProtocolSupportEnabled;
 

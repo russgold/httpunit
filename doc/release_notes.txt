@@ -18,7 +18,10 @@ Acknowledgements:
 Problems corrected:
     1. Under JDK 1.3, error headers would sometimes cause a FileNotFoundException
     2. Cookies containing '=' or wrapped in quotes are now recognized
-    
+
+Additions:
+    1. The Referer header is now sent for requests derived from links and forms.
+
 08-Jan-01 1.2.2
 Acknowledgements:
     Thanks to Rocky Rhodes for finding the multiple cookie bug

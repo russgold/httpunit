@@ -20,7 +20,9 @@ public class WebLink {
      * Creates and returns a web request which will simulate clicking on this link.
      **/
     public WebRequest getRequest() {
-        return new GetMethodWebRequest( _baseURL, getURLString(), getTarget() );
+        WebRequest request = new GetMethodWebRequest( _baseURL, getURLString(), getTarget() );
+	request.setRequestHeader( "Referer", _baseURL.toExternalForm() );
+	return request;
     }
 
 

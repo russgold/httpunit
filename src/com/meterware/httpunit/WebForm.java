@@ -240,6 +240,7 @@ public class WebForm {
                 }
             }
         }
+	result.setRequestHeader( "Referer", _baseURL.toExternalForm() );
         return result;
     }
 

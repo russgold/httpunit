@@ -32,13 +32,26 @@ public class PseudoServlet {
 
 
     /**
+     * Returns a resource object as a result of a get request. 
+     * @param parameters a mapping of parameter names to arrays of value string.
+     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
+     *        which is the raw bytes of the request contents stored in a string.
+     **/ 
+    public WebResource getGetResponse( Dictionary parameters, Dictionary headers ) {
+        throw new RuntimeException( "get not implemented" );
+    }
+
+
+    /*
      * Returns a resource object as a result of a post request. 
      * @param parameters a mapping of parameter names to arrays of value string.
      * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
      *        which is the raw bytes of the request contents stored in a string.
      **/ 
-    abstract
-    public WebResource getPostResponse( Dictionary parameters, Dictionary headers );
+    public WebResource getPostResponse( Dictionary parameters, Dictionary headers ) {
+        throw new RuntimeException( "post not implemented" );
+    }
+
 }
 
 

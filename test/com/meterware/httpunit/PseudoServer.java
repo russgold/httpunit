@@ -203,6 +203,8 @@ public class PseudoServer {
                 socket.close();
                 throw e;
             } catch (Throwable t) {
+		System.out.println( "Internal error: " + t );
+		t.printStackTrace();
                 sendResponse( pw, HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
             }
         }
@@ -219,6 +221,9 @@ public class PseudoServer {
         } else if (command.equals( "POST" ) && resource instanceof PseudoServlet) {
             Dictionary requestData = readRequest( br );
             return ((PseudoServlet) resource).getPostResponse( getParameters( (String) requestData.get( PseudoServlet.CONTENTS ) ), requestData );
+        } else if (command.equals( "GET" ) && resource instanceof PseudoServlet) {
+            Dictionary requestData = readRequest( br );
+            return ((PseudoServlet) resource).getGetResponse( getParameters( (String) requestData.get( PseudoServlet.CONTENTS ) ), requestData );
         } else {
             return null;
         }
@@ -258,8 +263,10 @@ public class PseudoServer {
     }
 
     private Dictionary getParameters( String content ) throws IOException {
-        StringTokenizer st = new StringTokenizer( content, "&=" );
         Hashtable parameters = new Hashtable();
+	if (content == null || content.trim().length() == 0) return parameters;
+
+        StringTokenizer st = new StringTokenizer( content, "&=" );
         while (st.hasMoreTokens()) {
             String name = st.nextToken();
             if (st.hasMoreTokens()) {
