@@ -52,13 +52,17 @@ public class WebImageTest extends HttpUnitTest {
                         "<html><head><title>A Sample Page</title></head>\n" +
                         "<body><img src='sample.jpg'>\n" +
                         "<IMG SRC='another.png'>" +
-                        " and <img src='onemore.gif'>\n" +
+                        " and <img src='onemore.gif' alt='one'>\n" +
                         "</body></html>\n" );
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
         WebResponse simplePage = wc.getResponse( request );
         assertEquals( "Number of images", 3, simplePage.getImages().length );
         assertEquals( "First image source", "sample.jpg", simplePage.getImages()[0].getSource() );
+
+        WebImage image = simplePage.getImageWithAltText( "one" );
+        assertNotNull( "No image found", image );
+        assertEquals( "Selected image source", "onemore.gif", image.getSource() );
     }
 
 

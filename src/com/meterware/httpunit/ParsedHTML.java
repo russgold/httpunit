@@ -135,20 +135,8 @@ class ParsedHTML {
      * Returns the first link which contains an image with the specified text as its 'alt' attribute.
      **/
     public WebLink getLinkWithImageText( String text ) {
-        WebLink[] links = getLinks();
-        for (int i = 0; i < links.length; i++) {
-            NodeList nl = ((Element) links[i].getDOMSubtree()).getElementsByTagName( "img" );
-            for (int j = 0; j < nl.getLength(); j++) {
-                NamedNodeMap nnm = nl.item(j).getAttributes();
-                if (text.equals( getValue( nnm.getNamedItem( "alt" ) ) )) {
-                    return links[i];
-                } else if (HttpUnitOptions.getMatchesIgnoreCase() &&
-                           text.equalsIgnoreCase( getValue( nnm.getNamedItem( "alt" ) ) )) {
-                    return links[i];
-                }
-            }
-        }
-        return null;
+        WebImage image = getImageWithAltText( text );
+        return image == null ? null : image.getLink();
     }
 
 
@@ -210,13 +198,26 @@ class ParsedHTML {
 
 
     /**
-     * Returns the image found in the page with the specified src attribute.
+     * Returns the first image found in the page with the specified src attribute.
      **/
     public WebImage getImageWithSource( String source ) {
         WebImage[] images = getImages();
         for (int i = 0; i < images.length; i++) {
             if (images[i].getSource().equals( source )) return images[i];
             else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getSource().equalsIgnoreCase( source )) return images[i];
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the first image found in the page with the specified alt attribute.
+     **/
+    public WebImage getImageWithAltText( String altText ) {
+        WebImage[] images = getImages();
+        for (int i = 0; i < images.length; i++) {
+            if (images[i].getSource().equals( altText )) return images[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getAltText().equalsIgnoreCase( altText )) return images[i];
         }
         return null;
     }

@@ -19,7 +19,9 @@ Acknowledgements:
 Additions:
     1. ServletUnit now supports HttpServletResponse header methods: setHeader, addHeader, setIntHeader, addIntHeader,
        setDateHeader, and addDateHeader.
-    2. ServletUnit now supports HttpSession.getAttributeNames
+    2. ServletUnit now supports HttpSession.getAttributeNames.
+    3. WebImage now supports a read-only 'altText' property.
+    4. WebResponse and TableCell now support getImageWithAltText to find an image with a specified value in its 'alt' attribute.
 
 21-Aug-2002
 

@@ -71,6 +71,34 @@ public interface HTMLSegment {
 
 
     /**
+     * Returns the images found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     **/
+    public WebImage[] getImages() throws SAXException;
+
+
+    /**
+     * Returns the image found in the page with the specified name.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     **/
+    public WebImage getImageWithName( String name ) throws SAXException;
+
+
+    /**
+     * Returns the first image found in the page with the specified src attribute.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     **/
+    public WebImage getImageWithSource( String source ) throws SAXException;
+
+
+    /**
+     * Returns the first image found in the page with the specified alt attribute.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     **/
+    public WebImage getImageWithAltText( String source ) throws SAXException;
+
+
+    /**
      * Returns the top-level tables found in this HTML segment in the order in which
      * they appear.
      * @exception SAXException thrown if there is an error parsing the segment.

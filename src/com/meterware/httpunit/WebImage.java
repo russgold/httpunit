@@ -36,7 +36,8 @@ public class WebImage {
     private Node       _node;
     private ParsedHTML _parsedHTML;
     private Scriptable _scriptable;
-    private String _src;
+    private String     _src;
+    private String     _alt;
 
 
     WebImage( ParsedHTML parsedHTML, URL baseURL, Node node ) {
@@ -44,6 +45,7 @@ public class WebImage {
         _node = node;
         _parsedHTML = parsedHTML;
         _src = NodeUtils.getNodeAttribute( _node, "src" );
+        _alt = NodeUtils.getNodeAttribute( _node, "alt" );
     }
 
 
@@ -54,6 +56,11 @@ public class WebImage {
 
     public String getSource() {
         return _src;
+    }
+
+
+    public String getAltText() {
+        return _alt;
     }
 
 

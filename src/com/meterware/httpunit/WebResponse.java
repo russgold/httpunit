@@ -381,11 +381,19 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
-     * Returns the image found in the page with the specified src attribute.
+     * Returns the first image found in the page with the specified src attribute.
      * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebImage getImageWithSource( String source ) throws SAXException {
         return getReceivedPage().getImageWithSource( source );
+    }
+
+
+    /**
+     * Returns the first image found in the page with the specified alt attribute.
+     **/
+    public WebImage getImageWithAltText( String altText ) throws SAXException {
+        return getReceivedPage().getImageWithAltText( altText );
     }
 
 
