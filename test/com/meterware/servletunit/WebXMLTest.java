@@ -129,6 +129,7 @@ public class WebXMLTest extends TestCase {
         wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
         wxs.addContextParam( "icecream", "vanilla" );
         wxs.addContextParam( "cone", "waffle" );
+        wxs.addContextParam( "topping", "" );
 
         ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient client = sr.newClient();
@@ -138,6 +139,7 @@ public class WebXMLTest extends TestCase {
         assertNotNull( "ServletContext should not be null", sc );
         assertEquals( "ServletContext.getInitParameter()", "vanilla", sc.getInitParameter( "icecream" ) );
         assertEquals( "init parameter: cone", "waffle", sc.getInitParameter( "cone" ) );
+        assertEquals( "init parameter: topping", "", sc.getInitParameter( "topping" ) );
         assertNull( "ServletContext.getInitParameter() should be null", sc.getInitParameter( "shoesize" ) );
 
     }
@@ -340,7 +342,6 @@ public class WebXMLTest extends TestCase {
     static class Servlet2 extends SimpleGetServlet {}
     static class Servlet3 extends SimpleGetServlet {}
     static class Servlet4 extends SimpleGetServlet {}
-    static class Servlet5 extends SimpleGetServlet {}
 
 }
 
