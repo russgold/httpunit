@@ -13,6 +13,14 @@ Limitations:
 
 
 Revision History:
+ 1-Apr-2003
+Problems fixed:
+    1. HttpUnit now handles refresh headers without explicit URLs, defaulting to refreshing the containing page.
+
+28-Mar-2003
+Acknowledgements:
+    Thanks to Ron Webster for designing the new HttpUnit logo.
+
 27-Mar-2003
 Acknowledgements:
     Thanks to Mark Luty for supplying a test for the getElementsByName function.

@@ -31,6 +31,7 @@ import java.net.URLConnection;
 import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
@@ -886,15 +887,21 @@ public class WebResponse implements HTMLSegment, CookieSource {
         String refreshHeader = _refreshHeader != null ? _refreshHeader : getHeaderField( "Refresh" );
         if (refreshHeader == null) return;
 
-        int splitIndex = refreshHeader.indexOf( ';' );
-        if (splitIndex < 0) splitIndex = 0;
-        try {
-            _refreshDelay = Integer.parseInt( refreshHeader.substring( 0, splitIndex ) );
-            _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( refreshHeader.substring( splitIndex+1 ) ), _frameName );
-        } catch (NumberFormatException e) {
-            _refreshDelay = 0;
-            System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
+        StringTokenizer st = new StringTokenizer( refreshHeader, ";" );
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (token.length() == 0) continue;
+            try {
+                if (Character.isDigit( token.charAt(0) )) {
+                    _refreshDelay = Integer.parseInt( token );
+                } else {
+                    _refreshRequest = new GetMethodWebRequest( _pageURL, getRefreshURL( token ), _frameName );
+                }
+            } catch (NumberFormatException e) {
+                System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
+            }
         }
+        if (_refreshRequest == null) _refreshRequest = new GetMethodWebRequest( _pageURL, _pageURL.toString(), _frameName );
     }
 
 
