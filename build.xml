@@ -239,8 +239,6 @@ Build-Time: ${TSTAMP}
             <include name="doc/**/*.*" />
         </fileset>
     </copy>
-    <replace file="${archive.dir}/index.html" token="var:dist " value="var:dist&gt;" />
-    <replace file="${archive.dir}/index.html" token="var:publish&gt;" value="var:publish " />
 </target>
 
 
@@ -282,6 +280,9 @@ Build-Time: ${TSTAMP}
 <!--  Updates the web site                                              -->
 <!--  ===================================================================  -->
 <target name="update-website" depends="compile-site">
+    <copy todir="${web.dir}">
+        <fileset dir="." includes="site.css,favicon.ico,doc/images/**" />
+    </copy>
     <java classname="com.meterware.httpunit.site.WebSite" fork="yes" >
         <classpath>
             <path refid="base.classpath" />
