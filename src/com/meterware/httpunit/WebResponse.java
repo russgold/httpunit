@@ -565,10 +565,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
         public void load() throws SAXException {
             if (isHTML()) {
                 getReceivedPage().getForms();         // TODO be more explicit here - don't care about forms, after all
-//                final String[] scripts = getReceivedPage().getScripts();       TODO delete this
-//                for (int i = 0; i < scripts.length; i++) {
-//                    runScript( scripts[i] );
-//                }
                 doEvent( getReceivedPage().getOnLoadEvent() );
             }
         }
