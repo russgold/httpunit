@@ -855,7 +855,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
         _baseURL = null;
         _baseTarget = _frame.getName();
         _refreshHeader = null;
-        _hasSubframes = false;
 
         try {
             readTags( text.getBytes() );
@@ -982,8 +981,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
         while (tag != null ) {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
             if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
-            if (tag.getName().equalsIgnoreCase( "frameset" )) _hasSubframes = true;
-            if (tag.getName().equalsIgnoreCase( "iframe" )) _hasSubframes = true;
             if (tag.getName().equalsIgnoreCase( "noscript") && HttpUnitOptions.isScriptingEnabled()) {
                 do { tag = parser.getNextTag(); } while (tag.getName().equalsIgnoreCase( "/noscript") );
             }
@@ -1149,11 +1146,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
         } catch (UnsupportedEncodingException e) {
             _characterSet = getDefaultEncoding();
         }
-    }
-
-
-    boolean hasSubframes() {
-        return _hasSubframes;
     }
 
 

@@ -174,18 +174,16 @@ class FrameHolder {
         _contents.put( frame, response );
 
         if (response.isHTML()) {
-            if (!response.hasSubframes()) {
-                requestContext.addNewResponse( response );
-            } else {
-                HttpUnitOptions.getScriptingEngine().associate( response );
+            HttpUnitOptions.getScriptingEngine().associate( response );
+            requestContext.addNewResponse( response );
+            WebRequest[] requests = response.getFrameRequests();
+            if (requests.length > 0) {
                 createSubFrames( frame, response.getFrameSelectors() );
-                WebRequest[] requests = response.getFrameRequests();
                 for (int i = 0; i < requests.length; i++) {
                     if (requests[i].getURLString().length() != 0) {
                         response.getWindow().getSubframeResponse( requests[i], requestContext );
                     }
                 }
-                HttpUnitOptions.getScriptingEngine().load( response );
             }
         }
     }

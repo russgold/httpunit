@@ -14,6 +14,10 @@ Limitations:
 
 
 Revision History:
+17-Oct-2004:
+    Problems fixed:
+        1. bug #1047367 frames defined by javascript were not being detected.
+
 14-Oct-2004:
     Problems fixed:
         1. bug #1046597 tables nested inside paragraphs were not being seen by the enclosing page. This bug was introduced
@@ -38,7 +42,7 @@ Revision History:
 
 4-Oct-2004
     Problems fixed:
-        1. bug #1039989 Did not compile with JDK 1.3
+        1. bug #1039989 Did not compile with JDK 1.3. This bug was introduced in HttpUnit 1.6 and has now been corrected.
         2. bug #1035949 Following a link from the top frame to a _parent target no longer results in a NullPointerException.
 
 3-Oct-2004 1.6

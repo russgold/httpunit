@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -28,7 +28,7 @@ import com.meterware.httpunit.*;
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- **/ 
+ **/
 public class NekoEnhancedScriptingTest extends HttpUnitTest {
 
     public static void main( String args[] ) {
@@ -59,7 +59,7 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebLink link = response.getLinkWithID( "here" );
         assertNotNull( "The link was not found", link );
-        assertEquals( "Link contents", "something", link.asText() );
+        assertEquals( "Link contents", "something", link.getText() );
     }
 
 
@@ -77,7 +77,7 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebLink link = response.getLinkWithID( "here" );
         assertNotNull( "The link was not found", link );
-        assertEquals( "Link contents", "something", link.asText() );
+        assertEquals( "Link contents", "something", link.getText() );
     }
 
 
@@ -125,17 +125,35 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         WebLink link = response.getLinkWithID( "here" );
         assertNotNull( "The link was not found", link );
-        assertEquals( "Link contents", "something", link.asText() );
+        assertEquals( "Link contents", "something", link.getText() );
         assertNull( "Should not have found link in noscript", response.getLinkWithID( "there" ) );
 
         HttpUnitOptions.setScriptingEnabled( false );
         response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         link = response.getLinkWithID( "there" );
         assertNotNull( "The link was not found", link );
-        assertEquals( "Link contents", "anything", link.asText() );
+        assertEquals( "Link contents", "anything", link.getText() );
         assertNull( "Should not have found scripted link", response.getLinkWithID( "here" ) );
     }
 
+
+    /**
+     * Verifies that a script can write part of the frameset.
+     */
+    public void testScriptedFrames() throws Exception {
+        defineWebPage( "OneForm", "<form name='form'><input name=text value='nothing special'></form>");
+        defineResource("Frames.html",
+                "<html><script>" +
+                "  document.write( '<frameset>' )" +
+                "</script>" +
+                "    <frame src='OneForm.html' name='green'>" +
+                "    <frame name=blue>" +
+                "</frameset></htmlL>");
+
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/Frames.html" );
+        assertMatchingSet( "Loaded frames", new String[] { "_top", "green", "blue" }, wc.getFrameNames() );
+    }
 
 
 }

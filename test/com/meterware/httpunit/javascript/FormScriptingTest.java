@@ -974,10 +974,14 @@ public class FormScriptingTest extends HttpUnitTest {
 
 
     public void testAccessAcrossFrames() throws Exception {
-        defineWebPage( "First",  "<script language='JavaScript'>" +
-                                 "  top.frame2.document.testform.param1.value = 'new1';" +
-                                 "  window.alert('value: ' + top.frame2.document.testform.param1.value);" +
-                                 "</script>" );
+        defineResource( "First.html",
+                        "<html><head><script language='JavaScript'>" +
+                        "function accessOtherFrame() {" +
+                        "  top.frame2.document.testform.param1.value = 'new1';" +
+                        "  window.alert('value: ' + top.frame2.document.testform.param1.value);" +
+                        "}" +
+                        "</script><body onload='accessOtherFrame();'>" +
+                        "</body></html>" );
         defineWebPage( "Second",  "<form method=post name=testform action='http://trinity/dummy'>" +
                                   "  <input type=hidden name='param1' value='old1'></form>" );
         defineResource( "Frames.html",
