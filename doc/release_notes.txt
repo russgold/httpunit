@@ -10,6 +10,13 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+13-Aug-2001
+Acknowledgements:
+    Thanks to Brett Neumeier for some Javadoc fixes and adding support for the non-standard "Charset" header
+
+    Additions:
+       1. Now recognizes a Charset header if no charset is specified in the Content-type header.
+
  8-Aug-2001
 Acknowledgements:
     Thanks to Dave Glowacki for the default content-type code.

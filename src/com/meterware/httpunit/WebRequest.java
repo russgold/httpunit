@@ -95,7 +95,8 @@ public class WebRequest {
 
     /**
      * Returns the value of a parameter in this web request.
-     * @return the value of the named parameter, or null if it is not set.
+     * @return the value of the named parameter, or empty string
+     *         if it is not set.
      **/
     public String getParameter( String name ) {
         Object value = _parameters.get( name );

@@ -142,6 +142,7 @@ public class WebResponse implements HTMLSegment {
     public String getCharacterSet() {
         if (_characterSet == null) {
             readContentTypeHeader();
+            if (_characterSet == null) _characterSet = getHeaderField( "Charset" );
             if (_characterSet == null) _characterSet = HttpUnitOptions.getDefaultCharacterSet();
         }
         return _characterSet;
