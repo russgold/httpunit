@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+20-Apr-2004
+    Problems fixed:
+        1. PseudoServer now accepts a full http URL to permit testing of interaction with proxy servers.
+
 14-Mar-2004
     Additions:
         1. RFE #909922: ServletUnit now supports HttpServletRequest.getHeaders

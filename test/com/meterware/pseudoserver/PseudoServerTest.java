@@ -21,12 +21,12 @@ package com.meterware.pseudoserver;
  *******************************************************************************************************************/
 import junit.framework.TestSuite;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Socket;
-import java.io.OutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.BufferedInputStream;
 
 
 public class PseudoServerTest extends HttpUserAgentTest {
@@ -73,6 +73,28 @@ public class PseudoServerTest extends HttpUserAgentTest {
 
         sendHTTPLine( os, "GET /sample HTTP/1.0" );
         sendHTTPLine( os, "Host: meterware.com" );
+        sendHTTPLine( os, "" );
+
+        StringBuffer sb = new StringBuffer();
+        int b;
+        while (-1 != (b = is.read())) sb.append( (char) b );
+        String result = sb.toString();
+        assertTrue( "Did not find matching protocol", result.startsWith( "HTTP/1.0" ) );
+        assertTrue( "Did not find expected text", result.indexOf( "Get this" ) > 0 );
+    }
+
+
+    /**
+     * This tests simple access to the server without using any client classes.
+     */
+    public void testProxyGetViaSocket() throws Exception {
+        defineResource( "http://someserver.com/sample", "Get this", "text/plain" );
+        Socket socket = new Socket( "localhost", getHostPort() );
+        OutputStream os = socket.getOutputStream();
+        InputStream is = new BufferedInputStream( socket.getInputStream() );
+
+        sendHTTPLine( os, "GET http://someserver.com/sample HTTP/1.0" );
+        sendHTTPLine( os, "Host: someserver.com" );
         sendHTTPLine( os, "" );
 
         StringBuffer sb = new StringBuffer();

@@ -242,7 +242,7 @@ public class PseudoServer {
 
 
     private String asResourceName( String rawName ) {
-        if (rawName.startsWith( "/" )) {
+        if (rawName.startsWith( "http:" ) || rawName.startsWith( "/" )) {
             return escape( rawName );
         } else {
             return escape( "/" + rawName );

@@ -67,6 +67,20 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    public void testProxyServerAccess() throws Exception {
+        defineResource( "http://someserver.com/sample", "Get this", "text/plain" );
+        WebConversation wc = new WebConversation();
+        try {
+            wc.setProxyServer( "localhost", getHostPort() );
+            WebResponse wr = wc.getResponse( "http://someserver.com/sample" );
+            String result = wr.getText();
+            assertEquals( "Expected text", "Get this", result.trim() );
+        } finally {
+            wc.clearProxyServer();
+        }
+    }
+
+
     public void testTitle() throws Exception {
         defineResource( "SimplePage.html",
                         "<html><head><title>A Sample Page</title></head>\n" +
