@@ -44,8 +44,6 @@ public class WebWindowTest extends HttpUnitTest {
     public WebWindowTest( String name ) {
         super( name );
     }
-
-
     public void testNewTarget() throws Exception {
         defineResource( "goHere", "You made it!" );
         defineWebPage( "start", "<a href='goHere' id='go' target='_blank'>here</a>" );
@@ -59,6 +57,23 @@ public class WebWindowTest extends HttpUnitTest {
         assertEquals( "Main page in original window", initialPage, main.getCurrentPage() );
         WebWindow other = wc.getOpenWindows()[1];
         assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
+
+        main.close();
+        assertTrue( "Original main window is not closed", main.isClosed() );
+        assertFalse( "New window has been closed", other.isClosed() );
+
+        assertEquals( "Num open windows", 1, wc.getOpenWindows().length );
+        assertEquals( "Main window", other, wc.getMainWindow() );
+    }
+
+
+    public void testCloseOnlyWindow() throws Exception {
+        defineResource( "goHere", "You made it!" );
+        WebConversation wc = new WebConversation();
+        WebWindow original = wc.getMainWindow();
+        wc.getMainWindow().close();
+        assertTrue( "Main window did not close", original.isClosed() );
+        assertNotNull( "No main window was created", wc.getMainWindow() );
     }
 
 
@@ -67,6 +82,7 @@ public class WebWindowTest extends HttpUnitTest {
         defineWebPage( "start", "<a href='goHere' id='go' target='_blank'>here</a>" );
 
         final ArrayList newWindowContents = new ArrayList();
+        final ArrayList closedWindows = new ArrayList();
         WebClient wc = new WebConversation();
         wc.addWindowListener( new WebWindowListener() {
             public void windowOpened( WebClient client, WebWindow window ) {
@@ -77,12 +93,21 @@ public class WebWindowTest extends HttpUnitTest {
                 }
             }
             public void windowClosed( WebClient client, WebWindow window ) {
+                closedWindows.add( window );
             }
         });
         WebResponse initialPage = wc.getResponse( getHostPath() + "/start.html" );
         initialPage.getLinkWithID( "go" ).click();
         assertFalse( "No window opened", newWindowContents.isEmpty() );
         assertEquals( "New window contents", "You made it!", newWindowContents.get(0) );
+        assertTrue( "Window already reported closed", closedWindows.isEmpty() );
+
+        WebWindow main = wc.getMainWindow();
+        WebWindow other = wc.getOpenWindows()[1];
+        other.close();
+        assertEquals( "Main window", main, wc.getMainWindow() );
+        assertFalse( "No windows reported closed", closedWindows.isEmpty() );
+        assertEquals( "Window reported closed", other, closedWindows.get(0) );
     }
 
 

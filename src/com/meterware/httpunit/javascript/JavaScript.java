@@ -319,11 +319,6 @@ public class JavaScript {
         }
 
 
-        public boolean jsGet_closed() {
-            return false;
-        }
-
-
         public Screen jsGet_screen() {
             return _screen;
         }
@@ -373,6 +368,7 @@ public class JavaScript {
 
 
         public void jsFunction_close() {
+            getDelegate().close();
         }
 
 

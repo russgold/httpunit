@@ -9,6 +9,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <h3>Window</h3>
 <h4>properties</h4>
 <ul>
+<li>closed    - true if the window has been closed</li>
 <li>document  - the associated Document object</li>
 <li>frames    - an array of subframes of this window</li>
 <li>location  - r/w full URL only</li>
@@ -28,6 +29,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <h4>methods</h4>
 <ul>
 <li>alert()   - queues up an alert message, accessible via WebResponse.getNextAlert() or popNextAlert()</li>
+<li>close()   - closes the window</li>
 <li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response. By default,
                 the callback returns true. Users may change this by supplying an implementation of DialogResponder.</li>
 <li>prompt()  - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>

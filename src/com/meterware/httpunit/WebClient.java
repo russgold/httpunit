@@ -464,6 +464,15 @@ public class WebClient {
     }
 
 
+    void close( WebWindow window ) {
+        if (!_openWindows.contains( window )) throw new IllegalStateException( "Window is already closed" );
+        _openWindows.remove( window );
+        if (_openWindows.isEmpty()) _openWindows.add( new WebWindow( this ) );
+        if (window.equals( _mainWindow )) _mainWindow = (WebWindow) _openWindows.get(0);
+        reportWindowClosed( window );
+    }
+
+
     private WebWindow getTargetWindow( WebWindow requestWindow, String target ) {
         return WebRequest.NEW_WINDOW.equalsIgnoreCase( target ) ? null : requestWindow;
     }
@@ -482,6 +491,17 @@ public class WebClient {
     }
 
 
+    private void reportWindowClosed( WebWindow window ) {
+        List listeners;
+
+        synchronized (_windowListeners) {
+            listeners = new ArrayList( _windowListeners );
+        }
+
+        for (Iterator i = listeners.iterator(); i.hasNext();) {
+            ((WebWindowListener) i.next()).windowClosed( this, window );
+        }
+    }
 
 //------------------------------------------ package members ------------------------------------
 

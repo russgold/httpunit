@@ -44,9 +44,25 @@ public class WebWindow {
     /** The web response containing the reference that opened this window **/
     private WebResponse _opener;
 
+    /** True if this window has been closed. **/
+    private boolean _closed;
 
+    /**
+     * Returns the web client associated with this window.
+     */
     public WebClient getClient() {
         return _client;
+    }
+
+
+    public boolean isClosed() {
+        return _closed;
+    }
+
+
+    public void close() {
+        if (!_closed) _client.close( this );
+        _closed = true;
     }
 
 

@@ -596,6 +596,11 @@ public class WebResponse implements HTMLSegment {
         }
 
 
+        public void close() {
+            if (getFrameName().equals( WebRequest.TOP_FRAME )) _window.close();
+        }
+
+
         /**
          * Returns the value of the named property. Will return null if the property does not exist.
          **/
@@ -611,6 +616,8 @@ public class WebResponse implements HTMLSegment {
                 return WebResponse.this._url.toExternalForm();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
+            } else if (propertyName.equalsIgnoreCase( "closed" )) {
+                return (getFrameName().equals( WebRequest.TOP_FRAME ) && _window.isClosed()) ? Boolean.TRUE : Boolean.FALSE;
             } else {
                 try {
                     return getSubframeContents( propertyName ).getScriptableObject();

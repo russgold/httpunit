@@ -225,8 +225,10 @@ public class ScriptingTest extends HttpUnitTest {
     public void testWindowOpen() throws Exception {
         defineResource( "Target.html", "You made it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
-                        "<body>" +
-                        "<a href='#' onClick=\"window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
+                        "<body><script language='JavaScript'>var otherWindow;</script>" +
+                        "<a href='#' onClick=\"otherWindow = window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
+                        "<a href='#' onClick=\"otherWindow.close();\">go</a>" +
+                        "<a href='#' onClick=\"alert( 'window is ' + (otherWindow.closed ? '' : 'not ') + 'closed' );\">go</a>" +
                         "</body></html>" );
         final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
@@ -238,8 +240,15 @@ public class ScriptingTest extends HttpUnitTest {
         response.getLinks()[0].click();
 
         assertFalse( "No window opened", windowsOpened.isEmpty() );
-        assertEquals( "New window message", "You made it!", ((WebWindow) windowsOpened.get( 0 )).getCurrentPage().getText() );
-        assertEquals( "New window name", "sample", ((WebWindow) windowsOpened.get( 0 )).getName() );
+        final WebWindow openedWindow = (WebWindow) windowsOpened.get( 0 );
+        assertEquals( "New window message", "You made it!", openedWindow.getCurrentPage().getText() );
+        assertEquals( "New window name", "sample", openedWindow.getName() );
+        response.getLinks()[2].click();
+        assertEquals( "Alert message", "window is not closed", wc.popNextAlert() );
+        response.getLinks()[1].click();
+        assertTrue( "Window was not closed", openedWindow.isClosed() );
+        response.getLinks()[2].click();
+        assertEquals( "Alert message", "window is closed", wc.popNextAlert() );
     }
 
 

@@ -1,5 +1,4 @@
 High priority:
-o closing windows
 o better support for use with proxy server
 
 Medium priority:
