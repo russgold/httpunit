@@ -20,6 +20,9 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.pseudoserver.PseudoServlet;
+import com.meterware.pseudoserver.WebResource;
+
 import java.net.URL;
 
 import junit.framework.Test;

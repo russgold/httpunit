@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.pseudoserver;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,13 +19,21 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.WebConversation;
+import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.HttpNotFoundException;
+import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.GetMethodWebRequest;
+import com.meterware.httpunit.HttpException;
+import com.meterware.httpunit.PostMethodWebRequest;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import java.net.HttpURLConnection;
 
 
-public class PseudoServerTest extends HttpUnitTest {
+public class PseudoServerTest extends HttpUserAgentTest {
 
     public static void main( String args[] ) {
         junit.textui.TestRunner.run( suite() );

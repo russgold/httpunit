@@ -20,6 +20,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.pseudoserver.PseudoServerTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

@@ -55,7 +55,8 @@ public class HttpUnitUtils {
         return result;
     }
 
-    static String stripQuotes( String value ) {
+
+    public static String stripQuotes( String value ) {
         if (value.startsWith( "'" ) || value.startsWith( "\"" )) value = value.substring( 1 );
         if (value.endsWith( "'" ) || value.endsWith( "\"" )) value = value.substring( 0, value.length()-1 );
         return value;

@@ -19,6 +19,9 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.pseudoserver.PseudoServlet;
+import com.meterware.pseudoserver.WebResource;
+
 import junit.framework.TestSuite;
 
 import java.io.ByteArrayOutputStream;

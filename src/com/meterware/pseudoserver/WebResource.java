@@ -1,8 +1,8 @@
-package com.meterware.httpunit;
+package com.meterware.pseudoserver;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.HttpUnitUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.Vector;
@@ -27,24 +29,45 @@ import java.util.Vector;
 /**
  * A resource to be returned from the simulated server.
  **/
-class WebResource {
+public class WebResource {
 
 
     final static String DEFAULT_CONTENT_TYPE = "text/html";
 
     final static String DEFAULT_CHARACTER_SET = "iso-8859-1";
 
-    WebResource( String contents ) {
+
+    public WebResource( String contents ) {
         this( contents, DEFAULT_CONTENT_TYPE );
     }
 
 
-    WebResource( String contents, String contentType ) {
+    public WebResource( String contents, String contentType ) {
         this( contents, contentType, HttpURLConnection.HTTP_OK );
     }
 
 
-    WebResource( int responseCode, String contents ) {
+    public WebResource( byte[] contents, String contentType ) {
+        this( contents, contentType, HttpURLConnection.HTTP_OK );
+    }
+
+
+    public void addHeader( String header ) {
+        _headers.addElement( header );
+    }
+
+
+    public void setCharacterSet( String characterSet ) {
+        _characterSet = characterSet;
+    }
+
+
+    public void setSendCharacterSet( boolean enabled ) {
+        _sendCharacterSet = enabled;
+    }
+
+
+    WebResource( String contents, int responseCode ) {
         this( contents, DEFAULT_CONTENT_TYPE, responseCode );
     }
 
@@ -56,30 +79,10 @@ class WebResource {
     }
 
 
-    WebResource( byte[] contents, String contentType ) {
-        this( contents, contentType, HttpURLConnection.HTTP_OK );
-    }
-
-
     WebResource( byte[] contents, String contentType, int responseCode ) {
         _contents    = contents;
         _contentType = contentType;
         _responseCode = responseCode;
-    }
-
-
-    void addHeader( String header ) {
-        _headers.addElement( header );
-    }
-
-
-    void setCharacterSet( String characterSet ) {
-        _characterSet = characterSet;
-    }
-
-
-    void setSendCharacterSet( boolean enabled ) {
-        _sendCharacterSet = enabled;
     }
 
 

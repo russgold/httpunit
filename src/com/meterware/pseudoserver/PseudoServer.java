@@ -1,8 +1,8 @@
-package com.meterware.httpunit;
+package com.meterware.pseudoserver;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -35,7 +35,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 /**
- * A basic simulated web-server for testing the HttpUnit library.
+ * A basic simulated web-server for testing user agents without a web server.
  **/
 public class PseudoServer {
 
@@ -117,7 +117,7 @@ public class PseudoServer {
      * Defines a resource which will result in an error message.
      **/
     public void setErrorResource( String name, int errorCode, String errorMessage ) {
-        _resources.put( asResourceName( name ), new WebResource( errorCode, errorMessage ) );
+        _resources.put( asResourceName( name ), new WebResource( errorMessage, errorCode ) );
     }
 
 
