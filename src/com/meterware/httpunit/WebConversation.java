@@ -29,6 +29,9 @@ import org.xml.sax.*;
  * The context for a series of HTTP requests. This class manages cookies used to maintain
  * session context, computes relative URLs, and generally emulates the browser behavior
  * needed to build an automated test of a web site.
+ *
+ * @author Russell Gold
+ * @author Jan Ohrstrom 
  **/
 public class WebConversation {
 
@@ -58,10 +61,39 @@ public class WebConversation {
     }
 
 
+    /**
+     * Defines a cookie to be sent to the server on every request.
+     **/
+    public void addCookie(String name, String value) {
+	_cookies.put( name, value );
+    }
+
+    
+    /**
+     * Specifies the user agent identification. Used to trigger browser-specific server behavior.
+     **/    
+    public void setUserAgent(String userAgent) {
+	_userAgent = userAgent;
+    }
+    
+        
+    /**
+     * Returns the current user agent setting.
+     **/
+    public String getUserAgent() {
+	return _userAgent;
+    }
+
+
 //---------------------------------- private members --------------------------------
 
-
+    /** The currently defined cookies. **/
     private Hashtable _cookies = new Hashtable();
+
+
+    /** The current user agent. **/
+    private String _userAgent;
+
     
     static {
         HttpURLConnection.setFollowRedirects( false );
@@ -70,8 +102,15 @@ public class WebConversation {
     private URLConnection openConnection( URL url ) throws MalformedURLException, IOException {
         URLConnection connection = url.openConnection();
         connection.setUseCaches( false );
+	sendUserAgent( connection );
         sendCookies( connection );
         return connection;
+    }
+
+    
+    private void sendUserAgent ( URLConnection connection ) {
+	if (getUserAgent() == null) return;
+	connection.setRequestProperty( "User-Agent" , getUserAgent() );
     }
 
     
