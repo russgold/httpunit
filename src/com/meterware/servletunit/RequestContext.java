@@ -45,7 +45,7 @@ class RequestContext {
     RequestContext( URL url ) {
         _url = url;
         String file = _url.getFile();
-        if (file.indexOf( '?' ) >= 0) loadParameters( file.substring( file.indexOf( '?' )+1 ), /* urlEncoded */ true );
+        if (file.indexOf( '?' ) >= 0) loadParameters( file.substring( file.indexOf( '?' )+1 ) /* urlEncoded */ );
     }
 
 
@@ -99,7 +99,7 @@ class RequestContext {
      *    have_equals -> initial: record parameter with null value
      *    have_value  -> initial: record parameter with value
      **/
-    void loadParameters( String queryString, boolean urlEncoded ) {
+    void loadParameters( String queryString ) {
         if (queryString.length() == 0) return;
         StringTokenizer st = new StringTokenizer( queryString, "&=", /* return tokens */ true );
         int state = STATE_INITIAL;
@@ -119,11 +119,11 @@ class RequestContext {
                     state = STATE_INITIAL;
                 }
             } else if (state == STATE_INITIAL) {
-                name = (!urlEncoded) ? token : HttpUnitUtils.decode( token, getMessageEncoding() );
+                name = HttpUnitUtils.decode( token, getMessageEncoding() );
                 value = "";
                 state = STATE_HAVE_NAME;
             } else {
-                value = (!urlEncoded) ? token : HttpUnitUtils.decode( token, getMessageEncoding() );
+                value = HttpUnitUtils.decode( token, getMessageEncoding() );
                 state = STATE_HAVE_VALUE;
             }
         }
@@ -152,7 +152,7 @@ class RequestContext {
 
     private Hashtable getParameters() {
         if (_messageBody != null) {
-            loadParameters( getMessageBodyAsString(), /* urlEncoded */ false );
+            loadParameters( getMessageBodyAsString() /* urlEncoded */ );
             _messageBody = null;
         }
         if (_visibleParameters == null) {
@@ -177,7 +177,7 @@ class RequestContext {
 
     private String getMessageBodyAsString() {
         try {
-            return new String( _messageBody, getMessageEncoding() );
+            return new String( _messageBody, "iso-8869-1" );
         } catch (UnsupportedEncodingException e) {
             return "";
         }

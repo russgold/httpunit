@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -31,10 +32,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.PutMethodWebRequest;
-import com.meterware.httpunit.PostMethodWebRequest;
+import com.meterware.httpunit.*;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -163,6 +161,15 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
         assertEquals( "age parameter", "12", request.getParameter( "age" ) );
         assertNull( "unset parameter should be null", request.getParameter( "unset" ) );
+    }
+
+
+    public void testInlineParameterWithEmbeddedSpace() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple?color=dark+red&age=12" );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
+
+        assertEquals( "age parameter", "12", request.getParameter( "age" ) );
+        assertEquals( "color parameter", "dark red", request.getParameter( "color" ) );
     }
 
 
@@ -446,20 +453,36 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
     public void testSpecifiedCharEncoding() throws Exception {
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
-        String paramString = "param1=red&param2=" + hebrewValue;
+        String paramString = "param1=red&param2=%E0%E1%E2%E3";  // use iso-8859-8 to encode the data
         WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
         wr.setHeaderField( "Content-Type", "application/x-www-form-urlencoded; charset=ISO-8859-8" );
-        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), paramString.getBytes( "ISO-8859-8" ) );
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), paramString.getBytes( "iso-8859-1" ) );
         assertEquals( "param1 value", "red", request.getParameter( "param1") );
         assertEquals( "param2 value", hebrewValue, request.getParameter( "param2") );
     }
 
 
+    public void ntestSpecifiedCharEncoding2() throws Exception {
+        String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
+        HttpUnitOptions.setDefaultCharacterSet( "iso-8859-8" );
+        WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
+        wr.setParameter( "param1", "red" );
+        wr.setParameter( "param2", hebrewValue );
+        wr.setHeaderField( "Content-Type", "application/x-www-form-urlencoded; charset=ISO-8859-8" );
+        ServletUnitClient client = ServletUnitClient.newClient( null );
+        ByteArrayOutputStream messageBody = client.getMessageBody( wr );
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), messageBody.toByteArray() );
+        String parameter = request.getParameter( "param2");
+        assertEquals( "param2 value", hebrewValue, parameter );
+        assertEquals( "param1 value", "red", request.getParameter( "param1") );
+    }
+
+
     public void testSuppliedCharEncoding() throws Exception {
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
-        String paramString = "param1=red&param2=" + hebrewValue;
+        String paramString = "param1=red&param2=%E0%E1%E2%E3";  // use iso-8859-8 to encode the data, then string is URL encoded
         WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
-        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), paramString.getBytes( "ISO-8859-8" ) );
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), paramString.getBytes( "ISO-8859-1" ) );
         request.setCharacterEncoding( "ISO-8859-8" );
         assertEquals( "param1 value", "red", request.getParameter( "param1") );
         assertEquals( "param2 value", hebrewValue, request.getParameter( "param2") );

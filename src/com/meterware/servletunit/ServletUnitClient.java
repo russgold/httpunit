@@ -70,9 +70,15 @@ public class ServletUnitClient extends WebClient {
 
 
     InvocationContext newInvocation( WebRequest request, FrameSelector frame ) throws IOException, MalformedURLException {
+        ByteArrayOutputStream baos = getMessageBody( request );
+        return _invocationContextFactory.newInvocation( this, frame, request, getHeaderFields( request.getURL() ), baos.toByteArray() );
+    }
+
+
+    ByteArrayOutputStream getMessageBody( WebRequest request ) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeMessageBody( request, baos );
-        return _invocationContextFactory.newInvocation( this, frame, request, getHeaderFields( request.getURL() ), baos.toByteArray() );
+        return baos;
     }
 
 

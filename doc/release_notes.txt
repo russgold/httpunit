@@ -14,6 +14,10 @@ Limitations:
 
 
 Revision History:
+25-Oct-2004:
+    Problems fixed:
+        1. bug #1051123 ServletUnit handling of parameter encoding was not cleaning up url-encodings
+
 17-Oct-2004:
     Problems fixed:
         1. bug #1047367 frames defined by javascript were not being detected.

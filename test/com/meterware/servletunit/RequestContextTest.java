@@ -103,8 +103,8 @@ public class RequestContextTest extends HttpUnitTest {
     public void testEncodedParameterParsing() throws Exception {
         RequestContext rc = new RequestContext( new URL( "http://localhost/basic" ));
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
-        String paramString = "param=red&param1=" + hebrewValue + "&param=blue";
-        rc.setMessageBody( paramString.getBytes( "iso-8859-8" ) );
+        String paramString = "param=red&param1=%E0%E1%E2%E3&param=blue";
+        rc.setMessageBody( paramString.getBytes( "iso-8859-1" ) );
         rc.setMessageEncoding( "iso-8859-8" );
         assertMatchingSet( "parameter names", new String[] { "param", "param1" }, rc.getParameterNames() );
         assertMatchingSet( "param values", new String[] { "red", "blue" }, rc.getParameterValues( "param" ) );
