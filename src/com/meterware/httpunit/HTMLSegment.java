@@ -113,6 +113,13 @@ public interface HTMLSegment {
 
 
     /**
+     * Returns the applets found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing the segment.
+     **/
+    public WebApplet[] getApplets() throws SAXException;
+
+
+    /**
      * Returns the top-level tables found in this HTML segment in the order in which
      * they appear.
      * @exception SAXException thrown if there is an error parsing the segment.

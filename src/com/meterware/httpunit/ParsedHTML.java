@@ -43,6 +43,7 @@ class ParsedHTML {
     private WebForm[]    _forms;
     private WebImage[]   _images;
     private WebLink[]    _links;
+    private WebApplet[]  _applets;
     private WebResponse  _response;
 
 
@@ -236,6 +237,22 @@ class ParsedHTML {
             else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getAltText().equalsIgnoreCase( altText )) return images[i];
         }
         return null;
+    }
+
+
+    /**
+     * Returns a proxy for each applet found embedded in this page.
+     */
+    public WebApplet[] getApplets() {
+        if (_applets == null) {
+            NodeList applets = NodeUtils.getElementsByTagName( getRootNode(), "applet" );
+
+            _applets = new WebApplet[ applets.getLength() ];
+            for (int i = 0; i < _applets.length; i++) {
+                _applets[i] = new WebApplet( _response, applets.item( i ), _baseTarget );
+            }
+        }
+        return _applets;
     }
 
 

@@ -409,6 +409,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+    public WebApplet[] getApplets() throws SAXException {
+        return getReceivedPage().getApplets();
+    }
+
+
     /**
      * Returns a copy of the domain object model tree associated with this response.
      * If the response is HTML, it will use a special parser which can transform HTML into an XML DOM.
