@@ -246,10 +246,12 @@ public class WebRequest {
 
 
     private void validateProtocol( String urlString ) {
-        String protocol = urlString.substring( 0, urlString.indexOf( ':' ) );
-        if (protocol.length() == 0) {
+        if (urlString.indexOf(':') <= 0) {
             throw new RuntimeException( "No protocol specified in URL '" + urlString + "'" );
-        } else if (protocol.equalsIgnoreCase( "http" )) {
+        }
+
+        String protocol = urlString.substring( 0, urlString.indexOf( ':' ) );
+        if (protocol.equalsIgnoreCase( "http" )) {
             return;
         } else if (protocol.equalsIgnoreCase( "https" )) {
             validateHttpsProtocolSupport();

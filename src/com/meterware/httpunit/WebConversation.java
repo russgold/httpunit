@@ -245,6 +245,9 @@ public class WebConversation {
         for (int i = 1; true; i++) {
             String key = connection.getHeaderFieldKey( i );
             if (key == null) break;
+            if (HttpUnitOptions.isLoggingHttpHeaders()) {
+                System.out.println( "Header:: " + connection.getHeaderFieldKey( i ) + ": " + connection.getHeaderField(i) );
+            }
             if (!key.equalsIgnoreCase( "Set-Cookie" )) continue;
             StringTokenizer st = new StringTokenizer( connection.getHeaderField( i ), "=;" );
             String name = st.nextToken();

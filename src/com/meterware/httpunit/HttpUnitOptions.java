@@ -80,6 +80,22 @@ public class HttpUnitOptions {
     }
 
 
+    /**
+     * Returns true if HTTP headers are to be dumped to system output.
+     **/
+    public static boolean isLoggingHttpHeaders() {
+        return _loggingHttpHeaders;
+    }
+
+
+    /**
+     * If true, tells HttpUnit to log HTTP headers to system output. The default is false.
+     **/
+    public static void setLoggingHttpHeaders( boolean enabled ) {
+        _loggingHttpHeaders = enabled;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
@@ -88,6 +104,8 @@ public class HttpUnitOptions {
     private static boolean _parameterValuesValidated = true;
 
     private static boolean _imagesTreatedAsAltText;
+
+    private static boolean _loggingHttpHeaders;
 
 }
 

@@ -1,19 +1,22 @@
 HttpUnit release notes
 
 Known problems:
-    1. Unnamed frames are not handled correctly
-    2. The "_parent" and "_empty" targets are not handled correctly
+    1. The "_parent" and "_empty" frame targets are not handled correctly
+    2. The "_self" target only works for links
 
 Limitations: HttpUnit does not support JavaScript
 
 Acknowledgements:
 Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
 Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink,
-                        and for correcting my set up of the https protocol handling.
+                        and for correcting the set up of the https protocol handling.
 Thanks to Perry Doell for the methods to examine cookies on WebConversation
 Thanks to Ken Hygh for the proper handling of parameters with no specified type 
 
 Revision History:
+Problems corrected:
+    1. Unnamed frames are now handled
+
  6-Oct-00
 Problems corrected:
     1. Base tag is now handled to override defaults for page URL and target

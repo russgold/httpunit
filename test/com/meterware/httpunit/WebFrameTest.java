@@ -98,6 +98,64 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    public void testFrameURLBase() throws Exception {
+        defineWebPage( "Deeper/Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
+        defineWebPage( "Deeper/Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );
+        defineWebPage( "Deeper/Form",    "This is a page with a simple form: " + 
+                                  "<form action=submit><input name=name><input type=submit></form>" +
+                                  "<a href=Linker.html target=red>a link</a>");
+        defineResource( "Frames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE>" +
+                        "<base href=\"" + getHostPath() + "/Deeper/Frames.html\"></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src=\"Linker.html\" name=\"red\">" +
+                        "    <FRAME src=Form.html name=blue>" +
+                        "</FRAMESET></HTML>" );
+
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
+
+        response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
+        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
+        assertEquals( "URL for second request", getHostPath() + "/Deeper/Target.html", response.getURL().toExternalForm() );
+    }
+
+
+    public void testUnnamedFrames() throws Exception {
+        defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
+        defineWebPage( "Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );
+        defineWebPage( "Form",    "This is a page with a simple form: " + 
+                                  "<form action=submit><input name=name><input type=submit></form>" +
+                                  "<a href=Linker.html target=red>a link</a>");
+        defineResource( "Frames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src=\"Linker.html\">" +
+                        "    <FRAME src=Form.html>" +
+                        "</FRAMESET></HTML>" );
+
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse linker = getFrameWithURL( _wc, "Linker" );
+        assertNotNull( "Linker not found", linker );
+
+        response = _wc.getResponse( linker.getLinks()[0].getRequest() );
+        WebResponse target = getFrameWithURL( _wc, "Target" );
+        assert( "Second response not the same as source frame contents", response == target );
+    }
+
+
+    private WebResponse getFrameWithURL( WebConversation wc, String urlString ) {
+        String[] names = wc.getFrameNames();
+        for (int i = 0; i < names.length; i++) {
+            WebResponse candidate = wc.getFrameContents( names[i] );
+            if (candidate.getURL().toExternalForm().indexOf( urlString ) >= 0) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
+
     public void testCrossFrameLinks() throws Exception {
         WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
 
@@ -142,6 +200,17 @@ public class WebFrameTest extends HttpUnitTest {
         WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
+    }
+
+
+    public void notestParentTarget() throws Exception {
+        defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html target=_parent>one link</a>" );
+
+        _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
+        assertMatchingSet( "Frames defined for the conversation", new String[] { "_top" }, _wc.getFrameNames() );
+        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "_top" ) );
         assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
     }
 

@@ -84,32 +84,12 @@ public class WebResponse {
      * Returns the names of the frames found in the page in the order in which they appear.
      **/
     public String[] getFrameNames() throws SAXException {
-        NodeList frames = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
-        String[] result = new String[ frames.getLength() ];
+        WebFrame[] frames = getFrames();
+        String[] result = new String[ frames.length ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = NodeUtils.getNodeAttribute( frames.item(i), "name" );
+            result[i] = frames[i].getName();
         }
 
-        return result;
-    }
-
-
-    /**
-     * Returns the frames found in the page in the order in which they appear.
-     **/
-    public WebRequest[] getFrameRequests() throws SAXException {
-        NodeList frames = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
-        Vector requests = new Vector();
-        for (int i = 0; i < frames.getLength(); i++) {
-            if (NodeUtils.getNodeAttribute( frames.item(i), "src" ).length() > 0) {
-                requests.addElement( new GetMethodWebRequest( getReceivedPage().getBaseURL(), 
-                                                     NodeUtils.getNodeAttribute( frames.item(i), "src" ),
-                                                     NodeUtils.getNodeAttribute( frames.item(i), "name" ) ) );
-            }
-        }
-
-        WebRequest[] result = new WebRequest[ requests.size() ];
-        requests.copyInto( result );
         return result;
     }
 
@@ -232,6 +212,24 @@ public class WebResponse {
     }
 
 
+    /**
+     * Returns the frames found in the page in the order in which they appear.
+     **/
+    WebRequest[] getFrameRequests() throws SAXException {
+        WebFrame[] frames = getFrames();
+        Vector requests = new Vector();
+        for (int i = 0; i < frames.length; i++) {
+            if (frames[i].hasInitialRequest()) {
+                requests.addElement( frames[i].getInitialRequest() );
+            }
+        }
+
+        WebRequest[] result = new WebRequest[ requests.size() ];
+        requests.copyInto( result );
+        return result;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
@@ -240,6 +238,8 @@ public class WebResponse {
 
 
     final private static String HTML_CONTENT = "text/html";
+
+    private WebFrame[] _frames;
 
     private ReceivedPage _page;
 
@@ -293,6 +293,22 @@ public class WebResponse {
         } catch (IOException e) {
             throw new RuntimeException( "Unable to retrieve data from URL: " + url.toExternalForm() + " (" + e + ")" );
         }
+    }
+
+
+    private WebFrame[] getFrames() throws SAXException {
+        if (_frames == null) {
+            NodeList nl = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
+            Vector list = new Vector();
+            for (int i = 0; i < nl.getLength(); i++) {
+                Node child = nl.item(i);
+                list.addElement( new WebFrame( getReceivedPage().getBaseURL(), child ) );
+            }
+            _frames = new WebFrame[ list.size() ];
+            list.copyInto( _frames );
+        }
+
+        return _frames;
     }
 
 
