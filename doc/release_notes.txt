@@ -20,6 +20,9 @@ Additions:
     1. ServletUnit now caches its servlet instances so that multiple invocations can use the same instance.  This more
        closely matches the servlet spec.
     2. Leading and trailing spaces in web.xml text nodes are now ignored.
+    3. If no other mapping matches a servlet name in a URL, ServletUnit will try to treat it as a servlet class name.
+       This means that you can use something like http://localhost/com.nowhere.MyServlet to access your servlet without
+       explicitly registering it.
 
 14-May-2002
 Additions:

@@ -51,6 +51,7 @@ import org.xml.sax.SAXException;
  * application. It is usually extracted from web.xml.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="balld@webslingerZ.com">Donald Ball</a>
  **/
 class WebApplication {
 
@@ -487,9 +488,6 @@ class WebApplication {
     /**
      * A utility class for mapping servlets to url patterns. This implements the
      * matching algorithm documented in section 10 of the JSDK-2.2 reference.
-     *
-     * @author <a href="balld@webslingerZ.com">Donald Ball</a>
-     * @version $Revision$
      */
     class ServletMapping {
 
@@ -522,31 +520,45 @@ class WebApplication {
 
 
         ServletConfiguration get( String url ) {
-            if (_exactMatches.containsKey( url )) {
-                return (ServletConfiguration) _exactMatches.get( url );
+            if (_exactMatches.containsKey( url )) return (ServletConfiguration) _exactMatches.get( url );
+
+            Map context = getContextForLongestPathPrefix( url );
+            if (context.containsKey( "*" )) return (ServletConfiguration) context.get( "*" );
+
+            if (_extensions.containsKey( getExtension( url ))) return (ServletConfiguration) _extensions.get( getExtension( url ) );
+
+            if (_urlTree.containsKey( "/" )) return (ServletConfiguration) _urlTree.get( "/" );
+
+            String className = url.substring( 1 );
+            try {
+                Class.forName( className );
+                return new ServletConfiguration( className );
+            } catch (ClassNotFoundException e) {
+                return null;
             }
-            ParsedPath path = new ParsedPath( url );
+        }
+
+
+        private Map getContextForLongestPathPrefix( String url ) {
             Map context = _urlTree;
+
+            ParsedPath path = new ParsedPath( url );
             while (path.hasNext()) {
                 String part = path.next();
-                if (!context.containsKey( part )) {
-                    if (context.containsKey( "*" )) {
-                        return (ServletConfiguration) context.get( "*" );
-                    } else {
-                        int index = url.lastIndexOf( '.' );
-                        if (index == -1 || index == url.length() - 1) {
-                            return null;
-                        } else {
-                            return (ServletConfiguration) _extensions.get( url.substring( index + 1 ) );
-                        }
-                    }
-                }
+                if (!context.containsKey( part )) break;
                 context = (Map) context.get( part );
             }
-            if (context.containsKey( "*" )) {
-                return (ServletConfiguration) context.get( "*" );
+            return context;
+        }
+
+
+        private String getExtension( String url ) {
+            int index = url.lastIndexOf( '.' );
+            if (index == -1 || index >= url.length() - 1) {
+                return "";
+            } else {
+                return url.substring( index + 1 );
             }
-            return (ServletConfiguration) context.get( "/" );
         }
 
     }

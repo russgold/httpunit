@@ -4,12 +4,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -38,8 +38,8 @@ public class StatelessTest extends TestCase {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-    
-    
+
+
     public static Test suite() {
         return new TestSuite( StatelessTest.class );
     }
@@ -72,6 +72,17 @@ public class StatelessTest extends TestCase {
         WebRequest request   = new GetMethodWebRequest( "http://localhost/" + resourceName );
         assertEquals( "First reply", "1", sr.getResponse( request ).getText().trim() );
         assertEquals( "Second reply", "2", sr.getResponse( request ).getText().trim() );
+    }
+
+
+    public void testServletAccessByClassName() throws Exception {
+        ServletRunner sr = new ServletRunner();
+
+        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + SimpleGetServlet.class.getName() );
+        WebResponse response = sr.getResponse( request );
+        assertNotNull( "No response received", response );
+        assertEquals( "content type", "text/html", response.getContentType() );
+        assertEquals( "requested resource", SimpleGetServlet.RESPONSE_TEXT, response.getText() );
     }
 
 

@@ -31,7 +31,6 @@ import java.util.Properties;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import org.xml.sax.SAXException;
@@ -165,9 +164,8 @@ public class WebXMLTest extends TestCase {
 
         ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient  wc = sr.newClient();
-        WebResponse response = null;
         try {
-            response = wc.getResponse( "http://localhost/SimpleServlet" );
+            wc.getResponse( "http://localhost/SimpleServlet" );
             fail( "Did not insist on validation for access to servlet" );
         } catch (AuthorizationRequiredException e) {
             assertEquals( "Realm", "Sample Realm", e.getAuthenticationParameter( "realm" ) );
@@ -251,7 +249,7 @@ public class WebXMLTest extends TestCase {
 
         try {
             ic = wc.newInvocation( "http://localhost/SimpleServlet" );
-            Servlet servlet = ic.getServlet();
+            ic.getServlet();
             fail("Attempt to access url outside of the webapp context path should have thrown a 404");
         } catch (com.meterware.httpunit.HttpNotFoundException e) {}
     }
@@ -277,7 +275,7 @@ public class WebXMLTest extends TestCase {
         assertTrue(ic.getServlet() instanceof Servlet3);
         try {
             ic = wc.newInvocation("http://localhost/catalog/index.html");
-            Servlet servlet = ic.getServlet();
+            ic.getServlet();
             fail("Should have gotten a 404");
         } catch (HttpNotFoundException e) {}
         ic = wc.newInvocation("http://localhost/catalog/racecar.bop");
@@ -286,9 +284,6 @@ public class WebXMLTest extends TestCase {
         assertTrue(ic.getServlet() instanceof Servlet4);
     }
 
-    private final static String DOCTYPE = "<!DOCTYPE web-app PUBLIC " +
-                                          "   \"-//Sun Microsystems, Inc.//DTD WebApplication 2.2//EN\" " +
-                                          "   \"http://java.sun/com/j2ee/dtds/web-app_2_2.dtd\">";
 
 //===============================================================================================================
 
@@ -343,6 +338,7 @@ public class WebXMLTest extends TestCase {
     static class Servlet2 extends SimpleGetServlet {}
     static class Servlet3 extends SimpleGetServlet {}
     static class Servlet4 extends SimpleGetServlet {}
+    static class Servlet5 extends SimpleGetServlet {}
 
 }
 
