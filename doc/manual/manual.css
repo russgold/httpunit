@@ -1,0 +1,6 @@
+FORM.sample { margin-left: 2%; margin-right: 2%;
+      padding-top: .5em; padding-bottom: .5em; padding-right: .5em; padding-left: .5em;
+      background-color: #cccccc; border-color: #0000cc; border-width: 2; border-style: solid }
+
+H2 { padding-left: .5em; padding-top: .5em; padding-bottom: .5 em; margin-bottom: 1em;
+     background-color: #e3e3e3; border-color: #000000; border-width: 2; border-style: solid }
