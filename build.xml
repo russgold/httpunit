@@ -5,7 +5,7 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
-    <property name="version" value="0.9" />
+    <property name="version" value="0.9.1" />
     <property name="zip_version" value="0_9" /> 
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
