@@ -14,6 +14,13 @@ Limitations:
 
 Revision History:
 17-Jun-2003
+Acknowledgements:
+    Thanks to Lloyd McKenzie for finding a problem with listing cookie names and suggesting a fix.
+
+Problems fixed:
+    1. bug #750846: Cannot retrieve all cookie names when both global and site-specific cookies are defined.
+    2. bug #744214: ServletUnit does not recognize subframes
+
 Additions:
     1. A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
     2. It is now possible to define a CookieListener on CookieProperties to watch for cookie rejection events

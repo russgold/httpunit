@@ -101,7 +101,7 @@ public class CookieJar {
             names[i] = ((Cookie) _globalCookies.get(i)).getName();
         }
         for (int i = numGlobalCookies; i < names.length; i++) {
-            names[ i + numGlobalCookies ] = ((Cookie) _cookies.get(i)).getName();
+            names[i] = ((Cookie) _cookies.get( i-numGlobalCookies )).getName();
         }
         return names;
     }
