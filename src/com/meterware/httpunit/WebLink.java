@@ -19,9 +19,14 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import java.net.URL;
 
+import java.util.Vector;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
@@ -30,17 +35,94 @@ import org.w3c.dom.Node;
  * on the link.
  *
  * @author Russell Gold
+ * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
  **/
 public class WebLink extends WebRequestSource {
-
 
     /**
      * Creates and returns a web request which will simulate clicking on this link.
      **/
     public WebRequest getRequest() {
-        WebRequest request = new GetMethodWebRequest( getBaseURL(), getURLString(), getTarget() );
+        WebRequest request = new GetMethodWebRequest( getBaseURL(), getBareURL(), getTarget() );
+        addPresetParameters( request );
         request.setRequestHeader( "Referer", getBaseURL().toExternalForm() );
         return request;
+    }
+
+
+    /**
+     * Strips a URL from its parameters
+     **/
+    private String getBareURL() {
+        String url = getURLString();
+        int questionMarkIndex = url.indexOf("?");
+        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
+            return url.substring(0, questionMarkIndex);
+        }
+        return url;
+    }
+
+
+    private void addPresetParameters(WebRequest request) {
+        Hashtable params = getPresetParameters();
+        Enumeration e = params.keys();
+        while (e.hasMoreElements()) {
+            String key = (String) e.nextElement();
+            request.setParameter( key, (String[]) params.get( key ) );
+        }
+    }
+
+
+    /**
+     * Gets all parameters from a URL
+     **/
+    private String getParametersString() {
+        String url = getURLString();
+        int questionMarkIndex = url.indexOf("?");
+        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
+            return url.substring(questionMarkIndex + 1);
+        }
+        return "";
+    }
+
+
+    /**
+     * Builds list of parameters
+     **/
+    private Hashtable getPresetParameters() {
+        Hashtable params = new Hashtable();
+        StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
+        while (st.hasMoreTokens()) stripOneParameter( params, st.nextToken() );
+        return params;
+    }
+
+
+    /**
+     * add a pair key-value to the hashtable, creates an array of values if param already exists.
+     **/
+    private void stripOneParameter(Hashtable params, String param) {
+        int index = param.indexOf("=");
+        if (index <= 0 || index == param.length() - 1) return;
+
+        String value = param.substring(index + 1);
+        String key = param.substring(0, index);
+        params.put( key, withNewValue( (String[]) params.get( key ), value ) );
+    }
+
+
+    /**
+     * Returns a string array created by appending a string to an existing array. The existing array may be null.
+     **/
+    private String[] withNewValue( String[] oldValue, String newValue ) {
+        String[] result;
+        if (oldValue == null) {
+            result = new String[] { newValue };
+        } else {
+            result = new String[ oldValue.length+1 ];
+            System.arraycopy( oldValue, 0, result, 0, oldValue.length );
+            result[ oldValue.length ] = newValue;
+        }
+        return result;
     }
 
 
@@ -77,5 +159,9 @@ public class WebLink extends WebRequestSource {
         super( node, baseURL, parentTarget );
     }
 
-}
+//---------------------------------- private members --------------------------------
 
+    private static final Hashtable NO_PARAMS = new Hashtable();
+    private static final String PARAM_DELIM = "&";
+
+}

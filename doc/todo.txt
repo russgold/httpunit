@@ -2,6 +2,7 @@ High Priority
 o Allow servlet initialization parameters in registerServlet
 o Add support for getLinkWithName
 o Add WebResponse.getMetaContent (returns array of matching content entries)
+o Prevent setParameter calls from working on requests built from links if validation is enabled
 
 Medium priority:
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)

@@ -5,10 +5,18 @@ Known problems:
     2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
     3. No order is guaranteed for parameters from forms, contrary to the HTML 4.01 spec
+    4. No parameter validation is done for requests built from links
 
 Limitations: HttpUnit does not support JavaScript
 
 Revision History:
+
+24-Oct-2001
+   Acknowledgements:
+       Thanks to Benoit Xhenseval for adding parameter detection in links.
+
+   Additions:
+       1. getParameter() and getParameterNames() now works for requests built from links with embedded parameters.
 
 19-Oct-2001
    Additions:

@@ -2,14 +2,14 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -27,18 +27,22 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import java.util.Vector;
+import java.util.Enumeration;
 
 
 /**
- * A unit test of the httpunit parsing classes.
+ * Tests for the WebLink class.
+ *
+ * @author <a href="mailto:russgold@acm.org>Russell Gold</a>
+ * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
  **/
 public class WebLinkTest extends HttpUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+
+
     public static Test suite() {
         return new TestSuite( WebLinkTest.class );
     }
@@ -62,8 +66,8 @@ public class WebLinkTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         _simplePage = wc.getResponse( getHostPath() + "/SimplePage.html" );
     }
-	
-	
+
+
     public void testFindNoLinks() throws Exception {
         defineResource( "NoLinks.html", "<html><head><title>NoLinks</title></head><body>No links at all</body></html>" );
         WebConversation wc = new WebConversation();
@@ -79,7 +83,7 @@ public class WebLinkTest extends HttpUnitTest {
         assertNotNull( links );
         assertEquals( 2, links.length );
     }
-    
+
 
     public void testLinkRequest() throws Exception {
         WebLink link = _simplePage.getLinks()[0];
@@ -127,7 +131,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         defineWebPage( "Initial", "Go to <a href=\"Next.html\">the next page.</a> <a name=\"bottom\">Bottom</a>" );
         defineWebPage( "Next", "And go back to <a href=\"Initial.html#Bottom\">the first page.</a>" );
-        
+
         WebResponse initialPage = wc.getResponse( getHostPath() + "/Initial.html" );
         assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
         WebLink link = initialPage.getLinks()[0];
@@ -159,7 +163,7 @@ public class WebLinkTest extends HttpUnitTest {
         assert( "Did not find the target", nextPage.getText().indexOf( "Found" ) >= 0 );
     }
 
-                              
+
     public void testTargetBase() throws Exception {
         WebConversation wc = new WebConversation();
         defineWebPage( "alternate/Target", "Found me!" );
@@ -174,6 +178,87 @@ public class WebLinkTest extends HttpUnitTest {
         WebRequest request = link.getRequest();
         assertEquals( "Target for link", "blue", request.getTarget() );
     }
+
+
+    public void testParametersOnLinks() throws Exception {
+        defineResource( "ParameterLinks.html",
+                        "<html><head><title>Param on Link Page</title></head>\n" +
+                        "<body>" +
+                        "<a href=\"/other.html\">no parameter link</A>\n" +
+                        "<a href=\"/other.html?param1=value1\">one parameter link</A>\n" +
+                        "<a href=\"/other.html?param1=value1&param2=value2\">two parameters link</A>\n" +
+                        "<a href=\"/other.html?param1=value1&param1=value3\">two values link</A>\n" +
+                        "<a href=\"/other.html?param1=value1&param2=value2&param1=value3\">two values link</A>\n" +
+                        "</body></html>\n" );
+        WebConversation wc = new WebConversation();
+
+        WebLink[] links = wc.getResponse( getHostPath() + "/ParameterLinks.html" ).getLinks();
+        assertNotNull( links );
+        assertEquals( "number of links", 5, links.length );
+		WebRequest request;
+
+		// first link should not have any param
+		request = links[0].getRequest();
+		assertNotNull( request);
+		Enumeration e = request.getParameterNames();
+		assertNotNull( e);
+		assert( !e.hasMoreElements() );
+
+        // second link should have one parameter
+		request = links[1].getRequest();
+		assertNotNull( request );
+		e = request.getParameterNames();
+		assert( e.hasMoreElements() );
+		String paramName = (String)e.nextElement();
+		assertNotNull(paramName);
+		assert(!e.hasMoreElements());
+		assertEquals("param1",paramName);
+		assertEquals("value1",request.getParameter(paramName));
+
+		// third link should have 2 parameters.  !! Order of parameters cannot be guaranted.
+		request = links[2].getRequest();
+		assertNotNull( request );
+		e = request.getParameterNames();
+		assert( e.hasMoreElements() );
+		paramName = (String)e.nextElement();
+		assertNotNull(paramName);
+		assert(e.hasMoreElements());
+    	String paramName2 = (String)e.nextElement();
+		assertNotNull(paramName2);
+		assert("different names",!paramName.equals(paramName2));
+		assert("test names for param1",paramName.equals("param1") || paramName2.equals("param1"));
+		assert("test names for param2",paramName.equals("param2") || paramName2.equals("param2"));
+		assertEquals("value1",request.getParameter("param1"));
+		assertEquals("value2",request.getParameter("param2"));
+
+		// fourth link should have 1 parameter with 2 values.
+		request = links[3].getRequest();
+		assertNotNull( request );
+		e = request.getParameterNames();
+		assert( e.hasMoreElements() );
+		paramName = (String)e.nextElement();
+		assertNotNull(paramName);
+		String[] values = request.getParameterValues("param1");
+		assertEquals("Length of ",2,values.length);
+		assertMatchingSet("Values",new String[] {"value1", "value3"}, values);
+
+		// fifth link should have 2 parameters with one with 2 values.
+		request = links[4].getRequest();
+		assertNotNull( request );
+		e = request.getParameterNames();
+		assert( e.hasMoreElements() );
+		paramName = (String)e.nextElement();
+		assertNotNull(paramName);
+		assert( e.hasMoreElements() );
+		paramName2 = (String)e.nextElement();
+		assertNotNull(paramName2);
+		assert("different names",!paramName.equals(paramName2));
+		values = request.getParameterValues("param1");
+		assertEquals("Length of ",2,values.length);
+		assertMatchingSet("Values for param1",new String[] {"value1", "value3"}, values);
+		assertMatchingSet("Values form param2",new String[] {"value2"}, request.getParameterValues("param2"));
+		assertEquals("value2",request.getParameter("param2"));
+	}
 
 
     public void testImageMapLinks() throws Exception {
@@ -193,9 +278,5 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "Relative URL", "guide.html", guide.getURLString() );
     }
 
-
-
     private WebResponse _simplePage;
-
-
 }
