@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2002, Russell Gold
+* Copyright (c) 2001-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -129,6 +129,14 @@ abstract class FormControl extends HTMLElementBase {
      **/
     boolean isReadOnly() {
         return _readOnly || _disabled;
+    }
+
+
+    /**
+     * Returns true if this control is hidden.
+     **/
+    boolean isHidden() {
+        return false;
     }
 
 
@@ -698,6 +706,10 @@ class HiddenFieldFormControl extends TextFieldFormControl {
     void claimValue( List values ) {
     }
 
+
+    boolean isHidden() {
+        return true;
+    }
 }
 
 

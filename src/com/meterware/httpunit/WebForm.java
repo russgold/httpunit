@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -409,6 +409,15 @@ public class WebForm extends WebRequestSource {
      **/
     public boolean isDisabledParameter( String name ) {
         return getParameter( name ).isDisabledParameter();
+    }
+
+
+    /**
+     * Returns true if the named parameter is hidden. If more than one control exists with the same name,
+     * will return true only if all such controls are hidden.
+     **/
+    public boolean isHiddenParameter( String name ) {
+        return getParameter( name ).isHiddenParameter();
     }
 
 

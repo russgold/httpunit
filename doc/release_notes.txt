@@ -14,8 +14,11 @@ Revision History:
  5-Feb-2003
 Acknowledgements:
     Thanks to Navid Vahdat for ServletUnit fixes for invalid session handling and request dispatcher paths
+    Thanks to Daniel Sheppard for correcting the return status for HttpServletResponse.sendRedirect
+
 Additions:
     1. ServletUnit now supports HttpServletResponse.flushBuffer()
+    2. WebForm.isHiddenParameter returns true if all parameters with the specified name are hidden
 
 Problems Fixed:
     1. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
@@ -25,7 +28,7 @@ Problems Fixed:
 
  4-Feb-2003
 Acknowledgements:
-    Thanks to Daniel Sheppard and Krystyna Polomski for identifying a problem with meta refresh tags.
+    Thanks to Daniel Sheppard for identifying a problem with meta refresh tags.
 
 Additions:
     1. Added support for <iframe> tag. IFrames work just like regular frames, except that they are embedded in a response

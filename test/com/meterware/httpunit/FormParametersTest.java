@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -132,14 +132,19 @@ public class FormParametersTest extends HttpUnitTest {
 
     public void testHiddenParameters() throws Exception {
         defineWebPage( "Default", "<form method=GET action = '/ask'>" +
-                                       "<Input type=hidden name=secret value=value>" +
-                                       "<Input type=submit></form>" );
+                                  "<Input type=text name=open value=value>" +
+                                  "<Input type=hidden name=secret value=value>" +
+                                  "<Input type=submit></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
-        WebRequest request = page.getForms()[0].getRequest();
+
+        final WebForm form = page.getForms()[0];
+        assertFalse( "Should not call 'open' hidden", form.isHiddenParameter( "open") );
+        assertTrue( "Should have called 'secret' hidden", form.isHiddenParameter( "secret") );
+
+        WebRequest request = form.getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
         validateSetParameterRejected( request, "secret", new String[] { "red" }, "setting hidden field to wrong value" );
 
-        WebForm form = page.getForms()[0];
         form.getScriptableObject().setParameterValue( "secret", "new" );
         assertEquals( "New hidden value", "new", form.getParameterValue( "secret" ) );
     }
