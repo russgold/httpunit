@@ -100,7 +100,7 @@ public class MessageBodyWebRequest extends WebRequest {
     public static class InputStreamMessageBody extends MessageBody {
     
     
-        InputStreamMessageBody( MessageBodyWebRequest request, InputStream source, String contentType ) {
+        public InputStreamMessageBody( MessageBodyWebRequest request, InputStream source, String contentType ) {
             super( request );
             _source = source;
             _contentType = contentType;
