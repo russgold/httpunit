@@ -1,7 +1,7 @@
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001, Russell Gold
+ * Copyright (c) 2001-2002, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -72,7 +72,44 @@ public class WebRequestSource {
     public WebRequest getRequest();
 
 
- //----------------------------- protected members ---------------------------------------------
+    /**
+     * Returns an array containing the names of any parameters to be sent on a request based on this request source.
+     **/
+    abstract
+    public String[] getParameterNames();
+
+
+    /**
+     * Returns the values of the named parameter.
+     **/
+    abstract
+    public String[] getParameterValues( String name );
+
+
+    /**
+     * Returns the character set encoding for the request.
+     **/
+    String getCharacterSet() {
+        return "iso-8859-1";
+    }
+
+
+    /**
+     * Returns the URL relative to the current page which will handle the request.
+     */
+    abstract
+    String getRelativeURL();
+
+
+    /**
+     * Returns true if the specified name is that of a file parameter. The default implementation returns false.
+     */
+    boolean isFileParameter( String name ) {
+        return false;
+    }
+
+
+//----------------------------- protected members ---------------------------------------------
 
     /**
      * Contructs a web form given the URL of its source page and the DOM extracted

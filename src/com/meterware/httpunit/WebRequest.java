@@ -235,9 +235,12 @@ public class WebRequest implements ParameterHolder {
     /**
      * Constructs a web request from a form.
      **/
-    protected WebRequest( URL urlBase, String urlString, String target, WebForm sourceForm, SubmitButton button ) {
-        this( urlBase, urlString, target );
+    protected WebRequest( WebForm sourceForm, SubmitButton button ) {
+        this( sourceForm.getBaseURL(), sourceForm.getRelativeURL(), sourceForm.getTarget() );
         _sourceForm   = sourceForm;
+        _parameterCollection = new UncheckedParameterCollection( sourceForm );
+
+        setHeaderField( "Referer", sourceForm.getBaseURL().toExternalForm() );
 
         if (button != null && button.getName().length() > 0) {
             _parameterCollection._parameters.put( button.getName(), button.getValue() );
@@ -328,22 +331,12 @@ public class WebRequest implements ParameterHolder {
         return _parameterCollection._parameters.size() == 0;
     }
 
+
     final
     protected String getParameterString() {
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
-        Enumeration e = _parameterCollection._parameters.keys();
-
-        while (e.hasMoreElements()) {
-            String name = (String) e.nextElement();
-            Object value = _parameterCollection._parameters.get( name );
-            if (value instanceof String) {
-                appendParameter( sb, name, (String) value, e.hasMoreElements() );
-            } else {
-                appendParameters( sb, name, (String[]) value, e.hasMoreElements() );
-            }
-        }
-        return sb.toString();
+        return _parameterCollection.getParameterString();
     }
+
 
 
 //---------------------------------- package members --------------------------------
@@ -465,53 +458,6 @@ public class WebRequest implements ParameterHolder {
     private Hashtable    _headers;
 
     private boolean      _httpsProtocolSupportEnabled;
-
-
-    private void appendParameters( StringBuffer sb, String name, String[] values, boolean moreToCome ) {
-        for (int i = 0; i < values.length; i++) {
-            appendParameter( sb, name, values[i], (i < values.length-1 || moreToCome ) );
-        }
-    }
-
-
-    private void appendParameter( StringBuffer sb, String name, String value, boolean moreToCome ) {
-        sb.append( encode( name ) );
-        if (value != null) sb.append( '=' ).append( encode( value ) );
-        if (moreToCome) sb.append( '&' );
-    }
-
-
-    /**
-     * Returns a URL-encoded version of the string, including all eight bits, unlike URLEncoder, which strips the high bit.
-     **/
-    private String encode( String source ) {
-        if (_sourceForm == null || _sourceForm.getCharacterSet().equalsIgnoreCase( "iso-8859-1" )) {
-            return URLEncoder.encode( source );
-        } else {
-            try {
-                byte[] rawBytes = source.getBytes( _sourceForm.getCharacterSet() );
-                StringBuffer result = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
-                for (int i = 0; i < rawBytes.length; i++) {
-                    int candidate = rawBytes[i] & 0xff;
-                    if (candidate == ' ') {
-                        result.append( '+' );
-                    } else if ((candidate >= 'A' && candidate <= 'Z') ||
-                               (candidate >= 'a' && candidate <= 'z') ||
-                               (candidate == '.') ||
-                               (candidate >= '0' && candidate <= '9')) {
-                        result.append( (char) rawBytes[i] );
-                    } else if (candidate < 16) {
-                        result.append( "%0" ).append( Integer.toHexString( candidate ).toUpperCase() );
-                    } else {
-                        result.append( '%' ).append( Integer.toHexString( candidate ).toUpperCase() );
-                    }
-                }
-                return result.toString();
-            } catch (java.io.UnsupportedEncodingException e) {
-                return "????";    // XXX should pass the exception through as IOException ultimately
-            }
-        }
-    }
 
 
     private void validateParameterValue( String name, String value ) {

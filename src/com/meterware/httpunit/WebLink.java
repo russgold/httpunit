@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,8 +21,10 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.w3c.dom.Node;
@@ -36,94 +38,6 @@ import org.w3c.dom.Node;
  * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
  **/
 public class WebLink extends WebRequestSource {
-
-    /**
-     * Creates and returns a web request which will simulate clicking on this link.
-     **/
-    public WebRequest getRequest() {
-        WebRequest request = new GetMethodWebRequest( getBaseURL(), getBareURL(), getTarget() );
-        addPresetParameters( request );
-        request.setHeaderField( "Referer", getBaseURL().toExternalForm() );
-        return request;
-    }
-
-
-    /**
-     * Strips a URL from its parameters
-     **/
-    private String getBareURL() {
-        final String url = getURLString();
-        final int questionMarkIndex = url.indexOf("?");
-        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
-            return url.substring(0, questionMarkIndex);
-        }
-        return url;
-    }
-
-
-    private void addPresetParameters(WebRequest request) {
-        Hashtable params = getPresetParameters();
-        Enumeration e = params.keys();
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
-            request.setParameter( key, (String[]) params.get( key ) );
-        }
-    }
-
-
-    /**
-     * Gets all parameters from a URL
-     **/
-    private String getParametersString() {
-        final String url = getURLString();
-        final int questionMarkIndex = url.indexOf("?");
-        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
-            return url.substring(questionMarkIndex + 1);
-        }
-        return "";
-    }
-
-
-    /**
-     * Builds list of parameters
-     **/
-    private Hashtable getPresetParameters() {
-        Hashtable params = new Hashtable();
-        StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
-        while (st.hasMoreTokens()) stripOneParameter( params, st.nextToken() );
-        return params;
-    }
-
-
-    /**
-     * add a pair key-value to the hashtable, creates an array of values if param already exists.
-     **/
-    private void stripOneParameter( Hashtable params, String param ) {
-        final int index = param.indexOf( "=" );
-        String value = ((index < 0) ? null
-                           : ((index == param.length() - 1)
-                               ? ""
-                               : HttpUnitUtils.decode( param.substring( index + 1 ) )));
-        String key = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
-        params.put( key, withNewValue( (String[]) params.get( key ), value ) );
-    }
-
-
-    /**
-     * Returns a string array created by appending a string to an existing array. The existing array may be null.
-     **/
-    private String[] withNewValue( String[] oldValue, String newValue ) {
-        String[] result;
-        if (oldValue == null) {
-            result = new String[] { newValue };
-        } else {
-            result = new String[ oldValue.length+1 ];
-            System.arraycopy( oldValue, 0, result, 0, oldValue.length );
-            result[ oldValue.length ] = newValue;
-        }
-        return result;
-    }
-
 
     /**
      * Returns the URL referenced by this link. This may be a relative URL.
@@ -153,7 +67,52 @@ public class WebLink extends WebRequestSource {
     }
 
 
-//---------------------------------- package members --------------------------------
+//----------------------------------------- WebRequestSource methods ---------------------------------------------------
+
+
+    /**
+     * Creates and returns a web request which will simulate clicking on this link.
+     **/
+    public WebRequest getRequest() {
+        WebRequest request = new GetMethodWebRequest( getBaseURL(), getRelativeURL(), getTarget() );
+        addPresetParameters( request );
+        request.setHeaderField( "Referer", getBaseURL().toExternalForm() );
+        return request;
+    }
+
+
+    /**
+     * Returns an array containing the names of any parameters defined as part of this link's URL.
+     **/
+    public String[] getParameterNames() {
+        ArrayList parameterNames = new ArrayList( getPresetParameters().keySet() );
+        return (String[]) parameterNames.toArray( new String[ parameterNames.size() ] );
+    }
+
+
+    /**
+     * Returns the multiple default values of the named parameter.
+     **/
+    public String[] getParameterValues( String name ) {
+        final String[] values = (String[]) getPresetParameters().get( name );
+        return values == null ? NO_VALUES : values;
+    }
+
+
+    /**
+     * Returns the HREF URL w/o its parameters.
+     **/
+    String getRelativeURL() {
+        final String url = getURLString();
+        final int questionMarkIndex = url.indexOf("?");
+        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
+            return url.substring(0, questionMarkIndex);
+        }
+        return url;
+    }
+
+
+//--------------------------------------------------- package members --------------------------------------------------
 
 
     /**
@@ -164,9 +123,80 @@ public class WebLink extends WebRequestSource {
         super( node, baseURL, parentTarget );
     }
 
-//---------------------------------- private members --------------------------------
 
-    private static final Hashtable NO_PARAMS = new Hashtable();
+//--------------------------------------------------- private members --------------------------------------------------
+
+
+    private static final String[] NO_VALUES = new String[0];
     private static final String PARAM_DELIM = "&";
+
+    private Map _presetParameters;
+
+
+    private void addPresetParameters(WebRequest request) {
+        Map params = getPresetParameters();
+        Iterator i = params.keySet().iterator();
+        while (i.hasNext()) {
+            String key = (String) i.next();
+            request.setParameter( key, (String[]) params.get( key ) );
+        }
+    }
+
+
+    /**
+     * Gets all parameters from a URL
+     **/
+    private String getParametersString() {
+        final String url = getURLString();
+        final int questionMarkIndex = url.indexOf("?");
+        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
+            return url.substring(questionMarkIndex + 1);
+        }
+        return "";
+    }
+
+
+    /**
+     * Builds list of parameters
+     **/
+    private Map getPresetParameters() {
+        if (_presetParameters == null) {
+            _presetParameters = new HashMap();
+            StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
+            while (st.hasMoreTokens()) stripOneParameter( _presetParameters, st.nextToken() );
+        }
+        return _presetParameters;
+    }
+
+
+    /**
+     * add a pair key-value to the hashtable, creates an array of values if param already exists.
+     **/
+    private void stripOneParameter( Map params, String param ) {
+        final int index = param.indexOf( "=" );
+        String value = ((index < 0) ? null
+                           : ((index == param.length() - 1)
+                               ? ""
+                               : HttpUnitUtils.decode( param.substring( index + 1 ) )));
+        String key = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
+        params.put( key, withNewValue( (String[]) params.get( key ), value ) );
+    }
+
+
+    /**
+     * Returns a string array created by appending a string to an existing array. The existing array may be null.
+     **/
+    private String[] withNewValue( String[] oldValue, String newValue ) {
+        String[] result;
+        if (oldValue == null) {
+            result = new String[] { newValue };
+        } else {
+            result = new String[ oldValue.length+1 ];
+            System.arraycopy( oldValue, 0, result, 0, oldValue.length );
+            result[ oldValue.length ] = newValue;
+        }
+        return result;
+    }
+
 
 }

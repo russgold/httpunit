@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -65,8 +65,8 @@ public class GetMethodWebRequest extends WebRequest {
     /**
      * Constructs a web request for a form.
      **/
-    GetMethodWebRequest( URL urlBase, String urlString, String target, WebForm sourceForm, SubmitButton button ) {
-        super( urlBase, urlString, target, sourceForm, button );
+    GetMethodWebRequest( WebForm sourceForm, SubmitButton button ) {
+        super( sourceForm, button );
     }
 
 

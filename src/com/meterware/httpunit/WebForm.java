@@ -95,8 +95,7 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Returns an array containing the names of the parameters defined for this form,
-     * in the order in which they appear.
+     * Returns an array containing the names of the parameters defined for this form.
      **/
     public String[] getParameterNames() {
         ArrayList parameterNames = new ArrayList( getFormParameters().keySet() );
@@ -283,24 +282,18 @@ public class WebForm extends WebRequestSource {
             }
         }
 
+        if (getMethod().equalsIgnoreCase( "post" )) {
+            return new PostMethodWebRequest( this, button );
+        } else {
+            return new GetMethodWebRequest( this, button );
+        }
+    }
+
+
+    String getRelativeURL() {
         String action = getAction();
         if (action.trim().length() == 0) action = getBaseURL().getFile();
-
-        WebRequest request;
-        if (getMethod().equalsIgnoreCase( "post" )) {
-            request = new PostMethodWebRequest( getBaseURL(), action, getTarget(), this, button );
-        } else {
-            request = new GetMethodWebRequest( getBaseURL(), action, getTarget(), this, button );
-        }
-
-        String[] parameterNames = getParameterNames();
-        for (int i = 0; i < parameterNames.length; i++) {
-            if (parameterNames[i].length() > 0 && !isFileParameter( parameterNames[i] )) {
-                request.setParameter( parameterNames[i], getParameterValues( parameterNames[i] ) );
-            }
-        }
-	    request.setHeaderField( "Referer", getBaseURL().toExternalForm() );
-        return request;
+        return action;
     }
 
 
