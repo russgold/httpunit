@@ -156,7 +156,7 @@ public class CookieTest extends TestCase {
 
     public void testHeaderGeneration() throws Exception {
         CookieJar jar = new CookieJar();
-        jar.addCookie( "zero", "nil" );
+        jar.putCookie( "zero", "nil" );
         jar.updateCookies( newJar( "www.meterware.com/servlets/standard/AServlet", "first=ready" ) );
         jar.updateCookies( newJar( "www.meterware.com/servlets/AnotherServlet", "second=set" ) );
         jar.updateCookies( newJar( "www.httpunit.org", "zero=go; domain=.httpunit.org" ) );

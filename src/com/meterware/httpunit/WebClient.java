@@ -163,9 +163,18 @@ public class WebClient {
 
     /**
      * Defines a cookie to be sent to the server on every request.
+     * @deprecated as of 1.5.5, use #putCookie instead.
      **/
     public void addCookie( String name, String value ) {
         _cookieJar.addCookie( name, value );
+    }
+
+
+    /**
+     * Defines a cookie to be sent to the server on every request. This overrides any previous setting for this cookie name.
+     **/
+    public void putCookie( String name, String value ) {
+        _cookieJar.putCookie( name, value );
     }
 
 

@@ -704,7 +704,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         addResourceHeader( "OnCommand.html", "Set-Cookie: age=12");
         WebConversation wc = new WebConversation();
-        wc.addCookie( "height", "tall" );
+        wc.putCookie( "height", "tall" );
         wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message 1", "cookies: age=12; height=tall", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );

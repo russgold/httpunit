@@ -85,8 +85,22 @@ public class CookieJar {
     /**
      * Defines a cookie to be sent to the server on every request. This bypasses the normal mechanism by which only
      * certain cookies are sent based on their host and path.
+     * @deprecated as of 1.5.5, use #setCookie
      **/
     public void addCookie( String name, String value ) {
+        _globalCookies.add( new Cookie( name, value ) );
+    }
+
+
+    /**
+     * Defines a cookie to be sent to the server on every request. This bypasses the normal mechanism by which only
+     * certain cookies are sent based on their host and path.
+     **/
+    public void putCookie( String name, String value ) {
+        for (Iterator iterator = _globalCookies.iterator(); iterator.hasNext();) {
+            Cookie cookie = (Cookie) iterator.next();
+            if (name.equals( cookie.getName() )) iterator.remove();
+        }
         _globalCookies.add( new Cookie( name, value ) );
     }
 

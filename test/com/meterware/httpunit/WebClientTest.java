@@ -208,6 +208,26 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    public void testManualCookies() throws Exception {
+        defineResource( "bounce", new CookieEcho() );
+        WebConversation wc   = new WebConversation();
+        wc.putCookie( "CUSTOMER", "WILE_E_COYOTE" );
+        WebResponse response = wc.getResponse( getHostPath() + "/bounce" );
+        assertEquals( "Cookies sent", "CUSTOMER=WILE_E_COYOTE", response.getText() );
+        wc.putCookie( "CUSTOMER", "ROAD RUNNER" );
+        response = wc.getResponse( getHostPath() + "/bounce" );
+        assertEquals( "Cookies sent", "CUSTOMER=ROAD RUNNER", response.getText() );
+    }
+
+
+    class CookieEcho extends PseudoServlet {
+
+        public WebResource getGetResponse() throws IOException {
+            return new WebResource( getHeader( "Cookie" ) );
+        }
+    }
+
+
     public void testHeaderFields() throws Exception {
         defineResource( "getHeaders", new PseudoServlet() {
             public WebResource getGetResponse() {

@@ -19,9 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.pseudoserver.PseudoServlet;
-import com.meterware.pseudoserver.WebResource;
-
 import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.File;

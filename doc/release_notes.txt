@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+28-Jul-2004
+   Additions:
+       1. rfe #986876: The WebClient.addCookie method has been deprecated, since its behavior is actually a bit confusing
+          and replaced with "putCookie" allowing subsequent the replacement of a cookie value defined by a previous
+          call to "putCookie."
+
 22-Jul-2004
    Acknowledgements:
        Thanks to Kazuaki Matsuhashi <matsuhashi@quick.co.jp> for correcting the handling of non-Latin link parameters
