@@ -855,6 +855,8 @@ class SelectionFormControl extends FormControl {
                 return _selectionOptions;
             } else if (propertyName.equalsIgnoreCase( "length" )) {
                 return new Integer( getOptionValues().length );
+            } else if (propertyName.equalsIgnoreCase( "value" )) {
+                return getSelectedValue();
             } else if (propertyName.equalsIgnoreCase( "selectedIndex" )) {
                 return new Integer( _selectionOptions.getFirstSelectedIndex() );
             } else {
@@ -863,8 +865,17 @@ class SelectionFormControl extends FormControl {
         }
 
 
+        private String getSelectedValue() {
+            String[] values = getValues();
+            return (values.length == 0 ? "" : values[0] );
+        }
+
+
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "value" )) {
+                ArrayList values = new ArrayList();
+                values.add( value );
+                _selectionOptions.claimUniqueValues( values );
             } else if (propertyName.equalsIgnoreCase( "selectedIndex" )) {
                 if (!(value instanceof Number)) throw new RuntimeException( "selectedIndex must be set to an integer" );
                 _selectionOptions.setSelectedIndex( ((Number) value).intValue() );

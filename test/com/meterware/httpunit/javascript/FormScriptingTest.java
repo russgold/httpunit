@@ -728,4 +728,31 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSelectValueProperty() throws Exception {
+        defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
+                                          "function testProperty( form ) {\n" +
+                                          "   elements = form.choices;\n" +
+                                          "   alert( 'selected item is ' + elements.value );\n" +
+                                          "}" +
+                                          "</script></head>" +
+                                          "<body>" +
+                                          "<form name='the_form'>" +
+                                          "   <select name='choices'>" +
+                                          "      <option>red" +
+                                          "      <option selected>blue" +
+                                          "   </select>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='testProperty( document.the_form )'>elements</a>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+        assertEquals( "Message 1", "selected item is blue", wc.popNextAlert() );
+        response.getScriptableObject().doEvent( "document.the_form.choices.value='red'" );
+        response.getLinks()[0].click();
+        assertEquals( "Message 2", "selected item is red", wc.popNextAlert() );
+    }
+
+
+
 }

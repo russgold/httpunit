@@ -13,7 +13,11 @@ Limitations:
 
 
 Revision History:
- 12-Mar-2002
+ 13-Mar-2003
+Additions:
+    1. Select.value is now supported.
+
+ 12-Mar-2003
 Acknowledgements:
     Thanks to Daniel Jasmin for fixing the handling of applet loading from archives.
 
