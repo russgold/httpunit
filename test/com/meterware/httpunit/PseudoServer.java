@@ -38,6 +38,8 @@ public class PseudoServer {
                     try {
                         handleConnection();
                         Thread.sleep( 50 );
+                    } catch (InterruptedIOException e) {
+                        _active = false;
                     } catch (IOException e) {
                         System.out.println( "Error in pseudo server: " + e );
                         e.printStackTrace();
@@ -359,6 +361,7 @@ public class PseudoServer {
     private ServerSocket getServerSocket() throws IOException {
         synchronized (this) {
             if (_serverSocket == null) _serverSocket = new ServerSocket(0);
+            _serverSocket.setSoTimeout( 1000 );
         }
         return _serverSocket;
     }
