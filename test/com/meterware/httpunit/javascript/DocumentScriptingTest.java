@@ -40,6 +40,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
         super( name );
     }
 
+
     public void testDocumentTitle() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><title>Amazing!</title></head>" +
                                             "<body onLoad='alert(\"Window title is \" + document.title)'></body>" );
@@ -299,5 +300,36 @@ public class DocumentScriptingTest extends HttpUnitTest {
         assertEquals("JavaScript no of forms", "No of forms: 1", wc.popNextAlert());
     }
 
+
+    public void testTagProperty() throws Exception {
+        defineResource( "start.html",
+                "<html><head><script language='JavaScript'>" +
+                "function showFormsCount(oDOM){   " +
+                "   var forms = oDOM.getElementsByTagName('form');" +
+                "   for( i = 0; i < forms.length; i++) {" +
+                "     alert( 'form with number ' + i + ' has ' + forms[i].getElementsByTagName('input').length + ' inputs' );" +
+                "   }" +
+                "}" +
+                "function showAll() {" +
+                "    showFormsCount(document);" +
+                "}" +
+                "</script></head><body onLoad='showAll();'>" +
+                "<a href='somewhere' name='there' title=second>here</a>" +
+                "<form name='perform1' title=fifth><input type='text' name='input' title='input1'></form>" +
+                "<form name='perform2' title=fifth><input type='text' name='input' title='input1'>" +
+                "<input type='hidden' name='input' title='input2'><input type='submit' name='doIt' title=sixth></form>" +
+                "</body></html>"
+                        );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/start.html" );
+
+        assertElementTags( wc, "0", "1");
+        assertElementTags( wc, "1", "3");
+    }
+
+
+    private void assertElementTags( WebConversation wc, String number, final String counts) {
+        assertEquals( "form '" + number + "' message", "form with number " + number + " has " + counts +" inputs", wc.popNextAlert() );
+    }
 
 }

@@ -192,6 +192,14 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     /**
+     * Returns the HTMLPage associated with this request source.
+     */
+    protected HTMLPage getHTMLPage() throws SAXException {
+        return _baseResponse.getReceivedPage();
+    }
+
+
+    /**
      * Extracts any parameters specified as part of the destination URL, calling addPresetParameter for each one
      * in the order in which they are found.
      */

@@ -21,6 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Document;
 
 import java.net.URL;
 import java.util.*;
@@ -164,6 +166,30 @@ class ParsedHTML {
         loadElements();
         ArrayList elements = (ArrayList) _elementsByName.get( name );
         return elements == null ? NO_ELEMENTS : (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
+    }
+
+
+    HTMLElement[] getElementsByTagName( Node dom, String name ) {
+        loadElements();
+        if (dom instanceof Element) {
+            return getElementsFromList( ((Element) dom).getElementsByTagName( name ) );
+        } else {
+            return getElementsFromList( ((Document) dom).getElementsByTagName( name ) );
+        }
+    }
+
+
+    private HTMLElement[] getElementsFromList( NodeList nl ) {
+        HTMLElement[] elements = new HTMLElement[ nl.getLength() ];
+        for (int i = 0; i < elements.length; i++) {
+            Node node = nl.item(i);
+            elements[i] = (HTMLElement) _elements.get( node );
+            if (elements[i] == null) {
+                elements[i] = toDefaultElement( (Element) node );
+                _elements.put( node, elements[i] );
+            }
+        }
+        return elements;
     }
 
 
@@ -796,7 +822,7 @@ class ParsedHTML {
 //---------------------------------- private members --------------------------------
 
 
-    private Node getRootNode() {
+    Node getRootNode() {
         if (_rootNode == null) throw new IllegalStateException( "The root node has not been specified" );
         return _rootNode;
     }

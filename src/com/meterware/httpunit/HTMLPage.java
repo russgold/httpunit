@@ -221,12 +221,12 @@ public class HTMLPage extends ParsedHTML {
 
 
         public ScriptableDelegate[] getElementsByName( String name ) {
-            final HTMLElement[] elements = HTMLPage.this.getElementsByName( name );
-            ScriptableDelegate[] result = new ScriptableDelegate[ elements.length ];
-            for (int i = 0; i < elements.length; i++) {
-                result[i] = elements[i].getScriptableDelegate();
-            }
-            return result;
+            return getDelegates( HTMLPage.this.getElementsByName( name ) );
+        }
+
+
+        public ScriptableDelegate[] getElementsByTagName( String name ) {
+            return getDelegates( HTMLPage.this.getElementsByTagName( HTMLPage.this.getRootNode(), name ) );
         }
     }
 

@@ -318,6 +318,17 @@ public class JavaScript {
             throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
         }
 
+
+        protected ElementArray toElementArray( ScriptableDelegate[] scriptables ) {
+            JavaScriptEngine[] elements = new JavaScriptEngine[ scriptables.length ];
+            for (int i = 0; i < elements.length; i++) {
+                elements[ i ] = (JavaScriptEngine) toScriptable( scriptables[ i ] );
+            }
+            ElementArray result = ElementArray.newElementArray( this );
+            result.initialize( elements );
+            return result;
+        }
+
     }
 
 
@@ -483,19 +494,19 @@ public class JavaScript {
 
 
         public Scriptable jsGet_images() throws SAXException{
-            if (_images == null) initializeImages();
+            if (_images == null) _images = toElementArray( getDelegate().getImages() );
             return _images;
         }
 
 
         public Scriptable jsGet_links() throws SAXException {
-            if (_links == null) initializeLinks();
+            if (_links == null) _links = toElementArray( getDelegate().getLinks() );
             return _links;
         }
 
 
         public Scriptable jsGet_forms() throws SAXException {
-            if (_forms == null) initializeForms();
+            if (_forms == null) _forms = toElementArray( getDelegate().getForms() );
             return _forms;
         }
 
@@ -506,14 +517,12 @@ public class JavaScript {
 
 
         public Object jsFunction_getElementsByName( String name ) {
-            ScriptableDelegate scriptables[] = getDelegate().getElementsByName( name );
-            JavaScriptEngine[] elements = new JavaScriptEngine[ scriptables.length ];
-            for (int i = 0; i < elements.length; i++) {
-                elements[ i ] = (JavaScriptEngine) toScriptable( scriptables[ i ] );
-            }
-            ElementArray result = ElementArray.newElementArray( this );
-            result.initialize( elements );
-            return result;
+            return toElementArray( getDelegate().getElementsByName( name ) );
+        }
+
+
+        public Object jsFunction_getElementsByTagName( String name ) {
+            return toElementArray( getDelegate().getElementsByTagName( name ) );
         }
 
 
@@ -578,39 +587,6 @@ public class JavaScript {
 
         protected void clearWriteBuffer() {
             _writeBuffer = null;
-        }
-
-
-        private void initializeImages() {
-            WebImage.Scriptable scriptables[] = getDelegate().getImages();
-            Image[] images = new Image[ scriptables.length ];
-            for (int i = 0; i < images.length; i++) {
-                images[ i ] = (Image) toScriptable( scriptables[ i ] );
-            }
-            _images = ElementArray.newElementArray( this );
-            _images.initialize( images );
-        }
-
-
-        private void initializeLinks() {
-            WebLink.Scriptable scriptables[] = getDelegate().getLinks();
-            Link[] links = new Link[ scriptables.length ];
-            for (int i = 0; i < links.length; i++) {
-                links[ i ] = (Link) toScriptable( scriptables[ i ] );
-            }
-            _links = ElementArray.newElementArray( this );
-            _links.initialize( links );
-        }
-
-
-        private void initializeForms() {
-            WebForm.Scriptable scriptables[] = getDelegate().getForms();
-            Form[] forms = new Form[ scriptables.length ];
-            for (int i = 0; i < forms.length; i++) {
-                forms[ i ] = (Form) toScriptable( scriptables[ i ] );
-            }
-            _forms = ElementArray.newElementArray( this );
-            _forms.initialize( forms );
         }
 
 
@@ -917,6 +893,11 @@ public class JavaScript {
                 initializeControls();
             }
             return _controls;
+        }
+
+
+        public Object jsFunction_getElementsByTagName( String name ) throws SAXException {
+            return toElementArray( getDelegate().getElementsByTagName( name ) );
         }
 
 

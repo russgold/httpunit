@@ -1,4 +1,7 @@
 package com.meterware.httpunit.scripting;
+
+import com.meterware.httpunit.HTMLElement;
+
 /********************************************************************************************************************
  * $Id$
  *
@@ -111,6 +114,15 @@ abstract public class ScriptableDelegate {
 
     public ScriptingEngine getScriptEngine( ScriptableDelegate child ) {
         return getScriptEngine().newScriptingEngine( child );
+    }
+
+
+    protected ScriptableDelegate[] getDelegates( final HTMLElement[] elements ) {
+        ScriptableDelegate[] result = new ScriptableDelegate[ elements.length ];
+        for (int i = 0; i < elements.length; i++) {
+            result[i] = elements[i].getScriptableDelegate();
+        }
+        return result;
     }
 
 }

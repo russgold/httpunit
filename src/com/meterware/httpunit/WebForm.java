@@ -588,6 +588,11 @@ public class WebForm extends WebRequestSource {
         }
 
 
+        public ScriptableDelegate[] getElementsByTagName( String name ) throws SAXException {
+            return getDelegates( getHTMLPage().getElementsByTagName( getNode(), name ) );
+        }
+
+
         Scriptable() {
             super( WebForm.this );
         }

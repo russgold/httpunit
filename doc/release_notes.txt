@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+ 2-Apr-2003
+Acknowledgments:
+    Thanks to Sergey Bondarenko for supplying a test for getElementsByTagName
+Additions:
+    1. Added support for getElementsByTagName to Document and Form
+
  1-Apr-2003
 Additions:
     1. Added format parameter for JUnitServlet: values are "text" or "html"

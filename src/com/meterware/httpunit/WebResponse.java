@@ -954,7 +954,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    private HTMLPage getReceivedPage() throws SAXException {
+    HTMLPage getReceivedPage() throws SAXException {
         if (_page == null) {
             try {
                 _parsingPage = true;
