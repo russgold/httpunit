@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -25,6 +25,10 @@ import java.util.Vector;
 
 import org.w3c.dom.*;
 
+/**
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+ **/
 class ParsedHTML {
 
 
@@ -170,7 +174,7 @@ class ParsedHTML {
      * they appear.
      **/
     public WebTable[] getTables() {
-        return WebTable.getTables( getDOM(), _baseURL, _baseTarget, _characterSet );
+        return WebTable.getTables( getOriginalDOM(), _baseURL, _baseTarget, _characterSet );
     }
 
 
@@ -188,10 +192,10 @@ class ParsedHTML {
             }
         } );
     }
-    
-    
+
+
     /**
-     * Returns the first table in the response which has the specified text as a prefix of the text 
+     * Returns the first table in the response which has the specified text as a prefix of the text
      * in its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
@@ -204,10 +208,10 @@ class ParsedHTML {
             }
         } );
     }
-    
-    
+
+
     /**
-     * Returns the first table in the response which has the specified text as its summary attribute. 
+     * Returns the first table in the response which has the specified text as its summary attribute.
      * Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
@@ -218,10 +222,10 @@ class ParsedHTML {
             }
         } );
     }
-    
-    
+
+
     /**
-     * Returns the first table in the response which has the specified text as its ID attribute. 
+     * Returns the first table in the response which has the specified text as its ID attribute.
      * Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
@@ -232,13 +236,21 @@ class ParsedHTML {
             }
         } );
     }
-    
-    
+
+
     /**
      * Returns a copy of the domain object model associated with this page.
      **/
     public Node getDOM() {
         return _rootNode.cloneNode( /* deep */ true );
+    }
+
+    /**
+     * Returns the domain object model associated with this page, to be used internally.
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    Node getOriginalDOM() {
+        return _rootNode;
     }
 
 

@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -25,6 +25,9 @@ import java.util.StringTokenizer;
  * Utility code shared by httpunit and servletunit.
  **/
 public class HttpUnitUtils {
+
+    public static final int DEFAULT_TEXT_BUFFER_SIZE = 2048;
+    public static final int DEFAULT_BUFFER_SIZE = 128;
 
     /**
      * Returns the content type and encoding as a pair of strings.
@@ -55,8 +58,8 @@ public class HttpUnitUtils {
      * FIXME: currently assumes iso-8859-1 character set.
      **/
     public static String decode( String byteString ) {
-        StringBuffer sb = new StringBuffer();
         char[] chars = byteString.toCharArray();
+        StringBuffer sb = new StringBuffer(chars.length);
         char[] hexNum = { '0', '0', '0' };
 
         int i = 0;
@@ -75,5 +78,4 @@ public class HttpUnitUtils {
         }
         return sb.toString();
     }
-
 }

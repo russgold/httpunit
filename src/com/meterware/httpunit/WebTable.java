@@ -97,7 +97,7 @@ public class WebTable {
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
                 if (_cells[i][j]!=null) {
-                    idToCompare = NodeUtils.getNodeAttribute( _cells[i][j].getDOM(), "id" );
+                    idToCompare = NodeUtils.getNodeAttribute( _cells[i][j].getOriginalDOM(), "id" );
                     if (HttpUnitOptions.getMatchesIgnoreCase())
                         if (id.equalsIgnoreCase(idToCompare))
                             return _cells[i][j];
@@ -210,7 +210,7 @@ public class WebTable {
     public String toString() {
         String eol = System.getProperty( "line.separator" );
         if (_cells == null) readTable();
-        StringBuffer sb = new StringBuffer( "WebTable:" ).append( eol );
+        StringBuffer sb = new StringBuffer( HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE).append("WebTable:" ).append( eol );
         for (int i = 0; i < _cells.length; i++) {
             sb.append( "[" ).append( i ).append( "]: " );
             for (int j = 0; j < _cells[i].length; j++) {
@@ -404,7 +404,6 @@ public class WebTable {
 
 
 }
-
 
 
 

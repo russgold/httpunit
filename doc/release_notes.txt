@@ -16,10 +16,13 @@ Revision History:
 27-Nov-2001
 Acknowledgements:
     Thanks to Peter Roﬂbach for catching some typos in the tutorial.
+    Thanks to Benoit Xhenseval for optimizing the use of DOMs and StringBuffers.
 
 Additions:
    1. The tutorial now includes an explanation of security testing in ServletUnit
    2. Archives are now rooted with the build name
+   3. HttpUnit is now more efficient in its use of memory, pre-allocating buffers to the most likely needed size and
+      avoiding unnecessary copying of DOMs.
 
 26-Nov-2001
 Acknowledgements:

@@ -333,10 +333,9 @@ public class WebRequest {
         return _parameters.size() == 0;
     }
 
-
     final
     protected String getParameterString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
         Enumeration e = _parameters.keys();
 
         while (e.hasMoreElements()) {
@@ -496,7 +495,7 @@ public class WebRequest {
         } else {
             try {
                 byte[] rawBytes = source.getBytes( _sourceForm.getCharacterSet() );
-                StringBuffer result = new StringBuffer();
+                StringBuffer result = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
                 for (int i = 0; i < rawBytes.length; i++) {
                     int candidate = rawBytes[i] & 0xff;
                     if (candidate == ' ') {
@@ -677,7 +676,7 @@ class IllegalParameterValueException extends IllegalRequestParameterException {
 
 
     public String getMessage() {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
         sb.append( "May not set parameter '" ).append( _parameterName ).append( "' to '" );
         sb.append( _badValue ).append( "'. Value must be one of: { " );
         for (int i = 0; i < _allowedValues.length; i++) {
@@ -712,7 +711,7 @@ class MissingParameterValueException extends IllegalRequestParameterException {
 
 
     public String getMessage() {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
         sb.append( "Parameter '" ).append( _parameterName ).append( "' must have the value '" );
         sb.append( _missingValue ).append( "'. Attempted to set it to: { " );
         for (int i = 0; i < _proposedValues.length; i++) {
@@ -844,4 +843,3 @@ class MultipartFormRequiredException extends IllegalRequestParameterException {
 
 
 }
-

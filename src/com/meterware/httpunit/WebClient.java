@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -39,9 +39,9 @@ import org.xml.sax.SAXException;
  *
  * @author Russell Gold
  * @author Jan Ohrstrom
- * @author Seth Ladd 
+ * @author Seth Ladd
  **/
-abstract 
+abstract
 public class WebClient {
 
 
@@ -121,15 +121,15 @@ public class WebClient {
         return (String) _cookies.get( name );
     }
 
-    
+
     /**
      * Specifies the user agent identification. Used to trigger browser-specific server behavior.
-     **/    
+     **/
     public void setUserAgent( String userAgent ) {
 	    setHeaderField( "User-Agent", userAgent );
     }
-    
-        
+
+
     /**
      * Returns the current user agent setting.
      **/
@@ -178,20 +178,20 @@ public class WebClient {
      **/
     protected String getCookieHeaderField() {
         String names[] = getCookieNames();
-    	if (names.length == 0) return null;
-    	
-    	StringBuffer sb = new StringBuffer();
-    	for (int i = 0; i < names.length; i++) {
+        if (names.length == 0) return null;
+
+        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_BUFFER_SIZE);
+        for (int i = 0; i < names.length; i++) {
             if (i != 0) sb.append( "; " );
-    	    String name = names[i];
-    	    sb.append( name ).append( '=' ).append( getCookieValue( name ) );
-    	}
+            String name = names[i];
+            sb.append( name ).append( '=' ).append( getCookieValue( name ) );
+        }
         return sb.toString();
     }
 
 
     /**
-     * Returns the value of all current header fields. 
+     * Returns the value of all current header fields.
      **/
     protected Dictionary getHeaderFields() {
         Hashtable result = (Hashtable) _headers.clone();
@@ -375,7 +375,7 @@ class RedirectWebRequest extends WebRequest {
     }
 }
 
-    
+
 
 //==================================================================================================
 
@@ -394,4 +394,3 @@ class NoSuchFrameException extends RuntimeException {
 
     private String _frameName;
 }
-

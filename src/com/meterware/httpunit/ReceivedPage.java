@@ -53,7 +53,7 @@ class ReceivedPage extends ParsedHTML {
      * Returns the title of the page.
      **/
     public String getTitle() throws SAXException {
-        NodeList nl = ((Document) getDOM()).getElementsByTagName( "title" );
+        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "title" );
         if (nl.getLength() == 0) return "";
         if (!nl.item(0).hasChildNodes()) return "";
         return nl.item(0).getFirstChild().getNodeValue();
@@ -67,7 +67,7 @@ class ReceivedPage extends ParsedHTML {
      * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
      **/
     public String getExternalStyleSheet() throws SAXException {
-        NodeList nl = ((Document) getDOM()).getElementsByTagName( "link" );
+        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "link" );
         int length = nl.getLength();
         if (length == 0) return "";
 
@@ -94,7 +94,7 @@ class ReceivedPage extends ParsedHTML {
      **/
     public String[] getMetaTagContent(String attribute, String attributeValue) {
         Vector matches = new Vector();
-        NodeList nl = ((Document) getDOM()).getElementsByTagName("meta");
+        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName("meta");
         int length = nl.getLength();
 
         for (int i = 0; i < length; i++) {
@@ -133,7 +133,7 @@ class ReceivedPage extends ParsedHTML {
 
 
     private void setBaseAttributes() throws SAXException {
-        NodeList nl = ((Document) getDOM()).getElementsByTagName( "base" );
+        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "base" );
         if (nl.getLength() == 0) return;
         try {
             applyBaseAttributes( NodeUtils.getNodeAttribute( nl.item(0), "href" ),
