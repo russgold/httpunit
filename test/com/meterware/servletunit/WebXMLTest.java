@@ -21,10 +21,7 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 import java.util.List;
@@ -61,13 +58,23 @@ public class WebXMLTest extends TestCase {
 
         WebXMLString wxs = new WebXMLString();
         wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        File webXml = createWebXml( wxs );
 
-        ServletRunner sr = new ServletRunner( new ByteArrayInputStream( wxs.asText().getBytes() ) );
+        ServletRunner sr = new ServletRunner( webXml.getAbsolutePath() );
         WebRequest request   = new GetMethodWebRequest( "http://localhost/SimpleServlet" );
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/html", response.getContentType() );
         assertEquals( "requested resource", SimpleGetServlet.RESPONSE_TEXT, response.getText() );
+    }
+
+
+    private File createWebXml( WebXMLString wxs ) throws IOException {
+        File webXml = new File( "examples/META-INF/web.xml" );
+        FileOutputStream fos = new FileOutputStream( webXml );
+        fos.write( wxs.asText().getBytes() );
+        fos.close();
+        return webXml;
     }
 
 
@@ -201,10 +208,11 @@ public class WebXMLTest extends TestCase {
         wxs.requireFormAuthentication( "Sample Realm", "/Logon", "/Error" );
         wxs.addSecureURL( "SecureArea1", "/Example/SimpleServlet" );
         wxs.addAuthorizedRole( "SecureArea1", "supervisor" );
+        File webXml = createWebXml( wxs );
 
-        ServletRunner sr = new ServletRunner( wxs.asInputStream() );
+        ServletRunner sr = new ServletRunner( webXml, "/samples" );
         ServletUnitClient wc = sr.newClient();
-        WebResponse response = wc.getResponse( "http://localhost/Example/SimpleServlet" );
+        WebResponse response = wc.getResponse( "http://localhost/samples/Example/SimpleServlet" );
         WebForm form = response.getFormWithID( "login" );
         assertNotNull( "did not find login form", form );
 
@@ -216,7 +224,7 @@ public class WebXMLTest extends TestCase {
         assertEquals( "content type", "text/html", response.getContentType() );
         assertEquals( "requested resource", SimpleGetServlet.RESPONSE_TEXT, response.getText() );
 
-        InvocationContext ic = wc.newInvocation( "http://localhost/Example/SimpleServlet" );
+        InvocationContext ic = wc.newInvocation( "http://localhost/samples/Example/SimpleServlet" );
         assertEquals( "Authenticated user", "Me", ic.getRequest().getRemoteUser() );
         assertTrue( "User assigned to 'bogus' role", !ic.getRequest().isUserInRole( "bogus" ) );
         assertTrue( "User not assigned to 'supervisor' role", ic.getRequest().isUserInRole( "supervisor" ) );

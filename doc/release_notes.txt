@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+25-Aug-2004:
+   Additions:
+       1. ServletRunner now takes a reference to a web.xml as a File object in its constructor.
+
 10-Aug-2004:
    Additions:
        1. rfe #901172: "application/xhtml+xml" is now recognized as a valid HTML "content-type"

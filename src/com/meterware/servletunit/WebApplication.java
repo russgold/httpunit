@@ -458,8 +458,8 @@ class WebApplication implements SessionListenerDispatcher {
             } else if (authenticationMethod.equalsIgnoreCase( "FORM" )) {
                 _useFormAuthentication = true;
                 if (_authenticationRealm.length() == 0) throw new SAXException( "No realm specified for FORM Authorization" );
-                _loginURL = new URL( "http", "localhost", XMLUtils.getChildNodeValue( loginConfigElement, "form-login-page" ) );
-                _errorURL = new URL( "http", "localhost", XMLUtils.getChildNodeValue( loginConfigElement, "form-error-page" ) );
+                _loginURL = new URL( "http", "localhost", _contextPath + XMLUtils.getChildNodeValue( loginConfigElement, "form-login-page" ) );
+                _errorURL = new URL( "http", "localhost", _contextPath + XMLUtils.getChildNodeValue( loginConfigElement, "form-error-page" ) );
             }
         }
     }

@@ -53,6 +53,7 @@ public class ServletRunner {
     /**
      * Constructor which expects the full path to the web.xml for the
      * application.
+     * @deprecated as of 1.5.5, use {@link ServletRunner(File)}
      *
      * @param webXMLFileSpec the full path to the web.xml file
      */
@@ -65,13 +66,39 @@ public class ServletRunner {
     /**
      * Constructor which expects the full path to the web.xml for the
      * application and a context path under which to mount it.
+     * @deprecated as of 1.5.5, use {@link ServletRunner(File,String)}
      *
      * @param webXMLFileSpec the full path to the web.xml file
      * @param contextPath the context path
      */
     public ServletRunner( String webXMLFileSpec, String contextPath ) throws IOException, SAXException {
-        File webXMLFile = new File( webXMLFileSpec );
-        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXMLFileSpec ), webXMLFile.getParentFile().getParentFile(), contextPath );
+        this( new File( webXMLFileSpec ), contextPath );
+    }
+
+
+    /**
+     * Constructor which expects a File object representing the web.xml for the
+     * application.
+     *
+     * @param webXml the web.xml file
+     * @since 1.5.5
+     */
+    public ServletRunner( File webXml ) throws IOException, SAXException {
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXml ) );
+        completeInitialization( null );
+    }
+
+
+    /**
+     * Constructor which expects a File object representing the web.xml for the
+     * application and a context path under which to mount it.
+     *
+     * @param webXml the web.xml file
+     * @param contextPath the context path
+     * @since 1.5.5
+     */
+    public ServletRunner( File webXml, String contextPath ) throws IOException, SAXException {
+        _application = new WebApplication( HttpUnitUtils.newParser().parse( webXml ), webXml.getParentFile().getParentFile(), contextPath );
         completeInitialization( contextPath );
     }
 
