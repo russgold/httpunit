@@ -848,7 +848,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
             range = range.trim();
             int dashIndex = range.indexOf( '-' );
             if (dashIndex < 0) {
-                return new Locale( range );
+                return new Locale( range, "" );
             } else {
                 return new Locale( range.substring( 0, dashIndex ), range.substring( dashIndex+1 ) );
             }
