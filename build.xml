@@ -6,31 +6,47 @@
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
     <property name="version" value="1.2.4" />
-    <property name="zip_version" value="1_2_4" /> 
+    <property name="zip_version" value="1_2_4" />
+     
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
     <property name="lib.dir" value="lib" />
-    <property name="jars.dir" value="" /> 
+    <property name="jars.dir" value="jars" />
+     
     <property name="docs.dir" value="doc" /> 
     <property name="build.dir" value="build" /> 
     <property name="build.classes" value="${build.dir}/classes" /> 
-    <property name="javadoc.dir" value="${docs.dir}/api" /> 
+    <property name="test.classes" value="${build.dir}/testclasses" /> 
+    <property name="javadoc.dir" value="${docs.dir}/api" />
+     
     <property name="dist.dir" value="dist" /> 
     <property name="classpath" value="" />
     <property name="web.dir" value="web" /> 
     <property name="packages" value="com.meterware.*" /> 
     <property name="build.compiler" value="classic" />
-    <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" /> 
+    <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
     
+<!-- =================================================================== -->
+<!-- Defines the classpath used for compilation and test.                -->
+<!-- =================================================================== -->
+<path id="base.classpath">
+    <fileset dir="${jars.dir}">
+        <include name="*.jar"/>
+    </fileset>
+</path>
+          
  
 <!-- =================================================================== -->
 <!-- Check to see what optional dependencies are available               -->
 <!-- =================================================================== -->
 <target name="check_for_optional_packages">
-    <available property="jsdk.present" classname="javax.servlet.http.HttpServlet" />
-    <available property="javamail.present" classname="javax.mail.internet.MimeMultipart" />
-    <available property="xerces.present" classname="org.apache.xerces.parsers.DOMParser" />
+    <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet" 
+                                           classpathref="base.classpath" />
+    <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"  
+                                           classpathref="base.classpath" />
+    <available property="xerces.present"   classname="org.apache.xerces.parsers.DOMParser"  
+                                           classpathref="base.classpath" />
 </target>
 
 
@@ -47,8 +63,9 @@
 <!--  ===================================================================  --> 
 <target name="compile" depends="prepare,check_for_optional_packages">
     <mkdir dir="${build.classes}" /> 
-    <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
+    <javac srcdir="${src.dir}" destdir="${build.classes}" 
            debug="off" deprecation="on" optimize="off">
+         <classpath refid="base.classpath" />
          <exclude name="**/servletunit/*" unless="jsdk.present" />
     </javac>
 </target>
@@ -58,8 +75,13 @@
 <!--  Compiles the test code                                               -->
 <!--  ===================================================================  --> 
 <target name="testcompile" depends="compile,check_for_optional_packages">
-    <javac srcdir="${tstsrc.dir}" destdir="${build.classes}" classpath="${classpath}" 
+    <mkdir dir="${test.classes}" />
+    <javac srcdir="${tstsrc.dir}" destdir="${test.classes}"  
            debug="off" deprecation="on" optimize="off">
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+         </classpath>
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/FileUploadTest.java" unless="javamail.present" />
          <exclude name="**/XMLPageTest.java" unless="xerces.present" />
@@ -69,11 +91,14 @@
 
 <!--  ===================================================================  --> 
 <!--  Runs the test code                                                   -->
-<!--  Note: the classpath variable must be set on the command line         -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">
-    <java classname="${test.class}"
-          fork="yes" classpath="${build.classes};${classpath}" >
+    <java classname="${test.class}" fork="yes" >
+         <classpath>
+             <path refid="base.classpath" />
+             <pathelement location="${build.classes}" />
+             <pathelement location="${test.classes}" />
+         </classpath>
     </java>
 </target>
 
@@ -156,9 +181,9 @@
 <!--  Cleans up generated stuff                                            --> 
 <!--  ===================================================================  --> 
 <target name="clean">
-    <deltree dir="${build.dir}" /> 
-    <deltree dir="${dist.dir}" />
-    <deltree dir="${web.dir}" />
+    <delete dir="${build.dir}" /> 
+    <delete dir="${dist.dir}" />
+    <delete dir="${web.dir}" />
 </target>
 
 
@@ -168,8 +193,8 @@
 <target name="total-clean" depends="clean">
     <delete file="${name}_${zip_version}.zip" /> 
     <delete file="${name}_website_${zip_version}.zip" /> 
-    <deltree dir="${docs.dir}/api" />
-    <deltree dir="${lib.dir}" /> 
+    <delete dir="${docs.dir}/api" />
+    <delete dir="${lib.dir}" /> 
 </target>
  
 </project>
