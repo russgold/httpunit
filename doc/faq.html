@@ -50,16 +50,12 @@ before sending your request.
 
 
 <A NAME="charset"><h3>Why isn't HttpUnit handling my non-English pages?</h3></A>
-Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform.
-As of version 1.2.1, HttpUnit correctly recognizes the charset parameter of the Content-type header which may
-specify an alternative character set;
-when none is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1.
+When no Content-Type header is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1.
 Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers incorrectly use this
-as an indication that they should
-determine the character set in some other fashion.  To imitate this behavior, HttpUnit allows you to set the expected character
+as an indication that they should determine the character set in some other fashion.  To imitate this behavior,
+HttpUnit allows you to set the expected character
 set for future pages by calling HttpUnitOptions.setDefaultCharacterSet(). This setting will not apply to those
-pages for which the server specifies
-the character set.
+pages for which the server specifies the character set.
 <p>
 Non-English form handling is supported as well. Any parameter values entered into a form will be encoded as the same
 character set as the document containing the form. The server code will then have to handle those characters
@@ -78,15 +74,15 @@ If you are using JUnit, call this method in your <code>setUp()</code> method.
 <h2>Form Handling Problems</h2>
 
 <A NAME="buttons"><h3>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</h3></A>
-If you are using JTidy (the HTML parser originally used by HttpUnit), this can happen when your HTML is not valid.
-Most browsers are extremely forgiving of bad HTML; however, JTidy is not. It expects tags to be nested according to the HTML
-specification and will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them,
-call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page.
-Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
+Usually this indicates some poor nesting of &lt;form&gt tags. Browsers are extremely forgiving of bad HTML, even
+handling cases where it is impossible to turn that HTML into a DOM. When a parser encounters such code, it tries
+to "fix it" which may not generate exactly the intended results. As of version 1.5.2, HttpUnit is a lot more forgiving,
+considering controls to belong to the last opened &lt;form&gt tag, even it was presumed to have been closed. This
+seems to match what most browsers do. Under some circumstances switching among the supported parsers may give different
+results.
 
-The <a href="http://www.apache.org/~andyc/neko/doc/html/">NekoHTML parser</a>, a much more forgiving parser, is the
-parser used by default as of HttpUnit 1.5. It is strongly recommended that you use it in preference to JTidy,
-as it should correct problems like this.
+Note that JTidy can display error messages to tell you when there are problems with your HTML. To see them,
+call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page.
 
 <A name="#hidden"><h3>Why can't I change hidden parameter values?</h3></A>
 By default, HttpUnit verifies any parameter value changes against the form containing them. Since a user cannot directly

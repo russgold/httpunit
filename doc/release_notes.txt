@@ -11,6 +11,9 @@ Limitations:
 
 
 Revision History:
+13-Jan-2002
+    Notes: upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.
+
 10-Jan-2003
     Thanks to Alex Beggs for noting the mishandling of non-JavaScript scripts and providing a test case.
 
