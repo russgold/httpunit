@@ -54,6 +54,7 @@ class ParsedHTML {
 
     private ArrayList    _formsList = new ArrayList();
     private WebForm[]    _forms;
+    private WebForm      _activeForm;
 
     private ArrayList    _imagesList = new ArrayList();
     private WebImage[]   _images;
@@ -218,6 +219,10 @@ class ParsedHTML {
         final protected Object getClosestContext( NodeUtils.PreOrderTraversal pot, Class aClass ) {
             return pot.getClosestContext( aClass );
         }
+
+        protected ParsedHTML getRootContext( NodeUtils.PreOrderTraversal pot ) {
+            return (ParsedHTML) pot.getContexts().next();
+        }
     }
 
 
@@ -225,7 +230,12 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebForm( element );
         }
-        protected boolean addToContext() { return true; }
+
+
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            super.addToLists( pot, htmlElement );
+            getRootContext( pot )._activeForm = (WebForm) htmlElement;
+        }
     }
 
 
@@ -296,10 +306,11 @@ class ParsedHTML {
     static class FormControlFactory extends HTMLElementFactory {
 
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
-            return getForm( pot ).newFormControl( element );
+            final WebForm form = getForm( pot );
+            return form == null ? null : form.newFormControl( element );
         }
         private WebForm getForm( NodeUtils.PreOrderTraversal pot ) {
-            return (WebForm) getClosestContext( pot, WebForm.class );
+            return getRootContext( pot )._activeForm;
         }
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
             getForm( pot ).addFormControl( (FormControl) htmlElement );
