@@ -38,6 +38,8 @@ public class Cookie {
 
     private String _domain;
 
+    private long _expiredTime;
+
 
     /**
      * Constructs a cookie w/o any domain or path restrictions.
@@ -52,11 +54,23 @@ public class Cookie {
         this( name, value );
         for (Iterator iterator = attributes.keySet().iterator(); iterator.hasNext();) {
             String key = (String) iterator.next();
+            String attributeValue = (String) attributes.get( key );
             if (key.equalsIgnoreCase( "path" )) {
-                _path = (String) attributes.get( key );
+                _path = attributeValue;
             } else if (key.equalsIgnoreCase( "domain" )) {
-                _domain = (String) attributes.get( key );
+                _domain = attributeValue;
+            } else if (key.equalsIgnoreCase( "max-age" )) {
+                _expiredTime = System.currentTimeMillis() + getAgeInMsec( attributeValue );
             }
+        }
+    }
+
+
+    private int getAgeInMsec( String maxAgeValue ) {
+        try {
+            return 1000 * Integer.parseInt( maxAgeValue );
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
 
@@ -110,6 +124,7 @@ public class Cookie {
 
     boolean mayBeSentTo( URL url ) {
         if (getDomain() == null) return true;
+        if (_expiredTime != 0 && _expiredTime <= System.currentTimeMillis()) return false;
 
         return acceptHost( getDomain(), url.getHost() ) && acceptPath( getPath(), url.getPath() );
     }

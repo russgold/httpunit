@@ -157,8 +157,8 @@ public class CookieTest extends TestCase {
     public void testHeaderGeneration() throws Exception {
         CookieJar jar = new CookieJar();
         jar.putCookie( "zero", "nil" );
-        jar.updateCookies( newJar( "www.meterware.com/servlets/standard/AServlet", "first=ready" ) );
-        jar.updateCookies( newJar( "www.meterware.com/servlets/AnotherServlet", "second=set" ) );
+        jar.updateCookies( newJar( "www.meterware.com/servlets/standard/AServlet", "first=ready, gone=expired;max-age=0" ) );
+        jar.updateCookies( newJar( "www.meterware.com/servlets/AnotherServlet", "second=set;max-age=1000" ) );
         jar.updateCookies( newJar( "www.httpunit.org", "zero=go; domain=.httpunit.org" ) );
         jar.updateCookies( newJar( "meterware.com", "fourth=money" ) );
 
@@ -167,7 +167,7 @@ public class CookieTest extends TestCase {
         checkHeader( 3, jar, "zero=go", "fancy.httpunit.org/servlets/AskMe" );
 
         HttpUserAgentTest.assertMatchingSet( "Cookie names",
-                                             new String[] { "zero", "zero", "first", "second", "fourth" },
+                                             new String[] { "zero", "zero", "first", "second", "fourth", "gone" },
                                              jar.getCookieNames() );
     }
 

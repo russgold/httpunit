@@ -13,6 +13,9 @@ Limitations:
 
 
 Revision History:
+12-Sep-2004:
+   Problems fixed:
+       1. bug #1025968: Cookies with max-age attribute will now expire (max-age=0 is treated as immediate expiration)
 10-Sep-2004:
    Problems fixed:
        1. bug #1013045: Form, Link, and Image id tags are now recognizable from JavaScript where a name tag would be
