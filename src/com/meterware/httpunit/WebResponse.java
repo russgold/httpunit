@@ -109,18 +109,22 @@ public class WebResponse {
      * @param url the url from which the response was received
      * @param inputStream the input stream from which the response can be read
      **/
-    WebResponse( WebConversation conversation, URL url, InputStream inputStream ) throws IOException {
+    WebResponse( WebConversation conversation, URL url, InputStream inputStream ) {
         _conversation = conversation;
         _url = url;
         StringBuffer sb = new StringBuffer();
-        BufferedReader input = new BufferedReader( new InputStreamReader( inputStream ) );
+        try {
+            BufferedReader input = new BufferedReader( new InputStreamReader( inputStream ) );
 
-        String str;
-        while (null != ((str = input.readLine()))) {
-            sb.append( str ).append( endOfLine );
+            String str;
+            while (null != ((str = input.readLine()))) {
+                sb.append( str ).append( endOfLine );
+            }
+            input.close ();
+            _responseText = sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException( "Unable to retrieve URL: " + _url.toExternalForm() );
         }
-        input.close ();
-        _responseText = sb.toString();
     }
 
 
@@ -155,3 +159,4 @@ public class WebResponse {
     }
 
 }
+
