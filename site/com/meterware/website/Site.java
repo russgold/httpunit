@@ -154,6 +154,7 @@ public class Site {
             } else if (type.equalsIgnoreCase( "enhancements" )) {
                 super.setLocation( getFeatureEntryURL() );
             } else if (type.equalsIgnoreCase( "donations" )) {
+                // xxx link from image: http://images.sourceforge.net/images/project-support.jpg
                 super.setLocation( "http://sourceforge.net/project/project_donations.php?group_id=" + _groupId );
             } else if (type.equalsIgnoreCase( "cvs" )) {
                 super.setLocation( "http://sourceforge.net/cvs/?group_id=" + _groupId );
