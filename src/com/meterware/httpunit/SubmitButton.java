@@ -27,37 +27,7 @@ import org.xml.sax.SAXException;
 /**
  * This class represents a submit button in an HTML form.
  **/
-public class SubmitButton extends FormControl {
-
-
-//    public static SubmitButton UNNAMED_BUTTON = new SubmitButton();
-
-
-    /**
-     * Returns the value associated with this submit button.
-     **/
-    public String getValue() {
-        return getValueAttribute();
-    }
-
-
-    /**
-     * Returns the ID associated with the button, if any.
-     * @return the button ID, or an empty string if no ID is defined.
-     **/
-    public String getID() {
-        return _id;
-    }
-
-
-    /**
-     * Performs the action associated with clicking this button. For a submit button this typically
-     * submits the form.
-     */
-    public void click() throws IOException, SAXException  {
-        _form.submit( this );
-    }
-
+public class SubmitButton extends Button {
 
     /**
      * Returns true if this submit button is an image map.
@@ -67,25 +37,15 @@ public class SubmitButton extends FormControl {
     }
 
 
+//--------------------------------- FormButton methods ----------------------------------------------
+
+
     /**
-     * Returns the current value(s) associated with this control. These values will be transmitted to the server
-     * if the control is 'successful'.
-     **/
-    public String[] getValues() {
-        return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValueAttribute() );
-    }
-
-
-    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
-        if (_pressed && !isDisabled() && getName().length() > 0) {
-            if (getValueAttribute().length() > 0) {
-                processor.addParameter( getName(), getValueAttribute(), characterSet );
-            }
-            if (_isImageButton) {
-                processor.addParameter( getName() + ".x", Integer.toString( _x ), characterSet );
-                processor.addParameter( getName() + ".y", Integer.toString( _y ), characterSet );
-            }
-        }
+     * Performs the action associated with clicking this button. For a submit button this typically
+     * submits the form.
+     */
+    public void click() throws IOException, SAXException  {
+        _form.submit( this );
     }
 
 
@@ -111,16 +71,13 @@ public class SubmitButton extends FormControl {
 
 
     SubmitButton( WebForm form, Node node ) {
-        super( node );
-        _form          = form;
+        super( form, node );
         _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( "image" );
-        _id = NodeUtils.getNodeAttribute( node, "id" );
     }
 
 
     SubmitButton( WebForm form ) {
-        _form          = form;
-        _id            = "";
+        super( form );
         _isImageButton = false;
     }
 
@@ -136,15 +93,39 @@ public class SubmitButton extends FormControl {
     }
 
 
+//--------------------------------- FormControl methods ----------------------------------------------------------------
+
+
+    /**
+     * Returns the current value(s) associated with this control. These values will be transmitted to the server
+     * if the control is 'successful'.
+     **/
+    String[] getValues() {
+        return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValueAttribute() );
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        if (_pressed && !isDisabled() && getName().length() > 0) {
+            if (getValueAttribute().length() > 0) {
+                processor.addParameter( getName(), getValueAttribute(), characterSet );
+            }
+            if (_isImageButton) {
+                processor.addParameter( getName() + ".x", Integer.toString( _x ), characterSet );
+                processor.addParameter( getName() + ".y", Integer.toString( _y ), characterSet );
+            }
+        }
+    }
+
+
 //------------------------------------------ private members ----------------------------------
 
-    private final WebForm  _form;
-    private final String   _id;
+
+    private       String[] _value = new String[1];
     private final boolean  _isImageButton;
     private       boolean  _pressed;
     private       int      _x;
     private       int      _y;
-    private       String[] _value = new String[1];
 
 
     private String[] toArray( String value ) {

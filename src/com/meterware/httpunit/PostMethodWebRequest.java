@@ -117,10 +117,18 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
 
     /**
-     * Constructs a web request for a form.
+     * Constructs a web request for a form submitted by clicking a button.
      **/
     PostMethodWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
         super( sourceForm, button, x, y );
+    }
+
+
+    /**
+     * Constructs a web request for a form submitted via a script.
+     **/
+    PostMethodWebRequest( WebForm sourceForm ) {
+        super( sourceForm );
     }
 
 

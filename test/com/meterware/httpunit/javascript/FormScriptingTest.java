@@ -85,6 +85,42 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitViaScript() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=submit name=change value=color>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='document.spectrum.submit(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getLinks()[ 0 ].click();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
+    public void testSubmitViaScriptButton() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=green>" +
+                                          "  <input type=button id=submit value=submit onClick='this.form.submit();'>" +
+                                          "</form>" +
+                                          "<a href='#' onClick='document.spectrum.submit(); return false;'>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getFormWithName( "spectrum" ).getButtons()[0].click();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
     public void testSetFormTextValue() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad=\"document.realform.color.value='green'\">" +

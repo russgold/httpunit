@@ -44,12 +44,15 @@ abstract class FormControl {
     final static String[] NO_VALUE = new String[0];
 
     private       String  _name;
+    private final String  _id;
     private final String  _valueAttribute;
     private final boolean _readOnly;
     private final boolean _disabled;
+    private Scriptable    _scriptable;
 
 
     FormControl() {
+        _id             = "";
         _name           = "";
         _valueAttribute = "";
         _readOnly       = false;
@@ -58,6 +61,7 @@ abstract class FormControl {
 
 
     FormControl( Node node ) {
+        _id             = NodeUtils.getNodeAttribute( node, "id" );
         _name           = NodeUtils.getNodeAttribute( node, "name" );
         _valueAttribute = NodeUtils.getNodeAttribute( node, "value" );
         _readOnly       = NodeUtils.isNodeAttributePresent( node, "readonly" );
@@ -74,17 +78,27 @@ abstract class FormControl {
 
 
     /**
+     * Returns the ID associated with this control, if any.
+     * @return the control ID, or an empty string if no ID is defined.
+     **/
+    public String getID() {
+        return _id;
+    }
+
+
+    /**
      * Returns the current value(s) associated with this control. These values will be transmitted to the server
      * if the control is 'successful'.
      **/
-    abstract public String[] getValues();
+    abstract String[] getValues();
 
 
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
     public ScriptableDelegate getScriptableObject() {
-        return new Scriptable();
+        if (_scriptable == null) _scriptable = newScriptable();
+        return _scriptable;
     }
 
 
@@ -191,6 +205,15 @@ abstract class FormControl {
 
 
     /**
+     * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different
+     * implementation of Scriptable.
+     */
+    protected Scriptable newScriptable() {
+        return new Scriptable();
+    }
+
+
+    /**
      * Returns the default value of this control in the form. If no value is specified, defaults to the empty string.
      **/
     protected String getValueAttribute() {
@@ -219,7 +242,7 @@ abstract class FormControl {
             if (type.equalsIgnoreCase( "submit" )) {
                 return new SubmitButton( form, node );
             } else {
-                return null;
+                return new Button( form, node );
             }
         } else if (!node.getNodeName().equals( "input" )) {
             return null;
@@ -235,6 +258,10 @@ abstract class FormControl {
                 return new CheckboxFormControl( node );
             } else if (type.equalsIgnoreCase( "submit" ) || type.equalsIgnoreCase( "image" )) {
                 return new SubmitButton( form, node );
+            } else if (type.equalsIgnoreCase( "button" )) {
+                return new Button( form, node );
+            } else if (type.equalsIgnoreCase( "reset" )) {
+                return new Button( form, node );
             } else if (type.equalsIgnoreCase( "file" )) {
                 return new FileSubmitFormControl( node );
             } else {
@@ -453,7 +480,7 @@ class CheckboxFormControl extends BooleanFormControl {
     }
 
 
-    public ScriptableDelegate getScriptableObject() {
+    protected FormControl.Scriptable newScriptable() {
         return new Scriptable();
     }
 

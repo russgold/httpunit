@@ -87,6 +87,14 @@ public class GetMethodWebRequest extends WebRequest {
 
 
     /**
+     * Constructs a web request for a form submitted from JavaScript.
+     **/
+    GetMethodWebRequest( WebForm sourceForm ) {
+        super( sourceForm );
+    }
+
+
+    /**
      * Constructs a web request for a link.
      **/
     GetMethodWebRequest( WebLink sourceLink ) {

@@ -32,6 +32,7 @@ import com.meterware.httpunit.scripting.SelectionOptions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.io.IOException;
 
 import org.mozilla.javascript.*;
 import org.xml.sax.SAXException;
@@ -93,7 +94,7 @@ public class JavaScript {
             try {
                 final Context context = Context.getCurrentContext();
                 Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
-                Object result = f.call( context, this, null, NO_ARGS );
+                Object result = f.call( context, this, this, NO_ARGS );
                 return (result instanceof Boolean) ? ((Boolean) result).booleanValue() : true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -107,7 +108,7 @@ public class JavaScript {
             _scriptable = scriptable;
             _scriptable.setScriptEngine( this );
             if (parent != null) setParentScope( parent );
-        }
+       }
 
 
         public boolean has( String propertyName, Scriptable scriptable ) {
@@ -396,6 +397,11 @@ public class JavaScript {
         }
 
 
+        public void jsFunction_submit() throws IOException, SAXException {
+            getDelegate().submit();
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
@@ -422,14 +428,26 @@ public class JavaScript {
 
     static public class Control extends JavaScriptEngine {
 
+        private Form _form;
+
         public String getClassName() {
             return "Control";
         }
 
+        public Form jsGet_form() {
+            return _form;
+        }
 
         public void jsFunction_focus() {}
 
         public void jsFunction_select() {}
+
+
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
+                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+            super.initialize( parent, scriptable );
+            _form = (Form) parent;
+        }
 
 
         Scriptable toScriptable( ScriptableDelegate delegate )

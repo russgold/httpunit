@@ -1,4 +1,4 @@
-package com.meterware.httpunit.javascript;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,30 +19,65 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptingEngineFactory;
-import com.meterware.httpunit.WebResponse;
+import java.io.IOException;
 
-import java.lang.reflect.InvocationTargetException;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-
-import org.mozilla.javascript.ClassDefinitionException;
-import org.mozilla.javascript.NotAFunctionException;
-import org.mozilla.javascript.PropertyException;
-import org.mozilla.javascript.JavaScriptException;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
 
 /**
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-public class JavaScriptEngineFactory implements ScriptingEngineFactory {
+public class Button extends FormControl {
 
-    public void associate( WebResponse response ) {
-        try {
-            JavaScript.run( response );
-        } catch (Exception e) {
-            throw new RuntimeException( e.toString() );
-        }
+    protected final WebForm  _form;
+    private String _onClickEvent = "";
+
+
+    Button( WebForm form ) {
+        _form = form;
     }
+
+
+    Button( WebForm form, Node node ) {
+        super( node );
+        _form = form;
+        _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
+    }
+
+
+    /**
+     * Returns the value associated with this button.
+     **/
+    public String getValue() {
+        return getValueAttribute();
+    }
+
+
+    /**
+     * Performs the action associated with clicking this button. For a submit button this typically
+     * submits the form.
+     */
+    public void click() throws IOException, SAXException  {
+        doOnClickEvent();
+    }
+
+
+    protected boolean doOnClickEvent() {
+        return _onClickEvent.length() == 0 || getScriptableObject().doEvent( _onClickEvent );
+    }
+
+
+//-------------------------------------------------- FormControl methods -----------------------------------------------
+
+
+    String[] getValues() {
+        return new String[ 0 ];
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+    }
+
 }

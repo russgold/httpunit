@@ -12,6 +12,14 @@ Limitations:
 
 
 Revision History:
+19-Aug-2002
+
+Additions:
+    1. WebForm.getButtons() now returns all form buttons, including reset buttons and generic buttons.
+    2. JavaScript: The "onClick" event is now supported for generic form buttons
+    3. JavaScript: Form.submit() is now working
+
+
 16-Aug-2002
 Acknowledgements:
    Thanks to PeterRoyal for fixing the handling of query-only relative URLs and the IllegalStateException when

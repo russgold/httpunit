@@ -54,10 +54,18 @@ public class MessageBodyWebRequest extends WebRequest {
 
 
     /**
-     * Constructs a web request for a form.
+     * Constructs a web request for a form submitted via a button.
      **/
     protected MessageBodyWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
         super( sourceForm, button, x, y );
+    }
+
+
+    /**
+     * Constructs a web request for a form submitted via script.
+     **/
+    protected MessageBodyWebRequest( WebForm sourceForm ) {
+        super( sourceForm );
     }
 
 

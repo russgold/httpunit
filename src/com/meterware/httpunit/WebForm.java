@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
  **/
 public class WebForm extends WebRequestSource {
     private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
+    private Button[] _buttons;
 
 
     /**
@@ -96,6 +97,23 @@ public class WebForm extends WebRequestSource {
             if (names[i].startsWith( prefix )) return true;
         }
         return false;
+    }
+
+
+    /**
+     * Returns an array containing all of the buttons defined for this form.
+     **/
+    public Button[] getButtons() {
+        if (_buttons == null) {
+            FormControl[] controls = getFormControls();
+            ArrayList buttonList = new ArrayList();
+            for (int i = 0; i < controls.length; i++) {
+                FormControl control = controls[ i ];
+                if (control instanceof Button) buttonList.add( control );
+            }
+            _buttons = (Button[]) buttonList.toArray( new Button[ buttonList.size() ] );
+        }
+        return _buttons;
     }
 
 
@@ -217,6 +235,21 @@ public class WebForm extends WebRequestSource {
         } else {
             return new GetMethodWebRequest( this, button, x, y );
         }
+    }
+
+
+    private WebRequest getScriptedSubmitRequest() {
+        SubmitButton[] buttons = getSubmitButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setPressed( false );
+        }
+
+        if (getMethod().equalsIgnoreCase( "post" )) {
+            return new PostMethodWebRequest( this );
+        } else {
+            return new GetMethodWebRequest( this );
+        }
+
     }
 
 
@@ -424,6 +457,11 @@ public class WebForm extends WebRequestSource {
     public class Scriptable extends ScriptableDelegate {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); }
+
+
+        public void submit() throws IOException, SAXException {
+            submitRequest( getScriptedSubmitRequest() );
+        }
 
 
         public Object get( String propertyName ) {
