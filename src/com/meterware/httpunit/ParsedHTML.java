@@ -334,7 +334,9 @@ class ParsedHTML {
      */
     String getIncludedScript( String srcAttribute ) throws IOException {
         WebRequest req = new GetMethodWebRequest( getBaseURL(), srcAttribute );
-        return getResponse().getWindow().getResource( req ).getText();
+        WebWindow window = getResponse().getWindow();
+        if (window == null) throw new IllegalStateException( "Unable to retrieve script included by this response, since it was loaded by getResource(). Use getResponse() instead.");
+        return window.getResource( req ).getText();
     }
 
 

@@ -142,7 +142,7 @@ public class WebClient {
 
 
     /**
-     * Returns the resource specified by the request. Does not update the client or load included framesets.
+     * Returns the resource specified by the request. Does not update the client or load included framesets or scripts.
      * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
      */
     public WebResponse getResource( WebRequest request ) throws IOException {

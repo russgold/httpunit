@@ -16,6 +16,8 @@ Revision History:
 29-Jun-2004
    Additions:
        1. rfe #766768: getText() methods now translate <br> tags as newlines.
+       2. HttpUnit now catches an attempt to load an included script from a page included with "getResource" rather than
+          "getResponse."
 
 28-Jun-2004
    Additions:
