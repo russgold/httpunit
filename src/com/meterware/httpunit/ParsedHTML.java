@@ -148,7 +148,6 @@ class ParsedHTML {
 
     /**
      * Returns the top-level block elements found in the page in the order in which they appear.
-     * @return
      */
     public TextBlock[] getTextBlocks() {
         if (_blocks == null) {

@@ -55,7 +55,7 @@ public class ServletRunner {
     /**
      * Constructor which expects the full path to the web.xml for the
      * application.
-     * @deprecated as of 1.5.5, use {@link ServletRunner(File)}
+     * @deprecated as of 1.5.5, use {@link #ServletRunner(File)}
      *
      * @param webXMLFileSpec the full path to the web.xml file
      */
@@ -68,7 +68,7 @@ public class ServletRunner {
     /**
      * Constructor which expects the full path to the web.xml for the
      * application and a context path under which to mount it.
-     * @deprecated as of 1.5.5, use {@link ServletRunner(File,String)}
+     * @deprecated as of 1.5.5, use {@link #ServletRunner(File,String)}
      *
      * @param webXMLFileSpec the full path to the web.xml file
      * @param contextPath the context path

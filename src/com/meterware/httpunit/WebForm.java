@@ -585,6 +585,25 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Sets the value of a parameter in this form.
+     **/
+    public void setParameter( String name, String value ) {
+        setParameter( name, new String[] { value } );
+    }
+
+
+    /**
+     * Sets the multiple values of a parameter in this form. This is generally used when there are multiple
+     * controls with the same name in the form.
+     */
+    public void setParameter( String name, final String[] values ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == UNKNOWN_PARAMETER) throw new NoSuchParameterException( name );
+        parameter.setValues( values );
+    }
+
+
+    /**
      * Sets the multiple values of a file upload parameter in a web request.
      **/
     public void setParameter( String name, UploadFileSpec[] files ) {
@@ -595,17 +614,12 @@ public class WebForm extends WebRequestSource {
 
 
     /**
-     * Sets the value of a parameter in this form.
-     **/
-    public void setParameter( String name, String value ) {
-        setParameter( name, new String[] { value } );
-    }
-
-
-    public void setParameter( String name, final String[] values ) {
-        FormParameter parameter = getParameter( name );
-        if (parameter == UNKNOWN_PARAMETER) throw new NoSuchParameterException( name );
-        parameter.setValues( values );
+     * Sets the single value of a file upload parameter in this form.
+     * A more convenient way to do this than using {@link #setParameter(String,UploadFileSpec[])}
+     * @since 1.5.5
+     */
+    public void setParameter( String name, File file ) {
+        setParameter( name, new UploadFileSpec[] { new UploadFileSpec( file ) } );
     }
 
 
