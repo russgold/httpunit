@@ -1113,6 +1113,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+    String getReferer() {
+        return null;
+    }
+
+
 
 //=======================================================================================
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -257,6 +257,30 @@ public class WebClientTest extends HttpUnitTest {
         response = wc.getResponse( page2 );
         response = wc.getResponse( response.getForms()[0].getRequest() );
         assertEquals( "Form Referer header", page2, response.getText().trim() );
+    }
+
+
+    public void testRedirectedRefererHeader() throws Exception {
+        String linkSource = "fromLink";
+        String linkTarget = "anOldOne";
+        String resourceName = "tellMe";
+
+        defineResource( linkSource, "<html><head></head><body><a href='" + linkTarget + "'>Go</a></body></html>" );
+
+        defineResource( linkTarget, "ignored content", HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( linkTarget, "Location: " + getHostPath() + '/' + resourceName );
+
+        defineResource( resourceName, new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String referer = getHeader( "Referer" );
+                return new WebResource( referer == null ? "null" : referer, "text/plain" );
+            }
+        } );
+
+        WebConversation wc   = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + linkSource );
+        response = wc.getResponse( response.getLinks()[0].getRequest() );
+        assertEquals( "Link Referer header", getHostPath() + '/' + linkSource, response.getText().trim() );
     }
 
 

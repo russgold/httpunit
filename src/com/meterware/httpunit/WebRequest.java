@@ -34,6 +34,8 @@ import java.util.*;
 abstract
 public class WebRequest {
 
+    static final String REFERER_HEADER_NAME = "Referer";
+
     private static URLStreamHandler JAVASCRIPT_STREAM_HANDLER = new JavascriptURLStreamHandler();
     private static URLStreamHandler HTTPS_STREAM_HANDLER = new HttpsURLStreamHandler();
 
@@ -47,6 +49,7 @@ public class WebRequest {
     private WebRequestSource _webRequestSource;
 
     private SubmitButton _button;
+
 
     /**
      * Sets the value of a header to be sent with this request. A header set here will override any matching header set
@@ -363,7 +366,7 @@ public class WebRequest {
     protected WebRequest( WebRequestSource requestSource, ParameterHolder parameterHolder ) {
         this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getFrame(), requestSource.getTarget(), parameterHolder );
         _webRequestSource = requestSource;
-        setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
+        setHeaderField( REFERER_HEADER_NAME, requestSource.getBaseURL().toExternalForm() );
     }
 
 
@@ -517,6 +520,11 @@ public class WebRequest {
             if (getContentType() != null) _headers.put( "Content-Type", getContentType() );
         }
         return _headers;
+    }
+
+
+    String getReferer() {
+        return _headers == null ? null : (String) _headers.get( REFERER_HEADER_NAME );
     }
 
 }

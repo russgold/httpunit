@@ -65,7 +65,7 @@ public class WebConversation extends WebClient {
         sendHeaders( connection, getHeaderFields( request.getURL() ) );
         sendHeaders( connection, request.getHeaderDictionary() );
         request.completeRequest( connection );
-        return new HttpWebResponse( this, targetFrame, request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
+        return new HttpWebResponse( this, targetFrame, request, connection, getExceptionsThrownOnErrorStatus() );
     }
 
 

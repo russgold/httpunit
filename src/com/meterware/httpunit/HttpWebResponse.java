@@ -41,6 +41,8 @@ import java.util.Vector;
  **/
 class HttpWebResponse extends WebResponse {
 
+    private String _referer;
+
 
     /**
      * Constructs a response object from an input stream.
@@ -59,6 +61,13 @@ class HttpWebResponse extends WebResponse {
             if (getContentType().startsWith( "text" )) loadResponseText();
         }
     }
+
+
+    HttpWebResponse( WebConversation client, FrameSelector frame, WebRequest request, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
+        this( client, frame, request.getURL(), connection, throwExceptionOnError );
+        _referer = request.getReferer();
+    }
+
 
 
     private InputStream getInputStream( URLConnection connection ) throws IOException {
@@ -127,6 +136,11 @@ class HttpWebResponse extends WebResponse {
         }
         sb.append( " ]" );
         return sb.toString();
+    }
+
+
+    String getReferer() {
+        return _referer;
     }
 
 

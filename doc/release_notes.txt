@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+22-Jun-2004
+   Problems fixed:
+       1. bug #964940 The Referer header was not being sent again if the original request was redirected
+
 21-Jun-2004
    Problems fixed:
        1. bug #974675 Javascript function Window.open did not honor "_self" tag for window name.
