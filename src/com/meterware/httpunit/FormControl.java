@@ -730,6 +730,24 @@ class FileSubmitFormControl extends FormControl {
     private UploadFileSpec _fileToUpload;
 
 
+    protected FormControl.Scriptable newScriptable() {
+        return new Scriptable();
+    }
+
+
+    class Scriptable extends FormControl.Scriptable {
+
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "value" )) {
+                return getSelectedName();
+           } else {
+                return super.get( propertyName );
+            }
+        }
+
+
+    }
+
     public FileSubmitFormControl( WebForm form, Node node ) {
         super( form, node );
     }
@@ -747,7 +765,12 @@ class FileSubmitFormControl extends FormControl {
      * Returns the name of the selected file, if any.
      */
     public String[] getValues() {
-        return new String[] { _fileToUpload == null ? "" : _fileToUpload.getFileName() };
+        return new String[] { getSelectedName() };
+    }
+
+
+    private String getSelectedName() {
+        return _fileToUpload == null ? "" : _fileToUpload.getFileName();
     }
 
 

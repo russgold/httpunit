@@ -19,19 +19,12 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebForm;
-import com.meterware.httpunit.HttpUnitTest;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebClient;
-import com.meterware.httpunit.WebLink;
+import com.meterware.httpunit.*;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
 import java.io.IOException;
-
-import org.xml.sax.SAXException;
+import java.io.File;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
@@ -326,13 +319,13 @@ public class FormScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
+        response.getFormWithName( "realform" );
         verifyCheckbox( /* default */ wc, true,  /* checked */ true,  /* value */ "good" );
         verifyCheckbox( /* default */ wc, false, /* checked */ false, /* value */ "bad" );
     }
 
 
-    private void verifyCheckbox( WebClient wc, boolean defaultChecked, boolean checked, String value ) throws SAXException {
+    private void verifyCheckbox( WebClient wc, boolean defaultChecked, boolean checked, String value ) {
         assertEquals( "Message " + 1 + "-1", "checkbox ready default = " + defaultChecked, wc.popNextAlert() );
         assertEquals( "Message " + 1 + "-2", "checkbox ready checked = " + checked, wc.popNextAlert() );
         assertEquals( "Message " + 1 + "-3", "checkbox ready value = " + value, wc.popNextAlert() );
@@ -384,13 +377,13 @@ public class FormScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
+        response.getFormWithName( "realform" );
         verifyRadio( /* default */ wc, true,  /* checked */ true,  /* value */ "good" );
         verifyRadio( /* default */ wc, false, /* checked */ false, /* value */ "bad" );
     }
 
 
-    private void verifyRadio( WebClient wc, boolean defaultChecked, boolean checked, String value ) throws SAXException {
+    private void verifyRadio( WebClient wc, boolean defaultChecked, boolean checked, String value ) {
         assertEquals( "Message " + 1 + "-1", "radio ready default = " + defaultChecked, wc.popNextAlert() );
         assertEquals( "Message " + 1 + "-2", "radio ready checked = " + checked, wc.popNextAlert() );
         assertEquals( "Message " + 1 + "-3", "radio ready value = " + value, wc.popNextAlert() );
@@ -509,6 +502,27 @@ public class FormScriptingTest extends HttpUnitTest {
         response.getFormWithName( "the_form" ).setParameter( "choices", "1" );
         response.getLinks()[0].mouseOver();
         assertEquals( "after change message", "selected #0", wc.popNextAlert() );
+    }
+
+
+    public void testFileSubmitProperties() throws Exception {
+        File file = new File( "temp.html" );
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body'>" +
+                                            "<form name='the_form'>" +
+                                            "  <input type='file' name='file'>" +
+                                            "</form>" +
+                                            "<a href='#' onMouseOver=\"alert( 'file selected is [' + document.the_form.file.value + ']' );\">which</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].mouseOver();
+        assertEquals( "1st message", "file selected is []", wc.popNextAlert() );
+
+        WebForm form = response.getFormWithName( "the_form" );
+        form.setParameter( "file", new UploadFileSpec[] { new UploadFileSpec( file ) } );
+        response.getLinks()[0].mouseOver();
+        assertEquals( "2nd message", "file selected is [" + file.getAbsolutePath() + "]", wc.popNextAlert() );
     }
 
 

@@ -18,6 +18,7 @@ Acknowledgements:
 Problems fixed:
     1. JavaScript ending with --> rather than the proper end-comment // --> was being treated as a syntax error
     2. Bug #626822 Controls without names are no longer sent as part of a MIME-encoded message
+    3. Bug #618140 JavaScript access to the file submit control value was not working
 
 Additions:
     1. Added the HeadMethodWebRequest class
