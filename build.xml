@@ -51,10 +51,11 @@
 
 <!--  ===================================================================  --> 
 <!--  Runs the test code                                                   -->
+<!--  Note: the classpath variable must be set on the command line         -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">
     <java classname="com.meterware.httpunit.HttpUnitTest"
-          args="-classpath ${build.classes};${classpath}" >
+          fork="yes" classpath="${build.classes};${classpath}" >
     </java>
 </target>
 
@@ -123,8 +124,9 @@
 <!--  Total cleanup                                                        --> 
 <!--  ===================================================================  --> 
 <target name="total-clean" depends="clean">
-    <delete file="${lib.dir}/${name}.jar" /> 
-    <delete file="${name}-${zip_version}.zip" /> 
+    <deltree dir="${docs.dir}/api" />
+    <deltree dir="${lib.dir}" /> 
+    <delete file="${name}_${zip_version}.zip" /> 
 </target>
  
 </project>
