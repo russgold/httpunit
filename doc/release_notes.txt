@@ -14,6 +14,10 @@ Limitations:
 
 
 Revision History:
+4-Oct-2004
+    Problems fixed:
+        1. bug #1039989 Did not compile with JDK 1.3
+
 3-Oct-2004 1.6
 Acknowledgements:
     Thanks to Chris Hane for making it easier to add support for javascript properties and for providing support for

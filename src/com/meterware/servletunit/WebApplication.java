@@ -144,8 +144,8 @@ class WebApplication implements SessionListenerDispatcher {
                  if (listener instanceof ServletContextAttributeListener) _contextAttributeListeners.add( listener );
                  if (listener instanceof HttpSessionListener) _sessionListeners.add( listener );
                  if (listener instanceof HttpSessionAttributeListener) _sessionAttributeListeners.add( listener );
-             } catch (Throwable x) {
-                 throw new RuntimeException("Unable to load context listener " + listenerName, x);
+             } catch (Throwable e) {
+                 throw new RuntimeException("Unable to load context listener " + listenerName + ": " + e.toString() );
              }
          }
      }
@@ -631,7 +631,7 @@ class WebApplication implements SessionListenerDispatcher {
             } catch (IllegalAccessException e) {
                 throw new ServletException( "Filter class " + getClassName() + " lacks a public no-arg constructor" );
             } catch (InstantiationException e) {
-                throw new ServletException( "Filter class " + getClassName() + " instantiation threw" + e.getCause() );
+                throw new ServletException( "Filter class " + getClassName() + " could not be instantiated." );
             } catch (ClassCastException e) {
                 throw new ServletException( "Filter class " + getClassName() + " does not implement" + Filter.class.getName() );
             }
