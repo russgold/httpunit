@@ -534,6 +534,37 @@ public class WebResponse implements HTMLSegment {
             runScript( getReceivedPage().getScripts() );
             doEvent( getReceivedPage().getOnLoadEvent() );
         }
+
+
+        /**
+         * Returns the value of the named property. Will return null if the property does not exist.
+         **/
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "location" )) {
+                return WebResponse.this._url.toExternalForm();
+            } else {
+                return super.get( propertyName );
+            }
+        }
+
+
+        /**
+         * Sets the value of the named property. Will throw a runtime exception if the property does not exist or
+         * cannot accept the specified value.
+         **/
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "location" )) {
+                try {
+                    getClient().getResponse( new GetMethodWebRequest( _url, value.toString(), _frameName ) );
+                } catch (IOException e) {
+                    throw new RuntimeException( "Error handling 'location=': " + e );
+                } catch (SAXException e) {
+                    throw new RuntimeException( "Error handling 'location=': " + e );
+                }
+            } else {
+                super.set( propertyName, value );
+            }
+        }
     }
 
 

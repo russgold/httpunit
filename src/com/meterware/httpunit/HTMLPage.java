@@ -157,8 +157,25 @@ public class HTMLPage extends ParsedHTML {
             WebImage wi = getImageWithName( propertyName );
             if (wi != null) return wi.getScriptableObject();
 
-            return super.get( propertyName );
+            if (propertyName.equalsIgnoreCase( "location" )) {
+                return getResponse().getScriptableObject().get( "location" );
+            } else {
+                return super.get( propertyName );
+            }
         }
+
+
+        /**
+         * Sets the value of the named property. Will throw a runtime exception if the property does not exist or
+         * cannot accept the specified value.
+         **/
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "location" )) {
+                getResponse().getScriptableObject().set( "location", value );
+            } else {
+                super.set( propertyName, value );
+             }
+       }
 
 
         public String getTitle() throws SAXException {
