@@ -55,9 +55,14 @@ class NodeUtils {
 
 
     public static String getNodeAttribute( Node node, String attributeName ) {
+        return getNodeAttribute( node, attributeName, "" );
+    }
+
+
+    public static String getNodeAttribute( Node node, String attributeName, String defaultValue ) {
         NamedNodeMap nnm = node.getAttributes();
         Node attribute = nnm.getNamedItem( attributeName );
-        return (attribute == null) ? "" : attribute.getNodeValue();
+        return (attribute == null) ? defaultValue : attribute.getNodeValue();
     }
 
 

@@ -219,7 +219,7 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
-    public void testSelfTarget() throws Exception {
+    public void testSelfTargetLink() throws Exception {
         defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html target=_self>one link</a>" );
 
         _wc.getResponse( getHostPath() + "/Frames.html" );
@@ -230,6 +230,19 @@ public class WebFrameTest extends HttpUnitTest {
     }
     
     
+    public void testSelfTargetForm() throws Exception {
+        defineWebPage( "Linker",  "<form action=redirect.html target=_self><input type=text name=sample value=z></form>" );
+        defineResource( "redirect.html?sample=z", "" );
+        addResourceHeader( "redirect.html?sample=z", "Location: " + getHostPath() + "/Target.html" );
+
+        _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getForms()[0].getRequest() );
+        assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
+        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
+    }
+
+
     public void testSubFrameRedirect() throws Exception {
         defineResource( "Linker.html", "" );
         addResourceHeader( "Linker.html", "Location: " + getHostPath() + "/Target.html" );

@@ -30,19 +30,23 @@ import org.w3c.dom.*;
  * defined for the form, the structure of the form (as a DOM), or the text of the form. They
  * may also create a {@link WebRequest} to simulate the submission of the form.
  **/
-public class WebForm {
+public class WebForm extends WebRequestSource {
 
 
     /**
-     * Returns the target for this form.
+     * Returns the method defined for this form.
      **/
-    public String getTarget() {
-        if (_node.getAttributes().getNamedItem( "target" ) == null) {
-            return _parentTarget;
-        } else {
-            return getValue( _node.getAttributes().getNamedItem( "target" ) );
-        }
+    public String getMethod() {
+        return NodeUtils.getNodeAttribute( getNode(), "method", "GET" );
     }
+
+
+    /**
+     * Returns the action defined for this form.
+     **/
+    public String getAction() {
+        return NodeUtils.getNodeAttribute( getNode(), "action" );
+     }
 
 
     /**
@@ -57,15 +61,7 @@ public class WebForm {
      * Returns the name of the form.
      **/
     public String getName() {
-        return emptyIfNull( getValue( _node.getAttributes().getNamedItem( "name" ) ) );
-    }
-
-
-    /**
-     * Returns the ID associated with the form.
-     **/
-    public String getID() {
-        return emptyIfNull( getValue( _node.getAttributes().getNamedItem( "id" ) ) );
+        return NodeUtils.getNodeAttribute( getNode(), "name" );
     }
 
 
@@ -118,7 +114,7 @@ public class WebForm {
         if (_buttonVector == null) {
             _buttonVector = new Vector();
 
-            NodeList nl = ((Element) _node).getElementsByTagName( "input" );
+            NodeList nl = ((Element) getNode()).getElementsByTagName( "input" );
             for (int i = 0; i < nl.getLength(); i++) {
                 if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
                     || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "image" )) {
@@ -126,7 +122,7 @@ public class WebForm {
                 }
             }
 
-            nl = ((Element) _node).getElementsByTagName( "button" );
+            nl = ((Element) getNode()).getElementsByTagName( "button" );
             for (int i = 0; i < nl.getLength(); i++) {
                 if (NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "submit" )
                     || NodeUtils.getNodeAttribute( nl.item(i), "type" ).equalsIgnoreCase( "" )) {
@@ -164,6 +160,22 @@ public class WebForm {
         SubmitButton[] buttons = getSubmitButtons();
         for (int i = 0; i < buttons.length; i++) {
             if (buttons[i].getName().equals( name ) && buttons[i].getValue().equals( value )) {
+                return buttons[i];
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the submit button defined in this form with the specified ID.
+     * If more than one such button exists, will return the first found.
+     * If no such button is found, will return null.
+     **/
+    public SubmitButton getSubmitButtonWithID( String ID ) {
+        SubmitButton[] buttons = getSubmitButtons();
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].getID().equals( ID )) {
                 return buttons[i];
             }
         }
@@ -236,18 +248,18 @@ public class WebForm {
             }
         }
 
-        NamedNodeMap nnm = _node.getAttributes();
+        NamedNodeMap nnm = getNode().getAttributes();
         String action = getValue( nnm.getNamedItem( "action" ) );
         if (action.trim().length() == 0) {
-            action = this._baseURL.getFile();
+            action = getBaseURL().getFile();
         }
 
         WebRequest result;
 
         if (getValue( nnm.getNamedItem( "method" ) ).equalsIgnoreCase( "post" )) {
-            result = new PostMethodWebRequest( _baseURL, action, getTarget(), this, button );
+            result = new PostMethodWebRequest( getBaseURL(), action, getTarget(), this, button );
         } else {
-            result = new GetMethodWebRequest( _baseURL, action, getTarget(), this, button );
+            result = new GetMethodWebRequest( getBaseURL(), action, getTarget(), this, button );
         }
 
         String[] parameterNames = getParameterNames();
@@ -261,7 +273,7 @@ public class WebForm {
                 }
             }
         }
-	result.setRequestHeader( "Referer", _baseURL.toExternalForm() );
+	    result.setRequestHeader( "Referer", getBaseURL().toExternalForm() );
         return result;
     }
 
@@ -336,15 +348,7 @@ public class WebForm {
      * Returns true if this form is to be submitted using mime encoding (the default is URL encoding).
      **/
     public boolean isSubmitAsMime() {
-        return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( _node, "enctype" ) );
-    }
-
-
-    /**
-     * Returns a copy of the domain object model subtree associated with this form.
-     **/
-    public Node getDOMSubtree() {
-        return _node.cloneNode( /* deep */ true );
+        return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( getNode(), "enctype" ) );
     }
 
 
@@ -355,9 +359,7 @@ public class WebForm {
      * from that page.
      **/
     WebForm( URL baseURL, String parentTarget, Node node, String characterSet ) {
-        _node         = node;
-        _baseURL      = baseURL;
-        _parentTarget = parentTarget;
+        super( node, baseURL, parentTarget );
         _characterSet = characterSet;
     }
 
@@ -377,12 +379,6 @@ public class WebForm {
     private final static Integer TYPE_FILE = new Integer(4);
 
 
-    /** The URL of the page containing this form. **/
-    private URL            _baseURL;
-
-    /** The DOM node representing the form. **/
-    private Node           _node;
-
     /** The attributes of the form parameters. **/
     private NamedNodeMap[] _parameters;
 
@@ -397,9 +393,6 @@ public class WebForm {
 
     /** The parameters mapped to the type of data which they accept. **/
     private Hashtable      _dataTypes;
-
-    /** The target in which the parent response is to be rendered. **/
-    private String         _parentTarget;
 
     /** The submit buttons in this form. **/
     private SubmitButton[] _submitButtons;
@@ -505,6 +498,9 @@ public class WebForm {
     }
 
 
+    /**
+     * Adds a string to an array of strings and returns the result.
+     **/
     private String[] withNewValue( String[] group, String value ) {
         String[] result = new String[ group.length+1 ];
         System.arraycopy( group, 0, result, 1, group.length );
@@ -551,7 +547,7 @@ public class WebForm {
      **/
     private HTMLSelectElement[] getSelections() {
         if (_selections == null) {
-            NodeList nl = ((Element) _node).getElementsByTagName( "select" );
+            NodeList nl = ((Element) getNode()).getElementsByTagName( "select" );
             HTMLSelectElement[] result = new HTMLSelectElement[ nl.getLength() ];
             for (int i = 0; i < result.length; i++) {
                 result[i] = new HTMLSelectElement( nl.item(i) );
@@ -566,7 +562,7 @@ public class WebForm {
      **/
     private HTMLTextAreaElement[] getTextAreas() {
         if (_textAreas == null) {
-            NodeList nl = ((Element) _node).getElementsByTagName( "textarea" );
+            NodeList nl = ((Element) getNode()).getElementsByTagName( "textarea" );
             HTMLTextAreaElement[] result = new HTMLTextAreaElement[ nl.getLength() ];
             for (int i = 0; i < result.length; i++) {
                 result[i] = new HTMLTextAreaElement( nl.item(i) );
@@ -582,7 +578,7 @@ public class WebForm {
     private NamedNodeMap[] getParameters() {
         if (_parameters == null) {
             Vector list = new Vector();
-            if (_node.hasChildNodes()) addFormParametersToList( _node.getChildNodes(), list );
+            if (getNode().hasChildNodes()) addFormParametersToList( getNode().getChildNodes(), list );
             _parameters = new NamedNodeMap[ list.size() ];
             list.copyInto( _parameters );
         }

@@ -64,9 +64,20 @@ public class WebRequest {
 
 
     /**
-     * Sets the file for a parameter upload in a web request. 
+     * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, File file, String contentType ) {
+        if (_sourceForm == null || !_sourceForm.isFileParameter( parameterName )) {
+            throw new IllegalNonFileParameterException( parameterName );
+        }
+        if (!isMimeEncoded()) throw new MultipartFormRequiredException();
+    }
+
+
+    /**
+     * Sets the file for a parameter upload in a web request.
+     **/
+    public void selectFile( String parameterName, String fileName, InputStream inputStream, String contentType ) {
         if (_sourceForm == null || !_sourceForm.isFileParameter( parameterName )) {
             throw new IllegalNonFileParameterException( parameterName );
         }
@@ -320,8 +331,26 @@ public class WebRequest {
         }
 
 
-        File getFile() {
-            return _file;
+        UploadFileSpec( String fileName, InputStream inputStream, String contentType ) {
+            _fileName = fileName;
+            _inputStream = inputStream;
+            _contentType = contentType;
+        }
+
+
+        InputStream getInputStream() throws IOException {
+            if (_inputStream == null) {
+                _inputStream = new FileInputStream( _file );
+            }
+            return _inputStream;
+        }
+
+
+        String getFileName() {
+            if (_fileName == null) {
+                _fileName = _file.getAbsolutePath();
+            }
+            return _fileName;
         }
 
 
@@ -330,6 +359,10 @@ public class WebRequest {
         }
 
         private File _file;
+
+        private InputStream _inputStream;
+
+        private String _fileName;
 
         private String _contentType = "text/plain";
 

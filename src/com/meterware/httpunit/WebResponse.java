@@ -547,23 +547,16 @@ public class WebResponse implements HTMLSegment {
      *                    the value
      */
     private Hashtable getNewCookies() {
-        if (_newCookies == null) {
-            _newCookies = new Hashtable();
-        }
-        String cookieHeader = getHeaderField( "Set-Cookie" );
-        if (cookieHeader != null) {
-            processCookieTokens( getCookieTokens(cookieHeader),IETF_RFC2109 );
-        }
-        String cookieHeader2 = getHeaderField( "Set-Cookie2" );
-        if (cookieHeader2 != null) {
-            processCookieTokens( getCookieTokens(cookieHeader2),IETF_RFC2965 );
-        }
+        if (_newCookies == null) _newCookies = new Hashtable();
+        processCookieHeader( getHeaderField( "Set-Cookie" ), IETF_RFC2109 );
+        processCookieHeader( getHeaderField( "Set-Cookie2" ), IETF_RFC2965 );
         return _newCookies;
     }
 
 
-    private void processCookieTokens(Vector tokens,
-                                        int version) {
+    private void processCookieHeader( String cookieHeader, int version ) {
+        if (cookieHeader == null) return;
+        Vector tokens = getCookieTokens(cookieHeader);
         // holds tokens that should be part of the value of
         // the first token before it that contains an
         // equals sign (=)
@@ -623,8 +616,8 @@ public class WebResponse implements HTMLSegment {
         st.wordChars(0,Character.MAX_VALUE);
 
         // set up characters for quoting
-        st.quoteChar(34); //double quotes
-        st.quoteChar(39); //single quotes
+        st.quoteChar( '"' ); //double quotes
+        st.quoteChar( '\'' ); //single quotes
 
         // set up characters to separate tokens
         st.whitespaceChars(59,59); //semicolon

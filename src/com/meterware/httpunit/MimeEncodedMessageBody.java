@@ -19,9 +19,9 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.InputStream;
 
 import java.net.URLConnection;
 
@@ -77,11 +77,11 @@ class MimeEncodedMessageBody extends MessageBody {
 	    String name = (String) e.nextElement();
 	    WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );
             writeLn( outputStream, "--" + BOUNDARY );
-            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + encode( name ) + "\"; filename=\"" + encode( spec.getFile().getAbsolutePath() ) + '"' );   // XXX need to handle non-ascii names here
+            writeLn( outputStream, "Content-Disposition: form-data; name=\"" + encode( name ) + "\"; filename=\"" + encode( spec.getFileName() ) + '"' );   // XXX need to handle non-ascii names here
             writeLn( outputStream, "Content-Type: " + spec.getContentType() );
             writeLn( outputStream, "" );
 
-            FileInputStream in = new FileInputStream( spec.getFile() );
+            InputStream in = spec.getInputStream();
             byte[] buffer = new byte[8 * 1024];
             int count = 0;
             do {

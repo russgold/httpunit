@@ -81,19 +81,24 @@ class ParsedHTML {
      **/
     public WebLink[] getLinks() {
         if (_links == null) {
-            NodeList nl = NodeUtils.getElementsByTagName( _rootNode, "a" );
             Vector list = new Vector();
-            for (int i = 0; i < nl.getLength(); i++) {
-                Node child = nl.item(i);
-                if (isLinkAnchor( child )) {
-                    list.addElement( new WebLink( _baseURL, _baseTarget, child ) );
-                }
-            }
+            addLinkAnchors( list, NodeUtils.getElementsByTagName( _rootNode, "a" ) );
+            addLinkAnchors( list, NodeUtils.getElementsByTagName( _rootNode, "area" ) );
             _links = new WebLink[ list.size() ];
             list.copyInto( _links );
         }
 
         return _links;
+    }
+
+
+    private void addLinkAnchors(Vector list, NodeList nl) {
+        for (int i = 0; i < nl.getLength(); i++) {
+            Node child = nl.item(i);
+            if (isLinkAnchor( child )) {
+                list.addElement( new WebLink( _baseURL, _baseTarget, child ) );
+            }
+        }
     }
 
 
@@ -103,12 +108,10 @@ class ParsedHTML {
     public WebLink getLinkWith( String text ) {
         WebLink[] links = getLinks();
         for (int i = 0; i < links.length; i++) {
-            String linkText = NodeUtils.asText( links[i].getDOMSubtree().getChildNodes() );
-            if (contains( linkText, text )) return links[i];
+            if (contains( links[i].asText(), text )) return links[i];
         }
         return null;
     }
-
 
 
     /**
@@ -304,7 +307,7 @@ class ParsedHTML {
     private boolean isLinkAnchor( Node node ) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return false;
-        } else if (!node.getNodeName().equals( "a" )) {
+        } else if (!node.getNodeName().equals( "a" ) && !node.getNodeName().equals( "area" )) {
             return false;
         } else {
             return (node.getAttributes().getNamedItem( "href" ) != null);

@@ -176,6 +176,25 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    public void testImageMapLinks() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "pageWithMap", "Here is a page with <a href=\"somewhere\">a link</a>" +
+                                      " and a map: <IMG src=\"navbar1.gif\" usemap=\"#map1\" alt=\"navigation bar\">" +
+                                      "<map name=\"map1\">" +
+                                      "  <area href=\"guide.html\" alt=\"Guide\" shape=\"rect\" coords=\"0,0,118,28\">" +
+                                      "  <area href=\"search.html\" alt=\"Search\" shape=\"circle\" coords=\"184,200,60\">" +
+                                      "</map>" );
+        WebResponse mapPage = wc.getResponse( getHostPath() + "/pageWithMap.html" );
+        WebLink[] links = mapPage.getLinks();
+        assertEquals( "number of links found", 3, links.length );
+
+        WebLink guide = mapPage.getLinkWith( "Guide" );
+        assertNotNull( "Did not find the guide area", guide );
+        assertEquals( "Relative URL", "guide.html", guide.getURLString() );
+    }
+
+
+
     private WebResponse _simplePage;
 
 

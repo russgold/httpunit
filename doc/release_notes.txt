@@ -2,29 +2,41 @@ HttpUnit release notes
 
 Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
-    2. The "_self" target only works for links, not forms
-    3. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response. 
+    2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
-    4. No order is guaranteed for parameters from forms, contrary to the HTML 4.01 spec
+    3. No order is guaranteed for parameters from forms, contrary to the HTML 4.01 spec
 
 Limitations: HttpUnit does not support JavaScript
 
 Revision History:
+
+31-Jul-2001
+    Additions:
+       1. Added ID property to SubmitButton and WebLink
+       2. Added getSubmitButtonWithID to WebForm
+       3. Added getMethod and getAction to WebForm
+       4. Image map <area> tags are now recognized as links, whose text is equal to their 'alt' tag. This allows
+          them to be retrieved using getLinkWith( altText ).
+       5. Added version of WebRequest.selectFile which allows clients to specify the file to upload using an input
+          stream rather than an actual file.
+
+    Problems corrected:
+       1. The _self target now works for forms.
 
 20-Jul-2001
 Acknowledgements:
     Thanks to Drew Varner for more sophisticated cookie handling, including Set-Cookie2 code
     Thanks to David Karr for pointing out the problem with status code 3xx responses and
     suggesting a fix for it.
-    
+
 Problems corrected:
     1. cookies with embedded commas and quotes are now handled
     2. Status code 3xx responses no longer result in a null pointer exception when
        invoking getText or reading the input stream.
-    
+
 Additions:
     1. The Set_Cookie2 header is now handled
-    
+
 19-Jul-2001
 Additions:
     1. Added getHeaderFieldNames to WebResponse
@@ -39,14 +51,14 @@ Additions:
        calling getResponse. This will prevent HttpUnit from throwing an exception
        in such cases. You can still check the status of the response by calling
        WebResponse.getStatusCode()
-    
+
 Problems corrected:
     1. Forms with no action now default to the originating page
 
  6-Jul-2001 1.2.6
 Acknowledgements:
     Thanks to Marcos Tarruella for adding a test case for the Base64 class
-    
+
 Additions:
     1. WebResponse.getRefreshRequest now returns a WebRequest object if a refresh URL
        was specified in the response header.
@@ -61,8 +73,8 @@ Problems corrected:
     1. The cookbook was missing parentheses for its constructors
     2. Updated the NearWords example to accomodate changes to the Merriam-Webster site
 
-    
-18-Jun-2001 1.2.5                            
+
+18-Jun-2001 1.2.5
 Acknowledgements:
     Thanks to Rolf Schmidiger for corrected behavior when failing to find a site
     Thanks to Tom Watkins, Deepa Dihr, Marcos Tarruella for their implementation of
@@ -85,7 +97,7 @@ Additions:
     8. Added getInputStream method in WebResponse to support non-text responses.
     9. Matching of text in web pages is now controlled by the HttpUnitOption property
        'matchesIgnoreCase'. The default behavior is as before - matches are not case sensitive
-       
+
 Problems corrected:
     1. Now throws HttpNotFoundException rather than NullPointerException when
        unable to connect to a web site
@@ -101,20 +113,20 @@ Configuration changes:
  5-May-01 1.2.4
 Acknowledgements:
     Thanks to Jim Kimball for finding and fixing the redirection of subframes
-    
+
 Problems corrected:
     1. Redirection with subframes was incorrectly targeted at the top frame.
     2. No longer capitalizes all header names; this was necessary for
        compatibility with those servers that do not understand case-insensitive
        header names.
-    3. Repeated requests to the same URL were not resending requests properly. 
+    3. Repeated requests to the same URL were not resending requests properly.
        This caused some problems with validation.
     4. Now correctly passes the full specification of uploaded files, rather than just the name.
 
 Additions:
     1. Transmitted headers as well as received headers are now shown when loggingHttpHeaders
        is enabled.
-    2. The GetMethodWebRequest and PostMethodWebRequest constructors which accept a target 
+    2. The GetMethodWebRequest and PostMethodWebRequest constructors which accept a target
        are now public.
     3. Added getID to WebForm
     4. Added getFormWithID to HTMLSegment interface
@@ -123,7 +135,7 @@ Additions:
 2-Apr-01 1.2.3
 Acknowledgements:
     Thanks to Silvio Samadelli for improved cookie-recognition logic
-    
+
 Problems corrected:
     1. Under JDK 1.3, error headers would sometimes cause a FileNotFoundException
     2. Cookies containing '=' or wrapped in quotes are now recognized
@@ -143,23 +155,23 @@ Acknowledgements:
 
 Additions:
     1. Initial implementation of file upload capability
-    
+
 Problems corrected:
     1. Multiple cookies were not being sent correctly
     2. When a response was received with a bad response code, it was treated either as a RuntimeException
        or a file not found exception.
     3. Creating a request from a form with an empty <select> tag was generating a SingleValuedParameterException.
     4. Corrected IllegalArgumentException: sun.io.CharToByteUTF-8 that happened in JDK 1.1.x
-    
+
 01-Jan-01 1.2.1
 Acknowledgements:
     Thanks to Toyoshi Ushio for helping with the handling of non-English scripts and for translating the home page and cookbook into Japanese.
-    
+
 Problems corrected:
     1. Content-type charset attribute is now recognized, allowing for the proper handling of non-ascii html pages.
     2. Form submissions now use the page character set encoding.
     3. Old format cookie headers (with the expires=attribute) are now recognized.
-    
+
 Additions:
     1. Introductory ServletUnit functionality (parameters and sessions, but no JSP, no forwarding)
     2. Added getTableWithID method to WebResponse, ParsedHTML
@@ -172,7 +184,7 @@ Additions:
 Acknowledgements:
     Thanks to Robert Krueger for providing an interface to the xerces parser for XML web responses.
     Thanks to Marco Tamanti and Gabriele Antonelli for suggesting ways to support file URLs
-    
+
 Problems corrected:
     1. Unnamed parameters are no longer submitted as part of a form request
     2. Searching for tables beginning with a string no longer aborts with NullPointerException if the table is missing cells
@@ -181,10 +193,10 @@ Problems corrected:
 Additions:
     1. Forms with multiple buttons are now supported, using the SubmitButton class.
     2. WebResponse now supports finding a table via its summary text, using getTableWithSummary().
-    3. XML parsing is now supported. If WebResponse.getDOM is called for a non-HTML response (content type is not "text/html"), 
+    3. XML parsing is now supported. If WebResponse.getDOM is called for a non-HTML response (content type is not "text/html"),
        the xerces parser will be invoked to treat the response as XML.
-    4. File URLs (file:xxx) are now supported 
-            
+    4. File URLs (file:xxx) are now supported
+
 17-Oct-00 1.1
 Acknowledgements:
     Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
@@ -193,7 +205,7 @@ Acknowledgements:
     Thanks to Perry Doell for the methods to examine cookies on WebConversation
     Thanks to Ken Hygh for the proper handling of parameters with no specified type
     Thanks to Gabriel Hauser for finding a bug in the handling of parameter defaults
-     
+
 Problems corrected:
     1. The value parameter for checkboxes is no longer ignored
     2. Previously, getTableStartingWith[Prefix] only checked the nested tables in cell (0,0) of each outer table
@@ -203,7 +215,7 @@ Problems corrected:
 
 Additions:
     1. The license agreement is now available from the home page and javadoc
-    2. Https support is now built in; however, it depends on the JSSE extension (not included). 
+    2. Https support is now built in; however, it depends on the JSSE extension (not included).
        See http://java.sun.com/products/jsse.
     3. Frames are now supported. The WebConversation method has two methods: getFrameNames and getFrameContents which
        allow manipulation of frames.
@@ -217,10 +229,10 @@ Additions:
     7. WebResponse.getTitle() returns the HTML title of the page
     8. WebLink.getURLString() returns the URL string specified by the link in its href attribute
     9. WebResponse.getURL() return the URL used to retrieve the page
-   10. WebConversation now supports getCookieNames and getCookieValue to return the current cookies  
+   10. WebConversation now supports getCookieNames and getCookieValue to return the current cookies
    11. The WebResponse now can return the response code associated with it (2xx)
    12. Non-breaking spaces are converted to spaces on any conversion to text
-   
+
 
 1-Sep-00 1.0
 
@@ -258,13 +270,13 @@ Additions:
     5. Added copyright notices to most source files
     6. Added support for checkboxes, radio buttons, text areas, and selects
 
-    
+
 29-Jun-00 0.9.1
 Additions:
     1. The PostMethodWebRequest class is now public.
     2. Row and column spans are now handled
     3. Formatting inside table cells is ignored in computing the text value of a cell
-    
+
 19-Jun-00 0.9
 Additions:
     1. The parser may be tested during the build by issuing the command: 'ant test -Dclasspath="%classpath%"'
@@ -285,6 +297,6 @@ Additions:
     ExampleTest now demonstrates the use of httpunit and JUnit to test servlets
     NearWords demonstrates the use of httpunit to access web site functionality
 
-03-May-00  0.8 
+03-May-00  0.8
 Initial public release
 

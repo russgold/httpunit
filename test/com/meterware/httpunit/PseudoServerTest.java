@@ -191,6 +191,7 @@ public class PseudoServerTest extends HttpUnitTest {
         ps.addResourceHeader( resourceName, "Set-Cookie: age=12, name=george" );
         ps.addResourceHeader( resourceName, "Set-Cookie: type=short" );
         ps.addResourceHeader( resourceName, "Set-Cookie: funky=ab$==" );
+        ps.addResourceHeader( resourceName, "Set-Cookie: p30waco_sso=3.0,en,us,AMERICA,Drew;path=/, PORTAL30_SSO_TEST=X" );
 
         try {
             WebConversation wc   = new WebConversation();
@@ -198,11 +199,13 @@ public class PseudoServerTest extends HttpUnitTest {
             WebResponse response = wc.getResponse( request );
             assertEquals( "requested resource", resourceValue, response.getText().trim() );
             assertEquals( "content type", "text/html", response.getContentType() );
-            assertEquals( "number of cookies", 4, wc.getCookieNames().length );
+            assertEquals( "number of cookies", 6, wc.getCookieNames().length );
             assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
             assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
             assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );
             assertEquals( "cookie 'funky' value", "ab$==", wc.getCookieValue( "funky" ) );
+            assertEquals( "cookie 'p30waco_sso' value", "3.0,en,us,AMERICA,Drew", wc.getCookieValue( "p30waco_sso" ) );
+            assertEquals( "cookie 'PORTAL30_SSO_TEST' value", "X", wc.getCookieValue( "PORTAL30_SSO_TEST" ) );
         } finally {
             ps.shutDown();
         }

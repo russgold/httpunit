@@ -50,6 +50,15 @@ public class SubmitButton {
 
 
     /**
+     * Returns the ID associated with the button, if any.
+     * @return the button ID, or an empty string if no ID is defined.
+     **/
+    public String getID() {
+        return NodeUtils.getNodeAttribute( _node, "id" );
+    }
+
+
+    /**
      * Returns true if this submit button is an image map.
      **/
     public boolean isImageButton() {

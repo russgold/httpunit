@@ -81,6 +81,19 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testFormProperties() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<select name=empty></select>" +
+                                  "<Input type=submit>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        assertEquals( "Form method", "GET", form.getMethod() );
+        assertEquals( "Form action", "/ask", form.getAction() );
+    }
+
+
     public void testSubmitString() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age>" +
@@ -118,6 +131,23 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
                               
+    public void testButtonIDDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit id=main name=update>" +
+                                  "<Input type=submit name=recalculate>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton button = form.getSubmitButton( "update" );
+        assertEquals( "Null ID", "", form.getSubmitButton( "recalculate" ).getID() );
+        assertEquals( "Button ID", "main", button.getID() );
+
+        SubmitButton button2 = form.getSubmitButtonWithID( "main" );
+        assertEquals( "Submit button", button, button2 );
+    }
+
+
     public void testButtonTagDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
