@@ -305,6 +305,29 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testWindowOpenWithSelf() throws Exception {
+        defineResource( "Target.txt", "You made it!", "text/plain" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body><script language='JavaScript'>var otherWindow;</script>" +
+                        "<a href='#' onClick=\"otherWindow = window.open( '" + getHostPath() + "/Target.txt', '_self' );\">go</a>" +
+                        "<a href='#' onClick=\"otherWindow.close();\">go</a>" +
+                        "<a href='#' onClick=\"alert( 'window is ' + (otherWindow.closed ? '' : 'not ') + 'closed' );\">go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
+        WebConversation wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) { windowsOpened.add( window ); }
+            public void windowClosed( WebClient client, WebWindow window ) {}
+        } );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+
+        assertTrue( "Opened a new window", windowsOpened.isEmpty() );
+        assertEquals( "New window message", "You made it!", wc.getCurrentPage().getText() );
+        assertEquals( "Number of open windows", 1, wc.getOpenWindows().length );
+    }
+
+
     public void testJavascriptURLWithFragment() throws Exception {
         defineResource( "Target.txt", "You made it!", "text/plain" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +

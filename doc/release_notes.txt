@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+21-Jun-2004
+   Problems fixed:
+       1. bug #974675 Javascript function Window.open did not honor "_self" tag for window name.
+
 18-Jun-2004
    Additions:
        1. Enhanced http logging to show target server, request header line, and received URL
