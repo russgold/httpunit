@@ -61,6 +61,7 @@ public class WebLinkTest extends HttpUnitTest {
                         "have <a href=\"/other.html\" id=\"activeID\">an <b>active</b> link</A>\n" +
                         " and <a name=here>an anchor</a>\n" +
                         "<a href=\"basic.html\" name=\"nextLink\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
+                        "<a href=\"another.html\" name=\"myLink\">some text</a>\n" +
                         "</body></html>\n" );
 
         WebConversation wc = new WebConversation();
@@ -80,8 +81,8 @@ public class WebLinkTest extends HttpUnitTest {
 
     public void testLinks() throws Exception {
         WebLink[] links = _simplePage.getLinks();
-        assertNotNull( links );
-        assertEquals( 2, links.length );
+        assertNotNull( "Found no links", links );
+        assertEquals( "number of links in page", 3, links.length );
     }
 
 
@@ -118,6 +119,24 @@ public class WebLinkTest extends HttpUnitTest {
         HttpUnitOptions.setImagesTreatedAsAltText( false );
         link = _simplePage.getLinkWith( "Next -->" );
         assertNull( "the image link was found based on its hidden alt attribute", link );
+    }
+
+
+    public void testCustomMatching() throws Exception {
+        WebLink link = _simplePage.getFirstMatchingLink( WebLink.MATCH_URL_STRING, "nothing" );
+        assertNull( "Non-existent link should not have been found", link );
+
+        link = _simplePage.getFirstMatchingLink( WebLink.MATCH_URL_STRING, "/other.html" );
+        assertNotNull( "an active link was not found", link );
+        assertEquals( "active link text", "an active link", link.asText() );
+
+        link = _simplePage.getFirstMatchingLink( WebLink.MATCH_URL_STRING, "basic" );
+        assertNotNull( "the image link was not found", link );
+        assertEquals( "image link URL", getHostPath() + "/basic.html", link.getRequest().getURL().toExternalForm() );
+
+        WebLink[] links = _simplePage.getMatchingLinks( WebLink.MATCH_URL_STRING, "other.ht" );
+        assertNotNull( "No link array returned", links );
+        assertEquals( "Number of links with URL containing 'other.ht'", 2, links.length );
     }
 
 

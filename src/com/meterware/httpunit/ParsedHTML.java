@@ -125,7 +125,7 @@ class ParsedHTML {
     public WebLink getLinkWith( String text ) {
         WebLink[] links = getLinks();
         for (int i = 0; i < links.length; i++) {
-            if (contains( links[i].asText(), text )) return links[i];
+            if (HttpUnitUtils.contains( links[i].asText(), text )) return links[i];
         }
         return null;
     }
@@ -165,6 +165,31 @@ class ParsedHTML {
             else if (HttpUnitOptions.getMatchesIgnoreCase() && links[i].getName().equalsIgnoreCase( name )) return links[i];
         }
         return null;
+    }
+
+
+    /**
+     * Returns the first link found in the page matching the specified criteria.
+     **/
+    public WebLink getFirstMatchingLink( HTMLElementPredicate predicate, Object criteria ) {
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            if (predicate.matchesCriteria( links[i], criteria )) return links[i];
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns all links found in the page matching the specified criteria.
+     **/
+    public WebLink[] getMatchingLinks( HTMLElementPredicate predicate, Object criteria ) {
+        ArrayList matches = new ArrayList();
+        WebLink[] links = getLinks();
+        for (int i = 0; i < links.length; i++) {
+            if (predicate.matchesCriteria( links[i], criteria )) matches.add( links[i] );
+        }
+        return (WebLink[]) matches.toArray( new WebLink[ matches.size() ] );
     }
 
 
@@ -242,7 +267,7 @@ class ParsedHTML {
             public boolean isTrue( WebTable table ) {
                 table.purgeEmptyCells();
                 return table.getRowCount() > 0 &&
-                       matches( table.getCellAsText(0,0), text );
+                       HttpUnitUtils.matches( table.getCellAsText(0,0), text );
             }
         } );
     }
@@ -258,7 +283,7 @@ class ParsedHTML {
             public boolean isTrue( WebTable table ) {
                 table.purgeEmptyCells();
                 return table.getRowCount() > 0 &&
-                       hasPrefix( table.getCellAsText(0,0).toUpperCase(), text );
+                       HttpUnitUtils.hasPrefix( table.getCellAsText(0,0).toUpperCase(), text );
             }
         } );
     }
@@ -272,7 +297,7 @@ class ParsedHTML {
     public WebTable getTableWithSummary( final String summary ) {
         return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
             public boolean isTrue( WebTable table ) {
-                return matches( table.getSummary(), summary );
+                return HttpUnitUtils.matches( table.getSummary(), summary );
             }
         } );
     }
@@ -286,7 +311,7 @@ class ParsedHTML {
     public WebTable getTableWithID( final String ID ) {
         return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
             public boolean isTrue( WebTable table ) {
-                return matches( table.getID(), ID );
+                return HttpUnitUtils.matches( table.getID(), ID );
             }
         } );
     }
@@ -382,33 +407,6 @@ class ParsedHTML {
     private String _baseTarget;
 
     private String _characterSet;
-
-
-    private boolean contains( String string, String substring ) {
-        if (HttpUnitOptions.getMatchesIgnoreCase()) {
-            return string.toUpperCase().indexOf( substring.toUpperCase() ) >= 0;
-        } else {
-            return string.indexOf( substring ) >= 0;
-        }
-    }
-
-
-    private boolean hasPrefix( String string, String prefix ) {
-        if (HttpUnitOptions.getMatchesIgnoreCase()) {
-            return string.toUpperCase().startsWith( prefix.toUpperCase() );
-        } else {
-            return string.startsWith( prefix );
-        }
-    }
-
-
-    private boolean matches( String string1, String string2 ) {
-        if (HttpUnitOptions.getMatchesIgnoreCase()) {
-            return string1.equalsIgnoreCase( string2 );
-        } else {
-            return string1.equals( string2 );
-        }
-    }
 
 
     private String getValue( Node node ) {

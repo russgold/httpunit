@@ -39,6 +39,9 @@ import org.xml.sax.SAXException;
  **/
 public class WebLink extends FixedURLWebRequestSource {
 
+    /** Predicate to match part or all of a link's URL string. **/
+    public final static HTMLElementPredicate MATCH_URL_STRING;
+
     private Scriptable _scriptable;
 
 
@@ -144,6 +147,17 @@ public class WebLink extends FixedURLWebRequestSource {
     Scriptable getScriptableObject() {
         if (_scriptable == null) _scriptable = new Scriptable();
         return _scriptable;
+    }
+
+
+    static {
+        MATCH_URL_STRING = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.contains( ((WebLink) htmlElement).getURLString(), (String) criteria );
+            };
+        };
+
+
     }
 
 

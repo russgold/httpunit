@@ -11,6 +11,14 @@ Limitations:
 
 
 Revision History:
+13-Sep-2002
+Acknowledgements:
+    Thanks to Jin Zhao for help in expanding the search possibilities for links.
+
+Additions:
+    1. The mechanism for search for links has been expanded to permit arbitrary search criteria and to retrieve
+       either the first match or all matches.
+
  9-Sep-2002
 Acknowledgement:
     1. Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.

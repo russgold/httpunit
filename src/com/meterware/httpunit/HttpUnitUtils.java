@@ -133,4 +133,43 @@ public class HttpUnitUtils {
         }
         return result;
     }
+
+
+    /**
+     * Return true if the first string contains the second.
+     * Case sensitivity is according to the setting of HttpUnitOptions.matchesIgnoreCase
+     */
+    static boolean contains( String string, String substring ) {
+        if (HttpUnitOptions.getMatchesIgnoreCase()) {
+            return string.toUpperCase().indexOf( substring.toUpperCase() ) >= 0;
+        } else {
+            return string.indexOf( substring ) >= 0;
+        }
+    }
+
+
+    /**
+     * Return true if the first string starts with the second.
+     * Case sensitivity is according to the setting of HttpUnitOptions.matchesIgnoreCase
+     */
+    static boolean hasPrefix( String string, String prefix ) {
+        if (HttpUnitOptions.getMatchesIgnoreCase()) {
+            return string.toUpperCase().startsWith( prefix.toUpperCase() );
+        } else {
+            return string.startsWith( prefix );
+        }
+    }
+
+
+    /**
+     * Return true if the first string equals the second.
+     * Case sensitivity is according to the setting of HttpUnitOptions.matchesIgnoreCase
+     */
+    static boolean matches( String string1, String string2 ) {
+        if (HttpUnitOptions.getMatchesIgnoreCase()) {
+            return string1.equalsIgnoreCase( string2 );
+        } else {
+            return string1.equals( string2 );
+        }
+    }
 }

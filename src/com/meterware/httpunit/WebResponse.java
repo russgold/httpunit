@@ -363,6 +363,24 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns the first link found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebLink getFirstMatchingLink( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+        return getReceivedPage().getFirstMatchingLink( predicate, criteria );
+    }
+
+
+    /**
+     * Returns all links found in the page matching the specified criteria.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebLink[] getMatchingLinks( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+        return getReceivedPage().getMatchingLinks( predicate, criteria );
+    }
+
+
+    /**
      * Returns the images found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the response.
      **/
