@@ -54,10 +54,20 @@ public class WebConversation extends WebClient {
      * Creates a web response object which represents the response to the specified web request.
      **/
     protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException, IOException {
-        URLConnection connection = openConnection( request.getURL() );
+        URLConnection connection = openConnection( getRequestURL( request ) );
 	    sendHeaders( connection, request.getHeaderDictionary() );
         request.completeRequest( connection );
         return new HttpWebResponse( this, frameName, request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
+    }
+
+
+    private URL getRequestURL( WebRequest request ) throws MalformedURLException {
+        DNSListener dnsListener = getClientProperties().getDnsListener();
+        if (dnsListener == null) return request.getURL();
+
+        String hostName = request.getURL().getHost();
+        setHeaderField( "Host", hostName + ':' + request.getURL().getPort() );
+        return new URL( request.getURL().getProtocol(), dnsListener.getIpAddress( hostName ), request.getURL().getPort(), request.getURL().getFile() );
     }
 
 

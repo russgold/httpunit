@@ -342,4 +342,21 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    public void testDNSOverride() throws Exception {
+        WebConversation wc = new WebConversation();
+        wc.getClientProperties().setDnsListener( new DNSListener() {
+            public String getIpAddress( String hostName ) { return "127.0.0.1"; }
+        });
+
+        defineResource( "whereAmI", new PseudoServlet() {
+            public WebResource getGetResponse() throws IOException {
+                return new WebResource( "found host header: " + getHeader( "Host" ) );
+            }
+        } );
+
+        WebResponse wr = wc.getResponse( "http://meterware.com:" + getHostPort() + "/whereAmI" );
+        assertEquals( "Submitted host header", "found host header: meterware.com:" + getHostPort(), wr.getText() );
+    }
+
+
 }

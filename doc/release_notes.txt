@@ -24,6 +24,8 @@ Problems fixed:
 
 Additions:
     1. PseudoServer now handles persistent connections.
+    2. ClientProperties now supports a listener which allows for the override of DNS mapping, allowing a client
+       to supply an actual IP address for a host programatically. The original Host header will be retained.
 
  17-Mar-2003
 Problems fixed:

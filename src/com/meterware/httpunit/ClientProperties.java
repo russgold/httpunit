@@ -210,6 +210,22 @@ public class ClientProperties {
     }
 
 
+    /**
+     * Specifies a listener for DNS requests from the client.
+     */
+    public void setDnsListener( DNSListener dnsListener ) {
+        _dnsListener = dnsListener;
+    }
+
+
+    /**
+     * Returns the listener for DNS requests to be used by the client.
+     */
+    DNSListener getDnsListener() {
+        return _dnsListener;
+    }
+
+
     static ClientProperties cloneProperties() {
         return new ClientProperties( getDefaultProperties() );
     }
@@ -228,6 +244,8 @@ public class ClientProperties {
     private boolean _acceptGzip    = true;
     private boolean _autoRedirect  = true;
     private boolean _autoRefresh   = false;
+
+    private DNSListener _dnsListener;
 
     private static ClientProperties _defaultProperties = new ClientProperties();
 
