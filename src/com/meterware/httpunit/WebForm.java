@@ -66,20 +66,14 @@ public class WebForm extends WebRequestSource {
      * Returns true if a parameter with given name exists in this form.
      **/
     public boolean hasParameterNamed( String soughtName ) {
-        NamedNodeMap[] parameters = getParameters();
+        FormControl[] parameters = getParameters();
         for (int i = 0; i < parameters.length; i++) {
-            String name = getValue( parameters[ i ].getNamedItem( "name" ) );
-            if (name.equals( soughtName )) return true;
+            if (parameters[i].getName().equals( soughtName )) return true;
         }
 
         HTMLSelectElement[] selections = getSelections();
         for (int i = 0; i < selections.length; i++) {
             if (soughtName.equals( selections[ i ].getName() )) return true;
-        }
-
-        HTMLTextAreaElement[] textAreas = getTextAreas();
-        for (int i = 0; i < textAreas.length; i++) {
-            if (soughtName.equals( textAreas[ i ].getName() )) return true;
         }
 
         return false;
@@ -90,20 +84,15 @@ public class WebForm extends WebRequestSource {
      * Returns true if a parameter starting with a given name exists,
      **/
     public boolean hasParameterStartingWithPrefix( String prefix ) {
-        NamedNodeMap[] parameters = getParameters();
+        FormControl[] parameters = getParameters();
         for (int i = 0; i < parameters.length; i++) {
-            String name = getValue( parameters[ i ].getNamedItem( "name" ) );
+            String name = parameters[i].getName();
             if (name.startsWith( prefix )) return true;
         }
 
         HTMLSelectElement[] selections = getSelections();
         for (int i = 0; i < selections.length; i++) {
             if (selections[ i ].getName().startsWith( prefix )) return true;
-        }
-
-        HTMLTextAreaElement[] textAreas = getTextAreas();
-        for (int i = 0; i < textAreas.length; i++) {
-            if (textAreas[ i ].getName().startsWith( prefix )) return true;
         }
 
         return false;
@@ -116,21 +105,16 @@ public class WebForm extends WebRequestSource {
      **/
     public String[] getParameterNames() {
         Vector parameterNames = new Vector();
-        NamedNodeMap[] parameters = getParameters();
+        FormControl[] parameters = getParameters();
 
         for (int i = 0; i < parameters.length; i++) {
-            String name = getValue( parameters[i].getNamedItem( "name" ) );
+            String name = parameters[i].getName();
             if (!parameterNames.contains( name )) parameterNames.addElement( name );
         }
 
         HTMLSelectElement[] selections = getSelections();
         for (int i = 0; i < selections.length; i++) {
             parameterNames.addElement( selections[i].getName() );
-        }
-
-        HTMLTextAreaElement[] textAreas = getTextAreas();
-        for (int i = 0; i < textAreas.length; i++) {
-            parameterNames.addElement( textAreas[i].getName() );
         }
 
         String[] result = new String[ parameterNames.size() ];
@@ -300,7 +284,7 @@ public class WebForm extends WebRequestSource {
         }
 
         NamedNodeMap nnm = getNode().getAttributes();
-        String action = getValue( nnm.getNamedItem( "action" ) );
+        String action = getAction();
         if (action.trim().length() == 0) {
             action = getBaseURL().getFile();
         }
@@ -461,7 +445,7 @@ public class WebForm extends WebRequestSource {
 
 
     /** The attributes of the form parameters. **/
-    private NamedNodeMap[] _parameters;
+    private FormControl[] _parameters;
 
     /** The parameters with their default values. **/
     private Hashtable      _defaults;
@@ -484,9 +468,6 @@ public class WebForm extends WebRequestSource {
     /** The selections in this form. **/
     private HTMLSelectElement[] _selections;
 
-    /** The text areas in this form. **/
-    private HTMLTextAreaElement[] _textAreas;
-
     /** The character set in which the form will be submitted. **/
     private String         _characterSet;
 
@@ -503,11 +484,11 @@ public class WebForm extends WebRequestSource {
 
     private Hashtable getParameterDefaults() {
         if (_defaults == null) {
-            NamedNodeMap[] parameters = getParameters();
+            FormControl[] parameters = getParameters();
             Hashtable defaults = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
-                String name  = getValue( parameters[i].getNamedItem( "name" ) );
-                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String name  = parameters[i].getName();
+                String value = parameters[i].getValue();
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null || type.length() == 0) type = "TEXT";
 
@@ -529,10 +510,6 @@ public class WebForm extends WebRequestSource {
             for (int i = 0; i < selections.length; i++) {
                 defaults.put( selections[i].getName(), selections[i].getSelected() );
             }
-            HTMLTextAreaElement[] textAreas = getTextAreas();
-            for (int i = 0; i < textAreas.length; i++) {
-                defaults.put( textAreas[i].getName(), textAreas[i].getValue() );
-            }
             _defaults = defaults;
         }
         return _defaults;
@@ -542,14 +519,14 @@ public class WebForm extends WebRequestSource {
 
     private Hashtable getParameterRequiredValues() {
         if (_required == null) {
-            NamedNodeMap[] parameters = getParameters();
+            FormControl[] parameters = getParameters();
             Hashtable required = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
-                String name  = getValue( parameters[i].getNamedItem( "name" ) );
-                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String name  = parameters[i].getName();
+                String value = parameters[i].getValue();
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null || type.length() == 0) type = "TEXT";
-                if (parameters[i].getNamedItem( "readonly" ) == null) continue;
+                if (!parameters[i].isReadOnly()) continue;
 
                 if (type.equals( "TEXT" ) || type.equals( "HIDDEN" ) || type.equals( "PASSWORD" )) {
                     required.put( name, value );
@@ -568,10 +545,6 @@ public class WebForm extends WebRequestSource {
             HTMLSelectElement[] selections = getSelections();
             for (int i = 0; i < selections.length; i++) {
                 if (selections[i].isDisabled()) required.put( selections[i].getName(), selections[i].getSelected() );
-            }
-            HTMLTextAreaElement[] textAreas = getTextAreas();
-            for (int i = 0; i < textAreas.length; i++) {
-                if (textAreas[i].isReadOnly()) required.put( textAreas[i].getName(), textAreas[i].getValue() );
             }
             _required = required;
         }
@@ -595,15 +568,15 @@ public class WebForm extends WebRequestSource {
     private Hashtable getParameterOptionValues() {
         if (_optionValues == null) {
             Hashtable options = new Hashtable();
-            NamedNodeMap[] parameters = getParameters();
+            FormControl[] parameters = getParameters();
             for (int i = 0; i < parameters.length; i++) {
-                String name  = getValue( parameters[i].getNamedItem( "name" ) );
-                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String name  = parameters[i].getName();
+                String value = parameters[i].getValue();
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null || type.length() == 0) type = "TEXT";
 
                 if ((type.equals( "RADIO" ) || type.equals( "CHECKBOX" ))
-                     && (parameters[i].getNamedItem( "readonly" ) == null
+                     && (!parameters[i].isReadOnly()
                          || parameters[i].getNamedItem( "checked" ) != null)) {
                     if (value.length() == 0 && type.equals( "CHECKBOX" )) value = "on";
                     String[] radioOptions = (String[]) options.get( name );
@@ -637,11 +610,11 @@ public class WebForm extends WebRequestSource {
 
     private Hashtable getParameterTypes() {
         if (_dataTypes == null) {
-            NamedNodeMap[] parameters = getParameters();
+            FormControl[] parameters = getParameters();
             Hashtable types = new Hashtable();
             _textParameterCounts = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
-                String name  = getValue( parameters[i].getNamedItem( "name" ) );
+                String name  = parameters[i].getName();
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null || type.length() == 0) type = "TEXT";
 
@@ -664,10 +637,6 @@ public class WebForm extends WebRequestSource {
             HTMLSelectElement[] selections = getSelections();
             for (int i = 0; i < selections.length; i++) {
                 types.put( selections[i].getName(), selections[i].isMultiSelect() ? TYPE_MULTI_VALUED : TYPE_SCALAR );
-            }
-            HTMLTextAreaElement[] textAreas = getTextAreas();
-            for (int i = 0; i < textAreas.length; i++) {
-                types.put( textAreas[i].getName(), TYPE_TEXT );
             }
             _dataTypes = types;
         }
@@ -693,26 +662,14 @@ public class WebForm extends WebRequestSource {
     /**
      * Returns an array of select control descriptors for this form.
      **/
-    private HTMLTextAreaElement[] getTextAreas() {
-        if (_textAreas == null) {
-            NodeList nl = ((Element) getNode()).getElementsByTagName( "textarea" );
-            HTMLTextAreaElement[] result = new HTMLTextAreaElement[ nl.getLength() ];
-            for (int i = 0; i < result.length; i++) {
-                result[i] = new HTMLTextAreaElement( nl.item(i) );
-            }
-            _textAreas = result;
-        }
-        return _textAreas;
-    }
-
     /**
      * Returns an array of form parameter attributes for this form.
      **/
-    private NamedNodeMap[] getParameters() {
+    private FormControl[] getParameters() {
         if (_parameters == null) {
             Vector list = new Vector();
             if (getNode().hasChildNodes()) addFormParametersToList( getNode().getChildNodes(), list );
-            _parameters = new NamedNodeMap[ list.size() ];
+            _parameters = new FormControl[ list.size() ];
             list.copyInto( _parameters );
         }
 
@@ -728,31 +685,11 @@ public class WebForm extends WebRequestSource {
 
 
     private void addFormParametersToList( Node child, Vector list ) {
-        if (isFormParameter( child )) {
-            list.addElement( child.getAttributes() );
+        final FormControl formParameter = FormControl.newFormParameter( child );
+         if (formParameter != null) {
+            list.addElement( formParameter );
         } else if (child.hasChildNodes()) {
             addFormParametersToList( child.getChildNodes(), list );
-        }
-    }
-
-
-    private boolean isFormParameter( Node node ) {
-        if (node.getNodeType() != Node.ELEMENT_NODE) {
-            return false;
-        } else if (!node.getNodeName().equals( "input" )) {
-            return false;
-        } else {
-            NamedNodeMap nnm = node.getAttributes();
-            Node n = nnm.getNamedItem( "type" );
-            if (n == null) {
-                return true;
-            } else if (n.getNodeValue().equalsIgnoreCase( "submit" )) {
-                return false;
-            } else if (n.getNodeValue().equalsIgnoreCase( "reset" )) {
-                return false;
-            } else {
-                return true;
-            }
         }
     }
 
@@ -838,38 +775,88 @@ public class WebForm extends WebRequestSource {
         }
 
 
-        private String getTextValue( Node optionNode ) {
-            NamedNodeMap nnm = optionNode.getAttributes();
-            return getValue( optionNode.getFirstChild() );
+    }
+
+}
+
+
+
+class FormControl {
+    protected Node _node;
+
+
+    FormControl( Node node ) {
+        _node = node;
+    }
+
+
+    Node getNamedItem( String attributeName ) {
+        return _node.getAttributes().getNamedItem( attributeName );
+    }
+
+
+    /**
+     * Returns the name of this control. If no name is specified, defaults to the empty string.
+     **/
+    String getName() {
+        return NodeUtils.getNodeAttribute( _node, "name" );
+    }
+
+
+    /**
+     * Returns the value of this control. If no value is specified, defaults to the empty string.
+     **/
+    String getValue() {
+        return NodeUtils.getNodeAttribute( _node, "value" );
+    }
+
+
+    /**
+     * Returns true if this control is read-only.
+     **/
+    boolean isReadOnly() {
+        return _node.getAttributes().getNamedItem( "readonly" ) != null;
+    }
+
+
+    static FormControl newFormParameter( Node node ) {
+        if (node.getNodeType() != Node.ELEMENT_NODE) {
+            return null;
+        } else if (node.getNodeName().equals( "textarea" )) {
+            return new TextAreaFormControl( node );
+        } else if (!node.getNodeName().equals( "input" )) {
+            return null;
+        } else {
+            NamedNodeMap nnm = node.getAttributes();
+            Node n = nnm.getNamedItem( "type" );
+            if (n == null) {
+                return new FormControl( node );
+            } else if (n.getNodeValue().equalsIgnoreCase( "submit" )) {
+                return null;
+            } else if (n.getNodeValue().equalsIgnoreCase( "reset" )) {
+                return null;
+            } else {
+                return new FormControl( node );
+            }
+        }
+    }
+
+}
+
+
+class TextAreaFormControl extends FormControl {
+
+    public TextAreaFormControl( Node node ) {
+        super( node );
+
+        if (!node.getNodeName().equalsIgnoreCase( "textarea" )) {
+            throw new RuntimeException( "Not a textarea element" );
         }
     }
 
 
-    class HTMLTextAreaElement {
-        HTMLTextAreaElement( Node node ) {
-            if (!node.getNodeName().equalsIgnoreCase( "textarea" )) {
-                throw new RuntimeException( "Not a textarea element" );
-            }
-            _node = node;
-        }
-    
-    
-        private Node _node;
-    
-    
-        String getName() {
-            NamedNodeMap nnm = _node.getAttributes();
-            return WebForm.this.getValue( nnm.getNamedItem( "name" ) );
-        }
-
-
-        String getValue() {
-            return NodeUtils.asText(_node.getChildNodes() );
-        }
-
-        boolean isReadOnly() {
-            return _node.getAttributes().getNamedItem( "readonly" ) != null;
-        }
+    String getValue() {
+        return NodeUtils.asText( _node.getChildNodes() );
     }
 
 }
