@@ -370,6 +370,15 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
+     * Returns the image found in the page with the specified name attribute.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebImage getImageWithName( String source ) throws SAXException {
+        return getReceivedPage().getImageWithName( source );
+    }
+
+
+    /**
      * Returns the image found in the page with the specified src attribute.
      * @exception SAXException thrown if there is an error parsing the response.
      **/

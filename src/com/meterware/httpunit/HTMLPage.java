@@ -137,6 +137,9 @@ public class HTMLPage extends ParsedHTML {
             WebLink wl = getLinkWithName( propertyName );
             if (wl != null) return wl.getScriptableObject();
 
+            WebImage wi = getImageWithName( propertyName );
+            if (wi != null) return wi.getScriptableObject();
+
             return super.get( propertyName );
         }
 
@@ -161,6 +164,16 @@ public class HTMLPage extends ParsedHTML {
             WebForm.Scriptable[] result = new WebForm.Scriptable[ forms.length ];
             for (int i = 0; i < forms.length; i++) {
                 result[i] = forms[i].getScriptableObject();
+            }
+            return result;
+        }
+
+
+        public WebImage.Scriptable[] getImages() {
+            WebImage[] images = HTMLPage.this.getImages();
+            WebImage.Scriptable[] result = new WebImage.Scriptable[ images.length ];
+            for (int i = 0; i < images.length; i++) {
+                result[i] = images[i].getScriptableObject();
             }
             return result;
         }

@@ -197,6 +197,19 @@ class ParsedHTML {
 
 
     /**
+     * Returns the image found in the page with the specified name.
+     **/
+    public WebImage getImageWithName( String name ) {
+        WebImage[] images = getImages();
+        for (int i = 0; i < images.length; i++) {
+            if (images[i].getName().equals( name )) return images[i];
+            else if (HttpUnitOptions.getMatchesIgnoreCase() && images[i].getName().equalsIgnoreCase( name )) return images[i];
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the image found in the page with the specified src attribute.
      **/
     public WebImage getImageWithSource( String source ) {

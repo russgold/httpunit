@@ -15,6 +15,10 @@ Revision History:
  5-Aug-2002
 Additions:
     1. The JavaScript link.href attribute is now readable.
+    2. JavaScript: document.images and document.<image-name> are now supported
+    3. JavaScript: The image.src property is read-write
+    4. WebResponse now has a getImageWithName method
+
 Problems fixed:
     A form request created after a call to getScriptableObject().setAction() now correctly uses the new action.
 

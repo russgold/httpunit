@@ -24,6 +24,7 @@ import com.meterware.httpunit.ScriptEngine;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebLink;
+import com.meterware.httpunit.WebImage;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -57,6 +58,7 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Form.class );
         ScriptableObject.defineClass( scope, Control.class );
         ScriptableObject.defineClass( scope, Link.class );
+        ScriptableObject.defineClass( scope, Image.class );
         Window w = (Window) context.newObject( scope, "Window" );
 
         w.initialize( null, response.getScriptableObject() );
@@ -189,6 +191,7 @@ public class JavaScript {
 
         private Scriptable _forms;
         private Scriptable _links;
+        private Scriptable _images;
 
 
         public String getClassName() {
@@ -201,11 +204,17 @@ public class JavaScript {
             super.initialize( this, scriptable );
             initializeLinks();
             initializeForms();
+            initializeImages();
         }
 
 
         public String jsGet_title() throws SAXException {
             return getDelegate().getTitle();
+        }
+
+
+        public Scriptable jsGet_images() {
+            return _images;
         }
 
 
@@ -216,6 +225,16 @@ public class JavaScript {
 
         public Scriptable jsGet_forms() {
             return _forms;
+        }
+
+
+        private void initializeImages() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+            WebImage.Scriptable scriptables[] = getDelegate().getImages();
+            Image[] images = new Image[ scriptables.length ];
+            for (int i = 0; i < images.length; i++) {
+                images[ i ] = (Image) toScriptable( scriptables[ i ] );
+            }
+            _images = Context.getCurrentContext().newArray( this, images );
         }
 
 
@@ -252,6 +271,8 @@ public class JavaScript {
                 return "Form";
             } else if (delegate instanceof WebLink.Scriptable) {
                 return "Link";
+            } else if (delegate instanceof WebImage.Scriptable) {
+                return "Image";
             } else {
                 throw new IllegalArgumentException( "Unknown ScriptableObject class: " + delegate.getClass() );
             }
@@ -281,6 +302,14 @@ public class JavaScript {
             _document = (Document) parent;
         }
 
+    }
+
+
+    static public class Image extends HTMLElement {
+
+        public String getClassName() {
+            return "Image";
+        }
     }
 
 

@@ -33,17 +33,25 @@ public class WebImage {
     private URL        _baseURL;
     private Node       _node;
     private ParsedHTML _parsedHTML;
+    private Scriptable _scriptable;
+    private String _src;
 
 
     WebImage( ParsedHTML parsedHTML, URL baseURL, Node node ) {
         _baseURL = baseURL;
         _node = node;
         _parsedHTML = parsedHTML;
+        _src = NodeUtils.getNodeAttribute( _node, "src" );
+    }
+
+
+    public String getName() {
+        return NodeUtils.getNodeAttribute( _node, "name" );
     }
 
 
     public String getSource() {
-        return NodeUtils.getNodeAttribute( _node, "src" );
+        return _src;
     }
 
 
@@ -58,4 +66,36 @@ public class WebImage {
             }
         } );
     }
+
+
+    /**
+     * Returns an object which provides scripting access to this link.
+     **/
+    public Scriptable getScriptableObject() {
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
+    }
+
+
+    public class Scriptable extends ScriptableObject {
+
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "src" )) {
+                return getSource();
+            } else {
+               return super.get( propertyName );
+            }
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "src" )) {
+                if (value != null) _src = value.toString();
+            } else {
+                super.set( propertyName, value );
+            }
+        }
+    }
+
+
 }

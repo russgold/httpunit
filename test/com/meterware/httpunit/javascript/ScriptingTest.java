@@ -24,6 +24,7 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
+import com.meterware.httpunit.WebImage;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -151,7 +152,7 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
                                             "<form name='realform'><input name='color' value='blue'></form>" +
-                                            "<a href='#' onMouseOver=\"document.realform.color.value='green'\">green</a>" +
+                                            "<a href='#' onMouseOver=\"document.realform.color.value='green';\">green</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
@@ -189,6 +190,50 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Alert message", getHostPath() + "/sample.html", response.popNextAlert() );
         assertNull( "Alert should have been removed", response.getNextAlert() );
     }
+
+
+    public void testDocumentFindImages() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function getFound( object ) {\n" +
+                                            "  return (object == null) ? \"did not find \" : \"found \";\n" +
+                                            "  }\n" +
+                                            "function viewImages() { \n" +
+                                            "  alert( \"found \" + document.images.length + \" images(s)\" );\n" +
+                                            "  alert( getFound( document.realimage ) + \"image 'realimage'\" )\n;" +
+                                            "  alert( getFound( document.noimage ) + \"image 'noimage'\" );\n" +
+                                            "  alert( '2nd image is ' + document.images[1].src ); }\n" +
+                                            "</script></head>\n" +
+                                            "<body onLoad='viewImages()'>\n" +
+                                            "<img name='realimage' src='pict1.gif'>\n" +
+                                            "<img name='2ndimage' src='pict2.gif'>\n" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        JavaScript.run( response );
+        assertEquals( "Alert message", "found 2 images(s)", response.popNextAlert() );
+        assertEquals( "Alert message", "found image 'realimage'", response.popNextAlert() );
+        assertEquals( "Alert message", "did not find image 'noimage'", response.popNextAlert() );
+        assertEquals( "Alert message", "2nd image is pict2.gif", response.popNextAlert() );
+        assertNull( "Alert should have been removed", response.getNextAlert() );
+    }
+
+    public void testImageSwap() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<img name='theImage' src='initial.gif'>" +
+                                            "<a href='#' onMouseOver=\"document.theImage.src='new.jpg';\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        JavaScript.run( response );
+        WebImage image = response.getImageWithName( "theImage" );
+        WebLink link = response.getLinks()[0];
+        assertEquals( "initial image source", "initial.gif", image.getSource() );
+        link.mouseOver();
+        assertEquals( "changed image source", "new.jpg", image.getSource() );
+    }
+
+
 
 
 }
