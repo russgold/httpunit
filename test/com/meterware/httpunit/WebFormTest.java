@@ -174,6 +174,21 @@ public class WebFormTest extends HttpUnitTest {
         assertMatchingSet( "inferred media default", new String[0], request.getParameterValues( "media" ) );
     }
 
+
+    public void testCheckboxDefaults() throws Exception {
+        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+                                              "<Input type=checkbox name=ready value=yes checked>" +
+                                              "<Input type=checkbox name=color value=red checked>" +
+                                              "<Input type=checkbox name=color value=blue checked>" +
+                                              "<Input type=checkbox name=gender value=male checked>" +
+                                              "<Input type=checkbox name=gender value=female>" +
+                                              "</form></body></html>" );
+        WebForm form = page.getForms()[0];
+        assertEquals( "ready state", "yes", form.getParameterValue( "ready" ) );
+        assertMatchingSet( "default genders allowed", new String[] { "male" }, form.getParameterValues( "gender" ) );
+        assertMatchingSet( "default colors", new String[] { "red", "blue" }, form.getParameterValues( "color" ) );
+    }
+
                               
     private static URL _baseURL;
      

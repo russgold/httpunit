@@ -198,10 +198,14 @@ class ParsedHTML {
             if (tables[i].getCellAsText(0,0).equalsIgnoreCase( text )) {
                 return tables[i];
             } else {
-                WebTable[] innerTables = tables[i].getTableCell(0,0).getTables();
-                if (innerTables.length != 0) {
-                    WebTable result = getTableStartingWith( text, innerTables );
-                    if (result != null) return result;
+                for (int j = 0; j < tables[i].getRowCount(); j++) {
+                    for (int k = 0; k < tables[i].getColumnCount(); k++) {
+                        WebTable[] innerTables = tables[i].getTableCell(j,k).getTables();
+                        if (innerTables.length != 0) {
+                            WebTable result = getTableStartingWith( text, innerTables );
+                            if (result != null) return result;
+                        }
+                    }
                 }
             }
         }
@@ -220,10 +224,14 @@ class ParsedHTML {
             if (tables[i].getCellAsText(0,0).toUpperCase().startsWith( text )) {
                 return tables[i];
             } else {
-                WebTable[] innerTables = tables[i].getTableCell(0,0).getTables();
-                if (innerTables.length != 0) {
-                    WebTable result = getTableStartingWithPrefix( text, innerTables );
-                    if (result != null) return result;
+                for (int j = 0; j < tables[i].getRowCount(); j++) {
+                    for (int k = 0; k < tables[i].getColumnCount(); k++) {
+                        WebTable[] innerTables = tables[i].getTableCell(j,k).getTables();
+                        if (innerTables.length != 0) {
+                            WebTable result = getTableStartingWithPrefix( text, innerTables );
+                            if (result != null) return result;
+                        }
+                    }
                 }
             }
         }

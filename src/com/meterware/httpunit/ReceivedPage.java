@@ -48,6 +48,8 @@ class ReceivedPage extends ParsedHTML {
      **/
     public String getTitle() throws SAXException {
         NodeList nl = ((Document) getDOM()).getElementsByTagName( "title" );
+        if (nl.getLength() == 0) return "";
+        if (!nl.item(0).hasChildNodes()) return "";
         return nl.item(0).getFirstChild().getNodeValue();
     }
 

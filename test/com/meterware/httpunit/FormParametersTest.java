@@ -158,15 +158,22 @@ public class FormParametersTest extends HttpUnitTest {
     public void testCheckboxValidation() throws Exception {
         ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
                                        "<Input type=checkbox name=use_color>" +
+                                       "<Input type=checkbox name=color value=red>" +
+                                       "<Input type=checkbox name=color value=blue>" +
                                        "</form></body></html>" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
         request.setParameter( "use_color", "red" );
+        request.setParameter( "color", "green" );
 
         HttpUnitOptions.setParameterValuesValidated( true );
         request.setParameter( "use_color", "on" );
         request.removeParameter( "use_color" );
         validateSetParameterRejected( request, "use_color", "red", "setting checkbox to a string value" );
+        request.setParameter( "color", "red" );
+        request.setParameter( "color", new String[] { "red", "blue" } );
+        validateSetParameterRejected( request, "color", "on", "setting checkbox to an incorrect value" );
+        validateSetParameterRejected( request, "color", new String[] { "green", "red" }, "setting checkbox to an incorrect value" );
     }
 
 

@@ -231,7 +231,13 @@ public class WebForm {
                 } else if (type.equals( "RADIO" ) && parameters[i].getNamedItem( "checked" ) != null) {
                     defaults.put( name, value );
                 } else if (type.equals( "CHECKBOX" ) && parameters[i].getNamedItem( "checked" ) != null) {
-                    defaults.put( name, "on" );
+                    if (value.length() == 0) value = "on";
+                    String[] currentDefaults = (String[]) defaults.get( name );
+                    if (currentDefaults == null) {
+                        defaults.put( name, new String[] { value } );
+                    } else {
+                        defaults.put( name, withNewValue( currentDefaults, value ) );
+                    }
                 }
             }
             HTMLSelectElement[] selections = getSelections();
@@ -265,22 +271,20 @@ public class WebForm {
         if (_optionValues == null) {
             Hashtable options = new Hashtable();
             NamedNodeMap[] parameters = getParameters();
-            Hashtable types = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
                 String name  = getValue( parameters[i].getNamedItem( "name" ) );
                 String value = getValue( parameters[i].getNamedItem( "value" ) );
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null) type = "TEXT";
 
-                if (type.equals( "RADIO" )) {
+                if (type.equals( "RADIO" ) || type.equals( "CHECKBOX" )) {
+                    if (value.length() == 0 && type.equals( "CHECKBOX" )) value = "on";
                     String[] radioOptions = (String[]) options.get( name );
                     if (radioOptions == null) {
                         options.put( name, new String[] { value } );
                     } else {
                         options.put( name, withNewValue( radioOptions, value ) );
                     }
-                } else if (type.equals( "CHECKBOX" )) {
-                    options.put( name, new String[] { "on" } );
                 }
             }
             HTMLSelectElement[] selections = getSelections();
@@ -307,7 +311,6 @@ public class WebForm {
             Hashtable types = new Hashtable();
             for (int i = 0; i < parameters.length; i++) {
                 String name  = getValue( parameters[i].getNamedItem( "name" ) );
-                String value = getValue( parameters[i].getNamedItem( "value" ) );
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
                 if (type == null) type = "TEXT";
 
@@ -316,7 +319,7 @@ public class WebForm {
                 } else if (type.equals( "RADIO" )) {
                     types.put( name, TYPE_SCALAR );
                 } else if (type.equals( "CHECKBOX" )) {
-                    types.put( name, TYPE_SCALAR );
+                    types.put( name, TYPE_MULTI_VALUED );
                 }
             }
             HTMLSelectElement[] selections = getSelections();
