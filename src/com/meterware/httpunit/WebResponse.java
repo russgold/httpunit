@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 
@@ -40,7 +41,6 @@ import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.StringTokenizer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -50,11 +50,33 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * A response from a web server to a web request.
+ * A response to a web request from a web server.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:DREW.VARNER@oracle.com">Drew Varner</a>
  **/
 abstract
 public class WebResponse implements HTMLSegment {
 
+	/**
+	 * A version flag indicating a cookie is based on the
+	 * Internet Engineering Task Force's (IETF)
+	 * <a href="http://www.ietf.org/rfc/rfc2109.txt">RFC 2109</a>
+	 *
+	 * <br />
+	 * These cookies come from the <code>Set-Cookie:</code> header
+	 **/
+	public static final int IETF_RFC2109 = 0;
+
+	/**
+	 * A version flag indicating a cookie is based on the
+	 * Internet Engineering Task Force's (IETF)
+	 * <a href="http://www.ietf.org/rfc/rfc2965.txt">RFC 2965</a>
+	 *
+	 * <br />
+	 * These cookies come from the <code>Set-Cookie2:</code> header
+	 **/
+	public static final int IETF_RFC2965 = 1;
 
     /**
      * Returns a web response built from a URL connection. Provided to allow
@@ -108,8 +130,8 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
-     * Returns the delay before normally following the request to refresh this page, if any. 
-     * This request will be defined by a <meta> tag in the header.  If no tag exists, 
+     * Returns the delay before normally following the request to refresh this page, if any.
+     * This request will be defined by a <meta> tag in the header.  If no tag exists,
      * will return zero.
      **/
     public int getRefreshDelay() {
@@ -178,12 +200,12 @@ public class WebResponse implements HTMLSegment {
 
     /**
      * Returns the value for the specified header field. If no such field is defined, will return null.
-     * No more than one header may be defined for each key.  
+     * No more than one header may be defined for each key.
      **/
     abstract
     public String getHeaderField( String fieldName );
-    
-    
+
+
     /**
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
      * which may be used to represent internal state of this object.
@@ -192,7 +214,7 @@ public class WebResponse implements HTMLSegment {
         if (_responseText == null) loadResponseText();
         return _responseText;
     }
-    
+
 
     /**
      * Returns a buffered input stream for reading the contents of this reply.
@@ -201,7 +223,7 @@ public class WebResponse implements HTMLSegment {
         return _inputStream;
     }
 
-    
+
     /**
      * Returns the names of the frames found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing this response
@@ -307,8 +329,8 @@ public class WebResponse implements HTMLSegment {
     public WebTable getTableStartingWith( String text ) throws SAXException {
         return getReceivedPage().getTableStartingWith( text );
     }
-    
-    
+
+
     /**
      * Returns the first table in the response which has the specified text as a prefix of the text of
      * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
@@ -322,7 +344,7 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
-     * Returns the first table in the response which has the specified text as its summary attribute. 
+     * Returns the first table in the response which has the specified text as its summary attribute.
      * Will recurse into any nested tables, as needed.
      * Case is ignored.
      * @exception SAXException thrown if there is an error parsing the response.
@@ -334,7 +356,7 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
-     * Returns the first table in the response which has the specified text as its ID attribute. 
+     * Returns the first table in the response which has the specified text as its ID attribute.
      * Will recurse into any nested tables, as needed.
      * Case is ignored.
      * @exception SAXException thrown if there is an error parsing the response.
@@ -394,7 +416,7 @@ public class WebResponse implements HTMLSegment {
         _contentHeader = value;
     }
 
-    
+
 //------------------------------------------ package members ------------------------------------------------
 
 
@@ -473,7 +495,7 @@ public class WebResponse implements HTMLSegment {
             byte[] bytes = outputStream.toByteArray();
             readMetaTags( bytes );
             _responseText = new String( bytes, getCharacterSet() );
-            _inputStream  = new ByteArrayInputStream( bytes ); 
+            _inputStream  = new ByteArrayInputStream( bytes );
         } finally {
             inputStream.close();
         }
@@ -507,39 +529,164 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    private Hashtable getNewCookies() {
-        if (_newCookies == null) {
-            _newCookies = new Hashtable();
-            String cookieHeader = getHeaderField( "Set-Cookie" );
-            if (cookieHeader != null) {
-                StringTokenizer st = new StringTokenizer( cookieHeader, "," );
-                while (st.hasMoreTokens()) recognizeOneCookie( st.nextToken() );
-            }
-        }
-        return _newCookies;
-    }
+	/**
+	 * Parses cookies from the <code>Set-Cookie</code> and the
+	 * <code>Set-Cookie2</code> header fields.
+	 * <p>
+	 * This class does not strictly follow the specifications, but
+	 * attempts to imitate the behavior of popular browsers. Specifically,
+	 * this method allows cookie values to contain commas, which the
+	 * Netscape standard does not allow for.
+	 * </p><p>
+	 * This method does not parse path,domain,expires or secure information
+	 * about the cookie.</p>
+	 *
+	 * @returns Hashtable a <code>Hashtable</code> of where the name of the
+	 *                    cookie is the key and the value of the cookie is
+	 *                    the value
+	 */
+	private Hashtable getNewCookies() {
+		if (_newCookies == null) {
+			_newCookies = new Hashtable();
+		}
+		String cookieHeader = getHeaderField( "Set-Cookie" );
+		if (cookieHeader != null) {
+			processCookieTokens( getCookieTokens(cookieHeader),IETF_RFC2109 );
+		}
+		String cookieHeader2 = getHeaderField( "Set-Cookie2" );
+		if (cookieHeader2 != null) {
+			processCookieTokens( getCookieTokens(cookieHeader2),IETF_RFC2965 );
+		}
+		return _newCookies;
+	}
 
 
+	private void processCookieTokens(Vector tokens,
+	                                    int version) {
+		// holds tokens that should be part of the value of
+		// the first token before it that contains an
+		// equals sign (=)
+		String tokensToAdd = "";
+		int numTokens = tokens.size();
+		for (int i=numTokens - 1; i >= 0; i--) {
+			String token = (String) tokens.get(i);
+			int equalsIndex = token.indexOf('=');
 
-    private void recognizeOneCookie( String cookieSpec ) {
-        StringTokenizer st = new StringTokenizer( cookieSpec, ";" );
-        String token = st.nextToken().trim();
-        int i = token.indexOf("=");
-        if (i > -1) {
-            String name = token.substring(0, i).trim();
-            String value = stripQuote( token.substring( i+1, token.length() ).trim() );
-    	    _newCookies.put( name, value );
-    	}
-    }
+			// if this token has an equals sign (=) in it
+			if (equalsIndex != -1) {
+				String name = token.substring(0,equalsIndex).trim();
+				// make sure we aren't using a cookie's attribute other
+				// than the name/value pair
+				if ( !isStringCookieAttribute(name,version) ) {
+					String value = token.substring(equalsIndex+1).trim();
+					_newCookies.put(name,value+tokensToAdd);
+				}
+				tokensToAdd = "";
+			}
+
+			else {
+				// make sure we aren't counting a one word reserved
+				// cookie attribute value
+				if ( !isTokenReservedWord(token,version) ) {
+					tokensToAdd =  token + tokensToAdd;
+					String preceedingToken = (String) tokens.get(i - 1);
+					char lastChar = preceedingToken.charAt(preceedingToken.length()-1);
+					if (lastChar != '=') {
+						tokensToAdd = ","+ tokensToAdd;
+					}
+				}
+				// the token is a secure or discard flag for the cookie
+				else {
+					// just to be safe we should clear the tokens
+					// to append to the value of the cookie
+					tokensToAdd = "";
+				}
+			}
+		}
+	}
 
 
-    private String stripQuote( String value ) {
-        if (((value.startsWith("\"")) && (value.endsWith("\""))) ||
-            ((value.startsWith("'") && (value.endsWith("'"))))) {
-            return value.substring(1,value.length()-1);
-        }
-        return value;
-    }
+	/**
+	 * Tokenizes a cookie header and returns the tokens in a
+	 * <code>Vector</code>.
+	 **/
+	private Vector getCookieTokens(String cookieHeader) {
+		StringReader sr = new StringReader(cookieHeader);
+		StreamTokenizer st = new StreamTokenizer(sr);
+		Vector tokens = new Vector();
+
+		// clear syntax tables of the StreamTokenizer
+		st.resetSyntax();
+
+		// set all characters as word characters
+		st.wordChars(0,Character.MAX_VALUE);
+
+		// set up characters for quoting
+		st.quoteChar(34); //double quotes
+		st.quoteChar(39); //single quotes
+
+		// set up characters to separate tokens
+		st.whitespaceChars(59,59); //semicolon
+		st.whitespaceChars(44,44); //comma
+
+		try {
+			while (st.nextToken() != StreamTokenizer.TT_EOF) {
+				tokens.add( st.sval.trim() );
+			}
+		}
+		catch (IOException ioe) {
+			// this will never happen with a StringReader
+		}
+		sr.close();
+		return tokens;
+	}
+
+
+	private boolean isStringCookieAttribute(String string,
+	                                           int version) {
+		String stringLowercase = string.toLowerCase();
+		if (version == IETF_RFC2109) {
+			if ( stringLowercase.equals("path") ||
+				 stringLowercase.equals("domain") ||
+				 stringLowercase.equals("expires") ||
+				 stringLowercase.equals("comment") ||
+				 stringLowercase.equals("max-age") ||
+				 stringLowercase.equals("version") ) {
+				return true;
+			}
+		}
+		else if (version == IETF_RFC2965) {
+			if ( stringLowercase.equals("path") ||
+				 stringLowercase.equals("domain") ||
+				 stringLowercase.equals("comment") ||
+				 stringLowercase.equals("commenturl") ||
+				 stringLowercase.equals("max-age") ||
+				 stringLowercase.equals("version") ||
+				 stringLowercase.equals("$version") ||
+				 stringLowercase.equals("port") ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	private boolean isTokenReservedWord(String token,
+	                                       int version) {
+		String tokenLowercase = token.toLowerCase();
+		if (version == IETF_RFC2109) {
+			if ( tokenLowercase.equals("secure") ) {
+				return true;
+			}
+		}
+		else if (version == IETF_RFC2965) {
+			if ( tokenLowercase.equals("discard") ||
+				 tokenLowercase.equals("secure") ) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
     private void readContentTypeHeader() {
@@ -756,8 +903,8 @@ class DefaultWebResponse extends WebResponse {
             return null;
         }
     }
-    
-    
+
+
     /**
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
      * which may be used to represent internal state of this object.
@@ -774,12 +921,12 @@ class DefaultWebResponse extends WebResponse {
         return new ByteArrayInputStream( _responseText.getBytes() );
     }
 
-    
+
     public String toString() {
-        return "DefaultWebResponse [" + _responseText + "]"; 
+        return "DefaultWebResponse [" + _responseText + "]";
     }
-    
-    
+
+
     private String _responseText;
 }
 

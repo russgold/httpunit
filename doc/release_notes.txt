@@ -11,6 +11,16 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+20-Jul-2001
+Acknowledgements:
+    Thanks to Drew Varner for more sophisticated cookie handling, including Set-Cookie2 code
+    
+Problems corrected:
+    1. cookies with embedded commas and quotes are now handled
+    
+Additions:
+    1. The Set_Cookie2 header is now handled
+    
 19-Jul-2001
 Additions:
     1. Added getHeaderFieldNames to WebResponse
