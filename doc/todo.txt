@@ -1,9 +1,7 @@
 High Priority
 o Allow servlet initialization parameters in registerServlet
-o Allow multiple text parameters with the same name
 o Add support for getLinkWithName
-o Allow creation of POST method with file upload w/o form
-o Other changes already submitted
+o Add WebResponse.getMetaContent (returns array of matching content entries)
 
 Medium priority:
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)

@@ -95,11 +95,8 @@ tests to reload safely.</ul>
 
 <A HREF="#badPost"><H2>Why doesn't my servlet see parameters on a POST request?</H2></A>
 Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type
-header. HttpUnit normally sends this attribute;
-however you can disable it by calling <code>HttpUnitOptions.setPostIncludesCharset(false)</code>. If you run into this
-problem trying disabling the charset attribute.
-
-
+header. HttpUnit 1.2.6 sends this attribute; As of HttpUnit 1.2.7 it will only send it if you call
+<code>HttpUnitOptions.setPostIncludesCharset(true)</code> before your request.
 </BODY></HTML>
 
 
