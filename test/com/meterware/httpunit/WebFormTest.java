@@ -36,8 +36,8 @@ public class WebFormTest extends HttpUnitTest {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-    
-    
+
+
     public static Test suite() {
         return new TestSuite( WebFormTest.class );
     }
@@ -60,8 +60,8 @@ public class WebFormTest extends HttpUnitTest {
                                   "<br><Input type=submit value = \"Log in\">" +
                                   "</form>" );
     }
-	
-	
+
+
     public void testFindNoForm() throws Exception {
         defineWebPage( "NoForms", "This has no forms but it does" +
                                   "have <a href=\"/other.html\">an active link</A>" +
@@ -87,7 +87,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                   "<br><Input type=submit value = \"Log in\">" +
                                   "</form>" );
-                                     
+
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         assertNull( "Found nonexistent form", page.getFormWithName( "nobody" ) );
         assertNotNull( "Did not find named form", page.getFormWithName( "oneform" ) );
@@ -132,6 +132,9 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "Original text area value", "Something", form.getParameterValue( "name" ) );
         form.setParameter( "name", "Something Else" );
         assertEquals( "Changed text area value", "Something Else", form.getParameterValue( "name" ) );
+
+        form.reset();
+        assertEquals( "Reset text area value", "Something", form.getParameterValue( "name" ) );
     }
 
 
@@ -151,7 +154,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                   "<br><Input type=submit value = \"Log in\">" +
                                   "</form>" );
-                                     
+
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         assertEquals( 3, form.getParameterNames().length );
@@ -180,7 +183,7 @@ public class WebFormTest extends HttpUnitTest {
                                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                   "<br><Input type=submit value = \"Log in\">" +
                                   "</form>" );
-                                     
+
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         assertEquals( 3, form.getParameterNames().length );
@@ -220,6 +223,9 @@ public class WebFormTest extends HttpUnitTest {
         } catch (IllegalRequestParameterException e) {
         }
         assertEquals( "Preserved value for sex", "neuter", form.getParameterValue( "sex" ) );
+
+        form.reset();
+        assertEquals( "Reverted value", "female", form.getParameterValue( "sex" ) );
     }
 
 
@@ -245,10 +251,15 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "New select value", "green", form.getParameterValue( "color" ) );
 
         try {
-            form.setParameter( "color", new String[] { "red", "green" } );
+            form.setParameter( "color", new String[] { "green", "red" } );
             fail( "Should have rejected set with multiple values" );
         } catch (IllegalRequestParameterException e) {
         }
+
+        form.setParameter( "color", "green" );
+        assertEquals( "Pre-reset color", "green", form.getParameterValue( "color" ) );
+        form.reset();
+        assertEquals( "Reverted color", "red", form.getParameterValue( "color" ) );
     }
 
 
@@ -283,9 +294,12 @@ public class WebFormTest extends HttpUnitTest {
             fail( "Should have rejected set with bad values" );
         } catch (IllegalRequestParameterException e) {
         }
+
+        form.reset();
+        assertMatchingSet( "Reverted colors", new String[] { "red", "pink" }, form.getParameterValues( "colors" ) );
     }
 
-                              
+
     public void testUnspecifiedDefaults() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Select name=colors><Option>blue<Option>red</Select>" +
@@ -326,13 +340,15 @@ public class WebFormTest extends HttpUnitTest {
         assertMatchingSet( "default colors", new String[] { "red", "blue" }, form.getParameterValues( "color" ) );
 
         form.setParameter( "color", "red" );
-        assertMatchingSet( "default colors", new String[] { "red" }, form.getParameterValues( "color" ) );
+        assertMatchingSet( "modified colors", new String[] { "red" }, form.getParameterValues( "color" ) );
         try {
             form.setParameter( "color", new String[] { "red", "purple" } );
             fail( "Should have rejected set with bad values" );
         } catch (IllegalRequestParameterException e) {
         }
 
+        form.reset();
+        assertMatchingSet( "reverted colors", new String[] { "red", "blue" }, form.getParameterValues( "color" ) );
     }
 
 

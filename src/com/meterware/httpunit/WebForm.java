@@ -257,6 +257,17 @@ public class WebForm extends WebRequestSource {
         return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( getNode(), "enctype" ) );
     }
 
+
+    /**
+     * Resets all parameters to their initial values.
+     */
+    public void reset() {
+        FormControl controls[] = getFormControls();
+        for (int i = 0; i < controls.length; i++) {
+            controls[i].reset();
+        }
+    }
+
 //---------------------------------- WebRequestSource methods --------------------------------
 
     /**

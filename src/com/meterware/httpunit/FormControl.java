@@ -172,6 +172,13 @@ abstract class FormControl {
 
 
     /**
+     * Resets this control to its initial value.
+     **/
+    void reset() {
+    }
+
+
+    /**
      * Returns the default value of this control in the form. If no value is specified, defaults to the empty string.
      **/
     protected String getValueAttribute() {
@@ -250,6 +257,11 @@ class BooleanFormControl extends FormControl {
 
     public void setChecked( boolean checked ) {
         _isChecked = checked;
+    }
+
+
+    void reset() {
+        _isChecked = _isCheckedDefault;
     }
 
 
@@ -387,6 +399,11 @@ class RadioGroupFormControl extends FormControl {
     }
 
 
+    void reset() {
+        for (int i = 0; i < getButtons().length; i++) getButtons()[i].reset();
+    }
+
+
     private String[] getAllowedValues() {
         if (_allowedValues == null) {
             _allowedValues = new String[ getButtons().length ];
@@ -494,6 +511,11 @@ class TextFormControl extends FormControl {
     }
 
 
+    void reset() {
+        _value[0] = null;
+    }
+
+
     void claimRequiredValues( List values ) {
         if (isReadOnly()) claimValueIsRequired( values );
     }
@@ -597,7 +619,9 @@ class SelectionFormControl extends FormControl {
     private final String[] _optionValues;
     private final String[] _displayedOptions;
 
-    private String[] _values;
+    private String[]  _values;
+    private boolean[] _selectionIndexes;
+    private boolean[] _initialIndexes;
 
 
     SelectionFormControl( Node node ) {
@@ -607,7 +631,10 @@ class SelectionFormControl extends FormControl {
         _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );
         _optionValues     = getInitialOptionValues( node );
         _displayedOptions = getInitialDisplayedOptions( node );
-        _values           = getInitialValues( node, _optionValues );
+
+        _initialIndexes   = getInitialSelectionIndexes( node );
+        _selectionIndexes = (boolean[]) _initialIndexes.clone();
+        _values           = getSelectedValues( _selectionIndexes, _optionValues );
     }
 
 
@@ -659,34 +686,49 @@ class SelectionFormControl extends FormControl {
 
         if (!_multiSelect) {
             if (numMatches == 0) throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
-
         }
 
-        ArrayList newValues = new ArrayList( matches.length );
         for (int i = 0; i < matches.length; i++) {
-            if (matches[i]) {
-                values.remove( _optionValues[i] );
-                newValues.add( _optionValues[i] );
-            }
+            if (matches[i]) values.remove( _optionValues[i] );
         }
-        _values = (String[]) newValues.toArray( new String[ values.size() ] );
+
+        _selectionIndexes = matches;
+        _values = getSelectedValues( matches, _optionValues );
     }
 
 
-    private String[] getInitialValues( Node selectionNode, String[] optionValues ) {
-        ArrayList selected = new ArrayList();
+    void reset() {
+        _selectionIndexes = (boolean[]) _initialIndexes.clone();
+        _values           = getSelectedValues( _selectionIndexes, _optionValues );
+    }
+
+
+    private String[] getSelectedValues( boolean[] selected, String[] optionValues ) {
+        ArrayList values = new ArrayList();
+        for (int i = 0; i < selected.length; i++) {
+            if (selected[i]) {
+                values.add( optionValues[i] );
+            }
+        }
+        return (String[]) values.toArray( new String[ values.size() ] );
+    }
+
+
+    private boolean[] getInitialSelectionIndexes( Node selectionNode ) {
+        boolean noneSelected = true;
         NodeList nl = ((Element) selectionNode).getElementsByTagName( "option" );
+        boolean isSelected[] = new boolean[ nl.getLength() ];
         for (int i = 0; i < nl.getLength(); i++) {
             if (nl.item(i).getAttributes().getNamedItem( "selected" ) != null) {
-                selected.add( optionValues[i] );
+                isSelected[i] = true;
+                noneSelected = false;
             }
         }
 
-        if (!isMultiValued() && selected.size() == 0 && nl.getLength() > 0) {
-            selected.add( optionValues[0] );
+        if (!isMultiValued() && noneSelected && isSelected.length > 0) {
+            isSelected[0] = true;
         }
-
-        return (String[]) selected.toArray( new String[ selected.size() ] );
+        return isSelected;
     }
 
 

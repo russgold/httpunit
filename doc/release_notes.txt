@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+ 5-Feb-2002
+Additions:
+    1. Form parameters can be reset to their initial values using WebForm.reset().
+
  4-Feb-2002
 Problems corrected:
     1. Forms with query strings included in the action attribute now are submitted with that string intact.
