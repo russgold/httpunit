@@ -90,10 +90,15 @@ public class WebImage extends FixedURLWebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
+    public class Scriptable extends HTMLElementScriptable implements NamedDelegate {
+
+        public Scriptable() {
+            super( WebImage.this );
+        }
+
 
         public String getName() {
-            return WebImage.this.getName();
+            return WebImage.this.getID().length() != 0 ? WebImage.this.getID() : WebImage.this.getName();
         }
 
 

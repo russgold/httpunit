@@ -118,6 +118,28 @@ public class HTMLElementTest  extends HttpUnitTest {
     }
 
 
+    public void testNamePropertyWithIdAttribute() throws Exception {
+        defineResource( "start.html",
+                       "<html><head><script language='JavaScript'>" +
+                       "function showAll() {" +
+                       "    alert( 'element with name there has title '   + document.there.title );" +
+                       "    alert( 'element with name perform has title ' + document.perform.title );" +
+                       "    alert( 'element with name seeme has title '   + document.seeme.title );" +
+                       "}</script>" +
+                       "</head><body onLoad='showAll();'>" +
+                       "<a href='somewhere' id='there' title=second>here</a>" +
+                       "<form id='perform' title=fifth></form>" +
+                       "<img id='seeme' title='haha' src='haha.jpg'>" +
+                       "</td></tr></table></div></body></html>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/start.html" );
+
+        assertElementTitle( wc, "name", "there", "second" );
+        assertElementTitle( wc, "name", "perform", "fifth" );
+        assertElementTitle( wc, "name", "seeme", "haha" );
+    }
+
+
     private void assertElementTitle( WebConversation wc, String propertyName, final String id, final String title ) {
         assertEquals( "element '" + id + "' message", "element with " + propertyName + ' ' + id + " has title " + title, wc.popNextAlert() );
     }

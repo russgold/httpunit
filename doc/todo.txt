@@ -1,6 +1,5 @@
 High priority:
-o behavior of request vs client headers does not match javascript - should possibly throw exception if any headers are not
-  settable on the request.
+o Better JavaScript error reporting: use custom object rather than NOT_FOUND (verify evaluate to false...)
 
 o Writeable 'name' Javascript attribute
 o NoOp request when link is to same page w/o new parameters?

@@ -685,7 +685,7 @@ public class WebForm extends WebRequestSource {
 
 
         public String getName() {
-            return WebForm.this.getName();
+            return WebForm.this.getID().length() != 0 ? WebForm.this.getID() : WebForm.this.getName();
         }
 
 

@@ -115,7 +115,7 @@ public class WebLink extends FixedURLWebRequestSource {
 
 
         public String getName() {
-            return WebLink.this.getName();
+            return WebLink.this.getID().length() != 0 ? WebLink.this.getID() : WebLink.this.getName();
         }
 
 
