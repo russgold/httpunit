@@ -210,7 +210,7 @@ public class WebClient {
         validateHeaders( response );
         if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
             getResponse( response.getRefreshRequest() );
-        } else if (response.getHeaderField( "Location" ) == null) {
+        } else if (!HttpUnitOptions.getAutoRedirect() || response.getHeaderField( "Location" ) == null) {
             updateFrames( response );
         } else {
             delay( HttpUnitOptions.getRedirectDelay() );

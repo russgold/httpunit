@@ -42,6 +42,7 @@ public abstract class HttpUnitOptions {
         _loggingHttpHeaders = false;
         _matchesIgnoreCase = true;
         _autoRefresh = false;
+        _autoRedirect = true;
         _redirectDelay = 0;
         _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
@@ -220,6 +221,24 @@ public abstract class HttpUnitOptions {
 
 
     /**
+     * Returns true if HttpUnit should automatically follow page redirect requests (status 3xx).
+     * By default, this is true.
+     **/
+    public static boolean getAutoRedirect() {
+        return _autoRedirect;
+    }
+
+
+    /**
+     * Determines whether HttpUnit should automatically follow page redirect requests (status 3xx).
+     * By default, this is true in order to simulate normal browser operation.
+     **/
+    public static void setAutoRedirect( boolean autoRedirect ) {
+        _autoRedirect = autoRedirect;
+    }
+
+
+    /**
      * Returns the delay, in milliseconds, before a redirect request is issues.
      **/
     public static int getRedirectDelay() {
@@ -298,6 +317,8 @@ public abstract class HttpUnitOptions {
     private static boolean _matchesIgnoreCase = true;
 
     private static boolean _autoRefresh;
+
+    private static boolean _autoRedirect;
 
     private static boolean _postIncludesCharset = false;
 
