@@ -20,6 +20,10 @@ Revision History:
        1. patch #915296: Local copies of the 2.2 and 2.3 web.xml dtds are now consulted if specified, rather than connecting to
           the Sun website.
 
+25-Jun-2004
+   Problems fixed:
+       1. bug #960307 meta tags within <noscript> tags were not being ignored when scripting was disabled
+
 24-Jun-2004
    Problems fixed:
        1. bug #978770 Clicking on a button outside of a form is now supported

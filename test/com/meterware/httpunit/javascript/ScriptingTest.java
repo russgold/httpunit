@@ -721,4 +721,25 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testJavascriptDetectionTrick() throws Exception {
+        defineResource( "NoScript.html", "No javascript here" );
+        defineResource( "HasScript.html", "Javascript is enabled!" );
+        defineResource( "Start.html",  "<html><head>" +
+                                       "  <noscript>" +
+                                       "      <meta http-equiv='refresh' content='0;url=NoScript.html>'" +
+                                       "  </noscript></head>" +
+                                       "<body onload='document.form.submit()'>" +
+                                       "<form name='form' action='HasScript.html'></form>" +
+                                       "</body></html>" );
+        WebConversation wc = new WebConversation();
+        wc.getClientProperties().setAutoRefresh( true );
+        WebResponse response = wc.getResponse( getHostPath() + "/Start.html" );
+        assertEquals( "Result page", "Javascript is enabled!", response.getText() );
+
+        HttpUnitOptions.setScriptingEnabled( false );
+        response = wc.getResponse( getHostPath() + "/Start.html" );
+        assertEquals( "Result page", "No javascript here", response.getText() );
+    }
+
+
 }

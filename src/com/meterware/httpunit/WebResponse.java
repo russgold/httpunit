@@ -940,6 +940,9 @@ public class WebResponse implements HTMLSegment, CookieSource {
             if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
             if (tag.getName().equalsIgnoreCase( "frameset" )) _hasSubframes = true;
             if (tag.getName().equalsIgnoreCase( "iframe" )) _hasSubframes = true;
+            if (tag.getName().equalsIgnoreCase( "noscript") && HttpUnitOptions.isScriptingEnabled()) {
+                do { tag = parser.getNextTag(); } while (tag.getName().equalsIgnoreCase( "/noscript") );
+            }
             tag = parser.getNextTag();
         }
     }
