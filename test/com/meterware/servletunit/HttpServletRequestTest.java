@@ -68,6 +68,11 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals( "sample header value", "value", request.getHeader( "sample") );
 
         assertContains( "Header names", "sample", request.getHeaderNames() );
+        Enumeration e = request.getHeaders( "Sample" );
+        assertNotNull( "No header enumeration returned", e );
+        assertTrue( "Enumeration is empty", e.hasMoreElements() );
+        assertEquals( "first header", "value", e.nextElement() );
+        assertFalse( "Enumeration has spurious header value", e.hasMoreElements() );
     }
 
 

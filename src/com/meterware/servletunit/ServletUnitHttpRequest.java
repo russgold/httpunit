@@ -621,7 +621,9 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns all the values of the specified request header as an Enumeration of String objects.
      **/
     public java.util.Enumeration getHeaders( String name ) {
-        throw new RuntimeException( "getHeaders not implemented" );
+        Vector list = new Vector();
+        if (_headers.containsKey( name )) list.add( _headers.get( name ));
+        return list.elements();
     }
 
 
