@@ -128,6 +128,20 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testJavaScriptURLInNewWindow() throws Exception {
+        defineWebPage( "OnCommand", "<input type='button' id='nowindow' onClick='alert(\"hi\")'></input>\n" +
+                                    "<input type='button' id='withwindow' onClick=\"window.open('javascript:alert(\\'hi\\')','_self')\"></input>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        Button button1 = (Button) response.getElementWithID( "nowindow" );
+        Button button2 = (Button) response.getElementWithID( "withwindow" );
+        button1.click();
+        assertEquals( "Alert message 1", "hi", wc.popNextAlert() );
+        button2.click();
+        assertEquals( "Alert message 2", "hi", wc.popNextAlert() );
+    }
+
+
     public void testSingleCommandOnLoad() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad='alert(\"Ouch!\")'></body>" );

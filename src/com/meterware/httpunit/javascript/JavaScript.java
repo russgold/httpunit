@@ -471,7 +471,8 @@ public class JavaScript {
 
         public Window jsFunction_open( Object url, String name, String features, boolean replace )
                 throws PropertyException, JavaScriptException, NotAFunctionException, IOException, SAXException {
-            return (Window) toScriptable( getDelegate().open( toStringIfNotUndefined( url ), name, features, replace ) );
+            WebResponse.Scriptable delegate = getDelegate().open( toStringIfNotUndefined( url ), name, features, replace );
+            return delegate == null ? null : (Window) toScriptable( delegate );
         }
 
 

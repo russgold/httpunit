@@ -695,7 +695,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
                 throws IOException, SAXException {
             if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
             GetMethodWebRequest request = new GetMethodWebRequest( getURL(), urlString, _frame, name );
-            return _window.getResponse( request ).getScriptableObject();
+            WebResponse response = _window.getResponse( request );
+            return response == null ? null : response.getScriptableObject();
         }
 
 
