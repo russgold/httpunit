@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+18-Jun-2004
+   Additions:
+       1. Enhanced http logging to show target server, request header line, and received URL
+
 15-Jun-2004
    Thanks to Phil Zampino for finding a fixing a problem in PseudoServer's handling of very long requests.
 

@@ -50,6 +50,7 @@ class HttpWebResponse extends WebResponse {
      **/
     HttpWebResponse( WebConversation client, FrameSelector frame, URL url, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
         super( client, frame, url );
+        if (HttpUnitOptions.isLoggingHttpHeaders()) System.out.println( "\nReceived from " + url );
         readHeaders( connection );
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/
