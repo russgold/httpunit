@@ -40,7 +40,7 @@ import java.util.Vector;
 public class PseudoServer {
 
 
-    PseudoServer() {
+    public PseudoServer() {
         Thread t = new Thread() {
             public void run() {
                 while (_active) {
