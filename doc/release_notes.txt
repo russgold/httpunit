@@ -13,11 +13,13 @@ Revision History:
  8-Oct-2002
 Acknowledgements:
     Thanks to Richard Harris for adding support for the title attribute for links,
-           and for adding the JavaScript Navigator.platform property.
+           for adding the JavaScript Navigator.platform property,
+           and for adding Javascript support for the Screen object.
 
 Additions:
     1. Links, forms, and images now have a readable title property.
     2. The navigator object now supports the readable 'platform' property.
+    3. The screen object is now supported, with properties availHeight and availWidth
 
 
  4-Oct-2002

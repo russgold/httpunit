@@ -499,4 +499,21 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testScreenObject() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewProperties() { \n" +
+                                            "  alert( 'dimensions=' + screen.availWidth + 'x' + screen.availHeight );\n" +
+                                            "}" +
+                                            "</script></head>\n" +
+                                            "<body onLoad='viewProperties()'>\n" +
+                                            "</body></html>" );
+        HttpUnitOptions.setExceptionsThrownOnScriptError( true );
+        WebConversation wc = new WebConversation();
+        wc.getClientProperties().setAvailableScreenSize( 1024, 752 );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Alert message 1", "dimensions=1024x752", wc.popNextAlert() );
+        assertNull( "Alert should have been removed", wc.getNextAlert() );
+    }
+
+
 }

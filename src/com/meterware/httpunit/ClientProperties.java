@@ -100,6 +100,35 @@ public class ClientProperties {
     }
 
 
+    /**
+     * A shortcut for setting both availableScreenWidth and availableScreenHeight at one time.
+     */
+    public void setAvailableScreenSize( int width, int height ) {
+        _availWidth = width;
+        _availHeight = height;
+    }
+
+
+    public int getAvailableScreenWidth() {
+        return _availWidth;
+    }
+
+
+    public void setAvailableScreenWidth( int availWidth ) {
+        _availWidth = availWidth;
+    }
+
+
+    public int getAvailHeight() {
+        return _availHeight;
+    }
+
+
+    public void setAvailHeight( int availHeight ) {
+        _availHeight = availHeight;
+    }
+
+
     static ClientProperties cloneProperties() {
         return new ClientProperties( getDefaultProperties() );
     }
@@ -110,6 +139,8 @@ public class ClientProperties {
     private String _applicationVersion  = "1.4";
     private String _userAgent;
     private String _platform            = "Java";
+    private int    _availWidth          = 800;
+    private int    _availHeight         = 600;
 
     private static ClientProperties _defaultProperties = new ClientProperties();
 

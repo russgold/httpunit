@@ -19,12 +19,7 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.HTMLPage;
-import com.meterware.httpunit.WebForm;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebLink;
-import com.meterware.httpunit.WebImage;
-import com.meterware.httpunit.ScriptException;
+import com.meterware.httpunit.*;
 
 import com.meterware.httpunit.scripting.ScriptingEngine;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
@@ -94,6 +89,7 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Window.class );
         ScriptableObject.defineClass( scope, Document.class );
         ScriptableObject.defineClass( scope, Navigator.class );
+        ScriptableObject.defineClass( scope, Screen.class );
         ScriptableObject.defineClass( scope, Link.class );
         ScriptableObject.defineClass( scope, Form.class );
         ScriptableObject.defineClass( scope, Control.class );
@@ -270,6 +266,7 @@ public class JavaScript {
 
         private Document  _document;
         private Navigator _navigator;
+        private Screen    _screen;
 
 
         public String getClassName() {
@@ -297,6 +294,11 @@ public class JavaScript {
         }
 
 
+        public Screen jsGet_screen() {
+            return _screen;
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
@@ -304,7 +306,10 @@ public class JavaScript {
             _document.initialize( this, getDelegate().getDocument() );
 
             _navigator = (Navigator) Context.getCurrentContext().newObject( this, "Navigator" );
-            _navigator.initialize( this, getDelegate() );
+            _navigator.setClientProperties( getDelegate().getClientProperties() );
+
+            _screen = (Screen) Context.getCurrentContext().newObject( this, "Screen" );
+            _screen.setClientProperties( getDelegate().getClientProperties() );
 
             getDelegate().load();
         }
@@ -440,40 +445,40 @@ public class JavaScript {
 
     static public class Navigator extends JavaScriptEngine {
 
+        private ClientProperties _clientProperties;
+
         public String getClassName() {
             return "Navigator";
         }
 
 
-        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
-                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
-            _scriptable = scriptable;
-            if (parent != null) setParentScope( parent );
+        void setClientProperties( ClientProperties clientProperties ) {
+            _clientProperties = clientProperties;
         }
 
 
         public String jsGet_appName() {
-            return getDelegate().getClientProperties().getApplicationName();
+            return _clientProperties.getApplicationName();
         }
 
 
         public String jsGet_appCodeName() {
-            return getDelegate().getClientProperties().getApplicationCodeName();
+            return _clientProperties.getApplicationCodeName();
         }
 
 
         public String jsGet_appVersion() {
-            return getDelegate().getClientProperties().getApplicationVersion();
+            return _clientProperties.getApplicationVersion();
         }
 
 
         public String jsGet_userAgent() {
-            return getDelegate().getClientProperties().getUserAgent();
+            return _clientProperties.getUserAgent();
         }
 
 
         public String jsGet_platform() {
-            return getDelegate().getClientProperties().getPlatform();
+            return _clientProperties.getPlatform();
         }
 
 
@@ -487,9 +492,33 @@ public class JavaScript {
         }
 
 
-        private WebResponse.Scriptable getDelegate() {
-            return (WebResponse.Scriptable) _scriptable;
+    }
+
+
+    static public class Screen extends JavaScriptEngine {
+
+        private ClientProperties _clientProperties;
+
+
+        void setClientProperties( ClientProperties clientProperties ) {
+            _clientProperties = clientProperties;
         }
+
+
+        public String getClassName() {
+            return "Screen";
+        }
+
+
+        public int jsGet_availWidth() {
+            return _clientProperties.getAvailableScreenWidth();
+        }
+
+
+        public int jsGet_availHeight() {
+            return _clientProperties.getAvailHeight();
+        }
+
 
     }
 
