@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.NamedDelegate;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
@@ -148,20 +149,28 @@ public class HTMLPage extends ParsedHTML {
     public class Scriptable extends ScriptableDelegate {
 
         public Object get( String propertyName ) {
-            WebForm wf = getFormWithName( propertyName );
-            if (wf != null) return wf.getScriptableObject();
+            NamedDelegate delegate = getNamedItem( getForms(), propertyName );
+            if (delegate != null) return delegate;
 
-            WebLink wl = getLinkWithName( propertyName );
-            if (wl != null) return wl.getScriptableObject();
+            delegate = getNamedItem( getLinks(), propertyName );
+            if (delegate != null) return delegate;
 
-            WebImage wi = getImageWithName( propertyName );
-            if (wi != null) return wi.getScriptableObject();
+            delegate = getNamedItem( getImages(), propertyName );
+            if (delegate != null) return delegate;
 
             if (propertyName.equalsIgnoreCase( "location" )) {
                 return getResponse().getScriptableObject().get( "location" );
             } else {
                 return super.get( propertyName );
             }
+        }
+
+
+        private NamedDelegate getNamedItem( NamedDelegate[] items, String name ) {
+            for (int i = 0; i < items.length; i++) {
+                if (items[i].getName().equals( name )) return items[i];
+            }
+            return null;
         }
 
 

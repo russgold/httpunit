@@ -11,6 +11,12 @@ Limitations:
 
 
 Revision History:
+25-Sep-2002
+Problems fixed:
+    1. Bug #604478 - setting the form action did not always update the predefined parameter list. This could cause a request
+       to be sent with the wrong URL parameters.
+    2. Form, Image, and Link names are now properly treated as case-sensitive within Javascript.
+
 13-Sep-2002
 Acknowledgements:
     Thanks to Jin Zhao for help in expanding the search possibilities for links.
@@ -20,11 +26,6 @@ Additions:
        either the first match or all matches.
     2. It is now possible to control the handling of script errors by calling HttpUnitOptions.setExceptionsThrownOnScriptError.
        If the exceptions are not thrown, the error messages will instead be available via HttpUnitOptions.getScriptErrorMessages()
-
-25-Sep-2002
-Problems fixed:
-    1. Bug #604478 - setting the form action did not always update the predefined parameter list. This could cause a request
-       to be sent with the wrong URL parameters.
 
  9-Sep-2002
 Acknowledgement:

@@ -267,6 +267,24 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testCaseSensitiveNames() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='item' action='run'></form>" +
+                                            "<a name='Item' href='sample.html'></a>" +
+                                            "<a href='#' name='first' onMouseOver='alert( document.item.action );'>1</a>" +
+                                            "<a href='#' name='second' onMouseOver='alert( document.Item.href );'>2</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        response.getLinkWithName( "first" ).mouseOver();
+        assertEquals( "form action", "run", wc.popNextAlert() );
+        response.getLinkWithName( "second" ).mouseOver();
+        assertEquals( "link href", getHostPath() + "/sample.html", wc.popNextAlert() );
+    }
+
+
     public void testLinkMouseOverEvent() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
