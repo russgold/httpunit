@@ -4,12 +4,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -40,8 +40,8 @@ public class HttpServletRequestTest extends ServletUnitTest {
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-    
-    
+
+
     public static Test suite() {
         return new TestSuite( HttpServletRequestTest.class );
     }
@@ -205,6 +205,20 @@ public class HttpServletRequestTest extends ServletUnitTest {
         HttpSession session = request.getSession( /* create */ false );
         assertNotNull( "No session created", session );
     }
+
+
+    public void testGetRequestURI() throws Exception {
+        ServletUnitContext context = new ServletUnitContext();
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( wr, context, new Hashtable(), NO_MESSAGE_BODY );
+        assertEquals("/simple", request.getRequestURI());
+
+        wr = new GetMethodWebRequest( "http://localhost/simple?foo=bar" );
+        request = new ServletUnitHttpRequest( wr, context, new Hashtable(), NO_MESSAGE_BODY);
+        assertEquals("/simple", request.getRequestURI());
+    }
+
 
     private final static byte[] NO_MESSAGE_BODY = new byte[0];
 }

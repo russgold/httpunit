@@ -31,6 +31,7 @@ import java.util.Properties;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import org.xml.sax.SAXException;
@@ -222,6 +223,69 @@ public class WebXMLTest extends TestCase {
     }
 
 
+    public void testGetContextPath() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ), "/mount" );
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic = wc.newInvocation( "http://localhost/mount/SimpleServlet" );
+        assertEquals("/mount", ic.getRequest().getContextPath());
+
+        sr = new ServletRunner( toInputStream( wxs.asText() ) );
+        wc = sr.newClient();
+        ic = wc.newInvocation( "http://localhost/SimpleServlet" );
+        assertEquals("", ic.getRequest().getContextPath());
+    }
+
+
+    public void testMountContextPath() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ), "/mount" );
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic = wc.newInvocation( "http://localhost/mount/SimpleServlet" );
+        assertTrue(ic.getServlet() instanceof SimpleGetServlet);
+        assertEquals("/mount/SimpleServlet", ic.getRequest().getRequestURI());
+
+        try {
+            ic = wc.newInvocation( "http://localhost/SimpleServlet" );
+            Servlet servlet = ic.getServlet();
+            fail("Attempt to access url outside of the webapp context path should have thrown a 404");
+        } catch (com.meterware.httpunit.HttpNotFoundException e) {}
+    }
+
+
+    public void testServletMapping() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet("/foo/bar/*", Servlet1.class);
+        wxs.addServlet("/baz/*", Servlet2.class);
+        wxs.addServlet("/catalog", Servlet3.class);
+        wxs.addServlet("*.bop", Servlet4.class);
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ));
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic = wc.newInvocation("http://localhost/foo/bar/index.html");
+        assertTrue(ic.getServlet() instanceof Servlet1);
+        ic = wc.newInvocation("http://localhost/foo/bar/index.bop");
+        assertTrue(ic.getServlet() instanceof Servlet1);
+        ic = wc.newInvocation("http://localhost/baz");
+        assertTrue(ic.getServlet() instanceof Servlet2);
+        ic = wc.newInvocation("http://localhost/baz/index.html");
+        assertTrue(ic.getServlet() instanceof Servlet2);
+        ic = wc.newInvocation("http://localhost/catalog");
+        assertTrue(ic.getServlet() instanceof Servlet3);
+        try {
+            ic = wc.newInvocation("http://localhost/catalog/index.html");
+            Servlet servlet = ic.getServlet();
+            fail("Should have gotten a 404");
+        } catch (HttpNotFoundException e) {}
+        ic = wc.newInvocation("http://localhost/catalog/racecar.bop");
+        assertTrue(ic.getServlet() instanceof Servlet4);
+        ic = wc.newInvocation("http://localhost/index.bop");
+        assertTrue(ic.getServlet() instanceof Servlet4);
+    }
+
     private final static String DOCTYPE = "<!DOCTYPE web-app PUBLIC " +
                                           "   \"-//Sun Microsystems, Inc.//DTD WebApplication 2.2//EN\" " +
                                           "   \"http://java.sun/com/j2ee/dtds/web-app_2_2.dtd\">";
@@ -274,6 +338,11 @@ public class WebXMLTest extends TestCase {
             pw.close();
         }
     }
+
+    static class Servlet1 extends SimpleGetServlet {}
+    static class Servlet2 extends SimpleGetServlet {}
+    static class Servlet3 extends SimpleGetServlet {}
+    static class Servlet4 extends SimpleGetServlet {}
 
 }
 

@@ -19,7 +19,10 @@ Acknowledgements:
     Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit
     Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces
     Thanks to Oliver Imbusch for adding the WebClientListener behavior
+    Thanks to Donald Ball for numerous additions to ServletUnit, including support for context paths, retrieval of
+            the requestURI for a servlet request, and wild-card mapping of servlets.
     Thanks to Peter Royal for correcting handling of long line numbers in JTidyWriter, based on locale
+    Thanks to Peter Rossbach for some documentation and build fixes
 
 Problems fixed:
     1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields
@@ -32,6 +35,7 @@ Problems fixed:
     8. Parameter validation is now done for requests built from links
     9. Control characters and spaces created by breaking HTML in the middle are now trimmed from link parameters.
    10. Forms with query strings included in the action attribute now are submitted with that string intact.
+   11. (bug #490821) Javadoc generation no longer gives errors
 
 Additions:
   Content and parsing enhancements:
@@ -44,23 +48,26 @@ Additions:
       4. ServletUnit now supports creating a RequestDispatcher from ServletContext to forward to other servlets.
          Support for this is rudimentary at present: query parameters on the request dispatcher create are ignored.
       5. ServletUnit now supports the web.xml <context-param> tag.
+      6. ServletUnit now supports the HttpServletRequest.getRequestURI method
+      7. ServletUnit now supports defining (and retrieving) a non-empty context path for a web application
+      8. ServletUnit now supports wild-cards in web.xml servlet mapping
 
   Form manipulation enhancements:
-      6. It is now possible to set values for a form directly into the WebForm object. All such changes will be validated.
+      9. It is now possible to set values for a form directly into the WebForm object. All such changes will be validated.
          These will be used by any requests derived from the form.
-      7. Parameters defined in form query strings are now included in the known parameters of a form and requests
+     10. Parameters defined in form query strings are now included in the known parameters of a form and requests
          built from it.
-      8. Form parameters can be reset to their initial values using WebForm.reset().
+     11. Form parameters can be reset to their initial values using WebForm.reset().
 
   Test properties enhancements:
-      9. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.
-     10. WebClient now has an exceptionsThrownOnErrorStatus property to control this behavior per client.
+     12. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.
+     13. WebClient now has an exceptionsThrownOnErrorStatus property to control this behavior per client.
 
   Extensibility enhancements:
-     11. HttpUnit can now use any jaxp-compliant parser, rather than just xerces.
-     12. MessageBodyWebRequest's constructors and inner class are now public, allowing outside code to create new request classes.
-     13. WebClient now exposes the protected method writeMessageBody to ease implementation of new subclasses
-     14. WebClient can now accept a listener of type WebClientListener to report on each request sent and response received.
+     14. HttpUnit can now use any jaxp-compliant parser, rather than just xerces.
+     15. MessageBodyWebRequest's constructors and inner class are now public, allowing outside code to create new request classes.
+     16. WebClient now exposes the protected method writeMessageBody to ease implementation of new subclasses
+     17. WebClient can now accept a listener of type WebClientListener to report on each request sent and response received.
 
 Notes:
     1. Parameter validation is now handled by the form. Requests created from the form while parameter validation is
