@@ -5,8 +5,8 @@ junit   3.8
 servlet 2.3
 xerces  2.2
 jtidy   04aug2000r7
-rhino   1.5R3
-NekoHTML 0.6.8
+rhino   1.5preR4 (patched)
+NekoHTML 0.6.8 (patched)
 
 (for testing HttpUnit only)
 mail        (javamail 1.2)

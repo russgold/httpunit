@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <name>httpunit</name>
+  <id>httpunit</id>
+  <currentVersion>1.5.0-dev</currentVersion>
+  <organization>
+    <name>Meterware</name>
+    <url>http://www.meterware.com/</url>
+  </organization>
+  <inceptionYear>2000</inceptionYear>
+  <package>com.meterware.httpunit</package>
+
+  <shortDescription>Web Functional Testing Library</shortDescription>
+
+  <!-- Gump integration -->
+  <gumpRepositoryId></gumpRepositoryId>
+
+  <description>
+    HttpUnit simplifies the job of writing automated functional tests for web site.
+    It emulates the relevant portions of browser behavior, including
+    form submission, <a href="doc/Javascript-support.html">JavaScript</a>,
+basic <A HREF="ftp://ftp.isi.edu/in-notes/rfc2617.txt">http authentication</A>,
+cookies and automatic page redirection, and allows
+Java test code to examine returned pages either as text, an XML DOM, or containers of forms, tables, and links..
+  </description>
+
+  <url>http://www.httpunit.org/</url>
+  <issueTrackingUrl>http://sourceforge.net/tracker/?group_id=6550&amp;atid=106550</issueTrackingUrl>
+  <siteAddress>httpunit.sourceforge.net</siteAddress>
+  <siteDirectory>/home/groups/h/ht/httpunit/htdocs/</siteDirectory>
+  <distributionDirectory>/home/groups/h/ht/httpunit/htdocs/prerelease</distributionDirectory>
+
+  <repository>
+    <connection>
+      scm:cvs:pserver:anonymous@cvs.httpunit.sourceforge.net:/cvsroot/httpunit
+    </connection>
+    <url>
+      http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/httpunit/
+    </url>
+  </repository>
+
+  <versions>
+    <version>
+      <id>1.5</id>
+      <name>1.5</name>
+      <tag>httpunit_1_5</tag>
+    </version>
+  </versions>
+
+  <mailingLists>
+    <mailingList>
+      <name>HttpUnit user/Developer List</name>
+      <subscribe>
+        http://lists.sourceforge.net/lists/listinfo/httpunit-develop
+      </subscribe>
+      <archive>
+        http://sourceforge.net/mailarchive/forum.php?forum=httpunit-develop
+      </archive>
+    </mailingList>
+  </mailingLists>
+
+  <developers>
+
+    <developer>
+      <name>Russell Gold</name>
+      <id>russgold</id>
+      <email>russgold@httpunit.org</email>
+      <organization></organization>
+    </developer>
+
+  </developers>
+
+  <dependencies>
+
+    <dependency>
+      <id>nekohtml</id>
+      <version>0.68</version>
+      <url>http://www.apache.org/~andyc/neko/doc/html/index.html</url>
+    </dependency>
+
+    <dependency>
+      <id>xerces</id>
+      <version>2.2</version>
+      <url>http://xml.apache.org/xerces2-j/index.html</url>
+    </dependency>
+
+   </dependencies>
+
+  <build>
+
+    <nagEmailAddress></nagEmailAddress>
+
+    <sourceDirectory>src</sourceDirectory>
+    <unitTestSourceDirectory>test</unitTestSourceDirectory>
+    <integrationUnitTestSourceDirectory/>
+    <aspectSourceDirectory/>
+
+    <!-- Unit test cases -->
+    <unitTest>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </unitTest>
+
+    <!-- J A R  R E S O U R C E S -->
+    <!-- Resources that are packaged up inside the JAR file -->
+    <resources>
+    </resources>
+
+    <!-- Integration unit test cases -->
+    <integrationUnitTest/>
+
+    <jars></jars>
+  </build>
+</project>
