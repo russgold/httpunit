@@ -40,8 +40,8 @@ import org.xml.sax.SAXException;
 class ReceivedPage extends ParsedHTML {
 
 
-    public ReceivedPage( URL url, String parentTarget, String pageText ) throws SAXException {
-        super( url, parentTarget, getDOM( pageText ) );
+    public ReceivedPage( URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
+        super( url, parentTarget, getDOM( pageText ), characterSet );
         setBaseAttributes();
     }
 

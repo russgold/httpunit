@@ -3,6 +3,7 @@ HttpUnit release notes
 Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
     2. The "_self" target only works for links, not forms
+    3. The "accept-charset" attribute for forms is ignored; the sent character set is used to encode any response
 
 Limitations: HttpUnit does not support JavaScript
 
@@ -15,7 +16,7 @@ Additions:
     1. Added getTableWithID method to WebResponse, ParsedHTML
     2. Implemented support for sendRedirect, getServletContext in ServletUnit
     3. Added recognition of content charset header. This should allow for proper handling of non-ascii html pages.
-    4. Added HttpUnitOptions.setDefaultCharacterSet to handle missing content charset headers not to assume default encoding (iso-8859-1).
+    4. Added HttpUnitOptions.setDefaultCharacterSet to handle missing content charset headers, so as not to assume default encoding (iso-8859-1).
      
 21-Nov-00
 Additions:

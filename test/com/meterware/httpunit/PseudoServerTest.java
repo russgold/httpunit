@@ -19,12 +19,15 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import java.net.HttpURLConnection;
+
+import java.util.Dictionary;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.meterware.httpunit.*;
-import java.net.HttpURLConnection;
 
 /**
  * Tests the basic authentication.
@@ -85,7 +88,7 @@ public class PseudoServerTest extends TestCase {
 
 
     public void testRedirect() throws Exception {
-        String resourceName = "something/interesting";
+        String resourceName = "something/redirected";
         String resourceValue = "the desired content\r\n";
 
         String redirectName = "anOldOne";
@@ -110,7 +113,7 @@ public class PseudoServerTest extends TestCase {
 
 
     public void testCookies() throws Exception {
-        String resourceName = "something/interesting";
+        String resourceName = "something/baking";
         String resourceValue = "the desired content\r\n";
 
         PseudoServer ps = new PseudoServer();
@@ -129,6 +132,34 @@ public class PseudoServerTest extends TestCase {
             assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
             assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
             assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );
+        } finally {
+            ps.shutDown();
+        }
+    }
+
+
+    public void testPseudoServlet() throws Exception {
+        String resourceName = "tellMe";
+        String name = "Charlie";
+        final String prefix = "Hello there, ";
+        String expectedResponse = prefix + name + "\r\n";
+
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
+
+        try {
+            ps.setResource( resourceName, new PseudoServlet() {
+                public WebResource getPostResponse( Dictionary parameters ) {
+                    return new WebResource( prefix + parameters.get( "name" ), "text/plain" );
+                }
+            } );
+ 
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new PostMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
+            request.setParameter( "name", name );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "Content type", "text/plain", response.getContentType() );
+            assertEquals( "Response", expectedResponse, response.getText() );
         } finally {
             ps.shutDown();
         }

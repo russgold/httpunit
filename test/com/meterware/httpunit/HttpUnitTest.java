@@ -34,6 +34,11 @@ class HttpUnitTest extends TestCase {
 //--------------------------------- protected members ----------------------------------------------
 
 
+    protected void defineResource( String resourceName, PseudoServlet servlet ) {
+        _server.setResource( resourceName, servlet );
+    }
+
+
     protected void defineResource( String resourceName, String value ) {
         _server.setResource( resourceName, value );
     }

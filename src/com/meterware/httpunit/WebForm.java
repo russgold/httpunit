@@ -46,6 +46,14 @@ public class WebForm {
 
 
     /**
+     * Returns the character set encoding for this form.
+     **/
+    public String getCharacterSet() {
+        return _characterSet;
+    }
+
+
+    /**
      * Returns the name of the form.
      **/
     public String getName() {
@@ -307,10 +315,11 @@ public class WebForm {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebForm( URL baseURL, String parentTarget, Node node ) {
+    WebForm( URL baseURL, String parentTarget, Node node, String characterSet ) {
         _node         = node;
         _baseURL      = baseURL;
         _parentTarget = parentTarget;
+        _characterSet = characterSet;
     }
 
 
@@ -358,6 +367,9 @@ public class WebForm {
 
     /** The text areas in this form. **/
     private HTMLTextAreaElement[] _textAreas;
+
+    /** The character set in which the form will be submitted. **/
+    private String         _characterSet;
 
 
     private String getValue( Node node ) {

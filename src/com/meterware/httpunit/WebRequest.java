@@ -200,7 +200,7 @@ public class WebRequest {
         return sb.toString();
     }
 
-    
+
 //---------------------------------- package members --------------------------------
 
     /** The name of the topmost frame. **/
@@ -246,8 +246,40 @@ public class WebRequest {
 
     private void appendParameter( StringBuffer sb, String name, String value, boolean moreToCome ) {
         sb.append( name ).append( '=' );
-        sb.append( URLEncoder.encode( value ) );
+        sb.append( encode( value ) );
         if (moreToCome) sb.append( '&' );
+    }
+
+
+    /**
+     * Returns a URL-encoded version of the string, including all eight bits, unlike URLEncoder, which strips the high bit.
+     **/
+    private String encode( String source ) {
+        if (_sourceForm == null || _sourceForm.getCharacterSet().equalsIgnoreCase( "iso-8859-1" )) {
+            return URLEncoder.encode( source );
+        } else {
+            try {
+                byte[] rawBytes = source.getBytes( _sourceForm.getCharacterSet() );
+                StringBuffer result = new StringBuffer();
+                for (int i = 0; i < rawBytes.length; i++) {
+                    int candidate = rawBytes[i] & 0xff;
+                    if (candidate == ' ') {
+                        result.append( '+' );
+                    } else if ((candidate >= 'A' && candidate <= 'Z') ||
+                               (candidate >= 'a' && candidate <= 'z') ||
+                               (candidate >= '0' && candidate <= '9')) {
+                        result.append( (char) rawBytes[i] );
+                    } else if (candidate < 16) {
+                        result.append( "%0" ).append( Integer.toHexString( candidate ) );
+                    } else {
+                        result.append( '%' ).append( Integer.toHexString( candidate ) );
+                    }
+                }
+                return result.toString();
+            } catch (java.io.UnsupportedEncodingException e) {
+                return "????";
+            }
+        }
     }
 
 

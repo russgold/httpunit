@@ -409,7 +409,7 @@ public class WebResponse {
     private ReceivedPage getReceivedPage() throws SAXException {
         if (_page == null) {
             if (!isHTML()) throw new NotHTMLException( getContentType() );
-            _page = new ReceivedPage( _url, _target, getText() );
+            _page = new ReceivedPage( _url, _target, getText(), getCharacterSet() );
         }
         return _page;
     }

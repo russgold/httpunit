@@ -26,6 +26,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.Dictionary;
 import java.util.Vector;
 
 import java.io.*;
@@ -165,4 +166,51 @@ public class WebPageTest extends HttpUnitTest {
         assertEquals( "Title", hebrewTitle, simplePage.getTitle() );
     }
 
+
+    public void testHebrewForm() throws Exception {
+        String hebrewName = "\u05d0\u05d1\u05d2\u05d3";
+        defineResource( "HebrewForm.html",
+                        "<html><head></head>" +
+                        "<form method=POST action=\"SayHello\">" +
+                        "<input type=text name=name><input type=submit></form></body></html>" );
+        setResourceCharSet( "HebrewForm.html", "iso-8859-8", true );
+        defineResource( "SayHello", new PseudoServlet() {
+            public WebResource getPostResponse( Dictionary parameters ) {
+                try {
+                    String name = (String) parameters.get( "name" );
+                    WebResource result = new WebResource( "<html><body><table><tr><td>Hello, " + 
+                                                          new String( name.getBytes( "iso-8859-1" ), "iso-8859-8" ) + 
+                                                          "</td></tr></table></body></html>" );
+                    result.setCharacterSet( "iso-8859-8" );
+                    result.setSendCharacterSet( true );
+                    return result;
+                } catch (java.io.UnsupportedEncodingException e) {
+                    return null;
+                }
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        WebResponse formPage = wc.getResponse( getHostPath() + "/HebrewForm.html" );
+        WebForm form = formPage.getForms()[0];
+        WebRequest request = form.getRequest();
+        request.setParameter( "name", hebrewName );
+
+        WebResponse answer = wc.getResponse( request );
+        String[][] cells = answer.getTables()[0].asText();
+
+        assertEquals( "Message", "Hello, " + hebrewName, cells[0][0] );
+        assertEquals( "Character set", "iso-8859-8", answer.getCharacterSet() );
+    }
+
+
+    private String toUnicode( String string ) {
+        StringBuffer sb = new StringBuffer( );
+        char[] chars = string.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            sb.append( "\\u" );
+            sb.append( Integer.toHexString( chars[i] ) );
+        }
+        return sb.toString();
+    }
 }

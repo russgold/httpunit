@@ -40,6 +40,7 @@ public class PseudoServer {
                         Thread.sleep( 50 );
                     } catch (IOException e) {
                         System.out.println( "Error in pseudo server: " + e );
+                        e.printStackTrace();
                     } catch (InterruptedException e) {
                         System.out.println( "Interrupted. Shutting down" );
                         _active = false;
@@ -69,6 +70,14 @@ public class PseudoServer {
      **/
     public void setResource( String name, String value ) {
         setResource( name, value, "text/html" );
+    }
+
+
+    /**
+     * Defines the contents of an expected resource.
+     **/
+    public void setResource( String name, PseudoServlet servlet ) {
+        _resources.put( asResourceName( name ), servlet );
     }
 
 
@@ -152,28 +161,114 @@ public class PseudoServer {
         String uri     = st.nextToken();
         String protocol = st.nextToken();
 
-        if (!command.equals( "GET" )) {
+
+
+        if (!command.equals( "GET" ) && !command.equals( "POST" )) {
             sendResponse( pw, HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + command );
         } else {
-            WebResource resource = (WebResource) _resources.get( uri );
-            if (resource == null) {
-                sendResponse( pw, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
-            } else {
-                sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
-                sendLine( pw, "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
-                String[] headers = resource.getHeaders();
-                for (int i = 0; i < headers.length; i++) {
-                    sendLine( pw, headers[i] );
+            try {
+                WebResource resource = getResource( command, uri, br );
+                if (resource == null) {
+                    sendResponse( pw, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
+                } else {
+                    sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
+                    sendLine( pw, "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
+                    String[] headers = resource.getHeaders();
+                    for (int i = 0; i < headers.length; i++) {
+                        sendLine( pw, headers[i] );
+                    }
+                    sendLine( pw, "" );
+                    pw.flush();
+                    pw = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), resource.getCharacterSet() ) );
+                    sendText( pw, resource.getContents() );
                 }
-                sendLine( pw, "" );
-                pw.flush();
-                pw = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), resource.getCharacterSet() ) );
-                sendText( pw, resource.getContents() );
+            } catch (IOException e) {
+                e.fillInStackTrace();
+                pw.close();
+                socket.close();
+                throw e;
+            } catch (Throwable t) {
+                sendResponse( pw, HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
             }
         }
 
         pw.close();
         socket.close();
+    }
+
+
+    private WebResource getResource( String command, String uri, BufferedReader br ) throws IOException {
+        Object resource = _resources.get( uri );
+        if (command.equals( "GET" ) && resource instanceof WebResource) {
+            return (WebResource) resource;
+        } else if (command.equals( "POST" ) && resource instanceof PseudoServlet) {
+            Dictionary requestData = readRequest( br );
+            return ((PseudoServlet) resource).getPostResponse( getParameters( (String) requestData.get( "content" ) ) );
+        } else {
+            return null;
+        }
+    }
+
+
+    private Dictionary readRequest( BufferedReader br ) throws IOException {
+        Hashtable headers = new Hashtable();
+
+        String header = br.readLine();
+        while (header.length() > 0) {
+            headers.put( header.substring( 0, header.indexOf(':') ).toUpperCase(),
+                         header.substring( header.indexOf(':')+1 ).trim() );
+            header = br.readLine();
+        }
+
+        readContent( headers, br );
+        return headers;
+    }
+
+
+    private void readContent( Hashtable headers, BufferedReader br ) throws IOException {
+        if (headers.get( "CONTENT-LENGTH" ) == null) return;
+        try {
+            int contentLength = Integer.parseInt( (String) headers.get( "CONTENT-LENGTH" ) );
+            char[] content = new char[ contentLength ];
+            br.read( content );
+            headers.put( "content", new String( content ) );
+        } catch (NumberFormatException e) {
+        }
+    }
+
+    private Dictionary getParameters( String content ) throws IOException {
+        StringTokenizer st = new StringTokenizer( content, "&=" );
+        Hashtable parameters = new Hashtable();
+        while (st.hasMoreTokens()) {
+            String name = st.nextToken();
+            if (st.hasMoreTokens()) {
+                parameters.put( name, decode( st.nextToken() ) );
+            }
+        }
+        return parameters;
+    }
+
+
+    private String decode( String byteString ) {
+        StringBuffer sb = new StringBuffer();
+        char[] chars = byteString.toCharArray();
+        char[] hexNum = { '0', '0', '0' };
+
+        int i = 0;
+        while (i < chars.length) {
+            if (chars[i] == '+') {
+                i++;
+                sb.append( ' ' );
+            } else if (chars[i] == '%') {
+                i++;
+                hexNum[1] = chars[i++];
+                hexNum[2] = chars[i++];
+                sb.append( (char) Integer.parseInt( new String( hexNum ), 16 ) );
+            } else {
+                sb.append( chars[i++] );
+            }
+        }
+        return sb.toString();
     }
 
 
@@ -216,77 +311,3 @@ public class PseudoServer {
     private ServerSocket _serverSocket;
 
 }
-
-
-class WebResource {
-
-
-    final static String DEFAULT_CONTENT_TYPE = "text/html";
-
-    final static String DEFAULT_CHARACTER_SET = "us-ascii";
-
-    WebResource( String contents ) {
-        this( contents, DEFAULT_CONTENT_TYPE );
-    }
-
-
-    WebResource( String contents, String contentType ) {
-        _contents    = contents;
-        _contentType = contentType;
-    }
-
-
-    void addHeader( String header ) {
-        _headers.addElement( header );
-    }
-
-
-    void setCharacterSet( String characterSet ) {
-        _characterSet = characterSet;
-    }
-
-
-    void setSendCharacterSet( boolean enabled ) {
-        _sendCharacterSet = enabled;
-    }
-
-
-    String[] getHeaders() {
-        String[] headers = new String[ _headers.size() ];
-        _headers.copyInto( headers );
-        return headers;
-    }
-
-
-    String getContents() {
-        return _contents;
-    }
-
-
-    String getContentType() {
-        return _contentType;
-    }
-
-
-    String getCharacterSet() {
-        return _characterSet;
-    }
-
-
-    String getCharacterSetParameter() {
-        if (!_sendCharacterSet) {
-            return "";
-        } else {
-            return "; charset=" + _characterSet;
-        }
-    }
-
-    private boolean _sendCharacterSet;
-    private String  _contents;
-    private String  _contentType;
-    private String  _characterSet = DEFAULT_CHARACTER_SET;
-    private Vector  _headers = new Vector();
-}
-
-
-
