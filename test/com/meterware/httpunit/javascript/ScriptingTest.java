@@ -211,6 +211,17 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testComment() throws Exception {
+        defineResource( "OnCommand.html", "<html><head><script language='JavaScript'><!--" +
+                                          "//--></script><script language='JavaScript'>" + "\n" +
+                                          "var n=0;" + "\n" +
+                                          "parseInt(n,32);" +
+                                          "</script></head></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+    }
+
+
     public void testIncludedFunction() throws Exception {
         defineResource( "saycheese.js", "function sayCheese() { alert( \"Cheese!\" ); }" );
         defineResource( "OnCommand.html", "<html><head><script language='JavaScript' src='saycheese.js'>" +

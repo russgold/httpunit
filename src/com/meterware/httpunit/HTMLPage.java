@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -76,24 +77,24 @@ public class HTMLPage extends ParsedHTML {
     /**
      * Returns the contents of any script tags on the page, concatenated.
      */
-    public String getScripts() throws SAXException {
+    public String[] getScripts() throws SAXException {
         NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "script" );
-        StringBuffer sb = new StringBuffer();
+        ArrayList scripts = new ArrayList();
         for (int i = 0; i < nl.getLength(); i++) {
             Node scriptNode = nl.item(i);
             String src = NodeUtils.getNodeAttribute( scriptNode, "src", null );
             if (src == null) {
-                sb.append( NodeUtils.asText( scriptNode.getChildNodes() ) );
+                scripts.add( NodeUtils.asText( scriptNode.getChildNodes() ) );
             } else {
                 try {
                     WebRequest req = new GetMethodWebRequest( getBaseURL(), src );
-                    sb.append( getResponse().getWindow().getResource( req ).getText() );
+                    scripts.add( getResponse().getWindow().getResource( req ).getText() );
                 } catch (IOException e) {
                     throw new RuntimeException( "Error loading included script: " + e );
                 }
             }
         }
-        return sb.toString();
+        return (String[]) scripts.toArray( new String[ scripts.size() ] );
     }
 
 

@@ -10,6 +10,13 @@ Limitations:
 
 
 Revision History:
+12-Oct-2002
+Acknowledgements:
+    Thanks to Richard Harris for finding a case where the handling of JavaScript comments was not working.
+
+Problems fixed:
+    1. Under certain circumstances, the first line of a JavaScript section was being treated as though commented out.
+
 10-Oct-2002
 Problems fixed:
     1. Window.open was implemented with parameters backwards in 8-Oct-2002 build
