@@ -20,6 +20,7 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
+import com.meterware.pseudoserver.HttpUserAgentTest;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -216,6 +217,21 @@ public class StatelessTest extends TestCase {
     }
 
 
+    public void testFrameAccess() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( "Frames", FrameTopServlet.class.getName() );
+        sr.registerServlet( "RedFrame", SimpleGetServlet.class.getName() );
+        sr.registerServlet( "BlueFrame", AccessCountServlet.class.getName() );
+
+        WebClient client = sr.newClient();
+        WebRequest request = new GetMethodWebRequest( "http://host/Frames" );
+        client.getResponse( request );
+        HttpUserAgentTest.assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, client.getFrameNames() );
+        WebResponse response = client.getFrameContents( "red" );
+        assertEquals( "Frame contents", SimpleGetServlet.RESPONSE_TEXT, response.getText() );
+    }
+
+
     static class SimpleGetServlet extends HttpServlet {
 
         static String RESPONSE_TEXT = "the desired content\r\n";
@@ -333,6 +349,22 @@ public class StatelessTest extends TestCase {
             resp.setContentType( "text/plain" );
             PrintWriter pw = resp.getWriter();
             pw.print( "You posted " + req.getParameter( "login" ) + "," + req.getParameter( "password" ) );
+            pw.close();
+        }
+
+    }
+
+
+    static class FrameTopServlet extends HttpServlet {
+
+        protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
+            resp.setContentType( "text/html" );
+
+            PrintWriter pw = resp.getWriter();
+            pw.println( "<html><head></head><frameset cols='20%,80&'>" );
+            pw.println( "<frame src='RedFrame' name='red'>" );
+            pw.println( "<frame src='BlueFrame' name='blue'>" );
+            pw.println( "</frameset></html>" );
             pw.close();
         }
 

@@ -169,7 +169,7 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
-    protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
+    public static void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
         Vector foundItems = new Vector();
         for (int i = 0; i < found.length; i++) foundItems.addElement( found[ i ] );
 
@@ -197,7 +197,7 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
-    protected String asText( Object[] args ) {
+    public static String asText( Object[] args ) {
         StringBuffer sb = new StringBuffer( "{" );
         for (int i = 0; i < args.length; i++) {
             if (i != 0) sb.append( "," );

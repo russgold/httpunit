@@ -24,6 +24,7 @@ import com.meterware.httpunit.WebResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.HttpURLConnection;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,10 +40,25 @@ class ServletUnitWebResponse extends WebResponse {
      * @param url the url from which the response was received
      * @param response the response populated by the servlet
      **/
-    ServletUnitWebResponse( ServletUnitClient client, String target, URL url, HttpServletResponse response ) throws IOException {
+    ServletUnitWebResponse( ServletUnitClient client, String target, URL url, HttpServletResponse response, boolean throwExceptionOnError ) throws IOException {
         super( client, target, url );
         _response = (ServletUnitHttpResponse) response;
-        defineRawInputStream( new ByteArrayInputStream( _response.getContents() ) );
+        /** make sure that any IO exception for HTML received page happens here, not later. **/
+        if (getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST || !throwExceptionOnError) {
+            defineRawInputStream( new ByteArrayInputStream( _response.getContents() ) );
+            if (getContentType().startsWith( "text" )) loadResponseText();
+        }
+    }
+
+
+    /**
+     * Constructs a response object from a servlet response.
+     * @param target the target frame on which the response will be displayed
+     * @param url the url from which the response was received
+     * @param response the response populated by the servlet
+     **/
+    ServletUnitWebResponse( ServletUnitClient client, String target, URL url, HttpServletResponse response ) throws IOException {
+        this( client, target, url, response, true );
     }
 
 

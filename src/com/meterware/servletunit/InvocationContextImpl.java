@@ -98,7 +98,7 @@ class InvocationContextImpl implements InvocationContext {
                 cookie.setPath( _application.getContextPath() );
                 _response.addCookie( cookie );
             }
-            _webResponse = new ServletUnitWebResponse( _client, _target, _requestURL, _response );
+            _webResponse = new ServletUnitWebResponse( _client, _target, _requestURL, _response, _client.getExceptionsThrownOnErrorStatus() );
         }
         return _webResponse;
     }
