@@ -64,6 +64,16 @@ public class WebResponse {
     }
 
 
+    /**
+     * Returns the first table in the response which has the specified text in its first non-blank row and
+     * non-blank column. Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableStartingWith( String text ) throws SAXException {
+        return getReceivedPage().getTableStartingWith( text );
+    }
+    
+    
     public String toString() {
         return _responseText;
     }
@@ -122,4 +132,5 @@ public class WebResponse {
         }
         return _page;
     }
+
 }

@@ -28,6 +28,14 @@ public class WebRequest {
     }
 
 
+    /**
+     * Removes a parameter from this web request.
+     **/
+    public void removeParameter( String name ) {
+        _parameters.remove( name );
+    }
+
+
     
     /**
      * Returns the final URL associated with this web request.
@@ -95,8 +103,9 @@ public class WebRequest {
         StringBuffer sb = new StringBuffer();
         for (Enumeration e = _parameters.keys(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
+            String value = (String) _parameters.get( name );
             sb.append( name ).append( '=' );
-            sb.append( URLEncoder.encode( (String) _parameters.get( name ) ) );
+            sb.append( URLEncoder.encode( value ) );
             if (e.hasMoreElements()) sb.append( '&' );
         }
         return sb.toString();

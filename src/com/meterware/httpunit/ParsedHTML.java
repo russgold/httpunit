@@ -81,6 +81,16 @@ class ParsedHTML {
 
 
     /**
+     * Returns the first table in the response which has the specified text in its first non-blank row and
+     * non-blank column. Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableStartingWith( String text ) {
+        return getTableStartingWith( text, getTables() );
+    }
+    
+    
+    /**
      * Returns a copy of the domain object model associated with this page.
      **/
     public Node getDOM() {
@@ -126,6 +136,28 @@ class ParsedHTML {
         } else {
             return (node.getAttributes().getNamedItem( "href" ) != null);
         }
+    }
+
+
+
+    /**
+     * Returns the table with the specified text in its first non-blank row and column.
+     **/
+    private WebTable getTableStartingWith( String text, WebTable[] tables ) {
+        for (int i = 0; i < tables.length; i++) {
+            tables[i].purgeEmptyCells();
+            if (tables[i].getRowCount() == 0) continue;
+            if (tables[i].getCellAsText(0,0).equalsIgnoreCase( text )) {
+                return tables[i];
+            } else {
+                WebTable[] innerTables = tables[i].getTableCell(0,0).getTables();
+                if (innerTables.length != 0) {
+                    WebTable result = getTableStartingWith( text, innerTables );
+                    if (result != null) return result;
+                }
+            }
+        }
+        return null;
     }
 
 }

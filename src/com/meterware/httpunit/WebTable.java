@@ -68,7 +68,8 @@ public class WebTable {
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
      **/
     public String getCellAsText( int row, int column ) {
-        return getTableCell( row, column ).asText();
+        TableCell cell = getTableCell( row, column );
+        return (cell == null) ? "" : cell.asText();
     }
 
 

@@ -47,12 +47,12 @@ public class HtmlTablesTest extends TestCase {
 
 
     public void setUp() throws Exception {
-        URL baseURL = new URL( "http://www.meterware.com" );
-        _noTables  = new ReceivedPage( baseURL, HEADER + "<body>This has no tables but it does" +
+        _baseURL = new URL( "http://www.meterware.com" );
+        _noTables  = new ReceivedPage( _baseURL, HEADER + "<body>This has no tables but it does" +
                                        "have <a href=\"/other.html\">an active link</A>" +
                                        " and <a name=here>an anchor</a>" +
                                        "</body></html>" );
-        _oneTable  = new ReceivedPage( baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+        _oneTable  = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
                                        "<table summary=\"tough luck\">" +
                                        "<tr><td>One</td><td>&nbsp;</td><td>1</td></tr>" +
                                        "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
@@ -60,7 +60,7 @@ public class HtmlTablesTest extends TestCase {
                                        "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
                                        "<tr><td>Three</td><td>&nbsp;</td><td>3</td></tr>" +
                                        "</table></body></html>" );
-        _nestTable = new ReceivedPage( baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+        _nestTable = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
                                        "<table summary=\"outer one\">" +
                                        "<tr><td>" +
                                        "Inner Table<br>" +
@@ -69,10 +69,16 @@ public class HtmlTablesTest extends TestCase {
                                        "        <tr><td>Blue</td><td>2</td></tr>" +
                                        "</table></td></tr>" +
                                        "</table></body></html>" );
-        _spanTable = new ReceivedPage( baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+        _spanTable = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
                                        "<table summary=\"tough luck\">" +
                                        "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
                                        "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td><td>rot</td></tr>" +
+                                       "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
+                                       "</table></body></html>" );
+        _badTable  = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+                                       "<table summary=\"tough luck\">" +
+                                       "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
+                                       "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td></tr>" +
                                        "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
                                        "</table></body></html>" );
     }
@@ -159,11 +165,39 @@ public class HtmlTablesTest extends TestCase {
         assertEquals( "vert",  table.getCellAsText( 2, 2 ) );
     }
 
+    public void testMissingColumns() {
+        WebTable table = _badTable.getTables()[0];
+        table.purgeEmptyCells();
+        assertEquals( 3, table.getRowCount() );
+        assertEquals( 3, table.getColumnCount() );
+    }
+
+
+    public void testInnerTableSeek() throws Exception {
+        ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
+                                            "<table summary=\"outer one\">" +
+                                            "<tr><td>&nbsp;</td><td>" +
+                                            "Inner Table<br>" +
+                                            "<table summary=\"inner one\">" +
+                                            "        <tr><td colspan=2>&nbsp;</td></tr>" +
+                                            "        <tr><td>Red</td><td>1</td></tr>" +
+                                            "        <tr><td>Blue</td><td>2</td></tr>" +
+                                            "</table></td></tr>" +
+                                            "</table></body></html>" );
+
+        String[][] cells = rp.getTableStartingWith( "Red" ).asText();
+        assertEquals( "Non-blank rows",    2, cells.length );
+        assertEquals( "Non-blank columns", 2, cells.length );
+        assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
+    }
+
 
     private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
     private ReceivedPage _noTables;
     private ReceivedPage _oneTable;
     private ReceivedPage _nestTable;
     private ReceivedPage _spanTable;
+    private ReceivedPage _badTable;
+    private URL          _baseURL;
 }
 

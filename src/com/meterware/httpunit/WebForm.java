@@ -51,6 +51,11 @@ public class WebForm {
             parameterNames.addElement( selections[i].getName() );
         }
 
+        HTMLTextAreaElement[] textAreas = getTextAreas();
+        for (int i = 0; i < textAreas.length; i++) {
+            parameterNames.addElement( textAreas[i].getName() );
+        }
+
         String[] result = new String[ parameterNames.size() ];
         parameterNames.copyInto( result );
         return result;
@@ -131,6 +136,9 @@ public class WebForm {
     private HTMLSelectElement[] _selections;
 
 
+    /** The text areas in this form. **/
+    private HTMLTextAreaElement[] _textAreas;
+
 
     private String getValue( Node node ) {
         return (node == null) ? "" : node.getNodeValue();
@@ -151,11 +159,17 @@ public class WebForm {
                     defaults.put( name, value );
                 } else if (type.equals( "RADIO" ) && parameters[i].getNamedItem( "checked" ) != null) {
                     defaults.put( name, value );
+                } else if (type.equals( "CHECKBOX" ) && parameters[i].getNamedItem( "checked" ) != null) {
+                    defaults.put( name, "on" );
                 }
             }
             HTMLSelectElement[] selections = getSelections();
             for (int i = 0; i < selections.length; i++) {
                 defaults.put( selections[i].getName(), selections[i].getSelected() );
+            }
+            HTMLTextAreaElement[] textAreas = getTextAreas();
+            for (int i = 0; i < textAreas.length; i++) {
+                defaults.put( textAreas[i].getName(), textAreas[i].getValue() );
             }
         _defaults = defaults;
         }
@@ -176,6 +190,21 @@ public class WebForm {
             _selections = result;
         }
         return _selections;
+    }
+
+    /**
+     * Returns an array of select control descriptors for this form.
+     **/
+    private HTMLTextAreaElement[] getTextAreas() {
+        if (_textAreas == null) {
+            NodeList nl = ((Element) _node).getElementsByTagName( "textarea" );
+            HTMLTextAreaElement[] result = new HTMLTextAreaElement[ nl.getLength() ];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = new HTMLTextAreaElement( nl.item(i) );
+            }
+            _textAreas = result;
+        }
+        return _textAreas;
     }
 
     /**
@@ -261,6 +290,30 @@ public class WebForm {
                 }
             }
             return "";
+        }
+    }
+
+
+    class HTMLTextAreaElement {
+        HTMLTextAreaElement( Node node ) {
+            if (!node.getNodeName().equalsIgnoreCase( "textarea" )) {
+                throw new RuntimeException( "Not a textarea element" );
+            }
+            _node = node;
+        }
+    
+    
+        private Node _node;
+    
+    
+        String getName() {
+            NamedNodeMap nnm = _node.getAttributes();
+            return WebForm.this.getValue( nnm.getNamedItem( "name" ) );
+        }
+
+
+        String getValue() {
+            return NodeUtils.asText(_node.getChildNodes() );
         }
     }
 

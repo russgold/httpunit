@@ -2,16 +2,19 @@ HttpUnit release notes
 
 Known issues: none
 
-13-Jul-00
+26-Jul-00 0.9.2
 General:
     1. Nested tables are now supported (examples to follow) by using WebTable.getTableCell
     2. table columns and rows used only for formatting may now be ignored using WebTable.purgeEmptyCells
+    3. It is now easy to find a table in a page based on the text in its first non-blank column and row,
+       using WebResponse.getTableStartingWith
 Additions:
     1. Deprecated WebTable.getCell, new method is getCellAsText
     2. Added WebTable.getTableCell to return a cell which could contain nested tables or just a DOM to examine
     3. Added WebTable.asText to return a 2D representation of the table
     4. Added WebTable.purgeEmptyCells to eliminate meaningless spacing information
     5. Added copyright notices to most source files
+    6. Added support for checkboxes, radio buttons, text areas, and selects
     
 29-Jun-00 0.9.1
 Additions:

@@ -36,6 +36,8 @@ public class HttpUnitTest extends TestCase {
         _oneForm = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
                                      "<form method=POST action = \"/servlet/Login\"><B>" +
                                      "Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                                     "<input type=\"checkbox\" name=first>Disabled" +
+                                     "<input type=\"checkbox\" name=second checked>Enabled" +
                                      "<br><Input type=submit value = \"Log in\">" +
                                      "</form></body></html>" );
         _hidden  = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
@@ -58,6 +60,7 @@ public class HttpUnitTest extends TestCase {
                                        "<form method=POST action = \"/servlet/Login\">" +
                                        "<Select name=color><Option>blue<Option selected>red \n" +
                                        "<Option>green</select>" +
+                                       "<TextArea name=\"text\">Sample text</TextArea>" +
                                        "</form></body></html>" );
     }
 	
@@ -75,11 +78,14 @@ public class HttpUnitTest extends TestCase {
     }
 
     public void testFormParameters() {
-        WebForm[] forms = _oneForm.getForms();
-        String[] parameters = forms[0].getParameterNames();
+        WebForm form = _oneForm.getForms()[0];
+        String[] parameters = form.getParameterNames();
         assertNotNull( parameters );
-        assertEquals( 1, parameters.length );
+        assertEquals( 3, parameters.length );
         assertEquals( "name", parameters[0] );
+
+        assertEquals( "First checkbox",  "",   form.getParameterValue( "first" ) );
+        assertEquals( "Second checkbox", "on", form.getParameterValue( "second" ) );
     }
 
     public void testFormRequest() throws Exception {
@@ -129,11 +135,12 @@ public class HttpUnitTest extends TestCase {
     public void testSelect() throws Exception {
         WebForm form = _selectForm.getForms()[0];
         String[] parameterNames = form.getParameterNames();
-        assertEquals( "Number of parameters", 1, parameterNames.length );
-        assertEquals( "Parameter name", "color", parameterNames[0] );
+        assertEquals( "Number of parameters", 2, parameterNames.length );
         assertEquals( "Default color", "red", form.getParameterValue( "color" ) );
+        assertEquals( "Default text",  "Sample text", form.getParameterValue( "text" ) );
         WebRequest request = form.getRequest();
         assertEquals( "Submitted color", "red", request.getParameter( "color" ) );
+        assertEquals( "Submitted text",  "Sample text", request.getParameter( "text" ) );
     }
 
 

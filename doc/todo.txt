@@ -1,0 +1,6 @@
+1. Add "User agent" to request (suggested by Jan Öhrström)
+
+2. Add methods to retrieve the possible choices for a set of radio buttons or pull-down
+
+3. Documentation, Documentation
+
