@@ -31,7 +31,8 @@ import org.xml.sax.*;
  * needed to build an automated test of a web site.
  *
  * @author Russell Gold
- * @author Jan Ohrstrom 
+ * @author Jan Ohrstrom
+ * @author Seth Ladd 
  **/
 public class WebConversation {
 
@@ -48,7 +49,7 @@ public class WebConversation {
      * cookies as requested by the server.
      **/
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException {
-        URLConnection connection = openConnection( request.getURL() );
+        HttpURLConnection connection = (HttpURLConnection) openConnection( request.getURL() );
         request.completeRequest( connection );
         updateCookies( connection );
 
@@ -56,6 +57,10 @@ public class WebConversation {
             return getResponse( new RedirectWebRequest( request, connection.getHeaderField( "Location" ) ) );
         } else if (connection.getHeaderField( "WWW-Authenticate" ) != null) {
             throw new AuthorizationRequiredException( connection.getHeaderField( "WWW-Authenticate" ) );
+        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+            throw new HttpInternalErrorException( request.getURLString() );
+        } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+            throw new HttpNotFoundException( request.getURLString() );        
         } else {
             WebResponse result = new WebResponse( this, request.getURL(), connection );
             return result;
@@ -113,8 +118,8 @@ public class WebConversation {
         HttpURLConnection.setFollowRedirects( false );
     }
 
-    private URLConnection openConnection( URL url ) throws MalformedURLException, IOException {
-        URLConnection connection = url.openConnection();
+    private HttpURLConnection openConnection( URL url ) throws MalformedURLException, IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setUseCaches( false );
         sendAuthorization( connection );
 	sendUserAgent( connection );

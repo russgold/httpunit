@@ -171,7 +171,7 @@ public class WebResponse {
             _responseText = sb.toString();
             readHeaders( connection );
         } catch (IOException e) {
-            throw new RuntimeException( "Unable to retrieve URL: " + _url.toExternalForm() );
+            throw new RuntimeException( "Unable to retrieve data from URL: " + _url.toExternalForm() );
         }
     }
 
