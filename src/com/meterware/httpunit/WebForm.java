@@ -57,7 +57,7 @@ public class WebForm extends WebRequestSource {
      * Submits this form using the web client from which it was originally obtained.
      **/
     WebResponse submit( SubmitButton button ) throws IOException, SAXException {
-        String event = NodeUtils.getNodeAttribute( getNode(), "onsubmit" );
+        String event = getAttribute( "onsubmit" );
         if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest( getRequest( button ) );
         return getBaseResponse();
     }
@@ -67,7 +67,7 @@ public class WebForm extends WebRequestSource {
      * Returns the method defined for this form.
      **/
     public String getMethod() {
-        return NodeUtils.getNodeAttribute( getNode(), "method", "GET" );
+        return getAttribute( "method", "GET" );
     }
 
 
@@ -322,7 +322,7 @@ public class WebForm extends WebRequestSource {
      * Returns true if this form is to be submitted using mime encoding (the default is URL encoding).
      **/
     public boolean isSubmitAsMime() {
-        return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( getNode(), "enctype" ) );
+        return "multipart/form-data".equalsIgnoreCase( getAttribute( "enctype" ) );
     }
 
 
@@ -330,7 +330,7 @@ public class WebForm extends WebRequestSource {
      * Resets all parameters to their initial values.
      */
     public void reset() {
-        String event = NodeUtils.getNodeAttribute( getNode(), "onreset" );
+        String event = getAttribute( "onreset" );
         if (event.length() == 0 || getScriptableObject().doEvent( event )) resetControls();
     }
 

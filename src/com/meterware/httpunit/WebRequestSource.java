@@ -37,7 +37,7 @@ public class WebRequestSource extends ParameterHolder {
      * Returns the ID associated with this request source.
      **/
     public String getID() {
-        return NodeUtils.getNodeAttribute( _node, "id" );
+        return getAttribute( "id" );
     }
 
 
@@ -45,7 +45,7 @@ public class WebRequestSource extends ParameterHolder {
      * Returns the name associated with this request source.
      **/
     public String getName() {
-        return NodeUtils.getNodeAttribute( _node, "name" );
+        return getAttribute( "name" );
     }
 
 
@@ -216,6 +216,16 @@ public class WebRequestSource extends ParameterHolder {
     protected void addPresetParameter( String name, String value );
 
 
+    String getAttribute( final String name ) {
+        return NodeUtils.getNodeAttribute( _node, name );
+    }
+
+
+    String getAttribute( final String name, String defaultValue ) {
+        return NodeUtils.getNodeAttribute( _node, name, defaultValue );
+    }
+
+
 //----------------------------- private members -----------------------------------------------
 
 
@@ -236,8 +246,9 @@ public class WebRequestSource extends ParameterHolder {
     /** The DOM node representing this entity. **/
     private Node           _node;
 
+
     private String getSpecifiedTarget() {
-        return NodeUtils.getNodeAttribute( _node, "target" );
+        return getAttribute( "target" );
     }
 
 

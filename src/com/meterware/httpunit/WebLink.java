@@ -67,7 +67,7 @@ public class WebLink extends FixedURLWebRequestSource {
      **/
     public String asText() {
         if (getNode().getNodeName().equals( "area" )) {
-            return NodeUtils.getNodeAttribute( getNode(), "alt" );
+            return getAttribute( "alt" );
         } else if (!getNode().hasChildNodes()) {
             return "";
         } else {
@@ -80,7 +80,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
      **/
     public WebResponse click() throws IOException, SAXException {
-        String event = NodeUtils.getNodeAttribute( getNode(), "onclick" );
+        String event = getAttribute( "onclick" );
         if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest();
         return getBaseResponse();
     }
@@ -90,7 +90,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * Simulates moving the mouse over the link. Will fire the 'onMouseOver' event if defined.
      **/
     public void mouseOver() {
-        String event = NodeUtils.getNodeAttribute( getNode(), "onmouseover" );
+        String event = getAttribute( "onmouseover" );
         if (event.length() > 0) getScriptableObject().doEvent( event );
     }
 
