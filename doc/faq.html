@@ -7,43 +7,62 @@
 <OL>
 <LI><A HREF="#Cannot unzip">Why can't I unzip the download library?</A></LI>
 <LI><A HREF="#org.xml.sax">What is the org.xml.sax package?</A></LI>
-<LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
-<LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
+<LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
+
+</ol><ol start=4>
+
 <LI><A HREF="sslfaq.html">Does HttpUnit support https?</A></LI>
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
+<LI><A HREF="#badType">The server is not sending a valid content type. How do I test HTML pages anyway?</A></LI>
+
+</ol><ol start=8>
+
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
-<LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
 <LI><A HREF="#badPost">Why doesn't my servlet see parameters on a POST request?</A></LI>
 <LI><A HREF="#hidden">Why can't I change hidden parameters?</A></LI>
-<LI><A HREF="#badType">The server is not sending a valid content type. How do I test HTML pages anyway?</A></LI>
+
+</ol><ol start=11>
+
+<LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
+<LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
+<li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
 </OL>
 
 
+<h2>Problems getting started</h2>
 
-<A NAME="Cannot unzip"><H2>Why can't I unzip the download library?</H2></A>
+<A NAME="Cannot unzip"><h3>Why can't I unzip the download library?</h3></A>
 HttpUnit is archived using the classes in the java.util.zip package. Some older Unzip programs cannot understand this format.
 If you are using WinZip, stick to version 7.0 or later.
 
-<A NAME="org.xml.sax"><H2>What is the org.xml.sax package?</H2></A>
-You may be getting compile or runtime errors asking for the org.xml.sax package. This package is found in JTidy, the HTML parser used
-by HttpUnit. You should download Jtidy from
-<A HREF="http://sourceforge.net/project/showfiles.php?group_id=13153">its SourceForge download page</A>
-and install Tidy.jar in your classpath.
+<A NAME="org.xml.sax"><h3>What is the org.xml.sax package?</h3></A>
+You may be getting compile or runtime errors asking for the org.xml.sax package.
+This package is found in <a href="http://www.sf.net/projects/jtidy">JTidy</a>, the HTML parser used
+by HttpUnit. It is included in the download.
 
-<A NAME="javascript"><H2>How do I use HttpUnit to test my pages that use JavaScript?</H2></A>
-You should not have to do anything special; however, not all JavaScript constructs are supported as yet. See
-<a href="Javascript-support.html">the list of supported JavaScript features</a> for more information.
+<A NAME="#reload"><h3>Why do I get java.lang.IllegalAccessError when calling getResponse()?</h3></A>
+<p>This happens when you use HttpUnit and certain versions of JTidy with one of the JUnit graphical test runners, which reloads
+classes every time to run a test. Unfortunately, this places different versions of the JTidy
+classes in different class loaders, so you get this error.  To avoid it,
+you can do any of the following:<ul><li>Use only the text test runner</li>
+<li>Disable all class reloading in JUnit by adding "loading=false" to <tt>junit.properties</tt> in your current directory</li>
+<li>Disable reloading of HttpUnit and JTidy by adding the following lines to <tt>excluded.properties</tt> in junit.jar<blockquote><code>
+excluded.10=com.meterware.httpunit.*<br>
+excluded.11=org.w3c.tidy.*
+</code></blockquote>
+This will require extracting the file, modifying it and then putting it back <em>in the same directory</em>, but it should allow your
+tests to reload safely.</ul></p>
+<p>This problem appears to be resolved in JTidy r7, which is included with HttpUnit 1.4.1 or later.
 
-<A NAME="#norhino"><H2>JavaScript is not being executed at all. Why not?</H2></A>
-If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.
+<h2>Server Issues</h2>
 
-<A NAME="proxy"><H2>Can I use HttpUnit through a proxy server?</H2></A>
+<A NAME="proxy"><h3>Can I use HttpUnit through a proxy server?</h3></A>
 Yes. HttpUnit uses java.net.HttpURLConnection, so the
 <A HREF="http://www.javaworld.com/javaworld/javatips/jw-javatip42.html">normal Java way to use
 proxies</A> will work. At some point HttpUnit may support this more directly, but for now, you will need to set the system properties yourself.
 
-<A NAME="charset"><H2>Why isn't HttpUnit handling my non-English pages?</H2></A>
+<A NAME="charset"><h3>Why isn't HttpUnit handling my non-English pages?</h3></A>
 Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform.
 As of version 1.2.1, HttpUnit correctly recognizes the charset parameter of the Content-type header which may
 specify an alternative character set;
@@ -63,33 +82,27 @@ String japaneseName = new String(name.getBytes("8859_1"),"EUC_JP");
 </code></blockquote>
 where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract the raw bytes from the parameter string.
 
-<A NAME="buttons"><H2>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</H2></A>
+<A name="#badType"><h3>The server is not sending a valid content type. How do I test HTML pages anyway?</h3></A>
+By default, HttpUnit assumes a content type of "text/plain" unless the server sends the Content-Type header to override
+it, as most servers do. If yours is not, you can
+call<blockquote><code>HttpUnitOptions.setDefaultContentType( "text/html" );</code></blockquote>before running your tests.
+If you are using JUnit, call this method in your <code>setUp()</code> method.
+
+<h2>Form Handling Problems</h2>
+
+<A NAME="buttons"><h3>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</h3></A>
 This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
 JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and
 will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them,
 call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page.
 Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
 
-<A NAME="#reload"><H2>Why do I get java.lang.IllegalAccessError when calling getResponse()?</H2></A>
-<p>This happens when you use HttpUnit and certain versions of JTidy with one of the JUnit graphical test runners, which reloads
-classes every time to run a test. Unfortunately, this places different versions of the JTidy
-classes in different class loaders, so you get this error.  To avoid it,
-you can do any of the following:<ul><li>Use only the text test runner</li>
-<li>Disable all class reloading in JUnit by adding "loading=false" to <tt>junit.properties</tt> in your current directory</li>
-<li>Disable reloading of HttpUnit and JTidy by adding the following lines to <tt>excluded.properties</tt> in junit.jar<blockquote><code>
-excluded.10=com.meterware.httpunit.*<br>
-excluded.11=org.w3c.tidy.*
-</code></blockquote>
-This will require extracting the file, modifying it and then putting it back <em>in the same directory</em>, but it should allow your
-tests to reload safely.</ul></p>
-<p>This problem appears to be resolved in JTidy r7, which is included with HttpUnit 1.4.1 or later.
-
-<A NAME="#badPost"><H2>Why doesn't my servlet see parameters on a POST request?</H2></A>
+<A NAME="#badPost"><h3>Why doesn't my servlet see parameters on a POST request?</h3></A>
 Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type
 header. HttpUnit 1.2.6 sends this attribute; As of HttpUnit 1.2.7 it will only send it if you call
 <code>HttpUnitOptions.setPostIncludesCharset(true)</code> before your request.
 
-<A name="#hidden"><h2>Why can't I change hidden parameter values?</h2></A>
+<A name="#hidden"><h3>Why can't I change hidden parameter values?</h3></A>
 By default, HttpUnit verifies any parameter value changes against the form containing them. Since a user cannot directly
 change hidden parameters, HttpUnit stops you from doing it in your code. If you have to change these values, you have a couple
 of choices:<ul>
@@ -101,12 +114,20 @@ the underlying value in the form. This will behave the way JavaScript does - res
 rather than the original one.
 </ul>
 
-<A name="#badType"><h2>The server is not sending a valid content type. How do I test HTML pages anyway?</h2></A>
-By default, HttpUnit assumes a content type of "text/plain" unless the server sends the Content-Type header to override
-it, as most servers do. If yours is not, you can
-call<blockquote><code>HttpUnitOptions.setDefaultContentType( "text/html" );</code></blockquote>before running your tests.
-If you are using JUnit, call this method in your <code>setUp()</code> method.
+<h2>JavaScript support</h2>
 
+<A NAME="javascript"><h3>How do I use HttpUnit to test my pages that use JavaScript?</h3></A>
+You should not have to do anything special; however, not all JavaScript constructs are supported as yet. See
+<a href="Javascript-support.html">the list of supported JavaScript features</a> for more information.
+
+<A NAME="norhino"><h3>JavaScript is not being executed at all. Why not?</h3></A>
+If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.
+
+<a name="unsupported"><h3>How do I handle a page that uses JavaScript features that HttpUnit does not support?</h3></a>
+The latest pre-release version supports disabling exceptions as a result of Javascript errors.
+If you call<blockquote><code>HttpUnitOptions.setExceptionsThrownOnScriptError( false );</code></blockquote>problems will
+recorded but will not throw exceptions.
+You can see the list of problems detected by calling<blockquote><code>HttpUnitOptions.getScriptErrorMessages();</code></blockquote>
 
 </BODY></HTML>
 
