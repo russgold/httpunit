@@ -70,6 +70,14 @@ public class GetMethodWebRequest extends WebRequest {
     }
 
 
+    /**
+     * Constructs a web request for a link.
+     **/
+    GetMethodWebRequest( WebLink sourceLink ) {
+        super( sourceLink );
+    }
+
+
 //------------------------------------- protected members ---------------------------------------------
 
 

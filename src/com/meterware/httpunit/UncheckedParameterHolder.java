@@ -32,11 +32,13 @@ import java.net.URLEncoder;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-class UncheckedParameterHolder implements ParameterHolder {
+class UncheckedParameterHolder extends ParameterHolder {
 
-    private Hashtable    _parameters = new Hashtable();
     private static final String[] NO_VALUES = new String[ 0 ];
     private final String _characterSet;
+
+    private Hashtable _parameters = new Hashtable();
+    private boolean   _submitAsMime;
 
 
     UncheckedParameterHolder() {
@@ -46,6 +48,7 @@ class UncheckedParameterHolder implements ParameterHolder {
 
     UncheckedParameterHolder( WebRequestSource source ) {
         _characterSet = source.getCharacterSet();
+        _submitAsMime = source.isSubmitAsMime();
         String[] names = source.getParameterNames();
         for (int i = 0; i < names.length; i++) {
             if (!source.isFileParameter( names[i] )) {
@@ -58,7 +61,7 @@ class UncheckedParameterHolder implements ParameterHolder {
     /**
      * Specifies the position at which an image button (if any) was clicked.
      **/
-    public void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
+    void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
         setParameter( imageButton.getName() + ".x", Integer.toString( x ) );
         setParameter( imageButton.getName() + ".y", Integer.toString( y ) );
     }
@@ -67,7 +70,7 @@ class UncheckedParameterHolder implements ParameterHolder {
     /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    public void recordParameters( ParameterProcessor processor ) throws IOException {
+    void recordParameters( ParameterProcessor processor ) throws IOException {
         Enumeration e = _parameters.keys();
 
         while (e.hasMoreElements()) {
@@ -86,18 +89,18 @@ class UncheckedParameterHolder implements ParameterHolder {
     }
 
 
-    public String[] getParameterNames() {
+    String[] getParameterNames() {
         return (String[]) _parameters.keySet().toArray( new String[ _parameters.size() ] );
     }
 
 
-    public String getParameterValue( String name ) {
+    String getParameterValue( String name ) {
         String[] values = getParameterValues( name );
         return values.length == 0 ? null : values[0];
     }
 
 
-    public String[] getParameterValues( String name ) {
+    String[] getParameterValues( String name ) {
         Object result = _parameters.get( name );
         if (result instanceof String) return new String[] { (String) result };
         if (result instanceof String[]) return (String[]) result;
@@ -106,27 +109,37 @@ class UncheckedParameterHolder implements ParameterHolder {
     }
 
 
-    public void removeParameter( String name ) {
+    void removeParameter( String name ) {
         _parameters.remove( name );
     }
 
 
-    public void setParameter( String name, String value ) {
+    void setParameter( String name, String value ) {
         _parameters.put( name, value );
     }
 
 
-    public void setParameter( String name, String[] values ) {
+    void setParameter( String name, String[] values ) {
         _parameters.put( name, values );
     }
 
 
-    public void setParameter( String name, UploadFileSpec[] files ) {
+    void setParameter( String name, UploadFileSpec[] files ) {
         _parameters.put( name, files );
     }
 
 
-    public boolean isFileParameter( String name ) {
-        return false;
+    boolean isFileParameter( String name ) {
+        return true;
+    }
+
+
+    boolean isSubmitAsMime() {
+        return _submitAsMime;
+    }
+
+
+    void setSubmitAsMime( boolean mimeEncoded ) {
+        _submitAsMime = mimeEncoded;
     }
 }

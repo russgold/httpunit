@@ -141,6 +141,17 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    public void testLinkImageAsText() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "HasImage", "<a href='somwhere.html' >\r\n<img src='blah.gif' alt='Blah Blah' >\r\n</a>" );
+
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/HasImage.html" );
+        WebLink link = initialPage.getLinks()[0];
+        assertEquals( "Link text", "", link.asText() );
+        initialPage.getLinkWithImageText("Blah Blah");
+    }
+
+
     public void testLinkFollowing() throws Exception {
         WebConversation wc = new WebConversation();
         defineWebPage( "Initial", "Go to <a href=\"Next.html\">the next page.</a> <a name=\"bottom\">Bottom</a>" );
@@ -323,6 +334,38 @@ public class WebLinkTest extends HttpUnitTest {
         WebRequest wr = link.getRequest();
         assertMatchingSet( "Request parameter names", new String[] { "arg1", "valueless" }, toStringArray( wr.getParameterNames() ) );
         assertEquals( "Value of arg1", null, wr.getParameter( "arg1" ) );
+    }
+
+
+    public void testLinkParameterOrder() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "encodedLinks", "<html><head><title>Encode Test</title></head>" +
+                                       "<body>" +
+                                       "<a href='/request?arg0=0&arg1&arg0=2&valueless='>request</a>" +
+                                       "</body></html>" );
+        WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
+        WebLink link = mapPage.getLinks()[0];
+        WebRequest wr = link.getRequest();
+        assertMatchingSet( "Request parameter names", new String[] { "arg0", "arg1", "valueless" }, toStringArray( wr.getParameterNames() ) );
+        assertMatchingSet( "Value of arg0", new String[] { "0", "2" }, wr.getParameterValues( "arg0" ) );
+        assertEquals( "Actual query", "arg0=0&arg1&arg0=2&valueless=", wr.getQueryString() );
+    }
+
+
+    public void testLinkParameterValidation() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "encodedLinks", "<html><head><title>Encode Test</title></head>" +
+                                       "<body>" +
+                                       "<a href='/request?arg0=0&arg1&arg0=2&valueless='>request</a>" +
+                                       "</body></html>" );
+        WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
+        WebLink link = mapPage.getLinks()[0];
+        WebRequest wr = link.getRequest();
+        wr.setParameter( "arg0", new String[] { "0", "2" } );
+        try {
+            wr.setParameter( "arg0", "3" );
+            fail( "Did not prevent change to link parameters" );
+        } catch (IllegalRequestParameterException e) {}
     }
 
 

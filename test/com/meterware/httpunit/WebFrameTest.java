@@ -140,6 +140,36 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    public void testDuplicateFrameNames() throws Exception {
+        defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
+        defineWebPage( "Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );
+        defineWebPage( "Form",    "This is a page with a simple form: " +
+                                  "<form action=submit><input name=name><input type=submit></form>" +
+                                  "<a href=Linker.html target=red>a link</a>");
+        defineResource( "Frames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src='SubFrames.html'>" +
+                        "    <FRAME src=Form.html>" +
+                        "</FRAMESET></HTML>" );
+
+        defineResource( "SubFrames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src=\"Linker.html\">" +
+                        "    <FRAME src=Form.html>" +
+                        "</FRAMESET></HTML>" );
+
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse linker = getFrameWithURL( _wc, "Linker" );
+        assertNotNull( "Linker not found", linker );
+
+        response = _wc.getResponse( linker.getLinks()[0].getRequest() );
+        WebResponse target = getFrameWithURL( _wc, "Target" );
+        assertTrue( "Second response not the same as source frame contents", response == target );
+    }
+
+
     public void testUnnamedFrames() throws Exception {
         defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
         defineWebPage( "Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );

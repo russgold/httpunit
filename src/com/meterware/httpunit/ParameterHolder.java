@@ -31,58 +31,83 @@ import java.util.Enumeration;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-interface ParameterHolder {
+abstract class ParameterHolder {
 
     /**
-     * Specifies the position at which an image button (if any) was clicked.
+     * Specifies the position at which an image button (if any) was clicked. This default implementation does nothing.
      **/
-    public void selectImageButtonPosition( SubmitButton imageButton, int x, int y );
+    void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {}
 
 
     /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    public void recordParameters( ParameterProcessor processor ) throws IOException;
+    abstract
+    void recordParameters( ParameterProcessor processor ) throws IOException;
 
 
     /**
      * Returns an array of all parameter names in this collection.
      **/
-    public String[] getParameterNames();
+    abstract
+    String[] getParameterNames();
 
 
     /**
      * Returns the multiple default values of the named parameter.
      **/
+    abstract
     String[] getParameterValues( String name );
 
 
     /**
      * Removes a parameter name from this collection.
      **/
+    abstract
     void removeParameter( String name );
 
 
     /**
      * Sets the value of a parameter in a web request.
      **/
+    abstract
     void setParameter( String name, String value );
 
 
     /**
      * Sets the multiple values of a parameter in a web request.
      **/
+    abstract
     void setParameter( String name, String[] values );
 
 
     /**
      * Sets the multiple values of a file upload parameter in a web request.
      **/
+    abstract
     void setParameter( String name, UploadFileSpec[] files );
 
 
     /**
-     * Returns true if the specified parameter is a file field.
+     * Returns true if the specified name is that of a file parameter. The default implementation returns false.
+     */
+    boolean isFileParameter( String name ) {
+        return false;
+    }
+
+
+    /**
+     * Returns the character set encoding for the request.
      **/
-    boolean isFileParameter( String name );
+    String getCharacterSet() {
+        return HttpUnitUtils.DEFAULT_CHARACTER_SET;
+    }
+
+
+    abstract
+    boolean isSubmitAsMime();
+
+
+    abstract
+    void setSubmitAsMime( boolean mimeEncoded );
 }

@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.List;
+import java.util.Arrays;
+import java.io.IOException;
 
 import org.w3c.dom.Node;
 
@@ -74,10 +77,7 @@ public class WebLink extends WebRequestSource {
      * Creates and returns a web request which will simulate clicking on this link.
      **/
     public WebRequest getRequest() {
-        WebRequest request = new GetMethodWebRequest( getBaseURL(), getRelativeURL(), getTarget() );
-        addPresetParameters( request );
-        request.setHeaderField( "Referer", getBaseURL().toExternalForm() );
-        return request;
+        return new GetMethodWebRequest( this );
     }
 
 
@@ -85,7 +85,7 @@ public class WebLink extends WebRequestSource {
      * Returns an array containing the names of any parameters defined as part of this link's URL.
      **/
     public String[] getParameterNames() {
-        ArrayList parameterNames = new ArrayList( getPresetParameters().keySet() );
+        ArrayList parameterNames = new ArrayList( getPresetParameterMap().keySet() );
         return (String[]) parameterNames.toArray( new String[ parameterNames.size() ] );
     }
 
@@ -94,25 +94,101 @@ public class WebLink extends WebRequestSource {
      * Returns the multiple default values of the named parameter.
      **/
     public String[] getParameterValues( String name ) {
-        final String[] values = (String[]) getPresetParameters().get( name );
+        final String[] values = (String[]) getPresetParameterMap().get( name );
         return values == null ? NO_VALUES : values;
     }
 
 
+//--------------------------------- ParameterHolder methods --------------------------------------
+
+
     /**
-     * Returns the HREF URL w/o its parameters.
+     * Specifies the position at which an image button (if any) was clicked.
      **/
-    String getRelativeURL() {
-        final String url = getURLString();
-        final int questionMarkIndex = url.indexOf("?");
-        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
-            return url.substring(0, questionMarkIndex);
-        }
-        return url;
+    void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
+        throw new IllegalLinkParametersRequest();
     }
 
 
-//--------------------------------------------------- package members --------------------------------------------------
+    /**
+     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
+     **/
+    void recordParameters( ParameterProcessor processor ) throws IOException {
+        Iterator i = getPresetParameterList().iterator();
+        while (i.hasNext()) {
+            LinkParameter o = (LinkParameter) i.next();
+            processor.addParameter( o.getName(), o.getValue(), getCharacterSet() );
+         }
+    }
+
+
+    /**
+     * Removes a parameter name from this collection.
+     **/
+    void removeParameter( String name ) {
+        throw new IllegalLinkParametersRequest();
+    }
+
+
+    /**
+     * Sets the value of a parameter in a web request.
+     **/
+    void setParameter( String name, String value ) {
+        setParameter( name, new String[] { value } );
+    }
+
+
+    /**
+     * Sets the multiple values of a parameter in a web request.
+     **/
+    void setParameter( String name, String[] values ) {
+        if (values == null) {
+            throw new IllegalArgumentException( "May not supply a null argument array to setParameter()" );
+        } else if (!getPresetParameterMap().containsKey( name )) {
+            throw new IllegalLinkParametersRequest();
+        } else if (!equals( getParameterValues( name ), values )) {
+            throw new IllegalLinkParametersRequest();
+        }
+    }
+
+
+    private boolean equals( String[] left, String[] right ) {
+        if (left.length != right.length) return false;
+        List rightValues = Arrays.asList( right );
+        for (int i = 0; i < left.length; i++) {
+            if (!rightValues.contains( left[i] )) return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Sets the multiple values of a file upload parameter in a web request.
+     **/
+    void setParameter( String name, UploadFileSpec[] files ) {
+        throw new IllegalLinkParametersRequest();
+    }
+
+
+    /**
+     * Returns true if the specified parameter is a file field.
+     **/
+    boolean isFileParameter( String name ) {
+        return false;
+    }
+
+
+    boolean isSubmitAsMime() {
+        return false;
+    }
+
+
+    void setSubmitAsMime( boolean mimeEncoded ) {
+        throw new IllegalStateException( "May not change the encoding for a validated request created from a link" );
+    }
+
+
+ //--------------------------------------------------- package members --------------------------------------------------
 
 
     /**
@@ -120,7 +196,7 @@ public class WebLink extends WebRequestSource {
      * from that page.
      **/
     WebLink( URL baseURL, String parentTarget, Node node ) {
-        super( node, baseURL, parentTarget );
+        super( node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), parentTarget );
     }
 
 
@@ -130,17 +206,8 @@ public class WebLink extends WebRequestSource {
     private static final String[] NO_VALUES = new String[0];
     private static final String PARAM_DELIM = "&";
 
-    private Map _presetParameters;
-
-
-    private void addPresetParameters(WebRequest request) {
-        Map params = getPresetParameters();
-        Iterator i = params.keySet().iterator();
-        while (i.hasNext()) {
-            String key = (String) i.next();
-            request.setParameter( key, (String[]) params.get( key ) );
-        }
-    }
+    private Map       _presetParameterMap;
+    private ArrayList _presetParameterList;
 
 
     /**
@@ -156,30 +223,38 @@ public class WebLink extends WebRequestSource {
     }
 
 
-    /**
-     * Builds list of parameters
-     **/
-    private Map getPresetParameters() {
-        if (_presetParameters == null) {
-            _presetParameters = new HashMap();
-            StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
-            while (st.hasMoreTokens()) stripOneParameter( _presetParameters, st.nextToken() );
-        }
-        return _presetParameters;
+    private Map getPresetParameterMap() {
+        if (_presetParameterMap == null) loadPresetParameters();
+        return _presetParameterMap;
+    }
+
+
+    private ArrayList getPresetParameterList() {
+        if (_presetParameterList == null) loadPresetParameters();
+        return _presetParameterList;
+    }
+
+
+    private void loadPresetParameters() {
+        _presetParameterMap = new HashMap();
+        _presetParameterList = new ArrayList();
+        StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
+        while (st.hasMoreTokens()) stripOneParameter( _presetParameterList, _presetParameterMap, st.nextToken() );
     }
 
 
     /**
      * add a pair key-value to the hashtable, creates an array of values if param already exists.
      **/
-    private void stripOneParameter( Map params, String param ) {
+    private void stripOneParameter( ArrayList list, Map map, String param ) {
         final int index = param.indexOf( "=" );
         String value = ((index < 0) ? null
                            : ((index == param.length() - 1)
                                ? ""
                                : HttpUnitUtils.decode( param.substring( index + 1 ) )));
-        String key = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
-        params.put( key, withNewValue( (String[]) params.get( key ), value ) );
+        String name = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
+        map.put( name, withNewValue( (String[]) map.get( name ), value ) );
+        list.add( new LinkParameter( name, value ) );
     }
 
 
@@ -197,6 +272,40 @@ public class WebLink extends WebRequestSource {
         }
         return result;
     }
+
+}
+
+
+class LinkParameter {
+    private String _name;
+    private String _value;
+
+
+    public LinkParameter( String name, String value ) {
+        _name = name;
+        _value = value;
+    }
+
+
+    public String getName() {
+        return _name;
+    }
+
+
+    public String getValue() {
+        return _value;
+    }
+}
+
+
+class IllegalLinkParametersRequest extends IllegalRequestParameterException {
+
+    public IllegalLinkParametersRequest() {
+    }
+
+    public String getMessage() {
+        return "May not modify parameters for a request derived from a link with parameter checking enabled.";
+     }
 
 
 }

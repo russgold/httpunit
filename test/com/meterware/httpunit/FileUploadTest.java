@@ -106,7 +106,7 @@ public class FileUploadTest extends HttpUnitTest {
         try {
             formSubmit.selectFile( "message", file );
             fail( "Should not allow setting of a text parameter to a file value" );
-        } catch (IllegalNonFileParameterException e) {
+        } catch (IllegalRequestParameterException e) {
         }
     }
 
@@ -126,7 +126,7 @@ public class FileUploadTest extends HttpUnitTest {
         try {
             formSubmit.selectFile( "message", file );
             fail( "Should not allow setting of a file parameter in a form which specifies url-encoding" );
-        } catch (MultipartFormRequiredException e) {
+        } catch (IllegalRequestParameterException e) {
         }
     }
 

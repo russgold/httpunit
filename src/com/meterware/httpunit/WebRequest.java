@@ -249,17 +249,20 @@ public class WebRequest {
      * Constructs a web request from a form.
      **/
     protected WebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
-        this( sourceForm.getBaseURL(), sourceForm.getRelativeURL(), sourceForm.getTarget(), newParameterHolder( sourceForm ) );
-        _sourceForm   = sourceForm;
+        this( sourceForm );
         if (button != null && button.isImageButton() && button.getName().length() > 0) {
             _parameterHolder.selectImageButtonPosition( button, x, y );
         }
-
-        setHeaderField( "Referer", sourceForm.getBaseURL().toExternalForm() );
     }
 
 
-    private static ParameterHolder newParameterHolder( WebForm requestSource ) {
+    protected WebRequest( WebRequestSource requestSource ) {
+        this( requestSource.getBaseURL(), requestSource.getRelativeURL(), requestSource.getTarget(), newParameterHolder( requestSource ) );
+        setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
+    }
+
+
+    private static ParameterHolder newParameterHolder( WebRequestSource requestSource ) {
         if (HttpUnitOptions.getParameterValuesValidated()) {
             return requestSource;
         } else {
@@ -280,15 +283,6 @@ public class WebRequest {
 
 
     /**
-     * Returns true if this request is based on a web form.
-     **/
-    final
-    protected boolean isFormBased() {
-        return _sourceForm != null;
-    }
-
-
-    /**
      * Returns true if selectFile may be called with this parameter.
      */
     protected boolean maySelectFile( String parameterName )
@@ -298,10 +292,21 @@ public class WebRequest {
 
 
     /**
+     * Selects whether MIME-encoding will be used for this request. MIME-encoding changes the way the request is sent
+     * and is required for requests which include file parameters. This method may only be called for a POST request
+     * which was not created from a form.
+     **/
+    protected void setMimeEncoded( boolean mimeEncoded )
+    {
+        _parameterHolder.setSubmitAsMime( mimeEncoded );
+    }
+
+
+    /**
      * Returns true if this request is to be MIME-encoded.
      **/
     protected boolean isMimeEncoded() {
-        return _sourceForm != null && _sourceForm.isSubmitAsMime();
+        return _parameterHolder.isSubmitAsMime();
     }
 
 
@@ -318,11 +323,7 @@ public class WebRequest {
      **/
     final
     protected String getCharacterSet() {
-        if (_sourceForm == null) {
-            return HttpUnitUtils.DEFAULT_CHARACTER_SET;
-        } else {
-            return _sourceForm.getCharacterSet();
-        }
+        return _parameterHolder.getCharacterSet();
     }
 
 
@@ -393,7 +394,6 @@ public class WebRequest {
 
     private URL          _urlBase;
     private String       _urlString;
-    private WebForm      _sourceForm;
     private String       _target = TOP_FRAME;
     private Hashtable    _headers;
 

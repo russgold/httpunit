@@ -39,7 +39,7 @@ abstract class FormControl {
 
     final static String[] NO_VALUE = new String[0];
 
-    private final String  _name;
+    private       String  _name;
     private final String  _valueAttribute;
     private final boolean _readOnly;
     private final boolean _disabled;
@@ -144,6 +144,13 @@ abstract class FormControl {
 
 
     /**
+     * Remove any required values for this control from the list, throwing an exception if they are missing.
+     **/
+    void claimRequiredValues( List values ) {
+    }
+
+
+    /**
      * Sets this control to the next compatible value from the list, removing it from the list.
      **/
     void claimValue( List values ) {
@@ -154,13 +161,6 @@ abstract class FormControl {
      * Sets this control to the next compatible value from the list, removing it from the list.
      **/
     void claimUniqueValue( List values ) {
-    }
-
-
-    /**
-     * Remove any required values for this control from the list, throwing an exception if they are missing.
-     **/
-    void claimRequiredValues( List values ) {
     }
 
 

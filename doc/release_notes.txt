@@ -4,7 +4,6 @@ Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
     2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
-    3. No parameter validation is done for requests built from links
 
 Limitations:
     1. HttpUnit does not support JavaScript
@@ -12,11 +11,24 @@ Limitations:
 
 
 Revision History:
+17-Jan-2002
+Problems fixed:
+    1. Link parameters are now sent in the proper order, as long as parameter validation is not turned off.
+    2. Parameter validation is now done for requests built from links
+
+15-Jan-2002
+Acknowledgements:
+    Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
+
+Problems fixed:
+    1. An infinite loop would result if a frame had the same name as one of its sub-frames
+
 14-Jan-2002
 
 Problems fixed:
     1. Parameters are now submitted in the order specified in the form, as long as parameter validation is not turned off.
     2. It is no longer permitted to change hidden parameters with parameter validation enabled.
+    3. An infinite loop would result if a frame had the same name as one of its sub-frames
 
 Additions:
     1. HttpUnit now handles multiple file form controls with the same name.

@@ -41,7 +41,7 @@ import org.w3c.dom.NodeList;
  * defined for the form, the structure of the form (as a DOM), or the text of the form. They
  * may also create a {@link WebRequest} to simulate the submission of the form.
  **/
-public class WebForm extends WebRequestSource implements ParameterHolder {
+public class WebForm extends WebRequestSource {
     private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
 
 
@@ -57,7 +57,7 @@ public class WebForm extends WebRequestSource implements ParameterHolder {
      * Returns the action defined for this form.
      **/
     public String getAction() {
-        return NodeUtils.getNodeAttribute( getNode(), "action" );
+        return getDestination();
      }
 
 
@@ -215,12 +215,7 @@ public class WebForm extends WebRequestSource implements ParameterHolder {
      * Returns the displayed options defined for the specified parameter name.
      **/
     public String[] getOptions( String name ) {
-        ArrayList optionList = new ArrayList();
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            optionList.addAll( Arrays.asList( controls[i].getDisplayedOptions() ) );
-        }
-        return (String[]) optionList.toArray( new String[ optionList.size() ] );
+        return getParameter( name ).getOptions();
     }
 
 
@@ -236,38 +231,28 @@ public class WebForm extends WebRequestSource implements ParameterHolder {
      * Returns true if the named parameter accepts multiple values.
      **/
     public boolean isMultiValuedParameter( String name ) {
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isMultiValued()) return true;
-            if (!controls[i].isExclusive() && controls.length > 1) return true;
-        }
-        return false;
-     }
+        return getParameter( name ).isMultiValuedParameter();
+    }
 
 
     /**
      * Returns the number of text parameters in this form with the specified name.
      **/
     public int getNumTextParameters( String name ) {
-        int result = 0;
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isTextControl()) result++;
-        }
-        return result;
+        return getParameter( name ).getNumTextParameters();
     }
-
 
 
     /**
      * Returns true if the named parameter accepts free-form text.
      **/
     public boolean isTextParameter( String name ) {
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isTextControl()) return true;
-        }
-        return false;
+        return getParameter( name ).isTextParameter();
+    }
+
+
+    void setSubmitAsMime( boolean mimeEncoded ) {
+        throw new IllegalStateException( "May not change the encoding for a validated request created from a form" );
     }
 
 
@@ -292,11 +277,7 @@ public class WebForm extends WebRequestSource implements ParameterHolder {
      * Returns true if the named parameter accepts files for upload.
      **/
     public boolean isFileParameter( String name ) {
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isFileParameter()) return true;
-        }
-        return false;
+        return getParameter( name ).isFileParameter();
     }
 
 
@@ -313,19 +294,8 @@ public class WebForm extends WebRequestSource implements ParameterHolder {
      * Returns the multiple default values of the named parameter.
      **/
     public String[] getParameterValues( String name ) {
-        ArrayList valueList = new ArrayList();
-        FormControl[] controls = getParameter( name ).getControls();
-        for (int i = 0; i < controls.length; i++) {
-            valueList.addAll( Arrays.asList( controls[i].getValues() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
-    }
-
-
-    String getRelativeURL() {
-        String action = getAction();
-        if (action.trim().length() == 0) action = getBaseURL().getFile();
-        return action;
+        final FormParameter parameter = getParameter( name );
+        return parameter.getValues();
     }
 
 
@@ -399,7 +369,7 @@ public class WebForm extends WebRequestSource implements ParameterHolder {
      * from that page.
      **/
     WebForm( URL baseURL, String parentTarget, Node node, String characterSet ) {
-        super( node, baseURL, parentTarget );
+        super( node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), parentTarget );
         _characterSet = characterSet;
     }
 
@@ -524,9 +494,19 @@ class FormParameter {
     }
 
 
-    FormControl[] getControls() {
+    private FormControl[] getControls() {
         if (_controls == null) _controls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
         return _controls;
+    }
+
+
+    String[] getValues() {
+        ArrayList valueList = new ArrayList();
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            valueList.addAll( Arrays.asList( controls[i].getValues() ) );
+        }
+        return (String[]) valueList.toArray( new String[ valueList.size() ] );
     }
 
 
@@ -548,12 +528,60 @@ class FormParameter {
     }
 
 
+    String[] getOptions() {
+        ArrayList optionList = new ArrayList();
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            optionList.addAll( Arrays.asList( controls[i].getDisplayedOptions() ) );
+        }
+        return (String[]) optionList.toArray( new String[ optionList.size() ] );
+    }
+
+
     String[] getOptionValues() {
         ArrayList valueList = new ArrayList();
         for (int i = 0; i < getControls().length; i++) {
             valueList.addAll( Arrays.asList( getControls()[i].getOptionValues() ) );
         }
         return (String[]) valueList.toArray( new String[ valueList.size() ] );
+    }
+
+
+    boolean isMultiValuedParameter() {
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isMultiValued()) return true;
+            if (!controls[i].isExclusive() && controls.length > 1) return true;
+        }
+        return false;
+    }
+
+
+    int getNumTextParameters() {
+        int result = 0;
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isTextControl()) result++;
+        }
+        return result;
+    }
+
+
+    boolean isTextParameter() {
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isTextControl()) return true;
+        }
+        return false;
+    }
+
+
+    boolean isFileParameter() {
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) {
+            if (controls[i].isFileParameter()) return true;
+        }
+        return false;
     }
 
 

@@ -66,13 +66,12 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
     /**
      * Selects whether MIME-encoding will be used for this request. MIME-encoding changes the way the request is sent
-     * and is required for requests which include file parameters. This method may only be called for a request which
-     * was not created from a form.
+     * and is required for requests which include file parameters. This method may only be called for a request
+     * which was not created from a form.
      **/
     public void setMimeEncoded( boolean mimeEncoded )
     {
-        if (isFormBased()) throw new IllegalStateException( "Encoding is defined by the form from which this request is derived." );
-        _mimeEncoded = mimeEncoded;
+        super.setMimeEncoded( mimeEncoded );
     }
 
 
@@ -89,15 +88,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
      */
     protected boolean maySelectFile( String parameterName )
     {
-        return !isFormBased() || super.isFileParameter( parameterName );
-    }
-
-
-    /**
-     * Returns true if this request is to be MIME-encoded.
-     **/
-    protected boolean isMimeEncoded() {
-        return isFormBased() ? super.isMimeEncoded() : _mimeEncoded;
+        return isMimeEncoded() && isFileParameter( parameterName );
     }
 
 

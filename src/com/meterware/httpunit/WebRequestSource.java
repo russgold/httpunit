@@ -26,7 +26,7 @@ import java.net.URL;
 
 
 abstract
-public class WebRequestSource {
+public class WebRequestSource extends ParameterHolder {
 
     /**
      * Returns the ID associated with this request source.
@@ -87,25 +87,32 @@ public class WebRequestSource {
 
 
     /**
-     * Returns the character set encoding for the request.
-     **/
-    String getCharacterSet() {
-        return HttpUnitUtils.DEFAULT_CHARACTER_SET;
+     * Returns the URL relative to the current page which will handle the request.
+     */
+    String getRelativeURL() {
+        final String url = getDestinationPage();
+        final int questionMarkIndex = url.indexOf("?");
+        if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
+            return url.substring(0, questionMarkIndex);
+        }
+        return url;
     }
 
 
-    /**
-     * Returns the URL relative to the current page which will handle the request.
-     */
-    abstract
-    String getRelativeURL();
+    private String getDestinationPage() {
+        String result = trimFragment( getDestination() );
+        if (result.trim().length() == 0) result = getBaseURL().getFile();
+        return result;
+    }
 
 
-    /**
-     * Returns true if the specified name is that of a file parameter. The default implementation returns false.
-     */
-    boolean isFileParameter( String name ) {
-        return false;
+    private String trimFragment( String href ) {
+        final int hashIndex = href.indexOf( '#' );
+        if (hashIndex < 0) {
+            return href;
+        } else {
+            return href.substring( 0, hashIndex );
+        }
     }
 
 
@@ -115,16 +122,22 @@ public class WebRequestSource {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebRequestSource( Node node, URL baseURL, String parentTarget ) {
+    WebRequestSource( Node node, URL baseURL, String destination, String parentTarget ) {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
         _node         = node;
         _baseURL      = baseURL;
+        _destination = destination;
         _parentTarget = parentTarget;
     }
 
 
     protected URL getBaseURL() {
         return _baseURL;
+    }
+
+
+    protected String getDestination() {
+        return _destination;
     }
 
 
@@ -143,6 +156,9 @@ public class WebRequestSource {
 
     /** The URL of the page containing this entity. **/
     private URL            _baseURL;
+
+    /** The raw destination specified for the request, including anchors and parameters. **/
+    private String         _destination;
 
     /** The DOM node representing this entity. **/
     private Node           _node;
