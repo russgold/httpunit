@@ -248,7 +248,7 @@ public class WebFormTest extends HttpUnitTest {
         WebForm form = page.getForms()[0];
         String[] parameterNames = form.getParameterNames();
         assertEquals( "Number of parameters", 2, parameterNames.length );
-        assertEquals( "First parameter name", "name", parameterNames[0] );
+        assertMatchingSet( "parameter names", new String[] { "name","sex" }, parameterNames );
         assertEquals( "Default name", "", form.getParameterValue( "name" ) );
         assertEquals( "Default sex", "female", form.getParameterValue( "sex" ) );
         WebRequest request = form.getRequest();
