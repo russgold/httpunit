@@ -233,7 +233,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         defineWebPage( "alternate/Target", "Found me!" );
         defineResource( "Initial.html", "<html><head><title>Test for Base</title>" +
-                                        "            <base href=\"" + getHostPath() + "/alternate/\"></head>" +
+                                        "            <base href='/alternate/'></head>" +
                                         "      <body><a href=\"Target.html\">Go</a></body></html>" );
 
         WebResponse initialPage = wc.getResponse( getHostPath() + "/Initial.html" );

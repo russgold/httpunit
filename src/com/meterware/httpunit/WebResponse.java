@@ -805,15 +805,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     private InputStream _inputStream;
 
+    private final URL    _pageURL;
 
-    // the following variables are essentially final; however, the JDK 1.1 compiler does not handle blank final variables properly with
-    // multiple constructors that call each other, so the final qualifiers have been removed.
+    private final String _frameName;
 
-    private URL    _pageURL;
-
-    private String _frameName;
-
-    private WebClient _client;
+    private final WebClient _client;
 
     private Scriptable _scriptable;
 
@@ -864,7 +860,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     private void processBaseTag( ByteTag tag ) throws MalformedURLException {
-        if (tag.getAttribute( "href" ) != null) _baseURL = new URL( tag.getAttribute( "href" ) );
+        if (tag.getAttribute( "href" ) != null) _baseURL = new URL( getURL(), tag.getAttribute( "href" ) );
         if (tag.getAttribute( "target" ) != null) _baseTarget = tag.getAttribute( "target" );
     }
 

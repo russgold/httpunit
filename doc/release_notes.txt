@@ -21,7 +21,8 @@ Additions:
        ant's XMLResultFormatter
     2. Form.getOptions() now works for radio buttons and checkboxes - as long as the desired name is located after the control.
 Problems fixed:
-    1. bug #717280: Requests with "../" in them are not resolved properly
+    1. bug #717280: URLs with "../" in them were not resolved properly
+    2. bug #717640: <base> element was not being handled in the case when no host was specified.
 
  4-Apr-2003
 Acknowledgements:
