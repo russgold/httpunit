@@ -12,8 +12,11 @@ Limitations:
 
 Revision History:
 27-Sep-2002
+Problems fixed:
+    1. Disabled form parameters were being submitted with requests and could be modified by setParameter calls.
+
 Additions:
-    1. The Javascript property Link.href is now read-write
+    1. The Javascript property Link.href is now read-write.
 
 26-Sep-2002
 Problems fixed:

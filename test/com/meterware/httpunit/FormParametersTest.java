@@ -281,6 +281,41 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
+    public void testDisabledControls() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = '/ask'>" +
+                                       "<Input disabled type=checkbox name=color value=red checked>" +
+                                       "<Input type=checkbox name=color value=blue>" +
+                                       "<Input type=radio name=species value=hippo disabled>" +
+                                       "<Input type=radio name=species value=kangaroo checked>" +
+                                       "<Input type=radio name=species value=lemur>" +
+                                       "<textarea name='big' disabled rows=2 cols=40>stop me</textarea>" +
+                                       "<Input type=text name=age value=12 disabled value='12'></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        WebRequest request = page.getForms()[0].getRequest();
+        assertEquals( "Expected request URL", getHostPath() + "/ask?species=kangaroo", request.getURL().toExternalForm() );
+
+        assertMatchingSet( "selected color", new String[] { "red" }, form.getParameterValues( "color" ) );
+        assertEquals( "selected animal", "kangaroo", form.getParameterValue( "species" ) );
+        assertEquals( "age", "12", form.getParameterValue( "age" ) );
+
+        assertMatchingSet( "color choices", new String[] { "red", "blue" }, form.getOptionValues( "color" ) );
+        assertMatchingSet( "species choices", new String[] { "kangaroo", "lemur" }, form.getOptionValues( "species" ) );
+
+        validateSetParameterRejected( request, "color", "blue", "unchecking 'red'" );
+        validateSetParameterRejected( request, "color", new String[] { "blue" }, "unchecking 'red'" );
+        validateSetParameterRejected( request, "species", "hippo", "selecting 'hippo'" );
+        validateSetParameterRejected( request, "age", "15", "changing a read-only text parameter value" );
+        validateSetParameterRejected( request, "big", "go-go", "changing a read-only textarea parameter value" );
+
+        request.setParameter( "color", "red" );
+        request.setParameter( "color", new String[] { "red", "blue" } );
+        request.setParameter( "species", "lemur" );
+        request.setParameter( "age", "12" );
+        request.setParameter( "big", "stop me" );
+    }
+
+
     public void testFileParameterValue() throws Exception {
         defineWebPage( "Default", "<form method=POST action='/ask'>" +
                                   "<Input type=file name=File>" +

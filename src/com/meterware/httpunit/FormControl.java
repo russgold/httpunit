@@ -135,7 +135,7 @@ abstract class FormControl {
      * Returns true if this control is read-only.
      **/
     boolean isReadOnly() {
-        return _readOnly;
+        return _readOnly || _disabled;
     }
 
 
@@ -406,7 +406,7 @@ class BooleanFormControl extends FormControl {
 
 
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
-        if (isChecked()) processor.addParameter( getName(), getQueryValue(), characterSet );
+        if (isChecked() && !isDisabled()) processor.addParameter( getName(), getQueryValue(), characterSet );
     }
 
 
@@ -638,7 +638,7 @@ class TextFormControl extends FormControl {
 
 
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
-        if (getName().length() > 0) processor.addParameter( getName(), getValues()[0], characterSet );
+        if (!isDisabled() && getName().length() > 0) processor.addParameter( getName(), getValues()[0], characterSet );
     }
 
 
@@ -862,6 +862,7 @@ class SelectionFormControl extends FormControl {
 
 
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        if (isDisabled()) return;
         for (int i = 0; i < getValues().length; i++) {
             processor.addParameter( getName(), getValues()[i], characterSet );
         }
