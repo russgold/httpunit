@@ -35,16 +35,14 @@ import org.xml.sax.SAXException;
  **/
 class FrameHolder {
 
-    private WebClient   _client;
     private Hashtable   _contents = new Hashtable();
     private Hashtable   _subFrames = new Hashtable();
     private String      _frameName;
 
 
     FrameHolder( WebClient client, String name ) {
-        _client = client;
         _frameName = name;
-        DefaultWebResponse blankResponse = new DefaultWebResponse( _client, null, WebResponse.BLANK_HTML );
+        DefaultWebResponse blankResponse = new DefaultWebResponse( client, null, WebResponse.BLANK_HTML );
         _contents.put( WebRequest.TOP_FRAME, blankResponse );
         HttpUnitOptions.getScriptingEngine().associate( blankResponse );
     }
@@ -83,7 +81,7 @@ class FrameHolder {
         if (response.isHTML()) {
             createSubFrames( target, response.getFrameNames() );
             WebRequest[] requests = response.getFrameRequests();
-            for (int i = 0; i < requests.length; i++) _client.getResponse( requests[ i ] );
+            for (int i = 0; i < requests.length; i++) response.getWindow().getResponse( requests[ i ] );
             HttpUnitOptions.getScriptingEngine().associate( response );
         }
     }
