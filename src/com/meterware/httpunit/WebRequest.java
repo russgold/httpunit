@@ -116,7 +116,7 @@ public class WebRequest {
 
 
     private String getNormalizedURL( String url ) {
-        if (url.lastIndexOf( "//" ) > url.indexOf( "://" ) + 1) return getNormalizedURL( stripDoubleSlashes( url ) );
+        if (url.lastIndexOf( "//" ) > url.lastIndexOf( "://" ) + 1) return getNormalizedURL( stripDoubleSlashes( url ) );
         if (url.indexOf( "/.." ) > 0) return getNormalizedURL( stripUpNavigation( url ) );
         if (url.indexOf( "/./" ) > 0) return getNormalizedURL( stripInPlaceNavigation( url ) );
         return url;

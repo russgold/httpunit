@@ -349,4 +349,11 @@ public class NormalizeURLTest extends HttpUnitTest {
     }
 
 
+    public void testUrlAsParameter() throws Exception {
+        String desiredUrl = "http://localhost:3333/composite/addobserver?url=http://localhost:8081/";
+        WebRequest request = new GetMethodWebRequest( desiredUrl );
+        assertEquals( "URL", desiredUrl, request.getURL().toExternalForm() );
+    }
+
+
 }
