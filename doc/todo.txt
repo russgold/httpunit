@@ -9,7 +9,6 @@ o Documentation, Documentation
 
 JavaScript priorities:
 o Document.write - may required substantial parser rewrite
-o Javascript includes
 o Navigator object
 
 Possibles:

@@ -4,8 +4,7 @@
 <p>
 JavaScript support is very basic at present. The near-term goal is full JavaScript 1.1 support. Currently, we do not plan
 to support browser-specific JavaScript. Please let us know via the mailing list your priorities for missing features.
-Inline deferred scripts (which define functions) are supported,
-as are the following DOM elements:
+Inline and included scripts are supported, as are the following DOM elements:
 
 <h3>Window</h3>
 <h4>properties</h4>
@@ -13,6 +12,7 @@ as are the following DOM elements:
 <li>document - the associated Document object</li>
 <li>self - the Window itself</li>
 <li>window - a synonym for self</li>
+<li>location - r/w full URL only</li>
 </ul>
 <h4>events</h4>
 <ul>
@@ -21,7 +21,8 @@ as are the following DOM elements:
 <h4>methods</h4>
 <ul>
 <li>alert()   - queues up an alert message, accessible via WebResponse.getNextAlert() or popNextAlert()</li>
-<li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
+<li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response. By default,
+                the callback returns true. Users may change this by supplying an implementation of DialogResponder.</li>
 <li>prompt() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
 </ul>
 
@@ -32,6 +33,7 @@ as are the following DOM elements:
 <li>images - an array of Image objects</li>
 <li>links - an array of Link objects</li>
 <li>title - readonly. The title of the page</li>
+<li>location - a synonym for window.location</li>
 <li>&lt;name&gt; - the name of a form, image, or link</li>
 </ul>
 

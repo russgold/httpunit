@@ -11,198 +11,80 @@ Limitations:
 
 
 Revision History:
-30-Aug-2002
-Additions:
-    1. Added support for included scripts using <script src=...>
-
-29-Aug-2002
-Acknowledgements:
-    Thanks to Geert Bevin for implementing ServletUnit support for HttpServletRequest.getParameterMap
-
-Additions:
-    1. ServletUnit now supports HttpServletRequest.getParameterMap
-    2. WebImage now supports getRequest() to return a request for retrieving the image
-
-Problems fixed:
-    1. Submitting a request created with parameter validation disabled would send disabled parameters as well as enabled ones.
-    2. WebRequest.getRequestParameterNames now returns only the names of the parameters that will be submitted with the request.
-
-27-Aug-2002
-Additions:
-    1. Reset buttons may now be clicked to reset the form
-    2. WebForm supports getButtonWithID
-    3. JavaScript: Form now supports reset() and onReset event.
-
-23-Aug-2002
-Additions:
-    1. javascript URLs are now supported.
-
-22-Aug-2002
-
-Acknowledgements:
-    Thanks to Michael Reardon for implementing the ServletUnit header method handling code and session.getAttributeNames
-    Thanks to Geert Bevin for finding and fixing the ServletUnit POST parameters bug.
-
-Additions:
-    1. ServletUnit now supports HttpServletResponse header methods: setHeader, addHeader, setIntHeader, addIntHeader,
-       setDateHeader, and addDateHeader.
-    2. ServletUnit now supports HttpSession.getAttributeNames.
-    3. WebImage now supports a read-only 'altText' property.
-    4. WebResponse and TableCell now support getImageWithAltText to find an image with a specified value in its 'alt' attribute.
-
-Problems fixed:
-    1. ServletUnit was not recognizing form parameters on a POST request which contained a query string in the URL.
-
-21-Aug-2002
-
-Additions:
-    1. JavaScript - Window.confirm is now supported. By default, it always returns true. Users may change this by supplying an
-       implementation of DialogResponder to the WebClient.
-    2. JavScript - Window.prompt is now supported. By default, it always returns the default value. Users may change this by supplying an
-       implementation of DialogResponder to the WebClient.
-
-20-Aug-2002
-
-Problems fixed:
-    1. JavaScript - HTML comments prevented JavaScript from working
-    2. JavaScript - Errors were reported if Rhino was not present in the classpath
-    3. Fixed handling of error statuses when information is still sent on input stream
-
-Additions:
-    1. JavaScript - Added Checkbox.value property, along with Checkbox.defaultChecked and Input.name
-    2. JavaScript - Added Radio.value, Radio.checked, and Radio.defaultChecked properties
-    3. JavaScript - Added Radio.onClick event support
-
-19-Aug-2002
-
-Additions:
-    1. WebForm.getButtons() now returns all form buttons, including reset buttons and generic buttons.
-    2. JavaScript: The "onClick" event is now supported for generic form buttons
-    3. JavaScript: Form.submit() is now working
-
-
-16-Aug-2002
-Acknowledgements:
-   Thanks to PeterRoyal for fixing the handling of query-only relative URLs and the IllegalStateException when
-       scripting is disable.
-
-Problems fixes:
-   1. Relative URLs beginning with "?" were not being handled properly.
-   2. Disabling scripting result in IllegalStateException being thrown.
-
-Additions:
-   1. JavaScript: The select() method is now defined as a no-op for controls
-   2. JavaScript: Form.elements is now defined
-
-14-Aug-2002
-Additions:
-   1. The focus() method is now defined as a no-op for all controls
-
-Problems fixed:
-   1. Embedded spaces in URLs are now encoded when a request is made
-
-13-Aug-2002
-Additions:
-   1. The onChange event now works for Select controls, Text controls, and TextArea controls.
-
- 9-Aug-2002
-Additions:
-   1. The SubmitButton class now supports a click() method to submit the form using that button.
-
- 8-Aug-2002
-Changes:
-   1. The class com.meterware.httpunit.ScriptableObject has been renamed as com.meterware.httpunit.scripting.ScriptableDelegate
-
-Additions:
-    1. The Option object now supports a constructor and writing to the text property
-
- 7-Aug-2002
-Additions:
-    1. JavaScript: the Select control now supports the length, options, and selectedIndex properties
-    2. JavaScript: the Option object now supports the index, defaultSelected, selected (r/w), value (r/w) and
-       text (read-only) properties
-
- 6-Aug-2002
-Acknowledgements:
-    Thanks to Hans-Joerg Hessmann for a faster algorithm for the table lookups
-
-Problems fixed:
-    1. Table lookups should be faster, especially for complex and large tables
-
-Additions:
-    1. JavaScript: the link.onClick event is now supported
-    2. JavaScript: the form.onSubmit event is now supported
-    3. JavaScript: the form.action property is read-write
-
- 5-Aug-2002
-Additions:
-    1. The JavaScript link.href attribute is now readable.
-    2. JavaScript: document.images and document.<image-name> are now supported
-    3. JavaScript: The image.src property is read-write
-    4. WebResponse now has a getImageWithName method
-    5. JavaScript execution is now automatic. It may be enabled or disable via HttpUnitOptions
-    6. JavaScript: the checkbox.clicked property is read-write
-
-Problems fixed:
-    A form request created after a call to getScriptableObject().setAction() now correctly uses the new action.
-
- 2-Aug-2002
-Additions:
-    1. Added JavaScript support for document.links and document.<link name> and the link 'onMouseOver' event.
-    2. You may now call link.mouseOver() to trigger the 'onMouseOver' event.
-
- 1-Aug-2002
-Additions:
-    1. You may now follow a link by calling link.click() rather than client.getResponse( link.getRequest() ).
-    2. You may now submit a form by calling form.submit() rather than client.getResponse( form.getRequest() ). In this
-       case you must set any parameters directly into the form.
-    3. You may now obtain the current page from a web client by calling client.getCurrentPage() rather than
-       client.getFrameContents( "_top" );
-    4. Added JavaScript support for form.<text field>.value
-
-29-Jul-2002
-Acknowledgements:
-    Thanks to Sebastien Rosset for pointing out the case sensitivity problem with WebResponse.isHTML
-
-Problems fixed:
-    1. WebResponses are now recognized as HTML even if the content type is not lower case.
-
-Acknowledgements:
-    Thanks to Rajan Narasimhan for fixing the relative URL computation problem.
-
-25-Jul-2002
-Problems fixed:
-    1. Relative URLs were not being computed properly when the base URL had a query string containing a slash.
-
-24-Jul-2002
-Additions:
-    1. PseudoServer and associated classes are now publically available and in their own package, pseudoserver.
-    2. Experimental JavaScript is starting to be added: support is present for the following DOM objects:
-         Window  properties: self, window, document   methods: alert,  events: onLoad
-         Document properties: title, forms, <form name>
-
-15-Jul-2002
-Problems fixed:
-    1. The "_parent" frame target should now be handled correctly.
-
-10-Jul-2002
-Additions:
-    1. WebResponse and WebCell now support a new method, getImages, which returns an array of objects representing the
-       image tags found.
-
-25-Jun-2002
-Additions:
-    1. The HttpUnitOption property 'acceptCookies' now controls whether cookies received from the server will be saved
-       in a web client and sent on subsequent requests. The default is true.
-
-23-Jun-2002
+30-Aug-2002 1.4.5
 Acknowledgements:
     Thanks to Steve Heath for an example on how to make JSPs work with ServletUnit.
+    Thanks to Rajan Narasimhan for fixing the relative URL computation problem.
+    Thanks to Sebastien Rosset for pointing out the case sensitivity problem with WebResponse.isHTML
+    Thanks to Hans-Joerg Hessmann for a faster algorithm for the table lookups
+    Thanks to Peter Royal for fixing the handling of query-only relative URLs and the IllegalStateException when
+       scripting is disabled.
+    Thanks to Michael Reardon for implementing the ServletUnit header method handling code and session.getAttributeNames
+    Thanks to Geert Bevin for finding and fixing the ServletUnit POST parameters bug.
+    Thanks to Geert Bevin for implementing ServletUnit support for HttpServletRequest.getParameterMap
+
+Problems fixed:
+    1. The "_parent" frame target should now be handled correctly.
+    2. Relative URLs were not being computed properly when the base URL had a query string containing a slash.
+    3. WebResponses are now recognized as HTML even if the content type is not lower case.
+    4. A form request created after a call to getScriptableObject().setAction() now correctly uses the new action.
+    5. Table lookups should be faster, especially for complex and large tables
+    6. Embedded spaces in URLs are now encoded when a request is made
+    7. Relative URLs beginning with "?" were not being handled properly.
+    8. Disabling scripting result in IllegalStateException being thrown.
+    9. Fixed handling of error statuses when information is still sent on input stream
+   10. ServletUnit was not recognizing form parameters on a POST request which contained a query string in the URL.
+   11. Submitting a request created with parameter validation disabled would send disabled parameters as well as enabled ones.
+   12. WebRequest.getRequestParameterNames now returns only the names of the parameters that will be submitted with the request.
 
 Additions:
-    1. ServletUnit now supports ServletContext.getRealPath
-    2. ServletUnit now supports JSPs using Jasper. By default, JSPs are expected to be in the current working directory.
-       If an external web.xml file is specified, JSPs will be searched for in the application context directory.
+    Content and parsing enhancements:
+        1. The HttpUnitOption property 'acceptCookies' now controls whether cookies received from the server will be saved
+           in a web client and sent on subsequent requests. The default is true.
+        2. WebResponse and WebCell now support a new method, getImages, which returns an array of objects representing the
+           image tags found.
+        3. WebResponse now has a getImageWithName method
+        4. WebForm.getButtons() now returns all form buttons, including reset buttons and generic buttons.
+        5. WebResponse and TableCell now support getImageWithAltText to find an image with a specified value in its 'alt' attribute.
+        6. WebForm supports getButtonWithID
+
+    Web navigation enhancements:
+        7. You may now follow a link by calling link.click() rather than client.getResponse( link.getRequest() ).
+        8. You may now submit a form by calling form.submit() rather than client.getResponse( form.getRequest() ). In this
+           case you must set any parameters directly into the form.
+        9. You may now obtain the current page from a web client by calling client.getCurrentPage() rather than
+           client.getFrameContents( "_top" );
+       10. The SubmitButton class now supports a click() method to submit the form using that button.
+       11. Reset buttons may now be clicked to reset the form
+
+    ServletUnit enhancements:
+       12. ServletContext.getRealPath is now supported.
+       13. ServletUnit now supports JSPs. The JSP engine must be in the class path and identified by the
+           HttpUnitOptions.scriptEngineClassName property (the default is Jasper). JSPs are expected to be in the current
+           working directory unless a web.xml file is specified, in which case JSPs will be searched for in the application
+           context directory.
+       14. HttpServletResponse header methods: setHeader, addHeader, setIntHeader, addIntHeader,
+           setDateHeader, and addDateHeader are now supported.
+       15. HttpSession.getAttributeNames is now supported.
+       16. HttpServletRequest.getParameterMap is now supported.
+
+    Scripting enhancements:
+       17. Much of JavaScript 1.1 is now supported. See <http://www.httpunit.org/doc/Javascript-support.html> for
+           details.
+       18. javascript: URLs are now supported.
+       19. WebLink.mouseOver() will trigger the associated 'onMouseOver' event, if defined
+       20. The JavaScript function Window.alert() adds messages to a queue. WebClient.getNextAlert() returns the next alert
+           without affecting the queue. WebClient.popNextAlert() returns the next alert, removing it from the queue.
+       21. WebClient.setDialogResponder() lets a user predefine responses to the JavaScript functions Window.confirm and
+           Window.prompt. By default, these functions return true and the default value, respectively. A base class,
+           DialogAdapter, provides default implementations of its methods.
+
+    Extra Testing support:
+       22. PseudoServer and associated classes are now publically available and in their own package, pseudoserver.
+
+Notes:
+   1. The class com.meterware.httpunit.ScriptableObject has been renamed as com.meterware.httpunit.scripting.ScriptableDelegate
+
 
 20-Jun-2002 1.4.1
 Acknowledgements:
