@@ -11,6 +11,13 @@ Limitations:
 
 
 Revision History:
+ 3-Oct-2002
+Acknowledgements:
+    Thanks to Geert Bevin for fixing a problem with generation of cookie headers that affects some servers.
+
+Problems fixed:
+    1. The cookie header was being generated with a space after each ";" separator.
+
  2-Oct-2002
 
 Acknowledgements:
