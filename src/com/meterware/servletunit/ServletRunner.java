@@ -19,36 +19,29 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.WebRequest;
+import com.meterware.httpunit.HttpNotFoundException;
+import com.meterware.httpunit.HttpInternalErrorException;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.apache.xerces.parsers.DOMParser;
 
-import com.meterware.httpunit.*;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
-import org.apache.xerces.parsers.DOMParser;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 /**
@@ -171,10 +164,10 @@ public class ServletRunner {
 
 
     /** A mapping of resource names to servlet class names. **/
-    Hashtable _servlets = new Hashtable();
+    private Hashtable _servlets = new Hashtable();
 
-    ServletUnitClient  _client = new ServletUnitClient( this );
-    ServletUnitContext _context = new ServletUnitContext();
+    private ServletUnitClient  _client = new ServletUnitClient( this );
+    private ServletUnitContext _context = new ServletUnitContext();
 
 
     private String getServletName( String urlFile ) {

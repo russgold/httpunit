@@ -1,4 +1,5 @@
 package com.meterware.servletunit;
+
 /********************************************************************************************************************
 * $Id$
 *
@@ -19,19 +20,22 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.*;
-import java.net.HttpURLConnection;
+import com.meterware.httpunit.HttpUnitUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import com.meterware.httpunit.HttpUnitUtils;
-import com.meterware.httpunit.WebRequest;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 
 class ServletUnitHttpResponse implements HttpServletResponse {

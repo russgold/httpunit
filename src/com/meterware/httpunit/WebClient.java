@@ -254,13 +254,14 @@ public class WebClient {
     private void validateHeaders( WebResponse response ) throws HttpException, IOException {
         if (response.getHeaderField( "WWW-Authenticate" ) != null) {
             throw new AuthorizationRequiredException( response.getHeaderField( "WWW-Authenticate" ) );
-        } else if (!HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
-        } else if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            throw new HttpInternalErrorException( response.getURL() );
-        } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new HttpNotFoundException( response.getURL() );
-        } else if (response.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
-            throw new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
+        } else if (HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
+            if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+                throw new HttpInternalErrorException( response.getURL() );
+            } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+                throw new HttpNotFoundException( response.getURL() );
+            } else if (response.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                throw new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
+            }
         }
     }
 

@@ -19,13 +19,25 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.security.Provider;
 import java.security.Security;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * A request sent to a web server.

@@ -19,11 +19,8 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
-
-import java.io.IOException;
 
 import java.net.MalformedURLException;
 import java.net.URL;

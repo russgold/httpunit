@@ -19,22 +19,12 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.*;
-
-import java.net.HttpURLConnection;
-
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import com.meterware.httpunit.*;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
 
 
 class ServletUnitHttpSession implements HttpSession {
@@ -216,7 +206,7 @@ class ServletUnitHttpSession implements HttpSession {
 
     private int _maxInactiveInterval;
 
-    private long _creationTime = new Date().getTime();
+    private final long _creationTime = new Date().getTime();
 
     private long _lastAccessedTime = new Date().getTime();
 
@@ -226,6 +216,6 @@ class ServletUnitHttpSession implements HttpSession {
 
     private boolean _isNew = true;
 
-    private String _id = Integer.toString( _NextID++ );
+    private final String _id = Integer.toString( _NextID++ );
 
 }

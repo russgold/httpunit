@@ -19,21 +19,23 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.*;
+import com.meterware.httpunit.HttpUnitUtils;
+import com.meterware.httpunit.WebRequest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.StringTokenizer;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.HttpUnitUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
+import javax.servlet.ServletInputStream;
+import javax.servlet.RequestDispatcher;
 
 
 /**

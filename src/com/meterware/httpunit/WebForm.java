@@ -21,9 +21,14 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 
 /**
  * This class represents a form in an HTML page. Users of this class may examine the parameters
