@@ -208,8 +208,21 @@ public class EncodingTest extends HttpUnitTest {
     }
 
 
-    public void testJapaneseLinkParam() throws Exception {
+    public void testJapaneseLinkParamNameWithValue() throws Exception {
         String japaneseUrl = "request?%A5%D8%A5%EB%A5%D7=2";
+        defineWebPage( "Linker", "<a id='link' href='" + japaneseUrl + "'>goThere</a>" );
+        setResourceCharSet( "Linker.html", "EUC-JP", true );
+        defineResource( japaneseUrl, "You made it!" );
+
+        WebConversation wc = new WebConversation();
+        WebResponse formPage = wc.getResponse( getHostPath() + "/Linker.html" );
+        WebResponse target = formPage.getLinkWithID( "link" ).click();
+        assertEquals( "Resultant page", "You made it!", target.getText() );
+    }
+
+
+    public void testJapaneseLinkParamNameWithoutValue() throws Exception {
+        String japaneseUrl = "request?%A5%D8%A5%EB%A5%D7";
         defineWebPage( "Linker", "<a id='link' href='" + japaneseUrl + "'>goThere</a>" );
         setResourceCharSet( "Linker.html", "EUC-JP", true );
         defineResource( japaneseUrl, "You made it!" );

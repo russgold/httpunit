@@ -8,7 +8,7 @@ o Disable content-type header in MIME encoding?
 
 Medium priority:
 o Support optional tags which hide their contents (as in OBJECT, etc.)
-o Check conformance with RFC 2109 - not currently sending $Version=1 string
+o Check conformance with RFC 2109/2965 - not currently sending $Version=1 string
 o Documentation, Documentation
 
 
