@@ -49,7 +49,13 @@ abstract class FormControl extends HTMLElementBase {
     private final String  _onClickEvent;
     private final WebForm _form;
 
-   FormControl( WebForm form ) {
+
+    static ScriptableDelegate newSelectionOption() {
+        return new SelectionFormControl.Option();
+    }
+
+
+    FormControl( WebForm form ) {
         super( newEmptyNode( form ) );
         _form           = form;
         _valueAttribute = "";

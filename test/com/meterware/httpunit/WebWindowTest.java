@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -27,7 +27,7 @@ import junit.textui.TestRunner;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class WebWindowTest extends HttpUnitTest {
 
@@ -112,7 +112,7 @@ public class WebWindowTest extends HttpUnitTest {
 
 
     public void testWindowIndependence() throws Exception {
-        defineResource( "next", "You made it!" );
+        defineResource( "next", "You made it!", "text/plain" );
         defineWebPage( "goHere", "<a href='next' id=proceed>more</a>" );
         defineWebPage( "start", "<a href='goHere.html' id='go' target='_blank'>here</a>" );
 
@@ -121,7 +121,7 @@ public class WebWindowTest extends HttpUnitTest {
         WebResponse initialPage = wc.getResponse( getHostPath() + "/start.html" );
         initialPage.getLinkWithID( "go" ).click();
         WebWindow other = wc.getOpenWindows()[1];
-        WebResponse response = other.getResponse( other.getCurrentPage().getLinkWithID( "proceed" ).getRequest() );
+        other.getResponse( other.getCurrentPage().getLinkWithID( "proceed" ).getRequest() );
         assertEquals( "Main page URL", getHostPath() + "/start.html", main.getCurrentPage().getURL().toExternalForm() );
         assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
     }
@@ -133,7 +133,7 @@ public class WebWindowTest extends HttpUnitTest {
         defineWebPage( "start", "<a href='goHere.html' id='go' target='_blank'>here</a>" );
 
         WebClient wc = new WebConversation();
-        WebWindow main = wc.getMainWindow();
+        wc.getMainWindow();
         WebResponse initialPage = wc.getResponse( getHostPath() + "/start.html" );
         initialPage.getLinkWithID( "go" ).click();
         WebWindow other = wc.getOpenWindows()[1];

@@ -538,7 +538,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     public static ScriptableDelegate newDelegate( String delegateClassName ) {
         if (delegateClassName.equalsIgnoreCase( "Option" )) {
-            return new SelectionFormControl.Option();
+            return FormControl.newSelectionOption();
         } else {
             throw new IllegalArgumentException( "No such scripting class supported: " + delegateClassName );
         }
@@ -587,11 +587,13 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
         public void load() throws SAXException {
-            final String[] scripts = getReceivedPage().getScripts();
-            for (int i = 0; i < scripts.length; i++) {
-                runScript( scripts[i] );
+            if (isHTML()) {
+                final String[] scripts = getReceivedPage().getScripts();
+                for (int i = 0; i < scripts.length; i++) {
+                    runScript( scripts[i] );
+                }
+                doEvent( getReceivedPage().getOnLoadEvent() );
             }
-            doEvent( getReceivedPage().getOnLoadEvent() );
         }
 
 

@@ -179,6 +179,7 @@ public class JavaScript {
         private void handleScriptException( Exception e, String badScript ) {
             final String errorMessage = badScript + " failed: " + e;
             if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException)) {
+                e.printStackTrace();
                 throw new RuntimeException( errorMessage );
             } else if (isThrowExceptionsOnError()) {
                 throw new ScriptException( errorMessage );

@@ -245,10 +245,10 @@ public class ScriptingTest extends HttpUnitTest {
 
 
     public void testWindowOpen() throws Exception {
-        defineResource( "Target.html", "You made it!" );
+        defineResource( "Target.txt", "You made it!", "text/plain" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
                         "<body><script language='JavaScript'>var otherWindow;</script>" +
-                        "<a href='#' onClick=\"otherWindow = window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
+                        "<a href='#' onClick=\"otherWindow = window.open( '" + getHostPath() + "/Target.txt', 'sample' );\">go</a>" +
                         "<a href='#' onClick=\"otherWindow.close();\">go</a>" +
                         "<a href='#' onClick=\"alert( 'window is ' + (otherWindow.closed ? '' : 'not ') + 'closed' );\">go</a>" +
                         "</body></html>" );

@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+ 5-Feb-2003
+Problems Fixed:
+    1. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
+
  4-Feb-2003
 Acknowledgements:
     Thanks to Daniel Sheppard and Krystyna Polomski for identifying a problem with meta refresh tags.
