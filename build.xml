@@ -129,24 +129,22 @@
 <!--  ===================================================================  --> 
 <target name="dist" depends="jar,javadocs">
     <mkdir dir="${dist.dir}" /> 
-    <mkdir dir="${dist.dir}/lib" /> 
-    <mkdir dir="${dist.dir}/doc" /> 
-    <mkdir dir="${dist.dir}/doc/api" /> 
-    <mkdir dir="${dist.dir}/src" />
-    <mkdir dir="${dist.dir}/test" />
-    <mkdir dir="${dist.dir}/examples" /> 
-    <copydir src="${src.dir}" dest="${dist.dir}/src" /> 
-    <copydir src="${tstsrc.dir}" dest="${dist.dir}/test" includes="**/httpunit/*" /> 
-    <copydir src="${examples.dir}" dest="${dist.dir}/examples" /> 
-    <copydir src="${lib.dir}" dest="${dist.dir}/lib" />
-    <copydir src="${jars.dir}" dest="${dist.dir}/lib" includes="Tidy.jar" /> 
-    <copyfile src="build.xml" dest="${dist.dir}/build.xml" /> 
-    <copydir src="${docs.dir}" dest="${dist.dir}/doc" /> 
-    <copyfile src="readme.txt" dest="${dist.dir}/readme.txt" /> 
-    <copyfile src="index.html" dest="${dist.dir}/index.html" />
+    <copy todir="${dist.dir}" >
+        <fileset dir="." >
+            <include name="build.xml" />
+            <include name="readme.txt" />
+            <include name="index.html" />
+            <include name="src/**" />
+            <include name="test/**" />
+            <include name="examples/**" />
+            <include name="lib/*.*" />
+            <include name="doc/**/*.*" />
+        </fileset>
+    </copy>
+    <copy todir="${dist.dir}/lib" file="${jars.dir}/Tidy.jar" />
     <replace file="${dist.dir}/index.html" token="var:dist " value="var:dist&gt;" /> 
     <replace file="${dist.dir}/index.html" token="var:publish&gt;" value="var:publish " /> 
-  </target>
+</target>
 
 
 <!--  ===================================================================  --> 
@@ -162,7 +160,9 @@
 <!--  ===================================================================  -->
 <target name="publish" depends="dist-zip">
     <mkdir dir="${web.dir}" />
-    <copydir src="." dest="${web.dir}" includes="*.zip,index.html,doc/**"/>
+    <copy todir="${web.dir}" >
+        <fileset dir="." includes="*.zip,index.html,doc/**"/>
+    </copy>
     <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " /> 
     <replace file="${web.dir}/index.html" token="var:publish " value="var:publish&gt;" />
     <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${zip_version}" /> 
@@ -191,8 +191,7 @@
 <!--  Total cleanup                                                        --> 
 <!--  ===================================================================  --> 
 <target name="total-clean" depends="clean">
-    <delete file="${name}_${zip_version}.zip" /> 
-    <delete file="${name}_website_${zip_version}.zip" /> 
+    <delete file="${name}_*.zip" quiet="true" /> 
     <delete dir="${docs.dir}/api" />
     <delete dir="${lib.dir}" /> 
 </target>
