@@ -2,7 +2,7 @@ package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import junit.framework.Assert;
 import junit.textui.TestRunner;
 
 
@@ -46,6 +47,12 @@ public class CookieTest extends TestCase {
 
     public CookieTest( String name ) {
         super( name );
+    }
+
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        CookieProperties.reset();
     }
 
 
@@ -104,9 +111,7 @@ public class CookieTest extends TestCase {
         checkAcceptance( 5, false, "www.meterware.com/servlets/special", "meterware", null );
         checkAcceptance( 6, false, "www.meterware.com/servlets/special", ".com", null );
         checkAcceptance( 7, false, "www.meterware.com/servlets/special", ".httpunit.org", null );
-
-        // N.B. This cookie should be rejected if we are using strict domain matching, but is accepted with lenient matching.
-        checkAcceptance( 8, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
+        checkAcceptance( 8, false, "www.some.meterware.com/servlets/special", ".meterware.com", null );
     }
 
 
@@ -180,6 +185,83 @@ public class CookieTest extends TestCase {
     private CookieJar newJar( String urlString, String setCookieHeader ) throws MalformedURLException {
         return new CookieJar( new TestSource( new URL( "http://" + urlString ), setCookieHeader ) );
     }
+
+
+    public void testLenientMatching() throws Exception {
+        CookieProperties.setDomainMatchingStrict( false );
+        checkAcceptance( 1, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
+        checkAcceptance( 2, false, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+
+        CookieProperties.setPathMatchingStrict( false );
+        checkAcceptance( 3, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkMatching( 4, true, new URL( "http://www.meterware.com/servlets/sample" ), "www.meterware.com", "/servlets/sample/data" );
+    }
+
+
+    public void testRejectionCallbacks() throws Exception {
+        MockListener listener = new MockListener();
+        CookieProperties.addCookieListener( listener );
+
+        checkCallback( listener, 1, 0, "www.meterware.com/servlets/special", null, null );
+        checkCallback( listener, 2, CookieListener.PATH_NOT_PREFIX, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
+        checkCallback( listener, 3, CookieListener.DOMAIN_NO_STARTING_DOT, "www.meterware.com/servlets/special", "meterware.com", null );
+        checkCallback( listener, 4, CookieListener.DOMAIN_ONE_DOT, "www.meterware.com/servlets/special", ".com", null );
+        checkCallback( listener, 5, CookieListener.DOMAIN_NOT_SOURCE_SUFFIX, "www.meterware.com/servlets/special", ".httpunit.org", null );
+        checkCallback( listener, 6, CookieListener.DOMAIN_TOO_MANY_LEVELS, "www.some.meterware.com/servlets/special", ".meterware.com", null );
+    }
+
+
+    private void checkCallback( MockListener listener, int index, int status, String urlString,
+                                String specifiedDomain, String specifiedPath ) throws MalformedURLException {
+        if (status == 0) {
+            listener.expectAcceptance( index );
+        } else if (status == CookieListener.PATH_NOT_PREFIX) {
+            listener.expectRejection( index, "name", status, specifiedPath );
+        } else {
+            listener.expectRejection( index, "name", status, specifiedDomain );
+        }
+        newJar( urlString, specifiedDomain, specifiedPath );
+        if (status != 0) listener.confirmRejection();
+    }
+
+
+    private class MockListener implements CookieListener {
+
+        private int _reason;
+        private String _attribute;
+        private String _cookieName;
+        private boolean _rejected;
+        private int _cookieNum;
+
+
+        void expectAcceptance( int cookieNum ) {
+            _cookieNum = cookieNum;
+            _reason = -1;
+        }
+
+
+        void expectRejection( int cookieNum, String cookieName, int reason, String attribute ) {
+            _cookieNum = cookieNum;
+            _reason = reason;
+            _attribute = attribute;
+            _cookieName = cookieName;
+            _rejected = false;
+        }
+
+
+        void confirmRejection() {
+            Assert.assertTrue( "Cookie " + _cookieNum + " was not logged as rejected", _rejected );
+        }
+
+
+        public void cookieRejected( String name, int reason, String attribute ) {
+            _rejected = true;
+            Assert.assertEquals( "Cookie " + _cookieNum + " rejection code", _reason, reason );
+            if (_attribute != null) Assert.assertEquals( "Cookie " + _cookieNum + " rejected attribute", _attribute, attribute );
+            if (_cookieName != null) Assert.assertEquals( "Cookie " + _cookieNum + " name", _cookieName, name );
+        }
+    }
+
 
 
     private class TestSource implements CookieSource {

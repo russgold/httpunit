@@ -13,12 +13,17 @@ Limitations:
 
 
 Revision History:
+17-Jun-2003
+Additions:
+    1. A new class CookieProperties now supports relaxing cookie matching rules for path, domain, or both.
+    2. It is now possible to define a CookieListener on CookieProperties to watch for cookie rejection events
+
 23-May-2002
 Problems fixed:
     1. bug #721989: scripts did not see id attributes of form controls.
     2. bug #741965: cookies with explicit domain attributes are being rejected when their host is of the form HD
                     where D is the explicit domain attribute and H contains a dot. Apparently, most browsers ignore this
-                    rule. Now, so does HttpUnit.
+                    rule. Now, so does HttpUnit, if CookieProperties.setDomainMatchingStrict( false ) is called.
 
 22-May-2003
 Problems fixed:

@@ -328,13 +328,21 @@ public class CookieJar {
             if (cookie.getPath() == null) {
                 cookie.setPath( getParentPath( _sourceURL.getPath() ) );
             } else {
-                if (!pathAttributeIsValid( _sourceURL.getPath(), cookie.getPath() )) return false;
+                int status = getPathAttributeStatus( cookie.getPath(), _sourceURL.getPath() );
+                if (status != CookieListener.ACCEPTED) {
+                    reportCookieRejected( status, cookie.getPath(), cookie.getName() );
+                    return false;
+                }
             }
 
             if (cookie.getDomain() == null) {
                 cookie.setDomain( _sourceURL.getHost() );
             } else {
-                if (!domainAttributeIsValid( cookie.getDomain(), _sourceURL.getHost() )) return false;
+                int status = getDomainAttributeStatus( cookie.getDomain(), _sourceURL.getHost() );
+                if (status != CookieListener.ACCEPTED) {
+                    reportCookieRejected( status, cookie.getDomain(), cookie.getName() );
+                    return false;
+                }
             }
 
             return true;
@@ -347,26 +355,35 @@ public class CookieJar {
         }
 
 
-        private boolean pathAttributeIsValid( String sourcePath, String pathAttribute ) {
-            return sourcePath.length() == 0 || sourcePath.startsWith( pathAttribute );
+        private int getPathAttributeStatus( String pathAttribute, String sourcePath ) {
+            if (!CookieProperties.isPathMatchingStrict() || sourcePath.length() == 0 || sourcePath.startsWith( pathAttribute )) {
+                return CookieListener.ACCEPTED;
+            } else {
+                return CookieListener.PATH_NOT_PREFIX;
+            }
         }
 
 
-        private boolean domainAttributeIsValid( String domainAttribute, String sourceHost ) {
-            if (!domainAttribute.startsWith(".")) return false;
-            if (domainAttribute.lastIndexOf('.') == 0) return false;
-            if (!sourceHost.endsWith( domainAttribute )) return false;
-            if (!isLenientMatching() && sourceHost.lastIndexOf( domainAttribute ) > sourceHost.indexOf( '.' )) return false;
-            return true;
+        private int getDomainAttributeStatus( String domainAttribute, String sourceHost ) {
+            if (!domainAttribute.startsWith(".")) {
+                return CookieListener.DOMAIN_NO_STARTING_DOT;
+            } else if (domainAttribute.lastIndexOf('.') == 0) {
+                return CookieListener.DOMAIN_ONE_DOT;
+            } else if (!sourceHost.endsWith( domainAttribute )) {
+                return CookieListener.DOMAIN_NOT_SOURCE_SUFFIX;
+            } else if (CookieProperties.isDomainMatchingStrict() &&
+                       sourceHost.lastIndexOf( domainAttribute ) > sourceHost.indexOf( '.' )) {
+                return CookieListener.DOMAIN_TOO_MANY_LEVELS;
+            } else {
+                return CookieListener.ACCEPTED;
+            }
         }
 
 
-        // set this to false to reject cookies when the host is of the form HD where D is the explicit domain attribute
-        // and H contains a dot. Apparently, most browsers are lenient.
-        private boolean isLenientMatching() {
-            return true;
+        private boolean reportCookieRejected( int reason, String attribute, String source ) {
+            CookieProperties.reportCookieRejected( reason, attribute, source );
+            return false;
         }
-
 
     }
 

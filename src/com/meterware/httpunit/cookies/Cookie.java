@@ -111,7 +111,12 @@ public class Cookie {
     boolean mayBeSentTo( URL url ) {
         if (getDomain() == null) return true;
 
-        return acceptHost( getDomain(), url.getHost() ) && url.getPath().startsWith( getPath() );
+        return acceptHost( getDomain(), url.getHost() ) && acceptPath( getPath(), url.getPath() );
+    }
+
+
+    private boolean acceptPath( String pathPattern, String hostPath ) {
+        return !CookieProperties.isPathMatchingStrict() || hostPath.startsWith( pathPattern );
     }
 
 
