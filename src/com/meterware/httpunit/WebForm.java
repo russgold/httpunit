@@ -98,7 +98,7 @@ public class WebForm {
     public String getParameterValue( String name ) {
         Object result = getParameterDefaults().get( name );
         if (result instanceof String) return (String) result;
-        if (result instanceof String[]) return ((String[]) result)[0];
+        if (result instanceof String[] && ((String[]) result).length > 0) return ((String[]) result)[0];
         return "";
     }
 
@@ -350,15 +350,11 @@ public class WebForm {
             Vector selected = new Vector();
             NodeList nl = ((Element) _node).getElementsByTagName( "option" );
             for (int i = 0; i < nl.getLength(); i++) {
-                NamedNodeMap nnm = nl.item(i).getAttributes();
-                if (nnm.getNamedItem( "selected" ) != null) {
-                    if (nnm.getNamedItem( "value" ) != null) {
-                        selected.addElement( getValue( nnm.getNamedItem( "value" ) ) );
-                    } else {
-                        selected.addElement( getValue( nl.item(i).getFirstChild() ) );
-                    }
+                if (nl.item(i).getAttributes().getNamedItem( "selected" ) != null) {
+                    selected.addElement( getOptionValue( nl.item(i) ) );
                 }
             }
+            if (selected.size() == 0 && nl.getLength() > 0) selected.addElement( getOptionValue( nl.item(0) ) );
             String[] result = new String[ selected.size() ];
             selected.copyInto( result );
             return result;
@@ -381,16 +377,21 @@ public class WebForm {
             Vector options = new Vector();
             NodeList nl = ((Element) _node).getElementsByTagName( "option" );
             for (int i = 0; i < nl.getLength(); i++) {
-                NamedNodeMap nnm = nl.item(i).getAttributes();
-                if (nnm.getNamedItem( "value" ) != null) {
-                    options.addElement( getValue( nnm.getNamedItem( "value" ) ) );
-                } else {
-                    options.addElement( getValue( nl.item(i).getFirstChild() ) );
-                }
+                options.addElement( getOptionValue( nl.item(i) ) );
             }
             String[] result = new String[ options.size() ];
             options.copyInto( result );
             return result;
+        }
+
+
+        private String getOptionValue( Node optionNode ) {
+            NamedNodeMap nnm = optionNode.getAttributes();
+            if (nnm.getNamedItem( "value" ) != null) {
+                return getValue( nnm.getNamedItem( "value" ) );
+            } else {
+                return getValue( optionNode.getFirstChild() );
+            }
         }
     }
 

@@ -156,6 +156,23 @@ public class WebFormTest extends HttpUnitTest {
     }
 
                               
+    public void testUnspecifiedDefaults() throws Exception {
+        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+                                       "<Select name=colors><Option>blue<Option>red</Select>" +
+                                       "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
+                                       "</form></body></html>" );
+        WebForm form = page.getForms()[0];
+        String[] parameterNames = form.getParameterNames();
+        assertEquals( "num parameters", 2, parameterNames.length );
+        assertEquals( "inferred color default", "blue", form.getParameterValue( "colors" ) );
+        assertEquals( "inferred fish default", "red", form.getParameterValue( "fish" ) );
+
+        WebRequest request = form.getRequest();
+        assertEquals( "inferred color request", "blue", request.getParameter( "colors" ) );
+        assertEquals( "inferred fish request",  "red", request.getParameter( "fish" ) );
+    }
+
+                              
     private static URL _baseURL;
      
     static {
