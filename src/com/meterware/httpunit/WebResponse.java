@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -34,8 +34,6 @@ import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -266,7 +264,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         WebFrame[] frames = getFrames();
         String[] result = new String[ frames.length ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = frames[i].getName();
+            result[i] = frames[i].getFrameName();
         }
 
         return result;
@@ -788,8 +786,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     final private static int UNINITIALIZED_INT = -2;
 
-    private WebFrame[] _frames;
-
     private WebWindow _window;
 
     private HTMLPage _page;
@@ -855,10 +851,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private void readTags( byte[] rawMessage ) throws UnsupportedEncodingException, MalformedURLException {
         ByteTagParser parser = new ByteTagParser( rawMessage );
         ByteTag tag = parser.getNextTag();
-        while (tag != null && !tag.getName().equalsIgnoreCase( "body" )) {
+        while (tag != null) {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
             if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
             if (tag.getName().equalsIgnoreCase( "frameset" )) _hasSubframes = true;
+            if (tag.getName().equalsIgnoreCase( "iframe" )) _hasSubframes = true;
             tag = parser.getNextTag();
         }
     }
@@ -955,23 +952,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     private WebFrame[] getFrames() throws SAXException {
-        if (_frames == null) {
-            Vector list = new Vector();
-            addFrameTags( list, "frame" );
-            _frames = new WebFrame[ list.size() ];
-            list.copyInto( _frames );
-        }
+        return getReceivedPage().getFrames();
 
-        return _frames;
-    }
-
-
-    private void addFrameTags( Vector list, String frameTagName ) throws SAXException {
-        NodeList nl = NodeUtils.getElementsByTagName( getReceivedPage().getOriginalDOM(), frameTagName );
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node child = nl.item(i);
-            list.addElement( new WebFrame( getReceivedPage().getBaseURL(), child, _frameName ) );
-        }
     }
 
 
@@ -979,7 +961,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         if (_page == null) {
             try {
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
-                _page = new HTMLPage( this, _baseURL, _baseTarget, getCharacterSet() );
+                _page = new HTMLPage( this, _frameName, _baseURL, _baseTarget, getCharacterSet() );
                 _page.parse( getText(), _pageURL );
             } catch (IOException e) {
                 e.printStackTrace();

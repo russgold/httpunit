@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,7 +23,7 @@ package com.meterware.httpunit;
 /**
  * A class which represents the properties of a web client.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class ClientProperties {
 
@@ -129,6 +129,16 @@ public class ClientProperties {
     }
 
 
+    public boolean isIframeSupported() {
+        return _iframeSupported;
+    }
+
+
+    public void setIframeSupported( boolean iframeSupported ) {
+        _iframeSupported = iframeSupported;
+    }
+
+
     static ClientProperties cloneProperties() {
         return new ClientProperties( getDefaultProperties() );
     }
@@ -141,6 +151,8 @@ public class ClientProperties {
     private String _platform            = "Java";
     private int    _availWidth          = 800;
     private int    _availHeight         = 600;
+
+    private boolean _iframeSupported = true;
 
     private static ClientProperties _defaultProperties = new ClientProperties();
 
@@ -155,5 +167,6 @@ public class ClientProperties {
         _applicationVersion  = source._applicationVersion;
         _userAgent           = source._userAgent;
         _platform            = source._platform;
+        _iframeSupported     = source._iframeSupported;
     }
 }

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,14 +19,10 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
 import java.net.HttpURLConnection;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.Vector;
 
 
 /**
@@ -69,7 +65,7 @@ public class WebFrameTest extends HttpUnitTest {
 
     public void testDefaultFrameNames() throws Exception {
         defineWebPage( "Initial", "This is a trivial page" );
-        WebResponse response = _wc.getResponse( getHostPath() + "/Initial.html" );
+        _wc.getResponse( getHostPath() + "/Initial.html" );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top" }, _wc.getFrameNames() );
     }
 
@@ -109,7 +105,7 @@ public class WebFrameTest extends HttpUnitTest {
 
 
     public void testFrameLoading() throws Exception {
-        WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
+        _wc.getResponse( getHostPath() + "/Frames.html" );
 
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assertEquals( "Number of links in first frame", 1, _wc.getFrameContents( "red" ).getLinks().length );
@@ -352,14 +348,37 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
-    public void notestParentTarget() throws Exception {
-        defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html target=_parent>one link</a>" );
+    public void testIFrameDetection() throws Exception {
+        defineWebPage( "Frame",  "This is a trivial page with <a href='mailto:russgold@httpunit.org'>one link</a>" +
+                                 "and <iframe name=center src='Contents.html'><form name=hidden></form></iframe>" );
+        defineWebPage( "Contents",  "This is another page with <a href=Form.html>one link</a>" );
+        defineWebPage( "Form",    "This is a page with a simple form: " +
+                                  "<form action=submit><input name=name><input type=submit></form>");
 
-        _wc.getResponse( getHostPath() + "/Frames.html" );
-        WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
-        assertMatchingSet( "Frames defined for the conversation", new String[] { "_top" }, _wc.getFrameNames() );
-        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "_top" ) );
-        assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frame.html" );
+        WebRequest[] requests = response.getFrameRequests();
+        assertEquals( "Number of links in main frame", 1, response.getLinks().length );
+        assertEquals( "Number of forms in main frame", 0, response.getForms().length );
+        assertEquals( "Number of frame requests", 1, requests.length );
+        assertEquals( "Target for iframe request", "center", requests[0].getTarget() );
+
+        WebResponse contents = getFrameWithURL( _wc, "Contents" );
+        assertNotNull( "Contents not found", contents );
+        assertEquals( "Number of links in iframe", 1, _wc.getFrameContents( "center" ).getLinks().length );
+    }
+
+
+    public void testIFrameDisabled() throws Exception {
+        defineWebPage( "Frame",  "This is a trivial page with <a href='mailto:russgold@httpunit.org'>one link</a>" +
+                                 "and <iframe name=center src='Contents.html'><form name=hidden></form></iframe>" );
+        defineWebPage( "Contents",  "This is another page with <a href=Form.html>one link</a>" );
+
+        _wc.getClientProperties().setIframeSupported( false );
+        WebResponse response = _wc.getResponse( getHostPath() + "/Frame.html" );
+        WebRequest[] requests = response.getFrameRequests();
+        assertEquals( "Number of links in main frame", 1, response.getLinks().length );
+        assertEquals( "Number of forms in main frame", 1, response.getForms().length );
+        assertEquals( "Number of frame requests", 0, requests.length );
     }
 
 

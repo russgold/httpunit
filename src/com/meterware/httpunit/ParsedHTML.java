@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,10 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Arrays;
+import java.util.*;
 
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
@@ -39,6 +36,8 @@ class ParsedHTML {
     private Node _rootNode;
 
     private URL _baseURL;
+
+    private String _frameName;
 
     private String _baseTarget;
 
@@ -70,9 +69,13 @@ class ParsedHTML {
     private ArrayList    _tableList = new ArrayList();
     private WebTable[]   _tables;
 
+    private ArrayList    _frameList = new ArrayList();
+    private WebFrame[]   _frames;
 
-    ParsedHTML( WebResponse response, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
+
+    ParsedHTML( WebResponse response, String frameName, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
         _response     = response;
+        _frameName    = frameName;
         _baseURL      = baseURL;
         _baseTarget   = baseTarget;
         _rootNode     = rootNode;
@@ -199,6 +202,7 @@ class ParsedHTML {
             }
         }
 
+        protected boolean isRecognized( ClientProperties properties ) { return true; }
         protected boolean addToContext() { return false; }
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
             for (Iterator i = pot.getContexts(); i.hasNext();) {
@@ -263,6 +267,30 @@ class ParsedHTML {
     static class WebLinkFactory extends HTMLElementFactory {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toLinkAnchor( element );
+        }
+    }
+
+
+    static class WebFrameFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toWebFrame( element );
+        }
+    }
+
+
+    static class WebIFrameFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toWebFrame( element );
+        }
+
+
+        protected boolean isRecognized( ClientProperties properties ) {
+            return properties.isIframeSupported();
+        }
+
+
+        protected boolean addToContext() {
+            return true;
         }
     }
 
@@ -353,6 +381,8 @@ class ParsedHTML {
         _htmlFactoryClasses.put( "tr",     new TableRowFactory() );
         _htmlFactoryClasses.put( "td",     new TableCellFactory() );
         _htmlFactoryClasses.put( "th",     new TableCellFactory() );
+        _htmlFactoryClasses.put( "frame",  new WebFrameFactory() );
+        _htmlFactoryClasses.put( "iframe",  new WebIFrameFactory() );
 
         for (Iterator i = Arrays.asList( FormControl.getControlElementTags() ).iterator(); i.hasNext();) {
             _htmlFactoryClasses.put( i.next(), new FormControlFactory() );
@@ -371,7 +401,8 @@ class ParsedHTML {
         NodeUtils.NodeAction action = new NodeUtils.NodeAction() {
             public boolean processElement( NodeUtils.PreOrderTraversal pot, Element element ) {
                 HTMLElementFactory factory = getHTMLElementFactory( element.getNodeName().toLowerCase() );
-                if (factory == null) return true;
+                if (factory == null || !factory.isRecognized( getClientProperties() )) return true;
+                if (pot.getClosestContext( WebFrame.class ) != null) return true;
 
                 if (!_elements.containsKey( element )) factory.recordElement( pot, element, ParsedHTML.this );
                 if (factory.addToContext()) pot.pushContext( _elements.get( element ) );
@@ -389,8 +420,19 @@ class ParsedHTML {
     }
 
 
+    private ClientProperties getClientProperties() {
+        WebWindow window = _response.getWindow();
+        return window == null ? ClientProperties.getDefaultProperties() : window.getClient().getClientProperties();
+    }
+
+
     private WebForm toWebForm( Element element ) {
         return new WebForm( _response, _baseURL, _baseTarget, element, _characterSet );
+    }
+
+
+    private WebFrame toWebFrame( Element element ) {
+        return new WebFrame( _baseURL, element, _frameName );
     }
 
 
@@ -415,7 +457,7 @@ class ParsedHTML {
 
 
     private WebTable toWebTable( Element element ) {
-        return new WebTable( _response, element, _baseURL, _baseTarget, _characterSet );
+        return new WebTable( _response, _frameName, element, _baseURL, _baseTarget, _characterSet );
     }
 
 
@@ -437,6 +479,7 @@ class ParsedHTML {
         if (element instanceof WebImage) return _imagesList;
         if (element instanceof WebApplet) return _appletList;
         if (element instanceof WebTable) return _tableList;
+        if (element instanceof WebFrame) return _frameList;
         return null;
     }
 
@@ -608,6 +651,7 @@ class ParsedHTML {
         _images = null;
         _applets = null;
         _tables = null;
+        _frames = null;
         _updateElements = true;
     }
 
@@ -630,6 +674,18 @@ class ParsedHTML {
      **/
     Node getOriginalDOM() {
         return getRootNode();
+    }
+
+
+    /**
+     * Returns the frames found in the page in the order in which they appear.
+     **/
+    public WebFrame[] getFrames() {
+        if (_frames == null) {
+            loadElements();
+            _frames = (WebFrame[]) _frameList.toArray( new WebFrame[ _frameList.size() ] );
+        }
+        return _frames;
     }
 
 

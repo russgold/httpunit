@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 import java.net.URL;
 
 import org.w3c.dom.Node;
@@ -26,26 +28,37 @@ import org.w3c.dom.Node;
 /**
  * A frame in a web page.
  **/
-class WebFrame {
+class WebFrame extends HTMLElementBase {
+
+
+    protected ScriptableDelegate newScriptable() {
+        return null;
+    }
+
+
+    protected ScriptableDelegate getParentDelegate() {
+        return null;
+    }
 
 
 //---------------------------------------- package methods -----------------------------------------
 
 
     WebFrame( URL baseURL, Node frameNode, String parentFrameName ) {
+        super( frameNode );
         _element = frameNode;
         _baseURL = baseURL;
         _name    = getFrameName( parentFrameName );
     }
 
 
-    String getName() {
+    String getFrameName() {
         return _name;
     }
 
 
     private String getFrameName( String parentFrameName ) {
-        final String relativeName = NodeUtils.getNodeAttribute( _element, "name" );
+        final String relativeName = super.getName();
         if (relativeName.length() == 0) return toString();
         else return getNestedFrameName( parentFrameName, relativeName );
     }
@@ -80,7 +93,7 @@ class WebFrame {
     WebRequest getInitialRequest() {
         return new GetMethodWebRequest( _baseURL,
                                         NodeUtils.getNodeAttribute( _element, "src" ),
-                                        getName() );
+                                        getFrameName() );
     }
 
 

@@ -11,7 +11,11 @@ Limitations:
 
 
 Revision History:
-13-Jan-2002
+ 4-Feb-2003
+Additions:
+    1. Added support for <iframe> tag. IFrames work just like regular frames, except that they are embedded in a response
+       without a <frameset> tag. IFrame support is controlled by the ClientProperties.iframeSupported property.
+13-Jan-2003
     Notes: upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.
 
 10-Jan-2003

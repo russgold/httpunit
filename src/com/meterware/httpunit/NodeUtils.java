@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,7 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -35,17 +34,6 @@ import com.meterware.httpunit.parsing.HTMLParserFactory;
  * Some common utilities for manipulating DOM nodes.
  **/
 class NodeUtils {
-
-
-    public static NodeList getElementsByTagName( Node root, String tagName ) {
-        if (root instanceof Document) {
-            return ((Document) root).getElementsByTagName( tagName );
-        } else if (root instanceof Element) {
-            return ((Element) root).getElementsByTagName( tagName );
-        } else {
-            throw new RuntimeException( "root is neither an Element nor a Document" );
-        }
-    }
 
 
     public static int getAttributeValue( Node node, String attributeName, int defaultValue ) {
