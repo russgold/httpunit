@@ -48,6 +48,10 @@ class SocketConnection {
     }
 
 
+    void close() throws IOException {
+        _socket.close();
+    }
+
     SocketResponse getResponse( String method, String path ) throws IOException {
         if (_isChunking) throw new IllegalStateException( "May not initiate a new request while chunking." );
         sendHTTPLine( method + ' ' + path + " HTTP/1.1" );

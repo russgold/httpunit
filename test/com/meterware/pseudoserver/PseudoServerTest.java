@@ -102,6 +102,7 @@ public class PseudoServerTest extends HttpUserAgentTest {
 
         sendHTTPLine( os, "GET /sample HTTP/1.1" );
         sendHTTPLine( os, "Host: meterware.com" );
+        sendHTTPLine( os, "Connection: close" );
         sendHTTPLine( os, "" );
 
         StringBuffer sb = new StringBuffer();

@@ -32,22 +32,34 @@ import java.util.*;
  **/
 public class PseudoServer {
 
-    private ArrayList _classpathDirs = new ArrayList();
+    private static final int DEFAULT_SOCKET_TIMEOUT = 1000;
 
-    private String _maxProtocolLevel = "1.1";
+    private static final int INPUT_POLL_INTERVAL = 10;
 
     /** Time in msec to wait for an outstanding server socket to be released before creating a new one. **/
     private static int _socketReleaseWaitTime = 50;
 
     /** Number of outstanding server sockets that must be present before trying to wait for one to be released. **/
     private static int _waitThreshhold = 10;
+
+    private static int _numServers = 0;
+
+    private int _serverNum = 0;
+
+    private int _connectionNum = 0;
+
+
+    private ArrayList _classpathDirs = new ArrayList();
+
+    private String _maxProtocolLevel = "1.1";
+
+
     private final int _socketTimeout;
-    private static final int DEFAULT_SOCKET_TIMEOUT = 1000;
 
 
     /**
      * Returns the amount of time the pseudo server will wait for a server socket to be released (in msec)
-     * before allocating a new one. See also #getWaitThreshhold.
+     * before allocating a new one. See also {@link #getWaitThreshhold getWaitThreshhold}.
      */
     public static int getSocketReleaseWaitTime() {
         return _socketReleaseWaitTime;
@@ -56,7 +68,7 @@ public class PseudoServer {
 
     /**
      * Returns the amount of time the pseudo server will wait for a server socket to be released (in msec)
-     * before allocating a new one. See also #getWaitThreshhold.
+     * before allocating a new one. See also {@link #getWaitThreshhold getWaitThreshhold}.
      */
     public static void setSocketReleaseWaitTime( int socketReleaseWaitTime ) {
         _socketReleaseWaitTime = socketReleaseWaitTime;
@@ -88,14 +100,14 @@ public class PseudoServer {
 
     public PseudoServer( int socketTimeout ) {
         _socketTimeout = socketTimeout;
-        Thread t = new Thread() {
+        _serverNum = ++_numServers;
+        Thread t = new Thread( "PseudoServer " + _serverNum ) {
             public void run() {
                 while (_active) {
                     try {
                         handleNewConnection( getServerSocket().accept() );
                         Thread.sleep( 20 );
                     } catch (InterruptedIOException e) {
-                        _active = false;
                     } catch (IOException e) {
                         System.out.println( "Error in pseudo server: " + e );
                         e.printStackTrace();
@@ -116,6 +128,7 @@ public class PseudoServer {
 
 
     public void shutDown() {
+        if (_debug) System.out.println( "** Requested shutdown of pseudoserver: " + hashCode() );
         _active = false;
     }
 
@@ -257,7 +270,7 @@ public class PseudoServer {
 
 
     private void handleNewConnection( final Socket socket ) {
-        Thread t = new Thread() {
+        Thread t = new Thread( "PseudoServer " + _serverNum + " connection " + (++_connectionNum) ) {
             public void run() {
                 try {
                     serveRequests( socket );
@@ -283,7 +296,7 @@ public class PseudoServer {
             boolean keepAlive = respondToRequest( request, outputStream );
             if (!keepAlive) break;
             while (_active && 0 == inputStream.available()) {
-                try { Thread.sleep(10); } catch (InterruptedException e) {}
+                try { Thread.sleep( INPUT_POLL_INTERVAL ); } catch (InterruptedException e) {}
             }
         }
         if (_debug) System.out.println( "** Closing server thread: " + hashCode() );
@@ -295,10 +308,11 @@ public class PseudoServer {
     private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {
         if (_debug) System.out.println( "** Server thread " + hashCode() + " handling request: " + request );
         boolean keepAlive = isKeepAlive( request );
+        WebResource resource = null;
         try {
             response.restart();
             response.setProtocol( getResponseProtocol( request ) );
-            WebResource resource = getResource( request );
+            resource = getResource( request );
             if (resource == null) {
                 response.setResponse( HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + request.getURI() );
             } else {
@@ -311,7 +325,6 @@ public class PseudoServer {
                     if (_debug) System.out.println( "** Server thread " + hashCode() + " sending header: " + headers[i] );
                     response.addHeader( headers[i] );
                 }
-                response.write( resource );
             }
         } catch (UnknownMethodException e) {
             response.setResponse( HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + e.getMethod() );
@@ -319,6 +332,7 @@ public class PseudoServer {
             t.printStackTrace();
             response.setResponse( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
         }
+        try { response.write( resource ); } catch (IOException e) { System.out.println( "*** Failed to send reply: " + e ); }
         return keepAlive;
     }
 
@@ -452,7 +466,7 @@ class HttpResponseStream {
 
     void write( WebResource resource ) throws IOException {
         flushHeaders();
-        resource.writeTo( _stream );
+        if (resource != null) resource.writeTo( _stream );
         _stream.flush();
     }
 
