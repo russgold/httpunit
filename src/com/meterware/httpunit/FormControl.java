@@ -77,6 +77,14 @@ abstract class FormControl {
 
 
     /**
+     * Returns a scriptable object which can act as a proxy for this control.
+     */
+    public ScriptableObject getScriptableObject() {
+        return new Scriptable();
+    }
+
+
+    /**
      * Returns the values permitted in this control. Does not apply to text or file controls.
      **/
     public String[] getOptionValues() {
@@ -228,6 +236,19 @@ abstract class FormControl {
             } else {
                 return null;
             }
+        }
+    }
+
+
+    class Scriptable implements ScriptableObject {
+
+        public Object get( String propertyName ) {
+            throw new RuntimeException( "Unknown property: " + propertyName );
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            throw new RuntimeException( "Unknown property: " + propertyName );
         }
     }
 
@@ -495,6 +516,11 @@ class TextFormControl extends FormControl {
     }
 
 
+    public ScriptableObject getScriptableObject() {
+        return new Scriptable();
+    }
+
+
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
         if (getName().length() > 0) processor.addParameter( getName(), getValues()[0], characterSet );
     }
@@ -523,6 +549,17 @@ class TextFormControl extends FormControl {
 
     protected void claimValueIsRequired( List values ) {
         claimValueIsRequired( values, _defaultValue[0] );
+    }
+
+    class Scriptable extends FormControl.Scriptable {
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "value" )) {
+                _value[0] =_defaultValue[0] = value.toString();
+            } else {
+                super.set( propertyName, value );
+            }
+        }
     }
 }
 

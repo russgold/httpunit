@@ -276,8 +276,8 @@ public class WebForm extends WebRequestSource {
     /**
      * Returns an object which provides scripting access to this form.
      **/
-    public ScriptableObject getScriptableObject() {
-        return new ScriptableObject();
+    public Scriptable getScriptableObject() {
+        return new Scriptable();
     }
 
 //---------------------------------- WebRequestSource methods --------------------------------
@@ -400,9 +400,17 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public class ScriptableObject {
+    public class Scriptable implements ScriptableObject {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { _action = newAction; }
+
+        public void setParameterValue( String name, String value ) {
+            getParameter( name ).getScriptableObject().set( "value", value );
+        }
+
+
+        public void set( String propertyName, Object value ) {}
+        public Object get( String propertyName ) { return null; }
     }
 
 
@@ -440,6 +448,11 @@ public class WebForm extends WebRequestSource {
     private ArrayList     _presets;
 
     private String        _action;
+
+
+    private Object getObject( String name ) {
+        return getParameter( name ).getScriptableObject();
+    }
 
 
     private SubmitButton getDefaultButton() {
@@ -562,6 +575,11 @@ class FormParameter {
     private FormControl[] getControls() {
         if (_controls == null) _controls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
         return _controls;
+    }
+
+
+    ScriptableObject getScriptableObject() {
+        return getControls()[0].getScriptableObject();
     }
 
 

@@ -133,6 +133,21 @@ public class FormParametersTest extends HttpUnitTest {
         validateSetParameterRejected( request, "secret", new String[] { "red", "pink" }, "setting hidden field to multiple values" );
     }
 
+
+    public void testHiddenParameters() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = '/ask'>" +
+                                       "<Input type=hidden name=secret value=value>" +
+                                       "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebRequest request = page.getForms()[0].getRequest();
+        HttpUnitOptions.setParameterValuesValidated( true );
+        validateSetParameterRejected( request, "secret", new String[] { "red" }, "setting hidden field to wrong value" );
+
+        WebForm form = page.getForms()[0];
+        form.getScriptableObject().setParameterValue( "secret", "new" );
+        assertEquals( "New hidden value", "new", form.getParameterValue( "secret" ) );
+    }
+
     public void testMultipleTextParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
