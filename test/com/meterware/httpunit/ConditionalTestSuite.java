@@ -1,15 +1,8 @@
 package com.meterware.httpunit;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -26,6 +19,11 @@ import junit.framework.TestCase;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
 /**
  *
@@ -48,7 +46,7 @@ public class ConditionalTestSuite {
                 System.out.println( "Note: test suite " + testCaseName + " not a TestClass and has no suite() method" );
             }
         } catch (ClassNotFoundException e) {
-            System.out.println( "Note: skipping optional test suite " + testCaseName + " since it was not build." );
+            System.out.println( "Note: skipping optional test suite " + testCaseName + " since it was not built." );
         } catch (Exception e) {
             System.out.println( "Note: unable to add " + testCaseName + ": " + e );
         }

@@ -940,21 +940,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    private byte[] readFromStream1( InputStream inputStream, int maxBytes ) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[8 * 1024];
-        int count = 0;
-        do {
-            outputStream.write( buffer, 0, count );
-            maxBytes -= count;
-            if (maxBytes <= 0) break;
-            count = inputStream.read( buffer, 0, Math.min( maxBytes, buffer.length ) );
-        } while (count != -1);
-
-        byte[] bytes = outputStream.toByteArray();
-        return bytes;
-    }
-
     private byte[] readFromStream( InputStream inputStream, int maxBytes ) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[8 * 1024];

@@ -234,6 +234,7 @@ Build-Time: ${TSTAMP}
             <include name="site.css" />
             <include name="favicon.ico" />
             <include name="src/**" />
+            <include name="META-INF/**" />
             <include name="test/**" />
             <include name="examples/**" />
             <include name="lib/*.*" />
