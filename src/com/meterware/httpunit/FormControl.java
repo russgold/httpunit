@@ -36,15 +36,25 @@ abstract class FormControl {
 
     final static String[] NO_VALUE = new String[0];
 
-    private String  _name;
-    private boolean _readOnly;
-    private boolean _disabled;
+    private final String  _name;
+    private final String  _valueAttribute;
+    private final boolean _readOnly;
+    private final boolean _disabled;
+
+
+    FormControl() {
+        _name           = "";
+        _valueAttribute = "";
+        _readOnly       = false;
+        _disabled       = false;
+    }
 
 
     FormControl( Node node ) {
-        _name         = NodeUtils.getNodeAttribute( node, "name" );
-        _readOnly     = NodeUtils.isNodeAttributePresent( node, "readonly" );
-        _disabled     = NodeUtils.isNodeAttributePresent( node, "disabled" );
+        _name           = NodeUtils.getNodeAttribute( node, "name" );
+        _valueAttribute = NodeUtils.getNodeAttribute( node, "value" );
+        _readOnly       = NodeUtils.isNodeAttributePresent( node, "readonly" );
+        _disabled       = NodeUtils.isNodeAttributePresent( node, "disabled" );
     }
 
 
@@ -131,24 +141,11 @@ abstract class FormControl {
     }
 
 
-    protected void addValue( Hashtable valueMap, String name, String value ) {
-        String[] currentValues = (String[]) valueMap.get( name );
-        if (currentValues == null) {
-            valueMap.put( name, new String[] { value } );
-        } else {
-            valueMap.put( name, withNewValue( currentValues, value ) );
-        }
-    }
-
-
     /**
-     * Adds a string to an array of strings and returns the result.
+     * Returns the default value of this control in the form. If no value is specified, defaults to the empty string.
      **/
-    private String[] withNewValue( String[] group, String value ) {
-        String[] result = new String[ group.length+1 ];
-        System.arraycopy( group, 0, result, 0, group.length );
-        result[ group.length ] = value;
-        return result;
+    protected String getValueAttribute() {
+        return _valueAttribute;
     }
 
 
@@ -169,6 +166,8 @@ abstract class FormControl {
                 return new RadioButtonFormControl( node );
             } else if (type.equalsIgnoreCase( "checkbox" )) {
                 return new CheckboxFormControl( node );
+//            } else if (type.equalsIgnoreCase( "submit" ) || type.equalsIgnoreCase( "image" )) {
+//                return new SubmitButton( node );
             } else if (type.equalsIgnoreCase( "file" )) {
                 return new FileSubmitFormControl( node );
             } else {
@@ -187,14 +186,12 @@ class BooleanFormControl extends FormControl {
     private String[] _value = new String[1];
 
     private final boolean _isCheckedDefault;
-    private final String  _valueAttribute;
 
 
 
     public BooleanFormControl( Node node ) {
         super( node );
         _isChecked      = _isCheckedDefault = NodeUtils.isNodeAttributePresent( node, "checked" );
-        _valueAttribute = NodeUtils.getNodeAttribute( node, "value" );
     }
 
 
@@ -217,14 +214,6 @@ class BooleanFormControl extends FormControl {
      **/
     public String[] getOptionValues() {
         return (isReadOnly() && !isChecked()) ? NO_VALUE : toArray( getQueryValue() );
-    }
-
-
-    /**
-     * Returns the default value of this control in the form. If no value is specified, defaults to the empty string.
-     **/
-    String getValueAttribute() {
-        return _valueAttribute;
     }
 
 
@@ -284,6 +273,28 @@ class CheckboxFormControl extends BooleanFormControl {
         final String value = getValueAttribute();
         return value.length() == 0 ? "on" : value;
     }
+
+
+    private void addValue( Hashtable valueMap, String name, String value ) {
+        String[] currentValues = (String[]) valueMap.get( name );
+        if (currentValues == null) {
+            valueMap.put( name, new String[] { value } );
+        } else {
+            valueMap.put( name, withNewValue( currentValues, value ) );
+        }
+    }
+
+
+    /**
+     * Adds a string to an array of strings and returns the result.
+     **/
+    private String[] withNewValue( String[] group, String value ) {
+        String[] result = new String[ group.length+1 ];
+        System.arraycopy( group, 0, result, 0, group.length );
+        result[ group.length ] = value;
+        return result;
+    }
+
 }
 
 

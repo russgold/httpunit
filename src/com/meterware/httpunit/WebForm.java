@@ -153,8 +153,7 @@ public class WebForm extends WebRequestSource {
 
             nl = ((Element) getNode()).getElementsByTagName( "button" );
             for (int i = 0; i < nl.getLength(); i++) {
-                if ((hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "" ))
-                     && nl.item(i).getAttributes().getNamedItem( "disabled" ) == null) {
+                if (hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "" )) {
                     _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
                 }
             }

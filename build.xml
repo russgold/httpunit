@@ -77,7 +77,7 @@
 <target name="testcompile" depends="compile,check_for_optional_packages">
     <mkdir dir="${test.classes}" />
     <javac srcdir="${tstsrc.dir}" destdir="${test.classes}"
-           debug="off" deprecation="on" optimize="off">
+           debug="on" deprecation="on" optimize="off">
          <classpath>
              <path refid="base.classpath" />
              <pathelement location="${build.classes}" />

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -22,26 +22,19 @@ package com.meterware.httpunit;
 import org.w3c.dom.Node;
 
 /**
- * This class represents a suubmit button in an HTML form.
+ * This class represents a submit button in an HTML form.
  **/
-public class SubmitButton {
+public class SubmitButton extends FormControl {
+
 
     public static SubmitButton UNNAMED_BUTTON = new SubmitButton();
-
-
-    /**
-     * Returns the name of this submit button.
-     **/
-    public String getName() {
-        return _name;
-    }
 
 
     /**
      * Returns the value associated with this submit button.
      **/
     public String getValue() {
-        return _value;
+        return getValueAttribute();
     }
 
 
@@ -50,7 +43,7 @@ public class SubmitButton {
      * @return the button ID, or an empty string if no ID is defined.
      **/
     public String getID() {
-        return NodeUtils.getNodeAttribute( _node, "id" );
+        return _id;
     }
 
 
@@ -63,10 +56,11 @@ public class SubmitButton {
 
 
     /**
-     * Returns true if this submit button is disabled. Requests cannot be made for disabled buttons.
+     * Returns the current value(s) associated with this control. These values will be transmitted to the server
+     * if the control is 'successful'.
      **/
-    public boolean isDisabled() {
-        return _isDisabled;
+    public String[] getValues() {
+        return isDisabled() ? NO_VALUE : toArray( getValueAttribute() );
     }
 
 
@@ -92,26 +86,29 @@ public class SubmitButton {
 
 
     SubmitButton( Node node ) {
-        _node  = node;
-        _name  = NodeUtils.getNodeAttribute( node, "name" );
-        _value = NodeUtils.getNodeAttribute( _node, "value" );
-        _isImageButton = NodeUtils.getNodeAttribute( _node, "type" ).equalsIgnoreCase( "image" );
-        _isDisabled = _node.getAttributes().getNamedItem( "disabled" ) != null;
+        super( node );
+        _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( "image" );
+        _id = NodeUtils.getNodeAttribute( node, "id" );
     }
 
 
 //------------------------------------------ private members ----------------------------------
 
-    private Node    _node;
-    private String  _name;
-    private String  _value;
-    private boolean _isImageButton;
-    private boolean _isDisabled;
+
+    private final String   _id;
+    private final boolean  _isImageButton;
+    private       String[] _value = new String[1];
 
 
     private SubmitButton() {
-        _name  = "";
-        _value = "";
+        _id            = "";
+        _isImageButton = false;
+    }
+
+
+    private String[] toArray( String value ) {
+        _value[0] = value;
+        return _value;
     }
 
 

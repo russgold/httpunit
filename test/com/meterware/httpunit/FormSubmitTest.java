@@ -142,7 +142,7 @@ public class FormSubmitTest extends HttpUnitTest {
         SubmitButton[] buttons = form.getSubmitButtons();
         assertEquals( "num detected submit buttons", 2, buttons.length );
         SubmitButton sb = form.getSubmitButton( "recalculate" );
-        assertNotNull( "Failed to find disabled button" );
+        assertNotNull( "Failed to find disabled button", sb );
         assertTrue( "Disabled button not marked as disabled", sb.isDisabled() );
         try {
             form.getRequest( sb );
