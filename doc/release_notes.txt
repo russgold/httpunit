@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+ 2-May-2003
+Additions:
+    1. JUnitServlet now supports a value of 'xml' for the format parameter, generating a format compatible with
+       ant's XMLResultFormatter
+
  4-Apr-2003
 Acknowledgements:
     Thanks to Andrew Bickerton for:

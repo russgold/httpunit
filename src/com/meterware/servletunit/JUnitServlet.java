@@ -73,6 +73,8 @@ public class JUnitServlet extends HttpServlet {
     private ResultsFormatter getResultsFormatter( String formatterName ) {
         if ("text".equalsIgnoreCase( formatterName )) {
             return new TextResultsFormatter();
+        } else if ("xml".equalsIgnoreCase( formatterName )) {
+            return new XMLResultsFormatter();
         } else {
             return new HTMLResultsFormatter();
         }
@@ -158,35 +160,96 @@ public class JUnitServlet extends HttpServlet {
 
 
     static abstract class ResultsFormatter {
-        String getContentType() {
-            return "text/html";
-        }
+
+        private static final char LF = 10;
+        private static final char CR = 13;
+
+
+        abstract String getContentType();
 
 
         void displayResults( PrintWriter writer, String testClassName, String elapsedTimeString, TestResult testResult ) {
-            displayHeader( writer, testClassName, getFormatted( testResult.runCount(), "test" ),
-                                   elapsedTimeString, testResult.wasSuccessful() ? "OK" : "Problems Occurred" );
-
-            if (!testResult.wasSuccessful()) {
-                displayProblems( writer, "failure", testResult.failureCount(), testResult.failures() );
-                displayProblems( writer, "error", testResult.errorCount(), testResult.errors() );
-            }
+            displayHeader( writer, testClassName, testResult, elapsedTimeString );
+            displayResults( writer, testResult );
             displayFooter( writer );
         }
 
 
-        private String getFormatted( int count, String name ) {
-            return count + " " + name + (count == 1 ? "" : "s");
+        protected abstract void displayHeader( PrintWriter writer, String testClassName, TestResult testResult, String elapsedTimeString );
+
+
+        protected abstract void displayResults( PrintWriter writer, TestResult testResult );
+
+
+        protected abstract void displayFooter( PrintWriter writer );
+
+
+        protected String sgmlEscape( String s ) {
+            StringBuffer result = new StringBuffer( s.length() );
+            char[] chars = s.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                switch( chars[i] ) {
+                case '&':
+                    result.append( "&amp;" );
+                    break;
+                case '<':
+                    result.append( "&lt;" );
+                    break;
+                case '>':
+                    result.append( "&gt;" );
+                    break;
+                case LF:
+                    if (i > 0 && chars[i-1] == CR) {
+                        result.append( chars[i] );
+                        break;
+                    }
+                case CR:
+                    result.append( getLineBreak() );
+                default:
+                    result.append( chars[i] );
+                }
+            }
+            return result.toString();
+        }
+
+
+        protected String getLineBreak() {
+            return "<br>";
+        }
+    }
+
+
+    abstract static class DisplayedResultsFormatter extends ResultsFormatter {
+
+        protected void displayHeader( PrintWriter writer, String testClassName, TestResult testResult, String elapsedTimeString ) {
+            displayHeader( writer, testClassName, getFormatted( testResult.runCount(), "test" ),
+                                   elapsedTimeString, testResult.wasSuccessful() ? "OK" : "Problems Occurred" );
+        }
+
+        protected void displayResults( PrintWriter writer, TestResult testResult ) {
+            if (!testResult.wasSuccessful()) {
+                displayProblems( writer, "failure", testResult.failureCount(), testResult.failures() );
+                displayProblems( writer, "error", testResult.errorCount(), testResult.errors() );
+            }
         }
 
 
         protected abstract void displayHeader( PrintWriter writer, String testClassName, String testCountText, String elapsedTimeString, String resultString );
 
 
-        protected abstract void displayFooter( PrintWriter writer );
+        protected abstract void displayProblemTitle( PrintWriter writer, String title );
 
 
-        protected void displayProblems( PrintWriter writer, String kind, int count, Enumeration enumeration ) {
+        protected abstract void displayProblemDetailHeader( PrintWriter writer, int i, String testName );
+
+
+        protected abstract void displayProblemDetailFooter( PrintWriter writer );
+
+
+        protected abstract void displayProblemDetail( PrintWriter writer, String message );
+
+
+        private void displayProblems( PrintWriter writer, String kind, int count, Enumeration enumeration ) {
             if (count != 0) {
                 displayProblemTitle( writer, getFormatted( count, kind ) );
                 Enumeration e = enumeration;
@@ -204,20 +267,15 @@ public class JUnitServlet extends HttpServlet {
         }
 
 
-        protected abstract void displayProblemTitle( PrintWriter writer, String title );
+        private String getFormatted( int count, String name ) {
+            return count + " " + name + (count == 1 ? "" : "s");
+        }
 
 
-        protected abstract void displayProblemDetailHeader( PrintWriter writer, int i, String testName );
-
-
-        protected abstract void displayProblemDetailFooter( PrintWriter writer );
-
-
-        protected abstract void displayProblemDetail( PrintWriter writer, String message );
     }
 
 
-    static class TextResultsFormatter extends ResultsFormatter {
+    static class TextResultsFormatter extends DisplayedResultsFormatter {
 
         String getContentType() {
             return "text/plain";
@@ -256,7 +314,11 @@ public class JUnitServlet extends HttpServlet {
     }
 
 
-    static class HTMLResultsFormatter extends ResultsFormatter {
+    static class HTMLResultsFormatter extends DisplayedResultsFormatter {
+
+        String getContentType() {
+            return "text/html";
+        }
 
 
         protected void displayHeader( PrintWriter writer, String testClassName, String testCountText,
@@ -297,41 +359,78 @@ public class JUnitServlet extends HttpServlet {
 
 
         protected void displayProblemDetail( PrintWriter writer, String message ) {
-            writer.println( htmlEscape( message ) );
+            writer.println( sgmlEscape( message ) );
+        }
+
+    }
+
+
+
+    static class XMLResultsFormatter extends ResultsFormatter {
+
+        String getContentType() {
+            return "text/xml;charset=UTF-8";
         }
 
 
-        private static final char LF = 10;
-        private static final char CR = 13;
+        protected void displayHeader( PrintWriter writer, String testClassName, TestResult testResult, String elapsedTimeString ) {
+            writer.println( "<?xml version='1.0' encoding='UTF-8' ?>\n" +
+                            "<testsuite name=" + asAttribute( testClassName ) +
+                                      " tests=" + asAttribute( testResult.runCount() ) +
+                                      " failures=" + asAttribute( testResult.failureCount() ) +
+                                      " errors=" + asAttribute( testResult.errorCount() ) +
+                                      " time=" + asAttribute( elapsedTimeString ) + ">" );
+        }
 
 
-        private String htmlEscape( String s ) {
-            StringBuffer result = new StringBuffer( s.length() );
-            char[] chars = s.toCharArray();
-            for (int i = 0; i < chars.length; i++) {
-                switch( chars[i] ) {
-                case '&':
-                    result.append( "&amp;" );
-                    break;
-                case '<':
-                    result.append( "&lt;" );
-                    break;
-                case '>':
-                    result.append( "&gt;" );
-                    break;
-                case LF:
-                    if (i > 0 && chars[i-1] == CR) {
-                        result.append( chars[i] );
-                        break;
-                    }
-                case CR:
-                    result.append( "<br>" );
-                default:
-                    result.append( chars[i] );
+        private String asAttribute( int value ) {
+            return '"' + Integer.toString( value ) + '"';
+        }
+
+
+        private String asAttribute( String value ) {
+            return '"' + sgmlEscape( value ) + '"';
+        }
+
+
+        protected void displayFooter( PrintWriter writer ) {
+            writer.println( "</testsuite>" );
+        }
+
+
+        protected void displayResults( PrintWriter writer, TestResult testResult ) {
+            displayResults( writer, "failure", testResult.failures() );
+            displayResults( writer, "error", testResult.errors() );
+        }
+
+
+        private void displayResults( PrintWriter writer, String failureNodeName, Enumeration resultsEnumeration ) {
+            for (Enumeration e = resultsEnumeration; e.hasMoreElements();) {
+                TestFailure failure = (TestFailure) e.nextElement();
+                writer.println( "  <testcase name=" + asAttribute( failure.failedTest().toString() ) + ">" );
+                writer.print( "    <" + failureNodeName + " type=" + asAttribute( failure.thrownException().getClass().getName() ) +
+                                                      " message=" + asAttribute( failure.exceptionMessage() ) );
+                if (!displayException( failure )) {
+                    writer.println( "/>" );
+                } else {
+                    writer.println( ">" );
+                    writer.print( sgmlEscape( BaseTestRunner.getFilteredTrace( failure.thrownException() ) ) );
+                    writer.println( "    </" + failureNodeName + ">" );
                 }
+                writer.println( "  </testcase>" );
             }
-            return result.toString();
+        }
+
+
+        private boolean displayException( TestFailure failure ) {
+            return !failure.isFailure();
+        }
+
+
+        protected String getLineBreak() {
+            return "";
         }
     }
+
 
 }

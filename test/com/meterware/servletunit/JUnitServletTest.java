@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebTable;
+import com.meterware.httpunit.HttpUnitUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,9 +34,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -139,6 +144,60 @@ public class JUnitServletTest extends TestCase {
         assertEquals( "Failure header", "1 error", results[1][1] );
         assertEquals( "Failure index 1", "1", results[2][0] );
         assertTrue( "Test class not found", results[2][1].indexOf( '(' + ErrorTests.class.getName() + ')' ) >= 0 );
+    }
+
+
+    public void testSomeFailuresXMLFormat() throws Exception {
+        ServletUnitClient client = newClient();
+
+        WebResponse wr = client.getResponse( "http://localhost/JUnit?format=xml&test=" + FailingTests.class.getName() );
+        assertEquals( "Content type", "text/xml", wr.getContentType() );
+        DocumentBuilder builder = HttpUnitUtils.newParser();
+        Document document = builder.parse( wr.getInputStream() );
+        Element element = document.getDocumentElement();
+        assertEquals( "document element name", "testsuite", element.getNodeName() );
+        assertEquals( "number of tests", "3", element.getAttribute( "tests" ) );
+        assertEquals( "number of failures", "2", element.getAttribute( "failures" ) );
+        assertEquals( "number of errors", "0", element.getAttribute( "errors" ) );
+        NodeList nl = element.getElementsByTagName( "testcase" );
+        verifyElementWithNameHasFailureNode( "testAddition", nl, /* failed */ "failure", true );
+        verifyElementWithNameHasFailureNode( "testSubtraction", nl, /* failed */ "failure", true );
+        verifyElementWithNameHasFailureNode( "testMultiplication", nl, /* failed */ "failure", false );
+    }
+
+
+    public void testSomeErrorsXMLFormat() throws Exception {
+        ServletUnitClient client = newClient();
+
+        WebResponse wr = client.getResponse( "http://localhost/JUnit?format=xml&test=" + ErrorTests.class.getName() );
+        assertEquals( "Content type", "text/xml", wr.getContentType() );
+        System.out.println( "REG-> " + wr.getText() );      // TODO remove this line
+        DocumentBuilder builder = HttpUnitUtils.newParser();
+        Document document = builder.parse( wr.getInputStream() );
+        Element element = document.getDocumentElement();
+        assertEquals( "document element name", "testsuite", element.getNodeName() );
+        assertEquals( "number of tests", "2", element.getAttribute( "tests" ) );
+        assertEquals( "number of failures", "0", element.getAttribute( "failures" ) );
+        assertEquals( "number of errors", "1", element.getAttribute( "errors" ) );
+        NodeList nl = element.getElementsByTagName( "testcase" );
+        verifyElementWithNameHasFailureNode( "testAddition", nl, /* failed */ "error", true );
+        verifyElementWithNameHasFailureNode( "testMultiplication", nl, /* failed */ "error", false );
+    }
+
+
+    private void verifyElementWithNameHasFailureNode( String name, NodeList nl, String nodeName, boolean failed ) {
+        for (int i = 0; i < nl.getLength(); i++) {
+            Element element = (Element) nl.item(i);
+            if (element.getAttribute( "name" ).indexOf( name ) >= 0) {
+                if (failed) {
+                    assertEquals( "no " + nodeName + " element found for test '" + name + "'", 1, element.getElementsByTagName( nodeName ).getLength() );
+                } else {
+                    assertEquals( "unexpected " + nodeName + " element found for test '" + name + "'", 0, element.getElementsByTagName( nodeName ).getLength() );
+                }
+                return;
+            }
+        }
+        if (failed) fail( "No test result found for '" + name + "'" );
     }
 
 
