@@ -319,7 +319,7 @@ public class ScriptingTest extends HttpUnitTest {
                                        "   alert( 'name=' + window.name );" +
                                        "   alert( 'top url=' + window.top.location );" +
                                        "   alert( '1st frame=' + top.frames[0].name );" +
-                                       "   alert( '2nd frame=' + window.top.frames[1].name );" +
+                                       "   alert( '2nd frame=' + window.parent.frames[1].name );" +
                                        "}" +
                                        "</script></head><body>" +
                                        "<a href=# onclick='show_properties()'>show</a>" +

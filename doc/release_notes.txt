@@ -10,6 +10,14 @@ Limitations:
 
 
 Revision History:
+10-Oct-2002
+Problems fixed:
+    1. Window.open was implemented with parameters backwards in 8-Oct-2002 build
+    2. Window.opener property was not returning undefined value for non-top-level windows in 8-Oct-2002 build
+
+Additions:
+    1. Added support for Window.parent
+
  9-Oct-2002
 Acknowledgements:
     Thanks to Richard Harris for adding stubs for various unimplemented JavaScript Window properties.
@@ -18,11 +26,6 @@ Additions:
     2. Added do-nothing stubs for the Window properties and functions: closed, close(), moveTo(), focus(), setTimeout()
 Problems fixed:
     1. ServletUnit was not supporting mappings for the default servlet.
-
-10-Oct-2002
-Problems fixed:
-    1. Window.open was implemented with parameters backwards in 8-Oct-2002 build
-    2. Window.opener property was not returning undefined value for non-top-level windows in 8-Oct-2002 build
 
  8-Oct-2002
 Acknowledgements:

@@ -42,7 +42,7 @@ public class RequestTargetTest extends HttpUnitTest {
         assertEquals( "new link target", WebRequest.TOP_FRAME, request.getTarget() );
         
         WebResponse response = _wc.getResponse( request );
-        assertEquals( "default response target", WebRequest.TOP_FRAME, response.getTarget() );
+        assertEquals( "default response target", WebRequest.TOP_FRAME, response.getFrameName() );
         WebLink link = response.getLinks()[0];
         assertEquals( "default link target", WebRequest.TOP_FRAME, link.getTarget() );
         assertEquals( "default request target", WebRequest.TOP_FRAME, link.getRequest().getTarget() );
@@ -67,7 +67,7 @@ public class RequestTargetTest extends HttpUnitTest {
         assertEquals( "request target", "subframe", link.getRequest().getTarget() );
 
         WebResponse response = _wc.getResponse( link.getRequest() );
-        assertEquals( "response target", "subframe", response.getTarget() );
+        assertEquals( "response target", "subframe", response.getFrameName() );
         link = response.getLinks()[0];
         assertEquals( "inherited link target", "subframe", link.getTarget() );
     }
@@ -82,7 +82,7 @@ public class RequestTargetTest extends HttpUnitTest {
         assertEquals( "request target", "subframe", link.getRequest().getTarget() );
 
         WebResponse response = _wc.getResponse( link.getRequest() );
-        assertEquals( "response target", "subframe", response.getTarget() );
+        assertEquals( "response target", "subframe", response.getFrameName() );
         WebTable table = response.getTables()[0];
         TableCell cell = table.getTableCell(0,0);
         link = cell.getLinks()[0];
@@ -144,7 +144,7 @@ public class RequestTargetTest extends HttpUnitTest {
         assertEquals( "request target", "subframe", link.getRequest().getTarget() );
 
         WebResponse response = _wc.getResponse( link.getRequest() );
-        assertEquals( "response target", "subframe", response.getTarget() );
+        assertEquals( "response target", "subframe", response.getFrameName() );
         WebForm form = response.getForms()[0];
         assertEquals( "inherited form target", "subframe", form.getTarget() );
     }

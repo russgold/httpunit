@@ -440,7 +440,7 @@ public class WebRequest {
     final static String TOP_FRAME = "_top";
 
     /** The target indicating the parent of a frame. **/
-    final static String PARENT_FRAME = "_frame";
+    final static String PARENT_FRAME = "_parent";
 
     /** The target indicating a new, empty window. **/
     final static String NEW_WINDOW = "_blank";

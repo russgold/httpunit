@@ -111,10 +111,20 @@ public class WebResponse implements HTMLSegment {
         return getReceivedPage().getMetaTagContent(attribute, attributeValue);
     }
 
+
     /**
      * Returns the target of the page.
+     * @deprecated use getFrameName
      **/
     public String getTarget() {
+        return getFrameName();
+    }
+
+
+    /**
+     * Returns the name of the frame containing this page.
+     **/
+    public String getFrameName() {
         return _frameName;
     }
 
@@ -591,13 +601,16 @@ public class WebResponse implements HTMLSegment {
          **/
         public Object get( String propertyName ) {
             if (propertyName.equals( "name" )) {
-                return getTarget().equals( WebRequest.TOP_FRAME ) ? _window.getName() : getTarget();
+                return getFrameName().equals( WebRequest.TOP_FRAME ) ? _window.getName() : getFrameName();
             } else if (propertyName.equalsIgnoreCase( "top" )) {
                 return _window.getFrameContents( WebRequest.TOP_FRAME ).getScriptableObject();
+            } else if (propertyName.equalsIgnoreCase( "parent" )) {
+                return getFrameName().equals( WebRequest.TOP_FRAME ) ? null
+                        : _window.getFrameContents( WebFrame.getParentFrameName( getFrameName() ) ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "location" )) {
                 return WebResponse.this._url.toExternalForm();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
-                return getTarget().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
+                return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
             } else {
                 return super.get( propertyName );
             }
@@ -616,7 +629,7 @@ public class WebResponse implements HTMLSegment {
         public void set( String propertyName, Object value ) {
             if (propertyName.equals( "name" )) {
                 if (value == null) value = "";
-                if (getTarget().equals( WebRequest.TOP_FRAME )) {
+                if (getFrameName().equals( WebRequest.TOP_FRAME )) {
                     _window.setName( value.toString() );
                 }
             } else if (propertyName.equalsIgnoreCase( "location" )) {
@@ -1084,105 +1097,105 @@ public class WebResponse implements HTMLSegment {
 
 
 
-}
-
-
 //=======================================================================================
 
-class ByteTag {
+    class ByteTag {
 
-    ByteTag( byte[] buffer, int start, int length ) throws UnsupportedEncodingException {
-        _buffer = new String( buffer, start, length, WebResponse.getDefaultEncoding() ).toCharArray();
-        _name = nextToken();
+        ByteTag( byte[] buffer, int start, int length ) throws UnsupportedEncodingException {
+            _buffer = new String( buffer, start, length, WebResponse.getDefaultEncoding() ).toCharArray();
+            _name = nextToken();
 
-        String attribute = "";
-        String token = nextToken();
-        while (token.length() != 0) {
-            if (token.equals( "=" ) && attribute.length() != 0) {
-                getAttributes().put( attribute.toLowerCase(), nextToken() );
-                attribute = "";
-            } else {
-                if (attribute.length() > 0) getAttributes().put( attribute.toLowerCase(), "" );
-                attribute = token;
+            String attribute = "";
+            String token = nextToken();
+            while (token.length() != 0) {
+                if (token.equals( "=" ) && attribute.length() != 0) {
+                    getAttributes().put( attribute.toLowerCase(), nextToken() );
+                    attribute = "";
+                } else {
+                    if (attribute.length() > 0) getAttributes().put( attribute.toLowerCase(), "" );
+                    attribute = token;
+                }
+                token = nextToken();
             }
-            token = nextToken();
+        }
+
+
+        public String getName() {
+            return _name;
+        }
+
+        public String getAttribute( String attributeName ) {
+            return (String) getAttributes().get( attributeName );
+        }
+
+        public String toString() {
+            return "ByteTag[ name=" + _name + ";attributes = " + _attributes + ']';
+        }
+
+
+        private Hashtable getAttributes() {
+            if (_attributes == null) _attributes = new Hashtable();
+            return _attributes;
+        }
+
+
+        private String _name = "";
+        private Hashtable _attributes;
+
+
+        private char[] _buffer;
+        private int    _start;
+        private int    _end = -1;
+
+
+        private String nextToken() {
+            _start = _end+1;
+            while (_start < _buffer.length && Character.isWhitespace( _buffer[ _start ] )) _start++;
+            if (_start >= _buffer.length) {
+                return "";
+            } else if (_buffer[ _start ] == '"') {
+                for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
+                return new String( _buffer, _start+1, _end-_start-1 );
+            } else if (_buffer[ _start ] == '\'') {
+                for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
+                return new String( _buffer, _start+1, _end-_start-1 );
+            } else if (_buffer[ _start ] == '=') {
+                _end = _start;
+                return "=";
+            } else {
+                for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '=' && !Character.isWhitespace( _buffer[ _end ] ); _end++);
+                return new String( _buffer, _start, (_end--)-_start );
+            }
         }
     }
-
-
-    public String getName() {
-        return _name;
-    }
-
-    public String getAttribute( String attributeName ) {
-        return (String) getAttributes().get( attributeName );
-    }
-
-    public String toString() {
-        return "ByteTag[ name=" + _name + ";attributes = " + _attributes + ']';
-    }
-
-
-    private Hashtable getAttributes() {
-        if (_attributes == null) _attributes = new Hashtable();
-        return _attributes;
-    }
-
-
-    private String _name = "";
-    private Hashtable _attributes;
-
-
-    private char[] _buffer;
-    private int    _start;
-    private int    _end = -1;
-
-
-    private String nextToken() {
-        _start = _end+1;
-        while (_start < _buffer.length && Character.isWhitespace( _buffer[ _start ] )) _start++;
-        if (_start >= _buffer.length) {
-            return "";
-        } else if (_buffer[ _start ] == '"') {
-            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
-            return new String( _buffer, _start+1, _end-_start-1 );
-        } else if (_buffer[ _start ] == '\'') {
-            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
-            return new String( _buffer, _start+1, _end-_start-1 );
-        } else if (_buffer[ _start ] == '=') {
-            _end = _start;
-            return "=";
-        } else {
-            for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '=' && !Character.isWhitespace( _buffer[ _end ] ); _end++);
-            return new String( _buffer, _start, (_end--)-_start );
-        }
-    }
-}
 
 
 //=======================================================================================
 
 
-class ByteTagParser {
+    class ByteTagParser {
 
-    ByteTagParser( byte[] buffer ) {
-        _buffer = buffer;
+        ByteTagParser( byte[] buffer ) {
+            _buffer = buffer;
+        }
+
+
+        ByteTag getNextTag() throws UnsupportedEncodingException {
+            _start = _end+1;
+            while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
+            for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
+            if (_end >= _buffer.length || _end < _start) return null;
+            return new ByteTag( _buffer, _start+1, _end-_start-1 );
+        }
+
+
+        private int _start = 0;
+        private int _end   = -1;
+
+        private byte[] _buffer;
     }
 
 
-    ByteTag getNextTag() throws UnsupportedEncodingException {
-        _start = _end+1;
-        while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
-        for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
-        if (_end >= _buffer.length || _end < _start) return null;
-        return new ByteTag( _buffer, _start+1, _end-_start-1 );
-    }
-
-
-    private int _start = 0;
-    private int _end   = -1;
-
-    private byte[] _buffer;
 }
 
 

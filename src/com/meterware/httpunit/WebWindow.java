@@ -165,7 +165,7 @@ public class WebWindow {
 
     void updateFrameContents( WebResponse response ) throws IOException, SAXException {
         response.setWindow( this );
-        _frameContents.updateFrames( response, response.getTarget() );
+        _frameContents.updateFrames( response, response.getFrameName() );
     }
 
 

@@ -262,7 +262,7 @@ public class WebClientTest extends HttpUnitTest {
                 messageLog.get( i ) instanceof WebRequest );
         assertTrue( "Logged item " + (i + 1) + " is not a web response, but " + messageLog.get( i + 1 ).getClass(),
                 messageLog.get( i + 1 ) instanceof WebResponse );
-        assertEquals( "Response target", ((WebRequest) messageLog.get( i )).getTarget(), ((WebResponse) messageLog.get( i + 1 )).getTarget() );
+        assertEquals( "Response target", ((WebRequest) messageLog.get( i )).getTarget(), ((WebResponse) messageLog.get( i + 1 )).getFrameName() );
         assertEquals( "Response URL", ((WebRequest) messageLog.get( i )).getURL(), ((WebResponse) messageLog.get( i + 1 )).getURL() );
     }
 

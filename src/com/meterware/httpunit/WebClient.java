@@ -598,7 +598,7 @@ class RedirectWebRequest extends WebRequest {
 
 
     RedirectWebRequest( WebResponse response ) throws MalformedURLException {
-        super( response.getURL(), response.getHeaderField( "Location" ), response.getTarget() );
+        super( response.getURL(), response.getHeaderField( "Location" ), response.getFrameName() );
     }
 
 
