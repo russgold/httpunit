@@ -175,7 +175,9 @@ class ServletUnitHttpSession implements HttpSession {
     public void setAttribute( String name, Object value ) {
         if (_invalid) throw new IllegalStateException();
 
-        if (!_values.containsKey( name )) {
+        if (value == null) {
+            removeAttribute( name );
+        } else if (!_values.containsKey( name )) {
             _values.put( name, value );
             _listenerDispatcher.sendAttributeAdded( this, name, value );
         } else {

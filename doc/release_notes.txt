@@ -13,9 +13,15 @@ Limitations:
 
 
 Revision History:
- 1-Mar-2004
- Problems fixed:
-    1. ServletUnit now applies character encoding in interpreting post parameters
+1-Mar-2004
+    Acknowledgements:
+        1. Thanks to Dan Frankow for supplying an implementation of ServletContext.getMimeType and correcting the
+           implementation of HttpSession.setAttribute when the value is null
+
+    Problems fixed:
+        1. ServletUnit now applies character encoding in interpreting post parameters
+        2. Patch #873911: ServletUnit now supports ServletContext.getMimeType
+        3. Patch #873914: ServletUnit HttpSession.setAttribute( name, null ) now properly removes the named attribute
 
 26-Feb-2004
 Additions:

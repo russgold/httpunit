@@ -87,6 +87,25 @@ public class ConfigTest extends TestCase {
     }
 
 
+    public void testFileMimeType() throws Exception {
+        final String servlet1Name = "something/interesting";
+
+        ServletRunner sr = new ServletRunner();
+        sr.registerServlet( servlet1Name, ConfigServlet.class.getName() );
+        ServletUnitClient wc = sr.newClient();
+        InvocationContext ic1 = wc.newInvocation( "http://localhost/" + servlet1Name );
+        ServletContext context = ic1.getServlet().getServletConfig().getServletContext();
+        checkMimeType( context, "sample.txt", "text/plain" );
+        checkMimeType( context, "sample.html", "text/html" );
+        checkMimeType( context, "sample.gif", "image/gif" );
+    }
+
+
+    private void checkMimeType( ServletContext context, String fileName, String expectedMimeType ) {
+        assertEquals( "mime type for " + fileName, expectedMimeType, context.getMimeType( fileName ) );
+    }
+
+
     static class ConfigServlet extends HttpServlet {
         static String RESPONSE_TEXT = "the desired content\r\n";
 

@@ -66,11 +66,26 @@ public class SessionTest extends ServletUnitTest {
         long accessedAt = session.getLastAccessedTime();
         assertTrue( "Session is not marked as new", session.isNew() );
         try { Thread.sleep( 50 ); } catch (InterruptedException e) {};
-        assertEquals( "Initial access time", accessedAt, context.getSession( session.getId() ).getLastAccessedTime() ); 
+        assertEquals( "Initial access time", accessedAt, context.getSession( session.getId() ).getLastAccessedTime() );
         session.access();
         assertTrue( "Last access time not changed", accessedAt != context.getSession( session.getId() ).getLastAccessedTime() );
         assertTrue( "Session is still marked as new", !context.getSession( session.getId() ).isNew() );
 
+    }
+
+
+    public void testSessionAttributes() throws Exception {
+        ServletUnitContext context = new ServletUnitContext();
+        ServletUnitHttpSession session = context.newSession();
+        session.setAttribute( "first", new Integer(1) );
+        session.setAttribute( "second", "two" );
+        session.setAttribute( "third", "III" );
+
+        assertMatchingSet( "Attribute names", new String[] { "first", "second", "third" }, toArray( session.getAttributeNames() ));
+
+        session.removeAttribute( "third" );
+        session.setAttribute( "first", null );
+        assertMatchingSet( "Attribute names", new String[] { "second" }, toArray( session.getAttributeNames() ));
     }
 
 

@@ -20,6 +20,8 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 import java.util.Vector;
+import java.util.Enumeration;
+import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
@@ -34,6 +36,13 @@ public class ServletUnitTest extends TestCase {
     }
 
 //------------------------------------ protected members ------------------------------------------
+
+
+    protected Object[] toArray( Enumeration e ) {
+        ArrayList result = new ArrayList();
+        while (e.hasMoreElements()) result.add( e.nextElement() );
+        return result.toArray();
+    }
 
 
     protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {

@@ -24,8 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -85,7 +86,7 @@ class ServletUnitServletContext implements ServletContext {
      * "text/html" and "image/gif".
      **/
     public java.lang.String getMimeType( String filePath ) {
-        return null;  // XXX not implemented
+        return URLConnection.getFileNameMap().getContentTypeFor(filePath);
     }
 
 
