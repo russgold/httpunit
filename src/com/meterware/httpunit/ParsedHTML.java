@@ -177,7 +177,7 @@ class ParsedHTML {
 
             _images = new WebImage[ images.getLength() ];
             for (int i = 0; i < _images.length; i++) {
-                _images[i] = new WebImage( this, _baseURL, images.item( i ) );
+                _images[i] = new WebImage( _response, this, _baseURL, images.item( i ), _baseTarget );
             }
         }
         return _images;

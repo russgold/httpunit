@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-public class WebImage {
+public class WebImage extends FixedURLWebRequestSource {
 
     private URL        _baseURL;
     private Node       _node;
@@ -40,7 +40,8 @@ public class WebImage {
     private String     _alt;
 
 
-    WebImage( ParsedHTML parsedHTML, URL baseURL, Node node ) {
+    WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, Node node, String parentTarget ) {
+        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "src" ), parentTarget );
         _baseURL = baseURL;
         _node = node;
         _parsedHTML = parsedHTML;
@@ -107,4 +108,14 @@ public class WebImage {
     }
 
 
+//---------------------------------- WebRequestSource methods ------------------------------------------
+
+
+    /**
+     * Returns the scriptable delegate.
+     */
+
+    ScriptableDelegate getScriptableDelegate() {
+        return getScriptableObject();
+    }
 }

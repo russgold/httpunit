@@ -367,7 +367,7 @@ public class FormSubmitTest extends HttpUnitTest {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
                                   "<Input type=submit name=update value=age>" +
-                                  "<Input type=submit name=update value=name>" +
+                                  "<Button type=submit name=update value=name>" +
                                   "</form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];

@@ -90,4 +90,20 @@ public class WebImageTest extends HttpUnitTest {
         assertEquals( "Link URL", "somewhere.htm", link.getURLString() );
     }
 
+
+    public void testImageRequest() throws Exception {
+        defineResource( "grouped/SimplePage.html",
+                        "<html><head><title>A Sample Page</title></head>\n" +
+                        "<body><img name='this_one' src='sample.jpg'>\n" +
+                        "<IMG SRC='another.png'>" +
+                        " and <img src='onemore.gif' alt='one'>\n" +
+                        "</body></html>\n" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/grouped/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        WebRequest imageRequest = simplePage.getImageWithName( "this_one" ).getRequest();
+        assertEquals( "Image URL", getHostPath() + "/grouped/sample.jpg", imageRequest.getURL().toExternalForm() );
+    }
+
+
 }

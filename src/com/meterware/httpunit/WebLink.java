@@ -21,17 +21,9 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
-import java.net.URL;
-import java.net.MalformedURLException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.List;
-import java.util.Arrays;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -44,7 +36,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
  **/
-public class WebLink extends WebRequestSource {
+public class WebLink extends FixedURLWebRequestSource {
 
     private Scriptable _scriptable;
 
@@ -96,141 +88,6 @@ public class WebLink extends WebRequestSource {
     }
 
 
-//----------------------------------------- WebRequestSource methods ---------------------------------------------------
-
-
-    /**
-     * Creates and returns a web request which will simulate clicking on this link.
-     **/
-    public WebRequest getRequest() {
-        return new GetMethodWebRequest( this );
-    }
-
-
-    /**
-     * Returns the scriptable delegate.
-     */
-    ScriptableDelegate getScriptableDelegate() {
-        return getScriptableObject();
-    }
-
-
-    /**
-     * Returns an array containing the names of any parameters defined as part of this link's URL.
-     **/
-    public String[] getParameterNames() {
-        ArrayList parameterNames = new ArrayList( getPresetParameterMap().keySet() );
-        return (String[]) parameterNames.toArray( new String[ parameterNames.size() ] );
-    }
-
-
-    /**
-     * Returns the multiple default values of the named parameter.
-     **/
-    public String[] getParameterValues( String name ) {
-        final String[] values = (String[]) getPresetParameterMap().get( name );
-        return values == null ? NO_VALUES : values;
-    }
-
-
-//--------------------------------- ParameterHolder methods --------------------------------------
-
-
-    /**
-     * Specifies the position at which an image button (if any) was clicked.
-     **/
-    void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
-        throw new IllegalLinkParametersRequest();
-    }
-
-
-    /**
-     * Iterates through the fixed, predefined parameters in this holder, recording them in the supplied parameter processor.\
-     * These parameters always go on the URL, no matter what encoding method is used.
-     **/
-
-    void recordPredefinedParameters( ParameterProcessor processor ) throws IOException {
-    }
-
-
-    /**
-     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
-     **/
-    void recordParameters( ParameterProcessor processor ) throws IOException {
-        Iterator i = getPresetParameterList().iterator();
-        while (i.hasNext()) {
-            LinkParameter o = (LinkParameter) i.next();
-            processor.addParameter( o.getName(), o.getValue(), getCharacterSet() );
-         }
-    }
-
-
-    /**
-     * Removes a parameter name from this collection.
-     **/
-    void removeParameter( String name ) {
-        throw new IllegalLinkParametersRequest();
-    }
-
-
-    /**
-     * Sets the value of a parameter in a web request.
-     **/
-    void setParameter( String name, String value ) {
-        setParameter( name, new String[] { value } );
-    }
-
-
-    /**
-     * Sets the multiple values of a parameter in a web request.
-     **/
-    void setParameter( String name, String[] values ) {
-        if (values == null) {
-            throw new IllegalArgumentException( "May not supply a null argument array to setParameter()" );
-        } else if (!getPresetParameterMap().containsKey( name )) {
-            throw new IllegalLinkParametersRequest();
-        } else if (!equals( getParameterValues( name ), values )) {
-            throw new IllegalLinkParametersRequest();
-        }
-    }
-
-
-    private boolean equals( String[] left, String[] right ) {
-        if (left.length != right.length) return false;
-        List rightValues = Arrays.asList( right );
-        for (int i = 0; i < left.length; i++) {
-            if (!rightValues.contains( left[i] )) return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * Sets the multiple values of a file upload parameter in a web request.
-     **/
-    void setParameter( String name, UploadFileSpec[] files ) {
-        throw new IllegalLinkParametersRequest();
-    }
-
-
-    /**
-     * Returns true if the specified parameter is a file field.
-     **/
-    boolean isFileParameter( String name ) {
-        return false;
-    }
-
-
-    boolean isSubmitAsMime() {
-        return false;
-    }
-
-
-    void setSubmitAsMime( boolean mimeEncoded ) {
-        throw new IllegalStateException( "May not change the encoding for a validated request created from a link" );
-    }
-
-
     public class Scriptable extends ScriptableDelegate {
 
         public Object get( String propertyName ) {
@@ -249,6 +106,17 @@ public class WebLink extends WebRequestSource {
                 return WebLink.this.getBaseURL();
             }
         }
+    }
+
+
+//----------------------------------------- WebRequestSource methods ---------------------------------------------------
+
+
+    /**
+     * Returns the scriptable delegate.
+     */
+    ScriptableDelegate getScriptableDelegate() {
+        return getScriptableObject();
     }
 
 
@@ -271,75 +139,6 @@ public class WebLink extends WebRequestSource {
         if (_scriptable == null) _scriptable = new Scriptable();
         return _scriptable;
     }
-
-
-//--------------------------------------------------- private members --------------------------------------------------
-
-
-    private static final String[] NO_VALUES = new String[0];
-
-    private Map       _presetParameterMap;
-    private ArrayList _presetParameterList;
-
-
-    private Map getPresetParameterMap() {
-        if (_presetParameterMap == null) loadPresetParameters();
-        return _presetParameterMap;
-    }
-
-
-    private ArrayList getPresetParameterList() {
-        if (_presetParameterList == null) loadPresetParameters();
-        return _presetParameterList;
-    }
-
-
-    private void loadPresetParameters() {
-        _presetParameterMap = new HashMap();
-        _presetParameterList = new ArrayList();
-        loadDestinationParameters();
-    }
-
-
-    protected void addPresetParameter( String name, String value ) {
-        _presetParameterMap.put( name, HttpUnitUtils.withNewValue( (String[]) _presetParameterMap.get( name ), value ) );
-        _presetParameterList.add( new LinkParameter( name, value ) );
-    }
-
-
-}
-
-
-class LinkParameter {
-    private String _name;
-    private String _value;
-
-
-    public LinkParameter( String name, String value ) {
-        _name = name;
-        _value = value;
-    }
-
-
-    public String getName() {
-        return _name;
-    }
-
-
-    public String getValue() {
-        return _value;
-    }
-}
-
-
-class IllegalLinkParametersRequest extends IllegalRequestParameterException {
-
-    public IllegalLinkParametersRequest() {
-    }
-
-    public String getMessage() {
-        return "May not modify parameters for a request derived from a link with parameter checking enabled.";
-     }
 
 
 }

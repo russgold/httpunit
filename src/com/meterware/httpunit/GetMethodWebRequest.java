@@ -95,9 +95,9 @@ public class GetMethodWebRequest extends WebRequest {
 
 
     /**
-     * Constructs a web request for a link.
+     * Constructs a web request for a link or image.
      **/
-    GetMethodWebRequest( WebLink sourceLink ) {
+    GetMethodWebRequest( FixedURLWebRequestSource sourceLink ) {
         super( sourceLink );
     }
 
