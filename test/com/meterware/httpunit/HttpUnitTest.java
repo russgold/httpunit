@@ -99,10 +99,6 @@ public class HttpUnitTest extends TestCase {
         return _hostPath;
     }
 
-    public static void assertTrue( String comment, boolean expression ) {
-        assert( comment, expression );
-    }
-
 
     protected void assertEquals( String comment, Object[] expected, Object[] found ) {
         if (!equals( expected, found )) {

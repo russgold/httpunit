@@ -16,8 +16,8 @@ Revision History:
 Acknowledgements:
     Thanks to Jessica Sant for correcting the handling of error statuses.
 Problems fixed:
-    1. As of JDK 1.3.1-03, the behavior of HttpURLConnection was changed to throw an IOException when an error status
-       is returned. This broke HttpUnit's handling of error codes. This has since been corrected.
+    1. bug #570644: As of JDK 1.3.1-03, the behavior of HttpURLConnection was changed to throw an IOException when an
+       error status is returned. This broke HttpUnit's handling of error codes. This has since been corrected.
 
 17-Jun-2002
 Acknowledgements:
