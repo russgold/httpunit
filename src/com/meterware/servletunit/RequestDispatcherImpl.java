@@ -50,7 +50,7 @@ class RequestDispatcherImpl extends RequestContext implements RequestDispatcher 
 
 
     public void forward( ServletRequest request, ServletResponse response ) throws ServletException, IOException {
-        ((ServletUnitHttpResponse) response).restartResponse();
+        response.reset();
         _servletMetaData.getServlet().service( DispatchedRequestWrapper.createForwardRequestWrapper( (HttpServletRequest) request, this ), response );
     }
 

@@ -86,6 +86,7 @@ Additions:
            updates the servlet, request, and response properties of the context so that subsequent calls can be done from
            the dispatched servlet. Calling popRequest reverts to the dispatching servlet.
        15. ServletUnit now loads and initializes servlets specified with the <load-on-startup> element.
+       16. HttpServletResponse methods reset(), resetBuffer(), and setBufferSize() are now implemented.
 
 Notes:
     1. Upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.

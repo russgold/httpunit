@@ -3,7 +3,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -364,8 +364,8 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * will use a buffer at least as large as the size requested. The actual buffer size
      * used can be found using getBufferSize.
      **/
-    public void setBufferSize( int size ) {   // XXX throw IllegalStateException if anything has been written
-        throw new RuntimeException( "setBufferSize not implemented" );
+    public void setBufferSize( int size ) {
+        if (getContents().length != 0) throw new IllegalStateException( "May not set buffer size after data is written" );
     }
 
 
@@ -400,7 +400,10 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * If the response has been committed, this method throws an IllegalStateException.
      **/
     public void reset() {
-        throw new RuntimeException( "reset not implemented" );
+        resetBuffer();
+        _headers = new Hashtable();
+        _headersComplete = false;
+        _status = SC_OK;
     }
 
 
@@ -432,23 +435,14 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * @since 1.3
      */
     public void resetBuffer() {
-        // XXX implement me
+        if (_committed) throw new IllegalStateException( "May not resetBuffer after response is committed" );
+        _outputStream = null;
+        _servletStream = null;
+        _writer = null;
     }
 
 
 //---------------------------------------------- package methods --------------------------------------------------
-
-    /**
-     * Clears all headers and content.
-     */
-    void restartResponse() {
-        _headers = new Hashtable();
-        _headersComplete = false;
-        _outputStream = null;
-        _servletStream = null;
-        _status = SC_OK;
-        _writer = null;
-    }
 
     /**
      * Returns the content type defined for this response.

@@ -127,6 +127,47 @@ public class HttpServletResponseTest extends ServletUnitTest {
     }
 
 
+    public void testSetBufferSizeAfterWrite() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setBufferSize( 120 );
+        servletResponse.getWriter();
+        servletResponse.setBufferSize( 100 );
+        servletResponse.getWriter().print( "something" );
+        try {
+            servletResponse.setBufferSize( 80 );
+            fail( "Should not have permitted setBufferSize after write" );
+        } catch (IllegalStateException e) {}
+    }
+
+
+    public void testSetBufferSizeAfterStreamOutput() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.setBufferSize( 120 );
+        servletResponse.getOutputStream();
+        servletResponse.setBufferSize( 100 );
+        servletResponse.getOutputStream().print( "something" );
+        try {
+            servletResponse.setBufferSize( 80 );
+            fail( "Should not have permitted setBufferSize after output" );
+        } catch (IllegalStateException e) {}
+    }
+
+
+    public void testResetBuffer() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        servletResponse.getOutputStream().print( "something" );
+        assertEquals( "buffer size", 9, servletResponse.getContents().length );
+        servletResponse.resetBuffer();
+        assertEquals( "buffer size", 0, servletResponse.getContents().length );
+
+        servletResponse.flushBuffer();
+        try {
+            servletResponse.resetBuffer();
+            fail( "Should not have permitted resetBuffer after flush" );
+        } catch (IllegalStateException e) {}
+    }
+
+
     public void testUpdateAfterFlushBuffer() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         servletResponse.getWriter();
