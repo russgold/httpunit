@@ -89,7 +89,7 @@ public class MessageBodyWebRequest extends WebRequest {
      * Performs any additional processing necessary to complete the request.
      **/
     protected void completeRequest( URLConnection connection ) throws IOException {
-        ((HttpURLConnection) connection).setRequestMethod( getMethod() );
+        super.completeRequest( connection );
         connection.setDoInput( true );
         connection.setDoOutput( true );
 

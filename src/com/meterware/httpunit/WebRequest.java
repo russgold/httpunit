@@ -24,11 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.net.URLStreamHandler;
+import java.net.*;
 
 import java.util.*;
 
@@ -442,6 +438,7 @@ public class WebRequest {
      * Performs any additional processing necessary to complete the request.
      **/
     protected void completeRequest( URLConnection connection ) throws IOException {
+        if (connection instanceof HttpURLConnection) ((HttpURLConnection) connection).setRequestMethod( getMethod() );
     }
 
 
