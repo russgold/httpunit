@@ -19,53 +19,56 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.MalformedURLException;
-import java.net.URL;
+
 
 /**
- * An HTTP request using the GET method.
+ * A collection of global options to control testing.
+ *
+ * @author Russell Gold
  **/
-public class GetMethodWebRequest extends WebRequest {
-
-    
-    /**
-     * Constructs a web request using a specific absolute url string.
-     **/
-    public GetMethodWebRequest( String urlString ) {
-        super( urlString );
-    }
+abstract
+public class HttpUnitOptions {
 
 
     /**
-     * Constructs a web request using a base URL and a relative url string.
+     * Returns true if parser warnings are enabled.
      **/
-    public GetMethodWebRequest( URL urlBase, String urlString ) {
-        super( urlBase, urlString );
+    public static boolean getParserWarningsEnabled() {
+        return _parserWarningsEnabled;
     }
-
-
-    public URL getURL() throws MalformedURLException {
-        if (hasNoParameters()) {
-            return new URL( getURLBase(), getURLString() );
-        } else {
-            return new URL( getURLBase(), getURLString() + "?" + getParameterString() );
-        }
-    }
-
-
-//--------------------------------------- package members ---------------------------------------------
 
 
     /**
-     * Constructs a web request for a form.
+     * If true, tells the parser to display warning messages. The default is false (warnings are not shown).
      **/
-    GetMethodWebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
-        super( urlBase, urlString, sourceForm );
+    public static void setParserWarningsEnabled( boolean enabled ) {
+        _parserWarningsEnabled = enabled;
     }
 
+
+    /**
+     * Returns true if form parameter settings are checked.
+     **/
+    public static boolean getParameterValuesValidated() {
+        return _parameterValuesValidated;
+    }
+
+
+    /**
+     * If true, tells HttpUnit to throw an exception on any attempt to set a form parameter to a value
+     * which could not be set via the browser. The default is true (parameters are validated).
+     **/
+    public static void setParameterValuesValidated( boolean validated ) {
+        _parameterValuesValidated = validated;
+    }
+
+
+//--------------------------------- private members --------------------------------------
+
+
+    private static boolean _parserWarningsEnabled;
+
+    private static boolean _parameterValuesValidated = true;
 
 }
-
-
-
 

@@ -71,9 +71,9 @@ public class WebForm {
         WebRequest result;
 
         if (getValue( nnm.getNamedItem( "method" ) ).equalsIgnoreCase( "post" )) {
-            result = new PostMethodWebRequest( _baseURL, action );
+            result = new PostMethodWebRequest( _baseURL, action, this );
         } else {
-            result = new GetMethodWebRequest( _baseURL, action );
+            result = new GetMethodWebRequest( _baseURL, action, this );
         }
 
         String[] parameterNames = getParameterNames();
@@ -135,6 +135,22 @@ public class WebForm {
 
 
     /**
+     * Returns true if the named parameter accepts multiple values.
+     **/
+    public boolean isMultiValuedParameter( String name ) {
+        return TYPE_MULTI_VALUED.equals( getParameterTypes().get( name ) );
+    }
+
+
+    /**
+     * Returns true if the named parameter accepts free-form text.
+     **/
+    public boolean isTextParameter( String name ) {
+        return TYPE_TEXT.equals( getParameterTypes().get( name ) );
+    }
+
+
+    /**
      * Returns a copy of the domain object model subtree associated with this form.
      **/
     public Node getDOMSubtree() {
@@ -156,6 +172,15 @@ public class WebForm {
 
 //---------------------------------- private members --------------------------------
 
+    /** The type of a parameter which accepts any text. **/
+    private final static Integer TYPE_TEXT = new Integer(1);
+
+    /** The type of a parameter which accepts single predefined values. **/
+    private final static Integer TYPE_SCALAR = new Integer(2);
+
+    /** The type of a parameter which accepts multiple predefined values. **/
+    private final static Integer TYPE_MULTI_VALUED = new Integer(3);
+
 
     /** The URL of the page containing this form. **/
     private URL            _baseURL;
@@ -174,6 +199,9 @@ public class WebForm {
 
     /** The parameters with their options. **/
     private Hashtable      _optionValues;
+
+    /** The parameters mapped to the type of data which they accept. **/
+    private Hashtable      _dataTypes;
 
     /** The selections in this form. **/
     private HTMLSelectElement[] _selections;
@@ -236,6 +264,25 @@ public class WebForm {
     private Hashtable getParameterOptionValues() {
         if (_optionValues == null) {
             Hashtable options = new Hashtable();
+            NamedNodeMap[] parameters = getParameters();
+            Hashtable types = new Hashtable();
+            for (int i = 0; i < parameters.length; i++) {
+                String name  = getValue( parameters[i].getNamedItem( "name" ) );
+                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
+                if (type == null) type = "TEXT";
+
+                if (type.equals( "RADIO" )) {
+                    String[] radioOptions = (String[]) options.get( name );
+                    if (radioOptions == null) {
+                        options.put( name, new String[] { value } );
+                    } else {
+                        options.put( name, withNewValue( radioOptions, value ) );
+                    }
+                } else if (type.equals( "CHECKBOX" )) {
+                    options.put( name, new String[] { "on" } );
+                }
+            }
             HTMLSelectElement[] selections = getSelections();
             for (int i = 0; i < selections.length; i++) {
                 options.put( selections[i].getName(), selections[i].getOptionValues() );
@@ -243,6 +290,46 @@ public class WebForm {
             _optionValues = options;
         }
         return _optionValues;
+    }
+
+
+    private String[] withNewValue( String[] group, String value ) {
+        String[] result = new String[ group.length+1 ];
+        System.arraycopy( group, 0, result, 1, group.length );
+        result[0] = value;
+        return result;
+    }
+
+
+    private Hashtable getParameterTypes() {
+        if (_dataTypes == null) {
+            NamedNodeMap[] parameters = getParameters();
+            Hashtable types = new Hashtable();
+            for (int i = 0; i < parameters.length; i++) {
+                String name  = getValue( parameters[i].getNamedItem( "name" ) );
+                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
+                if (type == null) type = "TEXT";
+
+                if (type.equals( "TEXT" ) | type.equals( "HIDDEN" ) | type.equals( "PASSWORD" )) {
+                    types.put( name, TYPE_TEXT );
+                } else if (type.equals( "RADIO" )) {
+                    types.put( name, TYPE_SCALAR );
+                } else if (type.equals( "CHECKBOX" )) {
+                    types.put( name, TYPE_SCALAR );
+                }
+            }
+            HTMLSelectElement[] selections = getSelections();
+            for (int i = 0; i < selections.length; i++) {
+                types.put( selections[i].getName(), selections[i].isMultiSelect() ? TYPE_MULTI_VALUED : TYPE_SCALAR );
+            }
+            HTMLTextAreaElement[] textAreas = getTextAreas();
+            for (int i = 0; i < textAreas.length; i++) {
+                types.put( textAreas[i].getName(), TYPE_TEXT );
+            }
+            _dataTypes = types;
+        }
+        return _dataTypes;
     }
 
 
@@ -389,7 +476,7 @@ public class WebForm {
         }
 
 
-        private boolean isMultiSelect() {
+        boolean isMultiSelect() {
             return _node.getAttributes().getNamedItem( "multiple" ) != null;
         }
 

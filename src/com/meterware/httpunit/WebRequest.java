@@ -15,6 +15,7 @@ public class WebRequest {
      * Sets the value of a parameter in a web request.
      **/
     public void setParameter( String name, String value ) {
+        if (HttpUnitOptions.getParameterValuesValidated()) validateParameterValue( name, value );
         _parameters.put( name, value );
     }
 
@@ -23,6 +24,7 @@ public class WebRequest {
      * Sets the multiple values of a parameter in a web request.
      **/
     public void setParameter( String name, String[] values ) {
+        if (HttpUnitOptions.getParameterValuesValidated()) validateParameterValues( name, values );
         _parameters.put( name, values );
     }
 
@@ -79,13 +81,22 @@ public class WebRequest {
         this( (URL) null, urlString );
     }
     
-
+    
     /**
      * Constructs a web request using a base URL and a relative URL string.
      **/
     protected WebRequest( URL urlBase, String urlString ) {
+        this( urlBase, urlString, null );
+    }
+
+
+    /**
+     * Constructs a web request using a base URL and a relative URL string.
+     **/
+    protected WebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
         _urlBase   = urlBase;
         _urlString = urlString;
+        _sourceForm = sourceForm;
     }
     
 
@@ -93,7 +104,7 @@ public class WebRequest {
      * Constructs a web request using a base request and a relative URL string.
      **/
     protected WebRequest( WebRequest baseRequest, String urlString ) throws MalformedURLException {
-        this( baseRequest.getURL(), urlString );
+        this( baseRequest.getURL(), urlString, null );
     }
     
 
@@ -143,6 +154,7 @@ public class WebRequest {
     private URL       _urlBase;
     private String    _urlString;
     private Hashtable _parameters = new Hashtable();
+    private WebForm   _sourceForm;
 
 
     private void appendParameters( StringBuffer sb, String name, String[] values, boolean moreToCome ) {
@@ -159,4 +171,102 @@ public class WebRequest {
     }
 
 
+    private void validateParameterValue( String name, String value ) {
+        if (_sourceForm == null) return;
+        if (_sourceForm.isTextParameter( name )) return;
+        if (!inArray( name, _sourceForm.getParameterNames() )) throw new NoSuchParameterException( name );
+        if (!inArray( value, _sourceForm.getOptionValues( name ) )) throw new IllegalParameterValueException( name, value );
+    }
+
+
+    private void validateParameterValues( String name, String[] values ) {
+        if (_sourceForm == null) return;
+        if (values.length != 1 && !_sourceForm.isMultiValuedParameter( name )) {
+            throw new SingleValuedParameterException( name );
+        }
+
+        for (int i = 0; i < values.length; i++) validateParameterValue( name, values[i] );
+    }
+
+
+    private boolean inArray( String candidate, String[] values ) {
+        for (int i = 0; i < values.length; i++) {
+            if (candidate.equals( values[i] )) return true;
+        }
+        return false;
+    }
+
+
 }
+
+
+//================================ exception class NoSuchParameterException =========================================
+
+
+/**
+ * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+ **/
+class NoSuchParameterException extends IllegalRequestParameterException {
+
+
+    NoSuchParameterException( String parameterName ) {
+        _parameterName = parameterName;
+    }
+
+
+    public String getMessage() {
+        return "No parameter named '" + _parameterName + "' is defined in the form";
+    }
+
+
+    private String _parameterName;
+
+}
+
+
+//============================= exception class IllegalParameterValueException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+ **/
+class IllegalParameterValueException extends IllegalRequestParameterException {
+
+
+    IllegalParameterValueException( String parameterName, String badValue ) {
+        _parameterName = parameterName;
+        _badValue      = badValue;
+    }
+
+    public String getMessage() {
+        return "May not set parameter '" + _parameterName + "' to '" + _badValue + "'";
+    }
+
+    private String _parameterName;
+    private String _badValue;
+}
+
+
+//============================= exception class SingleValuedParameterException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a single-valued parameter to multiple values.
+ **/
+class SingleValuedParameterException extends IllegalRequestParameterException {
+
+
+    SingleValuedParameterException( String parameterName ) {
+        _parameterName = parameterName;
+    }
+
+
+    public String getMessage() {
+        return "Parameter '" + _parameterName + "' may only have one value.";
+    }
+
+
+    private String _parameterName;
+
+}
+

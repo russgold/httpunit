@@ -19,53 +19,13 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Properties;
+import java.io.*;
+
 
 /**
- * An HTTP request using the GET method.
+ * This exception is thrown on an attempt to set a form parameter in a way not possible from a browser.
+ * @author Russell Gold
  **/
-public class GetMethodWebRequest extends WebRequest {
-
-    
-    /**
-     * Constructs a web request using a specific absolute url string.
-     **/
-    public GetMethodWebRequest( String urlString ) {
-        super( urlString );
-    }
-
-
-    /**
-     * Constructs a web request using a base URL and a relative url string.
-     **/
-    public GetMethodWebRequest( URL urlBase, String urlString ) {
-        super( urlBase, urlString );
-    }
-
-
-    public URL getURL() throws MalformedURLException {
-        if (hasNoParameters()) {
-            return new URL( getURLBase(), getURLString() );
-        } else {
-            return new URL( getURLBase(), getURLString() + "?" + getParameterString() );
-        }
-    }
-
-
-//--------------------------------------- package members ---------------------------------------------
-
-
-    /**
-     * Constructs a web request for a form.
-     **/
-    GetMethodWebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
-        super( urlBase, urlString, sourceForm );
-    }
-
-
-}
-
-
-
-
+abstract
+public class IllegalRequestParameterException extends RuntimeException {}

@@ -3,21 +3,31 @@ HttpUnit release notes
 Known issues: none
 
 Acknowledgements:
+Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
 Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink
-Thanks to Jan Ohrstrom for his additions to Web Conversation
 
 Revision History:
 11-Sep-00
 
 General:
     1. Non-breaking spaces are converted to spaces on any conversion to text
+    2. WebConversation.getResponse() can now throw HttpInternalErrorException and HttpNotFoundException
+       in response to 501 and 404 codes, respectively
+    3. By default, parser warnings are no longer displayed. They may be enabled by a call to
+       HttpUnitOptions.setParserWarningsEnabled( true )
+    4. By default, WebRequest.setParameter will now throw IllegalRequestParameterException on any attempt
+       to set a form parameter to a value not normally available from the browser. This checking can be
+       disabled via a call to HttpUnitOptions.setParameterValuesValidated( false ) 
 Additions:
     1. WebResponse.getTitle() returns the HTML title of the page
-    2. WebLink.getURLString() return the URL string specified by the link in its href attribute
+    2. WebLink.getURLString() returns the URL string specified by the link in its href attribute
     3. The license agreement is now available from the home page and javadoc
+    4. WebResponse.getURL() return the URL used to retrieve the page
 
 1-Sep-00 1.0
 
+Acknowledgements:
+Thanks to Jan Ohrstrom for his additions to WebConversation
 
 Problems corrected:
     1. Parsing a response would crash if there were no nodes inside a form

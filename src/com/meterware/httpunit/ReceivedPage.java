@@ -58,6 +58,7 @@ class ReceivedPage extends ParsedHTML {
     private static Tidy getParser() {
         Tidy tidy = new Tidy();
         tidy.setQuiet( true );
+        tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
         return tidy;
     }
 
