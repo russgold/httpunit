@@ -213,7 +213,6 @@ public class WebTable {
     private URL     _url;
 
 
-    private int[] _columnsRequired;
     private TableCell[][] _cells;
 
 
@@ -226,28 +225,28 @@ public class WebTable {
 
     private void readTable() {
         TableRow[] rows = getRows();
-        _columnsRequired = new int[ rows.length ];
+        int[] columnsRequired = new int[ rows.length ];
 
         for (int i = 0; i < rows.length; i++) {
             TableCell[] cells = rows[i].getCells();
             for (int j = 0; j < cells.length; j++) {
-                int spannedRows = Math.min( _columnsRequired.length-i, cells[j].getRowSpan() );
+                int spannedRows = Math.min( columnsRequired.length-i, cells[j].getRowSpan() );
                 for (int k = 0; k < spannedRows; k++) {
-                    _columnsRequired[ i+k ]+= cells[j].getColSpan();
+                    columnsRequired[ i+k ]+= cells[j].getColSpan();
                 }
             }
         }
         int numColumns = 0;
-        for (int i = 0; i < _columnsRequired.length; i++) {
-            numColumns = Math.max( numColumns, _columnsRequired[i] );
+        for (int i = 0; i < columnsRequired.length; i++) {
+            numColumns = Math.max( numColumns, columnsRequired[i] );
         }
 
-        _cells = new TableCell[ _columnsRequired.length ][ numColumns ];
+        _cells = new TableCell[ columnsRequired.length ][ numColumns ];
 
         for (int i = 0; i < rows.length; i++) {
             TableCell[] cells = rows[i].getCells();
             for (int j = 0; j < cells.length; j++) {
-                int spannedRows = Math.min( _columnsRequired.length-i, cells[j].getRowSpan() );
+                int spannedRows = Math.min( columnsRequired.length-i, cells[j].getRowSpan() );
                 for (int k = 0; k < spannedRows; k++) {
                     for (int l = 0; l < cells[j].getColSpan(); l++) {
                        placeCell( i+k, j+l, cells[j] );

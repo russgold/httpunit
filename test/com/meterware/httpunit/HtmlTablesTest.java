@@ -176,7 +176,7 @@ public class HtmlTablesTest extends TestCase {
     public void testInnerTableSeek() throws Exception {
         ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
                                             "<table summary=\"outer one\">" +
-                                            "<tr><td>&nbsp;</td><td>" +
+                                            "<tr><td>Here we are</td><td>" +
                                             "Inner Table<br>" +
                                             "<table summary=\"inner one\">" +
                                             "        <tr><td colspan=2>&nbsp;</td></tr>" +
@@ -185,11 +185,16 @@ public class HtmlTablesTest extends TestCase {
                                             "</table></td></tr>" +
                                             "</table></body></html>" );
 
-        String[][] cells = rp.getTableStartingWith( "Red" ).asText();
+        WebTable wt = rp.getTableStartingWith( "Red" );
+        assertNotNull( "Did not find table starting with 'Red'", wt );
+        String[][] cells = wt.asText();
         assertEquals( "Non-blank rows",    2, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
-        cells = rp.getTableStartingWithPrefix( "Re" ).asText();
+
+        wt = rp.getTableStartingWithPrefix( "Re" );
+        assertNotNull( "Did not find table starting with prefix 'Re'", wt );
+        cells = wt.asText();
         assertEquals( "Non-blank rows",    2, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
