@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -36,7 +36,7 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class WebClientTest extends HttpUnitTest {
 
@@ -90,8 +90,8 @@ public class WebClientTest extends HttpUnitTest {
         defineResource( resourceName, resourceValue );
         addResourceHeader( resourceName, "Set-Cookie: age=12" );
 
-        HttpUnitOptions.setAcceptCookies( false );
         WebConversation wc   = new WebConversation();
+        wc.getClientProperties().setAcceptCookies( false );
         WebRequest request   = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
         WebResponse response = wc.getResponse( request );
         assertEquals( "requested resource", resourceValue, response.getText().trim() );
@@ -170,9 +170,9 @@ public class WebClientTest extends HttpUnitTest {
     public void testGZIPDisabled() throws Exception {
         String expectedResponse = "Here is my answer";
         defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
-        HttpUnitOptions.setAcceptGzip( false );
 
         WebConversation wc = new WebConversation();
+        wc.getClientProperties().setAcceptGzip( false );
         WebResponse wr = wc.getResponse( getHostPath() + "/Compressed.html" );
         assertNull( "Should not have received a Content-Encoding header", wr.getHeaderField( "Content-encoding" ) );
         assertEquals( "Content-Type", "text/plain", wr.getContentType() );
@@ -248,7 +248,7 @@ public class WebClientTest extends HttpUnitTest {
         ArrayList messageLog = new ArrayList();
         wc.addClientListener( new ListenerExample( messageLog ) );
 
-        WebResponse response = wc.getResponse( getHostPath() + "/Frames.html" );
+        wc.getResponse( getHostPath() + "/Frames.html" );
         assertEquals( "Num logged items", 6, messageLog.size() );
         for (int i = 0; i < 3; i++) {
             verifyRequestResponsePair( messageLog, 2 * i );
@@ -333,8 +333,8 @@ public class WebClientTest extends HttpUnitTest {
         defineResource( redirectName, redirectValue, HttpURLConnection.HTTP_MOVED_PERM );
         addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
 
-        HttpUnitOptions.setAutoRedirect( false );
         WebConversation wc = new WebConversation();
+        wc.getClientProperties().setAutoRedirect( false );
         WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
         assertEquals( "requested resource", redirectValue, response.getText().trim() );
         assertEquals( "content type", "text/html", response.getContentType() );

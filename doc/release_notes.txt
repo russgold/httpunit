@@ -20,6 +20,12 @@ Acknowledgements:
 Additions:
     1. You can now get at the stored session IDs in ServletUnitContext.
 
+Notes:
+    1. The acceptCookies, acceptGzip, autoRefresh and autoForward properties have been moved from HttpUnitOptions to ClientProperties,
+       permitting them to be set per WebClient rather than just globally. The old properties have been deprecated,
+       and now access the defaults for ClientProperties. Tests which set the HttpUnitOptions properties before creating
+       their WebClients will be unaffected.
+
  14-Mar-2003
 Problems fixed:
     1. When loading a page triggered a script function which redirected to a new page in the same frame,

@@ -126,7 +126,7 @@ public class WebWindow {
      **/
     WebResponse updateWindow( String requestTarget, WebResponse response, RequestContext requestContext ) throws MalformedURLException, IOException, SAXException {
         _client.updateClient( response );
-        if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
+        if (getClient().getClientProperties().isAutoRefresh() && response.getRefreshRequest() != null) {
             return getResponse( response.getRefreshRequest() );
         } else if (shouldFollowRedirect( response )) {
             delay( HttpUnitOptions.getRedirectDelay() );
@@ -234,7 +234,7 @@ public class WebWindow {
 
 
     private boolean shouldFollowRedirect( WebResponse response ) {
-        return HttpUnitOptions.getAutoRedirect()
+        return getClient().getClientProperties().isAutoRedirect()
             && response.getResponseCode() >= HttpURLConnection.HTTP_MOVED_PERM
             && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
             && response.getHeaderField( "Location" ) != null;

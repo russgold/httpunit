@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -40,7 +40,7 @@ import junit.framework.TestSuite;
  **/
 public class WebPageTest extends HttpUnitTest {
 
-    public static void main(String args[]) {
+    public static void main( String args[] ) {
         junit.textui.TestRunner.run( suite() );
     }
 
@@ -58,7 +58,6 @@ public class WebPageTest extends HttpUnitTest {
     public void tearDown() throws Exception {
         super.tearDown();
         HttpUnitOptions.resetDefaultCharacterSet();
-        HttpUnitOptions.setAutoRefresh( false );
     }
 
 
@@ -335,8 +334,8 @@ public class WebPageTest extends HttpUnitTest {
         defineResource( "SimplePage.html", page );
         defineWebPage( "NextPage", "Not much here" );
 
-        HttpUnitOptions.setAutoRefresh( true );
         WebConversation wc = new WebConversation();
+        wc.getClientProperties().setAutoRefresh( true );
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
         WebResponse simplePage = wc.getResponse( request );
 

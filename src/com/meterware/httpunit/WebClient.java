@@ -345,9 +345,6 @@ public class WebClient {
 
 
     protected WebClient() {
-        if (HttpUnitOptions.isAcceptGzip()) {
-            setHeaderField( "Accept-Encoding", "gzip" );
-        }
         _openWindows.add( _mainWindow );
     }
 
@@ -373,6 +370,7 @@ public class WebClient {
     protected Dictionary getHeaderFields( URL targetURL ) {
         Hashtable result = (Hashtable) _headers.clone();
         result.put( "User-Agent", getClientProperties().getUserAgent() );
+        if (getClientProperties().isAcceptGzip()) result.put( "Accept-Encoding", "gzip" );
         AddHeaderIfNotNull( result, "Cookie", _cookieJar.getCookieHeaderField( targetURL ) );
         AddHeaderIfNotNull( result, getAuthorizationHeaderName(), _authorizationString );
         return result;
@@ -435,7 +433,7 @@ public class WebClient {
 
 
     void updateClient( WebResponse response ) throws IOException {
-        if (HttpUnitOptions.isAcceptCookies()) _cookieJar.updateCookies( response.getCookieJar() );
+        if (getClientProperties().isAcceptCookies()) _cookieJar.updateCookies( response.getCookieJar() );
         validateHeaders( response );
     }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -47,15 +47,11 @@ public abstract class HttpUnitOptions {
         _imagesTreatedAsAltText = false;
         _loggingHttpHeaders = false;
         _matchesIgnoreCase = true;
-        _autoRefresh = false;
-        _autoRedirect = true;
         _checkContentLength = false;
         _redirectDelay = 0;
         _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
-        _acceptGzip = true;
-        _acceptCookies = true;
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
         setExceptionsThrownOnScriptError( true );
@@ -64,33 +60,37 @@ public abstract class HttpUnitOptions {
 
     /**
      * Returns true if HttpUnit is accepting and saving cookies. The default is to accept them.
+     * @deprecated as of 1.5.3, use ClientProperties#isAcceptCookies();
      */
     public static boolean isAcceptCookies() {
-        return _acceptCookies;
+        return ClientProperties.getDefaultProperties().isAcceptCookies();
     }
 
 
     /**
      * Specifies whether HttpUnit should accept and send cookies.
+     * @deprecated as of 1.5.3, use ClientProperties#setAcceptCookies();
      */
     public static void setAcceptCookies( boolean acceptCookies ) {
-        _acceptCookies = acceptCookies;
+        ClientProperties.getDefaultProperties().setAcceptCookies( acceptCookies );
     }
 
 
     /**
      * Returns true if any WebClient created will accept GZIP encoding of responses. The default is to accept GZIP encoding.
+     * @deprecated as of 1.5.3, use ClientProperties#isAcceptGzip();
      **/
     public static boolean isAcceptGzip() {
-        return _acceptGzip;
+        return ClientProperties.getDefaultProperties().isAcceptGzip();
     }
 
 
     /**
      * Specifies whether a WebClient will be initialized to accept GZIP encoded responses. The default is true.
+     * @deprecated as of 1.5.3, use ClientProperties#setAcceptGzip();
      */
     public static void setAcceptGzip( boolean acceptGzip ) {
-        _acceptGzip = acceptGzip;
+        ClientProperties.getDefaultProperties().setAcceptGzip( acceptGzip );
     }
 
 
@@ -290,18 +290,20 @@ public abstract class HttpUnitOptions {
     /**
      * Returns true if HttpUnit should automatically follow page redirect requests (status 3xx).
      * By default, this is true.
+     * @deprecated as of 1.5.3, use ClientProperties#isAutoRedirect();
      **/
     public static boolean getAutoRedirect() {
-        return _autoRedirect;
+        return ClientProperties.getDefaultProperties().isAutoRedirect();
     }
 
 
     /**
      * Determines whether HttpUnit should automatically follow page redirect requests (status 3xx).
      * By default, this is true in order to simulate normal browser operation.
+     * @deprecated as of 1.5.3, use ClientProperties#setAutoRedirect();
      **/
     public static void setAutoRedirect( boolean autoRedirect ) {
-        _autoRedirect = autoRedirect;
+        ClientProperties.getDefaultProperties().setAutoRedirect( autoRedirect );
     }
 
 
@@ -328,9 +330,10 @@ public abstract class HttpUnitOptions {
      * Returns true if HttpUnit should automatically follow page refresh requests.
      * By default, this is false, so that programs can verify the redirect page presented
      * to users before the browser switches to the new page.
+     * @deprecated as of 1.5.3, use ClientProperties#isAutoRefresh();
      **/
     public static boolean getAutoRefresh() {
-        return _autoRefresh;
+        return ClientProperties.getDefaultProperties().isAutoRefresh();
     }
 
 
@@ -339,9 +342,10 @@ public abstract class HttpUnitOptions {
      * By default, this is false, so that programs can verify the redirect page presented
      * to users before the browser switches to the new page. Setting this to true can
      * cause an infinite loop on pages that refresh themselves.
+     * @deprecated as of 1.5.3, use ClientProperties#setAutoRefresh();
      **/
     public static void setAutoRefresh( boolean autoRefresh ) {
-        _autoRefresh = autoRefresh;
+        ClientProperties.getDefaultProperties().setAutoRefresh( autoRefresh );
     }
 
 
@@ -473,10 +477,6 @@ public abstract class HttpUnitOptions {
     };
 
 
-    private static boolean _acceptGzip = true;
-
-    private static boolean _acceptCookies = true;
-
     private static boolean _exceptionsOnErrorStatus = true;
 
     private static boolean _parameterValuesValidated = true;
@@ -486,10 +486,6 @@ public abstract class HttpUnitOptions {
     private static boolean _loggingHttpHeaders;
 
     private static boolean _matchesIgnoreCase = true;
-
-    private static boolean _autoRefresh;
-
-    private static boolean _autoRedirect = true;
 
     private static boolean _postIncludesCharset = false;
 

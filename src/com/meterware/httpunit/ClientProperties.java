@@ -129,6 +129,77 @@ public class ClientProperties {
     }
 
 
+    /**
+     * Returns true if the client should accept and transmit cookies. The default is to accept them.
+     */
+    public boolean isAcceptCookies() {
+        return _acceptCookies;
+    }
+
+
+    /**
+     * Specifies whether the client should accept and send cookies.
+     */
+    public void setAcceptCookies( boolean acceptCookies ) {
+        _acceptCookies = acceptCookies;
+    }
+
+
+    /**
+     * Returns true if the client will accept GZIP encoding of responses. The default is to accept GZIP encoding.
+     **/
+    public boolean isAcceptGzip() {
+        return _acceptGzip;
+    }
+
+
+    /**
+     * Specifies whether the client will accept GZIP encoded responses. The default is true.
+     */
+    public void setAcceptGzip( boolean acceptGzip ) {
+        _acceptGzip = acceptGzip;
+    }
+
+
+    /**
+     * Returns true if the client should automatically follow page redirect requests (status 3xx).
+     * By default, this is true.
+     **/
+    public boolean isAutoRedirect() {
+        return _autoRedirect;
+    }
+
+
+    /**
+     * Determines whether the client should automatically follow page redirect requests (status 3xx).
+     * By default, this is true in order to simulate normal browser operation.
+     **/
+    public void setAutoRedirect( boolean autoRedirect ) {
+        _autoRedirect = autoRedirect;
+    }
+
+
+    /**
+     * Returns true if the client should automatically follow page refresh requests.
+     * By default, this is false, so that programs can verify the redirect page presented
+     * to users before the browser switches to the new page.
+     **/
+    public boolean isAutoRefresh() {
+        return _autoRefresh;
+    }
+
+
+    /**
+     * Specifies whether the client should automatically follow page refresh requests.
+     * By default, this is false, so that programs can verify the redirect page presented
+     * to users before the browser switches to the new page. Setting this to true can
+     * cause an infinite loop on pages that refresh themselves.
+     **/
+    public void setAutoRefresh( boolean autoRefresh ) {
+        _autoRefresh = autoRefresh;
+    }
+
+
     public boolean isIframeSupported() {
         return _iframeSupported;
     }
@@ -146,13 +217,17 @@ public class ClientProperties {
 
     private String _applicationCodeName = "httpunit";
     private String _applicationName     = "HttpUnit";
-    private String _applicationVersion  = "1.4";
+    private String _applicationVersion  = "1.5";
     private String _userAgent;
     private String _platform            = "Java";
     private int    _availWidth          = 800;
     private int    _availHeight         = 600;
 
     private boolean _iframeSupported = true;
+    private boolean _acceptCookies = true;
+    private boolean _acceptGzip    = true;
+    private boolean _autoRedirect  = true;
+    private boolean _autoRefresh   = false;
 
     private static ClientProperties _defaultProperties = new ClientProperties();
 
@@ -168,5 +243,9 @@ public class ClientProperties {
         _userAgent           = source._userAgent;
         _platform            = source._platform;
         _iframeSupported     = source._iframeSupported;
+        _acceptCookies       = source._acceptCookies;
+        _acceptGzip          = source._acceptGzip;
+        _autoRedirect        = source._autoRedirect;
+        _autoRefresh         = source._autoRefresh;
     }
 }
