@@ -22,6 +22,7 @@ package com.meterware.httpunit;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -53,7 +54,9 @@ class HttpWebResponse extends WebResponse {
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/
         if (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST || !throwExceptionOnError) {
-            defineRawInputStream( new BufferedInputStream( connection.getInputStream() ) );
+            InputStream stream = (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST) ? connection.getInputStream()
+                                                                                      : ((HttpURLConnection) connection).getErrorStream();
+            defineRawInputStream( new BufferedInputStream( stream ) );
             if (getContentType().startsWith( "text" )) loadResponseText();
         }
     }
