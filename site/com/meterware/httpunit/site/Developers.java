@@ -158,7 +158,7 @@ public class Developers extends FragmentTemplate {
 
 
         void appendNameTo( StringBuffer sb ) {
-            if (_username == null && _email == null) {
+            if (_username == null /* && _email == null */) {
                 sb.append( _name );
             } else {
                 sb.append( "<a" );

@@ -82,7 +82,7 @@ String japaneseName = <b>new</b> String( name.getBytes("8859_1"), "EUC_JP" );</c
         <faq id="javascript">
             <question>How do I use HttpUnit to test my pages that use JavaScript?</question>
             <answer><![CDATA[For most purposes, You should not have to do anything special; however, not all JavaScript constructs are supported as yet.
-                    See <a href="Javascript-support.html">the list of supported JavaScript features</a> for more information.]]></answer>
+                    See <a href="javascript-support.html">the list of supported JavaScript features</a> for more information.]]></answer>
         </faq>
         <faq id="norhino">
             <question>JavaScript is not being executed at all. Why not?</question>
