@@ -266,33 +266,59 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
+    public void testAccessForbiddenToInvalidSession() throws Exception {
+        ServletUnitContext context = new ServletUnitContext();
+
+        HttpSession session = context.newSession();
+        session.setAttribute( "Initial", new Integer( 1 ) );
+        Enumeration attributeNames = session.getAttributeNames();
+        assertTrue( attributeNames.hasMoreElements() );
+        assertEquals( "Initial", attributeNames.nextElement() );
+
+        session.invalidate();
+
+        try {
+            session.getAttributeNames().hasMoreElements();
+            fail( "Should not be able to access an invalid session's attributes" );
+        } catch (IllegalStateException ex) {
+        }
+
+        try {
+            session.getAttribute( "Initial" );
+            fail( "Should not be able to access an invalid session's attributes" );
+        } catch (IllegalStateException ex) {
+        }
+    }
+
+
     /**
      * Verifies that a request for a session when the current one is invalid will result in a new session.
-     * @throws Exception
+     *
+     * Obtains a new session, invalidates it, and verifies that
      */
     public void testSessionInvalidation() throws Exception {
         WebRequest wr  = new GetMethodWebRequest( "http://localhost/simple" );
         ServletUnitContext context = new ServletUnitContext();
 
+        HttpSession originalSession = context.newSession();
+        String originalID = originalSession.getId();
+
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, context.newSession().getId() ) );
-
-        HttpSession session = request.getSession( /* create */ false );
-        String originalID = session.getId();
-        session.setAttribute( "Initial", new Integer(1) );
-
-        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
-        session = request.getSession();
-        assertEquals( "Retrieved session ID", originalID, session.getId() );
-        assertEquals( "Attribute", new Integer(1), session.getAttribute( "Initial" ) );
+        originalSession.setAttribute( "Initial", new Integer( 1 ) );
+        Enumeration attributeNames = originalSession.getAttributeNames();
+        assertTrue( attributeNames.hasMoreElements() );
+        assertEquals( "Initial", attributeNames.nextElement() );
 
-        session.invalidate();
-        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
-        request.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, originalID ) );
-        session = request.getSession();
-        assertNull( "Attribute should not exist", session.getAttribute( "Initial" ) );
-        assertFalse( "New session not created", originalID.equals( session.getId() ) );
+        originalSession.invalidate();
+
+        assertNull( "Invalidated session returned", request.getSession( false ) );
+
+        HttpSession newSession = request.getSession( true );
+        assertNotNull( "getSession(true) did not return a session", newSession );
+        assertNotSame( "getSession(true) returned the original invalidated session", originalSession, newSession );
+        assertSame( "session returned by getSession(false)", newSession, request.getSession( false ) );
+        assertSame( "Session in context with new ID", newSession, context.getSession( newSession.getId() ) );
     }
 
 

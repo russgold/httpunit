@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+ 19-Mar-2003
+Acknowledgements:
+    Thanks to Brendan Boesen for correcting the session invalidation problem.
+Problems fixed:
+    1. ServletUnit was creating a new session if the current one was not valid, even if "create" was not specified.
+
  17-Mar-2003
 Problems fixed:
     1. The Content-Length header was not being sent with requests in ServletUnit.
