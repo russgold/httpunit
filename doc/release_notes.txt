@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+20-Jul-2004
+   Problems fixed:
+       1. bug #990914: WebFrame scriptables are now accessible by getElementById
+
  9-Jul-2004
    Additions:
        1. rfe #974791: WebForm now supports submitNoButton to submit a form without any of its buttons. This permits

@@ -29,8 +29,13 @@ import junit.framework.TestSuite;
  * More complex tests of frame functionality.
  *
  * @author <a href="andrew.bickerton@hp.com">Andrew Bickerton</a>
+ * @author <a href="russgold@httpunit.org">Russell Gold</a>
  **/
 public class FrameScriptingTest extends HttpUnitTest {
+
+
+    private WebConversation _wc;
+
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -193,6 +198,7 @@ public class FrameScriptingTest extends HttpUnitTest {
         assertEquals( "Result of click", "You made it!", result.getText() );
     }
 
+
     /**
      * Verifies that when JavaScript overwrites an empty frame, other empty frames stay empty.
      */
@@ -214,5 +220,18 @@ public class FrameScriptingTest extends HttpUnitTest {
         assertEquals("Links in green frame", 1, _wc.getFrameContents("green").getLinks().length);
         assertEquals("Links in blue frame", 0, _wc.getFrameContents("blue").getLinks().length);
     }
-    private WebConversation _wc;
+
+
+    /**
+     * Verifies that when JavaScript overwrites an empty frame, other empty frames stay empty.
+     */
+    public void testIFrameAccessById() throws Exception {
+        defineWebPage( "Frames",
+                       "<iframe id='frame1'></iframe>" +
+                       "<script>" +
+                       "var frame = document.getElementById('frame1');" +
+                       "</script>" );
+
+        _wc.getResponse(getHostPath() + "/Frames.html");
+    }
 }

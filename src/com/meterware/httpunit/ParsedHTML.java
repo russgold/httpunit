@@ -665,7 +665,7 @@ class ParsedHTML {
 
 
     private WebFrame toWebFrame( Element element ) {
-        return new WebFrame( _baseURL, element, _frame );
+        return new WebFrame( _response, _baseURL, element, _frame );
     }
 
 
@@ -1040,7 +1040,7 @@ class ParsedHTML {
     class WebIFrame extends WebFrame implements ContentConcealer {
 
         public WebIFrame( URL baseURL, Node frameNode, FrameSelector parentFrame ) {
-            super( baseURL, frameNode, parentFrame );
+            super( _response, baseURL, frameNode, parentFrame );
         }
     }
 

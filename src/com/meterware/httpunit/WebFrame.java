@@ -32,26 +32,23 @@ class WebFrame extends HTMLElementBase {
 
     private FrameSelector _selector;
 
+    private WebResponse _response;
     private Node        _element;
 
     private URL         _baseURL;
 
 
-    protected ScriptableDelegate newScriptable() {
-        return null;
-    }
-
-
     protected ScriptableDelegate getParentDelegate() {
-        return null;
+        return _response.getScriptableObject().getDocument();
     }
 
 
 //---------------------------------------- package methods -----------------------------------------
 
 
-    WebFrame( URL baseURL, Node frameNode, FrameSelector parentFrame ) {
+    WebFrame( WebResponse response, URL baseURL, Node frameNode, FrameSelector parentFrame ) {
         super( frameNode );
+        _response = response;
         _element = frameNode;
         _baseURL = baseURL;
         _selector = getFrameSelector( parentFrame );

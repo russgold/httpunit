@@ -123,7 +123,9 @@ class HTMLElementBase implements HTMLElement {
      * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different
      * implementation of Scriptable.
      */
-    abstract protected ScriptableDelegate newScriptable();
+    protected ScriptableDelegate newScriptable() {
+        return new HTMLElementScriptable( this );
+    }
 
 
     /**
