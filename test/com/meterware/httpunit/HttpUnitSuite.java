@@ -40,6 +40,8 @@ public class HttpUnitSuite {
         suite.addTest( WebLinkTest.suite() );
         suite.addTest( HtmlTablesTest.suite() );
         suite.addTest( WebFormTest.suite() );
+        suite.addTest( WebFrameTest.suite() );
+        suite.addTest( RequestTargetTest.suite() );
         suite.addTest( FormParametersTest.suite() );
         suite.addTest( Base64Test.suite() );
         return suite;

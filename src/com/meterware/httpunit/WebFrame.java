@@ -19,50 +19,31 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+
+import java.util.Stack;
+import java.util.Vector;
+
+import org.w3c.dom.*;
+
 
 /**
- * An HTTP request using the POST method.
+ * A frame in a web page.
  **/
-public class PostMethodWebRequest extends WebRequest {
+public class WebFrame {
+
+    
+//---------------------------------------- package methods -----------------------------------------
 
 
-    /**
-     * Constructs a web request using a specific absolute url string.
-     **/
-    public PostMethodWebRequest( String urlString ) {
-        super( urlString );
+    WebFrame( Node frameNode ) {
+        _element = frameNode;
     }
 
 
-//---------------------------------- WebRequest methods --------------------------------
+//----------------------------------- private fields and methods -----------------------------------
 
 
-    protected void completeRequest( URLConnection connection ) throws IOException {
-        connection.setDoInput( true );
-        connection.setDoOutput( true );
-        DataOutputStream printout = new DataOutputStream( connection.getOutputStream() );
-        printout.writeBytes( getParameterString() );
-        printout.flush();
-        printout.close();
-    }
-
-//----------------------------------- package members -----------------------------------
-
-
-    /**
-     * Constructs a web request for a form.
-     **/
-    PostMethodWebRequest( URL urlBase, String urlString, String target, WebForm sourceForm ) {
-        super( urlBase, urlString, target, sourceForm );
-    }
-
-
-
-
+    private Node _element;
 }
+

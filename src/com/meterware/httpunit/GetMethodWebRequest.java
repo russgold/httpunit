@@ -48,10 +48,18 @@ public class GetMethodWebRequest extends WebRequest {
 
 
     /**
+     * Constructs a web request with a specific target.
+     **/
+    GetMethodWebRequest( URL urlBase, String urlString, String target ) {
+        super( urlBase, urlString, target );
+    }
+
+
+    /**
      * Constructs a web request for a form.
      **/
-    GetMethodWebRequest( URL urlBase, String urlString, WebForm sourceForm ) {
-        super( urlBase, urlString, sourceForm );
+    GetMethodWebRequest( URL urlBase, String urlString, String target, WebForm sourceForm ) {
+        super( urlBase, urlString, target, sourceForm );
     }
 
 

@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
 class ReceivedPage extends ParsedHTML {
 
 
-    public ReceivedPage( URL url, String pageText ) throws SAXException {
-        super( url, getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes() ), null ) ); 
+    public ReceivedPage( URL url, String parentTarget, String pageText ) throws SAXException {
+        super( url, parentTarget, getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes() ), null ) ); 
     }
 
 

@@ -105,12 +105,40 @@ public class WebLinkTest extends HttpUnitTest {
         link = _simplePage.getLinkWithImageText( "Next -->" );
         assertNotNull( "the image link was not found", link );
         assertEquals( "image link URL", getHostPath() + "/basic.html", link.getRequest().getURL().toExternalForm() );
+
+        HttpUnitOptions.setImagesTreatedAsAltText( true );
+        link = _simplePage.getLinkWith( "Next -->" );
+        assertNotNull( "the image link was not found", link );
+        assertEquals( "image link URL", getHostPath() + "/basic.html", link.getRequest().getURL().toExternalForm() );
+
+        HttpUnitOptions.setImagesTreatedAsAltText( false );
+        link = _simplePage.getLinkWith( "Next -->" );
+        assertNull( "the image link was found based on its hidden alt attribute", link );
     }
 
 
     public void testLinkText() throws Exception {
         WebLink link = _simplePage.getLinks()[0];
         assertEquals( "Link text", "an active link", link.asText() );
+    }
+
+
+    public void testLinkFollowing() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "Initial", "Go to <a href=\"Next.html\">the next page.</a> <a name=\"bottom\">Bottom</a>" );
+        defineWebPage( "Next", "And go back to <a href=\"Initial.html#Bottom\">the first page.</a>" );
+        
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/Initial.html" );
+        assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
+        WebLink link = initialPage.getLinks()[0];
+
+        WebResponse nextPage = wc.getResponse( link.getRequest() );
+        assertEquals( "Title of next page", "Next", nextPage.getTitle() );
+        assertEquals( "Num links in next page", 1, nextPage.getLinks().length );
+        link = nextPage.getLinks()[0];
+
+        WebResponse thirdPage = wc.getResponse( link.getRequest() );
+        assertEquals( "Title of next page", "Initial", thirdPage.getTitle() );
     }
 
                               

@@ -69,7 +69,7 @@ public class WebConversation {
         } else if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new HttpNotFoundException( request.getURLString() );        
         } else {
-            WebResponse result = new WebResponse( this, request.getURL(), connection );
+            WebResponse result = new WebResponse( this, request.getTarget(), request.getURL(), connection );
             return result;
         }
     }

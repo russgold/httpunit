@@ -63,12 +63,31 @@ public class HttpUnitOptions {
     }
 
 
+    /**
+     * Returns true if images are treated as text, using their alt attributes.
+     **/
+    public static boolean getImagesTreatedAsAltText() {
+        return _imagesTreatedAsAltText;
+    }
+
+
+    /**
+     * If true, tells HttpUnit to treat images with alt attributes as though they were the text
+     * value of that attribute in all searches and displays. The default is false (image text is generally ignored).
+     **/
+    public static void setImagesTreatedAsAltText( boolean asText ) {
+        _imagesTreatedAsAltText = asText;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
     private static boolean _parserWarningsEnabled;
 
     private static boolean _parameterValuesValidated = true;
+
+    private static boolean _imagesTreatedAsAltText;
 
 }
 

@@ -30,9 +30,10 @@ import org.w3c.dom.*;
 class ParsedHTML {
 
 
-    ParsedHTML( URL pageURL, Node rootNode ) {
+    ParsedHTML( URL pageURL, String parentTarget, Node rootNode ) {
         _url = pageURL;
         _rootNode = rootNode;
+        _parentTarget = parentTarget;
     }
 
 
@@ -43,7 +44,7 @@ class ParsedHTML {
         NodeList forms = NodeUtils.getElementsByTagName( _rootNode, "form" );
         WebForm[] result = new WebForm[ forms.getLength() ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = new WebForm( getURL(), forms.item( i ) );
+            result[i] = new WebForm( getURL(), _parentTarget, forms.item( i ) );
         }
 
         return result;
@@ -60,7 +61,7 @@ class ParsedHTML {
             for (int i = 0; i < nl.getLength(); i++) {
                 Node child = nl.item(i);
                 if (isLinkAnchor( child )) {
-                    list.addElement( new WebLink( _url, child ) );
+                    list.addElement( new WebLink( getURL(), _parentTarget, child ) );
                 }
             }
             _links = new WebLink[ list.size() ];
@@ -109,7 +110,7 @@ class ParsedHTML {
      * they appear.
      **/
     public WebTable[] getTables() {
-        return WebTable.getTables( getDOM(), _url );
+        return WebTable.getTables( getDOM(), _url, _parentTarget );
     }
 
 
@@ -166,6 +167,8 @@ class ParsedHTML {
     WebLink[] _links;
 
     URL _url;
+
+    private String _parentTarget;    
 
 
     private String getValue( Node node ) {

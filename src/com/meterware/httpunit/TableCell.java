@@ -60,8 +60,8 @@ public class TableCell extends ParsedHTML {
 //---------------------------------------- package methods -----------------------------------------
 
 
-    TableCell( Element cellNode, URL url ) {
-        super( url, cellNode );
+    TableCell( Element cellNode, URL url, String parentTarget ) {
+        super( url, parentTarget, cellNode );
         _element = cellNode;
         _colSpan = getAttributeValue( cellNode, "colspan", 1 );
         _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );

@@ -34,6 +34,18 @@ public class WebForm {
 
 
     /**
+     * Returns the target for this link.
+     **/
+    public String getTarget() {
+        if (_node.getAttributes().getNamedItem( "target" ) == null) {
+            return _parentTarget;
+        } else {
+            return getValue( _node.getAttributes().getNamedItem( "target" ) );
+        }
+    }
+
+
+    /**
      * Returns an array containing the names of the parameters defined for this form,
      * in the order in which they appear.
      **/
@@ -71,9 +83,9 @@ public class WebForm {
         WebRequest result;
 
         if (getValue( nnm.getNamedItem( "method" ) ).equalsIgnoreCase( "post" )) {
-            result = new PostMethodWebRequest( _baseURL, action, this );
+            result = new PostMethodWebRequest( _baseURL, action, getTarget(), this );
         } else {
-            result = new GetMethodWebRequest( _baseURL, action, this );
+            result = new GetMethodWebRequest( _baseURL, action, getTarget(), this );
         }
 
         String[] parameterNames = getParameterNames();
@@ -164,9 +176,10 @@ public class WebForm {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebForm( URL baseURL, Node node ) {
-        _node    = node;
-        _baseURL = baseURL;
+    WebForm( URL baseURL, String parentTarget, Node node ) {
+        _node         = node;
+        _baseURL      = baseURL;
+        _parentTarget = parentTarget;
     }
 
 
@@ -202,6 +215,9 @@ public class WebForm {
 
     /** The parameters mapped to the type of data which they accept. **/
     private Hashtable      _dataTypes;
+
+    /** The target in which the parent response is to be rendered. **/
+    private String         _parentTarget;
 
     /** The selections in this form. **/
     private HTMLSelectElement[] _selections;

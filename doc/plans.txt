@@ -1,0 +1,54 @@
+Implementing frames
+-------------------
+
+Without frames, browser behavior is simply in at least one aspect: each response replaces the previous one. As a result,
+it makes sense to test web site behavior by simply retrieving one response after another, and (usually) ignoring any previous 
+ones.  Frames change that rather drastically, requiring a concept to correspond to the browser window contents, only part of
+which may be updated by any particular server request.  The most obvious object to hold this information is the WebConversation,
+which will need to have added to it a 'current window' property. In addition, every request will need to have encoded in it
+somewhere the target information, so that the appropriate section of the window will receive the update.
+
+This could be done either by:
+1. making the target an attribute of the WebRequest, or
+2. specifying the target in the getResponse call.
+
+The question is, how would we use such features?
+
+
+Imagine:   (assuming option 1)
+
+    response1 = conversation.getResponse( initial frame request );
+    request1  = response1.getLink( within a frame )     // the link is found in frame "details" and has no target attribute
+    response2 = conversation.getResponse( request1 );   // this updates the nested frame only
+    frame = conversation.getFrame( "details" );
+    
+frame and response2 should be the same object
+
+To do this, each response must have encoded its current frame (default is "_top")
+and each request must as well. "target" is an attribute of both <A> and <FORM> tags.
+
+
+Additional properties:
+
+WebRequest.target  -- the target for the request
+WebResponse.target -- the name of the window in which the response is displayed
+WebConversation.frameNames[]  -- the names of the current active frames
+WebResponse.allFrameNames[] -- the names of the frames in or below this response
+WebResponse.frameNames[] -- the names of the frames in this response
+WebResponse.frames[]  -- all of the frames defined in this response
+
+WebFrame.name
+WebFrame.response
+
+Potential validations:
+
+validate whether a response is currently displayed?  Not sure why...   
+
+
+Other Consequences:
+
+will probably want to support history on the web conversation object.  Support "back, forward, mayGoBack, mayGoForward" 
+    
+    
+
+

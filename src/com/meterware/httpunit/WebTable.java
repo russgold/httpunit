@@ -190,13 +190,13 @@ public class WebTable {
     /**
      * Returns the top-level tables found in the specified DOM.
      **/
-    static WebTable[] getTables( Node domRoot, URL baseURL ) {
+    static WebTable[] getTables( Node domRoot, URL baseURL, String parentTarget ) {
         NodeList nl = NodeUtils.getElementsByTagName( domRoot, "table" );
         Vector topLevelTables = new Vector();
 
         for (int i = 0; i < nl.getLength(); i++) {
             if (isTopLevelTable( nl.item(i), domRoot )) {
-                topLevelTables.addElement( new WebTable( nl.item(i), baseURL ) );
+                topLevelTables.addElement( new WebTable( nl.item(i), baseURL, parentTarget ) );
             }
         }
 
@@ -211,14 +211,16 @@ public class WebTable {
 
     private Element _dom;
     private URL     _url;
+    private String  _parentTarget;
 
 
     private TableCell[][] _cells;
 
 
-    private WebTable( Node domTreeRoot, URL sourceURL ) {
-        _dom = (Element) domTreeRoot;
-        _url = sourceURL;
+    private WebTable( Node domTreeRoot, URL sourceURL, String parentTarget ) {
+        _dom          = (Element) domTreeRoot;
+        _url          = sourceURL;
+        _parentTarget = parentTarget;
     }
 
 
@@ -326,7 +328,7 @@ public class WebTable {
         private void collectChildren( String childTag, final Vector children ) {
             processChildren( _element, childTag, "table", new ElementHandler() {
                 public void handleElement( Element element ) {
-                    children.addElement( new TableCell( element, _url ) );
+                    children.addElement( new TableCell( element, _url, _parentTarget ) );
                 }
             } );
         }

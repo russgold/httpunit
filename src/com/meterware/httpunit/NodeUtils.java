@@ -76,19 +76,28 @@ class NodeUtils {
                     continue;
                 } else if (node.getNodeName().equalsIgnoreCase( "p" )) {
                     sb.append( "\n" );
-                } else if (node.getNodeName().equalsIgnoreCase( "tr")) {
+                } else if (node.getNodeName().equalsIgnoreCase( "tr" )) {
                     sb.append( "\n" );
                     pendingNodes.push( " |" );
-                } else if (node.getNodeName().equalsIgnoreCase( "td")) {
+                } else if (node.getNodeName().equalsIgnoreCase( "td" )) {
                     sb.append( " | " );
-                } else if (node.getNodeName().equalsIgnoreCase( "th")) {
+                } else if (node.getNodeName().equalsIgnoreCase( "th" )) {
                     sb.append( " | " );  
+                } else if (node.getNodeName().equalsIgnoreCase( "img" ) && HttpUnitOptions.getImagesTreatedAsAltText()) {
+                    sb.append( getNodeAttribute( node, "alt" ) );  
                 }
 
                 pushNodeList( node.getChildNodes(), pendingNodes );
             }
         }
         return sb.toString();
+    }
+
+
+    private static String getNodeAttribute( Node node, String attributeName ) {
+        NamedNodeMap nnm = node.getAttributes();
+        Node attribute = nnm.getNamedItem( attributeName );
+        return (attribute == null) ? "" : attribute.getNodeValue();
     }
 
 

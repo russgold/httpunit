@@ -20,7 +20,7 @@ public class WebLink {
      * Creates and returns a web request which will simulate clicking on this link.
      **/
     public WebRequest getRequest() {
-        return new GetMethodWebRequest( _baseURL, getURLString() );
+        return new GetMethodWebRequest( _baseURL, getURLString(), getTarget() );
     }
 
 
@@ -29,6 +29,18 @@ public class WebLink {
      **/
     public String getURLString() {
         return getValue( _node.getAttributes().getNamedItem( "href" ) );
+    }
+
+
+    /**
+     * Returns the target for this link.
+     **/
+    public String getTarget() {
+        if (_node.getAttributes().getNamedItem( "target" ) == null) {
+            return _parentTarget;
+        } else {
+            return getValue( _node.getAttributes().getNamedItem( "target" ) );
+        }
     }
 
 
@@ -59,10 +71,11 @@ public class WebLink {
      * Contructs a web link given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebLink( URL baseURL, Node node ) {
+    WebLink( URL baseURL, String parentTarget, Node node ) {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
-        _node    = node;
-        _baseURL = baseURL;
+        _node         = node;
+        _baseURL      = baseURL;
+        _parentTarget = parentTarget;
     }
 
 
@@ -74,6 +87,9 @@ public class WebLink {
 
     /** The DOM node representing the link. **/
     private Node           _node;
+
+    /** The target window to which the parent response was directed. **/
+    private String         _parentTarget;
 
 
     private String getValue( Node node ) {
