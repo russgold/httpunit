@@ -1,5 +1,9 @@
 build
 *.ipr
+*.iws
 savejars
 dist
 lib
+bin
+.project
+.classpath

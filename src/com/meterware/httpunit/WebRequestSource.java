@@ -174,9 +174,18 @@ public class WebRequestSource extends ParameterHolder {
      **/
     final
     protected WebResponse submitRequest() throws IOException, SAXException {
+        return submitRequest( getRequest() );
+    }
+
+
+    /**
+     * Submits a request to the web client from which this request source was originally obtained.
+     **/
+    final
+    protected WebResponse submitRequest( WebRequest request ) throws IOException, SAXException {
         return getDestination().equals( "#" )
                     ? _baseResponse
-                    : _baseResponse.getClient().sendRequest( getRequest() );
+                    : _baseResponse.getClient().sendRequest( request );
     }
 
 

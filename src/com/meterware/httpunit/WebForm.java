@@ -49,8 +49,16 @@ public class WebForm extends WebRequestSource {
      * Submits this form using the web client from which it was originally obtained.
      **/
     public WebResponse submit() throws IOException, SAXException {
+        return submit( getDefaultButton() );
+    }
+
+
+    /**
+     * Submits this form using the web client from which it was originally obtained.
+     **/
+    WebResponse submit( SubmitButton button ) throws IOException, SAXException {
         String event = NodeUtils.getNodeAttribute( getNode(), "onsubmit" );
-        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest();
+        if (event.length() == 0 || getScriptableObject().doEvent( event )) return submitRequest( getRequest( button ) );
         return getBaseResponse();
     }
 
@@ -475,10 +483,8 @@ public class WebForm extends WebRequestSource {
     private SubmitButton getDefaultButton() {
         if (getSubmitButtons().length == 1) {
             return getSubmitButtons()[0];
-        } else if (getSubmitButtonVector().contains( SubmitButton.UNNAMED_BUTTON )) {
-            return getSubmitButton( "" );
         } else {
-            return null;
+            return getSubmitButton( "" );
         }
     }
 
@@ -492,7 +498,7 @@ public class WebForm extends WebRequestSource {
                 if (control instanceof SubmitButton) _buttonVector.add( control );
             }
 
-            if (_buttonVector.isEmpty()) _buttonVector.addElement( SubmitButton.UNNAMED_BUTTON );
+            if (_buttonVector.isEmpty()) _buttonVector.addElement( new SubmitButton( this ) );
         }
         return _buttonVector;
     }

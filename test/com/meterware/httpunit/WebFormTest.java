@@ -79,6 +79,23 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitFromButton() throws Exception {
+        defineWebPage( "Form", "<form method=GET id=main action = 'tryMe'>" +
+                              "<Input type=text Name=name>" +
+                              "<input type=\"checkbox\" name=second checked>Enabled" +
+                              "<input type=submit name=save value=none>" +
+                              "<input type=submit name=save value=all>" +
+                              "</form>" );
+        defineResource( "/tryMe?name=master&second=on&save=all", "You made it!" );
+        WebResponse wr = _wc.getResponse( getHostPath() + "/Form.html" );
+        WebForm form = wr.getFormWithID( "main" );
+        form.setParameter( "name", "master" );
+        SubmitButton button = form.getSubmitButton( "save", "all" );
+        button.click();
+        assertEquals( "Expected response", "You made it!", _wc.getCurrentPage().getText() );
+    }
+
+
     public void testFindNoForm() throws Exception {
         defineWebPage( "NoForms", "This has no forms but it does" +
                                   "have <a href=\"/other.html\">an active link</A>" +

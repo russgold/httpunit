@@ -12,6 +12,10 @@ Limitations:
 
 
 Revision History:
+ 9-Aug-2002
+Additions:
+   1. The SubmitButton class now supports a click() method to submit the form using that button.
+
  8-Aug-2002
 Changes:
    1. The class com.meterware.httpunit.ScriptableObject has been renamed as com.meterware.httpunit.scripting.ScriptableDelegate

@@ -22,6 +22,7 @@ package com.meterware.httpunit;
 import java.io.IOException;
 
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * This class represents a submit button in an HTML form.
@@ -29,7 +30,7 @@ import org.w3c.dom.Node;
 public class SubmitButton extends FormControl {
 
 
-    public static SubmitButton UNNAMED_BUTTON = new SubmitButton();
+//    public static SubmitButton UNNAMED_BUTTON = new SubmitButton();
 
 
     /**
@@ -46,6 +47,15 @@ public class SubmitButton extends FormControl {
      **/
     public String getID() {
         return _id;
+    }
+
+
+    /**
+     * Performs the action associated with clicking this button. For a submit button this typically
+     * submits the form.
+     */
+    public void click() throws IOException, SAXException  {
+        _form.submit( this );
     }
 
 
@@ -102,17 +112,25 @@ public class SubmitButton extends FormControl {
 
     SubmitButton( WebForm form, Node node ) {
         super( node );
+        _form          = form;
         _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( "image" );
         _id = NodeUtils.getNodeAttribute( node, "id" );
     }
 
 
-    public void setPressed( boolean pressed ) {
+    SubmitButton( WebForm form ) {
+        _form          = form;
+        _id            = "";
+        _isImageButton = false;
+    }
+
+
+    void setPressed( boolean pressed ) {
         _pressed = pressed;
     }
 
 
-    public void setLocation( int x, int y ) {
+    void setLocation( int x, int y ) {
         _x = x;
         _y = y;
     }
@@ -120,19 +138,13 @@ public class SubmitButton extends FormControl {
 
 //------------------------------------------ private members ----------------------------------
 
-
+    private final WebForm  _form;
     private final String   _id;
     private final boolean  _isImageButton;
     private       boolean  _pressed;
     private       int      _x;
     private       int      _y;
     private       String[] _value = new String[1];
-
-
-    private SubmitButton() {
-        _id            = "";
-        _isImageButton = false;
-    }
 
 
     private String[] toArray( String value ) {
