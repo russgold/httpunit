@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2005, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,12 +19,14 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
-
-import java.util.*;
-
-import org.w3c.dom.*;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This class represents a table in an HTML page.
@@ -140,10 +142,10 @@ public class WebTable extends HTMLElementBase {
             int coords[]   = (int[]) spanningCells.get( cell );
             boolean neededInRow = true;
             boolean neededInCol = true;
-            for (int i = coords[0]; neededInRow && (i < coords[0] + cell.getRowSpan()); i++) {
+            for (int i = coords[0]; neededInRow && (i < rowHasText.length) && (i < coords[0] + cell.getRowSpan()); i++) {
                 neededInRow = !rowHasText[i];
             }
-            for (int j = coords[1]; neededInCol && (j < coords[1] + cell.getColSpan()); j++) {
+            for (int j = coords[1]; neededInCol && (j < columnHasText.length) && (j < coords[1] + cell.getColSpan()); j++) {
                 neededInCol = !columnHasText[j];
             }
             if (neededInRow) {
