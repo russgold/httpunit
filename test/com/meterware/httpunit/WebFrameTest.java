@@ -467,5 +467,24 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+
+    /**
+     * Verifies that an open call from a subframe can specify another frame name.
+     */
+    public void testFrameWithHashSource() throws Exception {
+        defineResource( "Frames.html",
+                        "<html><head><frameset>" +
+                        "    <frame name='banner' src='#'>" +
+                        "    <frame name='main'   src='main.html'>" +
+                        "</frameset></html>" );
+        defineResource( "target.txt", "You made it!" );
+        defineWebPage( "main", "<a id='banner' href='target.txt'>banner</a>" );
+
+        _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebLink link = (WebLink) _wc.getFrameContents( "main" ).getElementWithID( "banner" );
+        assertNotNull( "No link found",  link );
+    }
+
+
     private WebConversation _wc;
 }

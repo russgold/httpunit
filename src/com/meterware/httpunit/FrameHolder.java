@@ -180,7 +180,11 @@ class FrameHolder {
                 HttpUnitOptions.getScriptingEngine().associate( response );
                 createSubFrames( frame, response.getFrameSelectors() );
                 WebRequest[] requests = response.getFrameRequests();
-                for (int i = 0; i < requests.length; i++) response.getWindow().getSubframeResponse( requests[ i ], requestContext );
+                for (int i = 0; i < requests.length; i++) {
+                    if (requests[i].getURLString().length() != 0) {
+                        response.getWindow().getSubframeResponse( requests[i], requestContext );
+                    }
+                }
                 HttpUnitOptions.getScriptingEngine().load( response );
             }
         }

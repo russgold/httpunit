@@ -14,8 +14,13 @@ Limitations:
 
 Revision History:
 21-Sep-2004:
+   Acknowledgements:
+       Thanks to Bart Vanhaute for finding a fixing an infinite recursion problem with frame loading.
+
    Problems fixed:
        1. Proxy server settings no longer apply to the entire VM; however, accessing a proxy server is not thread-safe
+       2. bug #1029139: infinite recursion in frameset page when a frame has src="#"
+
    Additions:
        1. A username and password may now be specified when accessing a proxy server.
 
