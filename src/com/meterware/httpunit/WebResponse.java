@@ -182,6 +182,11 @@ public class WebResponse implements HTMLSegment {
             readContentTypeHeader();
             if (_characterSet == null) _characterSet = getHeaderField( "Charset" );
             if (_characterSet == null) _characterSet = HttpUnitOptions.getDefaultCharacterSet();
+            try {
+                "abcd".getBytes( _characterSet );
+            } catch (UnsupportedEncodingException e) {
+                _characterSet = getDefaultEncoding();
+            }
         }
         return _characterSet;
     }
@@ -831,6 +836,25 @@ public class WebResponse implements HTMLSegment {
         return doc;
    }
 
+    private static String _defaultEncoding;
+
+    private final static String[] DEFAULT_ENCODING_CANDIDATES = { "iso-8859-1", "us-ascii", "utf-8", "utf8" };
+
+    static String getDefaultEncoding() {
+        if (_defaultEncoding == null) {
+            for (int i = 0; i < DEFAULT_ENCODING_CANDIDATES.length; i++) {
+                try {
+                    _defaultEncoding = DEFAULT_ENCODING_CANDIDATES[i];
+                    "abcd".getBytes( _defaultEncoding );
+                    return _defaultEncoding;
+                } catch (UnsupportedEncodingException e) {
+                }
+            }
+        }
+        return (_defaultEncoding = System.getProperty( "file.encoding" ));
+    }
+
+
 
 }
 
@@ -840,7 +864,7 @@ public class WebResponse implements HTMLSegment {
 class ByteTag {
 
     ByteTag( byte[] buffer, int start, int length ) throws UnsupportedEncodingException {
-        _buffer = new String( buffer, start, length, "iso-8859-1" ).toCharArray();
+        _buffer = new String( buffer, start, length, WebResponse.getDefaultEncoding() ).toCharArray();
         _name = nextToken();
 
         String attribute = "";
