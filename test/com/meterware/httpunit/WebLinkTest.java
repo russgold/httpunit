@@ -50,18 +50,27 @@ public class WebLinkTest extends HttpUnitTest {
 
 
     public void setUp() throws Exception {
-        _simplePage = new ReceivedPage( _baseURL, HEADER + "<body>This has no forms but it does" +
-                                         "have <a href=\"/other.html\">an <b>active</b> link</A>" +
-                                         " and <a name=here>an anchor</a>" +
-                                         "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>" +
-                                         "</body></html>" );
+        super.setUp();
+        defineResource( "SimplePage.html",
+                        "<html><head><title>A Sample Page</title></head>\n" +
+                        "<body>This has no forms but it does\n" +
+                        "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
+                        " and <a name=here>an anchor</a>\n" +
+                        "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
+                        "</body></html>\n" );
+
+        WebConversation wc = new WebConversation();
+        _simplePage = wc.getResponse( getHostPath() + "/SimplePage.html" );
     }
 	
 	
-    public void testFindNoLinks() {
-        WebForm[] forms = _simplePage.getForms();
-        assertNotNull( forms );
-        assertEquals( 0, forms.length );
+    public void testFindNoLinks() throws Exception {
+        defineResource( "NoLinks.html", "<html><head><title>NoLinks</title></head><body>No links at all</body></html>" );
+        WebConversation wc = new WebConversation();
+
+        WebLink[] links = wc.getResponse( getHostPath() + "/NoLinks.html" ).getLinks();
+        assertNotNull( links );
+        assertEquals( 0, links.length );
     }
 
 
@@ -76,7 +85,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebLink link = _simplePage.getLinks()[0];
         WebRequest request = link.getRequest();
         assert( "Should be a get request", request instanceof GetMethodWebRequest );
-        assertEquals( "http://www.meterware.com/other.html", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/other.html", request.getURL().toExternalForm() );
     }
 
 
@@ -91,11 +100,11 @@ public class WebLinkTest extends HttpUnitTest {
         assertNull( "Non-existent link should not have been found", link );
         link = _simplePage.getLinkWith( "an active link" );
         assertNotNull( "an active link was not found", link );
-        assertEquals( "active link URL", "http://www.meterware.com/other.html", link.getRequest().getURL().toExternalForm() );
+        assertEquals( "active link URL", getHostPath() + "/other.html", link.getRequest().getURL().toExternalForm() );
 
         link = _simplePage.getLinkWithImageText( "Next -->" );
         assertNotNull( "the image link was not found", link );
-        assertEquals( "image link URL", "http://www.meterware.com/basic.html", link.getRequest().getURL().toExternalForm() );
+        assertEquals( "image link URL", getHostPath() + "/basic.html", link.getRequest().getURL().toExternalForm() );
     }
 
 
@@ -105,16 +114,7 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
                               
-    private static URL _baseURL;
-     
-    static {
-        try {
-            _baseURL = new URL( "http://www.meterware.com" );
-        } catch (java.net.MalformedURLException e ) {}  // ignore
-    }
-
-    private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
-    private ReceivedPage _simplePage;
+    private WebResponse _simplePage;
 
 
 }

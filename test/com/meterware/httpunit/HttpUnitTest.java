@@ -20,6 +20,36 @@ class HttpUnitTest extends TestCase {
     }
 
 
+    public void setUp() throws Exception {
+        _server = new PseudoServer();
+        _hostPath = "http://localhost:" + _server.getConnectedPort();
+    }
+
+
+    public void tearDown() {
+        if (_server != null) _server.shutDown();
+    }
+
+
+//--------------------------------- protected members ----------------------------------------------
+
+
+    protected void defineResource( String resourceName, String value ) {
+        _server.setResource( resourceName, value );
+    }
+
+
+    protected void defineWebPage( String pageName, String body ) {
+        defineResource( pageName + ".html", "<html><head><title>" + pageName + "</title></head>\n" + 
+                                            "<body>" + body + "</body></html>" );
+    }
+
+
+    protected String getHostPath() {
+        return _hostPath;
+    }
+
+
     protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
         Vector expectedItems = new Vector();
         Vector foundItems    = new Vector();
@@ -56,5 +86,12 @@ class HttpUnitTest extends TestCase {
         sb.append( "}" );
         return sb.toString();
     }
+
+
+//---------------------------------------- private members -----------------------------------------
+
+    private String _hostPath;
+
+    private PseudoServer _server;
 
 }

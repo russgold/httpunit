@@ -29,76 +29,64 @@ import junit.framework.TestSuite;
 /**
  * A unit test of the httpunit parsing classes.
  **/
-public class HtmlTablesTest extends TestCase {
+public class HtmlTablesTest extends HttpUnitTest {
 
-	public static void main(String args[]) {
+    public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
-	}
-	
-	
-	public static Test suite() {
-		return new TestSuite( HtmlTablesTest.class );
-	}
-
-
-	public HtmlTablesTest( String name ) {
-	    super( name );
-	}
-
-
-    public void setUp() throws Exception {
-        _baseURL = new URL( "http://www.meterware.com" );
-        _noTables  = new ReceivedPage( _baseURL, HEADER + "<body>This has no tables but it does" +
-                                       "have <a href=\"/other.html\">an active link</A>" +
-                                       " and <a name=here>an anchor</a>" +
-                                       "</body></html>" );
-        _oneTable  = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                       "<table summary=\"tough luck\">" +
-                                       "<tr><td>One</td><td>&nbsp;</td><td>1</td></tr>" +
-                                       "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
-                                       "<tr><td>Two</td><td>&nbsp;</td><td>2</td></tr>" +
-                                       "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
-                                       "<tr><td>Three</td><td>&nbsp;</td><td>3</td></tr>" +
-                                       "</table></body></html>" );
-        _nestTable = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                       "<table summary=\"outer one\">" +
-                                       "<tr><td>" +
-                                       "Inner Table<br>" +
-                                       "<table summary=\"inner one\">" +
-                                       "        <tr><td>Red</td><td>1</td></tr>" +
-                                       "        <tr><td>Blue</td><td>2</td></tr>" +
-                                       "</table></td></tr>" +
-                                       "</table></body></html>" );
-        _spanTable = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                       "<table summary=\"tough luck\">" +
-                                       "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
-                                       "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td><td>rot</td></tr>" +
-                                       "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
-                                       "</table></body></html>" );
-        _badTable  = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                       "<table summary=\"tough luck\">" +
-                                       "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
-                                       "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td></tr>" +
-                                       "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
-                                       "</table></body></html>" );
     }
 	
 	
-	public void testFindNoTables() {
-        WebTable[] tables = _noTables.getTables();
+    public static Test suite() {
+	return new TestSuite( HtmlTablesTest.class );
+    }
+
+
+    public HtmlTablesTest( String name ) {
+	super( name );
+    }
+
+
+    public void setUp() throws Exception {
+        super.setUp();
+        _wc = new WebConversation();
+
+        defineWebPage( "OneTable", "<h2>Interesting data</h2>" +
+                                   "<table summary=\"tough luck\">" +
+                                   "<tr><td>One</td><td>&nbsp;</td><td>1</td></tr>" +
+                                   "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
+                                   "<tr><td>Two</td><td>&nbsp;</td><td>2</td></tr>" +
+                                   "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
+                                   "<tr><td>Three</td><td>&nbsp;</td><td>3</td></tr>" +
+                                   "</table>" );
+        defineWebPage( "SpanTable", "<h2>Interesting data</h2>" +
+                                    "<table summary=\"tough luck\">" +
+                                    "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
+                                    "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td><td>rot</td></tr>" +
+                                    "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
+                                    "</table>" );
+    }
+	
+	
+    public void testFindNoTables() throws Exception {
+        defineWebPage( "Default", "This has no tables but it does" +
+                                  "have <a href=\"/other.html\">an active link</A>" +
+                                  " and <a name=here>an anchor</a>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebTable[] tables = page.getTables();
         assertNotNull( tables );
         assertEquals( 0, tables.length );
     }
 
 
-    public void testFindOneTable() {
-        WebTable[] tables = _oneTable.getTables();
+    public void testFindOneTable() throws Exception {
+        WebTable[] tables = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables();
         assertEquals( 1, tables.length );
     }
 
 
-    public void testFindTableSize() {
-        WebTable table = _oneTable.getTables()[0];
+    public void testFindTableSize() throws Exception {
+        WebTable table = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables()[0];
         assertEquals( 5, table.getRowCount() );
         assertEquals( 3, table.getColumnCount() );
         try {
@@ -114,15 +102,15 @@ public class HtmlTablesTest extends TestCase {
     }
 
 
-    public void testFindTableCell() {
-        WebTable table = _oneTable.getTables()[0];
+    public void testFindTableCell() throws Exception {
+        WebTable table = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables()[0];
         assertEquals( "Two", table.getCellAsText( 2, 0 ) );
         assertEquals( "3",   table.getCellAsText( 4, 2 ) );
     }
 
 
-    public void testTableAsText() {
-       WebTable table = _oneTable.getTables()[0];
+    public void testTableAsText() throws Exception {
+       WebTable table = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables()[0];
        table.purgeEmptyCells();
        String[][] text = table.asText();
        assertEquals( "rows with text", 3, text.length );
@@ -133,8 +121,19 @@ public class HtmlTablesTest extends TestCase {
 
 
 
-    public void testNestedTable() {
-        WebTable[] tables = _nestTable.getTables();
+    public void testNestedTable() throws Exception {
+        defineWebPage( "Default", "<h2>Interesting data</h2>" +
+                                  "<table summary=\"outer one\">" +
+                                  "<tr><td>" +
+                                  "Inner Table<br>" +
+                                  "<table summary=\"inner one\">" +
+                                  "        <tr><td>Red</td><td>1</td></tr>" +
+                                  "        <tr><td>Blue</td><td>2</td></tr>" +
+                                  "</table></td></tr>" +
+                                  "</table>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebTable[] tables = page.getTables();
         assertEquals( "top level tables count", 1, tables.length );
         assertEquals( "rows", 1, tables[0].getRowCount() );
         assertEquals( "columns", 1, tables[0].getColumnCount() );
@@ -149,15 +148,18 @@ public class HtmlTablesTest extends TestCase {
     }
 
 
-    public void testColumnSpan() {
-        WebTable table = _spanTable.getTables()[0];
+    public void testColumnSpan() throws Exception {
+        WebResponse page = _wc.getResponse( getHostPath() + "/SpanTable.html" );
+        WebTable table = page.getTables()[0];
         assertEquals( "Colors", table.getCellAsText( 0, 0 ) );
         assertEquals( "Colors", table.getCellAsText( 0, 1 ) );
         assertEquals( "Names",  table.getCellAsText( 0, 2 ) );
     }
 
-    public void testRowSpan() {
-        WebTable table = _spanTable.getTables()[0];
+
+    public void testRowSpan() throws Exception {
+        WebResponse page = _wc.getResponse( getHostPath() + "/SpanTable.html" );
+        WebTable table = page.getTables()[0];
         assertEquals( 3, table.getRowCount() );
         assertEquals( 3, table.getColumnCount() );
         assertEquals( "gules", table.getCellAsText( 1, 1 ) );
@@ -165,8 +167,17 @@ public class HtmlTablesTest extends TestCase {
         assertEquals( "vert",  table.getCellAsText( 2, 2 ) );
     }
 
-    public void testMissingColumns() {
-        WebTable table = _badTable.getTables()[0];
+
+    public void testMissingColumns() throws Exception {
+        defineWebPage( "Default", "<h2>Interesting data</h2>" +
+                                  "<table summary=\"tough luck\">" +
+                                  "<tr><th colspan=2>Colors</th><th>Names</th></tr>" +
+                                  "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td></tr>" +
+                                  "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
+                                  "</table>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebTable table = page.getTables()[0];
         table.purgeEmptyCells();
         assertEquals( 3, table.getRowCount() );
         assertEquals( 3, table.getColumnCount() );
@@ -174,25 +185,26 @@ public class HtmlTablesTest extends TestCase {
 
 
     public void testInnerTableSeek() throws Exception {
-        ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                            "<table summary=\"outer one\">" +
-                                            "<tr><td>Here we are</td><td>" +
-                                            "Inner Table<br>" +
-                                            "<table summary=\"inner one\">" +
-                                            "        <tr><td colspan=2>&nbsp;</td></tr>" +
-                                            "        <tr><td>Red</td><td>1</td></tr>" +
-                                            "        <tr><td>Blue</td><td>2</td></tr>" +
-                                            "</table></td></tr>" +
-                                            "</table></body></html>" );
+        defineWebPage( "Default", "<h2>Interesting data</h2>" +
+                                  "<table summary=\"outer one\">" +
+                                  "<tr><td>Here we are</td><td>" +
+                                  "Inner Table<br>" +
+                                  "<table summary=\"inner one\">" +
+                                  "        <tr><td colspan=2>&nbsp;</td></tr>" +
+                                  "        <tr><td>Red</td><td>1</td></tr>" +
+                                  "        <tr><td>Blue</td><td>2</td></tr>" +
+                                  "</table></td></tr>" +
+                                  "</table>" );
 
-        WebTable wt = rp.getTableStartingWith( "Red" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebTable wt = page.getTableStartingWith( "Red" );
         assertNotNull( "Did not find table starting with 'Red'", wt );
         String[][] cells = wt.asText();
         assertEquals( "Non-blank rows",    2, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
 
-        wt = rp.getTableStartingWithPrefix( "Re" );
+        wt = page.getTableStartingWithPrefix( "Re" );
         assertNotNull( "Did not find table starting with prefix 'Re'", wt );
         cells = wt.asText();
         assertEquals( "Non-blank rows",    2, cells.length );
@@ -202,14 +214,15 @@ public class HtmlTablesTest extends TestCase {
 
 
     public void testSpanOverEmptyColumns() throws Exception {
-        ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                            "<table summary=little>" +
-                                            "<tr><td colspan=2>Title</td><td>Data</td></tr>" +
-                                            "<tr><td>Name</td><td>&nbsp;</td><td>Value</td></tr>" +
-                                            "<tr><td>Name</td><td>&nbsp;</td><td>Value</td></tr>" +
-                                            "</table></body></html>" );
+        defineWebPage( "Default", "<h2>Interesting data</h2>" +
+                                  "<table summary=little>" +
+                                  "<tr><td colspan=2>Title</td><td>Data</td></tr>" +
+                                  "<tr><td>Name</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                  "<tr><td>Name</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                  "</table>" );
 
-        String[][] cells = rp.getTableStartingWith( "Title" ).asText();
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        String[][] cells = page.getTableStartingWith( "Title" ).asText();
         assertEquals( "Non-blank rows",    3, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,1",       "Value", cells[1][1] );
@@ -217,26 +230,20 @@ public class HtmlTablesTest extends TestCase {
 
 
     public void testSpanOverAllEmptyColumns() throws Exception {
-        ReceivedPage rp = new ReceivedPage( _baseURL, HEADER + "<body><h2>Interesting data</h2>" +
-                                            "<table summary=little>" +
-                                            "<tr><td colspan=2>Title</td><td>Data</td></tr>" +
-                                            "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
-                                            "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
-                                            "</table></body></html>" );
+        defineWebPage( "Default", "<h2>Interesting data</h2>" +
+                                  "<table summary=little>" +
+                                  "<tr><td colspan=2>Title</td><td>Data</td></tr>" +
+                                  "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                  "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                  "</table>" );
 
-        String[][] cells = rp.getTableStartingWith( "Title" ).asText();
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        String[][] cells = page.getTableStartingWith( "Title" ).asText();
         assertEquals( "Non-blank rows",    3, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,1",       "Value", cells[1][1] );
     }
 
-
-    private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
-    private ReceivedPage _noTables;
-    private ReceivedPage _oneTable;
-    private ReceivedPage _nestTable;
-    private ReceivedPage _spanTable;
-    private ReceivedPage _badTable;
-    private URL          _baseURL;
+    private WebConversation _wc;
 }
 

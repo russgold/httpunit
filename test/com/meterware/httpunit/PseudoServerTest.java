@@ -19,59 +19,60 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
-import java.net.URL;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.Vector;
-
+import com.meterware.httpunit.*;
 
 /**
- * A unit test of the httpunit parsing classes.
+ * Tests the basic authentication.
  **/
-public class WebPageTest extends HttpUnitTest {
+public class PseudoServerTest extends TestCase {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+    
+    
     public static Test suite() {
-        return new TestSuite( WebPageTest.class );
+        return new TestSuite( PseudoServerTest.class );
     }
 
 
-    public WebPageTest( String name ) {
+    public PseudoServerTest( String name ) {
         super( name );
     }
 
 
-    public void setUp() throws Exception {
-        super.setUp();
-        defineResource( "SimplePage.html",
-                        "<html><head><title>A Sample Page</title></head>\n" +
-                        "<body>This has no forms but it does\n" +
-                        "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
-                        " and <a name=here>an anchor</a>\n" +
-                        "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
-                        "</body></html>\n" );
+    public void testNotFound() throws Exception {
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
 
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
-        _simplePage = wc.getResponse( request );
-    }
-	
-	
-    public void testTitle() throws Exception {
-        assertEquals( "Title", "A Sample Page", _simplePage.getTitle() );
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/nothing" );
+        try {
+            WebResponse response = wc.getResponse( request );
+            fail( "Should have rejected the request" );
+        } catch (HttpNotFoundException e) {
+        }
     }
 
 
-                              
-    private WebResponse _simplePage;
+    public void testSimpleGet() throws Exception {
+        String resourceName = "something/interesting";
+        String resourceValue = "the desired content\r\n";
 
+        PseudoServer ps = new PseudoServer();
+        ps.setResource( resourceName, resourceValue );
+        int port = ps.getConnectedPort();
+
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.toString() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
 
 }
+

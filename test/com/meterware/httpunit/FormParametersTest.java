@@ -49,15 +49,18 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void setUp() throws Exception {
+        super.setUp();
+        _wc = new WebConversation();
     }
 	
 	
     public void testDisabledChoiceParameterValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
                                        "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
                                        "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
         request.setParameter( "noSuchControl", "green" );
@@ -70,11 +73,12 @@ public class FormParametersTest extends HttpUnitTest {
 
                               
     public void testEnabledChoiceParameterValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Select name=colors><Option>blue<Option>red</Select>" +
                                        "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
                                        "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
         validateSetParameterRejected( request, "noSuchControl", "green", "setting of non-existent control" );
@@ -94,11 +98,12 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testDisabledTextParameterValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
                                        "<Input type=hidden name=secret>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
         request.setParameter( "color", "green" );
@@ -111,11 +116,12 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testEnabledTextParameterValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=text name=color>" +
                                        "<Input type=password name=password>" +
                                        "<Input type=hidden name=secret>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
         request.setParameter( "color", "green" );
@@ -128,11 +134,12 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testDisabledRadioButtonValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=radio name=color value=red>" +
                                        "<Input type=radio name=color value=blue>" +
                                        "<Input type=radio name=color value=green>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
         request.setParameter( "color", "black" );
@@ -141,11 +148,12 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testEnabledRadioButtonValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=radio name=color value=red>" +
                                        "<Input type=radio name=color value=blue>" +
                                        "<Input type=radio name=color value=green>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( true );
         request.setParameter( "color", "red" );
@@ -156,11 +164,12 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testCheckboxValidation() throws Exception {
-        ReceivedPage page = new ReceivedPage( _baseURL, HEADER + "<body><form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input type=checkbox name=use_color>" +
                                        "<Input type=checkbox name=color value=red>" +
                                        "<Input type=checkbox name=color value=blue>" +
-                                       "</form></body></html>" );
+                                       "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
         HttpUnitOptions.setParameterValuesValidated( false );
         request.setParameter( "use_color", "red" );
@@ -180,6 +189,9 @@ public class FormParametersTest extends HttpUnitTest {
 //---------------------------------------------- private members ------------------------------------------------
 
 
+    private WebConversation _wc;
+
+
     private void validateSetParameterRejected( WebRequest request, String parameterName, String value, String comment ) throws Exception {
         try {
             request.setParameter( parameterName, value );
@@ -196,16 +208,4 @@ public class FormParametersTest extends HttpUnitTest {
         } catch (IllegalRequestParameterException e) {
         }
     }
-
-                              
-    private static URL _baseURL;
-     
-    static {
-        try {
-            _baseURL = new URL( "http://www.meterware.com" );
-        } catch (java.net.MalformedURLException e ) {}  // ignore
-    }
-
-    private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
-
 }

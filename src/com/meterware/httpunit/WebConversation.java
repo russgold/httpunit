@@ -43,6 +43,13 @@ public class WebConversation {
     public WebConversation() {
     }
 
+    /**
+     * Submits a GET method request and returns a response.
+     **/
+    public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException {
+        return getResponse( new GetMethodWebRequest( urlString ) );
+    }
+
 
     /**
      * Submits a web request and returns a response, using all state developed so far as stored in
