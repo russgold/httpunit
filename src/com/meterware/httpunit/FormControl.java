@@ -22,6 +22,7 @@ package com.meterware.httpunit;
 import com.meterware.httpunit.scripting.SelectionOptions;
 import com.meterware.httpunit.scripting.SelectionOption;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.NamedDelegate;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -301,11 +302,16 @@ abstract class FormControl {
     }
 
 
-    class Scriptable extends ScriptableDelegate {
+    class Scriptable extends ScriptableDelegate implements NamedDelegate {
+
+        public String getName() {
+            return FormControl.this.getName();
+        }
+
 
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "name" )) {
-                return getName();
+                return FormControl.this.getName();
             } else {
                 return super.get( propertyName );
             }

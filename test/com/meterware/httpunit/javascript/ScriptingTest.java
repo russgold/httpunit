@@ -210,6 +210,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "function viewForms() { " +
                                             "  alert( \"found \" + document.forms.length + \" form(s)\" );" +
                                             "  alert( getFound( document.realform ) + \"form 'realform'\" );" +
+                                            "  alert( getFound( document.forms[\"realform\"] ) + \"form 'forms[\'realform\']'\" );" +
                                             "  alert( getFound( document.noform ) + \"form 'noform'\" ); }" +
                                             "</script></head>" +
                                             "<body onLoad='viewForms()'>" +
@@ -219,6 +220,7 @@ public class ScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "found 1 form(s)", wc.popNextAlert() );
         assertEquals( "Alert message", "found form 'realform'", wc.popNextAlert() );
+        assertEquals( "Alert message", "found form 'forms[\'realform\']'", wc.popNextAlert() );
         assertEquals( "Alert message", "did not find form 'noform'", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
@@ -232,6 +234,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "function viewLinks() { " +
                                             "  alert( \"found \" + document.links.length + \" link(s)\" );" +
                                             "  alert( getFound( document.reallink ) + \"link 'reallink'\" );" +
+                                            "  alert( getFound( document.links[\"reallink\"] ) + \"link 'links[reallink]'\" );" +
                                             "  alert( getFound( document.nolink ) + \"link 'nolink'\" );" +
                                             "}" +
                                             "</script></head>" +
@@ -243,6 +246,7 @@ public class ScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "found 2 link(s)", wc.popNextAlert() );
         assertEquals( "Alert message", "found link 'reallink'", wc.popNextAlert() );
+        assertEquals( "Alert message", "found link 'links[reallink]'", wc.popNextAlert() );
         assertEquals( "Alert message", "did not find link 'nolink'", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
@@ -349,6 +353,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "function viewImages() { \n" +
                                             "  alert( \"found \" + document.images.length + \" images(s)\" );\n" +
                                             "  alert( getFound( document.realimage ) + \"image 'realimage'\" )\n;" +
+                                            "  alert( getFound( document.images['realimage'] ) + \"image 'images[realimage]'\" )\n;" +
                                             "  alert( getFound( document.noimage ) + \"image 'noimage'\" );\n" +
                                             "  alert( '2nd image is ' + document.images[1].src ); }\n" +
                                             "</script></head>\n" +
@@ -360,6 +365,7 @@ public class ScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "found 2 images(s)", wc.popNextAlert() );
         assertEquals( "Alert message", "found image 'realimage'", wc.popNextAlert() );
+        assertEquals( "Alert message", "found image 'images[realimage]'", wc.popNextAlert() );
         assertEquals( "Alert message", "did not find image 'noimage'", wc.popNextAlert() );
         assertEquals( "Alert message", "2nd image is pict2.gif", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );

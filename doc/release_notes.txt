@@ -18,6 +18,9 @@ Problems fixed:
        than UnusedParameterValueException.
     2. Obtaining the URL from a javascript: request no longer throws MalformedURLException.
 
+Additions:
+    1. The forms, images, links, and Form.elements arrays now handle string indexes
+
 30-Aug-2002 1.4.5
 Acknowledgements:
     Thanks to Steve Heath for an example on how to make JSPs work with ServletUnit.

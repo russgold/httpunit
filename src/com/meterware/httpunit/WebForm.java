@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.NamedDelegate;
 
 import java.io.IOException;
 import java.net.URL;
@@ -482,7 +483,7 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate {
+    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); }
 
@@ -494,6 +495,11 @@ public class WebForm extends WebRequestSource {
 
         public void reset() throws IOException, SAXException {
             resetControls();
+        }
+
+
+        public String getName() {
+            return WebForm.this.getName();
         }
 
 

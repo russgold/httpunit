@@ -58,7 +58,7 @@ public class FormScriptingTest extends HttpUnitTest {
                                            "function listElements( form ) {\n" +
                                            "  elements = form.elements;\n" +
                                            "  alert( 'form has ' + elements.length + ' elements' );\n" +
-                                           "  alert( 'value is ' + elements[0].value );\n" +
+                                           "  alert( 'value is ' + elements['first'].value );\n" +
                                            "  alert( 'index is ' + elements[1].selectedIndex );\n" +
                                            "  elements[2].checked=true;\n" +
                                            "}" +
@@ -140,6 +140,7 @@ public class FormScriptingTest extends HttpUnitTest {
                                           "<form name=spectrum action='DoIt'>" +
                                           "  <input type=text name=color value=green>" +
                                           "  <input type=submit name=change value=color>" +
+                                          "  <input type=submit name=keep value=nothing>" +
                                           "</form>" +
                                           "<a href='#' onClick='document.spectrum.submit(); return false;'>" +
                                           "</body></html>" );

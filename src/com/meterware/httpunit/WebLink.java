@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.NamedDelegate;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -88,7 +89,12 @@ public class WebLink extends FixedURLWebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate {
+    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
+
+        public String getName() {
+            return WebLink.this.getName();
+        }
+
 
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "href" )) {

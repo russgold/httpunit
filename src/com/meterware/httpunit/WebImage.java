@@ -20,6 +20,7 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.NamedDelegate;
 
 import java.net.URL;
 
@@ -87,7 +88,12 @@ public class WebImage extends FixedURLWebRequestSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate {
+    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
+
+        public String getName() {
+            return WebImage.this.getName();
+        }
+
 
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "src" )) {

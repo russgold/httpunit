@@ -29,6 +29,7 @@ import com.meterware.httpunit.scripting.ScriptingEngine;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.SelectionOption;
 import com.meterware.httpunit.scripting.SelectionOptions;
+import com.meterware.httpunit.scripting.NamedDelegate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -73,6 +74,7 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Image.class );
         ScriptableObject.defineClass( scope, Options.class );
         ScriptableObject.defineClass( scope, Option.class );
+        ScriptableObject.defineClass( scope, ElementArray.class );
     }
 
 
@@ -126,6 +128,11 @@ public class JavaScript {
             _scriptable.setScriptEngine( this );
             if (parent != null) setParentScope( parent );
        }
+
+
+        String getName() {
+            return _scriptable instanceof NamedDelegate ? ((NamedDelegate) _scriptable).getName() : "";
+        }
 
 
         public boolean has( String propertyName, Scriptable scriptable ) {
@@ -266,9 +273,9 @@ public class JavaScript {
 
     static public class Document extends JavaScriptEngine {
 
-        private Scriptable _forms;
-        private Scriptable _links;
-        private Scriptable _images;
+        private ElementArray _forms;
+        private ElementArray _links;
+        private ElementArray _images;
 
 
         public String getClassName() {
@@ -311,7 +318,8 @@ public class JavaScript {
             for (int i = 0; i < images.length; i++) {
                 images[ i ] = (Image) toScriptable( scriptables[ i ] );
             }
-            _images = Context.getCurrentContext().newArray( this, images );
+            _images = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _images.initialize( images );
         }
 
 
@@ -321,7 +329,8 @@ public class JavaScript {
             for (int i = 0; i < links.length; i++) {
                 links[ i ] = (Link) toScriptable( scriptables[ i ] );
             }
-            _links = Context.getCurrentContext().newArray( this, links );
+            _links = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _links.initialize( links );
         }
 
 
@@ -331,7 +340,8 @@ public class JavaScript {
             for (int i = 0; i < forms.length; i++) {
                 forms[ i ] = (Form) toScriptable( scriptables[ i ] );
             }
-            _forms = Context.getCurrentContext().newArray( this, forms );
+            _forms = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _forms.initialize( forms );
         }
 
 
@@ -360,6 +370,49 @@ public class JavaScript {
             return (HTMLPage.Scriptable) _scriptable;
         }
 
+    }
+
+
+    static public class ElementArray extends ScriptableObject {
+
+        private JavaScriptEngine _contents[] = new HTMLElement[0];
+
+
+        public ElementArray() {
+        }
+
+
+        void initialize( JavaScriptEngine[] contents ) {
+            _contents = contents;
+        }
+
+
+        public int jsGet_length() {
+            return _contents.length;
+        }
+
+
+        public String getClassName() {
+            return "ElementArray";
+        }
+
+
+        public Object get( int i, Scriptable scriptable ) {
+            if (i >= 0 && i < _contents.length) {
+                return _contents[i];
+            } else {
+                return super.get( i, scriptable );
+            }
+        }
+
+
+        public Object get( String name, Scriptable scriptable ) {
+            for (int i = 0; i < _contents.length; i++) {
+                JavaScriptEngine content = _contents[ i ];
+                if (name.equalsIgnoreCase( content.getName() )) return content;
+            }
+            return super.get( name, scriptable );
+        }
     }
 
 
@@ -405,7 +458,7 @@ public class JavaScript {
 
     static public class Form extends HTMLElement {
 
-        private Scriptable _controls;
+        private ElementArray _controls;
 
         public String getClassName() {
             return "Form";
@@ -458,7 +511,8 @@ public class JavaScript {
             for (int i = 0; i < controls.length; i++) {
                 controls[ i ] = (Control) toScriptable( scriptables[ i ] );
             }
-            _controls = Context.getCurrentContext().newArray( this, controls );
+            _controls = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+            _controls.initialize( controls );
         }
 
 
