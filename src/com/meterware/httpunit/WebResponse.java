@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.cookies.CookieJar;
 import com.meterware.httpunit.cookies.CookieSource;
 
@@ -532,7 +533,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    public class Scriptable extends ScriptableDelegate {
+    public class Scriptable extends ScriptableDelegate implements NamedDelegate {
 
         public void alert( String message ) {
             _client.postAlert( message );
@@ -607,11 +608,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
          **/
         public Object get( String propertyName ) {
             if (propertyName.equals( "name" )) {
-                return getFrameName().equals( WebRequest.TOP_FRAME ) ? _window.getName() : getFrameName();
+                return getName();
             } else if (propertyName.equalsIgnoreCase( "top" )) {
                 return _window.getFrameContents( WebRequest.TOP_FRAME ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "parent" )) {
-                return getFrameName().equals( WebRequest.TOP_FRAME ) ? null
+                return getFrameName().equals( WebRequest.TOP_FRAME ) ? this
                         : _window.getFrameContents( WebFrame.getParentFrameName( getFrameName() ) ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
@@ -624,6 +625,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
                     return super.get( propertyName );
                 }
             }
+        }
+
+
+        public String getName() {
+            return getFrameName().equals( WebRequest.TOP_FRAME ) ? _window.getName() : getFrameName();
         }
 
 

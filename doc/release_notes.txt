@@ -10,6 +10,14 @@ Limitations:
 
 
 Revision History:
+18-Nov-2002
+Acknowledgements:
+    Thanks to Neville Wylie for catching the top.parent and frame name index problems
+
+Problems fixed:
+    1. The parent attribute of the top frame was returning null rather than the frame.
+    2. Frame names used as indexes into the Window.frames array were not being recognized.
+
 17-Nov-2002
 Problems fixed:
     1. Bug #637208 Link.click() no longer returns null when an 'onClick' event fails to return true.

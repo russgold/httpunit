@@ -341,6 +341,9 @@ public class ScriptingTest extends HttpUnitTest {
                                        "   alert( 'top url=' + window.top.location );" +
                                        "   alert( '1st frame=' + top.frames[0].name );" +
                                        "   alert( '2nd frame=' + window.parent.blue.name );" +
+                                       "   alert( 'parent url=' + window.parent.location );" +
+                                       "   alert( 'top.parent=' + top.parent.location );" +
+                                       "   alert( 'indexed frame=' + top.frames['red'].name );" +
                                        "}" +
                                        "</script></head><body>" +
                                        "<a href=# onclick='show_properties()'>show</a>" +
@@ -364,6 +367,9 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "2nd alert", "top url=" + getHostPath() + "/Frames.html", wc.popNextAlert() );
         assertEquals( "3rd alert", "1st frame=red", wc.popNextAlert() );
         assertEquals( "4th alert", "2nd frame=blue", wc.popNextAlert() );
+        assertEquals( "5th alert", "parent url=" + getHostPath() + "/Frames.html", wc.popNextAlert() );
+        assertEquals( "6th alert", "top.parent=" + getHostPath() + "/Frames.html", wc.popNextAlert() );
+        assertEquals( "7th alert", "indexed frame=red", wc.popNextAlert() );
     }
 
 
