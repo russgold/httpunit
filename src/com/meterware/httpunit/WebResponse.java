@@ -49,7 +49,8 @@ abstract
 public class WebResponse implements HTMLSegment, CookieSource {
 
     final private static String HTML_CONTENT  = "text/html";
-    final private static String XHTML_CONTENT = "text/xhtml";
+    final private static String XHTML_CONTENT = "application/xhtml+xml";
+    final private static String FAUX_XHTML_CONTENT = "text/xhtml";
 
     final private static int UNINITIALIZED_INT = -2;
 
@@ -75,7 +76,9 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * Returns true if the response is HTML.
      **/
     public boolean isHTML() {
-        return getContentType().equalsIgnoreCase( HTML_CONTENT ) || getContentType().equalsIgnoreCase( XHTML_CONTENT );
+        return getContentType().equalsIgnoreCase( HTML_CONTENT ) ||
+               getContentType().equalsIgnoreCase( FAUX_XHTML_CONTENT ) ||
+               getContentType().equalsIgnoreCase( XHTML_CONTENT );
     }
 
 

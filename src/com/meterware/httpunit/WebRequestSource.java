@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
 import java.net.URL;
 import java.util.StringTokenizer;
 import java.io.IOException;
+import java.io.File;
 
 
 abstract

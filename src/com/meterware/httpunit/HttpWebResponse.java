@@ -213,12 +213,13 @@ class HttpWebResponse extends WebResponse {
             System.out.println( "Header:: " + connection.getHeaderField(0) );
         }
         for (int i = 1; true; i++) {
-            String key = connection.getHeaderFieldKey( i );
-            if (key == null) break;
+            String headerFieldKey = connection.getHeaderFieldKey( i );
+            String headerField = connection.getHeaderField(i);
+            if (headerFieldKey == null || headerField == null) break;
             if (HttpUnitOptions.isLoggingHttpHeaders()) {
-                System.out.println( "Header:: " + connection.getHeaderFieldKey( i ) + ": " + connection.getHeaderField(i) );
+                System.out.println( "Header:: " + headerFieldKey + ": " + headerField );
             }
-            addHeader( connection.getHeaderFieldKey( i ).toUpperCase(), connection.getHeaderField( i ) );
+            addHeader( headerFieldKey.toUpperCase(), headerField );
         }
 
         if (connection.getContentType() != null) {

@@ -23,6 +23,7 @@ import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;

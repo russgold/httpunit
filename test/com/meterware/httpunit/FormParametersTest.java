@@ -440,6 +440,8 @@ public class FormParametersTest extends HttpUnitTest {
         form.setParameter( "File", new UploadFileSpec[] { new UploadFileSpec( file ) } );
         assertEquals( "Selected filename", file.getAbsolutePath(), form.getParameterValue( "File" ) );
 
+        form.setParameter( "File", file );
+
         WebRequest wr = form.getRequest();
         assertEquals( "File from validated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
 

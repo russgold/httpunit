@@ -20,6 +20,7 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import java.io.IOException;
+import java.io.File;
 
 
 /**
@@ -84,6 +85,16 @@ abstract class ParameterHolder {
      **/
     abstract
     void setParameter( String name, String[] values );
+
+
+    /**
+     * Sets the single value of a file upload parameter in a form.
+     * A more convenient way to do this than using {@link #setParameter(String,UploadFileSpec[])}
+     * @since 1.5.5
+     */
+    public void setParameter( String name, File file ) {
+        setParameter( name, new UploadFileSpec[] { new UploadFileSpec( file ) } );
+    }
 
 
     /**

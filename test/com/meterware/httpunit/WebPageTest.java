@@ -83,6 +83,8 @@ public class WebPageTest extends HttpUnitTest {
         defineResource( "SimplePage.html", "<html><head><title>A Sample Page</title></head><body>Something here</body></html>", "text/html" );
         defineResource( "StructuredPage.html", "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML Basic 1.0//EN' 'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd'>" +
                                                "<html><head><title>A Structured Page</title></head><body>Something here</body></html>", "text/xhtml" );
+        defineResource( "XHTMLPage.html", "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML Basic 1.0//EN' 'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd'>" +
+                                               "<html><head><title>An XHTML Page</title></head><body>Something here</body></html>", "application/xhtml+xml" );
         WebConversation wc = new WebConversation();
         try {
             wc.getResponse( getHostPath() + "/TextPage.txt" ).getReceivedPage().getTitle();
@@ -94,6 +96,9 @@ public class WebPageTest extends HttpUnitTest {
 
         WebResponse structuredPage = wc.getResponse( getHostPath() + "/StructuredPage.html" );
         assertEquals( "XHTML Title", "A Structured Page", structuredPage.getReceivedPage().getTitle() );
+
+        WebResponse xhtmlPage = wc.getResponse( getHostPath() + "/XHTMLPage.html" );
+        assertEquals( "XHTML Title", "An XHTML Page", xhtmlPage.getReceivedPage().getTitle() );
     }
 
 

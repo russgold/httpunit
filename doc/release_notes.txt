@@ -13,6 +13,11 @@ Limitations:
 
 
 Revision History:
+10-Aug-2004:
+   Additions:
+       1. rfe #901172: "application/xhtml+xml" is now recognized as a valid HTML "content-type"
+       2. Added convenience method setParameter( String, File ) to simplify file uploading
+
  9-Aug-2004
    Problems fixed:
        1. When a form has no action specified and its URL contains parameters whose names match those of parameters
