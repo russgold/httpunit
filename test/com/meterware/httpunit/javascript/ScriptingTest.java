@@ -398,7 +398,6 @@ public class ScriptingTest extends HttpUnitTest {
                                           "<a href='#' onMouseOver=\"window.location='" + getHostPath() + "/Target.html';\">go</a>" +
                                           "<a href='#' onMouseOver=\"document.location='" + getHostPath() + "/Target.html';\">go</a>" +
                                           "<a href='#' onMouseOver=\"document.location.replace('" + getHostPath() + "/Target.html');\">go</a>" +
-                                          "<a href='#' onMouseOver=\"window.location.href='" + getHostPath() + "/Target.html';\">go</a>" +
                                           "</body>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
@@ -420,7 +419,7 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "4th page", "You made it!", wc.getCurrentPage().getText() );
 
         response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        response.getLinks()[3].mouseOver();
+        response.getScriptableObject().doEvent( "window.location.href='" + getHostPath() + "/Target.html'" );
         assertEquals( "5th page URL", getHostPath() + "/Target.html", wc.getCurrentPage().getURL().toExternalForm() );
         assertEquals( "5th page", "You made it!", wc.getCurrentPage().getText() );
     }
