@@ -170,6 +170,17 @@ class ParsedHTML {
     }
 
 
+//---------------------------------- package members --------------------------------
+
+
+    /**
+     * Returns the base URL for this HTML segment.
+     **/
+    URL getBaseURL() {
+        return _baseURL;
+    }
+
+
 //---------------------------------- private members --------------------------------
 
     private Node _rootNode;

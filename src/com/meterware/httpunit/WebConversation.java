@@ -96,11 +96,13 @@ public class WebConversation {
             throw new HttpNotFoundException( request.getURLString() );        
         } else {
             WebResponse result = new WebResponse( this, request.getTarget(), request.getURL(), connection );
-            removeSubFrames( request.getTarget() );
-            _frameContents.put( request.getTarget(), result );
-            createSubFrames( request.getTarget(), result.getFrameNames() );
-            WebRequest[] requests = result.getFrameRequests();
-            for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
+            if (result.isHTML()) {
+                removeSubFrames( request.getTarget() );
+                _frameContents.put( request.getTarget(), result );
+                createSubFrames( request.getTarget(), result.getFrameNames() );
+                WebRequest[] requests = result.getFrameRequests();
+                for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
+            }
             return result;
         }
     }

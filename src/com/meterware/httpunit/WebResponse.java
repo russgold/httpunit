@@ -33,6 +33,14 @@ public class WebResponse {
 
 
     /**
+     * Returns true if the response is HTML.
+     **/
+    public boolean isHTML() {
+        return _contentType.equals( HTML_CONTENT );
+    }
+
+
+    /**
      * Returns the URL which invoked this response.
      **/
     public URL getURL() {
@@ -94,7 +102,7 @@ public class WebResponse {
         Vector requests = new Vector();
         for (int i = 0; i < frames.getLength(); i++) {
             if (NodeUtils.getNodeAttribute( frames.item(i), "src" ).length() > 0) {
-                requests.addElement( new GetMethodWebRequest( this.getURL(), 
+                requests.addElement( new GetMethodWebRequest( getReceivedPage().getBaseURL(), 
                                                      NodeUtils.getNodeAttribute( frames.item(i), "src" ),
                                                      NodeUtils.getNodeAttribute( frames.item(i), "name" ) ) );
             }
@@ -230,6 +238,9 @@ public class WebResponse {
 
     final private static String endOfLine = System.getProperty( "line.separator" );
 
+
+    final private static String HTML_CONTENT = "text/html";
+
     private ReceivedPage _page;
 
     private String _responseText;
@@ -250,7 +261,7 @@ public class WebResponse {
      **/
     private WebResponse( String responseText ) {
         this( null, "", null, responseText );
-        _contentType = "text/html";
+        _contentType = HTML_CONTENT;
     }
 
 
@@ -287,7 +298,7 @@ public class WebResponse {
 
     private ReceivedPage getReceivedPage() throws SAXException {
         if (_page == null) {
-            if (!_contentType.equals( "text/html" )) throw new RuntimeException( "Response is not HTML" );
+            if (!isHTML()) throw new RuntimeException( "Response is not HTML" );
             _page = new ReceivedPage( _url, _target, _responseText );
         }
         return _page;
