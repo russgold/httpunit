@@ -8,6 +8,7 @@
 <LI><A HREF="#Cannot unzip">Why can't I unzip the download library?</A></LI>
 <LI><A HREF="#org.xml.sax">What is the org.xml.sax package?</A></LI>
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
+<LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
 <LI><A HREF="sslfaq.html">Does HttpUnit support https?</A></LI>
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
@@ -30,8 +31,11 @@ by HttpUnit. You should download Jtidy from
 and install Tidy.jar in your classpath.
 
 <A NAME="javascript"><H2>How do I use HttpUnit to test my pages that use JavaScript?</H2></A>
-Unfortunately, you can't - yet. I have started to add JavaScript support, but it is very basic as yet.
-If you would like to help out, please examine the code in cvs.
+You should not have to do anything special; however, not all JavaScript constructs are supported as yet. See
+<a href="javascript-support.html">the list of supported JavaScript features</a> for more information.
+
+<A NAME="#norhino"><H2>JavaScript is not being executed at all. Why not?</H2></A>
+If you do not have the Rhino JAR (js.jar) in your classpath, JavaScript features do not work.
 
 <A NAME="proxy"><H2>Can I use HttpUnit through a proxy server?</H2></A>
 Yes. HttpUnit uses java.net.HttpURLConnection, so the

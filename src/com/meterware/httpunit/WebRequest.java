@@ -298,9 +298,28 @@ public class WebRequest {
      **/
     private WebRequest( URL urlBase, String urlString, String target, ParameterHolder parameterHolder ) {
         _urlBase   = urlBase;
-        _urlString = urlString;
+        _urlString = escape( urlString );
         _target    = target;
         _parameterHolder = parameterHolder;
+    }
+
+
+    private static String escape( String urlString ) {
+        if (urlString.indexOf( ' ' ) < 0) return urlString;
+        StringBuffer sb = new StringBuffer();
+
+        int start = 0;
+        do {
+            int index = urlString.indexOf( ' ', start );
+            if (index < 0) {
+                sb.append( urlString.substring( start ) );
+                break;
+            } else {
+                sb.append( urlString.substring( start, index ) ).append( "%20" );
+                start = index+1;
+            }
+        } while (true);
+        return sb.toString();
     }
 
 

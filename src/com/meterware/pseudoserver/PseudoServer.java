@@ -166,10 +166,29 @@ public class PseudoServer {
 
     private String asResourceName( String rawName ) {
         if (rawName.startsWith( "/" )) {
-            return rawName;
+            return escape( rawName );
         } else {
-            return "/" + rawName;
+            return escape( "/" + rawName );
         }
+    }
+
+
+    private static String escape( String urlString ) {
+        if (urlString.indexOf( ' ' ) < 0) return urlString;
+        StringBuffer sb = new StringBuffer();
+
+        int start = 0;
+        do {
+            int index = urlString.indexOf( ' ', start );
+            if (index < 0) {
+                sb.append( urlString.substring( start ) );
+                break;
+            } else {
+                sb.append( urlString.substring( start, index ) ).append( "%20" );
+                start = index+1;
+            }
+        } while (true);
+        return sb.toString();
     }
 
 

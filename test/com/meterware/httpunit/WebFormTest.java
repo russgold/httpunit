@@ -23,6 +23,7 @@ import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
 import java.net.URL;
+import java.net.HttpURLConnection;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -447,6 +448,36 @@ public class WebFormTest extends HttpUnitTest {
         WebRequest request = form.getRequest();
         request.setParameter( "name", "Charlie" );
         assertEquals( "Request URL", getHostPath() + "/SayHello?speed=fast", request.getURL().toExternalForm() );
+
+        WebResponse answer = wc.getResponse( request );
+        String[][] cells = answer.getTables()[0].asText();
+
+        assertEquals( "Message", "Hello, there", cells[0][0] );
+    }
+
+
+    public void testPostWithEmbeddedSpace() throws Exception {
+        String sessionID = "/ID=03.019c010101010001.00000001.a202000000000019. 0d09";
+        defineResource( "login", "redirectoring", HttpURLConnection.HTTP_MOVED_PERM );
+        super.addResourceHeader( "login", "Location: " + getHostPath() + sessionID + "/login" );
+        defineResource( sessionID + "/login",
+                        "<html><head></head>" +
+                        "<form method=POST action='SayHello'>" +
+                        "<input type=text name=name><input type=submit></form></body></html>" );
+        defineResource( sessionID + "/SayHello", new PseudoServlet() {
+            public WebResource getPostResponse() {
+                String name = getParameter( "name" )[0];
+                WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
+                                                      "</td></tr></table></body></html>" );
+                return result;
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        WebResponse formPage = wc.getResponse( getHostPath() + "/login" );
+        WebForm form = formPage.getForms()[0];
+        WebRequest request = form.getRequest();
+        request.setParameter( "name", "Charlie" );
 
         WebResponse answer = wc.getResponse( request );
         String[][] cells = answer.getTables()[0].asText();

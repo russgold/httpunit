@@ -124,6 +124,20 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
+    public void testFunkyGet() throws Exception {
+        String resourceName = "ID=03.019c010101010001.00000001.a202000000000019. 0d09/login/";
+        String resourceValue = "the desired content";
+
+        defineResource( resourceName, resourceValue );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
+
     private String asBytes( String s ) {
         StringBuffer sb = new StringBuffer();
         char[] chars = s.toCharArray();

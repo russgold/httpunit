@@ -12,6 +12,13 @@ Limitations:
 
 
 Revision History:
+14-Aug-2002
+Additions:
+   1. The focus() method is now defined as a no-op for all controls
+
+Problems fixed:
+   1. Embedded spaces in URLs are now encoded when a request is made
+
 13-Aug-2002
 Additions:
    1. The onChange event now works for Select controls, Text controls, and TextArea controls.
