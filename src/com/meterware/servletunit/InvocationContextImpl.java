@@ -67,13 +67,13 @@ class InvocationContextImpl implements InvocationContext {
     public Servlet getServlet() throws ServletException {
         if (_servlet == null) {
             if (!_application.requiresAuthorization( _requestURL ) || userIsAuthorized() ) {
-                _servlet = _application.getServlet( _requestURL );
+                _servlet = _application.getServletRequest( _requestURL ).getServlet();
             } else if (_request.getRemoteUser() != null) {
                 throw new AccessDeniedException( _requestURL );
             } else if (_application.usesBasicAuthentication()) {
                 throw new BasicAuthenticationRequiredException( _application.getAuthenticationRealm() );
             } else if (_application.usesFormAuthentication()) {
-                _servlet = _application.getServlet( _application.getLoginURL() );
+                _servlet = _application.getServletRequest( _application.getLoginURL() ).getServlet();
                 ((ServletUnitHttpRequest) getRequest()).setOriginalURL( _requestURL );
             } else {
                 throw new IllegalStateException( "Authorization required but no authentication method defined" );
@@ -135,7 +135,8 @@ class InvocationContextImpl implements InvocationContext {
         _requestURL          = request.getURL();
         _target              = request.getTarget();
 
-        _request = new ServletUnitHttpRequest( request, runner.getContext(), clientHeaders, messageBody );
+        _request = new ServletUnitHttpRequest( _application.getServletRequest( _requestURL ), request, runner.getContext(),
+                                               clientHeaders, messageBody );
         for (int i = 0; i < cookies.length; i++) _request.addCookie( cookies[i] );
 
         if (_application.usesBasicAuthentication()) _request.readBasicAuthentication();

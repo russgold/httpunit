@@ -264,8 +264,8 @@ public class WebXMLTest extends TestCase {
         ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient wc = sr.newClient();
 
-        checkMapping( wc, "http://localhost/foo/bar/index.html",  Servlet1.class, "/foo/bar",            "/index.html" );
-        checkMapping( wc, "http://localhost/foo/bar/index.bop",   Servlet1.class, "/foo/bar",            "/index.bop" );
+        checkMapping( wc, "http://localhost/foo/bar/index.html",  Servlet1.class, "/foo/bar",             "/index.html" );
+        checkMapping( wc, "http://localhost/foo/bar/index.bop",   Servlet1.class, "/foo/bar",             "/index.bop" );
         checkMapping( wc, "http://localhost/baz",                 Servlet2.class, "/baz",                 null );
         checkMapping( wc, "http://localhost/baz/index.html",      Servlet2.class, "/baz",                 "/index.html" );
         checkMapping( wc, "http://localhost/catalog",             Servlet3.class, "/catalog",             null );
@@ -283,8 +283,8 @@ public class WebXMLTest extends TestCase {
     private void checkMapping( ServletUnitClient wc, final String url, final Class servletClass, final String expectedPath, final String expectedInfo ) throws IOException, ServletException {
         InvocationContext ic = wc.newInvocation( url );
         assertTrue( servletClass.isInstance( ic.getServlet() ) );
-//        assertEquals( "ServletPath", expectedPath, ic.getRequest().getServletPath() );
-//        assertEquals( "ServletInfo", expectedInfo, ic.getRequest().getPathInfo() );
+        assertEquals( "ServletPath for " + url, expectedPath, ic.getRequest().getServletPath() );
+        assertEquals( "ServletInfo for " + url, expectedInfo, ic.getRequest().getPathInfo() );
     }
 
 

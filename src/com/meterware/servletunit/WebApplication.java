@@ -55,6 +55,7 @@ import org.xml.sax.SAXException;
  **/
 class WebApplication {
 
+
     /**
      * Constructs a default application spec with no information.
      */
@@ -120,53 +121,8 @@ class WebApplication {
     }
 
 
-    synchronized Servlet getServlet( URL url ) throws ServletException {
-        final ServletConfiguration configuration = getServletConfiguration( url );
-        if (configuration == null) throw new HttpNotFoundException( url );
-
-        try {
-            Class servletClass = Class.forName( configuration.getClassName() );
-
-            Servlet cachedServlet = (Servlet)_cachedServlets.get(servletClass);
-            if (cachedServlet != null) return cachedServlet;
-
-            if (!Servlet.class.isAssignableFrom( servletClass )) throw new HttpInternalErrorException( url );
-            Servlet servlet = (Servlet) servletClass.newInstance();
-            servlet.init( new ServletUnitServletConfig( servlet, this, configuration.getInitParams(), _contextParameters, _contextDir ) );
-            _cachedServlets.put( servletClass, servlet );
-            return servlet;
-        } catch (ClassNotFoundException e) {
-            throw new HttpNotFoundException( url, e );
-        } catch (IllegalAccessException e) {
-            throw new HttpInternalErrorException( url, e );
-        } catch (InstantiationException e) {
-            throw new HttpInternalErrorException( url, e );
-        }
-    }
-
-
-    private ServletConfiguration getServletConfiguration( URL url ) {
-        if (!url.getFile().startsWith( _contextPath )) {
-            return null;
-        }
-        String servletName = getServletName( getURLPath( url ) );
-        if (servletName.endsWith( "j_security_check" )) {
-            return SECURITY_CHECK_CONFIGURATION;
-        } else {
-            return _servletMapping.get( servletName );
-        }
-    }
-
-
-    private String getURLPath( URL url ) {
-        String file = url.getFile();
-        if (_contextPath.equals( "" )) {
-            return file;
-        } else if (file.startsWith( _contextPath )) {
-            return file.substring( _contextPath.length() );
-        } else {
-            return null;
-        }
+    ServletRequest getServletRequest( URL url ) {
+        return _servletMapping.get( url );
     }
 
 
@@ -206,7 +162,16 @@ class WebApplication {
      * @param url the application-relative path of the URL
      */
     boolean requiresAuthorization( URL url ) {
-        return getControllingConstraint( getURLPath( url ) ) != NULL_SECURITY_CONSTRAINT;
+        String result;
+        String file = url.getFile();
+        if (_contextPath.equals( "" )) {
+            result = file;
+        } else if (file.startsWith( _contextPath )) {
+            result = file.substring( _contextPath.length() );
+        } else {
+            result = null;
+        }
+        return getControllingConstraint( result ) != NULL_SECURITY_CONSTRAINT;
     }
 
 
@@ -214,7 +179,16 @@ class WebApplication {
      * Returns true of the specified role may access the desired URL path.
      */
     boolean roleMayAccess( String roleName, URL url ) {
-        return getControllingConstraint( getURLPath( url ) ).hasRole( roleName );
+        String result;
+        String file = url.getFile();
+        if (_contextPath.equals( "" )) {
+            result = file;
+        } else if (file.startsWith( _contextPath )) {
+            result = file.substring( _contextPath.length() );
+        } else {
+            result = null;
+        }
+        return getControllingConstraint( result ).hasRole( roleName );
     }
 
 
@@ -227,12 +201,31 @@ class WebApplication {
     }
 
 
+    File getResourceFile( String path ) {
+        if (_contextDir == null) {
+            return null;
+        } else {
+            return new File( _contextDir, path.substring(1) );
+        }
+    }
+
+
+    Hashtable getContextParameters() {
+        return _contextParameters;
+    }
+
+
 //------------------------------------------------ private members ---------------------------------------------
 
-    private final static ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
+
+    private final static SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
+
+    private final ServletConfiguration SECURITY_CHECK_CONFIGURATION = new ServletConfiguration( SecurityCheckServlet.class.getName() );
+
+    private final ServletMapping SECURITY_CHECK_MAPPING = new ServletMapping( SECURITY_CHECK_CONFIGURATION );
 
     /** A mapping of resource names to servlet class names. **/
-    private ServletMapping _servletMapping = new ServletMapping();
+    private ServletMap _servletMapping = new ServletMap();
 
     private ArrayList _securityConstraints = new ArrayList();
 
@@ -251,10 +244,6 @@ class WebApplication {
     private File _contextDir = null;
 
     private String _contextPath = null;
-
-    private HashMap _cachedServlets = new HashMap();
-
-    final static private SecurityConstraint NULL_SECURITY_CONSTRAINT = new NullSecurityConstraint();
 
 
     private void extractLoginConfiguration( Document document ) throws MalformedURLException, SAXException {
@@ -338,16 +327,8 @@ class WebApplication {
     }
 
 
-    private String getServletName( String urlFile ) {
-        if (urlFile.indexOf( '?' ) < 0) {
-            return urlFile;
-        } else {
-            return urlFile.substring( 0, urlFile.indexOf( '?' ) );
-        }
-    }
-
-
 //============================================= SecurityCheckServlet class =============================================
+
 
     static class SecurityCheckServlet extends HttpServlet {
 
@@ -372,7 +353,7 @@ class WebApplication {
 //============================================= ServletConfiguration class =============================================
 
 
-    static class ServletConfiguration {
+    class ServletConfiguration {
 
         public ServletConfiguration( String className ) {
             _className = className;
@@ -389,6 +370,17 @@ class WebApplication {
         }
 
 
+        synchronized Servlet getServlet() throws ClassNotFoundException, InstantiationException, IllegalAccessException, ServletException {
+            if (_servlet == null) {
+                Class servletClass = Class.forName( getClassName() );
+                _servlet = (Servlet) servletClass.newInstance();
+                _servlet.init( new ServletUnitServletConfig( _servlet, WebApplication.this, getInitParams() ) );
+            }
+
+            return _servlet;
+        }
+
+
         String getClassName() {
             return _className;
         }
@@ -399,6 +391,7 @@ class WebApplication {
         }
 
 
+        private Servlet _servlet;
         private String _className;
         private Hashtable _initParams = new Hashtable();
     }
@@ -485,28 +478,126 @@ class WebApplication {
     }
 
 
+    static class ServletRequestImpl implements ServletRequest {
+
+        private URL            _url;
+        private String         _servletName;
+        private ServletMapping _mapping;
+
+
+        ServletRequestImpl( URL url, String servletName, ServletMapping mapping ) {
+            _url = url;
+            _servletName = servletName;
+            _mapping = mapping;
+        }
+
+
+        public Servlet getServlet() throws ServletException {
+            if (getConfiguration() == null) throw new HttpNotFoundException( _url );
+
+            try {
+                return getConfiguration().getServlet();
+            } catch (ClassNotFoundException e) {
+                throw new HttpNotFoundException( _url, e );
+            } catch (IllegalAccessException e) {
+                throw new HttpInternalErrorException( _url, e );
+            } catch (InstantiationException e) {
+                throw new HttpInternalErrorException( _url, e );
+            } catch (ClassCastException e) {
+                throw new HttpInternalErrorException( _url, e );
+            }
+        }
+
+
+        public String getServletPath() {
+            return _mapping == null ? null : _mapping.getServletPath( _servletName );
+        }
+
+
+        public String getPathInfo() {
+            return _mapping == null ? null : _mapping.getPathInfo( _servletName );
+        }
+
+
+        private ServletConfiguration getConfiguration() {
+            return _mapping == null ? null : _mapping.getConfiguration();
+        }
+    }
+
+
+    static class ServletMapping {
+
+        private ServletConfiguration _configuration;
+
+
+        ServletConfiguration getConfiguration() {
+            return _configuration;
+        }
+
+
+        ServletMapping( ServletConfiguration configuration ) {
+            _configuration = configuration;
+        }
+
+
+        String getServletPath( String servletName ) {
+            return servletName;
+        }
+
+
+        String getPathInfo( String servletName ) {
+            return null;
+        }
+    }
+
+
+    static class PartialMatchServletMapping extends ServletMapping {
+
+        private String _prefix;
+
+
+        public PartialMatchServletMapping( ServletConfiguration configuration, String prefix ) {
+            super( configuration );
+            if (!prefix.endsWith( "/*" )) throw new IllegalArgumentException( prefix + " does not end with '/*'" );
+            _prefix = prefix.substring( 0, prefix.length()-2 );
+        }
+
+
+        String getServletPath( String servletName ) {
+            return _prefix;
+        }
+
+
+        String getPathInfo( String servletName ) {
+            return servletName.length() > _prefix.length()
+                    ? servletName.substring( _prefix.length() )
+                    : null;
+        }
+    }
+
+
     /**
      * A utility class for mapping servlets to url patterns. This implements the
      * matching algorithm documented in section 10 of the JSDK-2.2 reference.
      */
-    class ServletMapping {
+    class ServletMap {
 
         private final Map _exactMatches = new HashMap();
         private final Map _extensions = new HashMap();
         private final Map _urlTree = new HashMap();
 
         void put( String mapping, ServletConfiguration servletConfiguration ) {
-            if (mapping.indexOf( '*' ) == -1) {
-                _exactMatches.put( mapping, servletConfiguration );
-            } else if (mapping.startsWith( "*." )) {
-                _extensions.put( mapping.substring( 2 ), servletConfiguration );
+            if (mapping.startsWith( "*." )) {
+                _extensions.put( mapping.substring( 2 ), new ServletMapping( servletConfiguration ) );
+            } else if (!mapping.startsWith( "/" ) || !mapping.endsWith( "/*" )) {
+                _exactMatches.put( mapping, new ServletMapping( servletConfiguration ) );
             } else {
                 ParsedPath path = new ParsedPath( mapping );
                 Map context = _urlTree;
                 while (path.hasNext()) {
                     String part = path.next();
                     if (part.equals( "*" )) {
-                        context.put( "*", servletConfiguration );
+                        context.put( "*", new PartialMatchServletMapping( servletConfiguration, mapping ) );
                         return;
                     }
                     if (!context.containsKey( part )) {
@@ -514,20 +605,42 @@ class WebApplication {
                     }
                     context = (Map) context.get( part );
                 }
-                context.put( "/", servletConfiguration );
             }
         }
 
 
-        ServletConfiguration get( String url ) {
-            if (_exactMatches.containsKey( url )) return (ServletConfiguration) _exactMatches.get( url );
+        ServletRequest get( URL url ) {
+            String file = url.getFile();
+            if (!file.startsWith( _contextPath )) throw new HttpNotFoundException( url );
+
+            String servletName = getServletName( file.substring( _contextPath.length() ) );
+
+            if (servletName.endsWith( "j_security_check" )) {
+                return new ServletRequestImpl( url, servletName, SECURITY_CHECK_MAPPING );
+            } else {
+                return new ServletRequestImpl( url, servletName, getMapping( servletName ) );
+            }
+        }
+
+
+        private String getServletName( String urlFile ) {
+            if (urlFile.indexOf( '?' ) < 0) {
+                return urlFile;
+            } else {
+                return urlFile.substring( 0, urlFile.indexOf( '?' ) );
+            }
+        }
+
+
+        private ServletMapping getMapping( String url ) {
+            if (_exactMatches.containsKey( url )) return (ServletMapping) _exactMatches.get( url );
 
             Map context = getContextForLongestPathPrefix( url );
-            if (context.containsKey( "*" )) return (ServletConfiguration) context.get( "*" );
+            if (context.containsKey( "*" )) return (ServletMapping) context.get( "*" );
 
-            if (_extensions.containsKey( getExtension( url ))) return (ServletConfiguration) _extensions.get( getExtension( url ) );
+            if (_extensions.containsKey( getExtension( url ))) return (ServletMapping) _extensions.get( getExtension( url ) );
 
-            if (_urlTree.containsKey( "/" )) return (ServletConfiguration) _urlTree.get( "/" );
+            if (_urlTree.containsKey( "/" )) return (ServletMapping) _urlTree.get( "/" );
 
             final String prefix = "/servlet/";
             if (!url.startsWith( prefix )) return null;
@@ -535,7 +648,7 @@ class WebApplication {
             String className = url.substring( prefix.length() );
             try {
                 Class.forName( className );
-                return new ServletConfiguration( className );
+                return new ServletMapping( new ServletConfiguration( className ) );
             } catch (ClassNotFoundException e) {
                 return null;
             }

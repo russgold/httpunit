@@ -12,6 +12,10 @@ Limitations:
 
 
 Revision History:
+19-Jun-2002
+Additions:
+    1. ServletUnit now implements the HttpServletRequest.getServletPath and getPathInfo methods.
+
 18-Jun-2002
 Acknowledgements:
     Thanks to Jessica Sant for correcting the handling of error statuses.

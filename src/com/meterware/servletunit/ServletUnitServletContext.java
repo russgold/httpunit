@@ -23,6 +23,7 @@ package com.meterware.servletunit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -31,6 +32,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.*;
 
@@ -41,10 +43,8 @@ import javax.servlet.*;
  **/
 class ServletUnitServletContext implements ServletContext {
 
-    ServletUnitServletContext( WebApplication application, Hashtable contextParams, File contextDir ) {
+    ServletUnitServletContext( WebApplication application ) {
         _application = application;
-        _contextParams = contextParams;
-        _contextDir = contextDir;
     }
 
 
@@ -111,15 +111,11 @@ class ServletUnitServletContext implements ServletContext {
      * method does not use class loaders.
      **/
     public java.net.URL getResource( String path ) {
-        if (_contextDir == null) {
-            return null; // no context, but maybe try against working dir?
-        } else {
-            try {
-                File resourceFile = new File(_contextDir, path.substring(1));
-                return resourceFile.toURL();
-            } catch (IOException e) {
-                return null;
-            }
+        try {
+            File resourceFile = _application.getResourceFile( path );
+            return resourceFile == null ? null : resourceFile.toURL();
+        } catch (MalformedURLException e) {
+            return null;
         }
     }
 
@@ -138,15 +134,11 @@ class ServletUnitServletContext implements ServletContext {
      * containers to make a resource available to a servlet from any location, without using a class loader.
      **/
     public java.io.InputStream getResourceAsStream( String path ) {
-        if (_contextDir == null) {
-            return null; // no context, but maybe try against working dir?
-        } else {
-            try {
-                File resourceFile = new File(_contextDir, path.substring(1));
-                return new FileInputStream(resourceFile);
-            } catch (IOException e) {
-                return null;
-            }
+        try {
+            File resourceFile = _application.getResourceFile( path );
+            return resourceFile == null ? null : new FileInputStream( resourceFile );
+        } catch (FileNotFoundException e) {
+            return null;
         }
     }
 
@@ -161,7 +153,8 @@ class ServletUnitServletContext implements ServletContext {
      **/
     public javax.servlet.RequestDispatcher getRequestDispatcher( String path ) {
         try {
-            return new RequestDispatcherImpl( _application.getServlet( new URL( "http", "localhost", path ) ) );
+            URL url = new URL( "http", "localhost", path );
+            return new RequestDispatcherImpl( _application.getServletRequest( url ).getServlet() );
         } catch (ServletException e) {
             return null;
         } catch (MalformedURLException e) {
@@ -267,7 +260,7 @@ class ServletUnitServletContext implements ServletContext {
      * webmaster's email address or the name of a system that holds critical data.
      **/
     public java.lang.String getInitParameter( String name ) {
-        return (String) _contextParams.get( name );
+        return (String) getContextParams().get( name );
     }
 
 
@@ -276,7 +269,7 @@ class ServletUnitServletContext implements ServletContext {
      * or an empty Enumeration if the context has no initialization parameters.
      **/
     public java.util.Enumeration getInitParameterNames() {
-            return _contextParams.keys();
+            return getContextParams().keys();
         }
 
 
@@ -351,12 +344,12 @@ class ServletUnitServletContext implements ServletContext {
 
 
     void setInitParameter( String name, Object initParameter ) {
-        _contextParams.put( name, initParameter );
+        getContextParams().put( name, initParameter );
     }
 
 
     void removeInitParameter( String name ) {
-        _contextParams.remove( name );
+        getContextParams().remove( name );
     }
 
 
@@ -366,6 +359,9 @@ class ServletUnitServletContext implements ServletContext {
 
     private Hashtable      _attributes = new Hashtable();
     private WebApplication _application;
-    private Hashtable      _contextParams = new Hashtable();
-    private File           _contextDir;
+
+
+    private Hashtable getContextParams() {
+        return _application.getContextParameters();
+    }
 }

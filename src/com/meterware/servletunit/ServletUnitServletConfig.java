@@ -34,10 +34,10 @@ import javax.servlet.ServletContext;
 class ServletUnitServletConfig implements ServletConfig {
 
 
-    ServletUnitServletConfig( Servlet servlet, WebApplication application, Hashtable initParams, Hashtable contextParams, File contextDir ) {
+    ServletUnitServletConfig( Servlet servlet, WebApplication application, Hashtable initParams ) {
         _name = servlet.getClass().getName();
         _initParameters = initParams;
-        _context = new ServletUnitServletContext( application, contextParams, contextDir );
+        _context = new ServletUnitServletContext( application );
     }
 
 

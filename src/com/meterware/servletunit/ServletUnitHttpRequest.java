@@ -57,7 +57,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     /**
      * Constructs a ServletUnitHttpRequest from a WebRequest object.
      **/
-    ServletUnitHttpRequest( WebRequest request, ServletUnitContext context, Dictionary clientHeaders, byte[] messageBody ) throws MalformedURLException {
+    ServletUnitHttpRequest( ServletRequest servletRequest, WebRequest request, ServletUnitContext context, Dictionary clientHeaders, byte[] messageBody ) throws MalformedURLException {
+        _servletRequest = servletRequest;
         _request = request;
         _context = context;
         _headers = new WebClient.HeaderDictionary();
@@ -165,8 +166,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * or a path to the servlet, but does not include any extra path information or a query string. 
      **/
     public String getServletPath() {
-        throwNotImplementedYet();
-        return "";
+        return _servletRequest.getServletPath();
     }
 
 
@@ -184,7 +184,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * This method returns null if there was no extra path information.
      **/ 
     public String getPathInfo() {
-        return null;
+        return _servletRequest.getPathInfo();
     }
 
 
@@ -720,6 +720,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
     private WebRequest                 _request;
+    private ServletRequest             _servletRequest;
     private WebClient.HeaderDictionary _headers;
     private ServletUnitContext         _context;
     private ServletUnitHttpSession     _session;
