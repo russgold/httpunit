@@ -13,6 +13,14 @@ Limitations:
 
 
 Revision History:
+24-Mar-2003
+Acknowledgements:
+    Thanks to Andrew Bickerton for identifying the javascript parent frame update problem and suggesting a fix.
+
+Problems fixed:
+    1. Following a javascript link which updated a parent frame via manipulating the location was causing a 'NoSuchFrame'
+       exception to be thrown.
+
  23-Mar-2003
 Problems fixed:
     1. ServletUnit had not implemented HttpServletRequest.getURL();

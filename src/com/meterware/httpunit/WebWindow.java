@@ -179,6 +179,14 @@ public class WebWindow {
 
 
     /**
+     * Returns true if the specified frame name is defined in this window.
+     */
+    public boolean hasFrame( String frameName ) {
+        return _frameContents.get( frameName ) != null;
+    }
+
+
+    /**
      * Returns the response associated with the specified frame name.
      * Throws a runtime exception if no matching frame is defined.
      **/
@@ -239,6 +247,5 @@ public class WebWindow {
             && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
             && response.getHeaderField( "Location" ) != null;
     }
-
 
 }

@@ -205,8 +205,13 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     protected WebResponse submitRequest( String event, final WebRequest request ) throws IOException, SAXException {
         WebResponse response = null;
         if (event.length() == 0 || getScriptableDelegate().doEvent( event )) response = submitRequest( request );
-        if (response == null) response = getBaseResponse().getWindow().getFrameContents( getPageFrame() );
+        if (response == null) response = getCurrentFrame( getBaseResponse().getWindow(), getPageFrame() );
         return response;
+    }
+
+
+    private WebResponse getCurrentFrame( WebWindow window, String pageFrame ) {
+        return window.hasFrame( pageFrame ) ? window.getFrameContents( pageFrame ) : window.getCurrentPage();
     }
 
 

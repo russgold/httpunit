@@ -176,5 +176,25 @@ public class FrameScriptingTest extends HttpUnitTest {
         assertEquals("Content of blue frame after clicking menu link", "Menu/Page/Target", _wc.getFrameContents("blue").getTitle());
     }
 
+
+    /**
+     * Verifies that a javascript URL which triggers refresh to the parent of a frame resolves with something sensible.
+     */
+    public void testJavaScriptURLToParentFrame() throws Exception {
+        defineResource( "Frames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src='Linker.html' name='red'>" +
+                        "    <FRAME src=Form name=blue>" +
+                        "</FRAMESET></HTML>" );
+        defineWebPage( "Linker",  "This is a trivial page with <a href='javascript:window.parent.location.replace( \"Target\" );'>one link</a>" );
+        defineResource( "Form",    "This is a page with nothing we care about");
+        defineResource( "Target",  "You made it!", "text/plain" );
+
+        _wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse result = _wc.getFrameContents( "red" ).getLinkWith( "one link" ).click();
+        assertEquals( "Result of click", "You made it!", result.getText() );
+    }
+
     private WebConversation _wc;
 }
