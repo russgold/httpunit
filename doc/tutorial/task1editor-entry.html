@@ -89,13 +89,13 @@ as well:<p />
 
     WebForm form = response.getFormWithID( "pool" );
     assertNotNull( "No form found with ID 'pool'", form );
-    WebRequest request = form.getRequest( "save", "Save" );                  // (1) select a submit button
 
-    request.setParameter( "away1", "Detroit Lions" );                        // (2) enter values into the form
-    request.setParameter( "home1", "Denver Broncos" );
-    request.setParameter( "tiebreaker", "1" );
-    response = client.getResponse( request );                                // (3) submit the form
-    form = response.getFormWithID( "pool" );
+    form.setParameter( "away1", "Detroit Lions" );                           // (1) enter values into the form
+    form.setParameter( "home1", "Denver Broncos" );
+    form.setParameter( "tiebreaker", "1" );
+
+    SubmitButton saveButton = getSubmitButton( "save", "Save" );             // (2) select the desired submit button
+    response = form.submit( saveButton );                                    // (3) submit the form
 
     assertEquals( "Away team 0", "", form.getParameterValue( "away0" ) );    // (4) verify the response
     assertEquals( "Home team 0", "", form.getParameterValue( "home0" ) );
@@ -106,11 +106,10 @@ as well:<p />
 }
 </pre>
 <p>This is our first form submission. Take note:<ol>
-<li>The first step in submitting a form is obtaining a request from it. Since this form has two named submit buttons,
-we must specify which one we want to be included in the request.</li>
 <li>We make a call for each parameter that we want to set. Any parameters we do not set will be submitted with their
 default values.</li>
-<li>We submit the form by asking our client to get a response to the prepared request.</li>
+<li>Since there is more than one button in the form, we ask for the one we want by name and value.</li>
+<li>We submit the form, specifying the desired button.</li>
 <li>We can use the same methods as above to check the new state of the pool. Alternately, we could have examined the
 BettingPool object directly.</li></ol></p>
 

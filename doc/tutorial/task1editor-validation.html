@@ -32,24 +32,26 @@ pieces and build one at a time. With <code>ServletUnit</code>, we can:<p />
     client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
     WebForm form = response.getFormWithID( "pool" );
-    WebRequest request = form.getRequest( "save", "Open Pool" );
 
-    request.setParameter( "away1", "Detroit Lions" );
-    request.setParameter( "home1", "Denver Broncos" );
-    request.setParameter( "home2", "Baltimore Ravens" );
-    request.setParameter( "tiebreaker", "3" );
-    InvocationContext context = client.newInvocation( request );           // (1) create an invocation context
+    form.setParameter( "away1", "Detroit Lions" );
+    form.setParameter( "home1", "Denver Broncos" );
+    form.setParameter( "home2", "Baltimore Ravens" );
+    form.setParameter( "tiebreaker", "3" );
+    WebRequest request = form.getRequest( "save", "Open Pool" );           // (1) select the request object directly
+    InvocationContext context = client.newInvocation( request );           // (2) create an invocation context
 
-    PoolEditorServlet servlet = (PoolEditorServlet) context.getServlet();  // (2) locate the invoked servlet
-    servlet.updateBettingPool( context.getRequest() );                     // (3) ask servlet to update the data
-    String[] errors = servlet.getValidationErrors();                       // (4) ask servlet to check the data
+    PoolEditorServlet servlet = (PoolEditorServlet) context.getServlet();  // (3) locate the invoked servlet
+    servlet.updateBettingPool( context.getRequest() );                     // (4) ask servlet to update the data
+    String[] errors = servlet.getValidationErrors();                       // (5) ask servlet to check the data
     assertEquals( "Number of errors reported", 2, errors.length );
     assertEquals( "First error", "Tiebreaker is not a valid game", errors[0] );
     assertEquals( "Second error", "Game 2 has no away team", errors[1] );
 }
 </pre>
 <p>This test starts out like all the others, but once we have created the request, things venture into new territory:<ol>
-<li>Rather than simply asking for the response, we create a context in which we can step through the invocation of the servlet.
+<li>Rather than simply submitting the form, we ask for the request object used to do the submission. This was hidden
+from us in the last test.</li>
+<li>Given the request, we create a context in which we can step through the invocation of the servlet.
 This uses the same mechanisms to locate and initialize the servlet, request, and response objects, but does not actually
 invoke the servlet to process the request.</li>
 <li>We retrieve the initialized servlet and cast it in order to get at its intermediate methods.</li>
@@ -98,28 +100,28 @@ containing bad inputs. We therefore ask for the response from the bad open pool 
     client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
     WebForm form = response.getFormWithID( "pool" );
-    WebRequest request = form.getRequest( "save", "Open Pool" );               // (1) select a submit button
 
-    request.setParameter( "away1", "Detroit Lions" );                          // (2) enter bad values into the form
-    request.setParameter( "home1", "Denver Broncos" );
-    request.setParameter( "home2", "Baltimore Ravens" );
-    request.setParameter( "tiebreaker", "3" );
-    response = client.getResponse( request );                                  // (3) submit the form
+    form.setParameter( "away1", "Detroit Lions" );                        // (1) enter bad values into the form
+    form.setParameter( "home1", "Denver Broncos" );
+    form.setParameter( "home2", "Baltimore Ravens" );
+    form.setParameter( "tiebreaker", "3" );
 
-    WebTable errorTable = response.getTableStartingWithPrefix( "Cannot ope" ); // (4) Look for error table
+    SubmitButton openButton = getSubmitButton( "save", "Open Pool" );     // (2) select the desired submit button
+    response = form.submit( saveButton );                                 // (3) submit the form
+
+    WebTable errorTable = response.getTableWithID( "errors" );            // (4) Look for the error table
     assertNotNull( "No errors reported", errorTable );
-    String[][] cells = errorTable.asText();                                    // (5) Convert non-empty cells to text
+    String[][] cells = errorTable.asText();                               // (5) Convert non-empty cells to text
     assertEquals( "Number of error messages provided", 2, cells.length - 1 );
     assertEquals( "Error message", "Tiebreaker is not a valid game", cells[1][0] );
     assertEquals( "Error message", "Game 2 has no away team", cells[2][0] );
 }
 </pre>
 <p>Note:<ol>
-<li>We select the "Open Pool" button to be included with the form submission.</li>
-<li>We then enter known bad values.</li>
+<li>We enter known bad values.</li>
+<li>We then select the "Open Pool" button to be included with the form submission.</li>
 <li>We want the response when we submit the form changes.</li>
-<li>We expect to find them in a table which we can recognize because its upper-leftmost non-empty cell which starts with
-a known string.</li>
+<li>We expect to find them in a table with "errors" as its ID.</li>
 <li>Since we want to examine the textual content of any non-empty cells in the table, we ask that the table be converted
 to a two-dimensional string array. In this case, there should only be one non-blank cell in each row.</li></ol></p>
 
@@ -136,7 +138,7 @@ to a two-dimensional string array. In this case, there should only be one non-bl
 
 
 <b>private void</b> reportErrors( PrintWriter pw, String[] errors ) {
-    pw.println( "&lt;table width='90%' style='background-color=yellow; " );
+    pw.println( "&lt;table id='errors' width='90%' style='background-color=yellow; " );
     pw.println( "   border-color: black; border-width: 2; border-style: solid'&gt;" );
     pw.println( "&lt;tr&gt;&lt;td colspan='2'&gt;&lt;b&gt;Cannot open pool for betting:&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;" );
     <b>for</b> (int i=0; i &lt; errors.length; i++) {
@@ -162,14 +164,13 @@ the pool itself. We will test this by verifying that the "save" submit buttons a
     client.setAuthorization( "aUser", "pool-admin" );
     WebResponse response = client.getResponse( "http://localhost/PoolEditor" );
     WebForm form = response.getFormWithID( "pool" );
-    WebRequest request = form.getRequest( "save", "Open Pool" );
 
-    request.setParameter( "away1", "Detroit Lions" );
-    request.setParameter( "home1", "Denver Broncos" );
-    request.setParameter( "away3", "Indianapolis Colts" );
-    request.setParameter( "home3", "Baltimore Ravens" );
-    request.setParameter( "tiebreaker", "3" );
-    client.getResponse( request );                                                // (1) ignore the response
+    form.setParameter( "away1", "Detroit Lions" );
+    form.setParameter( "home1", "Denver Broncos" );
+    form.setParameter( "away3", "Indianapolis Colts" );
+    form.setParameter( "home3", "Baltimore Ravens" );
+    form.setParameter( "tiebreaker", "3" );
+    form.getSubmitButton( "save", "Open Pool" ).click();                          // (1) click the submit button
 
     response = client.getResponse( "http://localhost/PoolEditor" );               // (2) retrieve the page separately
     form = response.getFormWithID( "pool" );
@@ -183,7 +184,8 @@ the pool itself. We will test this by verifying that the "save" submit buttons a
 }
 </pre>
 <p>Note:<ol>
-<li>We are not interested in the response this time because we may ultimately have the browser forwarded to the main page.</li>
+<li>Since we are not interested in the response this time (because we may ultimately have the browser forwarded to the main page),
+we simply click the submit button. This does the same as calling form.submit(), but does not return a response value.</li>
 <li>We come back to the form as though we were planning on editing it anew.</li>
 <li>We want to ensure that the submit buttons are disabled so the user cannot submit the form.</li>
 <li>We also verify that the fields are now marked readonly, which would prevent us from changing them. If the
