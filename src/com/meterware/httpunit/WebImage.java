@@ -67,15 +67,15 @@ public class WebImage extends FixedURLWebRequestSource {
 
 
     public WebLink getLink() {
-        return _parsedHTML.getLinkSatisfyingPredicate( new ParsedHTML.LinkPredicate() {
+        return _parsedHTML.getFirstMatchingLink( new HTMLElementPredicate() {
 
-            public boolean isTrue( WebLink link ) {
-                for (Node parent = _node.getParentNode(); parent != null; parent = parent.getParentNode()) {
-                    if (parent.equals( link.getNode() )) return true;
+            public boolean matchesCriteria( Object link, Object parentNode ) {
+                for (Node parent = (Node) parentNode; parent != null; parent = parent.getParentNode()) {
+                    if (parent.equals( ((WebLink) link).getNode() )) return true;
                 }
                 return false;
             }
-        } );
+        }, _node.getParentNode() );
     }
 
 

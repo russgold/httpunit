@@ -18,6 +18,8 @@ Additions:
     1. Following the "_blank" target now creates a new web window, with its own set of frames. Following links or submitting
        forms will update the window from which the request originated. Requests may also now be initiated from an open window.
        The list of open windows is a property of the web client.
+    2. The mechanism for searching for tables has been expanded to permit arbitrary search criteria, similar to that
+       for links.
 
 Problems fixed:
     1. The cookie header was being generated with a space after each ";" separator.

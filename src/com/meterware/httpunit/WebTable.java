@@ -34,6 +34,19 @@ import org.w3c.dom.*;
 public class WebTable {
 
 
+    /** Predicate to match the complete text of a table's first non-blank cell. **/
+    public final static HTMLElementPredicate MATCH_FIRST_NONBLANK_CELL;
+
+    /** Predicate to match a prefix of a table's first non-blank cell. **/
+    public final static HTMLElementPredicate MATCH_FIRST_NONBLANK_CELL_PREFIX;
+
+    /** Predicate to match a table's summary attribute. **/
+    public final static HTMLElementPredicate MATCH_SUMMARY;
+
+    /** Predicate to match a table's ID. **/
+    public final static HTMLElementPredicate MATCH_ID;
+
+
     /**
      * Returns the number of rows in the table.
      **/
@@ -406,6 +419,41 @@ public class WebTable {
         }
     }
 
+    static {
+        MATCH_FIRST_NONBLANK_CELL = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                WebTable table = ((WebTable) htmlElement);
+                table.purgeEmptyCells();
+                return table.getRowCount() > 0 &&
+                       HttpUnitUtils.matches( table.getCellAsText(0,0), (String) criteria );
+            };
+        };
+
+
+        MATCH_FIRST_NONBLANK_CELL_PREFIX = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                WebTable table = ((WebTable) htmlElement);
+                table.purgeEmptyCells();
+                return table.getRowCount() > 0 &&
+                       HttpUnitUtils.hasPrefix( table.getCellAsText(0,0).toUpperCase(), (String) criteria );
+            };
+        };
+
+
+        MATCH_ID = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.matches( ((WebTable) htmlElement).getID(), (String) criteria );
+            };
+        };
+
+
+        MATCH_SUMMARY = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
+                return HttpUnitUtils.matches( ((WebTable) htmlElement).getSummary(), (String) criteria );
+            };
+        };
+
+    }
 
 }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -118,6 +118,14 @@ public interface HTMLSegment {
      * @exception SAXException thrown if there is an error parsing the segment.
      **/
     public WebTable[] getTables() throws SAXException;
+
+
+    /**
+     * Returns the first table in the response which matches the specified predicate and value.
+     * Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getFirstMatchingTable( HTMLElementPredicate predicate, Object criteria ) throws SAXException;
 
 
     /**

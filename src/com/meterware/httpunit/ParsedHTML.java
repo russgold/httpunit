@@ -242,18 +242,22 @@ class ParsedHTML {
 
 
     /**
+     * Returns the first table in the response which matches the specified predicate and value.
+     * Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getFirstMatchingTable( HTMLElementPredicate predicate, Object criteria ) {
+        return getTableSatisfyingPredicate( getTables(), predicate, criteria );
+    }
+
+
+    /**
      * Returns the first table in the response which has the specified text as the full text of
      * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableStartingWith( final String text ) {
-        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
-            public boolean isTrue( WebTable table ) {
-                table.purgeEmptyCells();
-                return table.getRowCount() > 0 &&
-                       HttpUnitUtils.matches( table.getCellAsText(0,0), text );
-            }
-        } );
+    public WebTable getTableStartingWith( String text ) {
+        return getFirstMatchingTable( WebTable.MATCH_FIRST_NONBLANK_CELL, text );
     }
 
 
@@ -262,14 +266,8 @@ class ParsedHTML {
      * in its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableStartingWithPrefix( final String text ) {
-        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
-            public boolean isTrue( WebTable table ) {
-                table.purgeEmptyCells();
-                return table.getRowCount() > 0 &&
-                       HttpUnitUtils.hasPrefix( table.getCellAsText(0,0).toUpperCase(), text );
-            }
-        } );
+    public WebTable getTableStartingWithPrefix( String text ) {
+        return getFirstMatchingTable( WebTable.MATCH_FIRST_NONBLANK_CELL_PREFIX, text );
     }
 
 
@@ -278,12 +276,8 @@ class ParsedHTML {
      * Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableWithSummary( final String summary ) {
-        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
-            public boolean isTrue( WebTable table ) {
-                return HttpUnitUtils.matches( table.getSummary(), summary );
-            }
-        } );
+    public WebTable getTableWithSummary( String summary ) {
+        return getFirstMatchingTable( WebTable.MATCH_SUMMARY, summary );
     }
 
 
@@ -292,12 +286,8 @@ class ParsedHTML {
      * Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableWithID( final String ID ) {
-        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
-            public boolean isTrue( WebTable table ) {
-                return HttpUnitUtils.matches( table.getID(), ID );
-            }
-        } );
+    public WebTable getTableWithID( String ID ) {
+        return getFirstMatchingTable( WebTable.MATCH_ID, ID );
     }
 
 
@@ -361,25 +351,6 @@ class ParsedHTML {
     }
 
 
-    interface TablePredicate {
-        public boolean isTrue( WebTable table );
-    }
-
-
-    interface LinkPredicate {
-        public boolean isTrue( WebLink link );
-    }
-
-
-    WebLink getLinkSatisfyingPredicate( LinkPredicate predicate ) {
-        WebLink[] links = getLinks();
-        for (int i = 0; i < links.length; i++) {
-            if (predicate.isTrue( links[ i ] )) return links[ i ];
-        }
-        return null;
-    }
-
-
 //---------------------------------- private members --------------------------------
 
     private Node _rootNode;
@@ -416,9 +387,9 @@ class ParsedHTML {
     /**
      * Returns the table with the specified text in its summary attribute.
      **/
-    private WebTable getTableSatisfyingPredicate( WebTable[] tables, TablePredicate predicate ) {
+    private WebTable getTableSatisfyingPredicate( WebTable[] tables, HTMLElementPredicate predicate, Object value ) {
         for (int i = 0; i < tables.length; i++) {
-            if (predicate.isTrue( tables[i] )) {
+            if (predicate.matchesCriteria( tables[i], value )) {
                 return tables[i];
             } else {
                 for (int j = 0; j < tables[i].getRowCount(); j++) {
@@ -427,7 +398,7 @@ class ParsedHTML {
                         if (cell != null) {
                             WebTable[] innerTables = cell.getTables();
                             if (innerTables.length != 0) {
-                                WebTable result = getTableSatisfyingPredicate( innerTables, predicate );
+                                WebTable result = getTableSatisfyingPredicate( innerTables, predicate, value );
                                 if (result != null) return result;
                             }
                         }

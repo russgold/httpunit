@@ -408,16 +408,6 @@ public class WebResponse implements HTMLSegment {
 
 
     /**
-     * Returns the top-level tables found in this page in the order in which
-     * they appear.
-     * @exception SAXException thrown if there is an error parsing the response.
-     **/
-    public WebTable[] getTables() throws SAXException {
-        return getReceivedPage().getTables();
-    }
-
-
-    /**
      * Returns a copy of the domain object model tree associated with this response.
      * If the response is HTML, it will use a special parser which can transform HTML into an XML DOM.
      * @exception SAXException thrown if there is an error parsing the response.
@@ -432,6 +422,26 @@ public class WebResponse implements HTMLSegment {
                 throw new SAXException( e );
             }
         }
+    }
+
+
+    /**
+     * Returns the top-level tables found in this page in the order in which
+     * they appear.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebTable[] getTables() throws SAXException {
+        return getReceivedPage().getTables();
+    }
+
+
+    /**
+     * Returns the first table in the response which matches the specified predicate and value.
+     * Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getFirstMatchingTable( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+        return getReceivedPage().getFirstMatchingTable( predicate, criteria );
     }
 
 
