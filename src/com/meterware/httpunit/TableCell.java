@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -30,7 +30,7 @@ import org.w3c.dom.*;
 /**
  * A single cell in an HTML table.
  **/
-public class TableCell extends ParsedHTML {
+public class TableCell extends ParsedHTML implements HTMLSegment {
 
     
     /**
@@ -57,6 +57,14 @@ public class TableCell extends ParsedHTML {
     }
 
     
+    /**
+     * Returns a copy of the domain object model associated with this HTML segment.
+     **/
+    public Node getDOM() {
+        return super.getDOM();
+    }
+
+
 //---------------------------------------- package methods -----------------------------------------
 
 

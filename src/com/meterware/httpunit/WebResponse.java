@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
  * A response from a web server to a web request.
  **/
 abstract
-public class WebResponse {
+public class WebResponse implements HTMLSegment {
 
 
     /**
@@ -167,6 +167,8 @@ public class WebResponse {
     }
 
 
+//---------------------- HTMLSegment methods -----------------------------
+
     /**
      * Returns the forms found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the response.
@@ -282,6 +284,9 @@ public class WebResponse {
     public WebTable getTableWithID( String text ) throws SAXException {
         return getReceivedPage().getTableWithID( text );
     }
+
+
+//---------------------------------------- Object methods --------------------------------------------
 
 
     public String toString() {
