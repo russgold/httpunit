@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Set;
 
 import javax.servlet.*;
 
@@ -52,7 +53,7 @@ class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns the major version of the Java Servlet API that this servlet container supports. 
-     * All implementations that comply with Version 2.2 must have this method return the integer 2.
+     * All implementations that comply with Version 2.3 must have this method return the integer 2.
      **/
     public int getMajorVersion() {
         return 2;
@@ -61,7 +62,7 @@ class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns the minor version of the Servlet API that this servlet container supports. 
-     * All implementations that comply with Version 2.2 must have this method return the integer 2.
+     * All implementations that comply with Version 2.3 must have this method return the integer 2.
      **/
     public int getMinorVersion() {
         return 2;
@@ -268,6 +269,51 @@ class ServletUnitServletContext implements ServletContext {
         _attributes.remove( name );
     }
 
+
+
+//----------------------------- methods added to ServletContext in JSDK 2.3 --------------------------------------
+
+    /**
+     * Returns a directory-like listing of all the paths to resources within the web application
+     * whose longest sub-path matches the supplied path argument. Paths indicating subdirectory paths end with a '/'.
+     * The returned paths are all relative to the root of the web application and have a leading '/'.
+     * For example, for a web application containing
+     * <p>
+     * /welcome.html<br />
+     * /catalog/index.html<br /><br />
+     * /catalog/products.html<br />
+     * /catalog/offers/books.html<br />
+     * /catalog/offers/music.html<br />
+     * /customer/login.jsp<br />
+     * /WEB-INF/web.xml<br />
+     * /WEB-INF/classes/com.acme.OrderServlet.class,<br />
+     * <br />
+     * getResourcePaths("/") returns {"/welcome.html", "/catalog/", "/customer/", "/WEB-INF/"}<br />
+     * getResourcePaths("/catalog/") returns {"/catalog/index.html", "/catalog/products.html", "/catalog/offers/"}.
+     *
+     * @param path partial path used to match the resources, which must start with a /
+     * @return a Set containing the directory listing, or null if there are no resources
+     *         in the web application whose path begins with the supplied path.
+     * @since HttpUnit 1.3
+     */
+    public Set getResourcePaths( String path ) {
+        return null;
+    }
+
+
+    /**
+     * Returns the name of this web application correponding to this ServletContext as specified
+     * in the deployment descriptor for this web application by the display-name element.
+     *
+     * @return The name of the web application or null if no name has been declared in the deployment descriptor
+     * @since HttpUnit 1.3
+     */
+    public String getServletContextName() {
+        return null;
+    }
+
+
+//------------------------------------------- private members ----------------------------------------------------
 
     private final static Vector EMPTY_VECTOR = new Vector();
     private Hashtable _attributes = new Hashtable();

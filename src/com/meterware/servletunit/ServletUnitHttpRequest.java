@@ -24,12 +24,14 @@ import com.meterware.httpunit.WebRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.StringTokenizer;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
@@ -569,7 +571,52 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         throw new RuntimeException( "getContextPath not implemented" );
     }
 
-     
+
+//--------------------------------------- methods added to ServletRequest in JSDK 2.3 ----------------------------
+
+    /**
+     * Returns a java.util.Map of the parameters of this request.
+     * Request parameters are extra information sent with the request. For HTTP servlets, parameters are contained
+     * in the query string or posted form data.
+     *
+     * @since 1.3
+     **/
+    public Map getParameterMap() {
+        return null;    // XXX implement me!
+    }
+
+
+    /**
+     * Overrides the name of the character encoding used in the body of this request.
+     * This method must be called prior to reading request parameters or reading input using getReader().
+     *
+     * @since 1.3
+     **/
+    public void setCharacterEncoding( String s ) throws UnsupportedEncodingException {
+        // XXX implement me!
+    }
+
+
+//--------------------------------------- methods added to HttpServletRequest in JSDK 2.3 ----------------------------
+
+
+    /**
+     * Reconstructs the URL the client used to make the request.
+     * The returned URL contains a protocol, server name, port number, and server path, but
+     * it does not include query string parameters.
+     *
+     * Because this method returns a StringBuffer, not a string, you can modify the URL easily, for example,
+     * to append query parameters.
+     *
+     * This method is useful for creating redirect messages and for reporting errors.
+     *
+     * @since 1.3
+     */
+    public StringBuffer getRequestURL() {
+        return null;
+    }
+
+
 //--------------------------------------------- package members ----------------------------------------------
 
 

@@ -25,6 +25,7 @@ import java.util.Hashtable;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
+import javax.servlet.ServletContext;
 
 
 class ServletUnitHttpSession implements HttpSession {
@@ -187,7 +188,19 @@ class ServletUnitHttpSession implements HttpSession {
     }
 
 
-//------------------------------------- package members ---------------------------------------
+//---------------------------- methods added to HttpSession in JSDK 2.3 ----------------------------------------
+
+
+    /**
+     * Returns the ServletContext to which this session belongs.
+     *
+     * @since 1.3
+     **/
+    public ServletContext getServletContext() {
+        return null;    // XXX implement me
+    }
+
+//-------------------------------------------- package members -------------------------------------------------
 
 
     /**

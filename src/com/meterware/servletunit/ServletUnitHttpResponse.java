@@ -389,8 +389,21 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     }
 
      
-     
-//---------------------------------------- package methods ---------------------------------------
+//----------------------------- methods added to ServletResponse in JSDK 2.3 --------------------------------------
+
+
+    /**
+     * Clears the content of the underlying buffer in the response without clearing headers or status code.
+     * If the response has been committed, this method throws an IllegalStateException.
+     *
+     * @since 1.3
+     */
+    public void resetBuffer() {
+        // XXX implement me
+    }
+
+
+//---------------------------------------------- package methods --------------------------------------------------
 
 
     /**
