@@ -31,6 +31,31 @@ public class HttpUnitOptions {
 
 
     /**
+     * Resets the default character set to the platform default encoding.
+     **/
+    public static void resetDefaultCharacterSet() {
+        _characterSet = DEFAULT_CHARACTER_SET;
+    }
+
+
+    /**
+     * Sets the default character set for pages which do not specify one. By default, HttpUnit uses the platform
+     * default encoding.
+     **/
+    public static void setDefaultCharacterSet( String characterSet ) {
+        _characterSet = characterSet;
+    }
+
+
+    /**
+     * Returns the character set to be used for pages which do not specify one.
+     **/
+    public static String getDefaultCharacterSet() {
+        return _characterSet;
+    }
+
+
+    /**
      * Returns true if parser warnings are enabled.
      **/
     public static boolean getParserWarningsEnabled() {
@@ -118,6 +143,8 @@ public class HttpUnitOptions {
 //--------------------------------- private members --------------------------------------
 
 
+    private static String DEFAULT_CHARACTER_SET = "iso-8859-1";
+
     private static boolean _parserWarningsEnabled;
 
     private static boolean _parameterValuesValidated = true;
@@ -127,6 +154,8 @@ public class HttpUnitOptions {
     private static boolean _loggingHttpHeaders;
 
     private static int _redirectDelay;
+
+    private static String _characterSet = DEFAULT_CHARACTER_SET;
 
 }
 

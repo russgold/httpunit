@@ -80,7 +80,9 @@ class HttpWebResponse extends WebResponse {
 //-------------------------------------------- private members ------------------------------------------------
 
 
-    final private static String endOfLine = System.getProperty( "line.separator" );
+    final private static String endOfLine     = System.getProperty( "line.separator" );
+    final private static String _fileEncoding = System.getProperty( "file.encoding" );
+
 
     private int    _responseCode = HttpURLConnection.HTTP_OK;
 
@@ -120,6 +122,9 @@ class HttpWebResponse extends WebResponse {
                 _responseCode = ((HttpURLConnection) connection).getResponseCode();
             } else {
                 _responseCode = HttpURLConnection.HTTP_OK;
+                if (getContentType().startsWith( "text" )) {
+                    _headers.put( "Content-type".toUpperCase(), getContentType() + "; charset=" + _fileEncoding );
+                }
             }
         } catch (IOException e) {
         }
@@ -140,6 +145,7 @@ class HttpWebResponse extends WebResponse {
             _headers.put( "Content-type".toUpperCase(), connection.getContentType() );
         } 
     }
+
 
 
     private void addHeader( String key, String field ) {

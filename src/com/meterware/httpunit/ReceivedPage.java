@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,7 +41,7 @@ class ReceivedPage extends ParsedHTML {
 
 
     public ReceivedPage( URL url, String parentTarget, String pageText ) throws SAXException {
-        super( url, parentTarget, getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes() ), null ) );
+        super( url, parentTarget, getDOM( pageText ) );
         setBaseAttributes();
     }
 
@@ -53,6 +54,15 @@ class ReceivedPage extends ParsedHTML {
         if (nl.getLength() == 0) return "";
         if (!nl.item(0).hasChildNodes()) return "";
         return nl.item(0).getFirstChild().getNodeValue();
+    }
+
+
+    private static Node getDOM( String pageText ) throws SAXException {
+        try {
+            return getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes( "UTF-8" ) ), null );
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException( "UTF-8 encoding failed" );
+        }
     }
 
 
@@ -83,7 +93,7 @@ class ReceivedPage extends ParsedHTML {
 
     private static Tidy getParser() {
         Tidy tidy = new Tidy();
-        tidy.setCharEncoding( org.w3c.tidy.Configuration.RAW ); 
+        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 ); 
         tidy.setQuiet( true );
         tidy.setShowWarnings( HttpUnitOptions.getParserWarningsEnabled() );
         return tidy;

@@ -81,6 +81,16 @@ public class PseudoServer {
 
 
     /**
+     * Enables the sending of the character set in the content-type header.
+     **/
+    public void setSendCharacterSet( String name, boolean enabled ) {
+        WebResource resource = (WebResource) _resources.get( asResourceName( name ) );
+        if (resource == null) throw new IllegalArgumentException( "No defined resource " + name );
+        resource.setSendCharacterSet( enabled );
+    }
+
+
+    /**
      * Specifies the character set encoding for a resource.
      **/
     public void setCharacterSet( String name, String characterSet ) {
@@ -150,14 +160,13 @@ public class PseudoServer {
                 sendResponse( pw, HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + uri );
             } else {
                 sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
-                sendLine( pw, "Content-type: " + resource.getContentType() + "; charset=" + resource.getCharacterSet() );
+                sendLine( pw, "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
                 String[] headers = resource.getHeaders();
                 for (int i = 0; i < headers.length; i++) {
                     sendLine( pw, headers[i] );
                 }
                 sendLine( pw, "" );
                 pw.flush();
-
                 pw = new PrintWriter( new OutputStreamWriter( socket.getOutputStream(), resource.getCharacterSet() ) );
                 sendText( pw, resource.getContents() );
             }
@@ -184,6 +193,17 @@ public class PseudoServer {
     }
 
 
+
+    private String toUnicode( String string ) {
+        StringBuffer sb = new StringBuffer( );
+        char[] chars = string.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            sb.append( "\\u" );
+            sb.append( Integer.toHexString( chars[i] ) );
+        }
+        return sb.toString();
+    }
+    
 
     private ServerSocket getServerSocket() throws IOException {
         synchronized (this) {
@@ -226,6 +246,11 @@ class WebResource {
     }
 
 
+    void setSendCharacterSet( boolean enabled ) {
+        _sendCharacterSet = enabled;
+    }
+
+
     String[] getHeaders() {
         String[] headers = new String[ _headers.size() ];
         _headers.copyInto( headers );
@@ -247,10 +272,20 @@ class WebResource {
         return _characterSet;
     }
 
-    private String _contents;
-    private String _contentType;
-    private String _characterSet = DEFAULT_CHARACTER_SET;
-    private Vector _headers = new Vector();
+
+    String getCharacterSetParameter() {
+        if (!_sendCharacterSet) {
+            return "";
+        } else {
+            return "; charset=" + _characterSet;
+        }
+    }
+
+    private boolean _sendCharacterSet;
+    private String  _contents;
+    private String  _contentType;
+    private String  _characterSet = DEFAULT_CHARACTER_SET;
+    private Vector  _headers = new Vector();
 }
 
 

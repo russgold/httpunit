@@ -44,6 +44,12 @@ class HttpUnitTest extends TestCase {
     }
 
 
+    protected void setResourceCharSet( String resourceName, String setName, boolean reportCharSet ) {
+        _server.setCharacterSet( resourceName, setName );
+        _server.setSendCharacterSet( resourceName, reportCharSet );
+    }
+
+
     protected void defineWebPage( String pageName, String body ) {
         defineResource( pageName + ".html", "<html><head><title>" + pageName + "</title></head>\n" + 
                                             "<body>" + body + "</body></html>" );

@@ -55,6 +55,7 @@ public class WebPageTest extends HttpUnitTest {
 
     public void setUp() throws Exception {
         super.setUp();
+        HttpUnitOptions.resetDefaultCharacterSet();
     }
 	
 	
@@ -77,12 +78,11 @@ public class WebPageTest extends HttpUnitTest {
                         " and <a name=here>an anchor</a>\n" +
                         "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
                         "</body></html>\n" );
-
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
         WebResponse simplePage = wc.getResponse( request );
         assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
-        assertEquals( "Character set", "us-ascii", simplePage.getCharacterSet() );
+        assertEquals( "Character set", "iso-8859-1", simplePage.getCharacterSet() );
     }
 
 
@@ -110,7 +110,7 @@ public class WebPageTest extends HttpUnitTest {
         WebRequest request = new GetMethodWebRequest( "file:" + file.getAbsolutePath() );
         WebResponse simplePage = wc.getResponse( request );
         assertEquals( "Title", "A Sample Page", simplePage.getTitle() );
-        assertEquals( "Character set", "us-ascii", simplePage.getCharacterSet() );
+        assertEquals( "Character set", System.getProperty( "file.encoding" ), simplePage.getCharacterSet() );
 
         file.delete();
     }
@@ -131,5 +131,38 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
-                              
+    public void testSpecifiedEncoding() throws Exception {
+        String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
+        String page = "<html><head><title>" + hebrewTitle + "</title></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+        setResourceCharSet( "SimplePage.html", "iso-8859-8", true );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Title", hebrewTitle, simplePage.getTitle() );
+        assertEquals( "Character set", "iso-8859-8", simplePage.getCharacterSet() );
+    }
+
+
+    public void testUnspecifiedEncoding() throws Exception {
+        String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
+        String page = "<html><head><title>" + hebrewTitle + "</title></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+        setResourceCharSet( "SimplePage.html", "iso-8859-8", false );
+
+        HttpUnitOptions.setDefaultCharacterSet( "iso-8859-8" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertEquals( "Character set", "iso-8859-8", simplePage.getCharacterSet() );
+        assertEquals( "Title", hebrewTitle, simplePage.getTitle() );
+    }
+
 }

@@ -6,12 +6,16 @@ Known problems:
 
 Limitations: HttpUnit does not support JavaScript
 
-
+                            
 Revision History:
+Acknowledgements:
+    Thanks to Toyoshi Ushio for helping with the handling of non-English scripts and for translating the home page and cookbook into Japanese.
+25-Dec-2000
 Additions:
     1. Added getTableWithID method to WebResponse, ParsedHTML
     2. Implemented support for sendRedirect, getServletContext in ServletUnit
     3. Added recognition of content charset header. This should allow for proper handling of non-ascii html pages.
+    4. Added HttpUnitOptions.setDefaultCharacterSet to handle missing content charset headers not to assume default encoding (iso-8859-1).
      
 21-Nov-00
 Additions:

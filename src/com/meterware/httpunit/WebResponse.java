@@ -106,7 +106,7 @@ public class WebResponse {
     public String getCharacterSet() {
         if (_characterSet == null) {
             readContentTypeHeader();
-            if (_characterSet == null) _characterSet = DEFAULT_CHARACTER_SET;
+            if (_characterSet == null) _characterSet = HttpUnitOptions.getDefaultCharacterSet();
         }
         return _characterSet;
     }
@@ -326,8 +326,7 @@ public class WebResponse {
 
 
     final private static String DEFAULT_CONTENT_TYPE   = "text/plain";
-    final private static String DEFAULT_CHARACTER_SET  = "us-ascii";
-    final private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE + "; charset=" + DEFAULT_CHARACTER_SET;
+    final private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
 
     final private static String HTML_CONTENT = "text/html";
 
@@ -342,7 +341,7 @@ public class WebResponse {
     private Hashtable _newCookies;
 
 
-    // the following variables are essentially final; however, the JDK 1.1 compiler does not handle final variables properly with
+    // the following variables are essentially final; however, the JDK 1.1 compiler does not handle blank final variables properly with
     // multiple constructors that call each other, so the final qualifiers have been removed.
 
     private URL    _url;

@@ -11,7 +11,7 @@
 <LI><A HREF="javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="https">Does HttpUnit support https?</A></LI>
 <LI><A HREF="proxy">Can I use HttpUnit through a proxy server?</A></LI>
-
+<LI><A HREF="charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 </OL>
 
 
@@ -44,6 +44,15 @@ its three jars in your classpath.
 Yes. HttpUnit uses java.net.HttpURLConnection, so the 
 <A HREF="http://www.javaworld.com/javaworld/javatips/jw-javatip42.html">normal Java way to use
 proxies will work. At some point HttpUnit may support this more directly, but for now, you will need to set the system properties yourself.   
+
+<A NAME="charset"><H2>Why isn't HttpUnit handling my non-English pages?</H2></A>
+Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform. 
+HttpUnit now correctly recognizes the charset parameter of the Content-type header which may specify an alternative character set;
+when none is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1. 
+Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers incorrectly use this as an indication that they should
+determine the character set in some other fashion.  To imitate this behavior, HttpUnit allows you to set the expected character
+set for future pages by calling HttpUnitOptions.setDefaultCharacterSet(). This setting will not apply to those pages for which the server specifies
+the character set.   
 
 </BODY></HTML> 
 
