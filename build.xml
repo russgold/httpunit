@@ -24,8 +24,6 @@
     <property name="example.classes" value="${build.dir}/examples" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
 
-    <property name="use.jtidy" value="" />
-
     <property name="dist.dir" value="dist" />
     <property name="archive.dir" value="${dist.dir}/${name}-${version}" />
     <property name="classpath" value="" />
@@ -59,7 +57,7 @@
                                            classpathref="base.classpath" />
     <available property="jtidy.present"    classname="org.w3c.tidy.Tidy"
                                            classpathref="base.classpath" />
-    <available property="nekoHTML.present" classname="org.cyberneko.html.parsers.DOMParser"
+    <available property="nekoHTML.present" classname="org.cyberneko.html.HTMLConfiguration"
                                            classpathref="base.classpath" />
 </target>
 
@@ -102,6 +100,20 @@
              <pathelement location="${build.classes}" />
          </classpath>
     </javac>
+</target>
+
+
+<!--  ===================================================================  -->
+<!--  Runs the main example                                                -->
+<!--  ===================================================================  -->
+<target name="run-example" depends="compile-examples">
+    <java fork="true" classname="Example" dir="${basedir}">
+        <classpath>
+            <path refid="base.classpath"/>
+            <pathelement location="${example.classes}"/>
+            <pathelement location="${build.classes}"/>
+        </classpath>
+    </java>
 </target>
 
 

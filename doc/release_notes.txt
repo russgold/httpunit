@@ -10,6 +10,13 @@ Limitations:
 
 
 Revision History:
+25-Nov-2002
+Acknowledgements:
+    Thanks to Larry Hamel for supplying an ant target to run the first example
+
+Additions:
+    1. There is now an ant target to run the Example program.
+
 22-Nov-2002
 Notes:
     1. The nekohtml.jar included has a patch supplied by the author (Andy Clark) to support applet parameter tags
