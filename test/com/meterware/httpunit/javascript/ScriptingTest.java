@@ -258,8 +258,10 @@ public class ScriptingTest extends HttpUnitTest {
         response.getLinks()[0].click();
 
         assertFalse( "No window opened", windowsOpened.isEmpty() );
-        assertEquals( "New window message", "", ((WebWindow) windowsOpened.get( 0 )).getCurrentPage().getText() );
-        assertEquals( "New window name", "sample", ((WebWindow) windowsOpened.get( 0 )).getName() );
+        final WebWindow openedWindow = (WebWindow) windowsOpened.get( 0 );
+        assertEquals( "New window message", "", openedWindow.getCurrentPage().getText() );
+        assertEquals( "New window name", "sample", openedWindow.getName() );
+        assertEquals( "Window by name", openedWindow, wc.getOpenWindow( "sample" ) );
     }
 
 

@@ -1,12 +1,9 @@
 High priority:
 o closing windows
-o WebClient.getOpenWindow( name )
 o better support for use with proxy server
 
 Medium priority:
 o replace JTidy with a simpler custom parser or NekoHTML
-o Enable client code to write directly to the output stream of a message body request
-o Provide customization for table to text
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Documentation, Documentation
@@ -16,6 +13,8 @@ o Document.write - will require replacing JTidy
 
 
 Possibles:
+o Enable client code to write directly to the output stream of a message body request
+o Provide customization for table to text
 
 
 Low priority:

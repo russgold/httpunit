@@ -65,6 +65,16 @@ public class WebClient {
     }
 
 
+    public WebWindow getOpenWindow( String name ) {
+        if (name == null || name.length() == 0) return null;
+        for (Iterator i = _openWindows.iterator(); i.hasNext();) {
+            WebWindow window = (WebWindow) i.next();
+            if (name.equals( window.getName() )) return window;
+        }
+        return null;
+    }
+
+
     /**
      * Submits a GET method request and returns a response.
      * @exception SAXException thrown if there is an error parsing the retrieved page
