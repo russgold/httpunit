@@ -612,7 +612,11 @@ public class WebResponse implements HTMLSegment {
             } else if (propertyName.equalsIgnoreCase( "opener" )) {
                 return getFrameName().equals( WebRequest.TOP_FRAME ) ? getScriptable( _window.getOpener() ) : null;
             } else {
-                return super.get( propertyName );
+                try {
+                    return getSubframeContents( propertyName ).getScriptableObject();
+                } catch (NoSuchFrameException e) {
+                    return super.get( propertyName );
+                }
             }
         }
 

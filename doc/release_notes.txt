@@ -17,6 +17,7 @@ Problems fixed:
 
 Additions:
     1. Added support for Window.parent
+    2. Added support for Window.<subframe-name>
 
  9-Oct-2002
 Acknowledgements:
