@@ -1,4 +1,4 @@
-package com.meterware.httpunit.parsing;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,48 +19,37 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
-import java.net.URL;
-import java.io.IOException;
 
 /**
- * A front end to a DOM parser that can handle HTML.
+ * An interface which defines the common properties for an HTML element, which can correspond to any HTML tag.
  *
  * @since 1.5.2
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
  **/
-public interface HTMLParser {
+public interface HTMLElement {
 
     /**
-     * Parses the specified text string as a Document, registering it in the HTMLPage.
-     * Any error reporting will be annotated with the specified URL.
-     */
-    public void parse( URL baseURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException;
-
-
-    /**
-     * Removes any string artifacts placed in the text by the parser. For example, a parser may choose to encode
-     * an HTML entity as a special character. This method should convert that character to normal text.
-     */
-    public String getCleanedText( String string );
+     * Returns the ID associated with this element. IDs are unique throughout the HTML document.
+     **/
+     String getID();
 
 
     /**
-     * Returns true if this parser supports preservation of the case of tag and attribute names.
-     */
-    public boolean supportsPreserveTagCase();
+     * Returns the name associated with this element.
+     **/
+    String getName();
 
 
     /**
-     * Returns true if this parser can return an HTMLDocument object.
-     */
-    public boolean supportsReturnHTMLDocument();
+     * Returns the title associated with this element.
+     **/
+    String getTitle();
 
 
     /**
-     * Returns true if this parser can display parser warnings.
+     * Returns the delegate which supports scripting this element.
      */
-    public boolean supportsParserWarnings();
+    ScriptableDelegate getScriptableDelegate();
 }

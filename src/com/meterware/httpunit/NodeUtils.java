@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.Stack;
+import java.util.Iterator;
 
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 
@@ -81,7 +82,7 @@ class NodeUtils {
          * Does appropriate processing on specified element. Will return false if the subtree below the element
          * should be skipped.
          */
-        public boolean processElement( Element element );
+        public boolean processElement( PreOrderTraversal traversal, Element element );
 
         /**
          * Processes a text node.
@@ -95,8 +96,8 @@ class NodeUtils {
      **/
     public static String asText( NodeList rootNodes ) {
         final StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
-        processNodes( rootNodes, new NodeAction() {
-            public boolean processElement( Element node ) {
+        NodeAction action = new NodeAction() {
+            public boolean processElement( PreOrderTraversal traversal, Element node ) {
                 if (node.getNodeName().equalsIgnoreCase( "p" )) {
                     sb.append( "\n" );
                 } else if (node.getNodeName().equalsIgnoreCase( "tr" )) {
@@ -113,41 +114,76 @@ class NodeUtils {
             public void processTextNodeValue( String value ) {
                 sb.append( HTMLParserFactory.getHTMLParser().getCleanedText( value ) );
             }
-        } );
+        };
+        new PreOrderTraversal( rootNodes ).perform( action );
         return sb.toString();
     }
 
 
-    /**
-     * Converts the DOM trees rooted at the specified nodes to text, ignoring
-     * any HTML tags.
-     **/
-    public static void processNodes( NodeList rootNodes, NodeAction action ) {
-        Stack pendingNodes = new Stack();
-        pushNodeList( rootNodes, pendingNodes );
+    static class PreOrderTraversal {
 
-        while (!pendingNodes.empty()) {
-            Node node = (Node) pendingNodes.pop();
+        private Stack _pendingNodes = new Stack();
+        private Stack _traversalContext = new Stack();
+        private static final Object POP_CONTEXT = new Object();
 
-            if (node.getNodeType() == Node.TEXT_NODE) {
-                action.processTextNodeValue( node.getNodeValue() );
-            } else if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            } else
-                action.processElement( (Element) node );
 
-            pushNodeList( node.getChildNodes(), pendingNodes );
+        public PreOrderTraversal( NodeList rootNodes ) {
+            pushNodeList( rootNodes );
         }
-    }
 
 
-    private static void pushNodeList( NodeList nl, Stack stack ) {
-        if (nl != null) {
-            for (int i = nl.getLength()-1; i >= 0; i--) {
-                stack.push( nl.item(i) );
+        public PreOrderTraversal( Node rootNode ) {
+            pushNodeList( rootNode.getLastChild() );
+        }
+
+
+        public void pushBaseContext( Object context ) {
+            _traversalContext.push( context );
+        }
+
+
+        public void pushContext( Object context ) {
+            _traversalContext.push( context );
+            _pendingNodes.push( POP_CONTEXT );
+        }
+
+
+        public Iterator getContexts() {
+            return _traversalContext.iterator();
+        }
+
+
+        public void perform( NodeAction action ) {
+            while (!_pendingNodes.empty()) {
+                final Object object = _pendingNodes.pop();
+                if (object == POP_CONTEXT) {
+                    _traversalContext.pop();
+                } else {
+                    Node node = (Node) object;
+                    if (node.getNodeType() == Node.TEXT_NODE) {
+                        action.processTextNodeValue( node.getNodeValue() );
+                    } else if (node.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    } else
+                        action.processElement( this, (Element) node );
+                    pushNodeList( node.getLastChild() );
+                }
             }
         }
-    }
 
+
+        private void pushNodeList( NodeList nl ) {
+            if (nl != null) {
+                for (int i = nl.getLength()-1; i >= 0; i--) {
+                    _pendingNodes.push( nl.item(i) );
+                }
+            }
+        }
+
+
+        private void pushNodeList( Node lastChild ) {
+            for (Node node = lastChild; node != null; node = node.getPreviousSibling()) { _pendingNodes.push( node ); }
+        }
+    }
 
 }

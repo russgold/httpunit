@@ -191,11 +191,17 @@ public class HtmlTablesTest extends HttpUnitTest {
         defineWebPage( "Default", "<h2>Interesting data</h2>" +
                                   "<table id=you summary=\"outer one\">" +
                                   "<tr><td>Here we are</td><td>" +
-                                  "Inner Table<br>" +
-                                  "<table id=me summary=\"inner one\">" +
+                                  "Inner Table 1<br>" +
+                                  "<table id=you summary='inner zero'>" +
                                   "        <tr><td colspan=2>&nbsp;</td></tr>" +
                                   "        <tr><td>Red</td><td>1</td></tr>" +
                                   "        <tr><td>Blue</td><td>2</td></tr>" +
+                                  "</table></td><td>" +
+                                  "Inner Table 2<br>" +
+                                  "<table id=me summary=\"inner one\">" +
+                                  "        <tr><td colspan=2>&nbsp;</td></tr>" +
+                                  "        <tr><td>Black</td><td>1</td></tr>" +
+                                  "        <tr><td>White</td><td>2</td></tr>" +
                                   "</table></td></tr>" +
                                   "</table>" );
 
@@ -219,14 +225,14 @@ public class HtmlTablesTest extends HttpUnitTest {
         cells = wt.asText();
         assertEquals( "Total rows",    3, cells.length );
         assertEquals( "Total columns", 2, cells[0].length );
-        assertEquals( "cell at 2,0",       "Blue", cells[2][0] );
+        assertEquals( "cell at 2,0",       "White", cells[2][0] );
 
         wt = page.getTableWithID( "me" );
         assertNotNull( "Did not find table with id 'me'", wt );
         cells = wt.asText();
         assertEquals( "Total rows",    3, cells.length );
         assertEquals( "Total columns", 2, cells[0].length );
-        assertEquals( "cell at 2,0",       "Blue", cells[2][0] );
+        assertEquals( "cell at 2,0",       "White", cells[2][0] );
     }
 
 

@@ -31,7 +31,7 @@ import java.io.IOException;
 
 
 abstract
-public class WebRequestSource extends ParameterHolder {
+public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     /**
      * Returns the ID associated with this request source.
@@ -97,13 +97,6 @@ public class WebRequestSource extends ParameterHolder {
      **/
     abstract
     public String[] getParameterValues( String name );
-
-
-    /**
-     * Returns the scriptable delegate.
-     */
-    abstract
-    ScriptableDelegate getScriptableDelegate();
 
 
     /**

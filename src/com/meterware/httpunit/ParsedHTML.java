@@ -21,10 +21,11 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -42,17 +43,28 @@ class ParsedHTML {
 
     private WebResponse  _response;
 
-    private boolean      _updateForms;
+    private boolean      _updateElements = true;
+
+    /** map of element IDs to elements. **/
+    private HashMap      _elementsByID = new HashMap();
+
+    /** map of DOM elements to HTML elements **/
+    private HashMap      _elements = new HashMap();
+
+    private ArrayList    _formsList = new ArrayList();
     private WebForm[]    _forms;
 
-    private boolean      _updateImages;
+    private ArrayList    _imagesList = new ArrayList();
     private WebImage[]   _images;
 
-    private boolean      _updateLinks;
+    private ArrayList    _linkList = new ArrayList();
     private WebLink[]    _links;
 
-    private boolean      _updateApplets;
+    private ArrayList    _appletList = new ArrayList();
     private WebApplet[]  _applets;
+
+    private ArrayList    _tableList = new ArrayList();
+    private WebTable[]   _tables;
 
 
     ParsedHTML( WebResponse response, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
@@ -68,30 +80,95 @@ class ParsedHTML {
      * Returns the forms found in the page in the order in which they appear.
      **/
     public WebForm[] getForms() {
-        if (_forms == null || _updateForms) {
-            NodeList forms = NodeUtils.getElementsByTagName( getRootNode(), "form" );
-            WebForm[] oldForms = _forms;
-            _forms = new WebForm[ forms.getLength() ];
-
-            if (oldForms != null) System.arraycopy( oldForms, 0, _forms, 0, oldForms.length );
-            for (int i = (oldForms == null ? 0 : oldForms.length); i < _forms.length; i++) {
-                _forms[i] = new WebForm( _response, _baseURL, _baseTarget, forms.item( i ), _characterSet );
-            _updateForms = false;
-            }
+        if (_forms == null) {
+            loadElements();
+            _forms = (WebForm[]) _formsList.toArray( new WebForm[ _formsList.size() ] );
         }
         return _forms;
     }
 
 
     /**
+     * Returns the links found in the page in the order in which they appear.
+     **/
+    public WebLink[] getLinks() {
+        if (_links == null) {
+            loadElements();
+            _links = (WebLink[]) _linkList.toArray( new WebLink[ _linkList.size() ] );
+        }
+        return _links;
+    }
+
+
+    /**
+     * Returns a proxy for each applet found embedded in this page.
+     */
+    public WebApplet[] getApplets() {
+        if (_applets == null) {
+            loadElements();
+            _applets = (WebApplet[]) _appletList.toArray( new WebApplet[ _appletList.size() ] );
+        }
+        return _applets;
+    }
+
+
+    /**
+     * Returns the images found in the page in the order in which they appear.
+     **/
+    public WebImage[] getImages() {
+        if (_images == null) {
+            loadElements();
+            _images = (WebImage[]) _imagesList.toArray( new WebImage[ _imagesList.size() ] );
+        }
+        return _images;
+    }
+
+
+    /**
+     * Returns the top-level tables found in the page in the order in which they appear.
+     **/
+    public WebTable[] getTables() {
+        if (_tables == null) {
+            loadElements();
+            _tables = (WebTable[]) _tableList.toArray( new WebTable[ _tableList.size() ] );
+        }
+        return _tables;
+    }
+
+
+    /**
+     * Returns the HTMLElement with the specified ID.
+     */
+    public HTMLElement getElementWithID( String id ) {
+        return (HTMLElement) getElementWithID( id, HTMLElement.class );
+    }
+
+
+    /**
      * Returns the form found in the page with the specified ID.
      **/
-    public WebForm getFormWithID( String ID ) {
-        WebForm[] forms = getForms();
-        for (int i = 0; i < forms.length; i++) {
-            if (HttpUnitUtils.matches( ID, forms[i].getID() )) return forms[i];
-        }
-        return null;
+    public WebForm getFormWithID( String id ) {
+        return (WebForm) getElementWithID( id, WebForm.class );
+    }
+
+
+    /**
+     * Returns the link found in the page with the specified ID.
+     **/
+    public WebLink getLinkWithID( String id ) {
+        return (WebLink) getElementWithID( id, WebLink.class );
+
+    }
+
+
+    private Object getElementWithID( String id, final Class klass ) {
+        loadElements();
+        return whenCast( _elementsByID.get( id ), klass );
+    }
+
+
+    private Object whenCast( Object o, Class klass ) {
+        return klass.isInstance( o ) ? o : null;
     }
 
 
@@ -107,34 +184,159 @@ class ParsedHTML {
     }
 
 
-    /**
-     * Returns the links found in the page in the order in which they appear.
-     **/
-    public WebLink[] getLinks() {
-        if (_links == null || _updateLinks) {
-            final ArrayList list = new ArrayList();
-            NodeUtils.processNodes( getRootNode().getChildNodes(), new NodeUtils.NodeAction() {
-                public boolean processElement( Element element ) {
-                    if (element.getNodeName().equalsIgnoreCase( "a" )) addLinkAnchor( list, element );
-                    else if (element.getNodeName().equalsIgnoreCase( "area" )) addLinkAnchor( list, element );
-                    return true;
-                }
-                public void processTextNodeValue( String value ) {
-                }
-            } );
-            if (_links != null) for (int i = 0; i < _links.length; i++) list.set( i, _links[i] );
-            _links = (WebLink[]) list.toArray( new WebLink[ list.size() ] );
-            _updateLinks = false;
+    abstract static class HTMLElementFactory {
+        abstract HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element );
+        void recordElement( NodeUtils.PreOrderTraversal pot, Element element, HTMLElement htmlElement ) {
+            if (htmlElement != null) {
+                addToMaps( pot, element, htmlElement );
+                addToLists( pot, htmlElement );
+            }
         }
-
-        return _links;
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            for (Iterator i = pot.getContexts(); i.hasNext();) {
+                Object o = i.next();
+                if (o instanceof ParsedHTML) ((ParsedHTML) o).addToList( htmlElement );
+            }
+        }
+        protected void addToMaps( NodeUtils.PreOrderTraversal pot, Element element, HTMLElement htmlElement ) {
+            for (Iterator i = pot.getContexts(); i.hasNext();) {
+                Object o = i.next();
+                if (o instanceof ParsedHTML) ((ParsedHTML) o).addToMaps( element, htmlElement );
+            }
+        }
     }
 
 
-    private void addLinkAnchor( ArrayList list, Node child ) {
-        if (isLinkAnchor( child )) {
-            list.add( new WebLink( _response, _baseURL, _baseTarget, child ) );
+    static class WebFormFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toWebForm( element );
         }
+    }
+
+
+    static class WebLinkFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toLinkAnchor( element );
+        }
+    }
+
+
+    static class WebImageFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toWebImage( element );
+        }
+    }
+
+
+    static class WebAppletFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toWebApplet( element );
+        }
+    }
+
+
+    static class WebTableFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toWebTable( element );
+        }
+
+
+//        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+//            for (Iterator i = pot.getContexts(); i.hasNext();) {
+//                Object o = i.next();
+//                if (o instanceof ParsedHTML) {
+//                    ((ParsedHTML) o).addToList( htmlElement );
+//                    return;
+//                }
+//            }
+//        }
+    }
+
+
+    private static HashMap _htmlFactoryClasses = new HashMap();
+
+    static {
+        _htmlFactoryClasses.put( "a", new WebLinkFactory() );
+        _htmlFactoryClasses.put( "area", new WebLinkFactory() );
+        _htmlFactoryClasses.put( "form", new WebFormFactory() );
+        _htmlFactoryClasses.put( "img", new WebImageFactory() );
+        _htmlFactoryClasses.put( "applet", new WebAppletFactory() );
+        _htmlFactoryClasses.put( "table", new WebTableFactory() );
+    }
+
+    private static HTMLElementFactory getHTMLElementFactory( String tagName ) {
+        return (HTMLElementFactory) _htmlFactoryClasses.get( tagName );
+    }
+
+
+    private void loadElements() {
+        if (!_updateElements) return;
+
+        NodeUtils.NodeAction action = new NodeUtils.NodeAction() {
+            public boolean processElement( NodeUtils.PreOrderTraversal pot, Element element ) {
+                if (_elements.containsKey( element )) return true;
+
+                HTMLElementFactory factory = getHTMLElementFactory( element.getNodeName().toLowerCase() );
+                if (factory != null) factory.recordElement( pot, element, factory.toHTMLElement( ParsedHTML.this, element ) );
+
+                return true;
+            }
+            public void processTextNodeValue( String value ) {
+            }
+        };
+        NodeUtils.PreOrderTraversal nt = new NodeUtils.PreOrderTraversal( getRootNode() );
+        nt.pushBaseContext( this );
+        nt.perform( action );
+
+        _updateElements = false;
+    }
+
+
+    private WebForm toWebForm( Element element ) {
+        return new WebForm( _response, _baseURL, _baseTarget, element, _characterSet );
+    }
+
+
+    private WebLink toLinkAnchor( Element child ) {
+        return (!isLinkAnchor( child )) ? null : new WebLink( _response, _baseURL, _baseTarget, child );
+    }
+
+
+    private WebImage toWebImage( Element child ) {
+        return new WebImage( _response, this, _baseURL, child, _baseTarget );
+    }
+
+
+    private WebApplet toWebApplet( Element element ) {
+        return new WebApplet( _response, element, _baseTarget );
+    }
+
+
+    private WebTable toWebTable( Element element ) {
+        if (!WebTable.isTopLevelTable( element, getRootNode() )) return null;
+        return new WebTable( _response, element, _baseURL, _baseTarget, _characterSet );
+    }
+
+
+    private void addToMaps( Element element, HTMLElement htmlElement ) {
+        _elements.put( element, htmlElement );
+        if (htmlElement.getID() != null) _elementsByID.put( htmlElement.getID(), htmlElement );
+    }
+
+
+    private void addToList( HTMLElement htmlElement ) {
+        ArrayList list = getListForElement( htmlElement );
+        if (list != null) list.add( htmlElement );
+    }
+
+
+    private ArrayList getListForElement( HTMLElement element ) {
+        if (element instanceof WebLink) return _linkList;
+        if (element instanceof WebForm) return _formsList;
+        if (element instanceof WebImage) return _imagesList;
+        if (element instanceof WebApplet) return _appletList;
+        if (element instanceof WebTable) return _tableList;
+        return null;
     }
 
 
@@ -152,14 +354,6 @@ class ParsedHTML {
     public WebLink getLinkWithImageText( String text ) {
         WebImage image = getImageWithAltText( text );
         return image == null ? null : image.getLink();
-    }
-
-
-    /**
-     * Returns the link found in the page with the specified ID.
-     **/
-    public WebLink getLinkWithID( String ID ) {
-        return getFirstMatchingLink( WebLink.MATCH_ID, ID );
     }
 
 
@@ -197,25 +391,6 @@ class ParsedHTML {
 
 
     /**
-     * Returns the images found in the page in the order in which they appear.
-     **/
-    public WebImage[] getImages() {
-        if (_images == null || _updateImages) {
-            NodeList images = NodeUtils.getElementsByTagName( getRootNode(), "img" );
-            WebImage[] oldImages = _images;
-
-            _images = new WebImage[ images.getLength() ];
-            if (oldImages != null) System.arraycopy( oldImages, 0, _images, 0, oldImages.length );
-            for (int i = (oldImages == null ? 0 : oldImages.length); i < _images.length; i++) {
-                _images[i] = new WebImage( _response, this, _baseURL, images.item( i ), _baseTarget );
-            }
-            _updateImages = false;
-        }
-        return _images;
-    }
-
-
-    /**
      * Returns the image found in the page with the specified name.
      **/
     public WebImage getImageWithName( String name ) {
@@ -248,34 +423,6 @@ class ParsedHTML {
             if (HttpUnitUtils.matches( altText, images[i].getAltText() )) return images[i];
         }
         return null;
-    }
-
-
-    /**
-     * Returns a proxy for each applet found embedded in this page.
-     */
-    public WebApplet[] getApplets() {
-        if (_applets == null || _updateApplets) {
-            NodeList applets = NodeUtils.getElementsByTagName( getRootNode(), "applet" );
-            WebApplet[] oldApplets = _applets;
-
-            _applets = new WebApplet[ applets.getLength() ];
-            if (oldApplets != null) System.arraycopy( oldApplets, 0, _applets, 0, oldApplets.length );
-            for (int i = (oldApplets == null ? 0 : oldApplets.length); i < _applets.length; i++) {
-                _applets[i] = new WebApplet( _response, applets.item( i ), _baseTarget );
-            }
-            _updateApplets = false;
-        }
-        return _applets;
-    }
-
-
-    /**
-     * Returns the top-level tables found in this page in the order in which
-     * they appear.
-     **/
-    public WebTable[] getTables() {
-        return WebTable.getTables( _response, getOriginalDOM(), _baseURL, _baseTarget, _characterSet );
     }
 
 
@@ -355,8 +502,12 @@ class ParsedHTML {
         if (_rootNode != null && rootNode != _rootNode )
             throw new IllegalStateException( "The root node has already been defined as " + _rootNode + " and cannot be redefined as " + rootNode );
         _rootNode = rootNode;
-
-        _updateLinks = _updateForms = _updateImages = _updateApplets = true;
+        _links = null;
+        _forms = null;
+        _images = null;
+        _applets = null;
+        _tables = null;
+        _updateElements = true;
     }
 
 
@@ -394,7 +545,7 @@ class ParsedHTML {
     /**
      * Returns true if the node is a link anchor node.
      **/
-    private boolean isLinkAnchor( Node node ) {
+    private boolean isLinkAnchor( Node node ) {     // XXX do we really need all these tests any more?
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return false;
         } else if (!node.getNodeName().equalsIgnoreCase( "a" ) && !node.getNodeName().equalsIgnoreCase( "area" )) {

@@ -22,11 +22,13 @@ package com.meterware.httpunit;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.File;
+import java.io.IOException;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import java.io.*;
-import java.net.MalformedURLException;
 
 
 
@@ -44,9 +46,6 @@ public class WebPageTest extends HttpUnitTest {
 
 
     public static Test suite() {
-//        DefaultWebResponse blankResponse = new DefaultWebResponse( null, null, WebResponse.BLANK_HTML );
-//        HttpUnitOptions.getScriptingEngine().associate( blankResponse );
-
         return new TestSuite( WebPageTest.class );
     }
 
@@ -405,5 +404,21 @@ public class WebPageTest extends HttpUnitTest {
             assertEquals( "Full string", "abcdefghijklmnopqrstuvwxyz", alphabet );
         } catch (IOException e) {
         }
+    }
+
+
+    public void testGetElementByID() throws Exception {
+        defineResource( "SimplePage.html",
+                        "<html><head><title>A Sample Page</title></head>\n" +
+                        "<body><form id='aForm'><input name=color></form>" +
+                        "have <a id='link1' href='/other.html'>an <b>active</b> link</A>\n" +
+                        "<img id='23' src='/images/arrow.gif' ALT='Next -->' WIDTH=1 HEIGHT=4>\n" +
+                        "</body></html>\n" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        assertImplements( "element with id 'aForm'", simplePage.getElementWithID( "aForm" ), WebForm.class );
+        assertImplements( "element with id 'link1'", simplePage.getElementWithID( "link1" ), WebLink.class );
+        assertImplements( "element with id '23'", simplePage.getElementWithID( "23" ), WebImage.class );
     }
 }

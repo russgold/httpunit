@@ -135,7 +135,7 @@ public class WebFormTest extends HttpUnitTest {
 
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         assertNull( "Found nonexistent form", page.getFormWithID( "nobody" ) );
-        assertNotNull( "Did not find specified form", page.getFormWithID( "oneform" ) );
+        assertNotNull( "Did not find specified form", page.getFormWithID( "oneForm" ) );
     }
 
 

@@ -286,6 +286,16 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 //---------------------- HTMLSegment methods -----------------------------
 
+
+    /**
+     * Returns the HTMLElement with the specified ID.
+     * @throws SAXException thrown if there is an error parsing the response.
+     */
+    public HTMLElement getElementWithID( String id ) throws SAXException {
+        return getReceivedPage().getElementWithID( id );
+    }
+
+
     /**
      * Returns the forms found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the response.

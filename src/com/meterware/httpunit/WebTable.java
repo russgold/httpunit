@@ -31,7 +31,7 @@ import org.w3c.dom.*;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
-public class WebTable {
+public class WebTable extends HTMLElementBase {
 
 
     /** Predicate to match the complete text of a table's first non-blank cell. **/
@@ -207,14 +207,6 @@ public class WebTable {
     }
 
 
-    /**
-     * Returns the unique ID attribute associated with this table.
-     **/
-    public String getID() {
-        return NodeUtils.getNodeAttribute( _dom, "id" );
-    }
-
-
     public String toString() {
         String eol = System.getProperty( "line.separator" );
         if (_cells == null) readTable();
@@ -235,29 +227,6 @@ public class WebTable {
     }
 
 
-//----------------------------------- package members -----------------------------------
-
-
-    /**
-     * Returns the top-level tables found in the specified DOM.
-     **/
-    static WebTable[] getTables( WebResponse response, Node domRoot, URL baseURL, String parentTarget, String characterSet ) {
-        NodeList nl = NodeUtils.getElementsByTagName( domRoot, "table" );
-        Vector topLevelTables = new Vector();
-
-        for (int i = 0; i < nl.getLength(); i++) {
-            if (isTopLevelTable( nl.item(i), domRoot )) {
-                topLevelTables.addElement( new WebTable( response, nl.item(i), baseURL, parentTarget, characterSet ) );
-            }
-        }
-
-        WebTable[] result = new WebTable[ topLevelTables.size() ];
-        topLevelTables.copyInto( result );
-        return result;
-    }
-
-
-
 //----------------------------------- private members -----------------------------------
 
     private Element     _dom;
@@ -270,7 +239,8 @@ public class WebTable {
     private TableCell[][] _cells;
 
 
-    private WebTable( WebResponse response, Node domTreeRoot, URL sourceURL, String parentTarget, String characterSet ) {
+    WebTable( WebResponse response, Node domTreeRoot, URL sourceURL, String parentTarget, String characterSet ) {
+        super( domTreeRoot );
         _response     = response;
         _dom          = (Element) domTreeRoot;
         _url          = sourceURL;
@@ -324,7 +294,7 @@ public class WebTable {
     /**
      * Returns true if the specified table node is not nested within another one.
      **/
-    private static boolean isTopLevelTable( Node tableNode, Node root ) {
+    static boolean isTopLevelTable( Node tableNode, Node root ) {
         return isMoreCloselyNested( tableNode, root, "table" );
     }
 
@@ -416,7 +386,7 @@ public class WebTable {
     }
 
     static {
-        MATCH_FIRST_NONBLANK_CELL = new HTMLElementPredicate() {
+        MATCH_FIRST_NONBLANK_CELL = new HTMLElementPredicate() {    // XXX find a way to do this w/o purging the table cells
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 WebTable table = ((WebTable) htmlElement);
                 table.purgeEmptyCells();
@@ -426,7 +396,7 @@ public class WebTable {
         };
 
 
-        MATCH_FIRST_NONBLANK_CELL_PREFIX = new HTMLElementPredicate() {
+        MATCH_FIRST_NONBLANK_CELL_PREFIX = new HTMLElementPredicate() {   // XXX find a way to do this w/o purging the table cells
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 WebTable table = ((WebTable) htmlElement);
                 table.purgeEmptyCells();

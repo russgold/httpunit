@@ -1,4 +1,4 @@
-package com.meterware.httpunit.parsing;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,48 +19,61 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
-import java.net.URL;
-import java.io.IOException;
+import org.w3c.dom.Node;
+
 
 /**
- * A front end to a DOM parser that can handle HTML.
  *
  * @since 1.5.2
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
- **/
-public interface HTMLParser {
+ **/ 
+abstract
+class HTMLElementBase implements HTMLElement {
 
-    /**
-     * Parses the specified text string as a Document, registering it in the HTMLPage.
-     * Any error reporting will be annotated with the specified URL.
-     */
-    public void parse( URL baseURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException;
+    private Node        _node;
 
 
-    /**
-     * Removes any string artifacts placed in the text by the parser. For example, a parser may choose to encode
-     * an HTML entity as a special character. This method should convert that character to normal text.
-     */
-    public String getCleanedText( String string );
+    public String getID() {
+        return getAttribute( "id" );
+    }
 
 
-    /**
-     * Returns true if this parser supports preservation of the case of tag and attribute names.
-     */
-    public boolean supportsPreserveTagCase();
+    public String getTitle() {
+        return getAttribute( "title" );
+    }
+
+
+    public String getName() {
+        return getAttribute( "name" );
+    }
 
 
     /**
-     * Returns true if this parser can return an HTMLDocument object.
+     * Returns the delegate which supports scripting this element.
      */
-    public boolean supportsReturnHTMLDocument();
+    public ScriptableDelegate getScriptableDelegate() {
+        throw new RuntimeException( "No scripting support for " + getClass().getName() );
+    }
 
 
-    /**
-     * Returns true if this parser can display parser warnings.
-     */
-    public boolean supportsParserWarnings();
+    protected HTMLElementBase( Node node ) {
+        _node = node;
+    }
+
+
+    protected String getAttribute( final String name ) {
+        return NodeUtils.getNodeAttribute( getNode(), name );
+    }
+
+
+    protected String getAttribute( final String name, String defaultValue ) {
+        return NodeUtils.getNodeAttribute( getNode(), name, defaultValue );
+    }
+
+
+    protected Node getNode() {
+        return _node;
+    }
 }

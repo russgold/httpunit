@@ -127,6 +127,15 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
+    protected void assertImplements( String comment, Object object, Class expectedClass ) {
+        if (object == null) {
+            fail( comment + " should be of class " + expectedClass.getName() + " but is null" );
+        } else if (!expectedClass.isInstance( object )) {
+            fail( comment + " should be of class " + expectedClass.getName() + " but is " + object.getClass().getName() );
+        }
+    }
+
+
     protected void assertMatchingSet( String comment, Object[] expected, Object[] found ) {
         Vector expectedItems = new Vector();
         Vector foundItems = new Vector();

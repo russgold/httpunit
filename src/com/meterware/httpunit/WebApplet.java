@@ -42,10 +42,9 @@ import org.xml.sax.SAXException;
  * @author <a href="Oliver.Imbusch.extern@HVBInfo.com">Oliver Imbusch</a>
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/ 
-public class WebApplet {
+public class WebApplet extends HTMLElementBase {
 
     private WebResponse _response;
-    private Node        _node;
     private String      _baseTarget;
 
     private URL         _codeBase;
@@ -58,8 +57,8 @@ public class WebApplet {
 
 
     public WebApplet( WebResponse response, Node rootNode, String baseTarget ) {
+        super( rootNode );
         _response   = response;
-        _node       = rootNode;
         _baseTarget = baseTarget;
     }
 
@@ -93,24 +92,6 @@ public class WebApplet {
             _className = _className.replace( '/', '.' ).replace( '\\', '.' );
         }
         return _className;
-    }
-
-
-    String getAttribute( final String name ) {
-        return NodeUtils.getNodeAttribute( _node, name );
-    }
-
-
-    String getAttribute( final String name, String defaultValue ) {
-        return NodeUtils.getNodeAttribute( _node, name, defaultValue );
-    }
-
-
-    /**
-     * Returns the name of the applet.
-     */
-    public String getName() {
-        return getAttribute( "name" );
     }
 
 
@@ -171,7 +152,7 @@ public class WebApplet {
     private Map getParameterMap() {
         if (_parameters == null) {
             _parameters = new HashMap();
-            NodeList nl = ((Element) _node).getElementsByTagName( "param" );
+            NodeList nl = ((Element) getNode()).getElementsByTagName( "param" );
             for (int i = 0; i < nl.getLength(); i++) {
                 Node n = nl.item(i);
                 _parameters.put( NodeUtils.getNodeAttribute( n, "name", "" ), NodeUtils.getNodeAttribute( n, "value", "" ) );

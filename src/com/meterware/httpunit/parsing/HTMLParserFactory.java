@@ -26,6 +26,7 @@ import java.util.Vector;
  * Factory for creating HTML parsers. Parser customization properties can be specified but do not necessarily work
  * for every parser type.
  *
+ * @since 1.5.2
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
  **/

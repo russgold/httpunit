@@ -11,6 +11,11 @@ Limitations:
 
 
 Revision History:
+25-Dec-2002
+Notes:
+    get...WithID was incorrectly doing case insensitive matches.  It is now case-sensitive, since that is the way the
+    ID attribute is defined.
+
 24-Dec-2002
 Additions:
     HTMLParserFactory now supports methods to explicitly select the parser without playing with the class path.

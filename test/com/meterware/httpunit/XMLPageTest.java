@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -19,11 +19,11 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import junit.framework.Test;
-import junit.framework.TestCase;
+import java.util.Iterator;
+
 import junit.framework.TestSuite;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A test for the XML handling functionality.
@@ -35,7 +35,7 @@ public class XMLPageTest extends HttpUnitTest {
     }
 	
 	
-    public static Test suite() {
+    public static TestSuite suite() {
         return new TestSuite( XMLPageTest.class );
     }
 
@@ -53,6 +53,32 @@ public class XMLPageTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.xml" );
         WebResponse simplePage = wc.getResponse( request );
-        Document doc = simplePage.getDOM();
+        simplePage.getDOM();
+    }
+
+
+    public void testTraversal() throws Exception {
+        defineResource( "SimplePage.xml",
+                        "<?xml version='1.0' ?><zero><main><first><second/></first><main><normal/><simple/></main><after/></main><end/></zero>",
+                        "text/xml" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.xml" );
+        WebResponse simplePage = wc.getResponse( request );
+        NodeUtils.PreOrderTraversal pot = new NodeUtils.PreOrderTraversal( simplePage.getDOM() );
+        final StringBuffer sb = new StringBuffer();
+        pot.perform( new NodeUtils.NodeAction() {
+            public boolean processElement( NodeUtils.PreOrderTraversal traversal, Element element ) {
+                if (element.getNodeName().equals( "main" )) {
+                    traversal.pushContext( "x" );
+                } else {
+                    for (Iterator i = traversal.getContexts(); i.hasNext();) sb.append( i.next() );
+                    sb.append( element.getNodeName() ).append( "|" );
+                }
+                return true;
+            }
+            public void processTextNodeValue( String value ) {
+            }
+        } );
+        assertEquals( "Traversal result", "zero|xfirst|xsecond|xxnormal|xxsimple|xafter|end|", sb.toString() );
     }
 }
