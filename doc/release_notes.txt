@@ -18,6 +18,8 @@ Acknowledgements:
 Additions:
     1. The mechanism for search for links has been expanded to permit arbitrary search criteria and to retrieve
        either the first match or all matches.
+    2. It is now possible to control the handling of script errors by calling HttpUnitOptions.setExceptionsThrownOnScriptError.
+       If the exceptions are not thrown, the error messages will instead be available via HttpUnitOptions.getScriptErrorMessages()
 
  9-Sep-2002
 Acknowledgement:

@@ -406,6 +406,40 @@ public abstract class HttpUnitOptions {
     }
 
 
+
+    /**
+     * Determines whether script errors result in exceptions or warning messages.
+     */
+    public static void setExceptionsThrownOnScriptError( boolean throwExceptions ) {
+        getScriptingEngine().setThrowExceptionsOnError( throwExceptions );
+    }
+
+
+    /**
+     * Returns true if script errors cause exceptions to be thrown.
+     */
+    public static boolean getExceptionsThrownOnScriptError() {
+        return getScriptingEngine().isThrowExceptionsOnError();
+    }
+
+
+    /**
+     * Returns the accumulated script error messages encountered. Error messages are accumulated only
+     * if 'throwExceptionsOnError' is disabled.
+     */
+    public static String[] getScriptErrorMessages() {
+        return getScriptingEngine().getErrorMessages();
+    }
+
+
+    /**
+     * Clears the accumulated script error messages.
+     */
+    public static void clearScriptErrorMessages() {
+        getScriptingEngine().clearErrorMessages();
+    }
+
+
     private static void disableScripting( Exception e, String errorMessage ) {
         System.err.println( errorMessage + _scriptEngineClassName );
         System.err.println( "" + e );
@@ -421,8 +455,11 @@ public abstract class HttpUnitOptions {
 
     private static final ScriptingEngineFactory NULL_SCRIPTING_ENGINE_FACTORY = new ScriptingEngineFactory() {
         public boolean isEnabled() { return false; }
-        public void associate( WebResponse response ) {
-        }
+        public void associate( WebResponse response ) {}
+        public void setThrowExceptionsOnError( boolean throwExceptions ) {}
+        public boolean isThrowExceptionsOnError() { return false; }
+        public String[] getErrorMessages() { return new String[ 0 ]; }
+        public void clearErrorMessages() {}
     };
 
 

@@ -38,4 +38,25 @@ public interface ScriptingEngineFactory {
      **/
     public void associate( WebResponse response );
 
+    /**
+     * Determines whether script errors result in exceptions or warning messages.
+     */
+    public void setThrowExceptionsOnError( boolean throwExceptions );
+
+    /**
+     * Returns true if script errors cause exceptions to be thrown.
+     */
+    public boolean isThrowExceptionsOnError();
+
+    /**
+     * Returns the accumulated script error messages encountered. Error messages are accumulated only
+     * if 'throwExceptionsOnError' is disabled.
+     */
+    public String[] getErrorMessages();
+
+    /**
+     * Clears the accumulated script error messages.
+     */
+    public void clearErrorMessages();
+
 }

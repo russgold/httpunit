@@ -106,6 +106,21 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testOnLoadErrorBypass() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body onLoad='noSuchFunction()'>" +
+                                            "<img src=sample.jpg>" +
+                                            "</body>" );
+        WebConversation wc = new WebConversation();
+        HttpUnitOptions.setExceptionsThrownOnScriptError( false );
+        HttpUnitOptions.clearScriptErrorMessages();
+
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Number of images on page", 1, response.getImages().length );
+        assertEquals( "Number of script failures logged", 1, HttpUnitOptions.getScriptErrorMessages().length );
+    }
+
+
     public void testConfirmationDialog() throws Exception {
         defineWebPage( "OnCommand", "<a href='NextPage' id='go' onClick='return confirm( \"go on?\" );'>" );
         defineResource( "NextPage", "Got the next page!" );

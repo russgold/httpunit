@@ -24,6 +24,7 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebImage;
+import com.meterware.httpunit.ScriptException;
 
 import com.meterware.httpunit.scripting.ScriptingEngine;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
@@ -33,6 +34,7 @@ import com.meterware.httpunit.scripting.NamedDelegate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.io.IOException;
 
 import org.mozilla.javascript.*;
@@ -46,6 +48,30 @@ import org.xml.sax.SAXException;
 public class JavaScript {
 
     private final static Object[] NO_ARGS = new Object[0];
+
+    private static boolean _throwExceptionsOnError = true;
+
+    private static ArrayList _errorMessages = new ArrayList();
+
+
+    static boolean isThrowExceptionsOnError() {
+        return _throwExceptionsOnError;
+    }
+
+
+    static void setThrowExceptionsOnError( boolean throwExceptionsOnError ) {
+        _throwExceptionsOnError = throwExceptionsOnError;
+    }
+
+
+    static void clearErrorMessages() {
+        _errorMessages.clear();
+    }
+
+
+    static String[] getErrorMessages() {
+        return (String[]) _errorMessages.toArray( new String[ _errorMessages.size() ] );
+    }
 
 
     /**
@@ -88,10 +114,8 @@ public class JavaScript {
                 script = script.trim();
                 if (script.startsWith( "<!--" )) script = script.substring( 4 );
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
-            } catch (JavaScriptException e) {
-                throw new RuntimeException( "Script '" + script + "' failed: " + e );
-            } catch (EcmaError e) {
-                throw new RuntimeException( "Syntax Error at line " + e.getLineNumber() + ": " + e.getLineSource() );
+            } catch (Exception e) {
+                handleScriptException( e, "Script '" + script + "'" );
             }
         }
 
@@ -104,8 +128,8 @@ public class JavaScript {
                 Object result = f.call( context, this, this, NO_ARGS );
                 return (result instanceof Boolean) ? ((Boolean) result).booleanValue() : true;
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException( "Script '" + eventScript + "' failed: " + e );
+                handleScriptException( e, "Event '" + eventScript + "'" );
+                return false;
             }
         }
 
@@ -117,8 +141,20 @@ public class JavaScript {
                 Object result = Context.getCurrentContext().evaluateString( this, urlString, "httpunit", 0, null );
                 return (result == null || result instanceof Undefined) ? null : result.toString();
             } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException( "Script '" + urlString + "' failed: " + e );
+                handleScriptException( e, "URL '" + urlString + "'" );
+                return null;
+            }
+        }
+
+
+        private void handleScriptException( Exception e, String badScript ) {
+            final String errorMessage = badScript + " failed: " + e;
+            if (!(e instanceof EcmaError)) {
+                throw new RuntimeException( errorMessage );
+            } else if (isThrowExceptionsOnError()) {
+                throw new ScriptException( errorMessage );
+            } else {
+                _errorMessages.add( errorMessage );
             }
         }
 

@@ -1,4 +1,4 @@
-package com.meterware.httpunit.javascript;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,55 +19,15 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.scripting.ScriptingEngineFactory;
-
 
 /**
+ * An exception thrown when there is a problem running a script.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-public class JavaScriptEngineFactory implements ScriptingEngineFactory {
+public class ScriptException extends RuntimeException {
 
-    public boolean isEnabled() {
-        try {
-            Class.forName( "org.mozilla.javascript.Context" );
-            return true;
-        } catch (Exception e) {
-            System.err.println( "Rhino classes (js.jar) not found - Javascript disabled" );
-            return false;
-        }
-    }
-
-
-    public void associate( WebResponse response ) {
-        try {
-            JavaScript.run( response );
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException( e.toString() );
-        }
-    }
-
-
-    public void setThrowExceptionsOnError( boolean throwExceptions ) {
-        JavaScript.setThrowExceptionsOnError( throwExceptions );
-    }
-
-
-    public boolean isThrowExceptionsOnError() {
-        return JavaScript.isThrowExceptionsOnError();
-    }
-
-
-    public String[] getErrorMessages() {
-        return JavaScript.getErrorMessages();
-    }
-
-
-    public void clearErrorMessages() {
-        JavaScript.clearErrorMessages();
+    public ScriptException( String s ) {
+        super( s );
     }
 }
