@@ -546,7 +546,7 @@ public class WebForm extends WebRequestSource {
 class FormParameter {
 
     void addControl( FormControl control ) {
-        _controls.add( control )
+        _controls.add( control );
     }
 
 
