@@ -45,7 +45,6 @@ import org.xml.sax.SAXException;
 abstract
 public class WebClient {
 
-
     /**
      * Submits a GET method request and returns a response.
      * @exception SAXException thrown if there is an error parsing the retrieved page
@@ -164,6 +163,23 @@ public class WebClient {
     }
 
 
+    /**
+     * Specifies whether an exception will be thrown when an error status (4xx or 5xx) is detected on a response.
+     * Defaults to the value returned by HttpUnitOptions.getExceptionsThrownOnErrorStatus.
+     **/
+    public void setExceptionsThrownOnErrorStatus( boolean throwExceptions ) {
+        _exceptionsThrownOnErrorStatus = throwExceptions;
+    }
+
+
+    /**
+     * Returns true if an exception will be thrown when an error status (4xx or 5xx) is detected on a response.
+     **/
+    public boolean getExceptionsThrownOnErrorStatus() {
+        return _exceptionsThrownOnErrorStatus;
+    }
+
+
 //------------------------------------------ protected members -----------------------------------
 
 
@@ -254,6 +270,8 @@ public class WebClient {
     /** A map of header names to values. **/
     private HeaderDictionary _headers = new HeaderDictionary();
 
+    private boolean _exceptionsThrownOnErrorStatus = HttpUnitOptions.getExceptionsThrownOnErrorStatus();
+
 
     /**
      * Examines the headers in the response and throws an exception if appropriate.
@@ -261,7 +279,7 @@ public class WebClient {
     private void validateHeaders( WebResponse response ) throws HttpException, IOException {
         if (response.getHeaderField( "WWW-Authenticate" ) != null) {
             throw new AuthorizationRequiredException( response.getHeaderField( "WWW-Authenticate" ) );
-        } else if (HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
+        } else if (getExceptionsThrownOnErrorStatus()) {
             if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
                 throw new HttpInternalErrorException( response.getURL() );
             } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {

@@ -117,12 +117,16 @@ public class PseudoServerTest extends HttpUnitTest {
         ps.setErrorResource( "error.htm", 501, "Internal error" );
         int port = ps.getConnectedPort();
 
-        HttpUnitOptions.setExceptionsThrownOnErrorStatus( false );
-        WebConversation wc   = new WebConversation();
-        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/error.htm" );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "Response code", 501, response.getResponseCode() );
-        assertEquals( "Message contents", "Internal error", response.getText().trim() );
+        try {
+            WebConversation wc   = new WebConversation();
+            wc.setExceptionsThrownOnErrorStatus( false );
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/error.htm" );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "Response code", 501, response.getResponseCode() );
+            assertEquals( "Message contents", "Internal error", response.getText().trim() );
+        } finally {
+            ps.shutDown();
+        }
     }
 
 

@@ -63,7 +63,7 @@ public class WebConversation extends WebClient {
             }
         }
         request.completeRequest( connection );
-        return new HttpWebResponse( request.getTarget(), request.getURL(), connection );
+        return new HttpWebResponse( request.getTarget(), request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
     }
 
 

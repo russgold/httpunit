@@ -64,7 +64,7 @@ public class WebResponse implements HTMLSegment {
      * access to WebResponse parsing without using a WebClient.
      **/
     public static WebResponse newResponse( URLConnection connection ) throws IOException {
-        return new HttpWebResponse( "_top", connection.getURL(), connection );
+        return new HttpWebResponse( "_top", connection.getURL(), connection, HttpUnitOptions.getExceptionsThrownOnErrorStatus() );
     }
 
 

@@ -47,12 +47,12 @@ class HttpWebResponse extends WebResponse {
      * @param url the url from which the response was received
      * @param connection the URL connection from which the response can be read
      **/
-    HttpWebResponse( String target, URL url, URLConnection connection ) throws IOException {
+    HttpWebResponse( String target, URL url, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
         super( target, url );
         readHeaders( connection );
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/
-        if (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST || !HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
+        if (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST || !throwExceptionOnError) {
             defineRawInputStream( new BufferedInputStream( connection.getInputStream() ) );
             if (getContentType().startsWith( "text" )) loadResponseText();
         }

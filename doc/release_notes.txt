@@ -14,6 +14,14 @@ Revision History:
 11-Feb-2002
 Problems corrected:
     1. Subframes with the same names as others in the same tree no longer cause an infinite loop / stack overflow
+Additions:
+    1. WebClient now has an exceptionsThrownOnErrorStatus property to control this behavior per client.
+Notes:
+    1. The decision as to whether a response will throw an exception if its status is 4xx or 5xx is now controlled by
+       the exceptionsThrownOnErrorStatus property of WebClient and its subclasses (WebConversation, ServletUnitClient).
+       This property is initialized from the HttpUnitOptions property of the same name when the WebClient object is
+       created. This allows finer control over this behavior. Tests which depend on this setting should no longer
+       interfere with one another.
 
  5-Feb-2002
 Additions:
