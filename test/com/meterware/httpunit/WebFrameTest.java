@@ -328,7 +328,6 @@ public class WebFrameTest extends HttpUnitTest {
         defineWebPage( "Linker",  "<form action=redirect.html target=_self><input type=text name=sample value=z></form>" );
         defineResource( "redirect.html?sample=z", "", HttpURLConnection.HTTP_MOVED_PERM );
         addResourceHeader( "redirect.html?sample=z", "Location: " + getHostPath() + "/Target.html" );
-        addResourceHeader( "redirect.html?sample=z", "Connection: close" );   // TODO see why this is needed and remove it
 
         _wc.getResponse( getHostPath() + "/Frames.html" );
         WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getForms()[0].getRequest() );
@@ -341,7 +340,6 @@ public class WebFrameTest extends HttpUnitTest {
     public void testSubFrameRedirect() throws Exception {
         defineResource( "Linker.html", "", HttpURLConnection.HTTP_MOVED_PERM );
         addResourceHeader( "Linker.html", "Location: " + getHostPath() + "/Target.html" );
-        addResourceHeader( "Linker.html", "Connection: close" );   // TODO see why this is needed and remove it
 
         _wc.getResponse( getHostPath() + "/Frames.html" );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );

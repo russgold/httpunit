@@ -815,11 +815,14 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
         InputStream inputStream = getInputStream();
         try {
+            int bytesRemaining = getContentLength() < 0 ? Integer.MAX_VALUE : getContentLength();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[8 * 1024];
             int count = 0;
             do {
                 outputStream.write( buffer, 0, count );
+                bytesRemaining -= count;
+                if (bytesRemaining <= 0) break;
                 count = inputStream.read( buffer, 0, buffer.length );
             } while (count != -1);
 
