@@ -142,6 +142,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     private String trimFragment( String href ) {
+        if (href.startsWith( "javascript:" )) return href;
         final int hashIndex = href.indexOf( '#' );
         if (hashIndex < 0) {
             return href;

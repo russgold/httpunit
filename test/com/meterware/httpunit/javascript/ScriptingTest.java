@@ -275,6 +275,29 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testJavascriptURLWithFragment() throws Exception {
+        defineResource( "Target.txt", "You made it!", "text/plain" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body><script language='JavaScript'>function newWindow(hrefTarget) {" +
+                        "      window.open(hrefTarget);" +
+                        "}</script>" +
+                        "<a href='javascript:newWindow( \"" + getHostPath() + "/Target.txt#middle\" );'>go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
+        WebConversation wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) { windowsOpened.add( window ); }
+            public void windowClosed( WebClient client, WebWindow window ) {}
+        } );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+
+        assertFalse( "No window opened", windowsOpened.isEmpty() );
+        final WebWindow openedWindow = (WebWindow) windowsOpened.get( 0 );
+        assertEquals( "New window message", "You made it!", openedWindow.getCurrentPage().getText() );
+    }
+
+
     public void testWindowOpenNoContents() throws Exception {
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
                         "<body>" +

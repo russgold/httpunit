@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+26-Mar-2003
+Problems fixed:
+    1. HttpUnit was chopping off javascript urls if they contained a '#' character.
+
 24-Mar-2003
 Acknowledgements:
     Thanks to Andrew Bickerton for identifying the javascript parent frame update problem and suggesting a fix.

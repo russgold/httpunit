@@ -48,7 +48,7 @@ public abstract class HttpUnitOptions {
         _loggingHttpHeaders = false;
         _matchesIgnoreCase = true;
         _checkContentLength = false;
-        _redirectDelay = 0;
+        _redirectDelay = 0;                                          // TODO move this to ClientProperties
         _characterSet = HttpUnitUtils.DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
