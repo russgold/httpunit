@@ -521,11 +521,18 @@ public class WebResponse implements HTMLSegment {
 
 
     private void processMetaTag( ByteTag tag ) {
-        if ("content-type".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
+        if (isHttpEquivMetaTag( tag, "content-type" )) {
             inferContentType( tag.getAttribute( "content" ) );
-        } else if ("refresh".equalsIgnoreCase( tag.getAttribute( "http_equiv" ) )) {
+        } else if (isHttpEquivMetaTag( tag, "refresh" )) {
             readRefreshRequest( tag.getAttribute( "content" ) );
         }
+    }
+
+
+    private boolean isHttpEquivMetaTag( ByteTag tag, String headerName )
+    {
+        return headerName.equalsIgnoreCase( tag.getAttribute( "http_equiv" ) ) ||
+               headerName.equalsIgnoreCase( tag.getAttribute( "http-equiv" ) );
     }
 
 

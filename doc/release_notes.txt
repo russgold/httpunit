@@ -10,6 +10,11 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+15-Oct-2001
+   Problems corrected:
+       1. The http-equiv meta tag was incorrectly matched as "http_equiv"
+       2. By default, POSTs included charset attributes which messed up some servlet engines
+
 13-Sep-2001
    Problems corrected:
        1. The refresh handling now recognizes requests with content syntax "<seconds>;<location>" or "<seconds>; URL=<location>"

@@ -44,7 +44,7 @@ public class HttpUnitOptions {
         _redirectDelay = 0;
         _characterSet = DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
-        _postIncludesCharset = true;
+        _postIncludesCharset = false;
     }
 
 
@@ -279,7 +279,7 @@ public class HttpUnitOptions {
 
     private static boolean _autoRefresh;
 
-    private static boolean _postIncludesCharset = true;
+    private static boolean _postIncludesCharset = false;
 
     private static int _redirectDelay;
 
