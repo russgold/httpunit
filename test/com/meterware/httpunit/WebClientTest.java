@@ -19,7 +19,6 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
 import junit.framework.TestSuite;
 
 import java.io.ByteArrayOutputStream;
@@ -50,6 +49,92 @@ public class WebClientTest extends HttpUnitTest {
 
     public WebClientTest( String name ) {
         super( name );
+    }
+
+
+    public void testHeaderFields() throws Exception {
+        WebConversation wc = new WebConversation();
+        wc.setHeaderField( "user-agent", "Mozilla 6" );
+        assertEquals( "Mozilla 6", wc.getUserAgent() );
+    }
+
+
+    public void testCookies() throws Exception {
+        String resourceName = "something/baking";
+        String resourceValue = "the desired content";
+
+        defineResource( resourceName, resourceValue );
+        addResourceHeader( resourceName, "Set-Cookie: HSBCLoginFailReason=; path=/" );
+        addResourceHeader( resourceName, "Set-Cookie: age=12, name= george" );
+        addResourceHeader( resourceName, "Set-Cookie: type=short" );
+        addResourceHeader( resourceName, "Set-Cookie: funky=ab$==" );
+        addResourceHeader( resourceName, "Set-Cookie: p30waco_sso=3.0,en,us,AMERICA,Drew;path=/, PORTAL30_SSO_TEST=X" );
+        addResourceHeader( resourceName, "Set-Cookie: SESSION_ID=17585,Dzm5LzbRPnb95QkUyIX+7w5RDT7p6OLuOVZ91AMl4hsDATyZ1ej+FA==; path=/;" );
+
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+        assertEquals( "number of cookies", 8, wc.getCookieNames().length );
+        assertEquals( "cookie 'HSBCLoginFailReason' value", "", wc.getCookieValue( "HSBCLoginFailReason" ) );
+        assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
+        assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
+        assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );
+        assertEquals( "cookie 'funky' value", "ab$==", wc.getCookieValue( "funky" ) );
+        assertEquals( "cookie 'p30waco_sso' value", "3.0,en,us,AMERICA,Drew", wc.getCookieValue( "p30waco_sso" ) );
+        assertEquals( "cookie 'PORTAL30_SSO_TEST' value", "X", wc.getCookieValue( "PORTAL30_SSO_TEST" ) );
+        assertEquals( "cookie 'SESSION_ID' value", "17585,Dzm5LzbRPnb95QkUyIX+7w5RDT7p6OLuOVZ91AMl4hsDATyZ1ej+FA==", wc.getCookieValue( "SESSION_ID" ) );
+    }
+
+
+    public void testOldCookies() throws Exception {
+        String resourceName = "something/baking";
+        String resourceValue = "the desired content";
+
+        defineResource( resourceName, resourceValue );
+        addResourceHeader( resourceName, "Set-Cookie: CUSTOMER=WILE_E_COYOTE; path=/; expires=Wednesday, 09-Nov-99 23:12:40 GMT" );
+
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+        assertEquals( "number of cookies", 1, wc.getCookieNames().length );
+        assertEquals( "cookie 'CUSTOMER' value", "WILE_E_COYOTE", wc.getCookieValue( "CUSTOMER" ) );
+    }
+
+
+    public void testRefererHeader() throws Exception {
+        String resourceName = "tellMe";
+        String linkSource = "fromLink";
+	    String formSource = "fromForm";
+
+        String page0 = getHostPath() + '/' + resourceName;
+	    String page1 = getHostPath() + '/' + linkSource;
+	    String page2 = getHostPath() + '/' + formSource;
+
+        defineResource( linkSource, "<html><head></head><body><a href=\"tellMe\">Go</a></body></html>" );
+	    defineResource( formSource, "<html><body><form action=\"tellMe\"><input type=submit></form></body></html>" );
+        defineResource( resourceName, new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String referer = getHeader( "Referer" );
+                return new WebResource( referer == null ? "null" : referer, "text/plain" );
+            }
+        } );
+
+        WebConversation wc   = new WebConversation();
+        WebResponse response = wc.getResponse( page0 );
+        assertEquals( "Content type", "text/plain", response.getContentType() );
+        assertEquals( "Default Referer header", "null", response.getText().trim() );
+
+        response = wc.getResponse( page1 );
+        response = wc.getResponse( response.getLinks()[0].getRequest() );
+        assertEquals( "Link Referer header", page1, response.getText().trim() );
+
+        response = wc.getResponse( page2 );
+        response = wc.getResponse( response.getForms()[0].getRequest() );
+        assertEquals( "Form Referer header", page2, response.getText().trim() );
     }
 
 
