@@ -111,6 +111,21 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
     }
 
 
+    public boolean equals( Object obj ) {
+        return obj instanceof TableCell && equals( (TableCell) obj );
+    }
+
+
+    private boolean equals( TableCell cell ) {
+        return _element.equals( cell._element );
+    }
+
+
+    public int hashCode() {
+        return _element.hashCode();
+    }
+
+
 //---------------------------------------- package methods -----------------------------------------
 
 

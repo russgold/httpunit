@@ -369,10 +369,12 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         assertEquals("/simple", request.getRequestURI());
+        assertEquals( "http://localhost/simple", request.getRequestURL().toString() );
 
         wr = new GetMethodWebRequest( "http://localhost/simple?foo=bar" );
         request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY );
         assertEquals("/simple", request.getRequestURI());
+        assertEquals( "http://localhost/simple", request.getRequestURL().toString() );
     }
 
 

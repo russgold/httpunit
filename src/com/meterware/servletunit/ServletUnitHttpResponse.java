@@ -1,5 +1,4 @@
 package com.meterware.servletunit;
-
 /********************************************************************************************************************
 * $Id$
 *
@@ -258,7 +257,11 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         _contentType = typeAndEncoding[0];
         if (typeAndEncoding[1] != null) _encoding = typeAndEncoding[1];
 
-        setHeader( "Content-type", _contentType + "; charset=" + _encoding );
+        if (_encoding.equalsIgnoreCase( HttpUnitUtils.DEFAULT_CHARACTER_SET  )) {
+            setHeader( "Content-Type", type );
+        } else {
+            setHeader( "Content-Type", _contentType + "; charset=" + _encoding );
+        }
     }
 
 
@@ -533,7 +536,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     private String _contentType = "text/plain";
 
-    private String _encoding    = "us-ascii";
+    private String _encoding    = HttpUnitUtils.DEFAULT_CHARACTER_SET;
 
     private PrintWriter  _writer;
 

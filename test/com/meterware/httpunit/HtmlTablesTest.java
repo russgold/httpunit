@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,15 +19,13 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.parsing.HTMLParserFactory;
-
 import junit.framework.TestSuite;
 
 
 /**
  * A unit test of the table handling code.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class HtmlTablesTest extends HttpUnitTest {
@@ -155,6 +153,7 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "Colors", table.getCellAsText( 0, 0 ) );
         assertEquals( "Colors", table.getCellAsText( 0, 1 ) );
         assertEquals( "Names",  table.getCellAsText( 0, 2 ) );
+        assertSame( table.getTableCell( 0, 0 ), table.getTableCell( 0, 1 ) );
     }
 
 
@@ -166,6 +165,7 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "gules", table.getCellAsText( 1, 1 ) );
         assertEquals( "gules", table.getCellAsText( 2, 1 ) );
         assertEquals( "vert",  table.getCellAsText( 2, 2 ) );
+        assertSame( table.getTableCell( 1, 1 ), table.getTableCell( 2, 1 ) );
     }
 
 

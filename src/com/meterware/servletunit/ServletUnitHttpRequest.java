@@ -669,7 +669,15 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * @since 1.3
      */
     public StringBuffer getRequestURL() {
-        return null;
+        StringBuffer url = new StringBuffer();
+        try {
+            url.append( _request.getURL().getProtocol() ).append( "://" );
+            url.append( _request.getURL().getHost() );
+            url.append( _request.getURL().getPath() );
+        } catch (MalformedURLException e) {
+            throw new RuntimeException( "unable to read URL from request: " + _request );
+        }
+        return url;
     }
 
 

@@ -71,6 +71,8 @@ public class HttpServletResponseTest extends ServletUnitTest {
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );
         assertEquals( "Content length", 65, response.getContentLength() );
+        assertEquals( "Content encoding", "iso-8859-1", response.getCharacterSet() );
+        assertEquals( "Content header", "text/html", response.getHeaderField( "Content-type" ) );
     }
 
 
