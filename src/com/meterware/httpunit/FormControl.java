@@ -27,7 +27,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.Hashtable;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -591,27 +590,7 @@ class CheckboxFormControl extends BooleanFormControl {
     }
 
 
-    private void addValue( Hashtable valueMap, String name, String value ) {
-        String[] currentValues = (String[]) valueMap.get( name );
-        if (currentValues == null) {
-            valueMap.put( name, new String[] { value } );
-        } else {
-            valueMap.put( name, withNewValue( currentValues, value ) );
-        }
-    }
-
-
-    /**
-     * Adds a string to an array of strings and returns the result.
-     **/
-    private String[] withNewValue( String[] group, String value ) {
-        String[] result = new String[ group.length+1 ];
-        System.arraycopy( group, 0, result, 0, group.length );
-        result[ group.length ] = value;
-        return result;
-    }
-
-}
+ }
 
 
 class TextFormControl extends FormControl {

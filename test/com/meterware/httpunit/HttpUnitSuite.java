@@ -82,7 +82,7 @@ public class HttpUnitSuite {
                 System.out.println( "Note: test suite " + testCaseName + " not a TestClass and has no suite() method" );
             }
         } catch (ClassNotFoundException e) {
-            System.out.println( "Note: test suite " + testCaseName + " not found; skipping." );
+            System.out.println( "Note: skipping optional test suite " + testCaseName + " since it was not build." );
         } catch (Exception e) {
             System.out.println( "Note: unable to add " + testCaseName + ": " + e );
         }

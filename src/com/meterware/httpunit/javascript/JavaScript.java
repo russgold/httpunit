@@ -24,7 +24,6 @@ import com.meterware.httpunit.*;
 import com.meterware.httpunit.scripting.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.io.IOException;
 
@@ -33,6 +32,7 @@ import org.xml.sax.SAXException;
 
 
 /**
+ * This class is the Rhino-compatible implementation of the JavaScript DOM objects.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
@@ -206,24 +206,13 @@ public class JavaScript {
         private Object convertIfNeeded( final Object property ) {
             if (property == null) return NOT_FOUND;
 
-            try {
-                if (property instanceof ScriptableDelegate[]) return toScriptable( (ScriptableDelegate[]) property );
-                if (!(property instanceof ScriptableDelegate)) return property;
-                return toScriptable( (ScriptableDelegate) property );
-            } catch (PropertyException e) {
-                throw new RuntimeException( e.toString() );
-            } catch (NotAFunctionException e) {
-                throw new RuntimeException( e.toString() );
-            } catch (JavaScriptException e) {
-                throw new RuntimeException( e.toString() );
-            } catch (SAXException e) {
-                throw new RuntimeException( e.toString() );
-            }
+            if (property instanceof ScriptableDelegate[]) return toScriptable( (ScriptableDelegate[]) property );
+            if (!(property instanceof ScriptableDelegate)) return property;
+            return toScriptable( (ScriptableDelegate) property );
         }
 
 
-        private Object toScriptable( ScriptableDelegate[] list )
-                throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+        private Object toScriptable( ScriptableDelegate[] list ) {
             Object[] delegates = new Object[ list.length ];
             for (int i = 0; i < delegates.length; i++) {
                 delegates[i] = toScriptable( list[i] );
@@ -446,7 +435,7 @@ public class JavaScript {
         }
 
 
-        private void initializeImages() throws SAXException {
+        private void initializeImages() {
             WebImage.Scriptable scriptables[] = getDelegate().getImages();
             Image[] images = new Image[ scriptables.length ];
             for (int i = 0; i < images.length; i++) {
@@ -457,7 +446,7 @@ public class JavaScript {
         }
 
 
-        private void initializeLinks() throws SAXException {
+        private void initializeLinks() {
             WebLink.Scriptable scriptables[] = getDelegate().getLinks();
             Link[] links = new Link[ scriptables.length ];
             for (int i = 0; i < links.length; i++) {
@@ -468,7 +457,7 @@ public class JavaScript {
         }
 
 
-        private void initializeForms() throws SAXException {
+        private void initializeForms() {
             WebForm.Scriptable scriptables[] = getDelegate().getForms();
             Form[] forms = new Form[ scriptables.length ];
             for (int i = 0; i < forms.length; i++) {
@@ -681,7 +670,10 @@ public class JavaScript {
         }
 
 
-        public Scriptable jsGet_elements() {
+        public Scriptable jsGet_elements() throws PropertyException, NotAFunctionException, JavaScriptException {
+            if (_controls == null) {
+                initializeControls();
+            }
             return _controls;
         }
 
@@ -696,14 +688,7 @@ public class JavaScript {
         }
 
 
-        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
-                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
-            super.initialize( parent, scriptable );
-            initializeControls();
-        }
-
-
-        private void initializeControls() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+        private void initializeControls() throws PropertyException, NotAFunctionException, JavaScriptException {
             ScriptableDelegate scriptables[] = getDelegate().getElementDelegates();
             Control[] controls = new Control[ scriptables.length ];
             for (int i = 0; i < controls.length; i++) {

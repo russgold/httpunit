@@ -19,6 +19,8 @@ Problems fixed:
 Notes:
     1. The exception HttpServerNotFoundException has been removed. When no server is found, HttpUnit now throws the
        standard exception: java.net.UnknownHostException
+    2. The required jars are now included in the distribution, so it is not necessary to download them separately.
+       This was an oversight.
 
 21-Oct-2002
 Problems fixed:
