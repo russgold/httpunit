@@ -20,17 +20,17 @@ package com.meterware.servletunit;
 *
 *******************************************************************************************************************/
 import java.util.Enumeration;
-import java.util.Vector;
 import java.util.Hashtable;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.meterware.httpunit.GetMethodWebRequest;
+import com.meterware.httpunit.WebRequest;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import com.meterware.httpunit.*;
 
 /**
  * Tests the ServletUnitHttpRequest class.
@@ -58,6 +58,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertNull( "Authorization incorrectly specified", request.getAuthType() );
         assertNull( "Character encoding incorrectly specified", request.getCharacterEncoding() );
         assertEquals( "Parameters unexpectedly specified", "", request.getQueryString() );
+        assertNotNull( "No input stream available", request.getInputStream() );
     }
 
 

@@ -11,10 +11,13 @@ Limitations:
 
 
 Revision History:
+20-May-2002
+Additions:
+    1. ServletUnitHttpRequest now implements getInputStream and getContentType.
+
 16-May-2002
 Acknowledgements:
-    Thanks to James Murty for adding caching of servlet instances, a default mapping for servlet classes, and some XML
-    parsing cleanup.
+    Thanks to James Murty for adding caching of servlet instances and some XML parsing cleanup.
 
 Additions:
     1. ServletUnit now caches its servlet instances so that multiple invocations can use the same instance.  This more

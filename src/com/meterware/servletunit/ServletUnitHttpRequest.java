@@ -50,6 +50,9 @@ import javax.servlet.RequestDispatcher;
  **/
 class ServletUnitHttpRequest implements HttpServletRequest {
 
+    private ServletInputStreamImpl _inputStream;
+    private String                 _contentType;
+
 
     /**
      * Constructs a ServletUnitHttpRequest from a WebRequest object.
@@ -61,17 +64,25 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _headers.addEntries( clientHeaders );
         _headers.addEntries( request.getHeaders() );
         _messageBody = messageBody;
+        readContentTypeHeader();
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
         String file = request.getURL().getFile();
         if (file.indexOf( '?' ) >= 0) {
             loadParameters( file.substring( file.indexOf( '?' )+1 ) );
         } else {
-            final Object contentType = _headers.get( "Content-Type" );
-            if (contentType == null || contentType.toString().indexOf( "x-www-form-urlencoded" ) >= 0 ) {
+            if (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 ) {
                 loadParameters( request.getQueryString() );
                 loadParameters( new String( _messageBody ) );
             }
+        }
+    }
+
+
+    private void readContentTypeHeader() {
+        _contentType = (String) _headers.get( "Content-Type" );
+        if (_contentType != null && _contentType.indexOf( ';' ) >= 0) {
+            _contentType = _contentType.substring( 0, _contentType.indexOf( ';' ) );
         }
     }
 
@@ -333,8 +344,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      *
      */
     public ServletInputStream getInputStream() throws IOException {
-        throwNotImplementedYet();
-        return null;
+        if (_inputStream == null) {
+            _inputStream = new ServletInputStreamImpl( _messageBody );
+        }
+        return _inputStream;
     }
 
 
@@ -369,7 +382,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * of the CGI variable CONTENT_TYPE.
      **/
     public String getContentType() {
-        return null;
+        return _contentType;
     }
 
 
