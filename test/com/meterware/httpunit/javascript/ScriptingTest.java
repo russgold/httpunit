@@ -142,6 +142,24 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testCheckboxSetChecked() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='realform'><input type='checkbox' name='ready'></form>" +
+                                            "<a href='#' name='clear' onMouseOver=\"document.realform.ready.checked=false;\">clear</a>" +
+                                            "<a href='#' name='set' onMouseOver=\"document.realform.ready.checked=true;\">set</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        assertEquals( "initial parameter value", null, form.getParameterValue( "ready" ) );
+        response.getLinkWithName( "set" ).mouseOver();
+        assertEquals( "changed parameter value", "on", form.getParameterValue( "ready" ) );
+        response.getLinkWithName( "clear" ).mouseOver();
+        assertEquals( "final parameter value", null, form.getParameterValue( "ready" ) );
+    }
+
+
     public void testLinkMouseOverEvent() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +

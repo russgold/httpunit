@@ -449,6 +449,32 @@ class CheckboxFormControl extends BooleanFormControl {
     }
 
 
+    public ScriptableObject getScriptableObject() {
+        return new Scriptable();
+    }
+
+
+    class Scriptable extends FormControl.Scriptable {
+
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "checked" )) {
+                return isChecked() ? Boolean.TRUE : Boolean.FALSE;
+            } else {
+                return super.get( propertyName );
+            }
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "checked" )) {
+                setChecked( value instanceof Boolean && ((Boolean) value).booleanValue() );
+            } else {
+                super.set( propertyName, value );
+            }
+        }
+    }
+
+
     String getQueryValue() {
         final String value = getValueAttribute();
         return value.length() == 0 ? "on" : value;

@@ -19,6 +19,7 @@ Additions:
     3. JavaScript: The image.src property is read-write
     4. WebResponse now has a getImageWithName method
     5. JavaScript execution is now automatic. It may be enabled or disable via HttpUnitOptions
+    6. JavaScript: the checkbox.clicked property is read-write
 
 Problems fixed:
     A form request created after a call to getScriptableObject().setAction() now correctly uses the new action.
