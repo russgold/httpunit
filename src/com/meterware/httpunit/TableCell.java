@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -66,8 +66,8 @@ public class TableCell extends ParsedHTML implements HTMLSegment {
 //---------------------------------------- package methods -----------------------------------------
 
 
-    TableCell( Element cellNode, URL url, String parentTarget, String characterSet ) {
-        super( url, parentTarget, cellNode, characterSet );
+    TableCell( WebResponse response, Element cellNode, URL url, String parentTarget, String characterSet ) {
+        super( response, url, parentTarget, cellNode, characterSet );
         _element = cellNode;
         _colSpan = getAttributeValue( cellNode, "colspan", 1 );
         _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );

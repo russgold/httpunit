@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -52,8 +52,8 @@ class ServletUnitWebResponse extends WebResponse {
      * @param url the url from which the response was received
      * @param response the response populated by the servlet
      **/
-    ServletUnitWebResponse( String target, URL url, HttpServletResponse response ) throws IOException {
-        super( target, url );
+    ServletUnitWebResponse( ServletUnitClient client, String target, URL url, HttpServletResponse response ) throws IOException {
+        super( client, target, url );
         _response = (ServletUnitHttpResponse) response;
         defineRawInputStream( new ByteArrayInputStream( _response.getContents() ) );
     }

@@ -12,6 +12,14 @@ Limitations:
 
 
 Revision History:
+ 1-Aug-2002
+Additions:
+    1. You may now follow a link by calling link.click() rather than client.getResponse( link.getRequest() ).
+    2. You may now submit a form by calling form.submit() rather than client.getResponse( form.getRequest() ). In this
+       case you must set any parameters directly into the form.
+    3. You may now obtain the current page from a web client by calling client.getCurrentPage() rather than
+       client.getFrameContents( "_top" );
+
 29-Jul-2002
 Acknowledgements:
     Thanks to Sebastien Rosset for pointing out the case sensitivity problem with WebResponse.isHTML

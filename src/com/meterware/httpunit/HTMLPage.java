@@ -43,8 +43,8 @@ import org.xml.sax.SAXException;
 public class HTMLPage extends ParsedHTML {
 
 
-    public HTMLPage( URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
-        super( url, parentTarget, getDOM( url, pageText ), characterSet );
+    public HTMLPage( WebResponse response, URL url, String parentTarget, String pageText, String characterSet ) throws SAXException {
+        super( response, url, parentTarget, getDOM( url, pageText ), characterSet );
         setBaseAttributes();
     }
 

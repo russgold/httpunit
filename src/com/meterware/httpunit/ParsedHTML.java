@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -31,11 +31,13 @@ import org.w3c.dom.*;
  **/
 class ParsedHTML {
 
-    private WebForm[] _forms;
-    private WebImage[] _images;
+    private WebForm[]    _forms;
+    private WebImage[]   _images;
+    private WebResponse  _response;
 
 
-    ParsedHTML( URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
+    ParsedHTML( WebResponse response, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
+        _response     = response;
         _baseURL      = baseURL;
         _baseTarget   = baseTarget;
         _rootNode     = rootNode;
@@ -52,7 +54,7 @@ class ParsedHTML {
 
             _forms = new WebForm[ forms.getLength() ];
             for (int i = 0; i < _forms.length; i++) {
-                _forms[i] = new WebForm( _baseURL, _baseTarget, forms.item( i ), _characterSet );
+                _forms[i] = new WebForm( _response, _baseURL, _baseTarget, forms.item( i ), _characterSet );
             }
         }
         return _forms;
@@ -107,7 +109,7 @@ class ParsedHTML {
         for (int i = 0; i < nl.getLength(); i++) {
             Node child = nl.item(i);
             if (isLinkAnchor( child )) {
-                list.addElement( new WebLink( _baseURL, _baseTarget, child ) );
+                list.addElement( new WebLink( _response, _baseURL, _baseTarget, child ) );
             }
         }
     }
@@ -208,7 +210,7 @@ class ParsedHTML {
      * they appear.
      **/
     public WebTable[] getTables() {
-        return WebTable.getTables( getOriginalDOM(), _baseURL, _baseTarget, _characterSet );
+        return WebTable.getTables( _response, getOriginalDOM(), _baseURL, _baseTarget, _characterSet );
     }
 
 

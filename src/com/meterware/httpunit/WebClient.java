@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  * @author Oliver Imbusch
  **/
 abstract
-public class WebClient implements FrameHolder {
+public class WebClient {
 
     /**
      * Submits a GET method request and returns a response.
@@ -63,6 +63,14 @@ public class WebClient implements FrameHolder {
      */
     public WebResponse sendRequest( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         return getResponse( request );
+    }
+
+
+    /**
+     * Returns the response representing the current main page.
+     */
+    public WebResponse getCurrentPage() {
+        return getFrameContents( WebRequest.TOP_FRAME );
     }
 
 
@@ -113,7 +121,7 @@ public class WebClient implements FrameHolder {
      * any listeners or preferences which may have been set.
      **/
     public void clearContents() {
-        _frameContents = new FrameHolderImpl();
+        _frameContents = new FrameHolder( this, WebRequest.TOP_FRAME );
         _cookies = new Hashtable();
         _headers = new HeaderDictionary();
     }
@@ -123,7 +131,8 @@ public class WebClient implements FrameHolder {
      * Returns the name of the currently active frames.
      **/
     public String[] getFrameNames() {
-        return _frameContents.getFrameNames();
+        final List names = _frameContents.getActiveFrameNames();
+        return (String[]) names.toArray( new String[ names.size() ] );
     }
 
 
@@ -311,7 +320,7 @@ public class WebClient implements FrameHolder {
             delay( HttpUnitOptions.getRedirectDelay() );
             getResponse( new RedirectWebRequest( response ) );
         } else {
-            updateFrames( response );
+            _frameContents.updateFrames( response );
         }
     }
 
@@ -332,11 +341,7 @@ public class WebClient implements FrameHolder {
 
 
     /** A map of frame names to current contents. **/
-    private FrameHolderImpl _frameContents = new FrameHolderImpl();
-
-
-    /** A map of frame names to frames nested within them. **/
-    private Hashtable _subFrames = new Hashtable();
+    private FrameHolder _frameContents = new FrameHolder( this, WebRequest.TOP_FRAME );
 
 
     /** A map of header names to values. **/
@@ -390,36 +395,6 @@ public class WebClient implements FrameHolder {
         }
     }
 
-    private void updateFrames( WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        removeSubFrames( response.getTarget() );
-        response.setFrameHolder( this );
-        _frameContents.put( response.getTarget(), response );
-
-        if (response.isHTML()) {
-            createSubFrames( response.getTarget(), response.getFrameNames() );
-            WebRequest[] requests = response.getFrameRequests();
-            for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
-        }
-    }
-
-
-    private void createSubFrames( String targetName, String[] frameNames ) {
-        _subFrames.put( targetName, frameNames );
-        for (int i = 0; i < frameNames.length; i++) {
-            _frameContents.put( frameNames[i], WebResponse.BLANK_RESPONSE );
-        }
-    }
-
-
-    private void removeSubFrames( String targetName ) {
-        String[] names = (String[]) _subFrames.get( targetName );
-        if (names == null) return;
-        for (int i = 0; i < names.length; i++) {
-            removeSubFrames( names[i] );
-            _frameContents.remove( names[i] );
-            _subFrames.remove( names[i] );
-        }
-    }
 
 //==================================================================================================
 
@@ -489,34 +464,5 @@ class RedirectWebRequest extends WebRequest {
 
 
 
-class FrameHolderImpl {
-    private Hashtable _contents = new Hashtable();
-
-    void put( String targetName, WebResponse contents ) {
-        _contents.put( targetName, contents );
-    }
-
-
-    WebResponse get( String targetName ) {
-        return (WebResponse) _contents.get( targetName );
-    }
-
-    void remove( String targetName ) {
-        _contents.remove( targetName );
-    }
-
-
-    public String[] getFrameNames() {
-        Vector names = new Vector();
-        for (Enumeration e = _contents.keys(); e.hasMoreElements();) {
-            names.addElement( e.nextElement() );
-        }
-
-        String[] result = new String[ names.size() ];
-        names.copyInto( result );
-        return result;
-    }
-
-}
 
 

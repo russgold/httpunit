@@ -72,7 +72,7 @@ public class ServletUnitClient extends WebClient {
     public InvocationContext newInvocation( WebRequest request ) throws IOException, MalformedURLException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeMessageBody( request, baos );
-        return _invocationContextFactory.newInvocation( request, getCookies(), this.getHeaderFields(), baos.toByteArray() );
+        return _invocationContextFactory.newInvocation( this, request, getCookies(), this.getHeaderFields(), baos.toByteArray() );
     }
 
 

@@ -58,7 +58,7 @@ public class WebResponse implements HTMLSegment {
      * access to WebResponse parsing without using a WebClient.
      **/
     public static WebResponse newResponse( URLConnection connection ) throws IOException {
-        return new HttpWebResponse( "_top", connection.getURL(), connection, HttpUnitOptions.getExceptionsThrownOnErrorStatus() );
+        return new HttpWebResponse( null, "_top", connection.getURL(), connection, HttpUnitOptions.getExceptionsThrownOnErrorStatus() );
     }
 
 
@@ -281,8 +281,8 @@ public class WebResponse implements HTMLSegment {
      * @param subFrameName the name of the desired frame as defined in the frameset.
      **/
     public WebResponse getSubframeContents( String subFrameName ) {
-        if (_frameHolder == null) throw new NoSuchFrameException( subFrameName );
-        return _frameHolder.getFrameContents( WebFrame.getNestedFrameName( _frameName, subFrameName ) );
+        if (_client == null) throw new NoSuchFrameException( subFrameName );
+        return _client.getFrameContents( WebFrame.getNestedFrameName( _frameName, subFrameName ) );
     }
 
 
@@ -512,7 +512,8 @@ public class WebResponse implements HTMLSegment {
      * @param frameName the name of the frame to hold the response
      * @param url the url from which the response was received
      **/
-    protected WebResponse( String frameName, URL url ) {
+    protected WebResponse( WebClient client, String frameName, URL url ) {
+        _client = client;
         _url = url;
         _frameName = frameName;
     }
@@ -594,11 +595,8 @@ public class WebResponse implements HTMLSegment {
     }
 
 
-    /**
-     * Provides a FrameHolder to help with computation of subframes.
-     **/
-    void setFrameHolder( FrameHolder holder ) {
-        _frameHolder = holder;
+    WebClient getClient() {
+        return _client;
     }
 
 
@@ -645,8 +643,6 @@ public class WebResponse implements HTMLSegment {
 
     private WebRequest _refreshRequest;
 
-    private FrameHolder _frameHolder;
-
     private int _refreshDelay;
 
     private String _responseText;
@@ -660,6 +656,8 @@ public class WebResponse implements HTMLSegment {
     private URL    _url;
 
     private String _frameName;
+
+    private WebClient _client;
 
 
     protected void loadResponseText() throws IOException {
@@ -912,7 +910,7 @@ public class WebResponse implements HTMLSegment {
         if (_page == null) {
             try {
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
-                _page = new HTMLPage( _url, _frameName, getText(), getCharacterSet() );
+                _page = new HTMLPage( this, _url, _frameName, getText(), getCharacterSet() );
             } catch (IOException e) {
                 throw new SAXException( e );
             }
@@ -930,7 +928,7 @@ public class WebResponse implements HTMLSegment {
             for (int i = 0; i < DEFAULT_ENCODING_CANDIDATES.length; i++) {
                 try {
                     _defaultEncoding = DEFAULT_ENCODING_CANDIDATES[i];
-                    "abcd".getBytes( _defaultEncoding );
+                    "abcd".getBytes( _defaultEncoding );   // throws an exception if the encoding is not supported
                     return _defaultEncoding;
                 } catch (UnsupportedEncodingException e) {
                 }
@@ -1050,7 +1048,7 @@ class DefaultWebResponse extends WebResponse {
 
 
     DefaultWebResponse( String text ) {
-        super( "", null );
+        super( null, "", null );
         _responseText = text;
     }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -232,13 +232,13 @@ public class WebTable {
     /**
      * Returns the top-level tables found in the specified DOM.
      **/
-    static WebTable[] getTables( Node domRoot, URL baseURL, String parentTarget, String characterSet ) {
+    static WebTable[] getTables( WebResponse response, Node domRoot, URL baseURL, String parentTarget, String characterSet ) {
         NodeList nl = NodeUtils.getElementsByTagName( domRoot, "table" );
         Vector topLevelTables = new Vector();
 
         for (int i = 0; i < nl.getLength(); i++) {
             if (isTopLevelTable( nl.item(i), domRoot )) {
-                topLevelTables.addElement( new WebTable( nl.item(i), baseURL, parentTarget, characterSet ) );
+                topLevelTables.addElement( new WebTable( response, nl.item(i), baseURL, parentTarget, characterSet ) );
             }
         }
 
@@ -251,16 +251,18 @@ public class WebTable {
 
 //----------------------------------- private members -----------------------------------
 
-    private Element _dom;
-    private URL     _url;
-    private String  _parentTarget;
-    private String  _characterSet;
+    private Element     _dom;
+    private URL         _url;
+    private String      _parentTarget;
+    private String      _characterSet;
+    private WebResponse _response;
 
 
     private TableCell[][] _cells;
 
 
-    private WebTable( Node domTreeRoot, URL sourceURL, String parentTarget, String characterSet ) {
+    private WebTable( WebResponse response, Node domTreeRoot, URL sourceURL, String parentTarget, String characterSet ) {
+        _response     = response;
         _dom          = (Element) domTreeRoot;
         _url          = sourceURL;
         _parentTarget = parentTarget;
@@ -372,7 +374,7 @@ public class WebTable {
         private void collectChildren( String childTag, final Vector children ) {
             processChildren( _element, childTag, "table", new ElementHandler() {
                 public void handleElement( Element element ) {
-                    children.addElement( new TableCell( element, _url, _parentTarget, _characterSet ) );
+                    children.addElement( new TableCell( _response, element, _url, _parentTarget, _characterSet ) );
                 }
             } );
         }

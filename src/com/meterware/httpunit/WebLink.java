@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.io.IOException;
 
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * This class represents a link in an HTML page. Users of this class may examine the
@@ -67,6 +68,14 @@ public class WebLink extends WebRequestSource {
         } else {
             return NodeUtils.asText( getNode().getChildNodes() );
         }
+    }
+
+
+    /**
+     * Submits a request as though the user had clicked on this link.
+     **/
+    public void click() throws IOException, SAXException {
+        submitRequest();
     }
 
 
@@ -204,8 +213,8 @@ public class WebLink extends WebRequestSource {
      * Contructs a web link given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebLink( URL baseURL, String parentTarget, Node node ) {
-        super( node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), parentTarget );
+    WebLink( WebResponse response, URL baseURL, String parentTarget, Node node ) {
+        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), parentTarget );
     }
 
 

@@ -48,8 +48,8 @@ class HttpWebResponse extends WebResponse {
      * @param url the url from which the response was received
      * @param connection the URL connection from which the response can be read
      **/
-    HttpWebResponse( String target, URL url, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
-        super( target, url );
+    HttpWebResponse( WebConversation client, String target, URL url, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
+        super( client, target, url );
         readHeaders( connection );
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/

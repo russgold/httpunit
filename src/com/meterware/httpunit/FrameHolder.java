@@ -19,18 +19,80 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.xml.sax.SAXException;
 
 
 /**
- * An interface for a class which can act as a map of frame names to web responses.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-interface FrameHolder {
+class FrameHolder {
 
-    /**
-     * Returns the response associated with the specified frame name.
-     * Throws a runtime exception if no matching frame is defined.
-     **/
-    WebResponse getFrameContents( String frameName );
+    private WebClient   _client;
+    private Hashtable   _contents = new Hashtable();
+    private Hashtable   _subFrames = new Hashtable();
+    private String      _frameName;
+    private WebResponse _response = WebResponse.BLANK_RESPONSE;
+
+
+    FrameHolder( WebClient client, String name ) {
+        _client = client;
+        _frameName = name;
+    }
+
+
+    public WebResponse get( String frameName ) {
+        return (WebResponse) _contents.get( frameName );
+    }
+
+
+    List getActiveFrameNames() {
+        List result = new ArrayList();
+        for (Enumeration e = _contents.keys(); e.hasMoreElements();) {
+            result.add( e.nextElement() );
+        }
+
+        return result;
+    }
+
+
+    void updateFrames( WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        removeSubFrames( response.getTarget() );
+        _contents.put( response.getTarget(), response );
+
+        if (response.isHTML()) {
+            createSubFrames( response.getTarget(), response.getFrameNames() );
+            WebRequest[] requests = response.getFrameRequests();
+            for (int i = 0; i < requests.length; i++) _client.getResponse( requests[ i ] );
+        }
+    }
+
+
+    private void removeSubFrames( String targetName ) {
+        String[] names = (String[]) _subFrames.get( targetName );
+        if (names == null) return;
+        for (int i = 0; i < names.length; i++) {
+            removeSubFrames( names[ i ] );
+            _contents.remove( names[ i ] );
+            _subFrames.remove( names[ i ] );
+        }
+    }
+
+
+    private void createSubFrames( String targetName, String[] frameNames ) {
+        _subFrames.put( targetName, frameNames );
+        for (int i = 0; i < frameNames.length; i++) {
+            _contents.put( frameNames[ i ], WebResponse.BLANK_RESPONSE );
+        }
+    }
+
 }
+

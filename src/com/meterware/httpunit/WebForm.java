@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -40,6 +41,14 @@ import org.w3c.dom.NodeList;
  **/
 public class WebForm extends WebRequestSource {
     private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
+
+
+    /**
+     * Submits this form using the web client from which it was originally obtained.
+     **/
+    public void submit() throws IOException, SAXException {
+        submitRequest();
+    }
 
 
     /**
@@ -416,8 +425,8 @@ public class WebForm extends WebRequestSource {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebForm( URL baseURL, String frameName, Node node, String characterSet ) {
-        super( node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), frameName );
+    WebForm( WebResponse response, URL baseURL, String frameName, Node node, String characterSet ) {
+        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), frameName );
         _characterSet = characterSet;
     }
 

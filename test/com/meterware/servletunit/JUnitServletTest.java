@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001, Russell Gold
+ * Copyright (c) 2001-2002, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -180,8 +180,8 @@ public class JUnitServletTest extends TestCase {
     static class MyFactory implements InvocationContextFactory {
         private static ServletRunner _runner;
 
-        public InvocationContext newInvocation( WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
-            return new InvocationContextImpl( _runner, request, clientCookies, clientHeaders, messageBody );
+        public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Cookie[] clientCookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+            return new InvocationContextImpl( client, _runner, request, clientCookies, clientHeaders, messageBody );
         }
     }
 }

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001, Russell Gold
+* Copyright (c) 2001-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -93,7 +93,7 @@ class InvocationContextImpl implements InvocationContext {
             if (session != null && session.isNew()) {
                 _response.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, session.getId() ) );
             }
-            _webResponse = new ServletUnitWebResponse( _target, _requestURL, _response );
+            _webResponse = new ServletUnitWebResponse( _client, _target, _requestURL, _response );
         }
         return _webResponse;
     }
@@ -130,10 +130,11 @@ class InvocationContextImpl implements InvocationContext {
      * Constructs a servlet invocation context for a specified servlet container,
      * request, and cookie headers.
      **/
-    InvocationContextImpl( ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
-        _application         = runner.getApplication();
-        _requestURL          = request.getURL();
-        _target              = request.getTarget();
+    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, WebRequest request, Cookie[] cookies, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+        _client      = client;
+        _application = runner.getApplication();
+        _requestURL  = request.getURL();
+        _target      = request.getTarget();
 
         _request = new ServletUnitHttpRequest( _application.getServletRequest( _requestURL ), request, runner.getContext(),
                                                clientHeaders, messageBody );
@@ -149,6 +150,8 @@ class InvocationContextImpl implements InvocationContext {
 
 //------------------------------ private members ---------------------------------------
 
+
+    private ServletUnitClient _client;
 
     private WebApplication          _application;
     private ServletUnitHttpRequest  _request;

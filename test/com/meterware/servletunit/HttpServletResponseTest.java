@@ -55,7 +55,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
 
     public void testDefaultResponse() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
-        WebResponse response = new ServletUnitWebResponse( "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
         assertEquals( "Content type", "text/plain", response.getContentType() );
         assertEquals( "Contents", "", response.getText() );
     }
@@ -67,7 +67,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         PrintWriter pw = servletResponse.getWriter();
         pw.println( "<html><head><title>Sample Page</title></head><body></body></html>" );
 
-        WebResponse response = new ServletUnitWebResponse( "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
         assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );
@@ -85,7 +85,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         pw.print( page );
         pw.close();
 
-        WebResponse response = new ServletUnitWebResponse( "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
         assertEquals( "Character set", "iso-8859-8", response.getCharacterSet() );
         assertEquals( "Title", hebrewTitle, response.getTitle() );
     }
@@ -97,7 +97,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         ServletOutputStream sos = servletResponse.getOutputStream();
         sos.println( "<html><head><title>Sample Page</title></head><body></body></html>" );
 
-        WebResponse response = new ServletUnitWebResponse( "_self", null, servletResponse );
+        WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
         assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );

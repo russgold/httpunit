@@ -21,9 +21,11 @@
 package com.meterware.httpunit;
 
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import java.net.URL;
 import java.util.StringTokenizer;
+import java.io.IOException;
 
 
 abstract
@@ -49,9 +51,7 @@ public class WebRequestSource extends ParameterHolder {
      * Returns the target for this request source.
      **/
     public String getTarget() {
-        if (getSpecifiedTarget().length() == 0) {
-            return _pageFrame;
-        } else if (getSpecifiedTarget().equalsIgnoreCase( "_self" )) {
+        if (getSpecifiedTarget().length() == 0 || getSpecifiedTarget().equalsIgnoreCase( "_self" )) {
             return _pageFrame;
         } else if (getSpecifiedTarget().equalsIgnoreCase( "_top" )) {
             return "_top";
@@ -125,8 +125,9 @@ public class WebRequestSource extends ParameterHolder {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebRequestSource( Node node, URL baseURL, String destination, String pageFrame ) {
+    WebRequestSource( WebResponse response, Node node, URL baseURL, String destination, String pageFrame ) {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
+        _baseResponse = response;
         _node         = node;
         _baseURL      = baseURL;
         _destination  = destination;
@@ -164,6 +165,15 @@ public class WebRequestSource extends ParameterHolder {
 
 
     /**
+     * Submits a request to the web client from which this request source was originally obtained.
+     **/
+    final
+    protected void submitRequest() throws IOException, SAXException {
+        _baseResponse.getClient().sendRequest( getRequest() );
+    }
+
+
+    /**
      * Records a parameter defined by including it in the destination URL.
      * The value can be null, if the parameter name was not specified with an equals sign.
      **/
@@ -175,6 +185,9 @@ public class WebRequestSource extends ParameterHolder {
 
 
     private static final String PARAM_DELIM = "&";
+
+    /** The web response containing this request source. **/
+    private WebResponse    _baseResponse;
 
     /** The name of the frame in which the response containing this request source is rendered. **/
     private String         _pageFrame;
