@@ -36,7 +36,7 @@ import java.util.Vector;
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 abstract
-class HttpUnitTest extends TestCase {
+public class HttpUnitTest extends TestCase {
 
     public HttpUnitTest( String name ) {
         super( name );

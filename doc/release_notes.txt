@@ -11,6 +11,14 @@ Limitations:
 
 
 Revision History:
+21-Mar-2002
+Acknowledgements:
+    Thanks to Frank Carver for extending base 64 encoding to handle character values > 127.
+
+Problems fixed:
+    1. Passwords with character values > 127 are now handled.
+
+
 15-Mar-2002
 Acknowledgements:
     Thanks to Stefan Renz for finding the file control value bug and providing a fix.

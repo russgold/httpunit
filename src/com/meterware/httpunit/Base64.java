@@ -24,9 +24,9 @@ public class Base64 {
     final static String encodingChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     public static String encode( String source ) {
-        byte[] sourceBytes = getPaddedBytes( source );
+        char[] sourceBytes = getPaddedBytes( source );
         int numGroups = (sourceBytes.length + 2) / 3;
-        byte[] targetBytes = new byte[4];
+        char[] targetBytes = new char[4];
         char[] target = new char[ 4 * numGroups ];
 
         for (int group = 0; group < numGroups; group++) {
@@ -43,20 +43,20 @@ public class Base64 {
     }
 
 
-    private static byte[] getPaddedBytes( String source ) {
-        byte[] converted = source.getBytes();
+    private static char[] getPaddedBytes( String source ) {
+        char[] converted = source.toCharArray();
         int requiredLength = 3 * ((converted.length+2) /3);
-        byte[] result = new byte[ requiredLength ];
+        char[] result = new char[ requiredLength ];
         System.arraycopy( converted, 0, result, 0, converted.length );
         return result;
     }
 
 
-    private static void convert3To4( byte[] source, int sourceIndex, byte[] target ) {
-        target[0] = (byte) ( source[ sourceIndex ] >>> 2);
-        target[1] = (byte) (((source[ sourceIndex   ] & 0x03) << 4) | (source[ sourceIndex+1 ] >>> 4));
-        target[2] = (byte) (((source[ sourceIndex+1 ] & 0x0f) << 2) | (source[ sourceIndex+2 ] >>> 6));
-        target[3] = (byte) (  source[ sourceIndex+2 ] & 0x3f);
+    private static void convert3To4( char[] source, int sourceIndex, char[] target ) {
+        target[0] = (char) ( source[ sourceIndex ] >>> 2);
+        target[1] = (char) (((source[ sourceIndex   ] & 0x03) << 4) | (source[ sourceIndex+1 ] >>> 4));
+        target[2] = (char) (((source[ sourceIndex+1 ] & 0x0f) << 2) | (source[ sourceIndex+2 ] >>> 6));
+        target[3] = (char) (  source[ sourceIndex+2 ] & 0x3f);
     }
 
 
@@ -83,4 +83,3 @@ public class Base64 {
     }
 
 }
-
