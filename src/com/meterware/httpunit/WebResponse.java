@@ -31,7 +31,7 @@ public class WebResponse {
      * Returns the top-level tables found in this page in the order in which
      * they appear.
      **/
-    public WebTable[] getTables() {
+    public WebTable[] getTables() throws SAXException {
         return getReceivedPage().getTables();
     }
 
