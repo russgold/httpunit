@@ -186,10 +186,10 @@ public class HtmlTablesTest extends HttpUnitTest {
 
     public void testInnerTableSeek() throws Exception {
         defineWebPage( "Default", "<h2>Interesting data</h2>" +
-                                  "<table summary=\"outer one\">" +
+                                  "<table id=you summary=\"outer one\">" +
                                   "<tr><td>Here we are</td><td>" +
                                   "Inner Table<br>" +
-                                  "<table summary=\"inner one\">" +
+                                  "<table id=me summary=\"inner one\">" +
                                   "        <tr><td colspan=2>&nbsp;</td></tr>" +
                                   "        <tr><td>Red</td><td>1</td></tr>" +
                                   "        <tr><td>Blue</td><td>2</td></tr>" +
@@ -212,7 +212,14 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "cell at 1,0",       "Blue", cells[1][0] );
 
         wt = page.getTableWithSummary( "Inner One" );
-        assertNotNull( "Did not find table starting with summary 'Inner One'", wt );
+        assertNotNull( "Did not find table with summary 'Inner One'", wt );
+        cells = wt.asText();
+        assertEquals( "Total rows",    3, cells.length );
+        assertEquals( "Total columns", 2, cells[0].length );
+        assertEquals( "cell at 2,0",       "Blue", cells[2][0] );
+
+        wt = page.getTableWithID( "me" );
+        assertNotNull( "Did not find table with id 'me'", wt );
         cells = wt.asText();
         assertEquals( "Total rows",    3, cells.length );
         assertEquals( "Total columns", 2, cells[0].length );

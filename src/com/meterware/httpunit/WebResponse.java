@@ -261,6 +261,18 @@ public class WebResponse {
     }
 
 
+    /**
+     * Returns the first table in the response which has the specified text as its ID attribute. 
+     * Will recurse into any nested tables, as needed.
+     * Case is ignored.
+     * @exception SAXException thrown if there is an error parsing the response.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableWithID( String text ) throws SAXException {
+        return getReceivedPage().getTableWithID( text );
+    }
+
+
     public String toString() {
         return getText();
     }

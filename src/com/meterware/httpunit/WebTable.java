@@ -172,6 +172,14 @@ public class WebTable {
     }
 
 
+    /**
+     * Returns the unique ID attribute associated with this table.
+     **/
+    public String getID() {
+        return NodeUtils.getNodeAttribute( _dom, "id" );
+    }
+
+
     public String toString() {
         String eol = System.getProperty( "line.separator" );
         if (_cells == null) readTable();

@@ -132,8 +132,14 @@ class ParsedHTML {
      * its first non-blank row and non-blank column. Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableStartingWith( String text ) {
-        return getTableStartingWith( text, getTables() );
+    public WebTable getTableStartingWith( final String text ) {
+        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
+            public boolean isTrue( WebTable table ) {
+                table.purgeEmptyCells();
+                return table.getRowCount() > 0 &&
+                       table.getCellAsText(0,0).equalsIgnoreCase( text );
+            }
+        } );
     }
     
     
@@ -143,7 +149,14 @@ class ParsedHTML {
      * @return the selected table, or null if none is found
      **/
     public WebTable getTableStartingWithPrefix( String text ) {
-        return getTableStartingWithPrefix( text.toUpperCase(), getTables() );
+        final String prefix = text.toUpperCase();
+        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
+            public boolean isTrue( WebTable table ) {
+                table.purgeEmptyCells();
+                return table.getRowCount() > 0 &&
+                       table.getCellAsText(0,0).toUpperCase().startsWith( prefix );
+            }
+        } );
     }
     
     
@@ -152,8 +165,26 @@ class ParsedHTML {
      * Will recurse into any nested tables, as needed.
      * @return the selected table, or null if none is found
      **/
-    public WebTable getTableWithSummary( String summary ) {
-        return getTableWithSummary( summary, getTables() );
+    public WebTable getTableWithSummary( final String summary ) {
+        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
+            public boolean isTrue( WebTable table ) {
+                return table.getSummary().equalsIgnoreCase( summary );
+            }
+        } );
+    }
+    
+    
+    /**
+     * Returns the first table in the response which has the specified text as its ID attribute. 
+     * Will recurse into any nested tables, as needed.
+     * @return the selected table, or null if none is found
+     **/
+    public WebTable getTableWithID( final String ID ) {
+        return getTableSatisfyingPredicate( getTables(), new TablePredicate() {
+            public boolean isTrue( WebTable table ) {
+                return table.getID().equalsIgnoreCase( ID );
+            }
+        } );
     }
     
     
@@ -204,6 +235,11 @@ class ParsedHTML {
     }
 
 
+    interface TablePredicate {
+        public boolean isTrue( WebTable table );
+    }
+
+
 //---------------------------------- private members --------------------------------
 
     private Node _rootNode;
@@ -236,69 +272,11 @@ class ParsedHTML {
 
 
     /**
-     * Returns the table with the specified text in its first non-blank row and column.
-     **/
-    private WebTable getTableStartingWith( String text, WebTable[] tables ) {
-        for (int i = 0; i < tables.length; i++) {
-            tables[i].purgeEmptyCells();
-            if (tables[i].getRowCount() == 0) continue;
-            if (tables[i].getCellAsText(0,0).equalsIgnoreCase( text )) {
-                return tables[i];
-            } else {
-                for (int j = 0; j < tables[i].getRowCount(); j++) {
-                    for (int k = 0; k < tables[i].getColumnCount(); k++) {
-                        TableCell cell = tables[i].getTableCell(j,k);
-                        if (cell != null) {
-                            WebTable[] innerTables = cell.getTables();
-                            if (innerTables.length != 0) {
-                                WebTable result = getTableStartingWith( text, innerTables );
-                                if (result != null) return result;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-
-
-    /**
-     * Returns the table with the specified text in its first non-blank row and column.
-     **/
-    private WebTable getTableStartingWithPrefix( String text, WebTable[] tables ) {
-        for (int i = 0; i < tables.length; i++) {
-            tables[i].purgeEmptyCells();
-            if (tables[i].getRowCount() == 0) continue;
-            if (tables[i].getCellAsText(0,0).toUpperCase().startsWith( text )) {
-                return tables[i];
-            } else {
-                for (int j = 0; j < tables[i].getRowCount(); j++) {
-                    for (int k = 0; k < tables[i].getColumnCount(); k++) {
-                        TableCell cell = tables[i].getTableCell(j,k);
-                        if (cell != null) {
-                            WebTable[] innerTables = cell.getTables();
-                            if (innerTables.length != 0) {
-                                WebTable result = getTableStartingWithPrefix( text, innerTables );
-                                if (result != null) return result;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-
-
-    /**
      * Returns the table with the specified text in its summary attribute.
      **/
-    private WebTable getTableWithSummary( String summary, WebTable[] tables ) {
+    private WebTable getTableSatisfyingPredicate( WebTable[] tables, TablePredicate predicate ) {
         for (int i = 0; i < tables.length; i++) {
-            if (tables[i].getSummary().equalsIgnoreCase( summary )) {
+            if (predicate.isTrue( tables[i] )) {
                 return tables[i];
             } else {
                 for (int j = 0; j < tables[i].getRowCount(); j++) {
@@ -307,7 +285,7 @@ class ParsedHTML {
                         if (cell != null) {
                             WebTable[] innerTables = cell.getTables();
                             if (innerTables.length != 0) {
-                                WebTable result = getTableWithSummary( summary, innerTables );
+                                WebTable result = getTableSatisfyingPredicate( innerTables, predicate );
                                 if (result != null) return result;
                             }
                         }
