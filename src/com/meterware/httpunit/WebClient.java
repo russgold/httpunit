@@ -186,7 +186,7 @@ public class WebClient {
     	
     	StringBuffer sb = new StringBuffer();
     	for (int i = 0; i < names.length; i++) {
-            if (i != 0) sb.append( ';' );
+            if (i != 0) sb.append( "; " );
     	    String name = names[i];
     	    sb.append( name ).append( '=' ).append( getCookieValue( name ) );
     	}

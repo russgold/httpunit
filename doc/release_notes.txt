@@ -11,9 +11,14 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
-04-Jan-01
+08-Jan-01
+Acknowledgements:
+    Thanks to Rocky Rhodes for finding the multiple cookie bug
 Additions:
     1. Initial implementation of file upload capability
+    
+Problems corrected:
+    1. Multiple cookies were not being sent correctly
     
 01-Jan-01 1.2.1
 Acknowledgements:
