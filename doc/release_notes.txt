@@ -16,6 +16,7 @@ Revision History:
  1-Apr-2003
 Problems fixed:
     1. HttpUnit now handles refresh headers without explicit URLs, defaulting to refreshing the containing page.
+    2. Bug #709979: Select.selectedIndex was returning -1 for a normal select box with no options explicitly selected.
 
 28-Mar-2003
 Acknowledgements:

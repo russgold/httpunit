@@ -1092,7 +1092,7 @@ class SelectionFormControl extends FormControl {
             for (int i = 0; i < _options.length; i++) {
                 if (_options[i].isSelected()) return i;
             }
-            return -1;
+            return _multiSelect ? -1 : 0;
         }
 
 

@@ -599,6 +599,29 @@ public class FormScriptingTest extends HttpUnitTest {
 
 
     public void testFormSelectWriteableProperties() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <select name='choices'>" +
+                                            "    <option value='1'>red" +
+                                            "    <option value='3'>blue" +
+                                            "    <option value='5'>green" +
+                                            "    <option value='7'>azure" +
+                                            "  </select>" +
+                                            "</form>" +
+                                            "<a href='#' onclick='alert( \"Selected index is \" + document.the_form.choices.selectedIndex );'>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        assertEquals( "initial selection", "1", form.getParameterValue( "choices" ) );
+
+        response.getLinks()[0].click();
+        assertEquals( "Notification", "Selected index is 0", wc.popNextAlert() );
+    }
+
+
+    public void testFormSelectDefaultProperties() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function selectOptionNum( the_select, index ) { \n" +
                                             "  for (var i = 0; i < the_select.length; i++) {\n" +
