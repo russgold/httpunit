@@ -14,7 +14,7 @@ Limitations:
 
 
 Revision History:
-28-Sep-2004 1.6
+3-Oct-2004 1.6
 Acknowledgements:
     Thanks to Chris Hane for making it easier to add support for javascript properties and for providing support for
         getAttribute() to handle any property defined in the underlying Node.
@@ -133,7 +133,7 @@ Problems fixed:
         27. bug #1029139: infinite recursion in frameset page when a frame has src="#"
     JavaScript
         28. A frameset 'onload' event is now invoked after all of its subframes have been loaded
-        29. HttpUnit no longer complains about not being able to find the Rhino jar (js.jar) is scripting is disabled
+        29. HttpUnit no longer complains about not being able to find the Rhino jar (js.jar) if scripting is disabled
             before any pages are read.
         30. bug #823433: document.cookie now defaults to the empty string, like IE and Mozilla, rather than null
         31. Using JavaScript to write into an empty frame could change all empty frames to the same value
