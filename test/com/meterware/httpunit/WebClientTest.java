@@ -30,6 +30,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -488,6 +489,20 @@ public class WebClientTest extends HttpUnitTest {
 
         wr = wc.getResponse( "http://meterware.com:" + getHostPort() + "/checkCookies" );
         assertEquals( "Submitted cookie header", "found cookies: type=short", wr.getText() );
+    }
+
+
+    public void testHostHeaderWithDNSOverride() throws Exception {
+        WebConversation wc = new WebConversation();
+        wc.getClientProperties().setDnsListener( new DNSListener() {
+            public String getIpAddress( String hostName ) { return "127.0.0.1"; }
+        });
+
+        try {
+            wc.getResponse( "http://meterware.com" );
+        } catch (ConnectException e) {}
+
+        assertEquals( "Submitted host header", "meterware.com", wc.getHeaderField( "Host" ) );
     }
 
 

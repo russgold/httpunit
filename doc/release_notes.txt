@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+23-Jun-2004
+   Problems fixed:
+       1. bug #974380 When using a DNS listener, host header no longer includes ':-1' if the port is not specified
+
 22-Jun-2004
    Problems fixed:
        1. bug #964940 The Referer header was not being sent again if the original request was redirected
