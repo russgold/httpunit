@@ -31,7 +31,9 @@ import java.util.Vector;
 
 
 /**
- * A unit test of the httpunit parsing classes.
+ * a base class for HttpUnit regression tests.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
 abstract
 class HttpUnitTest extends TestCase {
@@ -90,6 +92,10 @@ class HttpUnitTest extends TestCase {
 
     protected String getHostPath() {
         return _hostPath;
+    }
+
+    public void assertTrue( String comment, boolean expression ) {
+        assert( comment, expression );
     }
 
 

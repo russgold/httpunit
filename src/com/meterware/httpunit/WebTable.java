@@ -2,14 +2,14 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -27,6 +27,9 @@ import org.w3c.dom.*;
 
 /**
  * This class represents a table in an HTML page.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class WebTable {
 
@@ -51,7 +54,7 @@ public class WebTable {
 
 
     /**
-     * Returns the contents of the specified table cell as text. 
+     * Returns the contents of the specified table cell as text.
      * The row and column numbers are zero-based.
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
      * @deprecated use #getCellAsText
@@ -62,7 +65,7 @@ public class WebTable {
 
 
     /**
-     * Returns the contents of the specified table cell as text. 
+     * Returns the contents of the specified table cell as text.
      * The row and column numbers are zero-based.
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
      **/
@@ -73,13 +76,37 @@ public class WebTable {
 
 
     /**
-     * Returns the contents of the specified table cell as text. 
+     * Returns the contents of the specified table cell as text.
      * The row and column numbers are zero-based.
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
      **/
     public TableCell getTableCell( int row, int column ) {
         if (_cells == null) readTable();
         return _cells[ row ][ column ];
+    }
+
+
+    /**
+     * Returns the contents of the specified table cell with a given ID
+     * @return TableCell with given ID or null if ID is not found.
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public TableCell getTableCellWithID( String id ) {
+        if (_cells == null) readTable();
+        String idToCompare;
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getColumnCount(); j++) {
+                if (_cells[i][j]!=null) {
+                    idToCompare = NodeUtils.getNodeAttribute( _cells[i][j].getDOM(), "id" );
+                    if (HttpUnitOptions.getMatchesIgnoreCase())
+                        if (id.equalsIgnoreCase(idToCompare))
+                            return _cells[i][j];
+                        else if (id.equals(idToCompare))
+                            return _cells[i][j];
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -116,7 +143,7 @@ public class WebTable {
             boolean neededInRow = true;
             boolean neededInCol = true;
             for (int i = coords[0]; neededInRow && (i < coords[0] + cell.getRowSpan()); i++) {
-                neededInRow = !rowHasText[i]; 
+                neededInRow = !rowHasText[i];
             }
             for (int j = coords[1]; neededInCol && (j < coords[1] + cell.getColSpan()); j++) {
                 neededInCol = !columnHasText[j];
@@ -270,7 +297,7 @@ public class WebTable {
                 for (int k = 0; k < spannedRows; k++) {
                     for (int l = 0; l < cells[j].getColSpan(); l++) {
                        placeCell( i+k, j+l, cells[j] );
-                    }     
+                    }
                 }
              }
          }
@@ -295,7 +322,7 @@ public class WebTable {
     /**
      * Returns true if the desiredParentTag is found in the tree above this node more closely nested than
      * the undesiredParentTag, or if the top of the tree is found before the undesired tag.
-     **/ 
+     **/
     private static boolean isMoreCloselyNested( Node node, Node desiredParentNode, String undesiredParentTag ) {
         node = node.getParentNode();
         while (true) {

@@ -2,14 +2,14 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -27,15 +27,18 @@ import junit.framework.TestSuite;
 
 
 /**
- * A unit test of the httpunit parsing classes.
+ * A unit test of the table handling code.
+ *
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 public class HtmlTablesTest extends HttpUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
-	
-	
+
+
     public static Test suite() {
 	return new TestSuite( HtmlTablesTest.class );
     }
@@ -53,9 +56,9 @@ public class HtmlTablesTest extends HttpUnitTest {
         defineWebPage( "OneTable", "<h2>Interesting data</h2>" +
                                    "<table summary=\"tough luck\">" +
                                    "<tr><td>One</td><td>&nbsp;</td><td>1</td></tr>" +
-                                   "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
+                                   "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" +
                                    "<tr><td>Two</td><td>&nbsp;</td><td>2</td></tr>" +
-                                   "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" + 
+                                   "<tr><td colspan=3><IMG SRC=\"/images/spacer.gif\" ALT=\"\" WIDTH=1 HEIGHT=1></td></tr>" +
                                    "<tr><td>Three</td><td>&nbsp;</td><td>3</td></tr>" +
                                    "</table>" );
         defineWebPage( "SpanTable", "<h2>Interesting data</h2>" +
@@ -65,8 +68,8 @@ public class HtmlTablesTest extends HttpUnitTest {
                                     "<tr><td>Green</td><td><a href=\"nowhere\">vert</a></td></tr>" +
                                     "</table>" );
     }
-	
-	
+
+
     public void testFindNoTables() throws Exception {
         defineWebPage( "Default", "This has no tables but it does" +
                                   "have <a href=\"/other.html\">an active link</A>" +
@@ -143,8 +146,8 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "nested columns", 2, nested[0].getColumnCount() );
 
         String nestedString = tables[0].getCellAsText( 0, 0 );
-        assert( "Cannot find 'Red' in string", nestedString.indexOf( "Red" ) >= 0 );
-        assert( "Cannot find 'Blue' in string", nestedString.indexOf( "Blue" ) >= 0 );
+        assertTrue( "Cannot find 'Red' in string", nestedString.indexOf( "Red" ) >= 0 );
+        assertTrue( "Cannot find 'Blue' in string", nestedString.indexOf( "Blue" ) >= 0 );
     }
 
 
@@ -256,6 +259,44 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "Non-blank rows",    3, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,1",       "Value", cells[1][1] );
+    }
+
+    /**
+     * Get a specific cell with a given id in a WebTable
+     * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+     **/
+    public void testCellsWithID() throws Exception {
+        defineWebPage( "Default", "<h2>Interesting data</h2>" +
+                                  "<table id=\"table\" summary=little>" +
+                                  "<tr><td>Title</td><td>Data</td></tr>" +
+                                  "<tr><td id=\"id1\">value1</td><td id=\"id2\">value2</td><td>Value</td></tr>" +
+                                  "<tr><td>&nbsp;</td><td>&nbsp;</td><td>Value</td></tr>" +
+                                  "</table>" );
+
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebTable table = page.getTableWithID("table");
+        assertNotNull("there is a table",table);
+        TableCell cell = table.getTableCellWithID("id1");
+        assertNotNull("cell id1",cell);
+        assertEquals("Value of cell id1","value1",cell.asText());
+        cell = table.getTableCellWithID("id2");
+        assertNotNull("cell id2",cell);
+        assertEquals("Value of cell id2","value2",cell.asText());
+
+        // test non existent cell id
+        cell = table.getTableCellWithID("nonExistingID");
+        assertNull("cell id2",cell);
+
+        // check the ignore case.TRUE
+        HttpUnitOptions.setMatchesIgnoreCase(true);
+        cell = table.getTableCellWithID("iD2");
+        assertNotNull("cell id2",cell);
+        assertEquals("Value of cell id2","value2",cell.asText());
+
+        // check the ignore case FALSE
+        HttpUnitOptions.setMatchesIgnoreCase(false);
+        cell = table.getTableCellWithID("iD2");
+        assertNull("cell iD2",cell);
     }
 
     private WebConversation _wc;
