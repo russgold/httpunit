@@ -1,7 +1,6 @@
-High Priority
-o Handle frames with the same name as one of their ancestors - fix both removal and lookup
-
 Medium priority:
+o Enable client code to write directly to the output stream of a message body request
+o Provide customization for table to text
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Support IFRAME tag

@@ -4,6 +4,7 @@ Known problems:
     1. The "_parent" and "_empty" frame targets are not handled correctly
     2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
+    3. The regression test "pseudo-server" do not appear to run properly under JDK 1.4
 
 Limitations:
     1. HttpUnit does not support JavaScript
@@ -12,97 +13,55 @@ Limitations:
 
 
 Revision History:
-19-Jun-2002
-Additions:
-    1. ServletUnit now implements the HttpServletRequest.getServletPath and getPathInfo methods.
-
-18-Jun-2002
-Acknowledgements:
-    Thanks to Jessica Sant for correcting the handling of error statuses.
-Problems fixed:
-    1. bug #570644: As of JDK 1.3.1-03, the behavior of HttpURLConnection was changed to throw an IOException when an
-       error status is returned. This broke HttpUnit's handling of error codes. This has since been corrected.
-
-17-Jun-2002
-Acknowledgements:
-    Thanks to Robert Watkins for the content length test.
-
-Additions:
-    1. An IO exception is thrown if the content length does not match the actual received length for a response and
-       content-length checking is enabled.
-
-21-May-2002
-Correction:
-    1. ServletUnit supports urls beginning with "/servlet/" as referring to a servlet class name if not mapped to anything else.
-
-20-May-2002
-Additions:
-    1. ServletUnitHttpRequest now implements getInputStream and getContentType.
-
-16-May-2002
-Acknowledgements:
-    Thanks to James Murty for adding caching of servlet instances and some XML parsing cleanup.
-
-Additions:
-    1. ServletUnit now caches its servlet instances so that multiple invocations can use the same instance.  This more
-       closely matches the servlet spec.
-    2. Leading and trailing spaces in web.xml text nodes are now ignored.
-    3. If no other mapping matches a servlet name in a URL, ServletUnit will try to treat it as a servlet class name.
-       This means that you can use something like http://localhost/com.nowhere.MyServlet to access your servlet without
-       explicitly registering it.
-
-14-May-2002
-Additions:
-    1. A <select> control with a size attribute may now have its value undefined. The specification does not require
-       this behavior, but both IE 5.5 and Netscape 6.2 do this.
-    2. WebResponse.getForms now caches its result so that multiple calls will return the same set of objects.
-    3. WebClient.sendRequest is now available as an alias for WebRequest.getResponse
-
- 9-May-2002
-Acknowledgements:
-    Thanks to Yassen Damyanov for fixing a bug in the handling response headers
-
-Problems fixed:
-    1. Response headers were truncated to the first word only
-    2. The servletunit tutorial failed with a NullPointerException in the first step.
-
- 8-Apr-2002
-Additions:
-    1. It is now possible to set the value of a hidden field in a form using a mechanism which will support scripting in the future:
-              form.getScriptableObject().setParameterValue( fieldName, newValue )
-
-25-Mar-2002
-Problems fixed:
-    1. Parameters were not being submitted for image buttons with no specified value
-
-21-Mar-2002
-Acknowledgements:
-    Thanks to Frank Carver for extending base 64 encoding to handle character values > 127.
-
-Problems fixed:
-    1. Passwords with character values > 127 are now handled.
-
-
-15-Mar-2002
+20-Jun-2002 1.4.1
 Acknowledgements:
     Thanks to Stefan Renz for finding the file control value bug and providing a fix.
+    Thanks to Frank Carver for extending base 64 encoding to handle character values > 127.
+    Thanks to Yassen Damyanov for fixing a bug in the handling response headers
+    Thanks to James Murty for adding caching of servlet instances and some XML parsing cleanup.
+    Thanks to Robert Watkins for the content length test.
+    Thanks to Jessica Sant for correcting the handling of error statuses in JDK 1.3.1-03
 
 Problems fixed:
     1. Trying to get the value of a file parameter no longer results in a null pointer exception.
+    2. Passwords with character values > 127 are now handled.
+    3. Parameters were not being submitted for image buttons with no specified value
+    4. Response headers were truncated to the first word only
+    5. The servletunit tutorial failed with a NullPointerException in the first step.
+    6. bug #570644: As of JDK 1.3.1-03, the behavior of HttpURLConnection was changed to throw an IOException when an
+       error status is returned. This broke HttpUnit's handling of error codes. This has since been corrected.
 
-14-Mar-2002
+19-Jun-2002
 Additions:
-    1. It is now possible to set the action on a form using a mechanism which will support scripting in the future:
+    Content and parsing additions
+        1. HttpUnit now sends Accept-encoding: gzip unless disabled by a call to HttpUnitOptions.setAcceptGzip( false )
+        2. It is now possible to set the action on a form using a mechanism which will support scripting in the future:
               form.getScriptableObject().setAction( newAction )
+        3. It is now possible to set the value of a hidden field in a form using a mechanism which will support scripting
+              in the future: form.getScriptableObject().setParameterValue( fieldName, newValue )
+        4. A <select> control with a size attribute may now have its value undefined. The specification does not require
+           this behavior, but both IE 5.5 and Netscape 6.2 do this.
+        5. WebResponse.getForms now caches its result so that multiple calls will return the same set of objects.
+        6. WebClient.sendRequest is now available as an alias for WebRequest.getResponse
+        7. An IO exception is thrown if the content length does not match the actual received length for a response and
+           content-length checking is enabled.
 
-11-Mar-2002
-
-Additions:
-    1. HttpUnit now sends Accept-encoding: gzip unless disabled by a call to HttpUnitOptions.setAcceptGzip( false )
+    ServletUnit enhancements
+        8. ServletUnit now caches its servlet instances so that multiple invocations can use the same instance.  This more
+           closely matches the servlet spec.
+        9. Leading and trailing spaces in web.xml text nodes are now ignored.
+       10. If no other mapping matches a servlet name in a URL, ServletUnit will try to treat it as a servlet class name.
+           This means that you can use something like http://localhost/servlet/com.nowhere.MyServlet to access your servlet
+           without explicitly registering it.
+       11. ServletUnitHttpRequest now implements getInputStream and getContentType.
+       12. ServletUnit now implements the HttpServletRequest.getServletPath and getPathInfo methods.
 
 Notes:
-    1. Hidden fields may not be modified if parameter validation is enabled, since they cannot be modified through
-       normal user interaction (in the absence of JavaScript).
+    1. Hidden fields may not be modified through the setParameter call if parameter validation is enabled, since they
+       cannot be modified through normal user interaction (in the absence of JavaScript). The getScriptableObject call
+       provides a way around this.
+    2. The version of JTidy included with this release is 4-Aug-2000-r7, which seems to have fewer problems with classloading;
+       however, it is also described as a "less stable" pre-release.
 
 
  6-Mar-2002 1.4
