@@ -19,13 +19,9 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
-
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.Vector;
 import java.io.File;
 
 
@@ -230,7 +226,7 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testCheckboxValidation() throws Exception {
-        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+        defineWebPage( "Default", "<form method=GET action = 'ask?color='>" +
                                        "<Input type=checkbox name=use_color>" +
                                        "<Input type=checkbox name=color value=red>" +
                                        "<Input type=checkbox name=color value=blue>" +

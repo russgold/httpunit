@@ -78,6 +78,11 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
     }
 
 
+    protected String getEmptyParameterValue() {
+        return "";
+    }
+
+
     protected void setDestination( String destination ) {
         super.setDestination( destination );
         _presetParameterList = null;

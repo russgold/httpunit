@@ -10,6 +10,10 @@ Limitations:
 
 
 Revision History:
+20-Nov-2002
+Problems fixed:
+    1. HttpUnit now ignores empty parameters on form actions, as IE and Netscape do.
+
 18-Nov-2002
 Acknowledgements:
     Thanks to Neville Wylie for catching the top.parent and frame name index problems

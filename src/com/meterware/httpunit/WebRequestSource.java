@@ -283,12 +283,13 @@ public class WebRequestSource extends ParameterHolder {
         String value = ((index < 0)
                            ? null
                            : ((index == param.length() - 1)
-                                    ? ""
+                                    ? getEmptyParameterValue()
                                     : HttpUnitUtils.decode( param.substring( index + 1 ) ).trim() ));
         String name = (index < 0) ? param.trim() : HttpUnitUtils.decode( param.substring( 0, index ) ).trim();
         addPresetParameter( name, value );
     }
 
 
+    abstract protected String getEmptyParameterValue();
 
 }

@@ -438,6 +438,11 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    protected String getEmptyParameterValue() {
+        return null;
+    }
+
+
 //---------------------------------- ParameterHolder methods --------------------------------
 
 
