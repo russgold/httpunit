@@ -26,13 +26,13 @@ import java.net.URLConnection;
 
 
 /**
- * An abstract class representing the body of a POST method request.
+ * An abstract class representing the body of a web request.
  **/
 abstract
 class MessageBody {
 
 
-    MessageBody( PostMethodWebRequest request ) {
+    MessageBody( MessageBodyWebRequest request ) {
         _request = request;
     }
 
@@ -51,11 +51,11 @@ class MessageBody {
     void writeTo( OutputStream outputStream ) throws IOException;
 
 
-    protected PostMethodWebRequest getRequest() {
+    protected MessageBodyWebRequest getRequest() {
         return _request;
     }
 
 
-    private PostMethodWebRequest _request;
+    private MessageBodyWebRequest _request;
 
 }

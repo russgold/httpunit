@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -37,6 +37,25 @@ public class PseudoServlet {
      * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
      *        which is the raw bytes of the request contents stored in a string.
      **/ 
+    public WebResource getResponse( String methodType, Dictionary parameters, Dictionary headers ) {
+        if (methodType.equalsIgnoreCase( "GET" )) {
+            return getGetResponse( parameters, headers );
+        } else if (methodType.equalsIgnoreCase( "PUT" )) {
+            return getPutResponse( parameters, headers );
+        } else if (methodType.equalsIgnoreCase( "POST" )) {
+            return getPostResponse( parameters, headers );
+        } else {
+            throw new RuntimeException( methodType + " not implemented" );
+        }
+    }
+
+
+    /**
+     * Returns a resource object as a result of a get request. 
+     * @param parameters a mapping of parameter names to arrays of value string.
+     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
+     *        which is the raw bytes of the request contents stored in a string.
+     **/ 
     public WebResource getGetResponse( Dictionary parameters, Dictionary headers ) {
         throw new RuntimeException( "get not implemented" );
     }
@@ -52,6 +71,16 @@ public class PseudoServlet {
         throw new RuntimeException( "post not implemented" );
     }
 
+
+    /*
+     * Returns a resource object as a result of a put request. 
+     * @param parameters a mapping of parameter names to arrays of value string.
+     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
+     *        which is the raw bytes of the request contents stored in a string.
+     **/ 
+    public WebResource getPutResponse( Dictionary parameters, Dictionary headers ) {
+        throw new RuntimeException( "put not implemented" );
+    }
 }
 
 

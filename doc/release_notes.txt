@@ -5,6 +5,7 @@ Known problems:
     2. The "_self" target only works for links, not forms
     3. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response. 
        This behavior matches that currently used by IE and Navigator.
+    4. No order is guaranteed for parameters from forms, contrary to the HTML 4.01 spec
 
 Limitations: HttpUnit does not support JavaScript
 
@@ -12,7 +13,15 @@ Limitations: HttpUnit does not support JavaScript
 Revision History:
 Acknowledgements:
     Thanks to Rolf Schmidiger for corrected behavior when failing to find a site
-    
+    Thanks to Tom Watkins, Deepa Dihr, Marcos Tarruella for their implementation of
+       PutMethodWebRequest
+
+ 4-Jun-01
+Additions:
+    1. Added PutMethodWebRequest
+    2. PostMethodWebRequest now has a constructor which allows its contents to be
+       taken from an InputSource, like PutMethodWebRequest
+           
 31-May-01
 Problems corrected:
     1. Now throws HttpNotFoundException rather than NullPointerException when

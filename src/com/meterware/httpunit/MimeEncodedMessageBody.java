@@ -49,6 +49,14 @@ class MimeEncodedMessageBody extends MessageBody {
 
 
     /**
+     * Returns the request associated with this message body, cast to a POST request.
+     **/
+    PostMethodWebRequest getPostRequest() {
+        return (PostMethodWebRequest) getRequest();
+    }
+
+
+    /**
      * Transmits the body of this request as a sequence of bytes.
      **/
     void writeTo( OutputStream outputStream ) throws IOException {
@@ -64,7 +72,7 @@ class MimeEncodedMessageBody extends MessageBody {
             }
         }
 
-        Dictionary files = getRequest().getSelectedFiles();
+        Dictionary files = getPostRequest().getSelectedFiles();
         for (Enumeration e = files.keys(); e.hasMoreElements();) {
 	    String name = (String) e.nextElement();
 	    WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );

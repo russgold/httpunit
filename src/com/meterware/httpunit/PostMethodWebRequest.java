@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -36,7 +37,7 @@ import java.util.Hashtable;
 /**
  * An HTTP request using the POST method.
  **/
-public class PostMethodWebRequest extends WebRequest {
+public class PostMethodWebRequest extends MessageBodyWebRequest {
 
 
     /**
@@ -44,6 +45,15 @@ public class PostMethodWebRequest extends WebRequest {
      **/
     public PostMethodWebRequest( String urlString ) {
         super( urlString );
+    }
+
+
+    /**
+     * Constructs a web request using a specific absolute url string and input stream.
+     **/
+    public PostMethodWebRequest( String urlString, InputStream source ) {
+        super( urlString );
+        _source = source;
     }
 
 
@@ -83,18 +93,17 @@ public class PostMethodWebRequest extends WebRequest {
     }
 
 
-//---------------------------------- WebRequest methods --------------------------------
+//----------------------------- MessageBodyWebRequest methods ---------------------------
 
 
-    protected void completeRequest( URLConnection connection ) throws IOException {
-        MessageBody mb = newMessageBody();
-        mb.updateHeaders( connection );
-        connection.setDoInput( true );
-        connection.setDoOutput( true );
-        OutputStream stream = connection.getOutputStream();
-        mb.writeTo( stream );
-        stream.flush();
-        stream.close();
+    protected MessageBody newMessageBody() {
+        if (_source != null) {
+            return new InputStreamMessageBody( this, _source );
+        } else if (isMimeEncoded()) {
+            return new MimeEncodedMessageBody( this );
+        } else {
+            return new URLEncodedMessageBody( this );
+        }
     }
 
 
@@ -121,17 +130,12 @@ public class PostMethodWebRequest extends WebRequest {
 //---------------------------------- private members -------------------------------------
 
     private Hashtable _files = new Hashtable();
+    private InputStream _source;
 
-
-    private MessageBody newMessageBody() {
-        if (isMimeEncoded()) {
-            return new MimeEncodedMessageBody( this );
-        } else {
-            return new URLEncodedMessageBody( this );
-        }
-    }
 
 }
+
+
 
 //============================= class URLEncodedMessageBody ======================================
 

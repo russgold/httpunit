@@ -48,7 +48,7 @@ public class PseudoServer {
                         _active = false;
                     }
                 }
-		try {
+        		try {
                     if (_serverSocket != null) _serverSocket.close();
                     _serverSocket = null;
                 } catch (IOException e) {
@@ -176,7 +176,7 @@ public class PseudoServer {
         String uri     = st.nextToken();
         String protocol = st.nextToken();
 
-        if (!command.equals( "GET" ) && !command.equals( "POST" )) {
+        if (!command.equals( "GET" ) && !command.equals( "POST" ) && !command.equals( "PUT" )) {
             sendResponse( pw, HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + command );
         } else {
             try {
@@ -186,8 +186,8 @@ public class PseudoServer {
                 } else if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     sendResponse( pw, resource.getResponseCode(), resource.getContents() );
                     sendLine( pw, "" );
-	            pw.flush();
-		} else {
+    	            pw.flush();
+    		    } else {
                     sendResponse( pw, HttpURLConnection.HTTP_OK, "OK" );
                     sendLine( pw, "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
                     String[] headers = resource.getHeaders();
@@ -205,8 +205,8 @@ public class PseudoServer {
                 socket.close();
                 throw e;
             } catch (Throwable t) {
-		System.out.println( "Internal error: " + t );
-		t.printStackTrace();
+        		System.out.println( "Internal error: " + t );
+        		t.printStackTrace();
                 sendResponse( pw, HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
             }
         }
@@ -220,12 +220,9 @@ public class PseudoServer {
         Object resource = _resources.get( uri );
         if (command.equals( "GET" ) && resource instanceof WebResource) {
             return (WebResource) resource;
-        } else if (command.equals( "POST" ) && resource instanceof PseudoServlet) {
+        } else if (resource instanceof PseudoServlet) {
             Dictionary requestData = readRequest( br );
-            return ((PseudoServlet) resource).getPostResponse( getParameters( (String) requestData.get( PseudoServlet.CONTENTS ) ), requestData );
-        } else if (command.equals( "GET" ) && resource instanceof PseudoServlet) {
-            Dictionary requestData = readRequest( br );
-            return ((PseudoServlet) resource).getGetResponse( getParameters( (String) requestData.get( PseudoServlet.CONTENTS ) ), requestData );
+            return ((PseudoServlet) resource).getResponse( command, getParameters( (String) requestData.get( PseudoServlet.CONTENTS ) ), requestData );
         } else {
             return null;
         }

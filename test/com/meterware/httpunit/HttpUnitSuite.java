@@ -46,6 +46,7 @@ public class HttpUnitSuite {
         suite.addTest( FormSubmitTest.suite() );
         suite.addTest( Base64Test.suite() );
         suite.addTest( PseudoServerTest.suite() );
+        suite.addTest( MessageBodyRequestTest.suite() );
         addOptionalTestCase( suite, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( suite, "com.meterware.httpunit.FileUploadTest" );
         return suite;

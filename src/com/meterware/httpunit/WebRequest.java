@@ -436,7 +436,7 @@ public class WebRequest {
         if (_sourceForm.isTextParameter( name )) return;
         if (_sourceForm.isFileParameter( name )) throw new IllegalFileParameterException( name );
         if (!inArray( name, _sourceForm.getParameterNames() )) throw new NoSuchParameterException( name );
-        if (!inArray( value, _sourceForm.getOptionValues( name ) )) throw new IllegalParameterValueException( name, value );
+        if (!inArray( value, _sourceForm.getOptionValues( name ) )) throw new IllegalParameterValueException( name, value, _sourceForm.getOptionValues( name ) );
     }
 
 
@@ -561,17 +561,29 @@ class NoSuchParameterException extends IllegalRequestParameterException {
 class IllegalParameterValueException extends IllegalRequestParameterException {
 
 
-    IllegalParameterValueException( String parameterName, String badValue ) {
+    IllegalParameterValueException( String parameterName, String badValue, String[] allowed ) {
         _parameterName = parameterName;
         _badValue      = badValue;
+        _allowedValues = allowed;
     }
+
 
     public String getMessage() {
-        return "May not set parameter '" + _parameterName + "' to '" + _badValue + "'";
+        StringBuffer sb = new StringBuffer();
+        sb.append( "May not set parameter '" ).append( _parameterName ).append( "' to '" );
+        sb.append( _badValue ).append( "'. Value must be one of: { " );
+        for (int i = 0; i < _allowedValues.length; i++) {
+            if (i != 0) sb.append( ", " );
+            sb.append( _allowedValues[i] );
+        }
+        sb.append( " }" );
+        return sb.toString();
     }
 
-    private String _parameterName;
-    private String _badValue;
+
+    private String   _parameterName;
+    private String   _badValue;
+    private String[] _allowedValues;
 }
 
 
