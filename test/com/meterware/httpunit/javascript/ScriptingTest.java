@@ -56,7 +56,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "<body onLoad='alert(\"Ouch!\")'></body>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertNotNull( "No alert detected", response.getNextAlert() );
         assertEquals( "Alert message", "Ouch!", response.popNextAlert() );
         assertNull( "Alert should have been removed", response.getNextAlert() );
@@ -72,7 +71,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "<body onLoad='sayCheese()'></body>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertEquals( "Alert message", "Cheese!", response.popNextAlert() );
     }
 
@@ -82,7 +80,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "<body onLoad='alert(\"Window title is \" + document.title)'></body>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertEquals( "Alert message", "Window title is Amazing!", response.popNextAlert() );
     }
 
@@ -102,7 +99,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertEquals( "Alert message", "found 1 form(s)", response.popNextAlert() );
         assertEquals( "Alert message", "found form 'realform'", response.popNextAlert() );
         assertEquals( "Alert message", "did not find form 'noform'", response.popNextAlert() );
@@ -127,7 +123,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertEquals( "Alert message", "found 2 link(s)", response.popNextAlert() );
         assertEquals( "Alert message", "found link 'reallink'", response.popNextAlert() );
         assertEquals( "Alert message", "did not find link 'nolink'", response.popNextAlert() );
@@ -142,7 +137,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         WebForm form = response.getFormWithName( "realform" );
         assertEquals( "color parameter value", "green", form.getParameterValue( "color" ) );
     }
@@ -156,7 +150,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         WebForm form = response.getFormWithName( "realform" );
         WebLink link = response.getLinks()[0];
         assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
@@ -183,7 +176,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertEquals( "Alert message", getHostPath() + "/demo.html", response.popNextAlert() );
         assertEquals( "Alert message", getHostPath() + "/guide.html", response.popNextAlert() );
         assertEquals( "Alert message", getHostPath() + "/search.html", response.popNextAlert() );
@@ -209,7 +201,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         assertEquals( "Alert message", "found 2 images(s)", response.popNextAlert() );
         assertEquals( "Alert message", "found image 'realimage'", response.popNextAlert() );
         assertEquals( "Alert message", "did not find image 'noimage'", response.popNextAlert() );
@@ -225,7 +216,6 @@ public class ScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        JavaScript.run( response );
         WebImage image = response.getImageWithName( "theImage" );
         WebLink link = response.getLinks()[0];
         assertEquals( "initial image source", "initial.gif", image.getSource() );

@@ -72,6 +72,7 @@ class FrameHolder {
             createSubFrames( response.getTarget(), response.getFrameNames() );
             WebRequest[] requests = response.getFrameRequests();
             for (int i = 0; i < requests.length; i++) _client.getResponse( requests[ i ] );
+            HttpUnitOptions.getScriptingEngine().associate( response );
         }
     }
 

@@ -48,10 +48,20 @@ public class JavaScript {
     /**
      * Initiates JavaScript execution for the specified web response.
      */
-    static public void run( WebResponse response ) throws IllegalAccessException, InstantiationException, InvocationTargetException,
-            ClassDefinitionException, NotAFunctionException, PropertyException, SAXException, JavaScriptException {
+    static void run( WebResponse response ) throws IllegalAccessException, InstantiationException,
+            InvocationTargetException, ClassDefinitionException, NotAFunctionException,
+            PropertyException, SAXException, JavaScriptException {
         Context context = Context.enter();
         Scriptable scope = context.initStandardObjects( null );
+        initHTMLObjects( scope );
+
+        Window w = (Window) context.newObject( scope, "Window" );
+        w.initialize( null, response.getScriptableObject() );
+    }
+
+
+    private static void initHTMLObjects( Scriptable scope ) throws IllegalAccessException, InstantiationException,
+            InvocationTargetException, ClassDefinitionException, PropertyException {
         ScriptableObject.defineClass( scope, Window.class );
         ScriptableObject.defineClass( scope, Document.class );
         ScriptableObject.defineClass( scope, Link.class );
@@ -59,9 +69,6 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Control.class );
         ScriptableObject.defineClass( scope, Link.class );
         ScriptableObject.defineClass( scope, Image.class );
-        Window w = (Window) context.newObject( scope, "Window" );
-
-        w.initialize( null, response.getScriptableObject() );
     }
 
 

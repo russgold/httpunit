@@ -18,6 +18,7 @@ Additions:
     2. JavaScript: document.images and document.<image-name> are now supported
     3. JavaScript: The image.src property is read-write
     4. WebResponse now has a getImageWithName method
+    5. JavaScript execution is now automatic. It may be enabled or disable via HttpUnitOptions
 
 Problems fixed:
     A form request created after a call to getScriptableObject().setAction() now correctly uses the new action.

@@ -31,6 +31,9 @@ import java.util.Vector;
  **/
 public abstract class HttpUnitOptions {
 
+    final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
+
+
     /**
      *  Resets all options to their default values.
      */
@@ -50,6 +53,8 @@ public abstract class HttpUnitOptions {
         _postIncludesCharset = false;
         _acceptGzip = true;
         _acceptCookies = true;
+        setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
+        setScriptingEnabled( true );
     }
 
 
@@ -351,10 +356,68 @@ public abstract class HttpUnitOptions {
         return _listeners;
     }
 
+
+    public static String getScriptEngineClassName() {
+        return _scriptEngineClassName;
+    }
+
+
+    public static void setScriptEngineClassName( String scriptEngineClassName ) {
+        if (_scriptEngineClassName == null || !_scriptEngineClassName.equals( scriptEngineClassName )) {
+            _scriptingEngine = null;
+        }
+        _scriptEngineClassName = scriptEngineClassName;
+    }
+
+
+    public static ScriptingEngineFactory getScriptingEngine() {
+        if (_scriptingEngine == null) {
+            try {
+                Class factoryClass = Class.forName( _scriptEngineClassName );
+                _scriptingEngine = (ScriptingEngineFactory) factoryClass.newInstance();
+            } catch (ClassNotFoundException e) {
+                disableScripting( e, "Unable to find scripting engine factory class " );
+            } catch (InstantiationException e) {
+                disableScripting( e, "Unable to instantiate scripting engine factory class " );
+            } catch (IllegalAccessException e) {
+                disableScripting( e, "Unable to create scripting engine factory class " );
+            }
+        }
+        return _scriptingEngine;
+    }
+
+
+    public static void setScriptingEnabled( boolean scriptingEnabled ) {
+        if (scriptingEnabled != _scriptingEnabled) {
+            _scriptingEngine = scriptingEnabled ? null : NULL_SCRIPTING_ENGINE_FACTORY;
+        }
+        _scriptingEnabled = scriptingEnabled;
+    }
+
+
+    public static boolean isScriptingEnabled() {
+        return _scriptingEnabled;
+    }
+
+
+    private static void disableScripting( Exception e, String errorMessage ) {
+        System.err.println( errorMessage + _scriptEngineClassName );
+        System.err.println( "" + e );
+        System.err.println( "JavaScript execution disabled");
+        _scriptingEngine = NULL_SCRIPTING_ENGINE_FACTORY;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
     private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
+
+    private static final ScriptingEngineFactory NULL_SCRIPTING_ENGINE_FACTORY = new ScriptingEngineFactory() {
+        public void associate( WebResponse response ) {
+        }
+    };
+
 
     private static boolean _acceptGzip = true;
 
@@ -388,7 +451,15 @@ public abstract class HttpUnitOptions {
 
     private static Vector _listeners;
 
+    private static String _scriptEngineClassName;
+
+    private static ScriptingEngineFactory _scriptingEngine;
+
+    private static boolean _scriptingEnabled = true;
+
+
     static {
         _listeners = new Vector();
+        reset();
     }
 }
