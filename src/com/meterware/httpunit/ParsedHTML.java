@@ -675,7 +675,7 @@ class ParsedHTML {
 
 
     private WebLink toLinkAnchor( Element child ) {
-        return (!isWebLink( child )) ? null : new WebLink( _response, _baseURL, child, _frame, _baseTarget );
+        return (!isWebLink( child )) ? null : new WebLink( _response, _baseURL, child, _frame, _baseTarget, _characterSet );
     }
 
 
@@ -685,7 +685,7 @@ class ParsedHTML {
 
 
     private WebImage toWebImage( Element child ) {
-        return new WebImage( _response, this, _baseURL, child, _frame, _baseTarget );
+        return new WebImage( _response, this, _baseURL, child, _frame, _baseTarget, _characterSet );
     }
 
 

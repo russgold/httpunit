@@ -36,10 +36,12 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
     private static final String[] NO_VALUES = new String[0];
     private Map       _presetParameterMap;
     private ArrayList _presetParameterList;
+    private String    _characterSet;
 
 
-    public FixedURLWebRequestSource( WebResponse response, Node node, URL baseURL, String destination, FrameSelector frame, String defaultTarget ) {
+    public FixedURLWebRequestSource( WebResponse response, Node node, URL baseURL, String destination, FrameSelector frame, String defaultTarget, String characterSet ) {
         super( response, node, baseURL, destination, frame, defaultTarget );
+        _characterSet = characterSet;
     }
 
 
@@ -149,6 +151,11 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
         } else if (!equals( getParameterValues( name ), values )) {
             throw new IllegalNonFormParametersRequest();
         }
+    }
+
+
+    String getCharacterSet() {
+        return _characterSet;
     }
 
 

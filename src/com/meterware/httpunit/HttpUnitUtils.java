@@ -20,6 +20,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,30 +67,70 @@ public class HttpUnitUtils {
     }
 
     /**
-     * Returns an interpretation of the specified URL-encoded string.
-     * FIXME: currently assumes iso-8859-1 character set.
+     * Returns an interpretation of the specified URL-encoded string, using the iso-8859-1 character set.
      **/
     public static String decode( String byteString ) {
-        char[] chars = byteString.toCharArray();
-        StringBuffer sb = new StringBuffer(chars.length);
-        char[] hexNum = { '0', '0', '0' };
+        return decode( byteString, "iso-8859-1" );
+    }
 
-        int i = 0;
-        while (i < chars.length) {
-            if (chars[i] == '+') {
-                i++;
-                sb.append( ' ' );
-            } else if (chars[i] == '%') {
-                i++;
-                hexNum[1] = chars[i++];
-                hexNum[2] = chars[i++];
-                sb.append( (char) Integer.parseInt( new String( hexNum ), 16 ) );
+
+
+    /**
+     * Decodes a URL safe string into its original form using the
+     * specified character set. Escaped characters are converted back
+     * to their original representation.
+     *
+     * This method is copied from the <b>Jakarta Commons Codec</b>;
+     * <code>org.apache.commons.codec.net.URLCodec</code> class.
+     *
+     * @param string URL safe string to convert into its original form
+     * @return original string
+     * @throws IllegalArgumentException thrown if URL decoding is unsuccessful,
+     */
+    public static String decode( String string, String charset ) {
+        try {
+            if (string == null) return null;
+
+            return new String( decodeUrl( string.getBytes( "US-ASCII" ) ), charset );
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException( e.toString() );
+        }
+    }
+
+
+    /**
+     * Decodes an array of URL safe 7-bit characters into an array of
+     * original bytes. Escaped characters are converted back to their
+     * original representation.
+     *
+     * This method is copied from the <b>Jakarta Commons Codec</b>;
+     * <code>org.apache.commons.codec.net.URLCodec</code> class.
+     *
+     * @param pArray array of URL safe characters
+     * @return array of original bytes
+     */
+    private static final byte[] decodeUrl( byte[] pArray ) throws IllegalArgumentException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        for (int i = 0; i < pArray.length; i++) {
+            int b = pArray[i];
+            if (b == '+') {
+                buffer.write( ' ' );
+            } else if (b != '%') {
+                buffer.write( b );
             } else {
-                sb.append( chars[i++] );
+                try {
+                    int u = Character.digit( (char) pArray[++i], 16 );
+                    int l = Character.digit( (char) pArray[++i], 16 );
+                    if (u == -1 || l == -1)  throw new IllegalArgumentException( "Invalid URL encoding" );
+                    buffer.write( (char) ((u << 4) + l) );
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    throw new IllegalArgumentException( "Invalid URL encoding" );
+                }
             }
         }
-        return sb.toString();
+        return buffer.toByteArray();
     }
+
 
 
     /**

@@ -165,8 +165,8 @@ public class WebLink extends FixedURLWebRequestSource {
      * Contructs a web link given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebLink( WebResponse response, URL baseURL, Node node, FrameSelector sourceFrame, String defaultTarget ) {
-        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), sourceFrame, defaultTarget );
+    WebLink( WebResponse response, URL baseURL, Node node, FrameSelector sourceFrame, String defaultTarget, String characterSet ) {
+        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), sourceFrame, defaultTarget, characterSet );
     }
 
 

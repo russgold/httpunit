@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+22-Jul-2004
+   Acknowledgements:
+       Thanks to Kazuaki Matsuhashi <matsuhashi@quick.co.jp> for correcting the handling of non-Latin link parameters
+
+   Problems fixed:
+       1. patch #995853: decode link parameters based on page character set
+
 21-Jul-2004
    Acknowledgements:
        Thanks to Darrell DeBoer <bigdaz@users.sourceforge.net> for providing a patch for select box functionality

@@ -45,7 +45,7 @@ class RequestContext {
     RequestContext( URL url ) {
         _url = url;
         String file = _url.getFile();
-        if (file.indexOf( '?' ) >= 0) loadParameters( file.substring( file.indexOf( '?' )+1 ) );
+        if (file.indexOf( '?' ) >= 0) loadParameters( file.substring( file.indexOf( '?' )+1 ), /* urlEncoded */ true );
     }
 
 
@@ -99,7 +99,7 @@ class RequestContext {
      *    have_equals -> initial: record parameter with null value
      *    have_value  -> initial: record parameter with value
      **/
-    void loadParameters( String queryString ) {
+    void loadParameters( String queryString, boolean urlEncoded ) {
         if (queryString.length() == 0) return;
         StringTokenizer st = new StringTokenizer( queryString, "&=", /* return tokens */ true );
         int state = STATE_INITIAL;
@@ -119,11 +119,11 @@ class RequestContext {
                     state = STATE_INITIAL;
                 }
             } else if (state == STATE_INITIAL) {
-                name = HttpUnitUtils.decode( token );
+                name = (!urlEncoded) ? token : HttpUnitUtils.decode( token, getMessageEncoding() );
                 value = "";
                 state = STATE_HAVE_NAME;
             } else {
-                value = HttpUnitUtils.decode( token );
+                value = (!urlEncoded) ? token : HttpUnitUtils.decode( token, getMessageEncoding() );
                 state = STATE_HAVE_VALUE;
             }
         }
@@ -152,7 +152,7 @@ class RequestContext {
 
     private Hashtable getParameters() {
         if (_messageBody != null) {
-            loadParameters( getMessageBodyAsString() );
+            loadParameters( getMessageBodyAsString(), /* urlEncoded */ false );
             _messageBody = null;
         }
         if (_visibleParameters == null) {
@@ -177,7 +177,7 @@ class RequestContext {
 
     private String getMessageBodyAsString() {
         try {
-            return _messageEncoding == null ? new String( _messageBody ) : new String( _messageBody, _messageEncoding );
+            return new String( _messageBody, getMessageEncoding() );
         } catch (UnsupportedEncodingException e) {
             return "";
         }
@@ -191,6 +191,11 @@ class RequestContext {
 
     public void setMessageEncoding( String messageEncoding ) {
         _messageEncoding = messageEncoding;
+    }
+
+
+    private String getMessageEncoding() {
+        return _messageEncoding == null ? HttpUnitUtils.DEFAULT_CHARACTER_SET : _messageEncoding;
     }
 
 

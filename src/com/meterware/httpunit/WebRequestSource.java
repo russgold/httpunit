@@ -352,8 +352,8 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
                            ? null
                            : ((index == param.length() - 1)
                                     ? getEmptyParameterValue()
-                                    : HttpUnitUtils.decode( param.substring( index + 1 ) ).trim() ));
-        String name = (index < 0) ? param.trim() : HttpUnitUtils.decode( param.substring( 0, index ) ).trim();
+                                    : HttpUnitUtils.decode( param.substring( index + 1 ), _baseResponse.getCharacterSet() ).trim() ));
+        String name = (index < 0) ? param.trim() : HttpUnitUtils.decode( param.substring( 0, index ), _baseResponse.getCharacterSet() ).trim();
         addPresetParameter( name, value );
     }
 

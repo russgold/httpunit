@@ -59,6 +59,7 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( ParsingTestSuite.suite() );
         result.addTest( NormalizeURLTest.suite() );
         result.addTest( TextBlockTest.suite() );
+        result.addTest( EncodingTest.suite() );
 
         if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("NekoHTML") >= 0) result.addTest( NekoEnhancedScriptingTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
