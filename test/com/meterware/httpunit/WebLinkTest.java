@@ -88,7 +88,7 @@ public class WebLinkTest extends HttpUnitTest {
     public void testLinkRequest() throws Exception {
         WebLink link = _simplePage.getLinks()[0];
         WebRequest request = link.getRequest();
-        assert( "Should be a get request", request instanceof GetMethodWebRequest );
+        assertTrue( "Should be a get request", request instanceof GetMethodWebRequest );
         assertEquals( getHostPath() + "/other.html", request.getURL().toExternalForm() );
     }
 
@@ -174,7 +174,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebRequest request = link.getRequest();
         assertEquals( "Destination for link", getHostPath() + "/alternate/Target.html", request.getURL().toExternalForm() );
         WebResponse nextPage = wc.getResponse( request );
-        assert( "Did not find the target", nextPage.getText().indexOf( "Found" ) >= 0 );
+        assertTrue( "Did not find the target", nextPage.getText().indexOf( "Found" ) >= 0 );
     }
 
 
@@ -216,7 +216,7 @@ public class WebLinkTest extends HttpUnitTest {
 		assertNotNull( request);
 		Enumeration e = request.getParameterNames();
 		assertNotNull( e);
-		assert( !e.hasMoreElements() );
+		assertTrue( "Should not have any params", !e.hasMoreElements() );
 
         // second link should have one parameter
 		request = links[1].getRequest();

@@ -124,7 +124,7 @@ public class WebFormTest extends HttpUnitTest {
         WebForm form = _wc.getResponse( getHostPath() + "/OneForm.html" ).getForms()[0];
         WebRequest request = form.getRequest();
         request.setParameter( "name", "master" );
-        assert( "Should be a post request", !(request instanceof GetMethodWebRequest) );
+        assertTrue( "Should be a post request", !(request instanceof GetMethodWebRequest) );
         assertEquals( getHostPath() + "/servlet/Login", request.getURL().toExternalForm() );
     }
 

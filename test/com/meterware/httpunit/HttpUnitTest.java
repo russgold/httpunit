@@ -94,7 +94,7 @@ class HttpUnitTest extends TestCase {
         return _hostPath;
     }
 
-    public void assertTrue( String comment, boolean expression ) {
+    public static void assertTrue( String comment, boolean expression ) {
         assert( comment, expression );
     }
 

@@ -75,9 +75,9 @@ public class WebFrameTest extends HttpUnitTest {
 
     public void testDefaultFrameContents() throws Exception {
         WebResponse response = _wc.getResponse( getHostPath() + "/Linker.html" );
-        assert( "Default response not the same as default frame contents", response == _wc.getFrameContents( "_top" ) );
+        assertTrue( "Default response not the same as default frame contents", response == _wc.getFrameContents( "_top" ) );
         response = _wc.getResponse( response.getLinks()[0].getRequest() );
-        assert( "Second response not the same as default frame contents", response == _wc.getFrameContents( "_top" ) );
+        assertTrue( "Second response not the same as default frame contents", response == _wc.getFrameContents( "_top" ) );
     }
 
 
@@ -111,7 +111,7 @@ public class WebFrameTest extends HttpUnitTest {
         WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
 
         response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
     }
@@ -134,7 +134,7 @@ public class WebFrameTest extends HttpUnitTest {
         WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
 
         response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assertEquals( "URL for second request", getHostPath() + "/Deeper/Target.html", response.getURL().toExternalForm() );
     }
@@ -159,7 +159,7 @@ public class WebFrameTest extends HttpUnitTest {
 
         response = _wc.getResponse( linker.getLinks()[0].getRequest() );
         WebResponse target = getFrameWithURL( _wc, "Target" );
-        assert( "Second response not the same as source frame contents", response == target );
+        assertTrue( "Second response not the same as source frame contents", response == target );
     }
 
 
@@ -187,7 +187,7 @@ public class WebFrameTest extends HttpUnitTest {
 
         _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
         response = _wc.getResponse( _wc.getFrameContents( "blue" ).getLinks()[0].getRequest() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assertEquals( "URL for second request", getHostPath() + "/Linker.html", response.getURL().toExternalForm() );
     }
@@ -198,7 +198,7 @@ public class WebFrameTest extends HttpUnitTest {
 
         response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
         response = _wc.getResponse( response.getLinks()[0].getRequest() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "_top" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "_top" ) );
         assertEquals( "URL for second request", getHostPath() + "/Form.html", response.getURL().toExternalForm() );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top" }, _wc.getFrameNames() );
     }
@@ -225,7 +225,7 @@ public class WebFrameTest extends HttpUnitTest {
         _wc.getResponse( getHostPath() + "/Frames.html" );
         WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
     }
     
@@ -238,7 +238,7 @@ public class WebFrameTest extends HttpUnitTest {
         _wc.getResponse( getHostPath() + "/Frames.html" );
         WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getForms()[0].getRequest() );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
     }
 
@@ -249,7 +249,7 @@ public class WebFrameTest extends HttpUnitTest {
                         
         _wc.getResponse( getHostPath() + "/Frames.html" );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
-        assert( "Did not redirect", _wc.getFrameContents( "red" ).getURL().toExternalForm().endsWith( "Target.html" ) );
+        assertTrue( "Did not redirect", _wc.getFrameContents( "red" ).getURL().toExternalForm().endsWith( "Target.html" ) );
         
     }
 
@@ -260,7 +260,7 @@ public class WebFrameTest extends HttpUnitTest {
         _wc.getResponse( getHostPath() + "/Frames.html" );
         WebResponse response = _wc.getResponse( _wc.getFrameContents( "red" ).getLinks()[0].getRequest() );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top" }, _wc.getFrameNames() );
-        assert( "Second response not the same as source frame contents", response == _wc.getFrameContents( "_top" ) );
+        assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "_top" ) );
         assertEquals( "URL for second request", getHostPath() + "/Target.html", response.getURL().toExternalForm() );
     }
 
