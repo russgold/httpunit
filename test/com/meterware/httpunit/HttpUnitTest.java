@@ -51,5 +51,9 @@ public class HttpUnitTest extends HttpUserAgentTest {
         HttpUnitOptions.reset();
     }
 
+    static {
+        new WebConversation();
+    }
+
 
 }

@@ -24,6 +24,8 @@ import java.applet.AudioClip;
 import java.applet.Applet;
 import java.net.URL;
 import java.awt.*;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  *
@@ -168,5 +170,61 @@ class AppletContextImpl implements AppletContext {
      * @param   status   a string to display in the status window.
      */
     public void showStatus( String status ) {
+    }
+
+
+    /**
+     * Returns the stream to which specified key is associated within this
+     * applet context. Returns <tt>null</tt> if the applet context contains
+     * no stream for this key.
+     * <p>
+     * For security reasons, mapping of streams and keys exists for each
+     * codebase. In other words, applet from one codebase cannot access
+     * the streams created by an applet from a different codebase
+     * <p>
+     * @return the stream to which this applet context maps the key
+     * @param key key whose associated stream is to be returned.
+     * @since JDK1.4
+     */
+    public InputStream getStream( String key ) {
+        return null;
+    }
+
+
+    /**
+     * Finds all the keys of the streams in this applet context.
+     * <p>
+     * For security reasons, mapping of streams and keys exists for each
+     * codebase. In other words, applet from one codebase cannot access
+     * the streams created by an applet from a different codebase
+     * <p>
+     * @return  an Iterator of all the names of the streams in this applet
+     *          context.
+     * @since JDK1.4
+     */
+    public Iterator getStreamKeys() {
+        return null;
+    }
+
+
+    /**
+     * Associates the specified stream with the specified key in this
+     * applet context. If the applet context previously contained a mapping
+     * for this key, the old value is replaced.
+     * <p>
+     * For security reasons, mapping of streams and keys exists for each
+     * codebase. In other words, applet from one codebase cannot access
+     * the streams created by an applet from a different codebase
+     * <p>
+     * @param key key with which the specified value is to be associated.
+     * @param stream stream to be associated with the specified key. If this
+     *               parameter is <code>null<code>, the specified key is removed
+     *               in this applet context.
+     * @throws <code>IOException</code> if the stream size exceeds a certain
+     *         size limit. Size limit is decided by the implementor of this
+     *         interface.
+     * @since JDK1.4
+     */
+    public void setStream( String key, InputStream stream ) throws IOException {
     }
 }
