@@ -25,6 +25,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebImage;
+import com.meterware.httpunit.WebRequest;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -208,6 +209,25 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testFormActionProperty() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "Default", "<form method=GET name='the_form' action = 'ask'>" +
+                                  "<Input type=text name=age>" +
+                                  "<Input type=submit value=Go>" +
+                                  "</form>" +
+                                  "<a href='#' name='doTell' onClick='document.the_form.action=\"tell\";'>tell</a>" +
+                                  "<a href='#' name='doShow' onClick='alert( document.the_form.action );'>show</a>" );
+        WebResponse page = wc.getResponse( getHostPath() + "/Default.html" );
+        page.getLinkWithName( "doShow" ).click();
+        assertEquals( "Current action", "ask", page.popNextAlert() );
+        page.getLinkWithName( "doTell" ).click();
+
+        WebRequest request = page.getForms()[0].getRequest();
+        request.setParameter( "age", "23" );
+        assertEquals( getHostPath() + "/tell?age=23", request.getURL().toExternalForm() );
+    }
+
+
     public void testFormValidationOnSubmit() throws Exception {
         defineResource( "doIt?color=pink", "You got it!", "text/plain" );
         defineResource( "OnCommand.html",  "<html><head><script language='JavaScript'>" +
@@ -303,5 +323,75 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "changed image source", "new.jpg", image.getSource() );
     }
 
+
+    public void testFormSelectReadableProperties() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewSelect( choices ) { \n" +
+                                            "  alert( 'select has ' + choices.options.length + ' options' )\n;" +
+                                            "  alert( 'select still has ' + choices.length + ' options' )\n;" +
+                                            "  alert( 'select option ' + choices.options[0].index + ' is ' + choices.options[0].text )\n;" +
+                                            "  alert( 'select 2nd option value is ' + choices.options[1].value )\n;" +
+                                            "  if (choices.options[0].selected) alert( 'red selected' );\n" +
+                                            "  if (choices.options[1].selected) alert( 'blue selected' );\n" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                            "<body onLoad='viewSelect( document.the_form.choices )'>" +
+                                            "<form name='the_form'>" +
+                                            "  <select name='choices'>" +
+                                            "    <option value='1'>red" +
+                                            "    <option value='3' selected>blue" +
+                                            "  </select>" +
+                                            "</form>" +
+                                            "<a href='#' onMouseOver=\"alert( 'selected #' + document.the_form.choices.selectedIndex );\">which</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "1st message", "select has 2 options", response.popNextAlert() );
+        assertEquals( "2nd message", "select still has 2 options", response.popNextAlert() );
+        assertEquals( "3rd message", "select option 0 is red", response.popNextAlert() );
+        assertEquals( "4th message", "select 2nd option value is 3", response.popNextAlert() );
+        assertEquals( "5th message", "blue selected", response.popNextAlert() );
+
+        response.getLinks()[0].mouseOver();
+        assertEquals( "before change message", "selected #1", response.popNextAlert() );
+        response.getFormWithName( "the_form" ).setParameter( "choices", "1" );
+        response.getLinks()[0].mouseOver();
+        assertEquals( "after change message", "selected #0", response.popNextAlert() );
+    }
+
+
+    public void testFormSelectWriteableProperties() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function selectOptionNum( the_select, index ) { \n" +
+                                            "  for (var i = 0; i < the_select.length; i++) {\n" +
+                                            "      the_select.options[i].selected = (i == index);\n" +
+                                            "  }\n" +
+                                            "}\n" +
+                                            "</script></head>" +
+                                            "<body>" +
+                                            "<form name='the_form'>" +
+                                            "  <select name='choices'>" +
+                                            "    <option value='1'>red" +
+                                            "    <option value='3' selected>blue" +
+                                            "    <option value='5'>green" +
+                                            "    <option value='7'>azure" +
+                                            "  </select>" +
+                                            "</form>" +
+                                            "<a href='#' onClick='selectOptionNum( document.the_form.choices, 2 )'>green</a>" +
+                                            "<a href='#' onClick='selectOptionNum( document.the_form.choices, 0 )'>red</a>" +
+                                            "<a href='#' onClick='document.the_form.choices.options[0].value=\"9\"'>red</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebForm form = response.getFormWithName( "the_form" );
+        assertEquals( "initial selection", "3", form.getParameterValue( "choices" ) );
+
+        response.getLinks()[0].click();
+        assertEquals( "2nd selection", "5", form.getParameterValue( "choices" ) );
+        response.getLinks()[1].click();
+        assertEquals( "3rd selection", "1", form.getParameterValue( "choices" ) );
+        response.getLinks()[2].click();
+        assertEquals( "4th selection", "9", form.getParameterValue( "choices" ) );
+    }
 
 }

@@ -19,6 +19,9 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.SelectionOptions;
+import com.meterware.httpunit.scripting.SelectionOption;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -681,14 +684,12 @@ class FileSubmitFormControl extends FormControl {
 
 
 class SelectionFormControl extends FormControl {
+
     private final boolean _multiSelect;
     private final boolean _listBox;
-    private final String[] _optionValues;
-    private final String[] _displayedOptions;
 
-    private String[]  _values;
-    private boolean[] _selectionIndexes;
-    private boolean[] _initialIndexes;
+    private Options _selectionOptions;
+    private Scriptable _scriptable;
 
 
     SelectionFormControl( Node node ) {
@@ -697,27 +698,23 @@ class SelectionFormControl extends FormControl {
 
         _multiSelect      = NodeUtils.isNodeAttributePresent( node, "multiple" );
         _listBox          = _multiSelect || NodeUtils.isNodeAttributePresent( node, "size" );
-        _optionValues     = getInitialOptionValues( node );
-        _displayedOptions = getInitialDisplayedOptions( node );
 
-        _initialIndexes   = getInitialSelectionIndexes( node );
-        _selectionIndexes = (boolean[]) _initialIndexes.clone();
-        _values           = getSelectedValues( _selectionIndexes, _optionValues );
+        _selectionOptions = new Options( node );
     }
 
 
     public String[] getValues() {
-        return _values;
+        return _selectionOptions.getSelectedValues();
     }
 
 
     public String[] getOptionValues() {
-        return _optionValues;
+        return _selectionOptions.getValues();
     }
 
 
     public String[] getDisplayedOptions() {
-        return _displayedOptions;
+        return _selectionOptions.getDisplayedText();
     }
 
 
@@ -726,6 +723,36 @@ class SelectionFormControl extends FormControl {
      **/
     public boolean isMultiValued() {
         return _multiSelect;
+    }
+
+
+    class Scriptable extends FormControl.Scriptable {
+
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "options" )) {
+                return _selectionOptions;
+            } else if (propertyName.equalsIgnoreCase( "length" )) {
+                return new Integer( getOptionValues().length );
+            } else if (propertyName.equalsIgnoreCase( "selectedIndex" )) {
+                return new Integer( _selectionOptions.getFirstSelectedIndex() );
+            } else {
+                return super.get( propertyName );
+            }
+        }
+
+
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equalsIgnoreCase( "value" )) {
+            } else {
+                super.set( propertyName, value );
+            }
+        }
+    }
+
+
+    public ScriptableObject getScriptableObject() {
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
     }
 
 
@@ -742,103 +769,200 @@ class SelectionFormControl extends FormControl {
 
 
     void claimUniqueValue( List values ) {
-        boolean[] matches = new boolean[ _optionValues.length ];
-        int numMatches = 0;
-        for (int i = 0; i < matches.length; i++) {
-            matches[i] = values.contains( _optionValues[i] );
-            if (matches[i]) {
-                numMatches++;
-                if (!_multiSelect) break;
+        _selectionOptions.claimUniqueValues( values );
+    }
+
+
+    final void reset() {
+        _selectionOptions.reset();
+    }
+
+
+    class Option extends ScriptableObject implements SelectionOption {
+
+        private String  _text;
+        private String  _value;
+        private boolean _defaultSelected;
+        private boolean _selected;
+        private int     _index;
+
+
+        Option( String text, String value, boolean selected ) {
+            _text = text;
+            _value = value;
+            _defaultSelected = _selected = selected;
+        }
+
+
+        void reset() {
+            _selected = _defaultSelected;
+        }
+
+
+        void addValueIfSelected( List list ) {
+            if (_selected) list.add( _value );
+        }
+
+
+        void setIndex( int index ) {
+            _index = index;
+        }
+
+
+ //------------------------- SelectionOption methods ------------------------------
+
+
+        public int getIndex() {
+            return _index;
+        }
+
+
+        public String getText() {
+            return _text;
+        }
+
+
+        public String getValue() {
+            return _value;
+        }
+
+
+        public void setValue( String value ) {
+            _value = value;
+        }
+
+
+        public boolean isDefaultSelected() {
+            return _defaultSelected;
+        }
+
+
+        public void setSelected( boolean selected ) {
+            _selected = selected;
+        }
+
+
+        public boolean isSelected() {
+            return _selected;
+        }
+    }
+
+
+    class Options extends ScriptableObject implements SelectionOptions {
+
+        private Option[] _options;
+
+        private String[]  _text;
+        private String[]  _value;
+
+
+        Options( Node selectionNode ) {
+            NodeList nl = ((Element) selectionNode).getElementsByTagName( "option" );
+
+            _options = new Option[ nl.getLength() ];
+            for (int i = 0; i < _options.length; i++) {
+                _options[i] = new Option( getValue( nl.item(i).getFirstChild() ),
+                                          getOptionValue( nl.item(i) ),
+                                          nl.item(i).getAttributes().getNamedItem( "selected" ) != null );
+                _options[i].setIndex(i);
             }
         }
 
-        if (!_listBox) {
-            if (numMatches == 0) throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
-        }
 
-        for (int i = 0; i < matches.length; i++) {
-            if (matches[i]) values.remove( _optionValues[i] );
-        }
+        void claimUniqueValues( List values ) {
+            for (int i = 0; i < _options.length; i++) _options[i].setSelected( false );
 
-        _selectionIndexes = matches;
-        _values = getSelectedValues( matches, _optionValues );
-    }
-
-
-    void reset() {
-        _selectionIndexes = (boolean[]) _initialIndexes.clone();
-        _values           = getSelectedValues( _selectionIndexes, _optionValues );
-    }
-
-
-    private String[] getSelectedValues( boolean[] selected, String[] optionValues ) {
-        ArrayList values = new ArrayList();
-        for (int i = 0; i < selected.length; i++) {
-            if (selected[i]) {
-                values.add( optionValues[i] );
+            int numMatches = 0;
+            for (int i = 0; i < _options.length; i++) {
+                if (values.contains( _options[i].getValue() )) {
+                    _options[i].setSelected( true );
+                    values.remove( _options[i].getValue() );
+                    numMatches++;
+                    if (!_multiSelect) break;
+                }
             }
-        }
-        return (String[]) values.toArray( new String[ values.size() ] );
-    }
-
-
-    private boolean[] getInitialSelectionIndexes( Node selectionNode ) {
-        boolean noneSelected = true;
-        NodeList nl = ((Element) selectionNode).getElementsByTagName( "option" );
-        boolean isSelected[] = new boolean[ nl.getLength() ];
-        for (int i = 0; i < nl.getLength(); i++) {
-            if (nl.item(i).getAttributes().getNamedItem( "selected" ) != null) {
-                isSelected[i] = true;
-                noneSelected = false;
+            if (!_listBox && numMatches == 0) {
+                throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
             }
         }
 
-        if (!_listBox && noneSelected && isSelected.length > 0) {
-            isSelected[0] = true;
+
+        String[] getSelectedValues() {
+            ArrayList list = new ArrayList();
+            for (int i = 0; i < _options.length; i++) {
+                _options[i].addValueIfSelected( list );
+            }
+            if (!_listBox && list.isEmpty() && _options.length > 0) list.add( _options[0].getValue() );
+            return (String[]) list.toArray( new String[ list.size() ] );
         }
-        return isSelected;
-    }
 
 
-    private String[] getInitialDisplayedOptions( Node node ) {
-        Vector options = new Vector();
-        NodeList nl = ((Element) node).getElementsByTagName( "option" );
-        for (int i = 0; i < nl.getLength(); i++) {
-            options.addElement( getValue( nl.item(i).getFirstChild() ) );
+        void reset() {
+            for (int i = 0; i < _options.length; i++) {
+                _options[i].reset();
+            }
         }
-        String[] result = new String[ options.size() ];
-        options.copyInto( result );
-        return result;
-    }
 
 
-    private String[] getInitialOptionValues( Node selectNode ) {
-        NodeList nl = ((Element) selectNode).getElementsByTagName( "option" );
-        ArrayList options = new ArrayList( nl.getLength() );
-        for (int i = 0; i < nl.getLength(); i++) {
-            options.add( getOptionValue( nl.item(i) ) );
+        String[] getDisplayedText() {
+            if (_text == null) {
+                _text = new String[ _options.length ];
+                for (int i = 0; i < _text.length; i++) _text[i] = _options[i].getText();
+            }
+            return _text;
         }
-        return (String[]) options.toArray( new String[ options.size() ] );
-    }
 
 
-    private String getOptionValue( Node optionNode ) {
-        NamedNodeMap nnm = optionNode.getAttributes();
-        if (nnm.getNamedItem( "value" ) != null) {
-            return getValue( nnm.getNamedItem( "value" ) );
-        } else {
-            return getValue( optionNode.getFirstChild() );
+        String[] getValues() {
+            if (_value == null) {
+                _value = new String[ _options.length ];
+                for (int i = 0; i < _value.length; i++) _value[i] = _options[i].getValue();
+            }
+            return _value;
         }
-    }
-
-    private static String getValue( Node node ) {
-        return (node == null) ? "" : emptyIfNull( node.getNodeValue() );
-    }
 
 
-    private static String emptyIfNull( String value ) {
-        return (value == null) ? "" : value;
+        /**
+         * Returns the index of the first item selected, or -1 if none is selected.
+         */
+        int getFirstSelectedIndex() {
+            for (int i = 0; i < _options.length; i++) {
+                if (_options[i].isSelected()) return i;
+            }
+            return -1;
+        }
+
+
+        public int getLength() {
+            return _options.length;
+        }
+
+
+        public Object get( int index ) {
+            return _options[ index ];
+        }
+
+
+        private String getOptionValue( Node optionNode ) {
+            NamedNodeMap nnm = optionNode.getAttributes();
+            if (nnm.getNamedItem( "value" ) != null) {
+                return getValue( nnm.getNamedItem( "value" ) );
+            } else {
+                return getValue( optionNode.getFirstChild() );
+            }
+        }
+
+        private String getValue( Node node ) {
+            return (node == null) ? "" : emptyIfNull( node.getNodeValue() );
+        }
+
+
+        private String emptyIfNull( String value ) {
+            return (value == null) ? "" : value;
+        }
+
     }
+
 
 }
 //============================= exception class IllegalParameterValueException ======================================

@@ -4,7 +4,7 @@ Known problems:
     1. The "_new" and "_empty" frame targets are not handled correctly
     2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
-    3. The regression test "pseudo-server" does not appear to run properly under JDK 1.4
+    3. The regression test "pseudo-server" does not appear to run properly under Unix.
 
 Limitations:
     1. JavaScript support is minimal
@@ -12,6 +12,12 @@ Limitations:
 
 
 Revision History:
+ 7-Aug-2002
+Additions:
+    1. JavaScript: the Select control now supports the length, options, and selectedIndex properties
+    2. JavaScript: the Options object now supports the index, defaultSelected, selected (r/w), value (r/w) and
+       text (read-only) properties
+
  6-Aug-2002
 Acknowledgements:
     Thanks to Hans-Joerg Hessmann for a faster algorithm for the table lookups
@@ -22,6 +28,7 @@ Problems fixed:
 Additions:
     1. JavaScript: the link.onClick event is now supported
     2. JavaScript: the form.onSubmit event is now supported
+    3. JavaScript: the form.action property is read-write
 
  5-Aug-2002
 Additions:

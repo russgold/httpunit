@@ -58,6 +58,14 @@ abstract public class ScriptableObject {
 
 
     /**
+     * Returns the value of the index property. Will return null if the property does not exist.
+     **/
+    public Object get( int index ) {
+        return null;
+    }
+
+
+    /**
      * Sets the value of the named property. Will throw a runtime exception if the property does not exist or
      * cannot accept the specified value.
      **/

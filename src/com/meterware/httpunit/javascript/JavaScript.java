@@ -25,6 +25,8 @@ import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebLink;
 import com.meterware.httpunit.WebImage;
+import com.meterware.httpunit.scripting.SelectionOptions;
+import com.meterware.httpunit.scripting.SelectionOption;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -66,6 +68,8 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Control.class );
         ScriptableObject.defineClass( scope, Link.class );
         ScriptableObject.defineClass( scope, Image.class );
+        ScriptableObject.defineClass( scope, Options.class );
+        ScriptableObject.defineClass( scope, Option.class );
     }
 
 
@@ -115,7 +119,21 @@ public class JavaScript {
             if (result != NOT_FOUND) return result;
             if (_scriptable == null) return NOT_FOUND;
 
-            final Object property = _scriptable.get( propertyName );
+            return convertIfNeeded( _scriptable.get( propertyName ) );
+
+        }
+
+
+        public Object get( int i, Scriptable scriptable ) {
+            Object result = super.get( i, scriptable );
+            if (result != NOT_FOUND) return result;
+            if (_scriptable == null) return NOT_FOUND;
+
+            return convertIfNeeded( _scriptable.get( i ) );
+        }
+
+
+        private Object convertIfNeeded( final Object property ) {
             if (property == null) return NOT_FOUND;
             if (!(property instanceof com.meterware.httpunit.ScriptableObject)) return property;
 
@@ -358,6 +376,22 @@ public class JavaScript {
             return control;
         }
 
+
+        public String jsGet_action() {
+            return getDelegate().getAction();
+        }
+
+
+        public void jsSet_action( String action ) {
+            getDelegate().setAction( action );
+        }
+
+
+
+        private WebForm.Scriptable getDelegate() {
+            return (WebForm.Scriptable) _scriptable;
+        }
+
     }
 
 
@@ -366,6 +400,98 @@ public class JavaScript {
         public String getClassName() {
             return "Control";
         }
+
+
+        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
+            JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( delegate ) );
+            element.initialize( this, delegate );
+            return element;
+        }
+
+
+        private String getScriptableClassName( com.meterware.httpunit.ScriptableObject delegate ) {
+            if (delegate instanceof SelectionOptions) {
+                return "Options";
+            } else {
+                throw new IllegalArgumentException( "Unknown ScriptableObject class: " + delegate.getClass() );
+            }
+        }
+
     }
 
+
+    static public class Options extends JavaScriptEngine {
+
+        public String getClassName() {
+            return "Options";
+        }
+
+
+        public int jsGet_length() {
+            return getDelegate().getLength();
+        }
+
+
+        private SelectionOptions getDelegate() {
+            return (SelectionOptions) _scriptable;
+        }
+
+
+        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
+            JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, "Option" );
+            element.initialize( this, delegate );
+            return element;
+        }
+
+    }
+
+
+    static public class Option extends JavaScriptEngine {
+
+        public String getClassName() {
+            return "Option";
+        }
+
+
+        public int jsGet_index() {
+            return getDelegate().getIndex();
+        }
+
+
+        public String jsGet_text() {
+            return getDelegate().getText();
+        }
+
+
+        public String jsGet_value() {
+            return getDelegate().getValue();
+        }
+
+
+        public void jsSet_value( String value ) {
+            getDelegate().setValue( value );
+        }
+
+
+        public boolean jsGet_selected() {
+            return getDelegate().isSelected();
+        }
+
+
+        public void jsSet_selected( boolean selected ) {
+            getDelegate().setSelected( selected );
+        }
+
+
+        public boolean jsGet_defaultSelected() {
+            return getDelegate().isDefaultSelected();
+        }
+
+
+        private SelectionOption getDelegate() {
+            return (SelectionOption) _scriptable;
+        }
+    }
 }
