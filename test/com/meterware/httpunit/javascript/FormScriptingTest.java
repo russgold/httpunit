@@ -232,6 +232,23 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitButtonScript() throws Exception {
+        defineResource( "DoIt?color=green", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name=spectrum action='DoIt'>" +
+                                          "  <input type=text name=color value=red>" +
+                                          "  <input type=submit onClick='form.color.value=\"green\";'>" +
+                                          "</form>" +
+                                          "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+
+        response.getFormWithName( "spectrum" ).submit();
+        assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
+    }
+
+
     public void testSetFormTextValue() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad=\"document.realform.color.value='green'\">" +

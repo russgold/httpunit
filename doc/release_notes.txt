@@ -35,15 +35,17 @@ Problems Fixed:
     JavaScript
         5. Scripts marked as something besides JavaScript are now ignored.
         6. Opening a non-HTML window via Javascript no longer raises a NotHTMLException.
+        7. Bug #682518: Calling WebForm.submit( button ) now runs the onClick event of the submit button before trying to
+           submit the form.
     ServletUnit
-        7. ServletUnit now creates a new session if the requested session exists but is marked invalid
-        8. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
+        8. ServletUnit now creates a new session if the requested session exists but is marked invalid
+        9. ServletUnit was interpreting the getRequestDispatcher path as an absolute path. It now correctly treats it
            as relative to the context root.
-        9. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
+       10. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
            had previously been defined.
-       10. Included and forwarded servlets now inherit parameters from their calling servlet.
-       11. Included servlets now have access to their path information as attributes, as per the spec.
-       12. Forwarded servlets now have access to their path information from the standard request methods, as required.
+       11. Included and forwarded servlets now inherit parameters from their calling servlet.
+       12. Included servlets now have access to their path information as attributes, as per the spec.
+       13. Forwarded servlets now have access to their path information from the standard request methods, as required.
 
 Additions:
     Content and Parsing
