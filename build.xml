@@ -282,7 +282,7 @@ Build-Time: ${TSTAMP}
 <!--  ===================================================================  -->
 <target name="update-website" depends="compile-site">
     <copy todir="${web.dir}">
-        <fileset dir="." includes="site.css,favicon.ico,doc/images/**" />
+        <fileset dir="." includes="site.css,favicon.ico,doc/images/**,doc/tutorial/*.html" />
     </copy>
     <java classname="com.meterware.httpunit.site.WebSite" fork="yes" >
         <classpath>
