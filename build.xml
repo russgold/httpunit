@@ -5,7 +5,7 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" />
     <property name="Name" value="HttpUnit" />
-    <property name="version" value="1.5.2" />
+    <property name="version" value="1.5.3" />
 
     <property name="debug" value="on" />
     <property name="deprecation" value="off" />
