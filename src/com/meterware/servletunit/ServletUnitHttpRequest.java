@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebClient;
 import com.meterware.httpunit.Base64;
+import com.meterware.httpunit.HttpUnitUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,6 +48,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private Vector                 _locales;
     private boolean                _secure;
     private RequestContext         _requestContext;
+    private String                 _charset;
 
 
     /**
@@ -63,12 +65,19 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _headers.addEntries( request.getHeaders() );
         _messageBody = messageBody;
         _secure = request.getURL().getProtocol().equalsIgnoreCase( "https" );
-        _contentType = (String) _headers.get( "Content-Type" );
-        if (_headers.get( "Content-Length") == null) _headers.put( "Content-Length", Integer.toString( messageBody.length ) );
 
         _requestContext = new RequestContext( request.getURL() );
+        String contentTypeHeader = (String) _headers.get( "Content-Type" );
+        if (contentTypeHeader != null) {
+            String[] res = HttpUnitUtils.parseContentTypeHeader( contentTypeHeader );
+            _contentType = res[0];
+            _charset     = res[1];
+            _requestContext.setMessageEncoding( _charset );
+        }
+        if (_headers.get( "Content-Length") == null) _headers.put( "Content-Length", Integer.toString( messageBody.length ) );
+
         if (_messageBody != null && (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 )) {
-            _requestContext.loadParameters( new String( _messageBody ) );
+            _requestContext.setMessageBody( _messageBody );
         }
     }
 
@@ -344,7 +353,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * does not use character encoding.
      **/
     public String getCharacterEncoding() {
-        return null;
+        return _charset;
     }
 
 
@@ -647,8 +656,9 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      *
      * @since 1.3
      **/
-    public void setCharacterEncoding( String s ) throws UnsupportedEncodingException {
-        // XXX implement me!
+    public void setCharacterEncoding( String charset ) throws UnsupportedEncodingException {
+        _charset = charset;
+        _requestContext.setMessageEncoding( charset );
     }
 
 

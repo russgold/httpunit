@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+ 1-Mar-2004
+ Problems fixed:
+    1. ServletUnit now applies character encoding in interpreting post parameters
+
 26-Feb-2004
 Additions:
     1. Added support for filters

@@ -23,6 +23,7 @@ import com.meterware.httpunit.HttpUnitUtils;
 
 import java.util.*;
 import java.net.URL;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,6 +38,8 @@ class RequestContext {
     private Hashtable _visibleParameters;
     private HttpServletRequest _parentRequest;
     private URL _url;
+    private byte[] _messageBody;
+    private String _messageEncoding;
 
 
     RequestContext( URL url ) {
@@ -148,6 +151,10 @@ class RequestContext {
 
 
     private Hashtable getParameters() {
+        if (_messageBody != null) {
+            loadParameters( getMessageBodyAsString() );
+            _messageBody = null;
+        }
         if (_visibleParameters == null) {
             if (_parentRequest == null) {
                 _visibleParameters = _parameters;
@@ -165,6 +172,25 @@ class RequestContext {
             }
         }
         return _visibleParameters;
+    }
+
+
+    private String getMessageBodyAsString() {
+        try {
+            return _messageEncoding == null ? new String( _messageBody ) : new String( _messageBody, _messageEncoding );
+        } catch (UnsupportedEncodingException e) {
+            return "";
+        }
+    }
+
+
+    void setMessageBody( byte[] bytes ) {
+        _messageBody = bytes;
+    }
+
+
+    public void setMessageEncoding( String messageEncoding ) {
+        _messageEncoding = messageEncoding;
     }
 
 

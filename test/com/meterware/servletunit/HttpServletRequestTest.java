@@ -34,6 +34,7 @@ import javax.servlet.ServletException;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.PutMethodWebRequest;
+import com.meterware.httpunit.PostMethodWebRequest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -416,6 +417,28 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
         verifyLocales( request, new Locale[] { Locale.FRENCH, Locale.US, Locale.ENGLISH } );
+    }
+
+
+    public void testSpecifiedCharEncoding() throws Exception {
+        String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
+        String paramString = "param1=red&param2=" + hebrewValue;
+        WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
+        wr.setHeaderField( "Content-Type", "application/x-www-form-urlencoded; charset=ISO-8859-8" );
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), paramString.getBytes( "ISO-8859-8" ) );
+        assertEquals( "param1 value", "red", request.getParameter( "param1") );
+        assertEquals( "param2 value", hebrewValue, request.getParameter( "param2") );
+    }
+
+
+    public void testSuppliedCharEncoding() throws Exception {
+        String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
+        String paramString = "param1=red&param2=" + hebrewValue;
+        WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), paramString.getBytes( "ISO-8859-8" ) );
+        request.setCharacterEncoding( "ISO-8859-8" );
+        assertEquals( "param1 value", "red", request.getParameter( "param1") );
+        assertEquals( "param2 value", hebrewValue, request.getParameter( "param2") );
     }
 
 
