@@ -50,6 +50,7 @@ public class WebClient {
     /** The current main window. **/
     private WebWindow _mainWindow = new WebWindow( this );
     private String _authorizationString;
+    private String _proxyAuthorizationString;
 
 
     public WebWindow getMainWindow() {
@@ -225,25 +226,29 @@ public class WebClient {
      **/
     public void setAuthorization( String userName, String password ) {
         _authorizationString = "Basic " + Base64.encode( userName + ':' + password );
-        setHeaderField( "Authorization", _authorizationString );
     }
 
 
     /**
-     * Specifies a proxy server to use. Note that at present this is global to all web clients in the VM.
+     * Specifies a proxy server to use for requests from this client.
      */
     public void setProxyServer( String proxyHost, int proxyPort ) {
-        System.setProperty( "proxyHost", proxyHost );
-        System.setProperty( "proxyPort", Integer.toString( proxyPort ) );
     }
 
 
     /**
-     * Clears the proxy server settings. Note that at present this is global to all web clients in the VM.
+     * Specifies a proxy server to use, along with a user and password for authentication.
+     */
+    public void setProxyServer( String proxyHost, int proxyPort, String userName, String password ) {
+        setProxyServer( proxyHost, proxyPort );
+        _proxyAuthorizationString = "Basic " + Base64.encode( userName + ':' + password );
+    }
+
+
+    /**
+     * Clears the proxy server settings.
      */
     public void clearProxyServer() {
-        System.getProperties().remove( "proxyHost" );
-        System.getProperties().remove( "proxyPort" );
     }
 
 
@@ -402,18 +407,14 @@ public class WebClient {
         result.put( "User-Agent", getClientProperties().getUserAgent() );
         if (getClientProperties().isAcceptGzip()) result.put( "Accept-Encoding", "gzip" );
         AddHeaderIfNotNull( result, "Cookie", _cookieJar.getCookieHeaderField( targetURL ) );
-        AddHeaderIfNotNull( result, getAuthorizationHeaderName(), _authorizationString );
+        AddHeaderIfNotNull( result, "Authorization", _authorizationString );
+        AddHeaderIfNotNull( result, "Proxy-Authorization", _proxyAuthorizationString );
         return result;
     }
 
 
     private void AddHeaderIfNotNull( Hashtable result, final String headerName, final String headerValue ) {
         if (headerValue != null) result.put( headerName, headerValue );
-    }
-
-
-    private String getAuthorizationHeaderName() {
-        return getProxyHost() != null ? "Proxy-Authorization" : "Authorization";
     }
 
 

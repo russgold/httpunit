@@ -28,6 +28,7 @@ import java.net.URLConnection;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Properties;
 
 
 /**
@@ -38,6 +39,9 @@ import java.util.Enumeration;
  * @author Russell Gold
  **/
 public class WebConversation extends WebClient {
+
+    private String _proxyHost;
+    private int _proxyPort;
 
 
     /**
@@ -54,16 +58,36 @@ public class WebConversation extends WebClient {
      * Creates a web response object which represents the response to the specified web request.
      **/
     protected WebResponse newResponse( WebRequest request, FrameSelector targetFrame ) throws MalformedURLException, IOException {
-        URLConnection connection = openConnection( getRequestURL( request ) );
-        if (HttpUnitOptions.isLoggingHttpHeaders()) {
-            String urlString = request.getURLString();
-            System.out.println( "\nConnecting to " + request.getURL().getHost() );
-            System.out.println( "Sending:: " + request.getMethod() + " " + urlString );
+        Properties savedProperties = (Properties) System.getProperties().clone();
+        try {
+            if (_proxyHost != null) {
+                System.setProperty( "proxyHost", _proxyHost );
+                System.setProperty( "proxyPort", Integer.toString( _proxyPort ) );
+            }
+            URLConnection connection = openConnection( getRequestURL( request ) );
+            if (HttpUnitOptions.isLoggingHttpHeaders()) {
+                String urlString = request.getURLString();
+                System.out.println( "\nConnecting to " + request.getURL().getHost() );
+                System.out.println( "Sending:: " + request.getMethod() + " " + urlString );
+            }
+            sendHeaders( connection, getHeaderFields( request.getURL() ) );
+            sendHeaders( connection, request.getHeaderDictionary() );
+            request.completeRequest( connection );
+            return new HttpWebResponse( this, targetFrame, request, connection, getExceptionsThrownOnErrorStatus() );
+        } finally {
+            System.setProperties( savedProperties );
         }
-        sendHeaders( connection, getHeaderFields( request.getURL() ) );
-        sendHeaders( connection, request.getHeaderDictionary() );
-        request.completeRequest( connection );
-        return new HttpWebResponse( this, targetFrame, request, connection, getExceptionsThrownOnErrorStatus() );
+    }
+
+
+    public void clearProxyServer() {
+        _proxyHost = null;
+    }
+
+
+    public void setProxyServer( String proxyHost, int proxyPort ) {
+        _proxyHost = proxyHost;
+        _proxyPort = proxyPort;
     }
 
 
@@ -96,7 +120,11 @@ public class WebConversation extends WebClient {
             String key = (String) e.nextElement();
             connection.setRequestProperty( key, (String) headers.get( key ) );
             if (HttpUnitOptions.isLoggingHttpHeaders()) {
-                System.out.println( "Sending:: " + key + ": " + connection.getRequestProperty( key ) );
+                if (key.equalsIgnoreCase( "authorization" ) || key.equalsIgnoreCase( "proxy-authorization") ) {
+                    System.out.println( "Sending:: " + key + ": " + headers.get( key ) );
+                } else {
+                    System.out.println( "Sending:: " + key + ": " + connection.getRequestProperty( key ) );
+                }
             }
         }
     }

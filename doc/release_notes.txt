@@ -13,6 +13,12 @@ Limitations:
 
 
 Revision History:
+21-Sep-2004:
+   Problems fixed:
+       1. Proxy server settings no longer apply to the entire VM; however, accessing a proxy server is not thread-safe
+   Additions:
+       1. A username and password may now be specified when accessing a proxy server.
+
 12-Sep-2004:
    Problems fixed:
        1. bug #1025968: Cookies with max-age attribute will now expire (max-age=0 is treated as immediate expiration)
