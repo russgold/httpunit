@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.net.URL;
+import java.net.MalformedURLException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,8 +78,8 @@ public class WebLink extends WebRequestSource {
     /**
      * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
      **/
-    public void click() throws IOException, SAXException {
-        submitRequest();
+    public WebResponse click() throws IOException, SAXException {
+        return submitRequest();
     }
 
 
@@ -228,6 +229,23 @@ public class WebLink extends WebRequestSource {
 
 
     public class Scriptable extends ScriptableObject {
+
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "href" )) {
+                return getReference().toExternalForm();
+            } else {
+               return super.get( propertyName );
+            }
+        }
+
+
+        private URL getReference() {
+            try {
+                return getRequest().getURL();
+            } catch (MalformedURLException e) {
+                return WebLink.this.getBaseURL();
+            }
+        }
     }
 
 

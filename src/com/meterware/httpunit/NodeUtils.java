@@ -73,31 +73,32 @@ class NodeUtils {
         return node.getAttributes().getNamedItem( attributeName ) != null;
     }
 
+
+    interface NodeAction {
+        /**
+         * Does appropriate processing on specified element. Will return false if the subtree below the element
+         * should be skipped.
+         */
+        public boolean processElement( Element element );
+
+        /**
+         * Processes a text node.
+         */
+        public void processTextNodeValue( String value );
+    }
+
     /**
      * Converts the DOM trees rooted at the specified nodes to text, ignoring
      * any HTML tags.
      **/
     public static String asText( NodeList rootNodes ) {
-        StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
-        Stack pendingNodes = new Stack();
-        pushNodeList( rootNodes, pendingNodes );
-
-        while (!pendingNodes.empty()) {
-            Object pending = pendingNodes.pop();
-            if (pending instanceof String) {
-                sb.append( pending );
-            } else {
-                Node node = (Node) pending;
-
-                if (node.getNodeType() == Node.TEXT_NODE) {
-                    sb.append( convertNBSP( node.getNodeValue() ) );
-                } else if (node.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                } else if (node.getNodeName().equalsIgnoreCase( "p" )) {
+        final StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
+        processNodes( rootNodes, new NodeAction() {
+            public boolean processElement( Element node ) {
+                if (node.getNodeName().equalsIgnoreCase( "p" )) {
                     sb.append( "\n" );
                 } else if (node.getNodeName().equalsIgnoreCase( "tr" )) {
                     sb.append( "\n" );
-                    pendingNodes.push( " |" );
                 } else if (node.getNodeName().equalsIgnoreCase( "td" )) {
                     sb.append( " | " );
                 } else if (node.getNodeName().equalsIgnoreCase( "th" )) {
@@ -105,11 +106,36 @@ class NodeUtils {
                 } else if (node.getNodeName().equalsIgnoreCase( "img" ) && HttpUnitOptions.getImagesTreatedAsAltText()) {
                     sb.append( getNodeAttribute( node, "alt" ) );
                 }
-
-                pushNodeList( node.getChildNodes(), pendingNodes );
+                return true;
             }
-        }
+            public void processTextNodeValue( String value ) {
+                sb.append( convertNBSP( value ) );
+            }
+        } );
         return sb.toString();
+    }
+
+
+    /**
+     * Converts the DOM trees rooted at the specified nodes to text, ignoring
+     * any HTML tags.
+     **/
+    public static void processNodes( NodeList rootNodes, NodeAction action ) {
+        Stack pendingNodes = new Stack();
+        pushNodeList( rootNodes, pendingNodes );
+
+        while (!pendingNodes.empty()) {
+            Node node = (Node) pendingNodes.pop();
+
+            if (node.getNodeType() == Node.TEXT_NODE) {
+                action.processTextNodeValue( node.getNodeValue() );
+            } else if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            } else
+                action.processElement( (Element) node );
+
+            pushNodeList( node.getChildNodes(), pendingNodes );
+        }
     }
 
 

@@ -12,6 +12,12 @@ Limitations:
 
 
 Revision History:
+ 5-Aug-2002
+Additions:
+    1. The JavaScript link.href attribute is now readable.
+Problems fixed:
+    A form request created after a call to getScriptableObject().setAction() now correctly uses the new action.
+
  2-Aug-2002
 Additions:
     1. Added JavaScript support for document.links and document.<link name> and the link 'onMouseOver' event.

@@ -22,6 +22,7 @@ package com.meterware.httpunit;
 import java.net.URL;
 
 import java.util.Vector;
+import java.util.ArrayList;
 
 import org.w3c.dom.*;
 
@@ -94,23 +95,26 @@ class ParsedHTML {
      **/
     public WebLink[] getLinks() {
         if (_links == null) {
-            Vector list = new Vector();
-            addLinkAnchors( list, NodeUtils.getElementsByTagName( _rootNode, "a" ) );
-            addLinkAnchors( list, NodeUtils.getElementsByTagName( _rootNode, "area" ) );
-            _links = new WebLink[ list.size() ];
-            list.copyInto( _links );
+            final ArrayList list = new ArrayList();
+            NodeUtils.processNodes( _rootNode.getChildNodes(), new NodeUtils.NodeAction() {
+                public boolean processElement( Element element ) {
+                    if (element.getNodeName().equalsIgnoreCase( "a" )) addLinkAnchor( list, element );
+                    else if (element.getNodeName().equalsIgnoreCase( "area" )) addLinkAnchor( list, element );
+                    return true;
+                }
+                public void processTextNodeValue( String value ) {
+                }
+            } );
+            _links = (WebLink[]) list.toArray( new WebLink[ list.size() ] );
         }
 
         return _links;
     }
 
 
-    private void addLinkAnchors(Vector list, NodeList nl) {
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node child = nl.item(i);
-            if (isLinkAnchor( child )) {
-                list.addElement( new WebLink( _response, _baseURL, _baseTarget, child ) );
-            }
+    private void addLinkAnchor( ArrayList list, Node child ) {
+        if (isLinkAnchor( child )) {
+            list.add( new WebLink( _response, _baseURL, _baseTarget, child ) );
         }
     }
 

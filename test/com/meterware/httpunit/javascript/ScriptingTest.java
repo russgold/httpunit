@@ -164,4 +164,31 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testLinkIndexes() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function alertLinks() { " +
+                                            "  for (var i=0; i < document.links.length; i++) {" +
+                                            "    alert( document.links[i].href );" +
+                                            "  }" +
+                                            "}" +
+                                            "</script></head>" +
+                                            "<body onLoad='alertLinks()'>" +
+                                            "<a href='demo.html'>green</a>" +
+                                            "<map name='map1'>" +
+                                            "  <area href='guide.html' alt='Guide' shape='rect' coords='0,0,118,28'>" +
+                                            "  <area href='search.html' alt='Search' shape='circle' coords='184,200,60'>" +
+                                            "</map>" +
+                                            "<a href='sample.html'>green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        JavaScript.run( response );
+        assertEquals( "Alert message", getHostPath() + "/demo.html", response.popNextAlert() );
+        assertEquals( "Alert message", getHostPath() + "/guide.html", response.popNextAlert() );
+        assertEquals( "Alert message", getHostPath() + "/search.html", response.popNextAlert() );
+        assertEquals( "Alert message", getHostPath() + "/sample.html", response.popNextAlert() );
+        assertNull( "Alert should have been removed", response.getNextAlert() );
+    }
+
+
 }
