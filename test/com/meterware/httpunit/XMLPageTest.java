@@ -19,15 +19,16 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.w3c.dom.Document;
 
 /**
- * Tests for the package.
+ * A test for the XML handling functionality.
  **/
-public class HttpUnitSuite {
+public class XMLPageTest extends HttpUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -35,30 +36,23 @@ public class HttpUnitSuite {
 	
 	
     public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( WebPageTest.suite() );
-        suite.addTest( WebLinkTest.suite() );
-        suite.addTest( HtmlTablesTest.suite() );
-        suite.addTest( WebFormTest.suite() );
-        suite.addTest( RequestTargetTest.suite() );
-        suite.addTest( FormParametersTest.suite() );
-        suite.addTest( FormSubmitTest.suite() );
-        suite.addTest( Base64Test.suite() );
-        suite.addTest( PseudoServerTest.suite() );
-        addOptionalTestCase( suite, "com.meterware.httpunit.XMLPageTest" );
-        addOptionalTestCase( suite, "com.meterware.httpunit.FileUploadTest" );
-        return suite;
+        return new TestSuite( XMLPageTest.class );
     }
 
 
-    private static void addOptionalTestCase( TestSuite suite, String testCaseName ) {
-        try {
-            suite.addTest( new TestSuite( Class.forName( testCaseName ) ) );
-        } catch (ClassNotFoundException e) {
-            System.out.println( "Note: test suite " + testCaseName + " not found; skipping." );
-        }
+    public XMLPageTest( String name ) {
+        super( name );
     }
 
 
+    public void testXML() throws Exception {
+        defineResource( "SimplePage.xml",
+                        "<?xml version=\"1.0\" ?><main><title>See me now</title></main>",
+                        "text/xml" );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.xml" );
+        WebResponse simplePage = wc.getResponse( request );
+        Document doc = simplePage.getDOM();
+    }
 }
-

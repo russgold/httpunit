@@ -30,6 +30,8 @@
 <target name="check_for_optional_packages">
     <available property="jsdk.present" classname="javax.servlet.http.HttpServlet" />
     <available property="javamail.present" classname="javax.mail.internet.MimeMultipart" />
+    <available property="xerces.present" classname="org.apache.xerces.parsers.DOMParser" />
+</target>
 </target>
 
 
@@ -49,7 +51,6 @@
     <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
            debug="on" deprecation="on" optimize="off">
          <exclude name="**/servletunit/*" unless="jsdk.present" />
-         <exclude name="**/MimeEncodedMessageBody.java" unless="javamail.present" />
     </javac>
 </target>
 
@@ -62,6 +63,7 @@
            debug="on" deprecation="on" optimize="off">
          <exclude name="**/servletunit/*" unless="jsdk.present" />
          <exclude name="**/FileUploadTest.java" unless="javamail.present" />
+         <exclude name="**/XMLPageTest.java" unless="xerces.present" />
     </javac>
 </target>
 
