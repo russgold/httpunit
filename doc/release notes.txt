@@ -9,15 +9,16 @@ Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
 Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink,
                         and for correcting my set up of the https protocol handling.
 Thanks to Perry Doell for the methods to examine cookies on WebConversation
+Thanks to Ken Hygh for the proper handling of parameters with no specified type 
 
 Revision History:
- 1-Oct-00
+ 3-Oct-00
 Additions:
     1. The beginnings of frame support has been added. All that you can do so far is find the names of the frames.
 Problems corrected:
-    2. It is no longer necessary to edit the java.security file to enable HTTPS support. Just install the JSSE jars
+    1. It is no longer necessary to edit the java.security file to enable HTTPS support. Just install the JSSE jars
        in your classpath.
-       s
+    2. Parameters with no type specified are now properly handled as text
 28-Sep-00
 Additions:
     1. PseudoServer class is now used by unit tests to handle requests. This will enable development of frames capability

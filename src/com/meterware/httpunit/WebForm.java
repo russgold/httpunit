@@ -240,9 +240,9 @@ public class WebForm {
                 String name  = getValue( parameters[i].getNamedItem( "name" ) );
                 String value = getValue( parameters[i].getNamedItem( "value" ) );
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
-                if (type == null) type = "TEXT";
+                if (type == null || type.length() == 0) type = "TEXT";
 
-                if (type.equals( "TEXT" ) | type.equals( "HIDDEN" ) | type.equals( "PASSWORD" )) {
+                if (type.equals( "TEXT" ) || type.equals( "HIDDEN" ) || type.equals( "PASSWORD" )) {
                     defaults.put( name, value );
                 } else if (type.equals( "RADIO" ) && parameters[i].getNamedItem( "checked" ) != null) {
                     defaults.put( name, value );
@@ -291,7 +291,7 @@ public class WebForm {
                 String name  = getValue( parameters[i].getNamedItem( "name" ) );
                 String value = getValue( parameters[i].getNamedItem( "value" ) );
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
-                if (type == null) type = "TEXT";
+                if (type == null || type.length() == 0) type = "TEXT";
 
                 if (type.equals( "RADIO" ) || type.equals( "CHECKBOX" )) {
                     if (value.length() == 0 && type.equals( "CHECKBOX" )) value = "on";
@@ -328,9 +328,9 @@ public class WebForm {
             for (int i = 0; i < parameters.length; i++) {
                 String name  = getValue( parameters[i].getNamedItem( "name" ) );
                 String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
-                if (type == null) type = "TEXT";
+                if (type == null || type.length() == 0) type = "TEXT";
 
-                if (type.equals( "TEXT" ) | type.equals( "HIDDEN" ) | type.equals( "PASSWORD" )) {
+                if (type.equals( "TEXT" ) || type.equals( "HIDDEN" ) || type.equals( "PASSWORD" )) {
                     types.put( name, TYPE_TEXT );
                 } else if (type.equals( "RADIO" )) {
                     types.put( name, TYPE_SCALAR );

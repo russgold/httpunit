@@ -85,7 +85,7 @@ public class WebFormTest extends HttpUnitTest {
     public void testHiddenParameters() throws Exception {
         defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
                                   "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
-                                  "<br><Input name=typeless>" +
+                                  "<br><Input name=typeless value=nothing>" +
                                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                   "<br><Input type=submit value = \"Log in\">" +
                                   "</form>" );
@@ -96,6 +96,7 @@ public class WebFormTest extends HttpUnitTest {
 
         WebRequest request = form.getRequest();
         assertEquals( "surprise", request.getParameter( "secret" ) );
+        assertEquals( "nothing", request.getParameter( "typeless" ) );
     }
 
 
