@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -51,7 +51,6 @@ class HttpWebResponse extends WebResponse {
 
 
         if (_responseCode == HttpURLConnection.HTTP_OK) loadResponseText( url, connection );
-	if (connection instanceof HttpURLConnection) ((HttpURLConnection) connection).disconnect();
     }
 
 

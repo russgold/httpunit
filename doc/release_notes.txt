@@ -11,6 +11,10 @@ Limitations: HttpUnit does not support JavaScript
                             
 Revision History:
 
+13-Apr-01
+Problems corrected:
+    1. Repeated requests to the same URL were not resending requests properly. This caused some problems with validation.
+
 3-Apr-01
 Acknowledgements:
     Thanks to Jim Kimball for finding and fixing the redirection of subframes
