@@ -227,7 +227,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     private String asDateHeaderValue( long date ) {
         Date value = new Date( date );
-        SimpleDateFormat formatter = new SimpleDateFormat( RFC1123_DATE_SPEC );
+        SimpleDateFormat formatter = new SimpleDateFormat( RFC1123_DATE_SPEC, Locale.US );
         formatter.setTimeZone( TimeZone.getTimeZone( "Greenwich Mean Time" ) );
         return formatter.format( value );
     }

@@ -14,6 +14,7 @@ Revision History:
 Problems fixed:
     1. The cookie fixes of 17-Oct had caused ServletUnit to see multiple servlets in an application with varying paths
        as being in separate sessions.
+    2. ServletUnit now explicitly specifies its locale for generating dates as Locale.US to comply with RFC-1123
 
 17-Oct-2002
 Additions:
