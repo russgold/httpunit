@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2002, Russell Gold
+* Copyright (c) 2001-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -21,7 +21,6 @@ package com.meterware.pseudoserver;
 *******************************************************************************************************************/
 import com.meterware.httpunit.HttpUnitUtils;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,22 +29,37 @@ import java.io.Reader;
 
 import java.util.StringTokenizer;
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 
-class HttpRequestStream {
-    HttpRequestStream( InputStream stream ) throws IOException {
-        _stream = new BufferedInputStream( stream );
+/**
+ * Represents a single HTTP request, extracted from the input stream.
+ */
+class HttpRequest {
 
-        StringTokenizer st = new StringTokenizer( readHeaderLine() );
+    private static final int CR = 13;
+    private static final int LF = 10;
+
+    private Reader         _reader;
+    private String         _protocol;
+    private String         _command;
+    private String         _uri;
+    private Hashtable      _headers = new Hashtable();
+    private Hashtable      _parameters;
+    private byte[]         _requestBody;
+
+
+    HttpRequest( InputStream inputStream ) throws IOException {
+        StringTokenizer st = new StringTokenizer( readHeaderLine( inputStream ) );
         _command  = st.nextToken();
         _uri      = st.nextToken();
-        String protocol = st.nextToken();
+        _protocol = st.nextToken();
     
         if (!_command.equals( "GET" ) && !_command.equals( "POST" ) && !_command.equals( "PUT" )) {
             throw new UnknownMethodException( _command );
         }
-        readHeaders();
-        readContent();
+        readHeaders( inputStream );
+        readContent( inputStream );
     }
 
 
@@ -59,6 +73,11 @@ class HttpRequestStream {
 
     String getURI() {
         return _uri;
+    }
+
+
+    String getProtocol() {
+        return _protocol;
     }
 
 
@@ -84,25 +103,22 @@ class HttpRequestStream {
     }
 
 
-    private static final int CR = 13;
-    private static final int LF = 10;
-
-    private InputStream    _stream;
-    private Reader         _reader;
-    private String         _command;
-    private String         _uri;
-    private Hashtable      _headers = new Hashtable();
-    private Hashtable      _parameters;
-    private byte[]         _requestBody;
-
-
-    private void readContent() throws IOException {
-        _requestBody = new byte[ getContentLength() ];
-        try {
-            _stream.read( _requestBody );
-            _reader = new InputStreamReader( new ByteArrayInputStream( _requestBody ) );
-        } catch (NumberFormatException e) {
+    public String toString() {
+        StringBuffer sb = new StringBuffer( "HttpRequest[ ");
+        sb.append( _command ).append( ' ' ).append( _uri ).append( ' ' ).append( _protocol ).append( "\n" );
+        for (Enumeration e = _headers.keys(); e.hasMoreElements();) {
+            Object key = e.nextElement();
+            sb.append( "      " ).append( key ).append( ": " ).append( _headers.get( key ) ).append( "\n" );
         }
+        sb.append( "   body contains " ).append( getBody().length ).append( " byte(s) ]" );
+        return sb.toString();
+    }
+
+
+    private void readContent( InputStream inputStream ) throws IOException {
+        _requestBody = new byte[ getContentLength() ];
+        inputStream.read( _requestBody );
+        _reader = new InputStreamReader( new ByteArrayInputStream( _requestBody ) );
     }
 
 
@@ -115,10 +131,10 @@ class HttpRequestStream {
     }
 
 
-    private void readHeaders() throws IOException {
+    private void readHeaders( InputStream inputStream ) throws IOException {
         String lastHeader = null;
 
-        String header = readHeaderLine();
+        String header = readHeaderLine( inputStream );
         while (header.length() > 0) {
     	    if (header.charAt(0) <= ' ') {
     	        if (lastHeader == null) continue;
@@ -127,20 +143,20 @@ class HttpRequestStream {
     	        lastHeader = header.substring( 0, header.indexOf(':') ).toUpperCase();
                 _headers.put( lastHeader, header.substring( header.indexOf(':')+1 ).trim() );
     	    }
-            header = readHeaderLine();
+            header = readHeaderLine( inputStream );
         }
     }
 
 
-    private String readHeaderLine() throws IOException {
+    private String readHeaderLine( InputStream inputStream ) throws IOException {
         StringBuffer sb = new StringBuffer();
-        int b = _stream.read();
+        int b = inputStream.read();
         while (b != CR) {
             sb.append( (char) b );
-            b = _stream.read();
+            b = inputStream.read();
         }
 
-        b = _stream.read();
+        b = inputStream.read();
         if (b != LF) throw new IOException( "Bad header line termination: " + b );
 
         return sb.toString();
@@ -172,6 +188,22 @@ class HttpRequestStream {
             values[ oldValues.length ] = value;
             parameters.put( name, values );
         }
+    }
+
+
+    boolean requestedCloseConnection() {
+//        if ("Keep-alive".equalsIgnoreCase( getConnectionHeader() )) {
+//            return false;
+//        } else if (_protocol.equals( "HTTP/1.1" )) {
+//            return "Close".equalsIgnoreCase( getConnectionHeader() );
+//        } else {
+            return true;
+//        }
+    }
+
+
+    private String getConnectionHeader() {
+        return getHeader( "Connection" );
     }
 
 }

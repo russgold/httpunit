@@ -72,7 +72,7 @@ public class PseudoServlet {
     }
 
 
-    void init( HttpRequestStream requestStream ) {
+    void init( HttpRequest requestStream ) {
         _requestStream = requestStream;
     }
 
@@ -107,7 +107,7 @@ public class PseudoServlet {
     }
 
 
-    private HttpRequestStream _requestStream;
+    private HttpRequest _requestStream;
 }
 
 

@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -40,8 +40,8 @@ public class PseudoServer {
             public void run() {
                 while (_active) {
                     try {
-                        handleConnection();
-                        Thread.sleep( 50 );
+                        handleNewConnection( getServerSocket().accept() );
+                        Thread.sleep( 20 );
                     } catch (InterruptedIOException e) {
                         _active = false;
                     } catch (IOException e) {
@@ -192,15 +192,40 @@ public class PseudoServer {
     }
 
 
-    private void handleConnection() throws IOException {
-        Socket socket = getServerSocket().accept();
+    private void handleNewConnection( final Socket socket ) {
+        Thread t = new Thread() {
+            public void run() {
+                try {
+                    serveRequests( socket );
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+                }
+            }
+        };
+        t.start();
+    }
+
+
+    private void serveRequests( Socket socket ) throws IOException {
         socket.setSoTimeout( 1000 );
         socket.setTcpNoDelay( true );
 
-        HttpRequestStream  request  = new HttpRequestStream( socket.getInputStream() );
-        HttpResponseStream response = new HttpResponseStream( socket.getOutputStream() );
+        final BufferedInputStream inputStream = new BufferedInputStream( socket.getInputStream() );
+        final HttpResponseStream outputStream = new HttpResponseStream( socket.getOutputStream() );
 
+        HttpRequest request;
+        do {
+            request = new HttpRequest( inputStream );
+            respondToRequest( request, outputStream );
+        } while (!request.requestedCloseConnection() );
+        outputStream.close();
+        socket.close();
+    }
+
+
+    private void respondToRequest( HttpRequest request, HttpResponseStream response ) {
         try {
+            response.setProtocol( request.getProtocol() );
             WebResource resource = getResource( request );
             if (resource == null) {
                 response.setResponse( HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + request.getURI() );
@@ -216,20 +241,14 @@ public class PseudoServer {
             }
         } catch (UnknownMethodException e) {
             response.setResponse( HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + e.getMethod() );
-        } catch (IOException e) {
-            e.fillInStackTrace();
-            throw e;
         } catch (Throwable t) {
             t.printStackTrace();
             response.setResponse( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
-        } finally {
-            response.close();
-            socket.close();
         }
     }
 
 
-    private WebResource getResource( HttpRequestStream request ) throws IOException {
+    private WebResource getResource( HttpRequest request ) throws IOException {
         Object resource = _resources.get( request.getURI() );
 
         if (request.getCommand().equals( "GET" ) && resource instanceof WebResource) {
@@ -268,7 +287,7 @@ public class PseudoServer {
     }
 
 
-    private WebResource getResource( PseudoServlet servlet, HttpRequestStream request ) throws IOException {
+    private WebResource getResource( PseudoServlet servlet, HttpRequest request ) throws IOException {
         servlet.init( request );
         return servlet.getResponse( request.getCommand() );
     }
@@ -311,6 +330,11 @@ class HttpResponseStream {
     }
 
 
+    void setProtocol( String protocol ) {
+        _protocol = protocol;
+    }
+
+
     void setResponse( int responseCode, String responseText ) {
         _responseCode = responseCode;
         _responseText = responseText;
@@ -347,6 +371,7 @@ class HttpResponseStream {
             for (Enumeration e = _headers.elements(); e.hasMoreElements();) {
                 sendLine( (String) e.nextElement() );
             }
+            sendLine( "Connection: close" ); // TODO get rid of this
             sendText( CRLF );
             _headersWritten = true;
             _pw.flush();
@@ -355,7 +380,7 @@ class HttpResponseStream {
 
 
     private void sendResponse( int responseCode, String responseText ) {
-        sendLine( "HTTP/1.0 " + responseCode + ' ' + responseText );
+        sendLine( _protocol + ' ' + responseCode + ' ' + responseText );
     }
 
 
@@ -374,6 +399,7 @@ class HttpResponseStream {
     private PrintWriter _pw;
 
     private Vector    _headers = new Vector();
+    private String    _protocol = "HTTP/1.0";
     private int       _responseCode = HttpURLConnection.HTTP_OK;
     private String    _responseText = "OK";
 

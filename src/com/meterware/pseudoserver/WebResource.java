@@ -24,6 +24,7 @@ import com.meterware.httpunit.HttpUnitUtils;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.Vector;
 
@@ -57,6 +58,7 @@ public class WebResource {
     public void addHeader( String header ) {
         _headers.addElement( header );
         if (header.toLowerCase().startsWith( "content-type" )) _hasExplicitContentTypeHeader = true;
+        if (header.toLowerCase().startsWith( "content-length" )) _hasExplicitContentLengthHeader = true;
     }
 
 
@@ -96,9 +98,10 @@ public class WebResource {
     }
 
 
-    String[] getHeaders() {
+    String[] getHeaders() throws UnsupportedEncodingException {
         final Vector effectiveHeaders = (Vector) _headers.clone();
         if (!_hasExplicitContentTypeHeader) effectiveHeaders.add( getContentTypeHeader() );
+        if (_stream == null && !_hasExplicitContentLengthHeader) effectiveHeaders.add( getContentLengthHeader() );
         String[] headers = new String[ effectiveHeaders.size() ];
         effectiveHeaders.copyInto( headers );
         return headers;
@@ -106,10 +109,8 @@ public class WebResource {
 
 
     void writeTo( OutputStream outputStream ) throws IOException {
-        if (_string != null) {
-            outputStream.write( _string.getBytes( getCharacterSet() ) );
-        } else if (_contents != null) {
-            outputStream.write( _contents );
+        if (_stream == null) {
+            outputStream.write( getContentsAsBytes() );
         } else if (_stream != null) {
             byte[] buffer = new byte[8 * 1024];
             int count = 0;
@@ -121,8 +122,24 @@ public class WebResource {
     }
 
 
+    private byte[] getContentsAsBytes() throws UnsupportedEncodingException {
+        if (_contents != null) {
+            return _contents;
+        } else if (_string != null) {
+            return _string.getBytes( getCharacterSet() );
+        } else {
+            throw new IllegalStateException( "Cannot get bytes from stream" );
+        }
+    }
+
+
     private String getContentTypeHeader() {
-        return "Content-type: " + _contentType + getCharacterSetParameter();
+        return "Content-Type: " + _contentType + getCharacterSetParameter();
+    }
+
+
+    private String getContentLengthHeader() throws UnsupportedEncodingException {
+        return "Content-Length: " + getContentsAsBytes().length;
     }
 
 
@@ -168,6 +185,7 @@ public class WebResource {
     private String  _contentType = DEFAULT_CONTENT_TYPE;
     private String  _characterSet = DEFAULT_CHARACTER_SET;
     private boolean _hasExplicitContentTypeHeader;
+    private boolean _hasExplicitContentLengthHeader;
     private Vector  _headers = new Vector();
 }
 

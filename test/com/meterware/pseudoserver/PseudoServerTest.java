@@ -25,6 +25,11 @@ import junit.framework.TestSuite;
 
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
+import java.net.Socket;
+import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.BufferedInputStream;
 
 
 public class PseudoServerTest extends HttpUserAgentTest {
@@ -131,6 +136,58 @@ public class PseudoServerTest extends HttpUserAgentTest {
         WebResponse response = wc.getResponse( request );
         assertEquals( "requested resource", resourceValue, response.getText().trim() );
         assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
+
+    /**
+     * This tests simple access to the server without using any client classes.
+     */
+    public void testGetViaSocket() throws Exception {
+        defineResource( "sample", "Get this", "text/plain" );
+        Socket socket = new Socket( "localhost", getHostPort() );
+        OutputStream os = socket.getOutputStream();
+        InputStream is = new BufferedInputStream( socket.getInputStream() );
+
+        sendHTTPLine( os, "GET /sample HTTP/1.0" );
+        sendHTTPLine( os, "Host: meterware.com" );
+        sendHTTPLine( os, "" );
+
+        StringBuffer sb = new StringBuffer();
+        int b;
+        while (-1 != (b = is.read())) sb.append( (char) b );
+        String result = sb.toString();
+        assertTrue( "Did not find matching protocol", result.startsWith( "HTTP/1.0" ) );
+        assertTrue( "Did not find expected text", result.indexOf( "Get this" ) > 0 );
+    }
+
+
+    private void sendHTTPLine( OutputStream os, final String line ) throws IOException {
+        os.write( line.getBytes() );
+        os.write( 13 );
+        os.write( 10 );
+    }
+
+
+    /**
+     * This verifies that the PseudoServer detects and echoes its protocol.
+     */
+    public void testProtocolMatching() throws Exception {
+        defineResource( "sample", "Get this", "text/plain" );
+        Socket socket = new Socket( "localhost", getHostPort() );
+        OutputStream os = socket.getOutputStream();
+        InputStream is = new BufferedInputStream( socket.getInputStream() );
+
+        sendHTTPLine( os, "GET /sample HTTP/1.1" );
+        sendHTTPLine( os, "Host: meterware.com" );
+        sendHTTPLine( os, "Connection: close" );
+        sendHTTPLine( os, "" );
+
+        StringBuffer sb = new StringBuffer();
+        int b;
+        while (-1 != (b = is.read())) sb.append( (char) b );
+        String result = sb.toString();
+        assertTrue( "Did not find matching protocol", result.startsWith( "HTTP/1.1" ) );
+        assertTrue( "Did not find expected text", result.indexOf( "Get this" ) > 0 );
     }
 
 
