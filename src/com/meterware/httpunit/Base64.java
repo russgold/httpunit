@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2002 by Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -19,10 +19,21 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+
+/**
+ * A utility class to convert to and from base 64 encoding.
+ *
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ **/
 public class Base64 {
 
     final static String encodingChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+
+    /**
+     * Returns the base 64 encoded equivalent of a supplied string.
+     * @param source the string to encode
+     */
     public static String encode( String source ) {
         char[] sourceBytes = getPaddedBytes( source );
         int numGroups = (sourceBytes.length + 2) / 3;
@@ -60,6 +71,10 @@ public class Base64 {
     }
 
 
+    /**
+     * Returns the plaintext equivalent of a base 64-encoded string.
+     * @param source a base 64 string (which must have a multiple of 4 characters)
+     */
     public static String decode( String source ) {
         if (source.length()%4 != 0) throw new RuntimeException( "valid Base64 codes have a multiple of 4 characters" );
         int numGroups = source.length() / 4;
