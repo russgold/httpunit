@@ -138,7 +138,6 @@ public class HtmlTablesTest extends TestCase {
         assertEquals( "nested columns", 2, nested[0].getColumnCount() );
 
         String nestedString = tables[0].getCellAsText( 0, 0 );
-        System.out.println( "Nested string=" + nestedString ); 
         assert( "Cannot find 'Red' in string", nestedString.indexOf( "Red" ) >= 0 );
         assert( "Cannot find 'Blue' in string", nestedString.indexOf( "Blue" ) >= 0 );
     }

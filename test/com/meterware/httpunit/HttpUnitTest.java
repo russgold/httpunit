@@ -45,7 +45,20 @@ public class HttpUnitTest extends TestCase {
                                      "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
                                      "<br><Input type=submit value = \"Log in\">" +
                                      "</form></body></html>" );
-
+        _tableForm = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
+                                       "<form method=POST action = \"/servlet/Login\">" +
+                                       "<table summary=\"\"><tr><td>" +
+                                       "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                                       "</td><td><Input type=Radio name=sex value=male>Masculine" +
+                                       "</td><td><Input type=Radio name=sex value=female checked>Feminine" +
+                                       "</td><td><Input type=Radio name=sex value=neuter>Neither" +
+                                       "<Input type=submit value = \"Log in\"></tr></table>" +
+                                       "</form></body></html>" );
+        _selectForm = new ReceivedPage( baseURL, HEADER + "<body><h2>Login required</h2>" +
+                                       "<form method=POST action = \"/servlet/Login\">" +
+                                       "<Select name=color><Option>blue<Option selected>red \n" +
+                                       "<Option>green</select>" +
+                                       "</form></body></html>" );
     }
 	
 	
@@ -102,8 +115,32 @@ public class HttpUnitTest extends TestCase {
     }
 
 
+    public void testTableForm() throws Exception {
+        WebForm form = _tableForm.getForms()[0];
+        String[] parameterNames = form.getParameterNames();
+        assertEquals( "Number of parameters", 2, parameterNames.length );
+        assertEquals( "First parameter name", "name", parameterNames[0] );
+        assertEquals( "Default name", "", form.getParameterValue( "name" ) );
+        assertEquals( "Default sex", "female", form.getParameterValue( "sex" ) );
+        WebRequest request = form.getRequest();
+    }
+
+
+    public void testSelect() throws Exception {
+        WebForm form = _selectForm.getForms()[0];
+        String[] parameterNames = form.getParameterNames();
+        assertEquals( "Number of parameters", 1, parameterNames.length );
+        assertEquals( "Parameter name", "color", parameterNames[0] );
+        assertEquals( "Default color", "red", form.getParameterValue( "color" ) );
+        WebRequest request = form.getRequest();
+        assertEquals( "Submitted color", "red", request.getParameter( "color" ) );
+    }
+
+
     private final static String HEADER = "<html><head><title>A Sample Page</title></head>";
     private ReceivedPage _noForms;
     private ReceivedPage _oneForm;
     private ReceivedPage _hidden;
+    private ReceivedPage _tableForm;
+    private ReceivedPage _selectForm;
 }

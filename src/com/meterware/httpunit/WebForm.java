@@ -1,12 +1,29 @@
 package com.meterware.httpunit;
-
+/********************************************************************************************************************
+* $Id$
+*
+* Copyright (c) 2000, Russell Gold
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+* to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+* THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+* CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+*
+*******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.Vector;
+import java.util.*;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 /**
  * This class represents a form in an HTML page. Users of this class may examine the parameters
@@ -21,12 +38,21 @@ public class WebForm {
      * in the order in which they appear.
      **/
     public String[] getParameterNames() {
+        Vector parameterNames = new Vector();
         NamedNodeMap[] parameters = getParameters();
-        String[] result = new String[ parameters.length ];
 
-        for (int i = 0; i < result.length; i++) {
-            result[i] = getValue( parameters[i].getNamedItem( "name" ) );
+        for (int i = 0; i < parameters.length; i++) {
+            String name = getValue( parameters[i].getNamedItem( "name" ) );
+            if (!parameterNames.contains( name )) parameterNames.addElement( name );
         }
+
+        HTMLSelectElement[] selections = getSelections();
+        for (int i = 0; i < selections.length; i++) {
+            parameterNames.addElement( selections[i].getName() );
+        }
+
+        String[] result = new String[ parameterNames.size() ];
+        parameterNames.copyInto( result );
         return result;
     }
 
@@ -45,15 +71,24 @@ public class WebForm {
             result = new GetMethodWebRequest( _baseURL, action );
         }
 
-        NamedNodeMap[] parameters = getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            if (parameters[i].getNamedItem( "value" ) != null) {
-                result.setParameter( getValue( parameters[i].getNamedItem( "name" ) ),
-                                     getValue( parameters[i].getNamedItem( "value" ) ) );
+        String[] parameterNames = getParameterNames();
+        for (int i = 0; i < parameterNames.length; i++) {
+            if (getParameterDefaults().get( parameterNames[i] ) != null) {
+                result.setParameter( parameterNames[i], (String) getParameterDefaults().get( parameterNames[i] ) );
             }
         }
         return result;
 
+    }
+
+
+    /**
+     * Returns the default value of the named parameter.
+     **/
+    public String getParameterValue( String name ) {
+        String result = (String) getParameterDefaults().get( name );
+        if (result == null) result = "";
+        return result;
     }
 
 
@@ -89,12 +124,63 @@ public class WebForm {
     /** The attributes of the form parameters. **/
     private NamedNodeMap[] _parameters;
 
+    /** The parameters with their default values. **/
+    private Hashtable      _defaults;
+
+    /** The selections in this form. **/
+    private HTMLSelectElement[] _selections;
+
+
 
     private String getValue( Node node ) {
         return (node == null) ? "" : node.getNodeValue();
     }
 
 
+    private Hashtable getParameterDefaults() {
+        if (_defaults == null) {
+            NamedNodeMap[] parameters = getParameters();
+            Hashtable defaults = new Hashtable();
+            for (int i = 0; i < parameters.length; i++) {
+                String name  = getValue( parameters[i].getNamedItem( "name" ) );
+                String value = getValue( parameters[i].getNamedItem( "value" ) );
+                String type  = getValue( parameters[i].getNamedItem( "type" ) ).toUpperCase();
+                if (type == null) type = "TEXT";
+
+                if (type.equals( "TEXT" ) | type.equals( "HIDDEN" ) | type.equals( "PASSWORD" )) {
+                    defaults.put( name, value );
+                } else if (type.equals( "RADIO" ) && parameters[i].getNamedItem( "checked" ) != null) {
+                    defaults.put( name, value );
+                }
+            }
+            HTMLSelectElement[] selections = getSelections();
+            for (int i = 0; i < selections.length; i++) {
+                defaults.put( selections[i].getName(), selections[i].getSelected() );
+            }
+        _defaults = defaults;
+        }
+        return _defaults;
+    }
+
+
+    /**
+     * Returns an array of select control descriptors for this form.
+     **/
+    private HTMLSelectElement[] getSelections() {
+        if (_selections == null) {
+            NodeList nl = ((Element) _node).getElementsByTagName( "select" );
+            HTMLSelectElement[] result = new HTMLSelectElement[ nl.getLength() ];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = new HTMLSelectElement( nl.item(i) );
+            }
+            _selections = result;
+        }
+        return _selections;
+    }
+
+    /**
+     * Returns an array of form parameter attributes for this form.
+     **/
     private NamedNodeMap[] getParameters() {
         if (_parameters == null) {
             Vector list = new Vector();
@@ -144,4 +230,41 @@ public class WebForm {
     }
 
 
+    class HTMLSelectElement {
+        HTMLSelectElement( Node node ) {
+            if (!node.getNodeName().equalsIgnoreCase( "select" )) {
+                throw new RuntimeException( "Not a select element" );
+            }
+            _node = node;
+        }
+    
+    
+        private Node _node;
+    
+    
+        String getName() {
+            NamedNodeMap nnm = _node.getAttributes();
+            return getValue( nnm.getNamedItem( "name" ) );
+        }
+
+
+        String getSelected() {
+            NodeList nl = ((Element) _node).getElementsByTagName( "option" );
+            for (int i = 0; i < nl.getLength(); i++) {
+                NamedNodeMap nnm = nl.item(i).getAttributes();
+                if (nnm.getNamedItem( "selected" ) != null) {
+                    if (nnm.getNamedItem( "value" ) != null) {
+                        return getValue( nnm.getNamedItem( "value" ) );
+                    } else {
+                        return getValue( nl.item(i).getFirstChild() );
+                    }
+                }
+            }
+            return "";
+        }
+    }
+
+
+
 }
+
