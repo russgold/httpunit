@@ -359,10 +359,17 @@ public class WebClientTest extends HttpUnitTest {
     private class CompressedPseudoServlet extends PseudoServlet {
 
         private String _responseText;
+        private boolean _suppressLengthHeader;
 
 
         public CompressedPseudoServlet( String responseText ) {
             _responseText = responseText;
+        }
+
+
+        public CompressedPseudoServlet( String responseText, boolean suppressLengthHeader ) {
+            this( responseText );
+            _suppressLengthHeader = suppressLengthHeader;
         }
 
 
@@ -371,6 +378,7 @@ public class WebClientTest extends HttpUnitTest {
                 return new WebResource( _responseText.getBytes(), "text/plain" );
             } else {
                 WebResource result = new WebResource( getCompressedContents(), "text/plain" );
+                if (_suppressLengthHeader) result.suppressAutomaticLengthHeader();
                 result.addHeader( "Content-Encoding: gzip" );
                 return result;
             }
@@ -393,6 +401,20 @@ public class WebClientTest extends HttpUnitTest {
             out.close();
             return baos.toByteArray();
         }
+    }
+
+
+    public void testGZIPUndefinedLengthHandling() throws Exception {
+        String expectedResponse = "Here is my answer. It needs to be reasonably long to make compression smaller " +
+                                  "than the raw message. It should be obvious when you reach that point. " +
+                                  "Of course it is more than that - it needs to be long enough to cause a problem.";
+        defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse, /* suppress length */ true ) );
+
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/Compressed.html" );
+        assertEquals( "Content-Encoding header", "gzip", wr.getHeaderField( "Content-encoding" ) );
+        assertEquals( "Content-Type", "text/plain", wr.getContentType() );
+        assertEquals( "Content", expectedResponse, wr.getText().trim() );
     }
 
 

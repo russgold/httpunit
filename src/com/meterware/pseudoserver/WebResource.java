@@ -77,6 +77,11 @@ public class WebResource {
     }
 
 
+    public void suppressAutomaticLengthHeader() {
+        _hasExplicitContentLengthHeader = true;
+    }
+
+
     WebResource( String contents, int responseCode ) {
         this( contents, DEFAULT_CONTENT_TYPE, responseCode );
     }

@@ -48,11 +48,13 @@ import org.xml.sax.SAXException;
 abstract
 public class WebResponse implements HTMLSegment, CookieSource {
 
-    final private static String HTML_CONTENT  = "text/html";
-    final private static String XHTML_CONTENT = "application/xhtml+xml";
-    final private static String FAUX_XHTML_CONTENT = "text/xhtml";
+    private static final String HTML_CONTENT  = "text/html";
+    private static final String XHTML_CONTENT = "application/xhtml+xml";
+    private static final String FAUX_XHTML_CONTENT = "text/xhtml";
 
-    final private static int UNINITIALIZED_INT = -2;
+    private static final int UNINITIALIZED_INT = -2;
+    private static final int UNKNOWN_LENGTH_TIMEOUT = 500;
+    private static final int UNKNOWN_LENGTH_RETRY_INTERVAL = 10;
 
     private FrameSelector _frame;
 
@@ -937,7 +939,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    private byte[] readFromStream( InputStream inputStream, int maxBytes ) throws IOException {
+    private byte[] readFromStream1( InputStream inputStream, int maxBytes ) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[8 * 1024];
         int count = 0;
@@ -950,6 +952,41 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
         byte[] bytes = outputStream.toByteArray();
         return bytes;
+    }
+
+    private byte[] readFromStream( InputStream inputStream, int maxBytes ) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8 * 1024];
+        int count = 0;
+        if (maxBytes > 0) {
+            do {
+                outputStream.write( buffer, 0, count );
+                maxBytes -= count;
+                if (maxBytes <= 0) break;
+                count = inputStream.read( buffer, 0, Math.min( maxBytes, buffer.length ) );
+            } while (count != -1);
+        } else {
+            do {
+                outputStream.write( buffer, 0, count );
+                int available = getAvailableBytes( inputStream );
+                count = (available == 0) ? -1 : inputStream.read( buffer, 0, buffer.length );
+            } while (count != -1);
+        }
+
+        byte[] bytes = outputStream.toByteArray();
+        return bytes;
+    }
+
+
+    private int getAvailableBytes( InputStream inputStream ) throws IOException {
+        int timeLeft = UNKNOWN_LENGTH_TIMEOUT;
+        int available;
+        do {
+            timeLeft -= UNKNOWN_LENGTH_RETRY_INTERVAL;
+            try { Thread.sleep( UNKNOWN_LENGTH_RETRY_INTERVAL ); } catch (InterruptedException e) {}
+            available = inputStream.available();
+        } while (available == 0 && timeLeft > 0);
+        return available;
     }
 
 
