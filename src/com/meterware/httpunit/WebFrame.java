@@ -73,17 +73,6 @@ class WebFrame extends HTMLElementBase {
     }
 
 
-    /**
-     * Returns the qualified name of a target frame.
-     *
-     */
-    static String getTargetFrameName( String sourceFrameName, final String relativeName ) {
-        if (relativeName.equalsIgnoreCase( WebRequest.PARENT_FRAME )) return getParentFrameName( sourceFrameName );
-        if (sourceFrameName.indexOf( ':' ) < 0) return relativeName;
-        return getParentFrameName( sourceFrameName ) + ':' + relativeName;
-    }
-
-
     static String getParentFrameName( String parentFrameName ) {
         if (parentFrameName.indexOf( ':' ) < 0) return WebRequest.TOP_FRAME;
         return parentFrameName.substring( 0, parentFrameName.lastIndexOf( ':' ) );

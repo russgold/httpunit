@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -258,8 +258,7 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "Num links in initial page", 1, initialPage.getLinks().length );
         WebLink link = initialPage.getLinks()[0];
 
-        WebRequest request = link.getRequest();
-        assertEquals( "Target for link", "blue", request.getTarget() );
+        assertEquals( "Target for link", "blue", link.getTarget() );
     }
 
 

@@ -348,6 +348,37 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    private void defineNestedFrames() throws Exception {
+        defineResource( "Topmost.html",
+                        "<HTML><HEAD><TITLE>Topmost</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"20%,80%\">" +
+                        "    <FRAME src=\"Target.html\" name=\"red\">" +
+                        "    <FRAME src=\"Inner.html\" name=\"blue\">" +
+                        "</FRAMESET></HTML>" );
+        defineResource( "Inner.html",
+                        "<HTML><HEAD><TITLE>Inner</TITLE></HEAD>" +
+                        "<FRAMESET rows=\"20%,80%\">" +
+                        "    <FRAME src=\"Form.html\" name=\"green\">" +
+                        "</FRAMESET></HTML>" );
+    }
+
+
+    public void testGetNestedFrameByName() throws Exception {
+        defineNestedFrames();
+        _wc.getResponse( getHostPath() + "/Topmost.html" );
+        _wc.getFrameContents( "green" );
+    }
+
+
+    public void testLinkWithAncestorTarget() throws Exception {
+        defineNestedFrames();
+        _wc.getResponse( getHostPath() + "/Topmost.html" );
+        WebResponse innerResponse = _wc.getFrameContents( "blue" ).getSubframeContents( "green" );
+        innerResponse.getLinks()[0].click();
+        assertEquals( "Title of 'red' frame", "Linker", _wc.getFrameContents( "red" ).getTitle() );
+    }
+
+
     public void testIFrameDetection() throws Exception {
         defineWebPage( "Frame",  "This is a trivial page with <a href='mailto:russgold@httpunit.org'>one link</a>" +
                                  "and <iframe name=center src='Contents.html'><form name=hidden></form></iframe>" );

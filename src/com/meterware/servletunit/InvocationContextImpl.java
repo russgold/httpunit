@@ -158,11 +158,11 @@ class InvocationContextImpl implements InvocationContext {
      * Constructs a servlet invocation context for a specified servlet container,
      * request, and cookie headers.
      **/
-    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+    InvocationContextImpl( ServletUnitClient client, ServletRunner runner, String target, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
         _client      = client;
         _application = runner.getApplication();
         _requestURL  = request.getURL();
-        _target      = request.getTarget();
+        _target      = target;
 
         final ServletUnitHttpRequest suhr = new ServletUnitHttpRequest( _application.getServletRequest( _requestURL ), request, runner.getContext(),
                                                        clientHeaders, messageBody );

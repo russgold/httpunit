@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,17 +21,14 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 import org.xml.sax.SAXException;
 
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 class FrameHolder {
 
@@ -49,7 +46,13 @@ class FrameHolder {
 
 
     WebResponse get( String target ) {
-        return (WebResponse) _contents.get( getFrameName( target ) );
+        final WebResponse response = (WebResponse) _contents.get( getFrameName( target ) );
+        if (response != null) return response;
+        for (Iterator iterator = _contents.keySet().iterator(); iterator.hasNext();) {
+            String name = (String) iterator.next();
+            if (name.endsWith( ':' + target )) return (WebResponse) _contents.get( name );
+        }
+        return null;
     }
 
 
@@ -60,6 +63,23 @@ class FrameHolder {
         }
 
         return result;
+    }
+
+
+    String getTargetFrame( WebRequest request ) {
+        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( request.getTarget() )) {
+            return WebRequest.TOP_FRAME;
+        } else if (WebRequest.TOP_FRAME.equalsIgnoreCase( request.getTarget() )) {
+            return WebRequest.TOP_FRAME;
+        } else {
+            final String computedTarget = getTargetFrameName( request.getSourceFrame(), request.getTarget() );
+            if (_contents.get( computedTarget ) != null) return computedTarget;
+            for (Iterator iterator = _contents.keySet().iterator(); iterator.hasNext();) {
+                String name = (String) iterator.next();
+                if (name.endsWith( ':' + request.getTarget() )) return name;
+            }
+            return request.getTarget();
+        }
     }
 
 
@@ -107,6 +127,15 @@ class FrameHolder {
         for (int i = 0; i < frameNames.length; i++) {
             _contents.put( frameNames[ i ], WebResponse.BLANK_RESPONSE );
         }
+    }
+
+    /**
+     * Returns the qualified name of a target frame.
+     */
+    private static String getTargetFrameName( String sourceFrameName, final String relativeName ) {
+        if (relativeName.equalsIgnoreCase( WebRequest.TOP_FRAME )) return WebRequest.TOP_FRAME;
+        if (sourceFrameName.indexOf( ':' ) < 0) return relativeName;
+        return WebFrame.getParentFrameName( sourceFrameName ) + ':' + relativeName;
     }
 
 }

@@ -13,7 +13,7 @@ Limitations:
 
 
 Revision History:
- 23-Feb-2003 1.5.2 release candidate
+ 27-Feb-2003 1.5.2 release candidate
 Acknowledgements:
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
     Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
@@ -28,6 +28,7 @@ Acknowledgements:
     Thanks to Raphael Corre for improving logger of transmitted headers
     Thanks to Jason Bedell for supplying an implementation for HttpSession.getValueNames.
     Thanks to Jianqin Qu for finding the getTableStartingWithPrefix bug when using NekoHTML
+    Thanks to Scott Fleischman for providing tests for missing frame handling functionality
 
 Problems Fixed:
     Packaging
@@ -72,13 +73,12 @@ Additions:
         5. Added support for <iframe> tag. IFrames work just like regular frames, except that they are embedded in a response
            without a <frameset> tag. IFrame support is controlled by the ClientProperties.iframeSupported property.
         6. WebForm.isHiddenParameter returns true if all parameters with the specified name are hidden
+        7. Frame handling is now more flexible, searching within a window for a target frame rather than just below the source frame.
     JavaScript
-        7. The Form.target property is now supported
         8. Added support for document.getElementById
         9. All HTML elements with id attributes are now accessible
+       10. The Form.target property is now supported
     ServletUnit
-       10. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked
-           through that servlet runner.
        11. ServletUnit now supports HttpServletRequest.getHeaderNames
        12. ServletUnit now handles https requests, marking them as "secure."
        13. ServletUnit now supports HttpServletResponse.flushBuffer()
@@ -87,6 +87,8 @@ Additions:
            the dispatched servlet. Calling popRequest reverts to the dispatching servlet.
        15. ServletUnit now loads and initializes servlets specified with the <load-on-startup> element.
        16. HttpServletResponse methods reset(), resetBuffer(), and setBufferSize() are now implemented.
+       17. ServletRunner.shutDown() will invoke the destroy() methods of any servlets which have been invoked
+           through that servlet runner.
 
 Notes:
     1. Upgraded NekoHTML to 0.7.2 which no longer generates superfluous <form> tags.

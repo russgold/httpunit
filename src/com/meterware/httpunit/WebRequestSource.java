@@ -1,7 +1,7 @@
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, Russell Gold
+ * Copyright (c) 2001-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -58,15 +58,23 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     /**
      * Returns the target for this request source.
-     **/
+     */
     public String getTarget() {
-        if (getSpecifiedTarget().length() == 0 || getSpecifiedTarget().equalsIgnoreCase( "_self" )) {
+        if (getSpecifiedTarget().length() == 0 || getSpecifiedTarget().equalsIgnoreCase( WebRequest.SAME_FRAME )) {
             return _pageFrame;
-        } else if (getSpecifiedTarget().equalsIgnoreCase( "_top" )) {
-            return "_top";
+        } else if (getSpecifiedTarget().equalsIgnoreCase( WebRequest.PARENT_FRAME )) {
+            return WebFrame.getParentFrameName( _pageFrame );
         } else {
-            return WebFrame.getTargetFrameName( _pageFrame, getSpecifiedTarget() );
+            return getSpecifiedTarget();
         }
+    }
+
+
+    /**
+     * Returns the name of the frame containing this request source.
+     */
+    public String getPageFrame() {
+        return _pageFrame;
     }
 
 

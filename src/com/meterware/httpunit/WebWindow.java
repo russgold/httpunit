@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -146,7 +146,7 @@ public class WebWindow {
         _client.tellListeners( request );
 
         WebResponse response = null;
-        final String frameName = getTargetFrame( request.getTarget() );
+        final String frameName = getTargetFrame( request );
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
             response = WebResponse.BLANK_RESPONSE;
@@ -164,13 +164,10 @@ public class WebWindow {
     }
 
 
-    private String getTargetFrame( String target ) {
-        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
-            return WebRequest.TOP_FRAME;
-        } else {
-            return target;
-        }
+    String getTargetFrame( WebRequest request ) {
+        return _frameContents.getTargetFrame( request );
     }
+
 
     /**
      * Returns the name of the currently active frames.

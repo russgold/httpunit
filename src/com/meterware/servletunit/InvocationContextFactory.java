@@ -36,6 +36,6 @@ public interface InvocationContextFactory {
     /**
      * Creates and returns a new invocation context to test calling of servlet methods.
      **/
-    public InvocationContext newInvocation( ServletUnitClient client, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException;
+    public InvocationContext newInvocation( ServletUnitClient client, String targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException;
 
 }

@@ -94,9 +94,17 @@ public class WebRequest {
 
     /**
      * Returns the target for this web request.
-     **/
+     */
     public String getTarget() {
-        return _target;
+        return _requestTarget;
+    }
+
+
+    /**
+     * Returns the frame from which this request originates.
+     */
+    String getSourceFrame() {
+        return _sourceFrame;
     }
 
 
@@ -281,7 +289,7 @@ public class WebRequest {
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
     protected WebRequest( URL urlBase, String urlString, String target ) {
-        this( urlBase, urlString, target, new UncheckedParameterHolder() );
+        this( urlBase, urlString, TOP_FRAME, target, new UncheckedParameterHolder() );
     }
 
 
@@ -298,7 +306,7 @@ public class WebRequest {
 
 
     protected WebRequest( WebRequestSource requestSource ) {
-        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getTarget(), newParameterHolder( requestSource ) );
+        this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getPageFrame(), requestSource.getTarget(), newParameterHolder( requestSource ) );
         _webRequestSource = requestSource;
         setHeaderField( "Referer", requestSource.getBaseURL().toExternalForm() );
     }
@@ -316,10 +324,11 @@ public class WebRequest {
     /**
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
-    private WebRequest( URL urlBase, String urlString, String target, ParameterHolder parameterHolder ) {
+    private WebRequest( URL urlBase, String urlString, String sourceFrame, String requestTarget, ParameterHolder parameterHolder ) {
         _urlBase   = urlBase;
+        _sourceFrame = sourceFrame;
+        _requestTarget = requestTarget;
         _urlString = urlString.toLowerCase().startsWith( "http" ) ? escape( urlString ) : urlString;
-        _target    = target;
         _parameterHolder = parameterHolder;
     }
 
@@ -430,16 +439,18 @@ public class WebRequest {
 //---------------------------------- package members --------------------------------
 
     /** The target indicating the topmost frame of a window. **/
-    final static String TOP_FRAME = "_top";
+    static final String TOP_FRAME = "_top";
 
     /** The target indicating the parent of a frame. **/
-    final static String PARENT_FRAME = "_parent";
+    static final String PARENT_FRAME = "_parent";
 
     /** The target indicating a new, empty window. **/
-    final static String NEW_WINDOW = "_blank";
+    static final String NEW_WINDOW = "_blank";
 
+    /** The target indicating the same frame. **/
+    static final String SAME_FRAME = "_self";
 
-   WebRequestSource getWebRequestSource() {
+    WebRequestSource getWebRequestSource() {
         return _webRequestSource;
     }
 
@@ -459,8 +470,9 @@ public class WebRequest {
     private final ParameterHolder _parameterHolder;
 
     private URL          _urlBase;
+    private String       _sourceFrame;
+    private String       _requestTarget;
     private String       _urlString;
-    private String       _target = TOP_FRAME;
     private Hashtable    _headers;
     private WebRequestSource _webRequestSource;
 

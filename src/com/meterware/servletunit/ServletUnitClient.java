@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,6 +38,8 @@ import org.xml.sax.SAXException;
  * calling any servlet methods which may be desired.  Even in this latter mode, end-to-end
  * testing is supported, but requires a call to this class's getResponse method to update
  * its cookies and frames.
+ *
+ * @author <a href="russgold@httpunit.org">Russell Gold</a>
  **/
 public class ServletUnitClient extends WebClient {
 
@@ -64,7 +66,7 @@ public class ServletUnitClient extends WebClient {
     public InvocationContext newInvocation( WebRequest request ) throws IOException, MalformedURLException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeMessageBody( request, baos );
-        return _invocationContextFactory.newInvocation( this, request, getHeaderFields( request.getURL() ), baos.toByteArray() );
+        return _invocationContextFactory.newInvocation( this, getTargetFrame( request ), request, getHeaderFields( request.getURL() ), baos.toByteArray() );
     }
 
 
