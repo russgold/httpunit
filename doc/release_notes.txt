@@ -16,7 +16,7 @@ Limitations:
 Revision History:
 28-Oct-2004:
     Acknowledgements:
-        Thanks to Vladimir Korenev for providing an implementation for style.visibility
+        Thanks to Vladimir Korenev for providing an implementation for style.visibility, element.tagName, and element.nodeName
 
     Problems fixed:
         1. patch #1046516 property style.visibility is now supported

@@ -674,6 +674,31 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+     public void testTagNameNodeNameProperties() throws Exception {
+         defineResource( "start.html",
+                 "<html><head><script language='JavaScript'>\n" +
+                 "function showTagName(id) {\n" +
+                 "  var element = document.getElementById( id );\n" +
+                 "  alert( 'element id=' + id + ', tagName='  + element.tagName + ', nodeName='  + element.nodeName );\n" +
+                 "}\n" +
+                 "function doAll() {\n" +
+                 "  showTagName('body_id')\n" +
+                 "  showTagName('iframe_id')\n" +
+                 "  showTagName('div_id')\n" +
+                 "}\n" +
+                 "</script>\n" +
+                 "</head><body id='body_id' onLoad='doAll();'>\n" +
+                 "<div id='div_id'><iframe id='iframe_id' /></div>\n" +
+                 "</body></html>" );
+         WebConversation wc = new WebConversation();
+         wc.getResponse( getHostPath() + "/start.html" );
+
+         assertEquals( "element id=body_id, tagName=BODY, nodeName=BODY", wc.popNextAlert() );
+         assertEquals( "element id=iframe_id, tagName=IFRAME, nodeName=IFRAME", wc.popNextAlert() );
+         assertEquals( "element id=div_id, tagName=DIV, nodeName=DIV", wc.popNextAlert() );
+     }
+
+
     public void testReadNoCookie() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function viewCookies() { \n" +

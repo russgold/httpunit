@@ -83,4 +83,12 @@ public interface HTMLElement {
      * @since 1.6
      */
     String getText();
+
+
+    /**
+     * Returns the tag name of this node.
+     *
+     * @since 1.6.1
+     */
+    String getTagName();
 }

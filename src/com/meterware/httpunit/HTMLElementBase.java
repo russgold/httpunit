@@ -85,6 +85,11 @@ class HTMLElementBase implements HTMLElement {
     }
 
 
+    public String getTagName() {
+        return _node.getNodeName();
+    }
+
+
     protected HTMLElementBase( Node node ) {
         _node = node;
         supportAttribute( "id" );

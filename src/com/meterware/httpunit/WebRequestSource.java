@@ -297,6 +297,11 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
 
+    public String getTagName() {
+        return _node.getNodeName();
+    }
+
+
     String getAttribute( final String name, String defaultValue ) {
         return NodeUtils.getNodeAttribute( _node, name, defaultValue );
     }
