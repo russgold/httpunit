@@ -192,14 +192,14 @@ public class WebLink extends FixedURLWebRequestSource {
 
         MATCH_TEXT = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
-                return HttpUnitUtils.matches( ((WebLink) htmlElement).asText(), (String) criteria );
+                return HttpUnitUtils.matches( ((WebLink) htmlElement).getText(), (String) criteria );
             };
         };
 
 
         MATCH_CONTAINED_TEXT = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
-                return HttpUnitUtils.contains( ((WebLink) htmlElement).asText(), (String) criteria );
+                return HttpUnitUtils.contains( ((WebLink) htmlElement).getText(), (String) criteria );
             };
         };
 

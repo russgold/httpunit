@@ -76,7 +76,7 @@ class ParsedHTML {
     private WebLink[]    _links;
 
     private ArrayList      _blocksList = new ArrayList();
-    private BlockElement[] _blocks;
+    private TextBlock[] _blocks;
 
     private ArrayList    _appletList = new ArrayList();
     private WebApplet[]  _applets;
@@ -150,12 +150,31 @@ class ParsedHTML {
      * Returns the top-level block elements found in the page in the order in which they appear.
      * @return
      */
-    public BlockElement[] getTextBlocks() {
+    public TextBlock[] getTextBlocks() {
         if (_blocks == null) {
             loadElements();
-            _blocks = (BlockElement[]) _blocksList.toArray( new BlockElement[ _blocksList.size() ] );
+            _blocks = (TextBlock[]) _blocksList.toArray( new TextBlock[ _blocksList.size() ] );
         }
         return _blocks;
+    }
+
+
+    /**
+     * Returns the first text block found in the page which matches the specified predicate and value.
+     */
+    public TextBlock getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) {
+        TextBlock[] blocks = getTextBlocks();
+        for (int i = 0; i < blocks.length; i++) {
+            if (predicate.matchesCriteria( blocks[i], criteria )) return blocks[i];
+        }
+        return null;
+    }
+
+
+    public TextBlock getNextTextBlock( TextBlock block ) {
+        int index = _blocksList.indexOf( block );
+        if (index < 0 || index == _blocksList.size() - 1) return null;
+        return (TextBlock) _blocksList.get( index+1 );
     }
 
 
@@ -394,7 +413,7 @@ class ParsedHTML {
         }
 
         protected ParsedHTML getRootContext( NodeUtils.PreOrderTraversal pot ) {
-            return (ParsedHTML) pot.getContexts().next();
+            return (ParsedHTML) pot.getRootContext();
         }
     }
 
@@ -442,6 +461,22 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toTextBlock( element );
         }
+
+
+        protected boolean addToContext() {
+            return true;
+        }
+
+
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            for (Iterator i = pot.getContexts(); i.hasNext();) {
+                Object o = i.next();
+                if (!(o instanceof ParsedHTML)) continue;
+                ((ParsedHTML) o).addToList( htmlElement );
+                break;
+            }
+        }
+
     }
 
 
@@ -584,6 +619,42 @@ class ParsedHTML {
     }
 
 
+    static class WebListFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            return parsedHTML.toOrderedList( element );
+        }
+
+        protected boolean addToContext() { return true; }
+
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+            TextBlock textBlock = getTextBlock( pot );
+            if (textBlock != null) textBlock.addList( (WebList) htmlElement );
+        }
+
+        private TextBlock getTextBlock( NodeUtils.PreOrderTraversal pot ) {
+            return (TextBlock) getClosestContext( pot, TextBlock.class );
+        }
+    }
+
+
+    static class ListItemFactory extends HTMLElementFactory {
+        HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
+            WebList webList = getWebList( pot );
+            if (webList == null) return null;
+            return webList.addNewItem( element );
+        }
+
+        private WebList getWebList( NodeUtils.PreOrderTraversal pot ) {
+            return (WebList) getClosestContext( pot, WebList.class );
+        }
+
+        protected boolean addToContext() { return true; }
+
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
+        }
+    }
+
+
     private static HashMap _htmlFactoryClasses = new HashMap();
     private static HTMLElementFactory _defaultFactory = new DefaultElementFactory();
 
@@ -601,6 +672,9 @@ class ParsedHTML {
         _htmlFactoryClasses.put( "iframe",   new WebIFrameFactory() );
         _htmlFactoryClasses.put( "script",   new ScriptFactory() );
         _htmlFactoryClasses.put( "noscript", new NoScriptFactory() );
+        _htmlFactoryClasses.put( "ol",       new WebListFactory() );
+        _htmlFactoryClasses.put( "ul",       new WebListFactory() );
+        _htmlFactoryClasses.put( "li",       new ListItemFactory() );
 
         for (int i = 0; i < TEXT_ELEMENTS.length; i++) {
             _htmlFactoryClasses.put( TEXT_ELEMENTS[i], new TextBlockFactory() );
@@ -699,13 +773,18 @@ class ParsedHTML {
     }
 
 
-    private BlockElement toTextBlock( Element element ) {
-        return new BlockElement( _response, _frame, _baseURL, _baseTarget, element, _characterSet );
+    private TextBlock toTextBlock( Element element ) {
+        return new TextBlock( _response, _frame, _baseURL, _baseTarget, element, _characterSet );
     }
 
 
-    private BlockElement newTextBlock( Node textNode ) {
-        return new BlockElement( _response, _frame, _baseURL, _baseTarget, textNode, _characterSet );
+    private TextBlock newTextBlock( Node textNode ) {
+        return new TextBlock( _response, _frame, _baseURL, _baseTarget, textNode, _characterSet );
+    }
+
+
+    private WebList toOrderedList( Element element ) {
+        return new WebList( _response, _frame, _baseURL, _baseTarget, element, _characterSet );
     }
 
 
@@ -822,18 +901,6 @@ class ParsedHTML {
         WebImage[] images = getImages();
         for (int i = 0; i < images.length; i++) {
             if (HttpUnitUtils.matches( altText, images[i].getAltText() )) return images[i];
-        }
-        return null;
-    }
-
-
-    /**
-     * Returns the first text block found in the page which matches the specified predicate and value.
-     */
-    public BlockElement getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) {
-        BlockElement[] blocks = getTextBlocks();
-        for (int i = 0; i < blocks.length; i++) {
-            if (predicate.matchesCriteria( blocks[i], criteria )) return blocks[i];
         }
         return null;
     }

@@ -20,7 +20,6 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import junit.framework.TestSuite;
-import org.xml.sax.SAXException;
 
 import java.io.StringReader;
 import java.io.BufferedReader;
@@ -56,7 +55,7 @@ public class TextBlockTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/SimplePage.html" );
         assertEquals( "Number of paragraphs", 3, response.getTextBlocks().length );
         assertEquals( "First paragraph", "This has no forms or links since we don't care about them", response.getTextBlocks()[0].getText() );
-        BlockElement comment = response.getFirstMatchingTextBlock( BlockElement.MATCH_CLASS, "comment" );
+        BlockElement comment = response.getFirstMatchingTextBlock( TextBlock.MATCH_CLASS, "comment" );
         assertNotNull( "Did not find a comment paragraph", comment );
         assertEquals( "Comment paragraph", "But it does have three paragraphs", comment.getText() );
     }
@@ -82,27 +81,55 @@ public class TextBlockTest extends HttpUnitTest {
                         "<p>Some more text</p>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/SimplePage.html" );
-        BlockElement header1 = response.getFirstMatchingTextBlock( BlockElement.MATCH_TAG, "H1" );
+        TextBlock header1 = response.getFirstMatchingTextBlock( TextBlock.MATCH_TAG, "H1" );
         assertNotNull( "Did not find the H1 header", header1 );
         assertEquals( "H1 header", "Here is a section", header1.getText() );
-        BlockElement header2 = response.getFirstMatchingTextBlock( BlockElement.MATCH_TAG, "h2" );
+        TextBlock header2 = response.getFirstMatchingTextBlock( TextBlock.MATCH_TAG, "h2" );
         assertNotNull( "Did not find the h2 header", header2 );
         assertEquals( "H2 header", "A subsection", header2.getText() );
-        assertEquals( "Text under header 1", "with some text", response.getTextBlocks()[ getBlockIndex( response, header1 )+1 ].getText() );
+        assertEquals( "Text under header 1", "with some text", response.getNextTextBlock( header1 ).getText() );
     }
 
 
-    private static int getBlockIndex( WebResponse response, BlockElement header1 ) throws SAXException {
-        int index = -1;
-        BlockElement[] blocks = response.getTextBlocks();
-        for (int i = 0; i < blocks.length; i++) {
-            BlockElement block = blocks[i];
-            if (block == header1) {
-                index = i;
-                break;
-            }
-        }
-        return index;
+    public void testEmbeddedLinks() throws Exception {
+        defineWebPage( "SimplePage",
+                        "<h1>Here is a section</h1>\n" +
+                        "<p>with a <a id='httpunit' href='http://httpunit.org'>link to the home page</a></p>"  );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/SimplePage.html" );
+        BlockElement paragraph = response.getTextBlocks()[1];
+        assertNotNull( "Did not retrieve any links", paragraph.getLinks() );
+        assertNotNull( "Did not find the httpunit link", paragraph.getLinkWithID( "httpunit" ) );
+        assertNull( "Should not have found the httpunit link in the header", response.getTextBlocks()[0].getLinkWithID( "httpunit" ) );
+        assertNotNull( "Did not find the home page link", paragraph.getFirstMatchingLink( WebLink.MATCH_CONTAINED_TEXT, "home page" ) );
+        assertEquals( "embedded link url", "http://httpunit.org", paragraph.getLinkWithID( "httpunit" ).getRequest().getURL().toExternalForm() );
+    }
+
+
+    public void testEmbeddedLists() throws Exception {
+        defineWebPage( "SimplePage",
+                        "<h1>Here is a section</h1>\n" +
+                        "<p id='ordered'><ol><li>One<li>Two<li>Three</ol></p>" +
+                        "<p id='unordered'><ul><li>Red<li>Green<li>Blue</ul></p>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/SimplePage.html" );
+        TextBlock paragraph = (TextBlock) response.getElementWithID( "ordered" );
+        WebList[] lists = paragraph.getLists();
+        assertTrue( "No lists found", lists.length > 0);
+        WebList orderedList = lists[0];
+        assertEquals( "ordered list type", WebList.ORDERED_LIST, orderedList.getListType() );
+        assertEquals( "ordered list size", 3, orderedList.getItems().length );
+        assertEquals( "Second ordered list item", "Two", orderedList.getItems()[1].getText() );
+    }
+
+
+    public void ntestFormattingDetection() throws Exception {
+        String expectedText = "Here is some bold text and some bold italic text";
+        defineWebPage( "FormattedPage", "<p>Here is some <b>bold</b> text and some <b><i>bold italic</i></b> text</p>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/FormattedPage.html" );
+        TextBlock paragraph = response.getTextBlocks()[0];
+        assertMatchingSet( "Attributes for word 'bold'", new String[] { "b" }, paragraph.getFormats( expectedText.indexOf( "bold" )));
     }
 
 }

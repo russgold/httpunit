@@ -30,13 +30,7 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class BlockElement extends ParsedHTML implements HTMLSegment, HTMLElement {
-
-    /** Predicate to match part or all of a block's class attribute. **/
-    public final static HTMLElementPredicate MATCH_CLASS;
-
-    /** Predicate to match the tag associated with a block (case insensitive). **/
-    public final static HTMLElementPredicate MATCH_TAG;
+abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HTMLElement {
 
 
     private ScriptableDelegate _scriptable;
@@ -162,23 +156,5 @@ public class BlockElement extends ParsedHTML implements HTMLSegment, HTMLElement
 
     protected int getAttributeValue( Node node, String attributeName, int defaultValue ) {
         return NodeUtils.getAttributeValue( node, attributeName, defaultValue );
-    }
-
-
-    static {
-        MATCH_CLASS = new HTMLElementPredicate() {
-            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
-                if (criteria == null) criteria = "";
-                return ((BlockElement) htmlElement).getClassName().equalsIgnoreCase( criteria.toString() );
-            };
-        };
-
-
-        MATCH_TAG = new HTMLElementPredicate() {
-            public boolean matchesCriteria( Object htmlElement, Object criteria ) {
-                if (criteria == null) criteria = "";
-                return criteria.toString().equalsIgnoreCase( ((BlockElement) htmlElement).getTagName() );
-            };
-        };
     }
 }

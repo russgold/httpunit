@@ -26,6 +26,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.Stack;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 
@@ -137,7 +138,32 @@ class NodeUtils {
 
 
         public Iterator getContexts() {
-            return _traversalContext.iterator();
+            Stack stack = _traversalContext;
+            return getTopDownIterator( stack );
+        }
+
+
+        public Object getRootContext() {
+            return _traversalContext.firstElement();
+        }
+
+
+        private Iterator getTopDownIterator( final Stack stack ) {
+            return new Iterator() {
+                private ListIterator _forwardIterator = stack.listIterator( stack.size() );
+
+                public boolean hasNext() {
+                    return _forwardIterator.hasPrevious();
+                }
+
+                public Object next() {
+                    return _forwardIterator.previous();
+                }
+
+                public void remove() {
+                    _forwardIterator.remove();
+                }
+            };
         }
 
 

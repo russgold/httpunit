@@ -21,6 +21,9 @@ Revision History:
        1. A frameset 'onload' event is now invoked after all of its subframes have been loaded
        2. ServletUnit's HttpServletRequest.getCookies() method was only returning the first cookie defined in the request
 
+   Additions:
+       1. Added preliminary support for lists
+
 28-Jul-2004
    Additions:
        1. rfe #986876: The WebClient.addCookie method has been deprecated, since its behavior is actually a bit confusing

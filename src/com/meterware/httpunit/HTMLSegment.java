@@ -163,7 +163,7 @@ public interface HTMLSegment {
      * Returns the top-level block elements found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the segment.
      */
-    public BlockElement[] getTextBlocks() throws SAXException;
+    public TextBlock[] getTextBlocks() throws SAXException;
 
 
     /**

@@ -494,16 +494,30 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    public BlockElement[] getTextBlocks() throws SAXException {
+    /**
+     * Returns an array of text blocks found in the page.
+     * @since 1.5.5
+     */
+    public TextBlock[] getTextBlocks() throws SAXException {
         return getReceivedPage().getTextBlocks();
     }
 
 
     /**
+     * Returns the text block after the specified block, if any.
+     * @since 1.5.5
+     */
+    public TextBlock getNextTextBlock( TextBlock block ) throws SAXException {
+        return getReceivedPage().getNextTextBlock( block );
+    }
+
+
+    /**
      * Returns the first link found in the page matching the specified criteria.
+     * @since 1.5.5
      * @exception SAXException thrown if there is an error parsing the response.
      **/
-    public BlockElement getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
+    public TextBlock getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) throws SAXException {
         return getReceivedPage().getFirstMatchingTextBlock( predicate, criteria );
     }
 
