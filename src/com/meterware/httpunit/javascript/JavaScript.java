@@ -81,6 +81,15 @@ public class JavaScript {
     }
 
 
+    /**
+     * Runs the onload event for the specified web response.
+     */
+    public static void load( WebResponse response ) throws ClassDefinitionException, InstantiationException, IllegalAccessException, InvocationTargetException, PropertyException, JavaScriptException, SAXException, NotAFunctionException {
+        if (!(response.getScriptableObject().getScriptEngine() instanceof JavaScriptEngine)) run( response );
+        response.getScriptableObject().load();
+    }
+
+
     private static void initHTMLObjects( Scriptable scope ) throws IllegalAccessException, InstantiationException,
             InvocationTargetException, ClassDefinitionException, PropertyException {
         ScriptableObject.defineClass( scope, Window.class );
@@ -425,8 +434,6 @@ public class JavaScript {
 
             _screen = (Screen) Context.getCurrentContext().newObject( this, "Screen" );
             _screen.setClientProperties( getDelegate().getClientProperties() );
-
-            getDelegate().load();
         }
 
 

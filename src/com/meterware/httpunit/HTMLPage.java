@@ -65,9 +65,15 @@ public class HTMLPage extends ParsedHTML {
      * Returns the onLoad event script.
      */
     public String getOnLoadEvent() throws SAXException {
-        NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "body" );
-        if (nl.getLength() == 0) return "";
-        return ((Element) nl.item(0)).getAttribute( "onload" );
+        Element mainElement = getMainElement( ((Document) getOriginalDOM()) );
+        return mainElement == null ? "" : mainElement.getAttribute( "onload" );
+    }
+
+
+    private Element getMainElement( Document document ) {
+        NodeList nl = document.getElementsByTagName( "frameset" );
+        if (nl.getLength() == 0) nl = document.getElementsByTagName( "body" );
+        return nl.getLength() == 0 ? null : ((Element) nl.item(0));
     }
 
 

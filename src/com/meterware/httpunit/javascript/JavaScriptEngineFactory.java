@@ -53,6 +53,18 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
     }
 
 
+    public void load( WebResponse response ) {
+        try {
+            JavaScript.load( response );
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException( e.toString() );
+        }
+    }
+
+
     public void setThrowExceptionsOnError( boolean throwExceptions ) {
         JavaScript.setThrowExceptionsOnError( throwExceptions );
     }

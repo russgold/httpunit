@@ -474,6 +474,7 @@ public abstract class HttpUnitOptions {
     private static final ScriptingEngineFactory NULL_SCRIPTING_ENGINE_FACTORY = new ScriptingEngineFactory() {
         public boolean isEnabled() { return false; }
         public void associate( WebResponse response ) {}
+        public void load( WebResponse response ) {}
         public void setThrowExceptionsOnError( boolean throwExceptions ) {}
         public boolean isThrowExceptionsOnError() { return false; }
         public String[] getErrorMessages() { return new String[ 0 ]; }

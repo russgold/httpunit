@@ -39,6 +39,12 @@ public interface ScriptingEngineFactory {
     public void associate( WebResponse response );
 
     /**
+     * Runs the 'onload' event (if any) for the specified HTML web response. Will associate a scripting engine with
+     * the response if that has not already been done.
+     **/
+    public void load( WebResponse response );
+
+    /**
      * Determines whether script errors result in exceptions or warning messages.
      */
     public void setThrowExceptionsOnError( boolean throwExceptions );

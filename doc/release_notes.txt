@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+ 8-Aug-2004
+   Thanks to Guillaume Dandurand <Guillaume.Dandurand@cn.ca> for supplying code to get the onload event when the page
+         is a frameset rather than a regular page.
+
+   Problems fixed:
+       1. A frameset 'onload' event is now invoked after all of its subframes have been loaded
+
 28-Jul-2004
    Additions:
        1. rfe #986876: The WebClient.addCookie method has been deprecated, since its behavior is actually a bit confusing

@@ -41,7 +41,7 @@ class RequestContext {
     void runScripts() throws SAXException {
         for (Iterator iterator = _newResponses.iterator(); iterator.hasNext();) {
             WebResponse response = (WebResponse) iterator.next();
-            HttpUnitOptions.getScriptingEngine().associate( response );
+            HttpUnitOptions.getScriptingEngine().load( response );
         }
     }
 }

@@ -223,7 +223,40 @@ public class FrameScriptingTest extends HttpUnitTest {
 
 
     /**
-     * Verifies that when JavaScript overwrites an empty frame, other empty frames stay empty.
+     * Verifies that the onload event of a frameset can access subframes.
+     */
+    public void testFrameOnLoadEvent() throws Exception {
+        defineWebPage( "OneForm", "<form name='form'><input name=text value='nothing special'></form>");
+        defineResource("Frames.html",
+                "<html><frameset onload='alert( green.document.form.text.value );'>" +
+                "    <frame src='OneForm.html' name='green'>" +
+                "    <frame name=blue>" +
+                "</frameset></htmlL>");
+
+        _wc.getResponse(getHostPath() + "/Frames.html");
+        assertEquals( "On load message", "nothing special", _wc.popNextAlert() );
+    }
+
+
+    /**
+     * Verifies that the onload event of a frameset runs even if there is a noframes tag present that contains a body tag.
+     */
+    public void testFrameOnLoadEventWithNoFrames() throws Exception {
+        defineWebPage( "OneForm", "<form name='form'><input name=text value='nothing special'></form>");
+        defineResource("Frames.html",
+                "<html><frameset onload='alert( green.document.form.text.value );'>" +
+                "    <frame src='OneForm.html' name='green'>" +
+                "    <frame name=blue>" +
+                "    <noframes><body></body></noframes>" +
+                "</frameset></htmlL>");
+
+        _wc.getResponse(getHostPath() + "/Frames.html");
+        assertEquals( "On load message", "nothing special", _wc.popNextAlert() );
+    }
+
+
+    /**
+     * Verifies that IFrames can be found using their id.
      */
     public void testIFrameAccessById() throws Exception {
         defineWebPage( "Frames",
