@@ -319,7 +319,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * HTTP Content-Length header.
      **/
     public void setContentLength( int len ) {
-        throw new RuntimeException( "setContentLength not implemented" );
+        setIntHeader( "Content-Length", len );
     }
 
 

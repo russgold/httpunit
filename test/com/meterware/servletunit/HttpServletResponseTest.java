@@ -66,6 +66,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
     public void testSimpleResponse() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         servletResponse.setContentType( "text/html" );
+        servletResponse.setContentLength( 65 );
         PrintWriter pw = servletResponse.getWriter();
         pw.println( "<html><head><title>Sample Page</title></head><body></body></html>" );
 
@@ -73,6 +74,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         assertEquals( "Status code", HttpServletResponse.SC_OK, response.getResponseCode() );
         assertEquals( "Content type", "text/html", response.getContentType() );
         assertEquals( "Title", "Sample Page", response.getTitle() );
+        assertEquals( "Content length", 65, response.getContentLength() );
     }
 
 
