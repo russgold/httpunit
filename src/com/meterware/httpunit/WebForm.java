@@ -19,14 +19,12 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.io.IOException;
 import java.net.URL;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -391,6 +389,24 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Returns true if the named parameter is read-only. If more than one control exists with the same name,
+     * will return true only if all such controls are read-only.
+     **/
+    public boolean isReadOnlyParameter( String name ) {
+        return getParameter( name ).isReadOnlyParameter();
+    }
+
+
+    /**
+     * Returns true if the named parameter is disabled. If more than one control exists with the same name,
+     * will return true only if all such controls are read-only.
+     **/
+    public boolean isDisabledParameter( String name ) {
+        return getParameter( name ).isDisabledParameter();
+    }
+
+
+    /**
      * Creates and returns a web request which will simulate the submission of this form with an unnamed submit button.
      **/
     public WebRequest getRequest() {
@@ -672,141 +688,6 @@ public class WebForm extends WebRequestSource {
 
 }
 
-
-class FormParameter {
-
-    void addControl( FormControl control ) {
-        _controls = null;
-        if (_name == null) _name = control.getName();
-        if (!_name.equalsIgnoreCase( control.getName() )) throw new RuntimeException( "all controls should have the same name" );
-        if (control.isExclusive()) {
-            getRadioGroup().addRadioButton( (RadioButtonFormControl) control );
-        } else {
-            _controlList.add( control );
-        }
-    }
-
-
-    private FormControl[] getControls() {
-        if (_controls == null) _controls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
-        return _controls;
-    }
-
-
-    Object getScriptableObject() {
-        if (getControls().length == 1) {
-            return getControls()[0].getDelegate();
-        } else {
-            ArrayList list = new ArrayList();
-            for (int i = 0; i < _controls.length; i++) {
-                FormControl control = _controls[i];
-                if (control instanceof CheckboxFormControl) {
-                    list.add( control.getScriptableObject() );
-                }
-            }
-            return list.toArray( new ScriptableDelegate[ list.size() ] );
-        }
-    }
-
-
-    String[] getValues() {
-        ArrayList valueList = new ArrayList();
-        FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) {
-            valueList.addAll( Arrays.asList( controls[i].getValues() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
-    }
-
-
-    void setValues( String[] values ) {
-        ArrayList list = new ArrayList( values.length );
-        list.addAll( Arrays.asList( values ) );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimRequiredValues( list );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimUniqueValue( list );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimValue( list );
-        if (!list.isEmpty()) throw new UnusedParameterValueException( _name, (String) list.get(0) );
-    }
-
-
-    void setFiles( UploadFileSpec[] fileArray ) {
-        ArrayList list = new ArrayList( fileArray.length );
-        list.addAll( Arrays.asList( fileArray ) );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimUploadSpecification( list );
-        if (!list.isEmpty()) throw new UnusedUploadFileException( _name, fileArray.length - list.size(), fileArray.length );
-    }
-
-
-    String[] getOptions() {
-        ArrayList optionList = new ArrayList();
-        FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) {
-            optionList.addAll( Arrays.asList( controls[i].getDisplayedOptions() ) );
-        }
-        return (String[]) optionList.toArray( new String[ optionList.size() ] );
-    }
-
-
-    String[] getOptionValues() {
-        ArrayList valueList = new ArrayList();
-        for (int i = 0; i < getControls().length; i++) {
-            valueList.addAll( Arrays.asList( getControls()[i].getOptionValues() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
-    }
-
-
-    boolean isMultiValuedParameter() {
-        FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isMultiValued()) return true;
-            if (!controls[i].isExclusive() && controls.length > 1) return true;
-        }
-        return false;
-    }
-
-
-    int getNumTextParameters() {
-        int result = 0;
-        FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isTextControl()) result++;
-        }
-        return result;
-    }
-
-
-    boolean isTextParameter() {
-        FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isTextControl()) return true;
-        }
-        return false;
-    }
-
-
-    boolean isFileParameter() {
-        FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].isFileParameter()) return true;
-        }
-        return false;
-    }
-
-
-    private FormControl[] _controls;
-    private ArrayList _controlList = new ArrayList();
-    private RadioGroupFormControl _group;
-    private String _name;
-
-    private RadioGroupFormControl getRadioGroup() {
-        if (_group == null) {
-            _group = new RadioGroupFormControl();
-            _controlList.add( _group );
-        }
-        return _group;
-    }
-}
 
 
 //========================================== class PresetFormParameter =================================================

@@ -11,7 +11,17 @@ Limitations:
 
 
 Revision History:
- 1-Oct-2002
+ 2-Oct-2002
+
+Acknowledgements:
+    Thanks to Ken Corbin for adding tests for disabled and read-only parameters.
+
+Additions:
+    1. WebForm now supports 'isReadOnlyParameter' and 'isDisabledParameter' which allow checking of the state of a
+       particular form parameter. Note that if multiple controls exist with the same name, these methods only return
+       true when all such controls are read-only or disabled, as appropriate.
+
+ 2-Oct-2002 1.4.6
 Acknowledgements:
     Thanks to Ville Skyttä for removing the test dependency on xerces.
     Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.

@@ -260,6 +260,11 @@ public class FormParametersTest extends HttpUnitTest {
         WebForm form = page.getForms()[0];
         WebRequest request = page.getForms()[0].getRequest();
 
+        assertFalse( "'color' incorrectly reported as read-only", form.isReadOnlyParameter( "color" ) );
+        assertFalse( "'species' incorrectly reported as read-only", form.isReadOnlyParameter( "species" ) );
+        assertTrue( "'big' should be reported as read-only", form.isReadOnlyParameter( "big" ) );
+        assertTrue( "'age' should be reported as read-only", form.isReadOnlyParameter( "age" ) );
+
         assertMatchingSet( "selected color", new String[] { "red" }, form.getParameterValues( "color" ) );
         assertEquals( "selected animal", "kangaroo", form.getParameterValue( "species" ) );
         assertEquals( "age", "12", form.getParameterValue( "age" ) );
@@ -294,6 +299,11 @@ public class FormParametersTest extends HttpUnitTest {
         WebForm form = page.getForms()[0];
         WebRequest request = page.getForms()[0].getRequest();
         assertEquals( "Expected request URL", getHostPath() + "/ask?species=kangaroo", request.getURL().toExternalForm() );
+
+        assertFalse( "'color' incorrectly reported as disabled", form.isDisabledParameter( "color" ) );
+        assertFalse( "'species' incorrectly reported as disabled", form.isDisabledParameter( "species" ) );
+        assertTrue( "'big' should be reported as disabled", form.isDisabledParameter( "big" ) );
+        assertTrue( "'age' should be reported as disabled", form.isDisabledParameter( "age" ) );
 
         assertMatchingSet( "selected color", new String[] { "red" }, form.getParameterValues( "color" ) );
         assertEquals( "selected animal", "kangaroo", form.getParameterValue( "species" ) );
