@@ -215,8 +215,7 @@ public class FormParametersTest extends HttpUnitTest {
                                        "<Input type=radio name=species value=kangaroo checked>" +
                                        "<Input type=radio name=species value=lemur>" +
                                        "<textarea name='big' readonly rows=2 cols=40>stop me</textarea>" +
-                                       "<Input type=text name=age value=12 readonly value='12'>" +
-                                       "<Input type=submit name=change disabled></form>" );
+                                       "<Input type=text name=age value=12 readonly value='12'></form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = page.getForms()[0].getRequest();
@@ -225,7 +224,6 @@ public class FormParametersTest extends HttpUnitTest {
         assertEquals( "selected animal", "kangaroo", form.getParameterValue( "species" ) );
         assertEquals( "age", "12", form.getParameterValue( "age" ) );
 
-        assertNull( "Found disabled button", form.getSubmitButton( "change" ) );
         assertMatchingSet( "color choices", new String[] { "red", "blue" }, form.getOptionValues( "color" ) );
         assertMatchingSet( "species choices", new String[] { "kangaroo", "lemur" }, form.getOptionValues( "species" ) );
 

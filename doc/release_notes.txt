@@ -13,8 +13,19 @@ Limitations:
 
 
 Revision History:
-28-Nov-2001 1.3.0
+ 3-Dec-2001
 
+Acknowledgements:
+    Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
+
+Problems fixed:
+    1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields
+
+Additions:
+    1. Disabled submit buttons are now detected, but requests cannot be made from them unless parameter validation is off.
+
+
+28-Nov-2001 1.3.0
 Acknowledgements:
     Thanks to Oliver Imbusch for finding and fixing problems with parsing of encoded link parameter names and values and
         of link URLs with parameters and fragments.

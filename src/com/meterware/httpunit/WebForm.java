@@ -67,25 +67,45 @@ public class WebForm extends WebRequestSource {
      **/
     public boolean hasParameterNamed( String soughtName ) {
         NamedNodeMap[] parameters = getParameters();
-
         for (int i = 0; i < parameters.length; i++) {
             String name = getValue( parameters[ i ].getNamedItem( "name" ) );
             if (name.equals( soughtName )) return true;
         }
+
+        HTMLSelectElement[] selections = getSelections();
+        for (int i = 0; i < selections.length; i++) {
+            if (soughtName.equals( selections[ i ].getName() )) return true;
+        }
+
+        HTMLTextAreaElement[] textAreas = getTextAreas();
+        for (int i = 0; i < textAreas.length; i++) {
+            if (soughtName.equals( textAreas[ i ].getName() )) return true;
+        }
+
         return false;
     }
 
 
     /**
-     * Returns true if a parameter starting with given name exists,
+     * Returns true if a parameter starting with a given name exists,
      **/
     public boolean hasParameterStartingWithPrefix( String prefix ) {
         NamedNodeMap[] parameters = getParameters();
-
         for (int i = 0; i < parameters.length; i++) {
-            String name = getValue( parameters[i].getNamedItem( "name" ) );
+            String name = getValue( parameters[ i ].getNamedItem( "name" ) );
             if (name.startsWith( prefix )) return true;
         }
+
+        HTMLSelectElement[] selections = getSelections();
+        for (int i = 0; i < selections.length; i++) {
+            if (selections[ i ].getName().startsWith( prefix )) return true;
+        }
+
+        HTMLTextAreaElement[] textAreas = getTextAreas();
+        for (int i = 0; i < textAreas.length; i++) {
+            if (textAreas[ i ].getName().startsWith( prefix )) return true;
+        }
+
         return false;
     }
 
@@ -141,8 +161,7 @@ public class WebForm extends WebRequestSource {
 
             NodeList nl = ((Element) getNode()).getElementsByTagName( "input" );
             for (int i = 0; i < nl.getLength(); i++) {
-                if ((hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "image" ))
-                     && nl.item(i).getAttributes().getNamedItem( "disabled" ) == null) {
+                if (hasMatchingAttribute( nl.item(i), "type", "submit" ) || hasMatchingAttribute( nl.item(i), "type", "image" )) {
                     _buttonVector.addElement( new SubmitButton( nl.item(i) ) );
                 }
             }
@@ -275,6 +294,8 @@ public class WebForm extends WebRequestSource {
                 throw new IllegalUnnamedSubmitButtonException();
             } else if (!getSubmitButtonVector().contains( button )) {  
                 throw new IllegalSubmitButtonException( button );
+            } else if (button.isDisabled()) {
+                throw new DisabledSubmitButtonException( button );
             }
         }
 
@@ -868,7 +889,7 @@ class IllegalUnnamedSubmitButtonException extends IllegalRequestParameterExcepti
 
 
     public String getMessage() {
-        return "This form has no unnamed buttons";
+        return "This form has more than one submit button, none unnamed. You must specify the button to be used.";
     }
 
 }
@@ -904,5 +925,32 @@ class IllegalSubmitButtonException extends IllegalRequestParameterException {
     private String _value;
 
 }
+
+//============================= exception class IllegalUnnamedSubmitButtonException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+ **/
+class DisabledSubmitButtonException extends IllegalRequestParameterException {
+
+
+    DisabledSubmitButtonException( SubmitButton button ) {
+        _name  = button.getName();
+        _value = button.getValue();
+    }
+
+
+    public String getMessage() {
+        return "The specified button (name='" + _name + "' value='" + _value
+               + "' is disabled and may not be used to submit this form.";
+    }
+
+
+    private String _name;
+    private String _value;
+
+}
+
 
 

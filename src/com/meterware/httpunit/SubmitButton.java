@@ -62,6 +62,14 @@ public class SubmitButton {
     }
 
 
+    /**
+     * Returns true if this submit button is disabled. Requests cannot be made for disabled buttons.
+     **/
+    public boolean isDisabled() {
+        return _isDisabled;
+    }
+
+
 //------------------------------------ Object methods ----------------------------------------
 
 
@@ -88,6 +96,7 @@ public class SubmitButton {
         _name  = NodeUtils.getNodeAttribute( node, "name" );
         _value = NodeUtils.getNodeAttribute( _node, "value" );
         _isImageButton = NodeUtils.getNodeAttribute( _node, "type" ).equalsIgnoreCase( "image" );
+        _isDisabled = _node.getAttributes().getNamedItem( "disabled" ) != null;
     }
 
 
@@ -97,6 +106,7 @@ public class SubmitButton {
     private String  _name;
     private String  _value;
     private boolean _isImageButton;
+    private boolean _isDisabled;
 
 
     private SubmitButton() {

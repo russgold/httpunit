@@ -131,6 +131,26 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
                               
+    public void testDisabledSubmitButtonDetection() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "<Input type=submit name=update>" +
+                                  "<Input type=submit name=recalculate disabled>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton[] buttons = form.getSubmitButtons();
+        assertEquals( "num detected submit buttons", 2, buttons.length );
+        SubmitButton sb = form.getSubmitButton( "recalculate" );
+        assertNotNull( "Failed to find disabled button" );
+        assertTrue( "Disabled button not marked as disabled", sb.isDisabled() );
+        try {
+            form.getRequest( sb );
+            fail( "Allowed to create a request for a disabled button" );
+        } catch (IllegalRequestParameterException e) {}
+    }
+
+
     public void testButtonIDDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
