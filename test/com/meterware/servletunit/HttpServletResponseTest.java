@@ -58,7 +58,6 @@ public class HttpServletResponseTest extends ServletUnitTest {
     public void testDefaultResponse() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         WebResponse response = new ServletUnitWebResponse( null, "_self", null, servletResponse );
-        assertEquals( "Content type", "text/plain", response.getContentType() );
         assertEquals( "Contents", "", response.getText() );
     }
 

@@ -459,7 +459,7 @@ public abstract class HttpUnitOptions {
 //--------------------------------- private members --------------------------------------
 
 
-    private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
+    private static final String DEFAULT_CONTENT_TYPE   = "text/html";
 
     private static final ScriptingEngineFactory NULL_SCRIPTING_ENGINE_FACTORY = new ScriptingEngineFactory() {
         public boolean isEnabled() { return false; }

@@ -7,27 +7,25 @@
 <OL>
 <LI><A HREF="#Cannot unzip">Why can't I unzip the download library?</A></LI>
 <LI><A HREF="#org.xml.sax">What is the org.xml.sax package?</A></LI>
-<LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
 
-</ol><ol start=4>
+</ol><ol start=3>
 
 <LI><A HREF="sslfaq.html">Does HttpUnit support https?</A></LI>
 <LI><A HREF="#proxy">Can I use HttpUnit through a proxy server?</A></LI>
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 <LI><A HREF="#badType">The server is not sending a valid content type. How do I test HTML pages anyway?</A></LI>
 
-</ol><ol start=8>
+</ol><ol start=7>
 
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
-<LI><A HREF="#badPost">Why doesn't my servlet see parameters on a POST request?</A></LI>
 <LI><A HREF="#hidden">Why can't I change hidden parameters?</A></LI>
 
-</ol><ol start=11>
+</ol><ol start=9>
 
 <LI><A HREF="#javascript">How do I use HttpUnit to test my pages that use JavaScript?</A></LI>
 <LI><A HREF="#norhino">JavaScript is not being executed at all. Why not?</A></LI>
 <li><a href="#unsupported">How do I handle a page that uses JavaScript features that HttpUnit does not support?</a></li>
-</ol><ol start=14>
+</ol><ol start=12>
 
 <LI><A HREF="#session">How can I see the servlet session between calls?</A></LI>
 <li><a href="#JSP">Can I use JSPs with ServletUnit?</a></li>
@@ -44,25 +42,12 @@ If you are using WinZip, stick to version 7.0 or later.
 You may be getting compile or runtime errors asking for the org.xml.sax package.
 You need to have xerces or another XML parser in your classpath. Xerces is included in the download.
 
-<A NAME="#reload"><h3>Why do I get java.lang.IllegalAccessError when calling getResponse()?</h3></A>
-<p>This happens when you use HttpUnit and certain versions of JTidy with one of the JUnit graphical test runners, which reloads
-classes every time to run a test. Unfortunately, this places different versions of the JTidy
-classes in different class loaders, so you get this error.  To avoid it,
-you can do any of the following:<ul><li>Use only the text test runner</li>
-<li>Disable all class reloading in JUnit by adding "loading=false" to <tt>junit.properties</tt> in your current directory</li>
-<li>Disable reloading of HttpUnit and JTidy by adding the following lines to <tt>excluded.properties</tt> in junit.jar<blockquote><code>
-excluded.10=com.meterware.httpunit.*<br>
-excluded.11=org.w3c.tidy.*
-</code></blockquote>
-This will require extracting the file, modifying it and then putting it back <em>in the same directory</em>, but it should allow your
-tests to reload safely.</ul></p>
-<p>This problem appears to be resolved in JTidy r7, which is included with HttpUnit 1.4.1 or later.
-
 <h2>Server Issues</h2>
 
 <A NAME="proxy"><h3>Can I use HttpUnit through a proxy server?</h3></A>
-Yes. Call <code>WebClient.setProxyServer( host, port )</code> before sending your request.
-This feature is available in the <a href="http://www.httpunit.org/prerelease">latest pre-release build.</a>
+Yes. Call <a href="api/com/meterware/httpunit/WebClient.html#setProxyServer(java.lang.String, int)"><code>WebClient.setProxyServer( host, port )</code></a>
+before sending your request.
+
 
 <A NAME="charset"><h3>Why isn't HttpUnit handling my non-English pages?</h3></A>
 Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform.
@@ -93,20 +78,15 @@ If you are using JUnit, call this method in your <code>setUp()</code> method.
 <h2>Form Handling Problems</h2>
 
 <A NAME="buttons"><h3>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</h3></A>
-This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
-JTidy (the HTML parser originally used by HttpUnit) is not. It expects tags to be nested according to the HTML
+If you are using JTidy (the HTML parser originally used by HttpUnit), this can happen when your HTML is not valid.
+Most browsers are extremely forgiving of bad HTML; however, JTidy is not. It expects tags to be nested according to the HTML
 specification and will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them,
 call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page.
 Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
 
-The <a href="http://www.httpunit.org/prerelease">latest pre-release build</a> supports
-<a href="http://www.apache.org/~andyc/neko/doc/html/">NekoHTML</a>, a much more forgiving parser.
-It is strongly recommended that you use it in preference to JTidy, as it should correct problems like this.
-
-<A NAME="#badPost"><h3>Why doesn't my servlet see parameters on a POST request?</h3></A>
-Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type
-header. HttpUnit 1.2.6 sends this attribute; As of HttpUnit 1.2.7 it will only send it if you call
-<code>HttpUnitOptions.setPostIncludesCharset(true)</code> before your request.
+The <a href="http://www.apache.org/~andyc/neko/doc/html/">NekoHTML parser</a>, a much more forgiving parser, is the
+parser used by default as of HttpUnit 1.5. It is strongly recommended that you use it in preference to JTidy,
+as it should correct problems like this.
 
 <A name="#hidden"><h3>Why can't I change hidden parameter values?</h3></A>
 By default, HttpUnit verifies any parameter value changes against the form containing them. Since a user cannot directly
