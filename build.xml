@@ -228,7 +228,6 @@
             <include name="examples/**" />
             <include name="lib/*.*" />
             <include name="jars/*.*" />
-            <exclude name="**/Tidy.jar"/>
             <exclude name="**/activation.jar"/>
             <exclude name="**/mailapi.jar" />
             <include name="doc/**/*.*" />

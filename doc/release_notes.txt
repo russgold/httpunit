@@ -11,111 +11,58 @@ Limitations:
 
 
 Revision History:
-12-Dec-2002
-Additions:
-    1. Added support for Document.cookie
+18-Dec-2002 1.5.1
 
-29-Nov-2002
-Additions:
-    1. Added support for most subproperties of the Location object - mostly r/o, but some read/write
-
-27-Nov-2002
-Problems fixed:
-    1. Bug #644642: changes to form parameters made from immediate scripts were being discarded
-
-26-Nov-2002
-Problems fixed:
-    1. Bug #641687: when neither NekoHTML.jar or Tidy.jar is in the classpath, an explanatory exception is now thrown
-    2. Javascript: multiple form parameters with the same name were only being treated as an array if they were checkboxes;
-       otherwise, they were being ignored - this would result in a "undefined value has no properties" error message.
-
-25-Nov-2002
-Acknowledgements:
-    Thanks to Larry Hamel for supplying an ant target to run Example.java
-
-Additions:
-    1. There is now an ant target to run the Example program.
-    2. The Rhino jar now includes a patch to improve error-reporting for unsupported DOM elements
-
-Problems fixed:
-    1. Table <th> elements were being handled *after* <td> elements in the same row
-    2. The <base> tag was not being used to find included scripts
-
-22-Nov-2002
-Notes:
-    1. The nekohtml.jar included has a patch supplied by the author (Andy Clark) to support applet parameter tags
-
-Additions:
-    1. Added support for applet parameters and archives
-
-20-Nov-2002
-Problems fixed:
-    1. HttpUnit now ignores empty parameters on form actions, as IE and Netscape do.
-
-18-Nov-2002
-Acknowledgements:
-    Thanks to Neville Wylie for catching the top.parent and frame name index problems
-
-Problems fixed:
-    1. The parent attribute of the top frame was returning null rather than the frame.
-    2. Frame names used as indexes into the Window.frames array were not being recognized.
-
-17-Nov-2002
-Problems fixed:
-    1. Bug #637208 Link.click() no longer returns null when an 'onClick' event fails to return true.
-
-Additions:
-    1. Added support for Document.open, Document.close, and Document.write / writeln for new documents
-
-16-Nov-2002
-Problems fixed:
-    1. Bug #638304 Interframe dependancies for JavaScript at load time are now handled better.
-
-14-Nov-2002
-Problems fixed:
-    1. Bug #638406 Multi-line values in form data were using the platform-specific line ending rather than CRLF.
-    2. Bug #638306 Document.writeln was writing the value "13" rather than CRLF as its terminator.
-
-12-Nov-2002
-Acknowledgements:
-    Thanks to Michael McCallum for adding handling for bad character-set headers and an ant target to build the examples
-
-Problems fixed:
-    1. Bad character-set headers from servers would result in an UnsupportedEncodingException.
-
-Additions:
-    1. Added support for the location.href property
-
- 9-Nov-2002
-Problems fixed:
-    1. As of 1.5, HttpUnit was not building if NekoHTML was not in the classpath. This is now fixed.
-
- 7-Nov-2002
-Acknowledgements:
-    Thanks to Raul Benito Garcia for pointing out the problem with no-action forms accessed with URL parameters
-    Thanks to Charles Mendis for finding the bug in the proxy support
-Problems fixed:
-    1. When a form obtained using parameters as part of the URL has no action, those parameters are now sent
-       as part of the form submission.
-    2. Bug #635273 Proxy port always interpreted as port 80 due to typo
-
- 6-Nov-2002
-Problems fixed:
-    1. Simply removing the NekoHTML parser jar from the classpath was not enough to re-enable JTidy. Now it is.
-
- 5-Nov-2002
-Acknowledgements:
-    Thanks to Troy Waldrep for pointing out the non-standard Refresh header definition accepted in popular browsers
-
-Additions:
-    1. Added support for the Refresh header
-
- 4-Nov-2002
 Acknowledgements:
     Thanks to Geert Bevin for fixing a problem with comparing cookies
+    Thanks to Troy Waldrep for pointing out the non-standard Refresh header definition accepted in popular browsers
+    Thanks to Raul Benito Garcia for pointing out the problem with no-action forms accessed with URL parameters
+    Thanks to Larry Hamel for supplying an ant target to run Example.java
+    Thanks to Charles Mendis for finding the bug in the proxy support
+    Thanks to Michael McCallum for adding handling for bad character-set headers and an ant target to build the examples
+    Thanks to Neville Wylie for catching the top.parent and frame name index problems
 
 Problems Fixed:
-    1. Adding both a "global" cookie and a server-based cookie with the same name causes a NullPointerException
+    Content and Parsing
+        1. Adding both a "global" cookie and a server-based cookie with the same name caused a NullPointerException
+        2. Simply removing the NekoHTML parser jar from the classpath was not enough to re-enable JTidy. Now it is.
+        3. When a form obtained using parameters as part of the URL has no action, those parameters are now sent
+           as part of the form submission.
+        4. Bug #635273 Proxy port always interpreted as port 80 due to typo
+        5. As of 1.5, HttpUnit was not building if NekoHTML was not in the classpath. This is now fixed.
+        6. Bad character-set headers from servers would result in an UnsupportedEncodingException.
+        7. Bug #638406 Multi-line values in form data were using the platform-specific line ending rather than CRLF.
+        8. HttpUnit now ignores empty parameters on form actions, as IE and Netscape do.
+        9. Table <th> elements were being handled *after* <td> elements in the same row
+       10. Bug #641687: when neither NekoHTML.jar or Tidy.jar is in the classpath, a class not found exception was thrown
+
+    JavaScript
+       11. Bug #638306 Document.writeln was writing the value "13" rather than CRLF as its terminator.
+       12. Bug #638304 Interframe dependancies for JavaScript at load time were causing frame data not to be found.
+       13. Bug #637208 Link.click() no longer returns null when an 'onClick' event fails to return true.
+       14. The parent attribute of the top frame was returning null rather than the frame.
+       15. Frame names used as indexes into the Window.frames array were not being recognized.
+       16. The <base> tag was not being used to find included scripts
+       17. Multiple form parameters with the same name were only being treated as an array if they were checkboxes;
+           otherwise, they were being ignored - this would result in a "undefined value has no properties" error message.
+       18. Bug #644642: changes to form parameters made from immediate scripts were being discarded
+
+Additions:
+    Content and Parsing
+        1. Added support for the Refresh header
+        2. Added support for applet parameters and archives
+        3. There is now an ant target to run the Example program.
+
+    JavaScript
+        4. Added support for the location.href property
+        5. Added support for Document.open, Document.close, and Document.write / writeln for new documents
+        6. The Rhino jar now includes a patch to improve error-reporting for unsupported DOM elements
+        7. Added support for most subproperties of the Location object - mostly r/o, but some read/write
+        8. Added support for Document.cookie
+
+Notes:
+    1. Upgraded NekoHTML to 0.7.1
+
 
  3-Nov-2002 1.5
 Acknowledgements:
