@@ -33,6 +33,9 @@ import org.xml.sax.SAXException;
  **/
 public class Button extends FormControl {
 
+    static final public HTMLElementPredicate HAS_ID;
+    static final public HTMLElementPredicate HAS_LABEL;
+
     private String _onClickEvent = "";
 
 
@@ -98,5 +101,21 @@ public class Button extends FormControl {
         public void click() throws IOException, SAXException {
             doButtonAction();
         }
+    }
+
+
+    static {
+        HAS_ID = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object button, Object id ) {
+                return ((Button) button).getID().equals( id );
+            };
+        };
+
+        HAS_LABEL = new HTMLElementPredicate() {
+            public boolean matchesCriteria( Object button, Object label ) {
+                return ((Button) button).getValue().equals( label );
+            };
+        };
+
     }
 }

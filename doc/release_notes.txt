@@ -16,6 +16,7 @@ Revision History:
  13-Mar-2003
 Additions:
     1. Select.value is now supported.
+    2. Added WebForm.getButton() method using HTMLPredicate to permit more generalized button searches.
 
  12-Mar-2003
 Acknowledgements:

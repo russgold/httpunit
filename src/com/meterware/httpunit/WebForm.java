@@ -120,15 +120,20 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    /**
-     * Returns the button with the specified ID
-     */
-    public Button getButtonWithID( String buttonID ) {
+    public Button getButton( HTMLElementPredicate predicate, Object criteria ) {
         Button[] buttons = getButtons();
         for (int i = 0; i < buttons.length; i++) {
-            if (buttons[i].getID().equals( buttonID )) return buttons[i];
+            if (predicate.matchesCriteria( buttons[i], criteria )) return buttons[i];
         }
         return null;
+    }
+
+
+    /**
+     * Convenience method which returns the button with the specified ID.
+     */
+    public Button getButtonWithID( String buttonID ) {
+        return getButton( Button.HAS_ID, buttonID );
     }
 
 
