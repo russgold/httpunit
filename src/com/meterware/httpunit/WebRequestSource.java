@@ -264,7 +264,8 @@ public class WebRequestSource extends ParameterHolder {
      * Gets all parameters from a URL
      **/
     private String getParametersString() {
-        final String url = trimFragment( getDestination() );
+        String url = trimFragment( getDestination() );
+        if (url.trim().length() == 0) url = getBaseURL().toExternalForm();
         if (url.startsWith( "javascript:" )) return "";
         final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {

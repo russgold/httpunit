@@ -475,6 +475,21 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testNoActionSuppliedWhenBaseHasParams() throws Exception {
+        defineResource( "abc/form?param1=value&param2=value", "<form name=\"test\">" +
+                               "  <input type=\"text\" name=\"aTextField\">" +
+                               "  <input type=\"submit\" name=\"apply\" value=\"Apply\">" +
+                               "</form>" );
+
+        WebResponse wr  = _wc.getResponse( getHostPath() + "/abc/form?param1=value&param2=value" );
+        WebForm form    = wr.getForms()[0];
+        WebRequest req  = form.getRequest( "apply" );
+        req.setParameter( "aTextField", "test" );
+        assertEquals( getHostPath() + "/abc/form?param1=value&param2=value&aTextField=test&apply=Apply",
+                            req.getURL().toExternalForm() );
+    }
+
+
     public void testPostActionParametersAfterSetAction() throws Exception {
         defineWebPage( "abc/form", "<form name=\"test\" method='POST' action='stop?ready=yes'>" +
                                "  <input type=\"text\" name=\"aTextField\">" +

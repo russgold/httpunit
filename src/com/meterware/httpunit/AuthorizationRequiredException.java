@@ -64,7 +64,7 @@ public class AuthorizationRequiredException extends RuntimeException {
 
 
     /**
-     * Returns the name of the <a href="ftp://ftp.isi.edu/in-notes/rfc2617.txt">authentication scheme</a>.
+     * Returns the name of the <a href="http://www.freesoft.org/CIE/RFC/Orig/rfc2617.txt">authentication scheme</a>.
      **/
     public String getAuthenticationScheme() {
         return _scheme;

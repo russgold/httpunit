@@ -23,6 +23,8 @@
     <property name="test.classes" value="${build.dir}/testclasses" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
 
+    <property name="use.jtidy" value="" />
+
     <property name="dist.dir" value="dist" />
     <property name="archive.dir" value="${dist.dir}/${name}-${version}" />
     <property name="classpath" value="" />
@@ -37,6 +39,7 @@
 <path id="base.classpath">
     <fileset dir="${jars.dir}">
         <include name="*.jar"/>
+        <exclude name="nekohtml.jar" if="use.jtidy" />
     </fileset>
 </path>
 
