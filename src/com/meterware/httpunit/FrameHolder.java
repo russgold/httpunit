@@ -96,7 +96,7 @@ class FrameHolder {
 
 
     FrameSelector getFrame( String target ) {
-        return getFrame( _topFrame, target );
+        return target.equals( _window.getName() ) ? _topFrame : getFrame( _topFrame, target );
     }
 
 

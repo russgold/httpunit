@@ -71,8 +71,10 @@ public class WebWindowTest extends HttpUnitTest {
 
 
     public void testUnknownTarget() throws Exception {
+        defineResource( "goThere", "You came back!" );
         defineResource( "goHere", "You made it!" );
-        defineWebPage( "start", "<a href='goHere' id='go' target='somewhere'>here</a>" );
+        defineWebPage( "start", "<a href='goHere' id='go' target='somewhere'>here</a>" +
+                                "<a href='goThere' id='return' target='somewhere'>there</a>");
 
         WebClient wc = new WebConversation();
         WebResponse initialPage = wc.getResponse( getHostPath() + "/start.html" );
@@ -80,6 +82,9 @@ public class WebWindowTest extends HttpUnitTest {
         assertEquals( "Number of windows after following link", 2, wc.getOpenWindows().length );
         WebWindow other = wc.getOpenWindows()[1];
         assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
+        initialPage.getLinkWithID( "return" ).click();
+        assertEquals( "Number of windows after following link", 2, wc.getOpenWindows().length );
+        assertEquals( "Updated window contents", "You came back!", other.getCurrentPage().getText() );
     }
 
 

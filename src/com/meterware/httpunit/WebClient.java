@@ -461,6 +461,7 @@ public class WebClient {
     void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         if (response.getFrame() == FrameSelector.NEW_FRAME) {
             WebWindow window = new WebWindow( this );
+            if (!WebRequest.NEW_WINDOW.equalsIgnoreCase( requestTarget )) window.setName( requestTarget );
             response.setFrame( window.getTopFrame() );
             window.updateFrameContents( response, requestContext );
             _openWindows.add( window );
