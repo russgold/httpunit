@@ -24,6 +24,14 @@
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" /> 
     
  
+<!-- =================================================================== -->
+<!-- Check to see what optional dependencies are available               -->
+<!-- =================================================================== -->
+<target name="check_for_optional_packages">
+    <available property="jsdk.present" classname="javax.servlet.http.HttpServlet" />
+</target>
+
+
 <!--  ===================================================================  --> 
 <!--  Prepares the build directory                                         --> 
 <!--  ===================================================================  --> 
@@ -35,10 +43,11 @@
 <!--  ===================================================================  --> 
 <!--  Compiles the source code                                             --> 
 <!--  ===================================================================  --> 
-<target name="compile" depends="prepare">
+<target name="compile" depends="prepare,check_for_optional_packages">
     <mkdir dir="${build.classes}" /> 
     <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
            debug="on" deprecation="on" optimize="off">
+         <exclude name="**/servletunit/*" unless="jsdk.present" />
     </javac>
 </target>
 
@@ -46,9 +55,10 @@
 <!--  ===================================================================  --> 
 <!--  Compiles the test code                                               -->
 <!--  ===================================================================  --> 
-<target name="testcompile" depends="compile">
+<target name="testcompile" depends="compile,check_for_optional_packages">
     <javac srcdir="${tstsrc.dir}" destdir="${build.classes}" classpath="${classpath}" 
            debug="on" deprecation="on" optimize="off">
+         <exclude name="**/servletunit/*" unless="jsdk.present" />
     </javac>
 </target>
 
