@@ -11,112 +11,63 @@ Limitations:
 
 
 Revision History:
-13-Feb-2002
-Additions:
-    1. WebResponse now has a getSubframeContents method which returns the contents of a subframe of the frame represented
-       by the response.
 
-11-Feb-2002
-Problems corrected:
-    1. Subframes with the same names as others in the same tree no longer cause an infinite loop / stack overflow
-Additions:
-    1. WebClient now has an exceptionsThrownOnErrorStatus property to control this behavior per client.
-Notes:
-    1. The decision as to whether a response will throw an exception if its status is 4xx or 5xx is now controlled by
-       the exceptionsThrownOnErrorStatus property of WebClient and its subclasses (WebConversation, ServletUnitClient).
-       This property is initialized from the HttpUnitOptions property of the same name when the WebClient object is
-       created. This allows finer control over this behavior. Tests which depend on this setting should no longer
-       interfere with one another.
-
- 5-Feb-2002
-Additions:
-    1. Form parameters can be reset to their initial values using WebForm.reset().
-
- 4-Feb-2002
-Problems corrected:
-    1. Forms with query strings included in the action attribute now are submitted with that string intact.
-Additions:
-    1. Parameters defined in form query strings are now included in the known parameters of a form and requests
-       built from it.
-
- 1-Feb-2002
+22-Feb-2000 1.3.5
 Acknowledgements:
+    Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
+    Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
+    Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit
     Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces
 
-Additions:
-    1. HttpUnit can now use any jaxp-compliant parser, rather than just xerces.
-
-30-Jan-2002
-Acknkowledgements:
-    Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit
-
-Additions:
-    1. ServletUnit now supports the <context-param> tag.
-
-24-Jan-2002
-Additions:
-    1. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.
-    2. WebClient now exposes the protected method writeMessageBody to ease implementation of new subclasses
-
-23-Jan-2002
 Problems fixed:
-    1. Control characters and spaces created by breaking HTML in the middle are now trimmed from link parameters.
-
-21-Jan-2002
-Additions:
-    1. MessageBodyWebRequest's constructors and inner class are now public, allowing outside code to create new request classes.
-    2. ServletUnit now supports creating a RequestDispatcher from ServletContext to forward to other servlets.
-       Support for this is rudimentary at present: query parameters on the request dispatcher create are ignored.
-
-17-Jan-2002
-Problems fixed:
-    1. Link parameters are now sent in the proper order, as long as parameter validation is not turned off.
-    2. Parameter validation is now done for requests built from links
-
-15-Jan-2002
-Acknowledgements:
-    Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
-
-Problems fixed:
-    1. An infinite loop would result if a frame had the same name as one of its sub-frames
-
-14-Jan-2002
-
-Problems fixed:
-    1. Parameters are now submitted in the order specified in the form, as long as parameter validation is not turned off.
-    2. It is no longer permitted to change hidden parameters with parameter validation enabled.
-    3. An infinite loop would result if a frame had the same name as one of its sub-frames
+    1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields
+    2. (bug #492003) JTidyPrintWriter fails to parse columns
+    3. Empty cookies were not being recognized.
+    4. Parameters are now submitted in the order specified in the form, as long as parameter validation is not turned off.
+    5. It is no longer permitted to change hidden parameters with parameter validation enabled.
+    6. Subframes with the same names as others in the same tree no longer cause an infinite loop / stack overflow
+    7. Link parameters are now sent in the proper order, as long as parameter validation is not turned off.
+    8. Parameter validation is now done for requests built from links
+    9. Control characters and spaces created by breaking HTML in the middle are now trimmed from link parameters.
+   10. Forms with query strings included in the action attribute now are submitted with that string intact.
 
 Additions:
-    1. HttpUnit now handles multiple file form controls with the same name.
-    2. It is now possible to set values for a form directly into the form. All such changes will be validated.
-       These will be used by any requests derived from the form.
+  Content and parsing enhancements:
+      1. Disabled submit buttons are now detected, but requests cannot be made from them unless parameter validation is off.
+      2. HttpUnit now handles multiple file form controls with the same name.
+      3. WebResponse now has a getSubframeContents method which returns the contents of a subframe of the frame represented
+         by the response.
+
+  ServletUnit enhancements
+      4. ServletUnit now supports creating a RequestDispatcher from ServletContext to forward to other servlets.
+         Support for this is rudimentary at present: query parameters on the request dispatcher create are ignored.
+      5. ServletUnit now supports the web.xml <context-param> tag.
+
+  Form manipulation enhancements:
+      6. It is now possible to set values for a form directly into the WebForm object. All such changes will be validated.
+         These will be used by any requests derived from the form.
+      7. Parameters defined in form query strings are now included in the known parameters of a form and requests
+         built from it.
+      8. Form parameters can be reset to their initial values using WebForm.reset().
+
+  Test properties enhancements:
+      9. You can now call HttpUnitOptions.setAutoRedirect( false ) to enable explicit testing of redirect requests.
+     10. WebClient now has an exceptionsThrownOnErrorStatus property to control this behavior per client.
+
+  Extensibility enhancements:
+     11. HttpUnit can now use any jaxp-compliant parser, rather than just xerces.
+     12. MessageBodyWebRequest's constructors and inner class are now public, allowing outside code to create new request classes.
+     13. WebClient now exposes the protected method writeMessageBody to ease implementation of new subclasses
 
 Notes:
     1. Parameter validation is now handled by the form. Requests created from the form while parameter validation is
        enabled will share the variable space of the form and therefore be validated. Requests created while validation
        is disabled will have their own variable space, which is initialized to that of the form.
-
-10-Jan-2002
-
-Problems fixed:
-    1. Empty cookies were not being recognized.
-
-12-Dec-2001
-
-Problems fixed:
-    1. (bug #492003) JTidyPrintWriter fails to parse columns
-
- 3-Dec-2001
-
-Acknowledgements:
-    Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
-
-Problems fixed:
-    1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields
-
-Additions:
-    1. Disabled submit buttons are now detected, but requests cannot be made from them unless parameter validation is off.
+    2. The decision as to whether a response will throw an exception if its status is 4xx or 5xx is now controlled by
+       the exceptionsThrownOnErrorStatus property of WebClient and its subclasses (WebConversation, ServletUnitClient).
+       This property is initialized from the HttpUnitOptions property of the same name when the WebClient object is
+       created. This allows finer control over this behavior. Tests which depend on this setting should no longer
+       interfere with one another.
 
 
 28-Nov-2001 1.3.0

@@ -58,7 +58,15 @@ object found in the context.</li>
 <li>We can now call a new method in the servlet which will return an array of error messages, which we can compare against
 our expected values for them.</li></ol></p>
 
-<p>To make this test pass, we just have to create a single new method in the servlet:</p>
+<p>This test won't even compile yet, so before proceeding, we should create the new method in the servlet without
+any logic:
+<pre class="servlet-code">
+String[] getValidationErrors() {
+    <b>return</b> new String[0];
+}
+</pre>
+
+<p>Now it compiles and fails, as expected. To make this test pass, we need to implement the new method in the servlet:</p>
 <pre class="servlet-code">
 String[] getValidationErrors() {
     ArrayList errorList = <b>new</b> ArrayList();
