@@ -14,6 +14,13 @@ Limitations:
 
 
 Revision History:
+5-Oct-2004:
+    Acknowledgements:
+        Thanks to Hanson Char for identifying a JDK 1.5 incompatibility.
+
+    Problems fixed:
+        1. Renamed local variables which conflicted with new JDK 1.5 keyword "enum."
+
 4-Oct-2004
     Problems fixed:
         1. bug #1039989 Did not compile with JDK 1.3

@@ -142,17 +142,17 @@ class ErrorHandler implements XMLErrorHandler {
             System.out.println( "At line " + warningException.getLineNumber() + ", column " + warningException.getColumnNumber() + ": " + warningException.getMessage() );
         }
 
-        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
-        while (enum.hasMoreElements()) {
-            ((HTMLParserListener) enum.nextElement()).warning( _url, warningException.getMessage(), warningException.getLineNumber(), warningException.getColumnNumber() );
+        Enumeration listeners = HTMLParserFactory.getHTMLParserListeners().elements();
+        while (listeners.hasMoreElements()) {
+            ((HTMLParserListener) listeners.nextElement()).warning( _url, warningException.getMessage(), warningException.getLineNumber(), warningException.getColumnNumber() );
         }
     }
 
 
     public void error( String domain, String key, XMLParseException errorException ) throws XNIException {
-        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
-        while (enum.hasMoreElements()) {
-            ((HTMLParserListener) enum.nextElement()).error( _url, errorException.getMessage(), errorException.getLineNumber(), errorException.getColumnNumber() );
+        Enumeration listeners = HTMLParserFactory.getHTMLParserListeners().elements();
+        while (listeners.hasMoreElements()) {
+            ((HTMLParserListener) listeners.nextElement()).error( _url, errorException.getMessage(), errorException.getLineNumber(), errorException.getColumnNumber() );
         }
     }
 

@@ -198,17 +198,17 @@ class JTidyPrintWriter extends PrintWriter {
     }
 
     private void reportError( String msg, int line, int column ) {
-        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
-        while (enum.hasMoreElements()) {
-            ((HTMLParserListener) enum.nextElement()).error( _url, msg, line, column );
+        Enumeration listeners = HTMLParserFactory.getHTMLParserListeners().elements();
+        while (listeners.hasMoreElements()) {
+            ((HTMLParserListener) listeners.nextElement()).error( _url, msg, line, column );
         }
     }
 
 
     private void reportWarning( String msg, int line, int column ) {
-        Enumeration enum = HTMLParserFactory.getHTMLParserListeners().elements();
-        while (enum.hasMoreElements()) {
-            ((HTMLParserListener) enum.nextElement()).warning( _url, msg, line, column );
+        Enumeration listeners = HTMLParserFactory.getHTMLParserListeners().elements();
+        while (listeners.hasMoreElements()) {
+            ((HTMLParserListener) listeners.nextElement()).warning( _url, msg, line, column );
         }
     }
 }
