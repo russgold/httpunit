@@ -316,6 +316,26 @@ public class WebClient {
 
 
     /**
+     * Adds a listener to watch for window openings and closings.
+     */
+    public void addWindowListener( WebWindowListener listener ) {
+        synchronized (_windowListeners) {
+            if (listener != null && !_windowListeners.contains( listener )) _windowListeners.add( listener );
+        }
+    }
+
+
+    /**
+     * Removes a listener to watch for window openings and closings.
+     */
+    public void removeWindowListener( WebWindowListener listener ) {
+        synchronized (_windowListeners) {
+            _windowListeners.remove( listener );
+        }
+    }
+
+
+    /**
      * Returns the next javascript alert without removing it from the queue.
      */
     public String getNextAlert() {
@@ -410,15 +430,36 @@ public class WebClient {
     }
 
 
-    WebWindow getTargetWindow( WebWindow requestWindow, String target ) {
-        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
-            WebWindow window = new WebWindow( this );
-            _openWindows.add( window );
-            return window;
+    void updateFrameContents( WebWindow requestWindow, String requestTarget, WebResponse response ) throws IOException, SAXException {
+        WebWindow window = getTargetWindow( requestWindow, requestTarget );
+        if (window != null) {
+            window.updateFrameContents( response );
         } else {
-            return requestWindow;
+            window = new WebWindow( this );
+            window.updateFrameContents( response );
+            _openWindows.add( window );
+            reportWindowOpened( window );
         }
     }
+
+
+    private WebWindow getTargetWindow( WebWindow requestWindow, String target ) {
+        return WebRequest.NEW_WINDOW.equalsIgnoreCase( target ) ? null : requestWindow;
+    }
+
+
+    private void reportWindowOpened( WebWindow window ) {
+        List listeners;
+
+        synchronized (_windowListeners) {
+            listeners = new ArrayList( _windowListeners );
+        }
+
+        for (Iterator i = listeners.iterator(); i.hasNext();) {
+            ((WebWindowListener) i.next()).windowOpened( this, window );
+        }
+    }
+
 
 
 //------------------------------------------ package members ------------------------------------
@@ -453,6 +494,8 @@ public class WebClient {
     private boolean _exceptionsThrownOnErrorStatus = HttpUnitOptions.getExceptionsThrownOnErrorStatus();
 
     private List _clientListeners = new ArrayList();
+
+    private List _windowListeners = new ArrayList();
 
     private DialogResponder _dialogResponder = new DialogAdapter();
 

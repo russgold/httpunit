@@ -116,7 +116,7 @@ public class WebWindow {
             delay( HttpUnitOptions.getRedirectDelay() );
             getResponse( new RedirectWebRequest( response ) );
         } else {
-            _client.getTargetWindow( this, requestTarget ).updateFrameContents( response );
+            _client.updateFrameContents( this, requestTarget, response );
         }
     }
 
@@ -130,7 +130,7 @@ public class WebWindow {
     }
 
 
-    private void updateFrameContents( WebResponse response ) throws IOException, SAXException {
+    void updateFrameContents( WebResponse response ) throws IOException, SAXException {
         response.setWindow( this );
         _frameContents.updateFrames( response, response.getTarget() );
     }

@@ -19,6 +19,9 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import java.util.ArrayList;
+import java.io.IOException;
+
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
@@ -56,6 +59,30 @@ public class WebWindowTest extends HttpUnitTest {
         assertEquals( "Main page in original window", initialPage, main.getCurrentPage() );
         WebWindow other = wc.getOpenWindows()[1];
         assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
+    }
+
+
+    public void testListeners() throws Exception {
+        defineResource( "goHere", "You made it!" );
+        defineWebPage( "start", "<a href='goHere' id='go' target='_blank'>here</a>" );
+
+        final ArrayList newWindowContents = new ArrayList();
+        WebClient wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) {
+                try {
+                    newWindowContents.add( window.getCurrentPage().getText() );
+                } catch (IOException e) {
+                    fail( "Error trying to read page" );
+                }
+            }
+            public void windowClosed( WebClient client, WebWindow window ) {
+            }
+        });
+        WebResponse initialPage = wc.getResponse( getHostPath() + "/start.html" );
+        initialPage.getLinkWithID( "go" ).click();
+        assertFalse( "No window opened", newWindowContents.isEmpty() );
+        assertEquals( "New window contents", "You made it!", newWindowContents.get(0) );
     }
 
 
