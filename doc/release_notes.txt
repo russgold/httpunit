@@ -10,6 +10,13 @@ Limitations:
 
 
 Revision History:
+ 5-Nov-2002
+Acknowledgements:
+    Thanks to Troy Waldrep for pointing out the non-standard Refresh header definition accepted in popular browsers
+
+Additions:
+    1. Added support for the Refresh header
+
  4-Nov-2002
 Acknowledgements:
     Thanks to Geert Bevin for fixing a problem with comparing cookies

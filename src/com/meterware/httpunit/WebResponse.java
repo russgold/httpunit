@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
  **/
 abstract
 public class WebResponse implements HTMLSegment, CookieSource {
+    private String _refreshHeader;
 
     /**
      * Returns a web response built from a URL connection. Provided to allow
@@ -135,6 +136,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * by a <meta> tag in the header.  If no tag exists, will return null.
      **/
     public WebRequest getRefreshRequest() {
+        readRefreshRequest();
         return _refreshRequest;
     }
 
@@ -145,6 +147,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
      * will return zero.
      **/
     public int getRefreshDelay() {
+        readRefreshRequest();
         return _refreshDelay;
     }
 
@@ -695,30 +698,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
-    final
-    protected void readRefreshRequest( String contentTypeHeader ) {
-        int splitIndex = contentTypeHeader.indexOf( ';' );
-        if (splitIndex < 0) splitIndex = 0;
-        try {
-            _refreshDelay = Integer.parseInt( contentTypeHeader.substring( 0, splitIndex ) );
-            _refreshRequest = new GetMethodWebRequest( _url, getRefreshURL( contentTypeHeader.substring( splitIndex+1 ) ), _frameName );
-        } catch (NumberFormatException e) {
-            System.out.println( "Unable to interpret refresh tag: \"" + contentTypeHeader + '"' );
-        }
-    }
-
-
-    private String getRefreshURL( String text ) {
-        text = text.trim();
-        if (!text.toUpperCase().startsWith( "URL" )) {
-            return text;
-        } else {
-            int splitIndex = text.indexOf( '=' );
-            return text.substring( splitIndex+1 ).trim();
-        }
-    }
-
-
     /**
      * Overwrites the current value (if any) of the content type header.
      **/
@@ -784,7 +763,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     private WebRequest _refreshRequest;
 
-    private int _refreshDelay;
+    private int _refreshDelay = -1;  // initialized to invalid value
 
     private String _responseText;
 
@@ -846,7 +825,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         if (isHttpEquivMetaTag( tag, "content-type" )) {
             inferContentType( tag.getAttribute( "content" ) );
         } else if (isHttpEquivMetaTag( tag, "refresh" )) {
-            readRefreshRequest( tag.getAttribute( "content" ) );
+            inferRefreshHeader( tag.getAttribute( "content" ) );
         }
     }
 
@@ -855,6 +834,43 @@ public class WebResponse implements HTMLSegment, CookieSource {
     {
         return headerName.equalsIgnoreCase( tag.getAttribute( "http_equiv" ) ) ||
                headerName.equalsIgnoreCase( tag.getAttribute( "http-equiv" ) );
+    }
+
+
+    private void inferRefreshHeader( String refreshHeader ) {
+        String originalHeader = getHeaderField( "Refresh" );
+        if (originalHeader == null) {
+            _refreshHeader = refreshHeader;
+        }
+    }
+
+
+    private void readRefreshRequest() {
+        if (_refreshDelay >= 0) return;
+        _refreshDelay = 0;
+        String refreshHeader = _refreshHeader != null ? _refreshHeader : getHeaderField( "Refresh" );
+        if (refreshHeader == null) return;
+
+        int splitIndex = refreshHeader.indexOf( ';' );
+        if (splitIndex < 0) splitIndex = 0;
+        try {
+            _refreshDelay = Integer.parseInt( refreshHeader.substring( 0, splitIndex ) );
+            _refreshRequest = new GetMethodWebRequest( _url, getRefreshURL( refreshHeader.substring( splitIndex+1 ) ), _frameName );
+        } catch (NumberFormatException e) {
+            _refreshDelay = 0;
+            System.out.println( "Unable to interpret refresh tag: \"" + refreshHeader + '"' );
+        }
+    }
+
+
+    private String getRefreshURL( String text ) {
+        text = text.trim();
+        if (!text.toUpperCase().startsWith( "URL" )) {
+            return text;
+        } else {
+            int splitIndex = text.indexOf( '=' );
+            return text.substring( splitIndex+1 ).trim();
+        }
     }
 
 

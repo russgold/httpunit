@@ -262,6 +262,24 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    public void testRefreshHeader() throws Exception {
+        String refreshURL = getHostPath() + "/NextPage.html";
+        String page = "<html><head><title>Sample</title></head>\n" +
+                      "<body>This has no data\n" +
+                      "</body></html>\n";
+        defineResource( "SimplePage.html", page );
+        addResourceHeader( "SimplePage.html", "Refresh: 2;URL=NextPage.html" );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+
+        assertNotNull( "No Refresh header found", simplePage.getRefreshRequest() );
+        assertEquals( "Refresh URL", refreshURL, simplePage.getRefreshRequest().getURL().toExternalForm() );
+        assertEquals( "Refresh delay", 2, simplePage.getRefreshDelay() );
+     }
+
+
     public void testMetaRefreshRequest() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
@@ -311,7 +329,8 @@ public class WebPageTest extends HttpUnitTest {
         WebResponse simplePage = wc.getResponse( request );
 
         assertNull( "No refresh request should have been found", simplePage.getRefreshRequest() );
-     }
+    }
+
 
     /**
      * Test the meta tag content retrieval
