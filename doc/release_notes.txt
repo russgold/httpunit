@@ -16,6 +16,8 @@ Revision History:
 9-Mar-2004
     Problems fixed:
         1. Support JavaScript changing "disabled" attribute on form controls
+        2. Forms defined after a <script> section which accessed document.forms would not be found if document.forms
+           was also accessed in a subsequent <script> section after the new form definition.
     Notes:
         1. Upgraded NekoHTML to 0.9.1
         2. Upgraded Xerces to 2.5.0

@@ -39,6 +39,7 @@ abstract public class ScriptableDelegate {
         public boolean performEvent( String eventScript ) { return true; }
         public String evaluateScriptExpression( String urlString ) { return null; }
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
+        public void clearCaches() {}
     };
 
 

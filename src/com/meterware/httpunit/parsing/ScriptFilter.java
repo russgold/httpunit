@@ -147,6 +147,7 @@ class ScriptFilter extends DefaultFilter {
 
 
     protected String getTranslatedScript( final String language, final String scriptText ) throws IOException {
+        _domParser.getScriptableDelegate().getScriptEngine().clearCaches();
         return _domParser.getScriptableDelegate().runScript( language, scriptText );
     }
 

@@ -57,4 +57,10 @@ public interface ScriptingEngine {
      */
     public ScriptingEngine newScriptingEngine( ScriptableDelegate child );
 
+
+    /**
+     * Clears any cached values, permitting them to be recomputed as needed.
+     */
+    public void clearCaches();
+
 }

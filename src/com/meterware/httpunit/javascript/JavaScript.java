@@ -283,6 +283,10 @@ public class JavaScript {
         }
 
 
+        public void clearCaches() {
+        }
+
+
         protected static String toStringIfNotUndefined( Object object ) {
             return (object == null || Undefined.instance.equals( object )) ? null : object.toString();
         }
@@ -464,6 +468,11 @@ public class JavaScript {
         }
 
 
+        public void clearCaches() {
+            if (_document != null) _document.clearCaches();
+        }
+
+
         protected StringBuffer getDocumentWriteBuffer() {
             return jsGet_document().getWriteBuffer();
         }
@@ -491,6 +500,11 @@ public class JavaScript {
 
         public String getClassName() {
             return "Document";
+        }
+
+
+        public void clearCaches() {
+            _forms = _links = _images = null;
         }
 
 
