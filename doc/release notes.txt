@@ -1,7 +1,17 @@
 HttpUnit release notes
 
-Known issues:
-    1. There is no way to access nested tables.
+Known issues: none
+
+13-Jul-00
+General:
+    1. Nested tables are now supported (examples to follow) by using WebTable.getTableCell
+    2. table columns and rows used only for formatting may now be ignored using WebTable.purgeEmptyCells
+Additions:
+    1. Deprecated WebTable.getCell, new method is getCellAsText
+    2. Added WebTable.getTableCell to return a cell which could contain nested tables or just a DOM to examine
+    3. Added WebTable.asText to return a 2D representation of the table
+    4. Added WebTable.purgeEmptyCells to eliminate meaningless spacing information
+    5. Added copyright notices to most source files
     
 29-Jun-00 0.9.1
 Additions:

@@ -1,8 +1,24 @@
 package com.meterware.httpunit;
-/*******************************************************************************************
- * $Id$
- ******************************************************************************************/
-
+/********************************************************************************************************************
+* $Id$
+*
+* Copyright (c) 2000, Russell Gold
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+* to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+* THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+* CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+*
+*******************************************************************************************************************/
 import java.net.URL;
 
 import java.util.Stack;
@@ -30,6 +46,7 @@ public class WebTable {
      **/
     public int getColumnCount() {
         if (_cells == null) readTable();
+        if (_cells.length == 0) return 0;
         return _cells[0].length;
     }
 
@@ -38,61 +55,89 @@ public class WebTable {
      * Returns the contents of the specified table cell as text. 
      * The row and column numbers are zero-based.
      * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
+     * @deprecated use #getCellAsText
      **/
     public String getCell( int row, int column ) {
+        return getCellAsText( row, column );
+    }
+
+
+    /**
+     * Returns the contents of the specified table cell as text. 
+     * The row and column numbers are zero-based.
+     * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
+     **/
+    public String getCellAsText( int row, int column ) {
+        return getTableCell( row, column ).asText();
+    }
+
+
+    /**
+     * Returns the contents of the specified table cell as text. 
+     * The row and column numbers are zero-based.
+     * @throws IndexOutOfBoundsException if the specified cell numbers are not valid
+     **/
+    public TableCell getTableCell( int row, int column ) {
         if (_cells == null) readTable();
-        return getCellContentsAsText( _cells[ row ][ column ] );
+        return _cells[ row ][ column ];
     }
 
 
-    private String getCellContentsAsText( Node node ) {
-        if (node == null) {
-            return null;
-        } else if (!node.hasChildNodes()) {
-            return null;
-        } else {
-            return asText( node.getFirstChild() );
-        }
-    }
+    /**
+     * Removes all rows and all columns from this table which have no visible text in them.
+     **/
+    public void purgeEmptyCells() {
+        int numRowsWithText = 0;
+        int numColumnsWithText = 0;
+        boolean rowHasText[] = new boolean[ getRowCount() ];
+        boolean columnHasText[] = new boolean[ getColumnCount() ];
 
-
-
-    private String asText( Node rootNode ) {
-        StringBuffer sb = new StringBuffer();
-        Stack pendingNodes = new Stack();
-        pendingNodes.push( rootNode );
-
-        while (!pendingNodes.empty()) {
-            Object pending = pendingNodes.pop();
-            if (pending instanceof String) {
-                sb.append( pending );
-            } else {
-                Node node = (Node) pending;
-
-                if (node.getNodeType() == Node.TEXT_NODE) {
-                    sb.append( node.getNodeValue() );
-                } else if (node.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                } else if (node.getNodeName().equalsIgnoreCase( "p" )) {
-                    sb.append( "\n" );
-                } else if (node.getNodeName().equalsIgnoreCase( "tr")) {
-                    sb.append( "\n" );
-                    pendingNodes.push( " |" );
-                } else if (node.getNodeName().equalsIgnoreCase( "td")) {
-                    sb.append( " | " );
-                } else if (node.getNodeName().equalsIgnoreCase( "th")) {
-                    sb.append( " | " );
-                }
-
-                NodeList nl = node.getChildNodes();
-                if (nl != null) {
-                    for (int i = nl.getLength()-1; i >= 0; i--) {
-                        pendingNodes.push( nl.item(i) );
-                    }
+        for (int i = 0; i < rowHasText.length; i++) {
+            for (int j = 0; j < columnHasText.length; j++) {
+                if (getTrimmedText( getCellAsText(i,j) ).length() != 0) {
+                    if (!rowHasText[i]) numRowsWithText++;
+                    if (!columnHasText[j]) numColumnsWithText++;
+                    rowHasText[i] = columnHasText[j] = true;
                 }
             }
         }
-        return sb.toString();
+
+        TableCell[][] remainingCells = new TableCell[ numRowsWithText ][ numColumnsWithText ];
+
+        int targetRow = 0;
+        for (int i = 0; i < rowHasText.length; i++) {
+            if (!rowHasText[i]) continue;
+            int targetColumn = 0;
+            for (int j = 0; j < columnHasText.length; j++) {
+                if (!columnHasText[j]) continue;
+                remainingCells[ targetRow ][ targetColumn++ ] = _cells[i][j];
+            }
+            targetRow++;
+        }
+
+        _cells = remainingCells;
+
+    }
+
+
+    private static String getTrimmedText( String text ) {
+        text = text.replace( NBSP, ' ' );
+        return text.trim();
+    }
+
+
+    /**
+     * Returns a rendering of the table with all cells converted to text.
+     **/
+    public String[][] asText() {
+        String[][] result = new String[ getRowCount() ][ getColumnCount() ];
+
+        for (int i = 0; i < result.length; i++) {
+            for (int j= 0; j < result[0].length; j++) {
+                result[i][j] = getCellAsText( i, j );
+            }
+        }
+        return result;
     }
 
 
@@ -107,7 +152,7 @@ public class WebTable {
                 if (_cells[i][j] == null) {
                     sb.append( "null" );
                 } else {
-                    sb.append( _cells[i][j].getFirstChild().getNodeValue() );
+                    sb.append( _cells[i][j].asText() );
                 }
             }
             sb.append( eol );
@@ -122,13 +167,13 @@ public class WebTable {
     /**
      * Returns the top-level tables found in the specified DOM.
      **/
-    static WebTable[] getTables( Document document ) {
-        NodeList nl = document.getElementsByTagName( "table" );
+    static WebTable[] getTables( Node domRoot, URL baseURL ) {
+        NodeList nl = NodeUtils.getElementsByTagName( domRoot, "table" );
         Vector topLevelTables = new Vector();
 
         for (int i = 0; i < nl.getLength(); i++) {
-            if (isTopLevelTable( nl.item(i), document )) {
-                topLevelTables.addElement( new WebTable( nl.item(i) ) );
+            if (isTopLevelTable( nl.item(i), domRoot )) {
+                topLevelTables.addElement( new WebTable( nl.item(i), baseURL ) );
             }
         }
 
@@ -142,14 +187,16 @@ public class WebTable {
 //----------------------------------- private members -----------------------------------
 
     private Element _dom;
+    private URL     _url;
 
 
     private int[] _columnsRequired;
-    private Node[][] _cells;
+    private TableCell[][] _cells;
 
 
-    private WebTable( Node domTreeRoot ) {
+    private WebTable( Node domTreeRoot, URL sourceURL ) {
         _dom = (Element) domTreeRoot;
+        _url = sourceURL;
     }
 
 
@@ -172,7 +219,7 @@ public class WebTable {
             numColumns = Math.max( numColumns, _columnsRequired[i] );
         }
 
-        _cells = new Node[ _columnsRequired.length ][ numColumns ];
+        _cells = new TableCell[ _columnsRequired.length ][ numColumns ];
 
         for (int i = 0; i < rows.length; i++) {
             TableCell[] cells = rows[i].getCells();
@@ -180,7 +227,7 @@ public class WebTable {
                 int spannedRows = Math.min( _columnsRequired.length-i, cells[j].getRowSpan() );
                 for (int k = 0; k < spannedRows; k++) {
                     for (int l = 0; l < cells[j].getColSpan(); l++) {
-                       placeCell( i+k, j+l, cells[j].getElement() );
+                       placeCell( i+k, j+l, cells[j] );
                     }     
                 }
              }
@@ -189,22 +236,9 @@ public class WebTable {
 
 
 
-    private void placeCell( int row, int column, Node cell ) {
+    private void placeCell( int row, int column, TableCell cell ) {
         while (_cells[ row ][ column ] != null) column++;
         _cells[ row ][ column ] = cell;
-    }
-
-
-    static private int getAttributeValue( Node node, String attributeName, int defaultValue ) {
-        NamedNodeMap nnm = node.getAttributes();
-        Node span = nnm.getNamedItem( attributeName );
-        if (span == null) {
-            return defaultValue;
-        } else try {
-            return Integer.parseInt( span.getNodeValue() );
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
     }
 
 
@@ -270,7 +304,7 @@ public class WebTable {
         private void collectChildren( String childTag, final Vector children ) {
             processChildren( _element, childTag, "table", new ElementHandler() {
                 public void handleElement( Element element ) {
-                    children.addElement( new TableCell( element ) );
+                    children.addElement( new TableCell( element, _url ) );
                 }
             } );
         }
@@ -283,29 +317,6 @@ public class WebTable {
     }
 
 
-    class TableCell {
-        Element getElement() {
-            return _element;
-        }
-
-        int getColSpan() {
-            return _colSpan;
-        }
-
-        int getRowSpan() {
-            return _rowSpan;
-        }
-
-        private Element _element;
-        private int     _colSpan;
-        private int     _rowSpan;
-
-        TableCell( Element cellNode ) {
-            _element = cellNode;
-            _colSpan = getAttributeValue( cellNode, "colspan", 1 );
-            _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );
-        }
-    }
 
 
     interface ElementHandler {
@@ -321,6 +332,9 @@ public class WebTable {
             }
         }
     }
+
+
+    final static private char NBSP = (char) 160;   // non-breaking space, defined by JTidy
 
 
 }

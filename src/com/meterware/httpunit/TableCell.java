@@ -19,37 +19,64 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.io.ByteArrayInputStream;
-
 import java.net.URL;
 
+import java.util.Stack;
 import java.util.Vector;
 
 import org.w3c.dom.*;
 
-import org.w3c.tidy.Tidy;
 
-import org.xml.sax.SAXException;
+public class TableCell extends ParsedHTML {
 
+    public int getColSpan() {
+        return _colSpan;
+    }
 
-/**
- * This class represents an HTML page returned from a request.
- **/
-class ReceivedPage extends ParsedHTML {
-
-
-    public ReceivedPage( URL url, String pageText ) throws SAXException {
-        super( url, getParser().parseDOM( new ByteArrayInputStream( pageText.getBytes() ), null ) ); 
+    public int getRowSpan() {
+        return _rowSpan;
     }
 
 
-//---------------------------------- private members --------------------------------
+//---------------------------------------- package methods -----------------------------------------
 
 
-    private static Tidy getParser() {
-        Tidy tidy = new Tidy();
-        tidy.setQuiet( true );
-        return tidy;
+    TableCell( Element cellNode, URL url ) {
+        super( url, cellNode );
+        _element = cellNode;
+        _colSpan = getAttributeValue( cellNode, "colspan", 1 );
+        _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );
     }
+
+
+    String asText() {
+        return getCellContentsAsText( _element );
+    }
+
+    
+//----------------------------------- private fields and methods -----------------------------------
+
+
+    private Element _element;
+    private int     _colSpan;
+    private int     _rowSpan;
+
+    private String getCellContentsAsText( Node node ) {
+        if (node == null) {
+            return "";
+        } else if (!node.hasChildNodes()) {
+            return "";
+        } else {
+            return NodeUtils.asText( node.getChildNodes() );
+        }
+    }
+
+
+
+    private int getAttributeValue( Node node, String attributeName, int defaultValue ) {
+        return NodeUtils.getAttributeValue( node, attributeName, defaultValue );
+    }
+
 
 }
+
