@@ -33,7 +33,7 @@ public class WebLinkTest extends HttpUnitTest {
         _simplePage = new ReceivedPage( _baseURL, HEADER + "<body>This has no forms but it does" +
                                          "have <a href=\"/other.html\">an <b>active</b> link</A>" +
                                          " and <a name=here>an anchor</a>" +
-                                         "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"-->\" WIDTH=1 HEIGHT=4></a>" +
+                                         "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>" +
                                          "</body></html>" );
     }
 	
@@ -67,7 +67,7 @@ public class WebLinkTest extends HttpUnitTest {
         assertNotNull( "an active link was not found", link );
         assertEquals( "active link URL", "http://www.meterware.com/other.html", link.getRequest().getURL().toExternalForm() );
 
-        link = _simplePage.getLinkWithImageText( "-->" );
+        link = _simplePage.getLinkWithImageText( "Next -->" );
         assertNotNull( "the image link was not found", link );
         assertEquals( "image link URL", "http://www.meterware.com/basic.html", link.getRequest().getURL().toExternalForm() );
     }
