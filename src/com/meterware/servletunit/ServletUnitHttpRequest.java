@@ -581,7 +581,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 //--------------------------------------------- private members ----------------------------------------------
 
-    final static private String LOOPBACK_ADDRESS = "17.0.0.1";
+    final static private String LOOPBACK_ADDRESS = "127.0.0.1";
 
 
     private WebRequest             _request;

@@ -23,6 +23,7 @@ Acknowledgements:
     Thanks to Richard Scothern for identiying the cause of problems with POST requests and older servlet engines.
     Thanks to Benoit Xhenseval for adding parameter detection in links, handling of meta and link tags,
         and selection of table cells by ID.
+    Thanks to Mike Bracewell for noticing the incorrect loopback address in ServletUnitHttpRequest
 
 Problems corrected:
     1. Forms with no action now default to the originating page
@@ -37,6 +38,7 @@ Problems corrected:
     9. By default, POSTs included charset attributes which messed up some servlet engines
    10. WebRequest.isFileParameter is now functioning and public
    11. auto-redirect now handles relative URLs
+   12. ServletUnit's HttpServletRequest implementation was returning "17.0.0.1" as the host address.
 
 Additions:
     Content and parsing enhancements
