@@ -498,7 +498,7 @@ public class JavaScript {
 
         public void jsFunction_writeln( String string ) {
             final StringBuffer documentWriteBuffer = getDocumentWriteBuffer();
-            documentWriteBuffer.append( string ).append( 0x0D );
+            documentWriteBuffer.append( string ).append( (char) 0x0D ).append( (char) 0x0A );
         }
 
 

@@ -53,7 +53,7 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
                                             "<body>" +
                                             "<script language='JavaScript'>" +
                                             "document.write( '<a id=here href=about:blank>' );" +
-                                            "document.write( document.title );" +
+                                            "document.writeln( document.title );" +
                                             "document.write( '</a>' );" +
                                             "</script>" +
                                             "</body></html>" );

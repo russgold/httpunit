@@ -12,7 +12,8 @@ Limitations:
 Revision History:
 14-Nov-2002
 Problems fixed:
-    1. Bug #638406 Multi-line values in form data were using the platform-specific line ending rather than CRLF
+    1. Bug #638406 Multi-line values in form data were using the platform-specific line ending rather than CRLF.
+    2. Bug #638306 Document.writeln was writing the value "13" rather than CRLF as its terminator.
 
 12-Nov-2002
 Acknowledgements:

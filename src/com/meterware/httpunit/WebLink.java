@@ -71,7 +71,7 @@ public class WebLink extends FixedURLWebRequestSource {
         } else if (!getNode().hasChildNodes()) {
             return "";
         } else {
-            return NodeUtils.asText( getNode().getChildNodes() );
+            return NodeUtils.asText( getNode().getChildNodes() ).trim();
         }
     }
 
