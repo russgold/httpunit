@@ -66,9 +66,7 @@ class FormParameter {
             ArrayList list = new ArrayList();
             for (int i = 0; i < _controls.length; i++) {
                 FormControl control = _controls[i];
-                if (control instanceof CheckboxFormControl) {
-                    list.add( control.getScriptableObject() );
-                }
+                list.add( control.getScriptableObject() );
             }
             return list.toArray( new ScriptableDelegate[ list.size() ] );
         }

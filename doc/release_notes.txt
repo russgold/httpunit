@@ -13,6 +13,8 @@ Revision History:
 26-Nov-2002
 Problems fixed:
     1. Bug #641687: when neither NekoHTML.jar or Tidy.jar is in the classpath, an explanatory exception is now thrown
+    2. Javascript: multiple form parameters with the same name were only being treated as an array if they were checkboxes;
+       otherwise, they were being ignored - this would result in a "undefined value has no properties" error message.
 
 25-Nov-2002
 Acknowledgements:
