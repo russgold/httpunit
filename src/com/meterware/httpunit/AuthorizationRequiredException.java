@@ -33,7 +33,7 @@ public class AuthorizationRequiredException extends RuntimeException {
         int i = wwwAuthenticateHeader.indexOf( ' ' );
         if (i < 0) {  // non-conforming header
             _scheme = "Basic";
-            _params = wwwAuthenticationHeader;
+            _params = wwwAuthenticateHeader;
         } else {
             _scheme = wwwAuthenticateHeader.substring( 0, i );
             _params = wwwAuthenticateHeader.substring( i+1 );

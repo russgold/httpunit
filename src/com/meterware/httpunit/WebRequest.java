@@ -356,12 +356,13 @@ public class WebRequest {
                         result.append( '+' );
                     } else if ((candidate >= 'A' && candidate <= 'Z') ||
                                (candidate >= 'a' && candidate <= 'z') ||
+                               (candidate == '.') ||
                                (candidate >= '0' && candidate <= '9')) {
                         result.append( (char) rawBytes[i] );
                     } else if (candidate < 16) {
-                        result.append( "%0" ).append( Integer.toHexString( candidate ) );
+                        result.append( "%0" ).append( Integer.toHexString( candidate ).toUpperCase() );
                     } else {
-                        result.append( '%' ).append( Integer.toHexString( candidate ) );
+                        result.append( '%' ).append( Integer.toHexString( candidate ).toUpperCase() );
                     }
                 }
                 return result.toString();

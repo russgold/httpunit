@@ -44,7 +44,7 @@ class MimeEncodedMessageBody extends MessageBody {
      * Updates the headers for this request as needed.
      **/
     void updateHeaders( URLConnection connection ) throws IOException {
-        connection.setRequestProperty( "Content-type", "multipart/form-data;boundary=\"" + BOUNDARY + "\"" );
+        connection.setRequestProperty( "Content-type", "multipart/form-data; boundary=" + BOUNDARY );
     }
 
 
