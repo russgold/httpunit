@@ -440,6 +440,26 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testFormTargetProperty() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "Default", "<form method=GET name='the_form' action = 'ask'>" +
+                                  "<Input type=text name=age>" +
+                                  "<Input type=submit value=Go>" +
+                                  "</form>" +
+                                  "<a href='#' name='doTell' onClick='document.the_form.target=\"_blank\";'>tell</a>" +
+                                  "<a href='#' name='doShow' onClick='alert( document.the_form.target );'>show</a>" );
+        WebResponse page = wc.getResponse( getHostPath() + "/Default.html" );
+        page.getLinkWithName( "doShow" ).click();
+        assertEquals( "Initial target", "_top", wc.popNextAlert() );
+        page.getLinkWithName( "doTell" ).click();
+        page.getLinkWithName( "doShow" ).click();
+        assertEquals( "Current target", "_blank", wc.popNextAlert() );
+
+        WebRequest request = page.getForms()[0].getRequest();
+        assertEquals( "_blank", request.getTarget() );
+    }
+
+
     public void testFormValidationOnSubmit() throws Exception {
         defineResource( "doIt?color=pink", "You got it!", "text/plain" );
         defineResource( "OnCommand.html",  "<html><head><script language='JavaScript'>" +

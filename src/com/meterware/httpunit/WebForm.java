@@ -531,8 +531,25 @@ public class WebForm extends WebRequestSource {
 
 
         public Object get( String propertyName ) {
-            final FormParameter parameter = getParameter( propertyName );
-            return parameter == UNKNOWN_PARAMETER ? null : parameter.getScriptableObject();
+            if (propertyName.equals( "target" )) {
+                return getTarget();
+            } else {
+                final FormParameter parameter = getParameter( propertyName );
+                return parameter == UNKNOWN_PARAMETER ? null : parameter.getScriptableObject();
+            }
+        }
+
+
+        /**
+         * Sets the value of the named property. Will throw a runtime exception if the property does not exist or
+         * cannot accept the specified value.
+         **/
+        public void set( String propertyName, Object value ) {
+            if (propertyName.equals( "target" )) {
+                setTargetAttribute( value.toString() );
+            } else {
+                super.set( propertyName, value );
+            }
         }
 
 

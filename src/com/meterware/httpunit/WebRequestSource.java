@@ -23,6 +23,7 @@ package com.meterware.httpunit;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import java.net.URL;
@@ -250,6 +251,11 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     private String getSpecifiedTarget() {
         return getAttribute( "target" );
+    }
+
+
+    protected void setTargetAttribute( String value ) {
+        ((Element) _node).setAttribute( "target", value );
     }
 
 

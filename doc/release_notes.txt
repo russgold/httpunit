@@ -13,8 +13,13 @@ Limitations:
 Revision History:
 26-Dec-2002
 Additions:
-    WebResponse and TableCell now support the getElementWithID method, which returns any supported HTMLElement, given its ID.
-    Supported HTMLElement objects include WebForm, WebLink, WebTable, WebImage, WebApplet, FormControl, TableCell, and TableRow.
+    1. WebResponse and TableCell now support the getElementWithID method, which returns any supported HTMLElement, given its ID.
+       Supported HTMLElement objects include WebForm, WebLink, WebTable, WebImage, WebApplet, FormControl, TableCell, and TableRow.
+    2. The Form.target property is now supported
+
+Problems fixed:
+    1. Forms prematurely closed because of improper nesting will now contain any controls defined before the next form.
+       At present, this only works with the JTidy parser.
 
 25-Dec-2002
 Notes:
