@@ -210,6 +210,11 @@ public class JavaScript {
         }
 
 
+        String getID() {
+            return _scriptable instanceof IdentifiedDelegate ? ((IdentifiedDelegate) _scriptable).getID() : "";
+        }
+
+
         public boolean has( String propertyName, Scriptable scriptable ) {
             return super.has( propertyName, scriptable ) ||
                     (_scriptable != null && _scriptable.get( propertyName ) != null);
@@ -817,9 +822,18 @@ public class JavaScript {
         public Object get( String name, Scriptable scriptable ) {
             for (int i = 0; i < _contents.length; i++) {
                 JavaScriptEngine content = _contents[ i ];
+                if (name.equalsIgnoreCase( content.getID() )) return content;
+            }
+            for (int i = 0; i < _contents.length; i++) {
+                JavaScriptEngine content = _contents[ i ];
                 if (name.equalsIgnoreCase( content.getName() )) return content;
             }
             return super.get( name, scriptable );
+        }
+
+
+        protected JavaScriptEngine[] getContents() {
+            return _contents;
         }
     }
 

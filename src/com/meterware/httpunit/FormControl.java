@@ -316,6 +316,11 @@ abstract class FormControl extends HTMLElementBase {
         }
 
 
+        public String getID() {
+            return FormControl.this.getID();
+        }
+
+
         public Scriptable() {
             super( FormControl.this );
         }

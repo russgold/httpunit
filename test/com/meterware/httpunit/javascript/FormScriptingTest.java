@@ -232,7 +232,7 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testSubmitButtonScript() throws Exception {    // XXX not sure this is the desired behavior
+    public void testSubmitButtonScript() throws Exception {
         defineResource( "DoIt?color=green", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +
                                           "<body>" +
@@ -792,5 +792,33 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testElementsByIDProperty() throws Exception {
+        defineResource( "index.html", "<html>\n" +
+                "<head>\n" +
+                "<title>JavaScript Form Elements by ID String Test</title>\n" +
+                "<script language='JavaScript' type='text/javascript'><!--\n" +
+                "function foo() {\n" +
+                "  if (document.forms['formName']) {\n" +
+                "    var form = document.forms['formName'];\n" +
+                "    if (form.elements['inputID']) {\n" +
+                "      form.elements['inputID'].value = 'Hello World!';\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n" +
+                "// --></script>\n" +
+                "</head>\n" +
+                "<body onLoad='foo();'>\n" +
+                "<h1>JavaScript Form Elements by ID String Test</h1>\n" +
+                "<form name='formName'>\n" +
+                "  <input type='text' name='inputName' value='' id='inputID'>\n" +
+                "</form>\n" +
+                "</body>\n" +
+                "</html>\n"
+        );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/index.html" );
+        WebForm form = response.getFormWithName( "formName" );
+        assertEquals( "Changed value", "Hello World!", form.getParameterValue( "inputName" ) );
+    }
 
 }

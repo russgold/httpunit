@@ -1,12 +1,8 @@
 package com.meterware.httpunit.scripting;
-import java.io.IOException;
-
-import org.xml.sax.SAXException;
-
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,19 +19,13 @@ import org.xml.sax.SAXException;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+
 /**
- * An interface for scriptable delegates which represent form controls.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface Input extends IdentifiedDelegate, NamedDelegate {
+public interface IdentifiedDelegate {
 
-    Object get( String propertyName );
-
-
-    void set( String propertyName, Object value );
-
-
-    void click() throws IOException, SAXException;
+    public String getID();
 
 }
