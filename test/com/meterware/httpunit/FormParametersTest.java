@@ -279,6 +279,13 @@ public void testFileParameterValue() throws Exception {
     final File file = new File( "dummy.txt" );
     form.setParameter( "File", new UploadFileSpec[] { new UploadFileSpec( file ) } );
     assertEquals( "Selected filename", file.getAbsolutePath(), form.getParameterValue( "File" ) );
+
+    WebRequest wr = form.getRequest();
+    assertEquals( "File from validated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
+
+    HttpUnitOptions.setParameterValuesValidated( false );
+    wr = form.getRequest();
+    assertEquals( "File from unvalidated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
 }
 
 

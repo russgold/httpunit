@@ -130,7 +130,7 @@ final class UncheckedParameterHolder extends ParameterHolder implements Paramete
 
         String[] result = new String[ values.length ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = values[i].toString();
+            result[i] = values[i] instanceof UploadFileSpec ? ((UploadFileSpec) values[i]).getFileName() : values[i].toString();
         }
         return result;
     }
