@@ -24,6 +24,7 @@ import com.meterware.pseudoserver.WebResource;
 
 import java.io.*;
 import java.util.StringTokenizer;
+import java.net.URLEncoder;
 
 import javax.activation.DataSource;
 
@@ -63,6 +64,7 @@ public class FileUploadTest extends HttpUnitTest {
         defineResource( "ListParams", new MimeEcho() );
         defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
                                   "<Input type=text name=age value=12>" +
+                                  "<Textarea name=comment>first\nsecond</textarea>" +
                                   "<Input type=submit name=update value=age>" +
                                   "</form>" );
         WebConversation wc = new WebConversation();
@@ -70,13 +72,11 @@ public class FileUploadTest extends HttpUnitTest {
         WebResponse simplePage = wc.getResponse( request );
         WebRequest formSubmit = simplePage.getForms()[0].getRequest();
         WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "http://dummy?age=12&update=age", "http://dummy?" + encoding.getText().trim() );
+        assertEquals( "http://dummy?age=12&comment=first%0D%0Asecond&update=age", "http://dummy?" + encoding.getText().trim() );
     }
 
 
     public void testFileParameterValidation() throws Exception {
-        File file = new File( "temp.html" );
-
         defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
                                   "<Input type=file name=message>" +
                                   "<Input type=submit name=update value=age>" +
@@ -372,7 +372,7 @@ class MimeEcho extends PseudoServlet {
 
 
     private void appendFieldValue( String parameterName, StringBuffer sb, MimeBodyPart mbp ) throws IOException, MessagingException {
-        sb.append( parameterName ).append( "=" ).append( mbp.getContent() );
+        sb.append( parameterName ).append( "=" ).append( URLEncoder.encode( mbp.getContent().toString(), "iso-8859-1" ) );
     }
 
 

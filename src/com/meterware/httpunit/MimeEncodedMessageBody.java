@@ -109,7 +109,24 @@ class MimeEncodedMessageBody extends MessageBody {
             writeLn( _outputStream, "Content-Disposition: form-data; name=\"" + name + '"' );  // XXX need to handle non-ascii names here
             writeLn( _outputStream, "Content-Type: text/plain; charset=" + getRequest().getCharacterSet() );
             writeLn( _outputStream, "" );
-            writeLn( _outputStream, value, getRequest().getCharacterSet() );
+            writeLn( _outputStream, fixLineEndings( value ), getRequest().getCharacterSet() );
+        }
+
+
+        private final static char CR = 0x0D;
+        private final static char LF = 0x0A;
+
+        private String fixLineEndings( String value ) {
+            StringBuffer sb = new StringBuffer();
+            char[] chars = value.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                if (chars[i] == CR || (chars[i] == LF && (i == 0 || chars[i-1] != CR))) {
+                    sb.append( CR ).append( LF );
+                } else {
+                    sb.append( chars[i] );
+                }
+            }
+            return sb.toString();
         }
 
 

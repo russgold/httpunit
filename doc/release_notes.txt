@@ -10,6 +10,10 @@ Limitations:
 
 
 Revision History:
+14-Nov-2002
+Problems fixed:
+    1. Bug #638406 Multi-line values in form data were using the platform-specific line ending rather than CRLF
+
 12-Nov-2002
 Acknowledgements:
     Thanks to Michael McCallum for adding handling for bad character-set headers and an ant target to build the examples

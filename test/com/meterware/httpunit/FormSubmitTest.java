@@ -521,6 +521,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse wr  = _wc.getResponse( getHostPath() + "/abc/form.html" );
         WebForm form    = wr.getForms()[0];
         form.setParameter( "text_field-name*", "a value" );
+
         WebResponse response = form.submit();
         assertEquals( "posted parameters", "text_field-name*=a+value&apply=Apply", response.getText() );
     }
