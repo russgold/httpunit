@@ -152,7 +152,7 @@ class RequestContext {
 
     private Hashtable getParameters() {
         if (_messageBody != null) {
-            loadParameters( getMessageBodyAsString() /* urlEncoded */ );
+            loadParameters( getMessageBodyAsString() );
             _messageBody = null;
         }
         if (_visibleParameters == null) {
@@ -177,7 +177,7 @@ class RequestContext {
 
     private String getMessageBodyAsString() {
         try {
-            return new String( _messageBody, "iso-8869-1" );
+            return new String( _messageBody, "iso-8859-1" );
         } catch (UnsupportedEncodingException e) {
             return "";
         }
