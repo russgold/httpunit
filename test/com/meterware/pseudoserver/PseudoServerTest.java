@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 
+import org.xml.sax.SAXException;
+
 
 public class PseudoServerTest extends HttpUserAgentTest {
 
@@ -235,6 +237,24 @@ public class PseudoServerTest extends HttpUserAgentTest {
         WebResponse response = wc.getResponse( request );
         assertEquals( "Content type", "text/plain", response.getContentType() );
         assertEquals( "Response", expectedResponse, response.getText().trim() );
+    }
+
+
+
+
+    public void testBadMethodUsingPseudoServlet() throws Exception {
+        String resourceName = "tellMe";
+
+        defineResource( resourceName, new PseudoServlet() {} );
+
+        try {
+            WebConversation wc = new WebConversation();
+            WebRequest request = new HeadMethodWebRequest( getHostPath() + '/' + resourceName );
+            wc.getResponse( request );
+            fail( "Should have rejected HEAD request" );
+        } catch (HttpException e) {
+            assertEquals( "Status code returned", HttpURLConnection.HTTP_BAD_METHOD, e.getResponseCode() );
+        }
     }
 
 

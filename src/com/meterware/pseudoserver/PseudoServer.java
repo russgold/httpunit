@@ -36,6 +36,48 @@ public class PseudoServer {
 
     private String _maxProtocolLevel = "1.1";
 
+    /** Time in msec to wait for an outstanding server socket to be released before creating a new one. **/
+    private static int _socketReleaseWaitTime = 50;
+
+    /** Number of outstanding server sockets that must be present before trying to wait for one to be released. **/
+    private static int _waitThreshhold = 10;
+
+
+    /**
+     * Returns the amount of time the pseudo server will wait for a server socket to be released (in msec)
+     * before allocating a new one. See also #getWaitThreshhold.
+     */
+    public static int getSocketReleaseWaitTime() {
+        return _socketReleaseWaitTime;
+    }
+
+
+    /**
+     * Returns the amount of time the pseudo server will wait for a server socket to be released (in msec)
+     * before allocating a new one. See also #getWaitThreshhold.
+     */
+    public static void setSocketReleaseWaitTime( int socketReleaseWaitTime ) {
+        _socketReleaseWaitTime = socketReleaseWaitTime;
+    }
+
+
+    /**
+     * Returns the number of server sockets that must have been allocated and not returned before waiting for one
+     * to be returned.
+     */
+    public static int getWaitThreshhold() {
+        return _waitThreshhold;
+    }
+
+
+    /**
+     * Specifies the number of server sockets that must have been allocated and not returned before waiting for one
+     * to be returned.
+     */
+    public static void setWaitThreshhold( int waitThreshhold ) {
+        _waitThreshhold = waitThreshhold;
+    }
+
 
     public PseudoServer() {
         Thread t = new Thread() {
@@ -55,7 +97,7 @@ public class PseudoServer {
                     }
                 }
         		try {
-                    if (_serverSocket != null) _serverSocket.close();
+                    if (_serverSocket != null) ServerSocketFactory.release( _serverSocket );
                     _serverSocket = null;
                 } catch (IOException e) {
                 }
@@ -330,8 +372,7 @@ public class PseudoServer {
 
     private ServerSocket getServerSocket() throws IOException {
         synchronized (this) {
-            if (_serverSocket == null) _serverSocket = new ServerSocket(0);
-            _serverSocket.setSoTimeout( 1000 );
+            if (_serverSocket == null) _serverSocket = ServerSocketFactory.newServerSocket();
         }
         return _serverSocket;
     }
@@ -446,4 +487,36 @@ class HttpResponseStream {
     private String    _responseText = "OK";
 
     private boolean   _headersWritten;
+
+}
+
+
+
+class ServerSocketFactory {
+
+    static private ArrayList _sockets = new ArrayList();
+
+    static private int _outstandingSockets;
+
+    static private Object _releaseSemaphore = new Object();
+
+    static synchronized ServerSocket newServerSocket() throws IOException {
+        if (_sockets.isEmpty() && _outstandingSockets > PseudoServer.getWaitThreshhold()) {
+            try { synchronized( _releaseSemaphore) {_releaseSemaphore.wait( PseudoServer.getSocketReleaseWaitTime() ); } } catch (InterruptedException e) {};
+        }
+        _outstandingSockets++;
+        if (!_sockets.isEmpty()) {
+            return (ServerSocket) _sockets.remove(0);
+        } else {
+            ServerSocket serverSocket = new ServerSocket(0);
+            serverSocket.setSoTimeout( 1000 );
+            return serverSocket;
+        }
+    }
+
+    static synchronized void release( ServerSocket serverSocket ) throws IOException {
+        _sockets.add( serverSocket );
+        _outstandingSockets--;
+        synchronized (_releaseSemaphore) { _releaseSemaphore.notify(); }
+    }
 }

@@ -131,6 +131,16 @@ public class WebResource {
     }
 
 
+    static String toString( byte[] contentsAsBytes ) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < contentsAsBytes.length; i++) {
+            byte contentsAsByte = contentsAsBytes[i];
+            sb.append( Integer.toHexString( contentsAsByte ) ).append( ' ' );
+        }
+        return sb.toString();
+    }
+
+
     private byte[] getContentsAsBytes() throws UnsupportedEncodingException {
         if (_contents != null) {
             return _contents;

@@ -55,9 +55,6 @@ class HttpRequest {
         _uri      = st.nextToken();
         _protocol = st.nextToken();
 
-        if (!_command.equals( "GET" ) && !_command.equals( "POST" ) && !_command.equals( "PUT" )) {
-            throw new UnknownMethodException( _command );
-        }
         readHeaders( inputStream );
         readContent( inputStream );
     }

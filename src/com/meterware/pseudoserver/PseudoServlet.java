@@ -43,7 +43,7 @@ public class PseudoServlet {
         } else if (methodType.equalsIgnoreCase( "POST" )) {
             return getPostResponse();
         } else {
-            throw new RuntimeException( methodType + " not implemented" );
+            throw new UnknownMethodException( methodType );
         }
     }
 
@@ -52,7 +52,7 @@ public class PseudoServlet {
      * Returns a resource object as a result of a get request. 
      **/ 
     public WebResource getGetResponse() throws IOException {
-        throw new RuntimeException( "get not implemented" );
+        throw new UnknownMethodException( "GET" );
     }
 
 
@@ -60,7 +60,7 @@ public class PseudoServlet {
      * Returns a resource object as a result of a post request. 
      **/ 
     public WebResource getPostResponse() throws IOException {
-        throw new RuntimeException( "post not implemented" );
+        throw new UnknownMethodException( "POST" );
     }
 
 
@@ -68,7 +68,7 @@ public class PseudoServlet {
      * Returns a resource object as a result of a put request. 
      **/ 
     public WebResource getPutResponse() throws IOException {
-        throw new RuntimeException( "put not implemented" );
+        throw new UnknownMethodException( "PUT" );
     }
 
 
