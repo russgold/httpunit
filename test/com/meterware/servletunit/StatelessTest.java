@@ -78,7 +78,7 @@ public class StatelessTest extends TestCase {
     public void testServletAccessByClassName() throws Exception {
         ServletRunner sr = new ServletRunner();
 
-        WebRequest request   = new GetMethodWebRequest( "http://localhost/" + SimpleGetServlet.class.getName() );
+        WebRequest request   = new GetMethodWebRequest( "http://localhost/servlet/" + SimpleGetServlet.class.getName() );
         WebResponse response = sr.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/html", response.getContentType() );
@@ -155,6 +155,20 @@ public class StatelessTest extends TestCase {
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
         assertEquals( "requested resource", "You posted red", response.getText() );
+    }
+
+
+    public void testRequestInputStream() throws Exception {
+        ServletRunner sr = new ServletRunner();
+        WebRequest request = new PostMethodWebRequest( "http://localhost/servlet/" + ParameterServlet.class.getName() );
+        request.setParameter( "color", "green" );
+        final String expectedBody = "color=green";
+        InvocationContext ic = sr.newClient().newInvocation( request );
+        assertEquals( "Message body type", "application/x-www-form-urlencoded", ic.getRequest().getContentType() );
+        InputStream is = ic.getRequest().getInputStream();
+        byte[] buffer = new byte[ expectedBody.length() ];
+        assertEquals( "Input stream length", buffer.length, is.read( buffer ) );
+        assertEquals( "Message body", expectedBody, new String( buffer ) );
     }
 
 

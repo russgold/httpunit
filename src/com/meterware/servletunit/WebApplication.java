@@ -529,7 +529,10 @@ class WebApplication {
 
             if (_urlTree.containsKey( "/" )) return (ServletConfiguration) _urlTree.get( "/" );
 
-            String className = url.substring( 1 );
+            final String prefix = "/servlet/";
+            if (!url.startsWith( prefix )) return null;
+
+            String className = url.substring( prefix.length() );
             try {
                 Class.forName( className );
                 return new ServletConfiguration( className );

@@ -8,9 +8,14 @@ Known problems:
 Limitations:
     1. HttpUnit does not support JavaScript
     2. JDK 1.2 or higher is required
+    3. ServletUnit does not support JSP
 
 
 Revision History:
+21-May-2002
+Correction:
+    1. ServletUnit supports urls beginning with "/servlet/" as referring to a servlet class name if not mapped to anything else.
+
 20-May-2002
 Additions:
     1. ServletUnitHttpRequest now implements getInputStream and getContentType.

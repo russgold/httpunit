@@ -257,32 +257,36 @@ public class WebXMLTest extends TestCase {
 
     public void testServletMapping() throws Exception {
         WebXMLString wxs = new WebXMLString();
-        wxs.addServlet("/foo/bar/*", Servlet1.class);
-        wxs.addServlet("/baz/*", Servlet2.class);
-        wxs.addServlet("/catalog", Servlet3.class);
-        wxs.addServlet("*.bop", Servlet4.class);
-        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ));
+        wxs.addServlet( "/foo/bar/*", Servlet1.class );
+        wxs.addServlet( "/baz/*", Servlet2.class );
+        wxs.addServlet( "/catalog", Servlet3.class );
+        wxs.addServlet( "*.bop", Servlet4.class );
+        ServletRunner sr = new ServletRunner( toInputStream( wxs.asText() ) );
         ServletUnitClient wc = sr.newClient();
-        InvocationContext ic = wc.newInvocation("http://localhost/foo/bar/index.html");
-        assertTrue(ic.getServlet() instanceof Servlet1);
-        ic = wc.newInvocation("http://localhost/foo/bar/index.bop");
-        assertTrue(ic.getServlet() instanceof Servlet1);
-        ic = wc.newInvocation("http://localhost/baz");
-        assertTrue(ic.getServlet() instanceof Servlet2);
-        ic = wc.newInvocation("http://localhost/baz/index.html");
-        assertTrue(ic.getServlet() instanceof Servlet2);
-        ic = wc.newInvocation("http://localhost/catalog");
-        assertTrue(ic.getServlet() instanceof Servlet3);
+
+        checkMapping( wc, "http://localhost/foo/bar/index.html",  Servlet1.class, "/foo/bar",            "/index.html" );
+        checkMapping( wc, "http://localhost/foo/bar/index.bop",   Servlet1.class, "/foo/bar",            "/index.bop" );
+        checkMapping( wc, "http://localhost/baz",                 Servlet2.class, "/baz",                 null );
+        checkMapping( wc, "http://localhost/baz/index.html",      Servlet2.class, "/baz",                 "/index.html" );
+        checkMapping( wc, "http://localhost/catalog",             Servlet3.class, "/catalog",             null );
+        checkMapping( wc, "http://localhost/catalog/racecar.bop", Servlet4.class, "/catalog/racecar.bop", null );
+        checkMapping( wc, "http://localhost/index.bop",           Servlet4.class, "/index.bop",           null );
+
         try {
-            ic = wc.newInvocation("http://localhost/catalog/index.html");
-            ic.getServlet();
-            fail("Should have gotten a 404");
-        } catch (HttpNotFoundException e) {}
-        ic = wc.newInvocation("http://localhost/catalog/racecar.bop");
-        assertTrue(ic.getServlet() instanceof Servlet4);
-        ic = wc.newInvocation("http://localhost/index.bop");
-        assertTrue(ic.getServlet() instanceof Servlet4);
+            wc.newInvocation( "http://localhost/catalog/index.html" ).getServlet();
+            fail( "Should have gotten a 404" );
+        } catch (HttpNotFoundException e) {
+        }
     }
+
+
+    private void checkMapping( ServletUnitClient wc, final String url, final Class servletClass, final String expectedPath, final String expectedInfo ) throws IOException, ServletException {
+        InvocationContext ic = wc.newInvocation( url );
+        assertTrue( servletClass.isInstance( ic.getServlet() ) );
+//        assertEquals( "ServletPath", expectedPath, ic.getRequest().getServletPath() );
+//        assertEquals( "ServletInfo", expectedInfo, ic.getRequest().getPathInfo() );
+    }
+
 
 
 //===============================================================================================================

@@ -129,11 +129,6 @@ public class ServletRunner {
 //-------------------------------------------- package methods ---------------------------------------------------------
 
 
-    Servlet getServlet( URL url ) throws ServletException {
-        return _application.getServlet( url );
-    }
-
-
     ServletUnitContext getContext() {
         return _context;
     }
