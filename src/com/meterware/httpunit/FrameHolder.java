@@ -158,7 +158,7 @@ class FrameHolder {
         } else if (WebRequest.SAME_FRAME.equalsIgnoreCase( request.getTarget() )) {
             return request.getSourceFrame();
         } else if (WebRequest.PARENT_FRAME.equalsIgnoreCase( request.getTarget() )) {
-            return request.getSourceFrame().getParent();
+            return request.getSourceFrame().getParent() == null ? _topFrame : request.getSourceFrame().getParent();
         } else if (request.getSourceFrame().getName().equalsIgnoreCase( request.getTarget() )) {
             return request.getSourceFrame();
         } else {

@@ -17,6 +17,7 @@ Revision History:
 4-Oct-2004
     Problems fixed:
         1. bug #1039989 Did not compile with JDK 1.3
+        2. bug #1035949 Following a link from the top frame to a _parent target no longer results in a NullPointerException.
 
 3-Oct-2004 1.6
 Acknowledgements:

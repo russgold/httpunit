@@ -95,6 +95,14 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    public void testParentTargetFromTopFrame() throws Exception {
+        defineWebPage( "Target",  "This is another page with <a href=Form.html target='_parent'>one link</a>" );
+        WebResponse resp = _wc.getResponse( getHostPath() + "/Target.html" );
+        resp = _wc.getResponse( resp.getLinks()[0].getRequest() );
+        assertMatchingSet( "Frames after second response", new String[] { "_top" }, _wc.getFrameNames() );
+    }
+
+
     public void testFrameRequests() throws Exception {
         WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
         WebRequest[] requests = response.getFrameRequests();
