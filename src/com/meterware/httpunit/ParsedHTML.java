@@ -597,7 +597,7 @@ class ParsedHTML {
         }
 
         private HTMLElement newControlWithoutForm( ParsedHTML parsedHTML, Element element ) {
-            if (element.getNodeName().equalsIgnoreCase( "button" ) &&
+            if ((element.getNodeName().equalsIgnoreCase( "button" ) || element.getNodeName().equalsIgnoreCase( "input" )) &&
                     isValidNonFormButtonType( NodeUtils.getNodeAttribute( element, "type" ) )) {
                 return parsedHTML.toButtonWithoutForm( element );
             } else {

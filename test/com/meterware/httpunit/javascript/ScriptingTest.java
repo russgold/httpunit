@@ -752,7 +752,7 @@ public class ScriptingTest extends HttpUnitTest {
 
     public void testButtonWithoutForm() throws Exception {
         defineWebPage(  "OnCommand",  "<button id='mybutton' onclick='alert( \"I heard you!\" )'>" +
-                                      "<button id='yourbutton' type='button'  onclick='alert( \"Loud and Clear.\" )'>");
+                                      "<input id='yourbutton' type='button'  onclick='alert( \"Loud and Clear.\" )'>");
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         ((Button) response.getElementWithID( "mybutton" )).click();
