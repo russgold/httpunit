@@ -391,6 +391,11 @@ public class JavaScript {
         }
 
 
+        public Scriptable jsGet_elements() {
+            return _controls;
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
@@ -423,6 +428,8 @@ public class JavaScript {
 
 
         public void jsFunction_focus() {}
+
+        public void jsFunction_select() {}
 
 
         Scriptable toScriptable( ScriptableDelegate delegate )
