@@ -44,7 +44,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head><title>Amazing!</title></head>" +
                                             "<body onLoad='alert(\"Window title is \" + document.title)'></body>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "Window title is Amazing!", wc.popNextAlert() );
     }
 
@@ -64,7 +64,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "<form name='realform'></form>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "found 1 form(s)", wc.popNextAlert() );
         assertEquals( "Alert message", "found form 'realform'", wc.popNextAlert() );
         assertEquals( "Alert message", "found form 'forms[\'realform\']'", wc.popNextAlert() );
@@ -90,12 +90,29 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "<a href='else'>second</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "found 2 link(s)", wc.popNextAlert() );
         assertEquals( "Alert message", "found link 'reallink'", wc.popNextAlert() );
         assertEquals( "Alert message", "found link 'links[reallink]'", wc.popNextAlert() );
         assertEquals( "Alert message", "did not find link 'nolink'", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
+    }
+
+
+    public void testEmbeddedDocumentWrite() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><title>something</title></head>" +
+                                            "<body>" +
+                                            "<script language='JavaScript'>" +
+                                            "document.write( '<a id=here href=about:blank>' );" +
+                                            "document.write( document.title );" +
+                                            "document.write( '</a>' );" +
+                                            "</script>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebLink link = response.getLinkWithID( "here" );
+        assertNotNull( "The link was not found", link );
+        assertEquals( "Link contents", "something", link.asText() );
     }
 
 
@@ -114,7 +131,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "<a href='else'>second</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "they are the same", wc.popNextAlert() );
     }
 
@@ -129,7 +146,6 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
         response.getLinkWithName( "first" ).mouseOver();
         assertEquals( "form action", "run", wc.popNextAlert() );
         response.getLinkWithName( "second" ).mouseOver();
@@ -220,7 +236,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "<a href='sample.html'>green</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", getHostPath() + "/demo.html", wc.popNextAlert() );
         assertEquals( "Alert message", getHostPath() + "/guide.html", wc.popNextAlert() );
         assertEquals( "Alert message", getHostPath() + "/search.html", wc.popNextAlert() );
@@ -246,7 +262,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "<img name='2ndimage' src='pict2.gif'>\n" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "found 2 images(s)", wc.popNextAlert() );
         assertEquals( "Alert message", "found image 'realimage'", wc.popNextAlert() );
         assertEquals( "Alert message", "found image 'images[realimage]'", wc.popNextAlert() );

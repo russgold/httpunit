@@ -22,14 +22,10 @@ package com.meterware.httpunit;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
-import java.net.URL;
 import java.net.HttpURLConnection;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.Vector;
 
 
 /**
@@ -214,7 +210,7 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
-    // XXX turn this back on when Tidy handles it properly
+    // XXX turn this back on when the parser handles it properly
     public void notestNullTextValues() throws Exception {
         defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
                                   "<Input name=\"secret\" type=\"hidden\" value=>" +
@@ -251,7 +247,6 @@ public class WebFormTest extends HttpUnitTest {
         assertMatchingSet( "parameter names", new String[] { "name","sex" }, parameterNames );
         assertEquals( "Default name", "", form.getParameterValue( "name" ) );
         assertEquals( "Default sex", "female", form.getParameterValue( "sex" ) );
-        WebRequest request = form.getRequest();
 
         form.setParameter( "sex", "neuter" );
         assertEquals( "New value for sex", "neuter", form.getParameterValue( "sex" ) );
@@ -363,8 +358,7 @@ public class WebFormTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
 
         WebForm form = page.getForms()[0];
-        String[] parameterNames = form.getParameterNames();
-        assertEquals( "inferred color default", "blue", form.getParameterValue( "colors" ) );
+         assertEquals( "inferred color default", "blue", form.getParameterValue( "colors" ) );
         assertEquals( "inferred fish default", "red", form.getParameterValue( "fish" ) );
         assertMatchingSet( "inferred media default", new String[0], form.getParameterValues( "media" ) );
 
@@ -439,7 +433,6 @@ public class WebFormTest extends HttpUnitTest {
                         "<input type=text name=name><input type=submit></form></body></html>" );
         defineResource( "SayHello?speed=fast", new PseudoServlet() {
             public WebResource getPostResponse() {
-                String name = getParameter( "name" )[0];
                 WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
                                                       "</td></tr></table></body></html>" );
                 return result;
@@ -470,10 +463,7 @@ public class WebFormTest extends HttpUnitTest {
                         "<input type=text name=name><input type=submit></form></body></html>" );
         defineResource( sessionID + "/SayHello", new PseudoServlet() {
             public WebResource getPostResponse() {
-                String name = getParameter( "name" )[0];
-                WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
-                                                      "</td></tr></table></body></html>" );
-                return result;
+                return new WebResource( "<html><body><table><tr><td>Hello, there</td></tr></table></body></html>" );
             }
         } );
 

@@ -45,9 +45,8 @@ public class HTMLPage extends ParsedHTML {
     private Scriptable _scriptable;
 
 
-    HTMLPage( WebResponse response, URL url, String parentTarget, String pageText, String characterSet ) throws IOException, SAXException {
-        super( response, url, parentTarget, getDOM( url, pageText ), characterSet );
-        setBaseAttributes();
+    HTMLPage( WebResponse response, URL url, String parentTarget, String characterSet ) throws IOException, SAXException {
+        super( response, url, parentTarget, null, characterSet );
     }
 
 
@@ -80,19 +79,30 @@ public class HTMLPage extends ParsedHTML {
         ArrayList scripts = new ArrayList();
         for (int i = 0; i < nl.getLength(); i++) {
             Node scriptNode = nl.item(i);
-            String src = NodeUtils.getNodeAttribute( scriptNode, "src", null );
-            if (src == null) {
+            String scriptLocation = NodeUtils.getNodeAttribute( scriptNode, "src", null );
+            if (scriptLocation == null) {
                 scripts.add( NodeUtils.asText( scriptNode.getChildNodes() ) );
             } else {
                 try {
-                    WebRequest req = new GetMethodWebRequest( getBaseURL(), src );
-                    scripts.add( getResponse().getWindow().getResource( req ).getText() );
+                    scripts.add( getIncludedScript( scriptLocation ) );
                 } catch (IOException e) {
                     throw new RuntimeException( "Error loading included script: " + e );
                 }
             }
         }
         return (String[]) scripts.toArray( new String[ scripts.size() ] );
+    }
+
+
+    /**
+     * Returns the contents of an included script, given its src attribute.
+     * @param srcAttribute
+     * @return the contents of the script.
+     * @throws IOException if there is a problem retrieving the script
+     */
+    String getIncludedScript( String srcAttribute ) throws IOException {
+        WebRequest req = new GetMethodWebRequest( getBaseURL(), srcAttribute );
+        return getResponse().getWindow().getResource( req ).getText();
     }
 
 
@@ -182,7 +192,12 @@ public class HTMLPage extends ParsedHTML {
             } else {
                 super.set( propertyName, value );
              }
-       }
+        }
+
+
+        public WebResponse.Scriptable getParent() {
+            return getResponse().getScriptableObject();
+        }
 
 
         public String getTitle() throws SAXException {
@@ -232,15 +247,18 @@ public class HTMLPage extends ParsedHTML {
         return _scriptable;
     }
 
-//---------------------------------- private members --------------------------------
 
 
-    private static Node getDOM( URL url, String pageText ) throws IOException, SAXException {
-        return HttpUnitOptions.getHTMLParser().getDocument( url, pageText );
+    public void parse( String text ) throws SAXException, IOException {
+        HttpUnitOptions.getHTMLParser().parse( this, getBaseURL(), text );
+        setBaseAttributes();
     }
 
 
-    private void setBaseAttributes() throws SAXException {
+//---------------------------------- private members --------------------------------
+
+
+    private void setBaseAttributes() {
         NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "base" );
         if (nl.getLength() == 0) return;
         try {

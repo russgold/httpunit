@@ -32,10 +32,10 @@ import java.io.IOException;
 interface HTMLParser {
 
     /**
-     * Converts an HTML text string to a Document. Any error reporting will be annotated with the
-     * specified URL.
+     * Parses the specified text string as a Document, registering it in the HTMLPage.
+     * Any error reporting will be annotated with the specified URL.
      */
-    public Node getDocument( URL url, String pageText ) throws IOException, SAXException;
+    public void parse( HTMLPage page, URL baseURL, String pageText ) throws IOException, SAXException;
 
 
     /**

@@ -60,7 +60,7 @@ class ParsedHTML {
      **/
     public WebForm[] getForms() {
         if (_forms == null) {
-            NodeList forms = NodeUtils.getElementsByTagName( _rootNode, "form" );
+            NodeList forms = NodeUtils.getElementsByTagName( getRootNode(), "form" );
 
             _forms = new WebForm[ forms.getLength() ];
             for (int i = 0; i < _forms.length; i++) {
@@ -103,7 +103,7 @@ class ParsedHTML {
     public WebLink[] getLinks() {
         if (_links == null) {
             final ArrayList list = new ArrayList();
-            NodeUtils.processNodes( _rootNode.getChildNodes(), new NodeUtils.NodeAction() {
+            NodeUtils.processNodes( getRootNode().getChildNodes(), new NodeUtils.NodeAction() {
                 public boolean processElement( Element element ) {
                     if (element.getNodeName().equalsIgnoreCase( "a" )) addLinkAnchor( list, element );
                     else if (element.getNodeName().equalsIgnoreCase( "area" )) addLinkAnchor( list, element );
@@ -189,7 +189,7 @@ class ParsedHTML {
      **/
     public WebImage[] getImages() {
         if (_images == null) {
-            NodeList images = NodeUtils.getElementsByTagName( _rootNode, "img" );
+            NodeList images = NodeUtils.getElementsByTagName( getRootNode(), "img" );
 
             _images = new WebImage[ images.getLength() ];
             for (int i = 0; i < _images.length; i++) {
@@ -302,16 +302,8 @@ class ParsedHTML {
      * Returns a copy of the domain object model associated with this page.
      **/
     public Node getDOM() {
-        return _rootNode.cloneNode( /* deep */ true );
+        return getRootNode().cloneNode( /* deep */ true );
     }
-
-    /**
-     * Returns the domain object model associated with this page, to be used internally.
-     **/
-    Node getOriginalDOM() {
-        return _rootNode;
-    }
-
 
 //---------------------------------- Object methods --------------------------------
 
@@ -341,7 +333,28 @@ class ParsedHTML {
     }
 
 
+
+    protected Node getRootNode() {
+        if (_rootNode == null) throw new IllegalStateException( "The root node has not been specified" );
+        return _rootNode;
+    }
+
+
 //---------------------------------- package members --------------------------------
+
+
+    /**
+     * Specifies the root node for this HTML fragment.
+     */
+    protected void setRootNode( Node rootNode ) {
+        if (_rootNode != null && rootNode != _rootNode )
+            throw new IllegalStateException( "The root node has already been defined as " + _rootNode + " and cannot be redefined as " + rootNode );
+        _rootNode = rootNode;
+
+        _links = null;
+        _forms = null;
+        _images = null;
+    }
 
 
     /**
@@ -354,6 +367,14 @@ class ParsedHTML {
 
     WebResponse getResponse() {
         return _response;
+    }
+
+
+    /**
+     * Returns the domain object model associated with this page, to be used internally.
+     **/
+    Node getOriginalDOM() {
+        return getRootNode();
     }
 
 

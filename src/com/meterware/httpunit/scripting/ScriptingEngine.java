@@ -31,7 +31,7 @@ public interface ScriptingEngine {
     /**
      * Interprets the specified script, which may include global function definitions.
      */
-    public void executeScript( String script );
+    public String executeScript( String script );
 
 
     /**

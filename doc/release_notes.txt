@@ -10,7 +10,14 @@ Limitations:
 
 
 Revision History:
-22-Oct-22
+24-Oct-2002
+Acknowledgements:
+    Thanks to Andy Clark for help using the NekoHTML filter capability.
+
+Additions:
+    1. document.write and writeln are now supported for embedded uses
+
+22-Oct-2002
 Acknowledgements:
     Thanks to Troy Waldrep for help with the new handling of response statuses and messages.
 

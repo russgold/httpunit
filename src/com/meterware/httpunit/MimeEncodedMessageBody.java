@@ -70,7 +70,7 @@ class MimeEncodedMessageBody extends MessageBody {
         StringBuffer sb = new StringBuffer(chars.length+20);
         for (int i = 0; i < chars.length; i++ ) {
             if (chars[i] == '\\') {
-                sb.append( "\\\\" );    // accomodate MS-DOS file paths XXX is this safe??
+                sb.append( "\\\\" );    // accomodate MS-DOS file paths ??? is this safe??
             } else {
                 sb.append( chars[i] );
             }

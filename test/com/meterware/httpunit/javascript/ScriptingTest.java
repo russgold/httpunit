@@ -78,7 +78,7 @@ public class ScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         GetMethodWebRequest request = new GetMethodWebRequest( "javascript:alert( 'Hi there!' )" );
         assertEquals( "Javascript URL", "javascript:alert( 'Hi there!' )", request.getURL().toExternalForm() );
-        WebResponse response = wc.getResponse( request );
+        wc.getResponse( request );
         assertEquals( "Alert message", "Hi there!", wc.popNextAlert() );
     }
 
@@ -131,7 +131,7 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad='alert(\"Ouch!\")'></body>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertNotNull( "No alert detected", wc.getNextAlert() );
         assertEquals( "Alert message", "Ouch!", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
@@ -206,7 +206,7 @@ public class ScriptingTest extends HttpUnitTest {
                                             "// end hiding -->" +
                                             "</script></body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
     }
 
@@ -218,7 +218,7 @@ public class ScriptingTest extends HttpUnitTest {
                                           "parseInt(n,32);" +
                                           "</script></head></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
     }
 
 
@@ -228,7 +228,7 @@ public class ScriptingTest extends HttpUnitTest {
                                           "</script></head>" +
                                           "<body onLoad='sayCheese()'></body>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
     }
 
@@ -321,7 +321,6 @@ public class ScriptingTest extends HttpUnitTest {
                         "<body onload=\"window.name='main'; alert ('opener ' + (window.opener ? 'found' : 'not defined') );\">" +
                         "<a href='#' onClick=\"window.open( '" + getHostPath() + "/Target.html', 'sample' );\">go</a>" +
                         "</body></html>" );
-        final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "main window name", "main", wc.getMainWindow().getName() );
@@ -357,7 +356,7 @@ public class ScriptingTest extends HttpUnitTest {
                         "</frameset></html>" );
 
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/Frames.html" );
+        wc.getResponse( getHostPath() + "/Frames.html" );
         WebResponse blue = wc.getFrameContents( "blue" );
         blue.getLinkWith( "show" ).click();
 
@@ -427,7 +426,7 @@ public class ScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         wc.getClientProperties().setApplicationID( "Internet Explorer", "Mozilla", "4.0" );
         wc.getClientProperties().setPlatform( "JVM" );
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message 1", "appName=Internet Explorer", wc.popNextAlert() );
         assertEquals( "Alert message 2", "appCodeName=Mozilla", wc.popNextAlert() );
         assertEquals( "Alert message 3", "appVersion=4.0", wc.popNextAlert() );
@@ -450,7 +449,7 @@ public class ScriptingTest extends HttpUnitTest {
         HttpUnitOptions.setExceptionsThrownOnScriptError( true );
         WebConversation wc = new WebConversation();
         wc.getClientProperties().setAvailableScreenSize( 1024, 752 );
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
         assertEquals( "Alert message 1", "dimensions=1024x752", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }

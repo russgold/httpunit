@@ -33,11 +33,12 @@ import java.io.UnsupportedEncodingException;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class JTidyHTMLParser implements HTMLParser {
+class JTidyHTMLParser implements HTMLParser {
 
-    public Node getDocument( URL url, String pageText ) throws IOException, SAXException {
+
+    public void parse( HTMLPage page, URL baseURL, String pageText ) throws IOException, SAXException {
         try {
-            return getParser( url ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null );
+            page.setRootNode( getParser( baseURL ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null ) );
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException( "UTF-8 encoding failed" );
         }

@@ -102,14 +102,28 @@ public class JavaScript {
         protected ScriptableDelegate _scriptable;
 
 
-        public void executeScript( String script ) {
+        public String executeScript( String script ) {
             try {
                 script = script.trim();
                 if (script.startsWith( "<!--" )) script = withoutFirstLine( script );
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
+                StringBuffer buffer = getDocumentWriteBuffer();
+                return buffer.toString();
             } catch (Exception e) {
                 handleScriptException( e, "Script '" + script + "'" );
+                return "";
+            } finally {
+                Context.getCurrentContext().removeThreadLocal( "stream" );
             }
+        }
+
+        protected StringBuffer getDocumentWriteBuffer() {
+            StringBuffer buffer = (StringBuffer) Context.getCurrentContext().getThreadLocal( "stream" );
+            if (buffer == null) {
+                buffer = new StringBuffer();
+                Context.getCurrentContext().putThreadLocal( "stream", buffer );
+            }
+            return buffer;
         }
 
 
@@ -138,6 +152,7 @@ public class JavaScript {
                 return false;
             }
         }
+
 
         /**
          * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
@@ -237,7 +252,6 @@ public class JavaScript {
 
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) {
             try {
-//            return (JavaScriptEngine) Context.getCurrentContext().newObject( this, getScriptableClassName( child ) );
                 return (ScriptingEngine) toScriptable( child );
             } catch (Exception e) {
                 e.printStackTrace();
@@ -432,6 +446,18 @@ public class JavaScript {
         public Scriptable jsGet_forms() throws SAXException {
             if (_forms == null) initializeForms();
             return _forms;
+        }
+
+
+        public void jsFunction_write( String string ) {
+            final StringBuffer documentWriteBuffer = getDocumentWriteBuffer();
+            documentWriteBuffer.append( string );
+        }
+
+
+        public void jsFunction_writeln( String string ) {
+            final StringBuffer documentWriteBuffer = getDocumentWriteBuffer();
+            documentWriteBuffer.append( string ).append( 0x0D );
         }
 
 

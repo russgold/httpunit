@@ -27,8 +27,6 @@ import com.meterware.httpunit.Base64;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.ByteArrayOutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -449,7 +447,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     /**
      *
      * @deprecated 	As of Version 2.1 of the Java Servlet API,
-     * 			use {@link ServletContext#getRealPath} instead.
+     * 			use {@link javax.servlet.ServletContext#getRealPath} instead.
      *
      */
     public String getRealPath( String path ) {
