@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -266,6 +266,36 @@ public class ScriptingTest extends HttpUnitTest {
         final WebWindow openedWindow = (WebWindow) windowsOpened.get( 0 );
         assertEquals( "New window message", "You made it!", openedWindow.getCurrentPage().getText() );
         assertEquals( "New window name", "sample", openedWindow.getName() );
+        response.getLinks()[2].click();
+        assertEquals( "Alert message", "window is not closed", wc.popNextAlert() );
+        response.getLinks()[1].click();
+        assertTrue( "Window was not closed", openedWindow.isClosed() );
+        response.getLinks()[2].click();
+        assertEquals( "Alert message", "window is closed", wc.popNextAlert() );
+    }
+
+
+    public void testWindowOpenWithEmptyName() throws Exception {
+        defineResource( "Target.txt", "You made it!", "text/plain" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body><script language='JavaScript'>var otherWindow;</script>" +
+                        "<a href='#' onClick=\"otherWindow = window.open( '" + getHostPath() + "/Target.txt', '' );\">go</a>" +
+                        "<a href='#' onClick=\"otherWindow.close();\">go</a>" +
+                        "<a href='#' onClick=\"alert( 'window is ' + (otherWindow.closed ? '' : 'not ') + 'closed' );\">go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
+        WebConversation wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) { windowsOpened.add( window ); }
+            public void windowClosed( WebClient client, WebWindow window ) {}
+        } );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+
+        assertFalse( "No window opened", windowsOpened.isEmpty() );
+        final WebWindow openedWindow = (WebWindow) windowsOpened.get( 0 );
+        assertEquals( "New window message", "You made it!", openedWindow.getCurrentPage().getText() );
+        assertEquals( "New window name", "", openedWindow.getName() );
         response.getLinks()[2].click();
         assertEquals( "Alert message", "window is not closed", wc.popNextAlert() );
         response.getLinks()[1].click();

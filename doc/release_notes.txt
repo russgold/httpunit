@@ -13,6 +13,10 @@ Limitations:
 
 
 Revision History:
+12-Feb-2004
+Problems fixed:
+    1. Window.open() using an empty name was replacing the main window rather than creating a new one.
+
  4-Dec-2003
 Acknowledgements:
     Thanks to Andrew Bickerton for adding the following JavaScript support:

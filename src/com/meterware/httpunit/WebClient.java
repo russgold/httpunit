@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -45,10 +45,10 @@ import com.meterware.httpunit.cookies.CookieJar;
 abstract
 public class WebClient {
 
+    private ArrayList _openWindows = new ArrayList();
 
     /** The current main window. **/
     private WebWindow _mainWindow = new WebWindow( this );
-    private ArrayList _openWindows = new ArrayList();
     private String _authorizationString;
 
 

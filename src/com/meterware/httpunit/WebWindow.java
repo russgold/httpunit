@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -47,6 +47,9 @@ public class WebWindow {
 
     /** True if this window has been closed. **/
     private boolean _closed;
+
+
+    static final String NO_NAME = "$$HttpUnit_Window$$_";
 
 
     /**
@@ -216,6 +219,7 @@ public class WebWindow {
     WebWindow( WebClient client ) {
         _client = client;
         _frameContents = new FrameHolder( _client, WebRequest.TOP_FRAME );
+        _name = NO_NAME + _client.getOpenWindows().length;
     }
 
 
