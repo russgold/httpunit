@@ -113,8 +113,8 @@ public class HTMLElementTest  extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
 
-        assertEquals( "tabindex", "1", response.getScriptableObject().evaluateURL( "document.perform.name.tabindex") );
-        assertEquals( "maxlength", "20", response.getScriptableObject().evaluateURL( "document.perform.name.maxlength") );
+        assertEquals( "tabindex", "1", response.getScriptableObject().evaluateExpression( "document.perform.name.tabindex") );
+        assertEquals( "maxlength", "20", response.getScriptableObject().evaluateExpression( "document.perform.name.maxlength") );
     }
 
 

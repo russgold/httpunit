@@ -37,7 +37,7 @@ abstract public class ScriptableDelegate {
         public boolean supportsScriptLanguage( String language ) { return false; }
         public String executeScript( String language, String script ) { return ""; }
         public boolean performEvent( String eventScript ) { return true; }
-        public String getURLContents( String urlString ) { return null; }
+        public String evaluateScriptExpression( String urlString ) { return null; }
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
     };
 
@@ -66,11 +66,11 @@ abstract public class ScriptableDelegate {
 
 
     /**
-     * Evaluates the specified javascript URL.
+     * Evaluates the specified javascript expression, returning its value.
      **/
-    public String evaluateURL( String urlString ) {
+    public String evaluateExpression( String urlString ) {
         if (urlString.length() == 0) return null;
-        return getScriptEngine().getURLContents( urlString );
+        return getScriptEngine().evaluateScriptExpression( urlString );
     }
 
 

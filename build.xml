@@ -30,7 +30,7 @@
     <property name="archive.dir" value="${dist.dir}/${name}-${version}" />
     <property name="classpath" value="" />
     <property name="web.dir" value="web" />
-    <property name="packages" value="com.meterware.httpunit,com.meterware.servletunit,com.meterware.pseudoserver,com.meterware.httpunit.cookies,com.meterware.httpunit.parsing" />
+    <property name="packages" value="com.meterware.httpunit,com.meterware.servletunit,com.meterware.pseudoserver,com.meterware.httpunit.cookies,com.meterware.httpunit.scripting,com.meterware.httpunit.parsing" />
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
     <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />
 

@@ -49,7 +49,7 @@ public interface ScriptingEngine {
     /**
      * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
      */
-    public String getURLContents( String urlString );
+    public String evaluateScriptExpression( String urlString );
 
 
     /**
