@@ -81,7 +81,7 @@ call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrie
 Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
 
 <A NAME="#reload"><H2>Why do I get java.lang.IllegalAccessError when calling getResponse()?</H2></A>
-This happens when you use HttpUnit and JTidy with one of the JUnit graphical test runners, which reloads
+<p>This happens when you use HttpUnit and certain versions of JTidy with one of the JUnit graphical test runners, which reloads
 classes every time to run a test. Unfortunately, this places different versions of the JTidy
 classes in different class loaders, so you get this error.  To avoid it,
 you can do any of the following:<ul><li>Use only the text test runner</li>
@@ -91,7 +91,8 @@ excluded.10=com.meterware.httpunit.*<br>
 excluded.11=org.w3c.tidy.*
 </code></blockquote>
 This will require extracting the file, modifying it and then putting it back <em>in the same directory</em>, but it should allow your
-tests to reload safely.</ul>
+tests to reload safely.</ul></p>
+<p>This problem appears to be resolved in JTidy r7, which is included with HttpUnit 1.4.1 or later.
 
 <A HREF="#badPost"><H2>Why doesn't my servlet see parameters on a POST request?</H2></A>
 Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type
