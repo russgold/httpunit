@@ -11,6 +11,12 @@ Limitations:
 
 
 Revision History:
+ 1-Oct-2002
+Additions:
+    1. Added support for the Navigator object.
+    2. Created a ClientProperties object to hold per-client properties. Each new web client is initialized from the
+       default, but may be configured independently.
+
 27-Sep-2002
 Problems fixed:
     1. Disabled form parameters were being submitted with requests and could be modified by setParameter calls.
@@ -51,6 +57,7 @@ Acknowledgments:
     1. Thanks to Ville Skyttä for removing the test dependency on xerces.
 
  5-Sep-2002
+Additions:
     1. The web XML tests will now work with any jaxp-compliant parser, not just xerces.
 
 Problems fixed:

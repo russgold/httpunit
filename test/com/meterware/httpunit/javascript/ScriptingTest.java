@@ -455,4 +455,31 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testNavigatorObject() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function viewProperties() { \n" +
+                                            "  alert( 'appName=' + navigator.appName );\n" +
+                                            "  alert( 'appCodeName=' + navigator.appCodeName )\n;" +
+                                            "  alert( 'appVersion=' + navigator.appVersion )\n;" +
+                                            "  alert( 'userAgent=' + navigator.userAgent )\n;" +
+                                            "  alert( 'javaEnabled=' + navigator.javaEnabled() )\n;" +
+                                            "  alert( '# plugins=' + navigator.plugins.length )\n;" +
+                                            "}" +
+                                            "</script></head>\n" +
+                                            "<body onLoad='viewProperties()'>\n" +
+                                            "</body></html>" );
+        HttpUnitOptions.setExceptionsThrownOnScriptError( true );
+        WebConversation wc = new WebConversation();
+        wc.getClientProperties().setApplicationID( "Internet Explorer", "Mozilla", "4.0" );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Alert message 1", "appName=Internet Explorer", wc.popNextAlert() );
+        assertEquals( "Alert message 2", "appCodeName=Mozilla", wc.popNextAlert() );
+        assertEquals( "Alert message 3", "appVersion=4.0", wc.popNextAlert() );
+        assertEquals( "Alert message 4", "userAgent=Mozilla/4.0", wc.popNextAlert() );
+        assertEquals( "Alert message 5", "javaEnabled=false", wc.popNextAlert() );
+        assertEquals( "Alert message 6", "# plugins=0", wc.popNextAlert() );
+        assertNull( "Alert should have been removed", wc.getNextAlert() );
+    }
+
+
 }

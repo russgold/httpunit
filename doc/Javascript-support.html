@@ -10,9 +10,10 @@ Inline and included scripts are supported, as are the following DOM elements:
 <h4>properties</h4>
 <ul>
 <li>document - the associated Document object</li>
+<li>location - r/w full URL only</li>
+<li>navigator - the Navigator object</li>
 <li>self - the Window itself</li>
 <li>window - a synonym for self</li>
-<li>location - r/w full URL only</li>
 </ul>
 <h4>events</h4>
 <ul>
@@ -24,6 +25,20 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response. By default,
                 the callback returns true. Users may change this by supplying an implementation of DialogResponder.</li>
 <li>prompt() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
+</ul>
+
+<h3>Navigator</h3>
+<h4>properties</h4>
+<ul>
+<li>appCodeName - the code name set in ClientProperties.setApplicationCodeName()</li>
+<li>appName     - the name of the browser, as set in ClientProperties.setApplicationName()</li>
+<li>appVersion  - the browser version, set in ClientProperties.setApplicationVersion()</li>
+<li>plugins     - an empty array of objects, since plugins are not universally supported</li>
+<li>userAgent   - the name of the user agent, set by ClientProperties.setUserAgent or derived from the code name and version</li>
+</ul>
+<h4>methods</h4>
+<ul>
+<li>javaEnabled - always returns false to indicate that applets are not supported</li>
 </ul>
 
 <h3>Document</h3>

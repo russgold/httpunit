@@ -543,6 +543,11 @@ public class WebResponse implements HTMLSegment {
         }
 
 
+        public ClientProperties getClientProperties() {
+            return _client.getClientProperties();
+        }
+
+
         public HTMLPage.Scriptable getDocument() throws SAXException {
             return getReceivedPage().getScriptableObject();
         }

@@ -197,18 +197,28 @@ public class WebClient {
 
 
     /**
+     * Returns the properties associated with this client.
+     */
+    public ClientProperties getClientProperties() {
+        return _clientProperties;
+    }
+
+
+    /**
      * Specifies the user agent identification. Used to trigger browser-specific server behavior.
+     * @deprecated as of 1.4.6. Use ClientProperties#setUserAgent instead.
      **/
     public void setUserAgent( String userAgent ) {
-	    setHeaderField( "User-Agent", userAgent );
+	    getClientProperties().setUserAgent( userAgent );
     }
 
 
     /**
      * Returns the current user agent setting.
+     * @deprecated as of 1.4.6. Use ClientProperties#getUserAgent instead.
      **/
     public String getUserAgent() {
-	    return getHeaderField( "User-Agent" );
+	    return getClientProperties().getUserAgent();
     }
 
 
@@ -351,6 +361,7 @@ public class WebClient {
      * Returns the value of all current header fields.
      **/
     protected Dictionary getHeaderFields() {
+        setHeaderField( "User-Agent", getClientProperties().getUserAgent() );
         Hashtable result = (Hashtable) _headers.clone();
         if (getCookieHeaderField() != null) result.put( "Cookie", getCookieHeaderField() );
         return result;
@@ -422,6 +433,8 @@ public class WebClient {
     private List _clientListeners = new ArrayList();
 
     private DialogResponder _dialogResponder = new DialogAdapter();
+
+    private ClientProperties _clientProperties = ClientProperties.getDefaultProperties().cloneProperties();
 
 
     /**

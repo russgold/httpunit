@@ -93,6 +93,7 @@ public class JavaScript {
             InvocationTargetException, ClassDefinitionException, PropertyException {
         ScriptableObject.defineClass( scope, Window.class );
         ScriptableObject.defineClass( scope, Document.class );
+        ScriptableObject.defineClass( scope, Navigator.class );
         ScriptableObject.defineClass( scope, Link.class );
         ScriptableObject.defineClass( scope, Form.class );
         ScriptableObject.defineClass( scope, Control.class );
@@ -267,7 +268,8 @@ public class JavaScript {
 
     static public class Window extends JavaScriptEngine {
 
-        private Document _document;
+        private Document  _document;
+        private Navigator _navigator;
 
 
         public String getClassName() {
@@ -290,11 +292,19 @@ public class JavaScript {
         }
 
 
+        public Navigator jsGet_navigator() {
+            return _navigator;
+        }
+
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
             _document = (Document) Context.getCurrentContext().newObject( this, "Document" );
             _document.initialize( this, getDelegate().getDocument() );
+
+            _navigator = (Navigator) Context.getCurrentContext().newObject( this, "Navigator" );
+            _navigator.initialize( this, getDelegate() );
 
             getDelegate().load();
         }
@@ -423,6 +433,57 @@ public class JavaScript {
 
         private HTMLPage.Scriptable getDelegate() {
             return (HTMLPage.Scriptable) _scriptable;
+        }
+
+    }
+
+
+    static public class Navigator extends JavaScriptEngine {
+
+        public String getClassName() {
+            return "Navigator";
+        }
+
+
+        void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
+                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+            _scriptable = scriptable;
+            if (parent != null) setParentScope( parent );
+        }
+
+
+        public String jsGet_appName() {
+            return getDelegate().getClientProperties().getApplicationName();
+        }
+
+
+        public String jsGet_appCodeName() {
+            return getDelegate().getClientProperties().getApplicationCodeName();
+        }
+
+
+        public String jsGet_appVersion() {
+            return getDelegate().getClientProperties().getApplicationVersion();
+        }
+
+
+        public String jsGet_userAgent() {
+            return getDelegate().getClientProperties().getUserAgent();
+        }
+
+
+        public Object[] jsGet_plugins() {
+            return new Object[0];
+        }
+
+
+        public boolean jsFunction_javaEnabled() {
+            return false;   // no support is provided for applets at present
+        }
+
+
+        private WebResponse.Scriptable getDelegate() {
+            return (WebResponse.Scriptable) _scriptable;
         }
 
     }

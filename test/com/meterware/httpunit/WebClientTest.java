@@ -55,13 +55,6 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
-    public void testHeaderFields() throws Exception {
-        WebConversation wc = new WebConversation();
-        wc.setHeaderField( "user-agent", "Mozilla 6" );
-        assertEquals( "Mozilla 6", wc.getUserAgent() );
-    }
-
-
     public void testCookies() throws Exception {
         String resourceName = "something/baking";
         String resourceValue = "the desired content";
@@ -122,6 +115,23 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "content type", "text/html", response.getContentType() );
         assertEquals( "number of cookies", 1, wc.getCookieNames().length );
         assertEquals( "cookie 'CUSTOMER' value", "WILE_E_COYOTE", wc.getCookieValue( "CUSTOMER" ) );
+    }
+
+
+    public void testHeaderFields() throws Exception {
+        defineResource( "getHeaders", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                StringBuffer sb = new StringBuffer();
+                sb.append( getHeader( "Junky" ) ).append( "<-->" ).append( getHeader( "User-Agent" ) );
+                return new WebResource( sb.toString(), "text/plain" );
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        wc.getClientProperties().setUserAgent( "me alone" );
+        wc.setHeaderField( "junky", "Mozilla 6" );
+        WebResponse wr = wc.getResponse( getHostPath() + "/getHeaders" );
+        assertEquals( "headers found", "Mozilla 6<-->me alone", wr.getText() );
     }
 
 
