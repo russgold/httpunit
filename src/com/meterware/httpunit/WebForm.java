@@ -46,8 +46,8 @@ public class WebForm extends WebRequestSource {
     /**
      * Submits this form using the web client from which it was originally obtained.
      **/
-    public void submit() throws IOException, SAXException {
-        submitRequest();
+    public WebResponse submit() throws IOException, SAXException {
+        return submitRequest();
     }
 
 
@@ -63,8 +63,7 @@ public class WebForm extends WebRequestSource {
      * Returns the action defined for this form.
      **/
     public String getAction() {
-        if (_action == null) _action = getDestination();
-        return _action;
+        return getDestination();
      }
 
 
@@ -411,7 +410,7 @@ public class WebForm extends WebRequestSource {
 
     public class Scriptable extends ScriptableObject {
         public String getAction() { return WebForm.this.getAction(); }
-        public void setAction( String newAction ) { _action = newAction; }
+        public void setAction( String newAction ) { setDestination( newAction ); }
 
 
         public Object get( String propertyName ) {
@@ -458,8 +457,6 @@ public class WebForm extends WebRequestSource {
 
     private FormControl[] _presetParameters;
     private ArrayList     _presets;
-
-    private String        _action;
 
 
     private Object getObject( String name ) {

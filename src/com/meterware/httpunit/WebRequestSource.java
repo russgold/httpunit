@@ -145,6 +145,11 @@ public class WebRequestSource extends ParameterHolder {
     }
 
 
+    protected void setDestination( String destination ) {
+        _destination = destination;
+    }
+
+
     /**
      * Returns the actual DOM for this request source, not a copy.
      **/
@@ -168,8 +173,8 @@ public class WebRequestSource extends ParameterHolder {
      * Submits a request to the web client from which this request source was originally obtained.
      **/
     final
-    protected void submitRequest() throws IOException, SAXException {
-        _baseResponse.getClient().sendRequest( getRequest() );
+    protected WebResponse submitRequest() throws IOException, SAXException {
+        return _baseResponse.getClient().sendRequest( getRequest() );
     }
 
 

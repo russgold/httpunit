@@ -110,6 +110,19 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testSubmitStringAfterSetAction() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age>" +
+                                  "<Input type=submit value=Go>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        page.getForms()[0].getScriptableObject().setAction( "tell" );
+        WebRequest request = page.getForms()[0].getRequest();
+        request.setParameter( "age", "23" );
+        assertEquals( getHostPath() + "/tell?age=23", request.getURL().toExternalForm() );
+    }
+
+
     public void testNoNameSubmitString() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text value=dontSend>" +
