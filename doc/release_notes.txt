@@ -13,6 +13,14 @@ Limitations:
 
 
 Revision History:
+24-Jun-2003
+Additions:
+    1. rfe #721424: You can now set checkbox values in a form via: setCheckbox(name,boolean) or toggleCheckbox(name).
+                    These methods will throw an exception if the specified parameter is not a checkbox or if more than
+                    one control  has the name.
+    2. PseudoServer now permits setting the maximum protocol level. If it is 1.0, all responses will be forced to
+                    HTTP/1.0 no matter the protocol of the request.
+
 20-Jun-2003
 Acknowledgements:
     Thanks to Brian O'Kelley for supplying a way to disable use of the proxy server.

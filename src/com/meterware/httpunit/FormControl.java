@@ -220,6 +220,22 @@ abstract class FormControl extends HTMLElementBase {
 
 
     /**
+     * Toggles the value of this control.
+     */
+    public void toggle() {
+        throw new FormParameter.IllegalCheckboxParameterException( getName(), "toggleCheckbox" );
+    }
+
+
+    /**
+     * Sets the state of this boolean control.
+     */
+    public void setState( boolean state ) {
+        throw new FormParameter.IllegalCheckboxParameterException( getName(), "setCheckbox" );
+    }
+
+
+    /**
      * Performs the 'onChange' event defined for this control.
      */
     protected void sendOnChangeEvent() {
@@ -631,6 +647,20 @@ class CheckboxFormControl extends BooleanFormControl {
     }
 
 
+    /**
+     * Toggles the value of this control.
+     */
+    public void toggle() {
+        setChecked( !isChecked() );
+    }
+
+
+    /**
+     * Sets the state of this boolean control.
+     */
+    public void setState( boolean state ) {
+        setChecked( state );
+    }
  }
 
 

@@ -250,6 +250,38 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
+    public void testCheckboxShortcuts() throws Exception {
+        defineWebPage( "Default", "<form method=GET id='boxes'>" +
+                                       "<Input type=checkbox name=use_color>" +
+                                       "<Input type=checkbox name=running value=fast>" +
+                                       "<Input type=checkbox name=color value=red>Scarlet" +
+                                       "<Input type=checkbox name=color value=blue>Turquoise" +
+                                       "<Input type=text name=fish>" +
+                                       "<Input type=submit></form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getFormWithID( "boxes" );
+        form.toggleCheckbox( "use_color" );
+        assertEquals( "'use_color' checkbox after toggle", "on", form.getParameterValue( "use_color" ) );
+        form.setCheckbox( "use_color", false );
+        assertEquals( "'use_color' checkbox after set-false", null, form.getParameterValue( "use_color" ) );
+        form.toggleCheckbox( "running" );
+        assertEquals( "'running' checkbox after toggle", "fast", form.getParameterValue( "running" ) );
+
+        try {
+            form.setCheckbox( "color", true );
+            fail( "Did not forbid setting checkbox with multiple values" );
+        } catch (IllegalRequestParameterException e) {
+        }
+
+        try {
+            form.toggleCheckbox( "fish" );
+            fail( "Did not forbid toggling non-checkbox parameter" );
+        } catch (IllegalRequestParameterException e) {
+        }
+
+    }
+
+
     public void testReadOnlyControls() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                        "<Input readonly type=checkbox name=color value=red checked>" +

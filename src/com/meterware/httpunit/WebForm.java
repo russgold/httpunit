@@ -534,6 +534,33 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    /**
+     * Toggles the value of the specified checkbox parameter.
+     * @param name the name of the checkbox parameter
+     * @throws IllegalArgumentException if the specified parameter is not a checkbox or there is more than one
+     *         control with that name.
+     */
+    public void toggleCheckbox( String name ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == null) throw new NoSuchParameterException( name );
+        parameter.toggleCheckbox();
+    }
+
+
+    /**
+     * Sets the value of the specified checkbox parameter.
+     * @param name the name of the checkbox parameter
+     * @param state the new state of the checkbox
+     * @throws IllegalArgumentException if the specified parameter is not a checkbox or there is more than one
+     *         control with that name.
+     */
+    public void setCheckbox( String name, boolean state ) {
+        FormParameter parameter = getParameter( name );
+        if (parameter == null) throw new NoSuchParameterException( name );
+        parameter.setValue( state );
+    }
+
+
     public class Scriptable extends HTMLElementScriptable implements NamedDelegate {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); _presetParameters = null; }

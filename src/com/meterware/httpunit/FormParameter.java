@@ -93,6 +93,20 @@ class FormParameter {
     }
 
 
+    public void toggleCheckbox() {
+        FormControl[] controls = getControls();
+        if (controls.length != 1) throw new IllegalCheckboxParameterException( _name, "toggleCheckbox" );
+        controls[0].toggle();
+    }
+
+
+    public void setValue( boolean state ) {
+        FormControl[] controls = getControls();
+        if (controls.length != 1) throw new IllegalCheckboxParameterException( _name, "toggleCheckbox" );
+        controls[0].setState( state );
+    }
+
+
     void setFiles( UploadFileSpec[] fileArray ) {
         ArrayList list = new ArrayList( fileArray.length );
         list.addAll( Arrays.asList( fileArray ) );
@@ -254,6 +268,36 @@ class FormParameter {
         private int    _numExpected;
         private int    _numSupplied;
     }
+
+
+//============================= exception class IllegalCheckboxParameterException ======================================
+
+
+    /**
+     * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
+     **/
+    static class IllegalCheckboxParameterException extends IllegalRequestParameterException {
+
+
+        IllegalCheckboxParameterException( String parameterName, String methodName ) {
+            _parameterName = parameterName;
+            _methodName      = methodName;
+        }
+
+
+        public String getMessage() {
+            StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
+            sb.append( "Attempted to invoke method '" ).append( _methodName );
+            sb.append( "' for parameter '" ).append( _parameterName ).append( "', which is not a unique checkbox control." );
+            return sb.toString();
+        }
+
+
+        private String   _parameterName;
+        private String   _methodName;
+    }
+
+
 
 }
 
