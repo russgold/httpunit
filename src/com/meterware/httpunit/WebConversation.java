@@ -43,10 +43,36 @@ public class WebConversation {
     public WebConversation() {
     }
 
+
+    /**
+     * Returns the name of the currently active frames.
+     **/
+    public String[] getFrameNames() {
+        Vector names = new Vector();
+        for (Enumeration e = _frameContents.keys(); e.hasMoreElements();) {
+            names.addElement( e.nextElement() );
+        }
+
+        String[] result = new String[ names.size() ];
+        names.copyInto( result );
+        return result;
+    }
+
+
+    /**
+     * Returns the response associated with the specified frame name.
+     **/
+    public WebResponse getFrameContents( String frameName ) {
+        WebResponse response = (WebResponse) _frameContents.get( frameName );
+        if (response == null) throw new NoSuchFrameException( frameName );
+        return response;
+    }
+
+
     /**
      * Submits a GET method request and returns a response.
      **/
-    public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException {
+    public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException, SAXException {
         return getResponse( new GetMethodWebRequest( urlString ) );
     }
 
@@ -55,7 +81,7 @@ public class WebConversation {
      * Submits a web request and returns a response, using all state developed so far as stored in
      * cookies as requested by the server.
      **/
-    public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException {
+    public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         HttpURLConnection connection = (HttpURLConnection) openConnection( request.getURL() );
         request.completeRequest( connection );
         updateCookies( connection );
@@ -70,7 +96,23 @@ public class WebConversation {
             throw new HttpNotFoundException( request.getURLString() );        
         } else {
             WebResponse result = new WebResponse( this, request.getTarget(), request.getURL(), connection );
+            removeSubFrames( request.getTarget() );
+            _frameContents.put( request.getTarget(), result );
+            _subFrames.put( request.getTarget(), result.getFrameNames() );
+            WebRequest[] requests = result.getFrameRequests();
+            for (int i = 0; i < requests.length; i++) getResponse( requests[i] );
             return result;
+        }
+    }
+
+
+    private void removeSubFrames( String targetName ) {
+        String[] names = (String[]) _subFrames.get( targetName );
+        if (names == null) return;
+        for (int i = 0; i < names.length; i++) {
+            removeSubFrames( names[i] );
+            _frameContents.remove( names[i] );
+            _subFrames.remove( names[i] );
         }
     }
 
@@ -141,6 +183,14 @@ public class WebConversation {
     /** The authorization header value. **/
     private String _authorization;
 
+
+    /** A map of frame names to current contents. **/
+    private Hashtable _frameContents = new Hashtable();
+
+
+    /** A map of frame names to frames nested within them. **/
+    private Hashtable _subFrames = new Hashtable();
+
     
     static {
         HttpURLConnection.setFollowRedirects( false );
@@ -202,4 +252,21 @@ class RedirectWebRequest extends WebRequest {
         super( baseRequest, relativeURL );
     }    
     
+}
+
+
+
+class NoSuchFrameException extends RuntimeException {
+
+    NoSuchFrameException( String frameName ) {
+        _frameName = frameName;
+    }
+
+
+    public String getMessage() {
+        return "No frame named " + _frameName + " is currently active";
+    }
+
+
+    private String _frameName;
 }

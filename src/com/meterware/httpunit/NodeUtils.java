@@ -43,14 +43,21 @@ class NodeUtils {
 
     public static int getAttributeValue( Node node, String attributeName, int defaultValue ) {
         NamedNodeMap nnm = node.getAttributes();
-        Node span = nnm.getNamedItem( attributeName );
-        if (span == null) {
+        Node attribute = nnm.getNamedItem( attributeName );
+        if (attribute == null) {
             return defaultValue;
         } else try {
-            return Integer.parseInt( span.getNodeValue() );
+            return Integer.parseInt( attribute.getNodeValue() );
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+
+    public static String getNodeAttribute( Node node, String attributeName ) {
+        NamedNodeMap nnm = node.getAttributes();
+        Node attribute = nnm.getNamedItem( attributeName );
+        return (attribute == null) ? "" : attribute.getNodeValue();
     }
 
 
@@ -91,13 +98,6 @@ class NodeUtils {
             }
         }
         return sb.toString();
-    }
-
-
-    private static String getNodeAttribute( Node node, String attributeName ) {
-        NamedNodeMap nnm = node.getAttributes();
-        Node attribute = nnm.getNamedItem( attributeName );
-        return (attribute == null) ? "" : attribute.getNodeValue();
     }
 
 

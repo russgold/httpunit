@@ -1,7 +1,5 @@
 HttpUnit release notes
 
-Known issues: Frames are mostly ignored, except that you can find their names
-
 Limitations: HttpUnit does not support JavaScript
 
 Acknowledgements:
@@ -12,13 +10,19 @@ Thanks to Perry Doell for the methods to examine cookies on WebConversation
 Thanks to Ken Hygh for the proper handling of parameters with no specified type 
 
 Revision History:
- 3-Oct-00
+ 4-Oct-00
 Additions:
-    1. The beginnings of frame support has been added. All that you can do so far is find the names of the frames.
+    1. Frames are now supported. The WebConversation method has two methods: getFrameNames and getFrameContents which
+       allow manipulation of frames.
+    2. Calling HttpUnitOptions.setImagesTreatedAsAltText( true ) will cause the ALT text in images to be treated as ordinary
+       text
+       
 Problems corrected:
     1. It is no longer necessary to edit the java.security file to enable HTTPS support. Just install the JSSE jars
        in your classpath.
     2. Parameters with no type specified are now properly handled as text
+    
+
 28-Sep-00
 Additions:
     1. PseudoServer class is now used by unit tests to handle requests. This will enable development of frames capability

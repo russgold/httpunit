@@ -79,7 +79,7 @@ public class WebResponse {
         NodeList frames = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
         String[] result = new String[ frames.getLength() ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = getValue( frames.item(i).getAttributes().getNamedItem( "name" ) );
+            result[i] = NodeUtils.getNodeAttribute( frames.item(i), "name" );
         }
 
         return result;
@@ -89,19 +89,16 @@ public class WebResponse {
     /**
      * Returns the frames found in the page in the order in which they appear.
      **/
-    public WebFrame[] getFrames() throws SAXException {
+    public WebRequest[] getFrameRequests() throws SAXException {
         NodeList frames = NodeUtils.getElementsByTagName( getReceivedPage().getDOM(), "frame" );
-        WebFrame[] result = new WebFrame[ frames.getLength() ];
+        WebRequest[] result = new WebRequest[ frames.getLength() ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = new WebFrame( frames.item(i) );
+            result[i] = new GetMethodWebRequest( this.getURL(), 
+                                                 NodeUtils.getNodeAttribute( frames.item(i), "src" ),
+                                                 NodeUtils.getNodeAttribute( frames.item(i), "name" ) );
         }
 
         return result;
-    }
-
-
-    private String getValue( Node node ) {
-        return node == null ? "" : node.getNodeValue();
     }
 
 

@@ -1,4 +1,10 @@
-o Support Frames
-o Support digest HTTP Authentication (?)
 o Documentation, Documentation
+
+Possibles:
+o replace JTidy with a simpler custom parser
+
+Low priority:
+
+o history on web conversation
+o Support digest HTTP Authentication (?)
 
