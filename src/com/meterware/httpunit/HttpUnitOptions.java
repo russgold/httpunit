@@ -64,6 +64,23 @@ public class HttpUnitOptions {
 
 
     /**
+     * If true, WebClient.getResponse throws an exception when it receives an error status.
+     * Defaults to true.
+     **/
+    public static void setExceptionsThrownOnErrorStatus( boolean enabled ) {
+        _exceptionsOnErrorStatus = enabled;
+    }
+
+
+    /**
+     * Returns true if WebClient.getResponse throws exceptions when detected an error status.
+     **/
+    public static boolean getExceptionsThrownOnErrorStatus() {
+        return _exceptionsOnErrorStatus;
+    }
+
+
+    /**
      * If true, tells the parser to display warning messages. The default is false (warnings are not shown).
      **/
     public static void setParserWarningsEnabled( boolean enabled ) {
@@ -179,12 +196,30 @@ public class HttpUnitOptions {
     }
 
 
+//------------------------------  package methods ----------------------------------------
+
+
+    static void reset() {
+        _parserWarningsEnabled = false;
+        _exceptionsOnErrorStatus = true;
+        _parameterValuesValidated = true;
+        _imagesTreatedAsAltText = false;
+        _loggingHttpHeaders = false;
+        _matchesIgnoreCase = true;
+        _autoRefresh = false;
+        _redirectDelay = 0;
+        _characterSet = DEFAULT_CHARACTER_SET;
+    }
+
+
 //--------------------------------- private members --------------------------------------
 
 
     private static String DEFAULT_CHARACTER_SET = "iso-8859-1";
 
     private static boolean _parserWarningsEnabled;
+
+    private static boolean _exceptionsOnErrorStatus = true;
 
     private static boolean _parameterValuesValidated = true;
 

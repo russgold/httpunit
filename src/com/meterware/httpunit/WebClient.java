@@ -254,6 +254,7 @@ public class WebClient {
     private void validateHeaders( WebResponse response ) throws HttpException, IOException {
         if (response.getHeaderField( "WWW-Authenticate" ) != null) {
             throw new AuthorizationRequiredException( response.getHeaderField( "WWW-Authenticate" ) );
+        } else if (!HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
             throw new HttpInternalErrorException( response.getURL().toExternalForm() );
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -46,9 +46,8 @@ class WebResource {
     }
 
 
-    WebResource( int responseCode, String responseText ) {
-        this( "", DEFAULT_CONTENT_TYPE, responseCode );
-        _responseText = responseText;
+    WebResource( int responseCode, String contents ) {
+        this( contents, DEFAULT_CONTENT_TYPE, responseCode );
     }
 
 
@@ -125,10 +124,6 @@ class WebResource {
         return _responseCode;
     }
 
-    String getResponseText() {
-        return _responseText;
-    }
-
 
     public String toString() {
         return "WebResource [code=" + _responseCode + "; type = " + _contentType 
@@ -149,8 +144,7 @@ class WebResource {
 
     private int     _responseCode;
     private boolean _sendCharacterSet;
-    private String  _responseText = "";
-    private String  _contentType;
+    private String  _contentType = DEFAULT_CONTENT_TYPE;
     private String  _characterSet = DEFAULT_CHARACTER_SET;
     private Vector  _headers = new Vector();
 }

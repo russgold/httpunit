@@ -11,7 +11,21 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
- 6-Jul-2001
+16-Jul-2001
+Acknowledgements:
+    Thanks to Chris Stevenson for identifying a problem with forms lacking an action
+
+Additions:
+    1. It is now possible to see the response accompanying an error status by
+       calling HttpUnitOptions.setExceptionsThrownOnErrorStatus( false ) before
+       calling getResponse. This will prevent HttpUnit from throwing an exception
+       in such cases. You can still check the status of the response by calling
+       WebResponse.getStatusCode()
+       
+Problems corrected:
+    1. Forms with no action now default to the originating page
+
+ 6-Jul-2001 1.2.6
 Acknowledgements:
     Thanks to Marcos Tarruella for adding a test case for the Base64 class
     

@@ -303,6 +303,20 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    public void testNoActionSupplied() throws Exception {
+        defineWebPage( "abc/form", "<form name=\"test\">" +
+                               "  <input type=\"text\" name=\"aTextField\">" +
+                               "  <input type=\"submit\" name=\"apply\" value=\"Apply\">" +
+                               "</form>" );
+
+        WebResponse wr  = _wc.getResponse( getHostPath() + "/abc/form.html" );
+        WebForm form    = wr.getForms()[0];
+        WebRequest req  = form.getRequest( "apply" );
+        req.setParameter( "aTextField", "test" );
+        assertEqualQueries( getHostPath() + "/abc/form.html?apply=Apply&aTextField=test",
+                            req.getURL().toExternalForm() );
+    }
+
 
 //---------------------------------------------- private members ------------------------------------------------
 

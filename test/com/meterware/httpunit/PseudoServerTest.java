@@ -32,7 +32,7 @@ import com.meterware.httpunit.*;
 /**
  * Tests the basic authentication.
  **/
-public class PseudoServerTest extends TestCase {
+public class PseudoServerTest extends HttpUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -76,7 +76,7 @@ public class PseudoServerTest extends TestCase {
     }
 
 
-    public void testInternalError() throws Exception {
+    public void notestInternalErrorException() throws Exception {
         PseudoServer ps = new PseudoServer();
         ps.setErrorResource( "error.htt", 501, "Internal error" );
         int port = ps.getConnectedPort();
@@ -91,6 +91,20 @@ public class PseudoServerTest extends TestCase {
         } finally {
             ps.shutDown();
         }
+    }
+
+
+    public void testInternalErrorDisplay() throws Exception {
+        PseudoServer ps = new PseudoServer();
+        ps.setErrorResource( "error.htm", 501, "Internal error" );
+        int port = ps.getConnectedPort();
+
+        HttpUnitOptions.setExceptionsThrownOnErrorStatus( false );
+        WebConversation wc   = new WebConversation();
+        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/error.htm" );
+        WebResponse response = wc.getResponse( request );
+        assertEquals( "Response code", 501, response.getResponseCode() );
+        assertEquals( "Message contents", "Internal error", response.getText().trim() );
     }
 
 

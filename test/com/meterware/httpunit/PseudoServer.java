@@ -176,9 +176,10 @@ public class PseudoServer {
             WebResource resource = getResource( request );
             if (resource == null) {
                 response.setResponse( HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + request.getURI() );
-            } else if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                response.setResponse( resource.getResponseCode(), resource.getResponseText() );
             } else {
+                if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    response.setResponse( resource.getResponseCode(), "" );
+                }
                 response.addHeader( "Content-type: " + resource.getContentType() + resource.getCharacterSetParameter() );
                 String[] headers = resource.getHeaders();
                 for (int i = 0; i < headers.length; i++) {

@@ -50,7 +50,7 @@ class HttpWebResponse extends WebResponse {
         readHeaders( connection );
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/
-        if (_responseCode == HttpURLConnection.HTTP_OK) {
+        if (_responseCode == HttpURLConnection.HTTP_OK || !HttpUnitOptions.getExceptionsThrownOnErrorStatus()) {
             defineRawInputStream( new BufferedInputStream( connection.getInputStream() ) );
             if (getContentType().startsWith( "text" )) loadResponseText();
         }

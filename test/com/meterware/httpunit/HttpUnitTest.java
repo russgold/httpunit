@@ -43,6 +43,7 @@ class HttpUnitTest extends TestCase {
 
     public void setUp() throws Exception {
         _server = new PseudoServer();
+        HttpUnitOptions.reset();
         _hostPath = "http://localhost:" + _server.getConnectedPort();
     }
 

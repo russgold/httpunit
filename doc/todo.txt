@@ -1,3 +1,9 @@
+High priority:
+o Support selection of input stream for file upload. Will require file 'name' 
+  and mime type as well as input stream
+o Support image maps
+
+Medium priority:
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Support IFRAME tag
 o Support reset button detection
@@ -8,9 +14,9 @@ o Documentation, Documentation
 Possibles:
 o replace JTidy with a simpler custom parser
 o support JavaScript
+o support in-container testing, probably through integration with Cactus
 
 Low priority:
-
 o history on web conversation
 o Support digest HTTP Authentication
 
