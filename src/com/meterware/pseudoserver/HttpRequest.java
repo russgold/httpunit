@@ -192,9 +192,6 @@ class HttpRequest {
 
 
     boolean wantsKeepAlive() {
-        /**
-        return false;
-        /**/
         if ("Keep-alive".equalsIgnoreCase( getConnectionHeader() )) {
             return true;
         } else if (_protocol.equals( "HTTP/1.1" )) {
@@ -202,7 +199,6 @@ class HttpRequest {
         } else {
             return false;
         }
-        /**/
     }
 
 

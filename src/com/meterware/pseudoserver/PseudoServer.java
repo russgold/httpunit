@@ -34,6 +34,8 @@ public class PseudoServer {
 
     private ArrayList _classpathDirs = new ArrayList();
 
+    private String _maxProtocolLevel = "1.1";
+
 
     public PseudoServer() {
         Thread t = new Thread() {
@@ -65,6 +67,11 @@ public class PseudoServer {
 
     public void shutDown() {
         _active = false;
+    }
+
+
+    public void setMaxProtocolLevel( int majorLevel, int minorLevel ) {
+        _maxProtocolLevel = majorLevel + "." + minorLevel;
     }
 
 
@@ -237,10 +244,10 @@ public class PseudoServer {
 
     private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {
         if (_debug) System.out.println( "** Server thread " + hashCode() + " handling request: " + request );
-        boolean keepAlive = request.wantsKeepAlive();
+        boolean keepAlive = isKeepAlive( request );
         try {
             response.restart();
-            response.setProtocol( request.getProtocol() );
+            response.setProtocol( getResponseProtocol( request ) );
             WebResource resource = getResource( request );
             if (resource == null) {
                 response.setResponse( HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + request.getURI() );
@@ -263,6 +270,16 @@ public class PseudoServer {
             response.setResponse( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
         }
         return keepAlive;
+    }
+
+
+    private boolean isKeepAlive( HttpRequest request ) {
+        return request.wantsKeepAlive() && _maxProtocolLevel.equals( "1.1" );
+    }
+
+
+    private String getResponseProtocol( HttpRequest request ) {
+        return _maxProtocolLevel.equalsIgnoreCase( "1.1" ) ? request.getProtocol() : "HTTP/1.0";
     }
 
 

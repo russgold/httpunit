@@ -100,6 +100,11 @@ public class HttpUserAgentTest extends TestCase {
     }
 
 
+    protected PseudoServer getServer() {
+        return _server;
+    }
+
+
     protected void setServerDebug( boolean enabled ) {
         _server.setDebug( enabled );
     }

@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2000-2002, Russell Gold
+ * Copyright (c) 2000-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -179,7 +179,6 @@ public class PseudoServerTest extends HttpUserAgentTest {
 
         sendHTTPLine( os, "GET /sample HTTP/1.1" );
         sendHTTPLine( os, "Host: meterware.com" );
-        sendHTTPLine( os, "Connection: close" );
         sendHTTPLine( os, "" );
 
         StringBuffer sb = new StringBuffer();
@@ -187,6 +186,32 @@ public class PseudoServerTest extends HttpUserAgentTest {
         while (-1 != (b = is.read())) sb.append( (char) b );
         String result = sb.toString();
         assertTrue( "Did not find matching protocol", result.startsWith( "HTTP/1.1" ) );
+        assertTrue( "Did not find expected text", result.indexOf( "Get this" ) > 0 );
+    }
+
+
+
+
+    /**
+     * This verifies that the PseudoServer can be restricted to a HTTP/1.0.
+     */
+    public void testProtocolThrottling() throws Exception {
+        getServer().setMaxProtocolLevel( 1, 0 );
+        defineResource( "sample", "Get this", "text/plain" );
+        Socket socket = new Socket( "localhost", getHostPort() );
+        OutputStream os = socket.getOutputStream();
+        InputStream is = new BufferedInputStream( socket.getInputStream() );
+
+        sendHTTPLine( os, "GET /sample HTTP/1.1" );
+        sendHTTPLine( os, "Host: meterware.com" );
+        sendHTTPLine( os, "Connection: close" );
+        sendHTTPLine( os, "" );
+
+        StringBuffer sb = new StringBuffer();
+        int b;
+        while (-1 != (b = is.read())) sb.append( (char) b );
+        String result = sb.toString();
+        assertTrue( "Did not find matching protocol", result.startsWith( "HTTP/1.0" ) );
         assertTrue( "Did not find expected text", result.indexOf( "Get this" ) > 0 );
     }
 
