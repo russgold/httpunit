@@ -19,15 +19,7 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
-import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.util.Vector;
-import java.util.Enumeration;
 
 
 /**
@@ -43,7 +35,7 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
-    public static Test suite() {
+    public static TestSuite suite() {
         return new TestSuite( WebLinkTest.class );
     }
 
@@ -58,10 +50,10 @@ public class WebLinkTest extends HttpUnitTest {
         defineResource( "SimplePage.html",
                         "<html><head><title>A Sample Page</title></head>\n" +
                         "<body>This has no forms but it does\n" +
-                        "have <a href=\"/other.html\" id=\"activeID\">an <b>active</b> link</A>\n" +
+                        "have <a href='/other.html#middle' id='activeID'>an <b>active</b> link</A>\n" +
                         " and <a name=here>an anchor</a>\n" +
-                        "<a href=\"basic.html\" name=\"nextLink\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
-                        "<a href=\"another.html\" name=\"myLink\">some text</a>\n" +
+                        "<a href='basic.html' name=\"nextLink\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
+                        "<a href='another.html' name='myLink'>some text</a>\n" +
                         "</body></html>\n" );
 
         WebConversation wc = new WebConversation();
@@ -151,6 +143,15 @@ public class WebLinkTest extends HttpUnitTest {
         link = _simplePage.getLinkWithName( "nextLink" );
         assertNotNull( "the image link was not found", link );
         assertEquals( "image link URL", getHostPath() + "/basic.html", link.getRequest().getURL().toExternalForm() );
+    }
+
+
+    public void testFragmentIdentifier() throws Exception {
+        WebLink link = (WebLink) _simplePage.getElementWithID( "activeID" );
+        assertNotNull( "the active link was not found", link );
+        assertEquals( "fragment identifier #1", "middle", link.getFragmentIdentifier() );
+
+        assertEquals( "fragment identifier #2", "", _simplePage.getLinks()[1].getFragmentIdentifier() );
     }
 
 

@@ -11,6 +11,10 @@ Limitations:
 
 
 Revision History:
+27-Dec-2002
+Additions:
+    1. Added getFragmentIdentifier() to WebRequestSource (parent of WebLink, WebForm, and WebImage)
+
 26-Dec-2002
 Additions:
     1. WebResponse and TableCell now support the getElementWithID method, which returns any supported HTMLElement, given its ID.

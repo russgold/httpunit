@@ -20,8 +20,6 @@
  *******************************************************************************************************************/
 package com.meterware.httpunit;
 
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -70,6 +68,20 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
             return WebFrame.getTargetFrameName( _pageFrame, getSpecifiedTarget() );
         }
     }
+
+
+    /**
+     * Returns the fragment identifier for this request source, used to identifier an element within an HTML document.
+     */
+    public String getFragmentIdentifier() {
+        final int hashIndex = getDestination().indexOf( '#' );
+        if (hashIndex < 0) {
+            return "";
+        } else {
+            return getDestination().substring( hashIndex+1 );
+        }
+    }
+
 
     /**
      * Returns a copy of the domain object model subtree associated with this entity.
