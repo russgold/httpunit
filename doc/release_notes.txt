@@ -11,9 +11,11 @@ Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
 Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink,
                         and for correcting the set up of the https protocol handling.
 Thanks to Perry Doell for the methods to examine cookies on WebConversation
-Thanks to Ken Hygh for the proper handling of parameters with no specified type 
+Thanks to Ken Hygh for the proper handling of parameters with no specified type
+Thanks to Gabriel Hauser for finding a bug in the handling of parameter defaults 
 
 Revision History:
+17-Oct-00 1.1
 Additions:
     1. It is now possible to set a delay in the handling of redirect requests, if necessary
     2. The WebResponse now can return the response code associated with it (2xx)
@@ -21,6 +23,7 @@ Additions:
      
 Problems corrected:
     1. Unnamed frames are now handled
+    2. Empty parameter values are now handled
 
  6-Oct-00
 Problems corrected:

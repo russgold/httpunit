@@ -100,6 +100,24 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testNullTextValues() throws Exception {
+        defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
+                                  "<Input name=\"secret\" type=\"hidden\" value=>" +
+                                  "<br><Input name=typeless value=>" +
+                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                                  "<br><Input type=submit value = \"Log in\">" +
+                                  "</form>" );
+                                     
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        assertEquals( 3, form.getParameterNames().length );
+
+        WebRequest request = form.getRequest();
+        assertEquals( "", request.getParameter( "secret" ) );
+        assertEquals( "", request.getParameter( "typeless" ) );
+    }
+
+
     public void testTableForm() throws Exception {
         defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
                                   "<table summary=\"\"><tr><td>" +

@@ -228,7 +228,12 @@ public class WebForm {
 
 
     private String getValue( Node node ) {
-        return (node == null) ? "" : node.getNodeValue();
+        return (node == null) ? "" : emptyIfNull( node.getNodeValue() );
+    }
+
+
+    private String emptyIfNull( String value ) {
+        return (value == null) ? "" : value;
     }
 
 
