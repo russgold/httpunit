@@ -44,6 +44,7 @@ public class HttpUnitOptions {
         _redirectDelay = 0;
         _characterSet = DEFAULT_CHARACTER_SET;
         _contentType = DEFAULT_CONTENT_TYPE;
+        _postIncludesCharset = true;
     }
 
 
@@ -77,6 +78,26 @@ public class HttpUnitOptions {
      **/
     public static String getDefaultCharacterSet() {
         return _characterSet;
+    }
+
+
+    /**
+     * Determines whether a normal POST request will include the character set in the content-type header.
+     * The default is to include it; however, some older servlet engines (most notably Tomcat 3.1) get confused
+     * when they see it.
+     **/
+    public static void setPostIncludesCharset( boolean postIncludesCharset )
+    {
+        _postIncludesCharset = postIncludesCharset;
+    }
+
+
+    /**
+     * Returns true if POST requests should include the character set in the content-type header.
+     **/
+    public static boolean isPostIncludesCharset()
+    {
+        return _postIncludesCharset;
     }
 
 
@@ -257,6 +278,8 @@ public class HttpUnitOptions {
     private static boolean _matchesIgnoreCase = true;
 
     private static boolean _autoRefresh;
+
+    private static boolean _postIncludesCharset = true;
 
     private static int _redirectDelay;
 

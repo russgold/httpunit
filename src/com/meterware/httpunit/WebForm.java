@@ -698,6 +698,12 @@ public class WebForm extends WebRequestSource {
                 return getValue( optionNode.getFirstChild() );
             }
         }
+
+
+        private String getTextValue( Node optionNode ) {
+            NamedNodeMap nnm = optionNode.getAttributes();
+            return getValue( optionNode.getFirstChild() );
+        }
     }
 
 

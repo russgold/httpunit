@@ -10,6 +10,14 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+21-Aug-2001
+Acknowledgements:
+    Thanks to Richard Scothern for identiying the cause of problems with POST requests and older servlet engines.
+
+    Additions:
+       1. HttpUnitOptions now has a postIncludesCharset which can be set to false to interoperate with older servlet
+          engines, such as Tomcat 3.1, which cannot handle the charset attribute
+
 13-Aug-2001
 Acknowledgements:
     Thanks to Brett Neumeier for some Javadoc fixes and adding support for the non-standard "Charset" header

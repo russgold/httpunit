@@ -15,46 +15,47 @@
 <LI><A HREF="#utf8">HttpUnit fails with an IllegalArgumentException: sun.io.CharToByteUTF-8, what do I do?</A></LI>
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</A></LI>
 <LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
+<LI><A HREF="#badPost">Why doesn't my servlet see parameters on a POST request?</A></LI>
 </OL>
 
 
 
 <A NAME="Cannot unzip"><H2>Why can't I unzip the download library?</H2></A>
-HttpUnit is archived using the classes in the java.util.zip package. Some older Unzip programs cannot understand this format. 
+HttpUnit is archived using the classes in the java.util.zip package. Some older Unzip programs cannot understand this format.
 If you are using WinZip, stick to version 7.0 or later.
 
 <A NAME="org.xml.sax"><H2>What is the org.xml.sax package?</H2></A>
 You may be getting compile or runtime errors asking for the org.xml.sax package. This package is found in JTidy, the HTML parser used
-by HttpUnit. You should download Jtidy from 
+by HttpUnit. You should download Jtidy from
 <A HREF="http://sourceforge.net/project/showfiles.php?group_id=13153">its SourceForge download page</A>
 and install Tidy.jar in your classpath.
 
 <A NAME="meterware.com"><H2>Where is meterware.com?</H2></A>
-When I started HttpUnit, I had a web site with the meterware.com domain, and relied on it to host some of the example code. 
-Since then, my ISP has dropped the hosting package I was using and I have not yet signed up with another host, mostly due to 
+When I started HttpUnit, I had a web site with the meterware.com domain, and relied on it to host some of the example code.
+Since then, my ISP has dropped the hosting package I was using and I have not yet signed up with another host, mostly due to
 lack of funds. I hope to correct this in the near future.
 
 <A NAME="javascript"><H2>How do I use HttpUnit to test my pages that use JavaScript?</H2></A>
-Unfortunately, you can't. HttpUnit does not support any dialect of JavaScript. I have been shown a JavaScript library and it is possible 
+Unfortunately, you can't. HttpUnit does not support any dialect of JavaScript. I have been shown a JavaScript library and it is possible
 that I will one day add JavaScript support, but since I use it very little in my own development, and since it looks like a lot of work,
 it is not a major priority for me. If you feel ambitious enough to add JavaScript support yourself, I would be happy to accept submissions.
 
 <A NAME="proxy"><H2>Can I use HttpUnit through a proxy server?</H2></A>
-Yes. HttpUnit uses java.net.HttpURLConnection, so the 
+Yes. HttpUnit uses java.net.HttpURLConnection, so the
 <A HREF="http://www.javaworld.com/javaworld/javatips/jw-javatip42.html">normal Java way to use
-proxies</A> will work. At some point HttpUnit may support this more directly, but for now, you will need to set the system properties yourself.   
+proxies</A> will work. At some point HttpUnit may support this more directly, but for now, you will need to set the system properties yourself.
 
 <A NAME="charset"><H2>Why isn't HttpUnit handling my non-English pages?</H2></A>
-Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform. 
-As of version 1.2.1, HttpUnit correctly recognizes the charset parameter of the Content-type header which may 
+Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform.
+As of version 1.2.1, HttpUnit correctly recognizes the charset parameter of the Content-type header which may
 specify an alternative character set;
-when none is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1. 
-Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers incorrectly use this 
+when none is specified, HTML 1.1 says that the character set is to be taken as iso-8859-1.
+Unfortunately, some HTTP servers do not send this parameter correctly, and many browsers incorrectly use this
 as an indication that they should
 determine the character set in some other fashion.  To imitate this behavior, HttpUnit allows you to set the expected character
-set for future pages by calling HttpUnitOptions.setDefaultCharacterSet(). This setting will not apply to those 
+set for future pages by calling HttpUnitOptions.setDefaultCharacterSet(). This setting will not apply to those
 pages for which the server specifies
-the character set.   
+the character set.
 <p>
 Non-English form handling is supported as well. Any parameter values entered into a form will be encoded as the same
 character set as the document containing the form. The server code will then have to handle those characters
@@ -67,20 +68,20 @@ where the proper encoding should be substituted for "EUC_JP". The <code>getBytes
 <A NAME="utf8"><H2>HttpUnit fails with an IllegalArgumentException:
 sun.io.CharToByteUTF-8, what do I do?</H2></A>
 JTidy requires bytes, not characters, and HttpUnit 1.2.1 sends it bytes in UTF-8
-encoding, which it obtains from the input page 
+encoding, which it obtains from the input page
 using <code>getBytes( "UTF-8" )</code>. Unfortunately, Sun used the wrong
-encoding name in its JDK 1.1.x implementations, so this code 
-fails under JDK 1.1. This has been corrected in HttpUnit 1.2.2. 
+encoding name in its JDK 1.1.x implementations, so this code
+fails under JDK 1.1. This has been corrected in HttpUnit 1.2.2.
 
 <A NAME="buttons"><H2>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</H2></A>
 This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
-JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and 
-will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them, 
-call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page. 
+JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and
+will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them,
+call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page.
 Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
 
 <A NAME="#reload"><H2>Why do I get java.lang.IllegalAccessError when calling getResponse()?</H2></A>
-This happens when you use HttpUnit and JTidy with one of the JUnit graphical test runners, which reloads 
+This happens when you use HttpUnit and JTidy with one of the JUnit graphical test runners, which reloads
 classes every time to run a test. Unfortunately, this places different versions of the JTidy
 classes in different class loaders, so you get this error.  To avoid it,
 you can do any of the following:<ul><li>Use only the text test runner</li>
@@ -92,8 +93,14 @@ excluded.11=org.w3c.tidy.*
 This will require extracting the file, modifying it and then putting it back <em>in the same directory</em>, but it should allow your
 tests to reload safely.</ul>
 
+<A HREF="#badPost"><H2>Why doesn't my servlet see parameters on a POST request?</H2></A>
+Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type
+header. HttpUnit normally sends this attribute;
+however you can disable it by calling <code>HttpUnitOptions.setPostIncludesCharset(false)</code>. If you run into this
+problem trying disabling the charset attribute.
 
-</BODY></HTML> 
+
+</BODY></HTML>
 
 
 

@@ -168,7 +168,9 @@ class URLEncodedMessageBody extends MessageBody {
      * Returns the content type of this message body.
      **/
     String getContentType() {
-        return "application/x-www-form-urlencoded; charset=" + getRequest().getCharacterSet();
+        return "application/x-www-form-urlencoded" +
+                  (!HttpUnitOptions.isPostIncludesCharset() ? ""
+                                                            : "; charset=" + getRequest().getCharacterSet());
     }
 
 
