@@ -37,18 +37,16 @@ import java.io.InputStream;
 public class PutMethodWebRequest extends MessageBodyWebRequest {
 
 
-    public PutMethodWebRequest( String url, InputStream source ) {
-        super( url );
-        _source = source;
-    }
-
     /**
-     * Returns a message body based on the input stream.
+     * Constructs a web request using a specific absolute url string and input stream.
+     * @param urlString the URL to which the request should be issued
+     * @param source    an input stream which will provide the body of this request
+     * @param contentType the MIME content type of the body, including any character set
      **/
-    protected MessageBody newMessageBody() {
-        return new InputStreamMessageBody( this, _source );
+    public PutMethodWebRequest( String url, InputStream source, String contentType ) {
+        super( url );
+        _body = new InputStreamMessageBody( this, source, contentType );
     }
-
 
 
     /**
@@ -59,5 +57,13 @@ public class PutMethodWebRequest extends MessageBodyWebRequest {
     }
 
 
-    private InputStream _source;
+    /**
+     * Returns a message body based on the input stream.
+     **/
+    protected MessageBody newMessageBody() {
+        return _body;
+    }
+
+
+    private MessageBody _body;
 }

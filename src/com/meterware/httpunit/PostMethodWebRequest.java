@@ -50,10 +50,13 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
     /**
      * Constructs a web request using a specific absolute url string and input stream.
+     * @param urlString the URL to which the request should be issued
+     * @param source    an input stream which will provide the body of this request
+     * @param contentType the MIME content type of the body, including any character set
      **/
-    public PostMethodWebRequest( String urlString, InputStream source ) {
+    public PostMethodWebRequest( String urlString, InputStream source, String contentType ) {
         super( urlString );
-        _source = source;
+        _body = new InputStreamMessageBody( this, source, contentType );
     }
 
 
@@ -97,8 +100,8 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
 
     protected MessageBody newMessageBody() {
-        if (_source != null) {
-            return new InputStreamMessageBody( this, _source );
+        if (_body != null) {
+            return _body;
         } else if (isMimeEncoded()) {
             return new MimeEncodedMessageBody( this );
         } else {
@@ -131,6 +134,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
     private Hashtable _files = new Hashtable();
     private InputStream _source;
+    private MessageBody _body;
 
 
 }
@@ -151,9 +155,10 @@ class URLEncodedMessageBody extends MessageBody {
 
 
     /**
-     * Updates the headers for this request as needed.
+     * Returns the content type of this message body.
      **/
-    void updateHeaders( URLConnection connection ) throws IOException {
+    String getContentType() {
+        return "application/x-www-form-urlencoded; charset=" + getRequest().getCharacterSet();
     }
 
 

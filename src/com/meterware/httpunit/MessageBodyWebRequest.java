@@ -57,7 +57,7 @@ public class MessageBodyWebRequest extends WebRequest {
         connection.setDoOutput( true );
 
         MessageBody mb = newMessageBody();
-        mb.updateHeaders( connection );
+        connection.setRequestProperty( "Content-type", mb.getContentType() );
         OutputStream stream = connection.getOutputStream();
         mb.writeTo( stream );
         stream.flush();
@@ -102,19 +102,21 @@ public class MessageBodyWebRequest extends WebRequest {
     static class InputStreamMessageBody extends MessageBody {
     
     
-        InputStreamMessageBody( MessageBodyWebRequest request, InputStream source ) {
+        InputStreamMessageBody( MessageBodyWebRequest request, InputStream source, String contentType ) {
             super( request );
             _source = source;
+            _contentType = contentType;
         }
     
     
         /**
-         * Updates the headers for this request as needed.
+         * Returns the content type of this message body.
          **/
-        void updateHeaders( URLConnection connection ) throws IOException {
+        String getContentType() {
+            return _contentType;
         }
-    
-    
+
+
         /**
          * Transmits the body of this request as a sequence of bytes.
          **/
@@ -131,5 +133,6 @@ public class MessageBodyWebRequest extends WebRequest {
     
     
         private InputStream _source;
+        private String      _contentType;
     }
 }

@@ -41,10 +41,10 @@ class MimeEncodedMessageBody extends MessageBody {
 
 
     /**
-     * Updates the headers for this request as needed.
+     * Returns the content type of this message body.
      **/
-    void updateHeaders( URLConnection connection ) throws IOException {
-        connection.setRequestProperty( "Content-type", "multipart/form-data; boundary=" + BOUNDARY );
+    String getContentType() {
+        return "multipart/form-data; boundary=" + BOUNDARY;
     }
 
 

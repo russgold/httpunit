@@ -1,3 +1,4 @@
+o Support non-text web responses
 o Support <META HTTP_EQUIV=REFRESH tags>
 o Support reset button detection
 o Support _new frame tag

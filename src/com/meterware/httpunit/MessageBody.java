@@ -38,10 +38,20 @@ class MessageBody {
 
 
     /**
-     * Updates the headers for this request as needed.
+     * Returns the content type of this message body. For text messages, this
+     * should include the character set.
      **/
     abstract
-    void updateHeaders( URLConnection connection ) throws IOException;
+    String getContentType();
+
+
+    /**
+     * Updates the headers for this request as needed.
+     * @deprecated use getContentType
+     **/
+    final
+    void updateHeaders( URLConnection connection ) throws IOException {
+    }
 
 
     /**
