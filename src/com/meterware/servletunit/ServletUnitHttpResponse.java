@@ -118,7 +118,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Relative URLs are not permitted here.
      */
     public void sendRedirect( String location ) throws IOException {
-        setStatus( HttpServletResponse.SC_MOVED_PERMANENTLY );
+        setStatus( HttpServletResponse.SC_MOVED_TEMPORARILY );
         setHeader( "Location", location );
     }
 

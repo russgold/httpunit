@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -21,8 +21,6 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import java.io.*;
 
-import java.util.Enumeration;
-import java.util.Vector;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -109,7 +107,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
     public void testStreamWriterAfterOutputStream() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         servletResponse.setContentType( "text/html" );
-        ServletOutputStream sos = servletResponse.getOutputStream();
+        servletResponse.getOutputStream();
         try {
             servletResponse.getWriter();
             fail( "Should have thrown IllegalStateException" );
@@ -182,7 +180,15 @@ public class HttpServletResponseTest extends ServletUnitTest {
         headerList = servletResponse.getHeaderFields( "list" );
         assertEquals( "setHeader did not replace the list header", headerList.length, 1 );
         assertEquals( "header is wrong", "monkeyboy", headerList[ 0 ] );
+    }
 
+
+    public void testSendRedirect() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        final String location = "http://localhost/newLocation";
+        servletResponse.sendRedirect( location );
+        assertEquals( "Redirected Location", location, servletResponse.getHeaderField( "Location" ) );
+        assertEquals( "Status", 302, servletResponse.getStatus() );
     }
 
 }
