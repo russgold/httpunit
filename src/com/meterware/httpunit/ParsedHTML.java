@@ -172,6 +172,20 @@ class ParsedHTML {
 
 
     /**
+     * Returns the HTML elements with an attribute with the specified name and value.
+     */
+    public HTMLElement[] getElementsWithAttribute( String name, String value ) {
+        loadElements();
+        ArrayList elements = new ArrayList();
+        for (Iterator i = _elements.values().iterator(); i.hasNext();) {
+            HTMLElement element = (HTMLElement) i.next();
+            if (value.equals( element.getAttribute( name ))) elements.add( element );
+        }
+        return (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
+    }
+
+
+    /**
      * Returns a list of HTML element names contained in this HTML section.
      */
     public String[] getElementNames() {

@@ -143,6 +143,7 @@ public class HttpUserAgentTest extends TestCase {
 
 
     protected void assertImplement( String comment, Object[] objects, Class expectedClass ) {
+        if (objects.length == 0) fail( "No " + comment + " found." );
         for (int i = 0; i < objects.length; i++) {
             assertImplements( comment, objects[i], expectedClass );
         }

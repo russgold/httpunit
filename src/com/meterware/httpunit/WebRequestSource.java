@@ -265,7 +265,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     protected void addPresetParameter( String name, String value );
 
 
-    String getAttribute( final String name ) {
+    public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( _node, name );
     }
 

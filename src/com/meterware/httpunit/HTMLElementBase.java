@@ -73,7 +73,7 @@ class HTMLElementBase implements HTMLElement {
     }
 
 
-    protected String getAttribute( final String name ) {
+    public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( getNode(), name );
     }
 

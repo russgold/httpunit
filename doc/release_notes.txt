@@ -13,6 +13,13 @@ Limitations:
 
 
 Revision History:
+
+26-Aug-2003
+Additions:
+    1. HTMLElement now supports a getAttribute method to return the value of any named attribute.
+    2. WebResponse and TableCell now support getElementsWithAttribute to return all contained HTML elements with
+       the specified attribute.
+
 21-Aug-2003 1.5.4
 Acknowledgements:
     Thanks to David D. Kilzer for:

@@ -304,6 +304,14 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     /**
+     * Returns the HTMLElements found with the specified attribute value.
+     */
+    public HTMLElement[] getElementsWithAttribute( String name, String value ) throws SAXException {
+        return getReceivedPage().getElementsWithAttribute( name, value );
+    }
+
+
+    /**
      * Returns the forms found in the page in the order in which they appear.
      * @exception SAXException thrown if there is an error parsing the response.
      **/

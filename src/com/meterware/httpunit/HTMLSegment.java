@@ -43,6 +43,12 @@ public interface HTMLSegment {
 
 
     /**
+     * Returns the HTMLElements found with the specified attribute value.
+     */
+    public HTMLElement[] getElementsWithAttribute( String name, String value ) throws SAXException;
+
+
+    /**
      * Returns a list of HTML element names contained in this HTML section.
      */
     public String[] getElementNames() throws SAXException;

@@ -111,7 +111,7 @@ public class TableCell extends ParsedHTML implements HTMLSegment, HTMLElement {
     }
 
 
-    private String getAttribute( final String name ) {
+    public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( _element, name );
     }
 

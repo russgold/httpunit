@@ -55,6 +55,13 @@ public interface HTMLElement {
 
 
     /**
+     * Returns the value of the attribute of this element with the specified name.
+     * Returns the empty string if no such attribute exists.
+     */
+    String getAttribute( String name );
+
+
+    /**
      * Returns the delegate which supports scripting this element.
      */
     ScriptableDelegate getScriptableDelegate();
