@@ -29,9 +29,6 @@ import junit.framework.TestSuite;
 
 import com.meterware.httpunit.*;
 
-/**
- * Tests the basic authentication.
- **/
 public class PseudoServerTest extends HttpUnitTest {
 
     public static void main(String args[]) {
@@ -344,5 +341,6 @@ public class PseudoServerTest extends HttpUnitTest {
             ps.shutDown();
         }
     }
+
 }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -29,6 +29,9 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.xml.sax.SAXException;
 
@@ -41,6 +44,7 @@ import org.xml.sax.SAXException;
  * @author Russell Gold
  * @author Jan Ohrstrom
  * @author Seth Ladd
+ * @author Oliver Imbusch
  **/
 abstract
 public class WebClient implements FrameHolder {
@@ -62,9 +66,48 @@ public class WebClient implements FrameHolder {
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         if (request.getURLString().startsWith( "about:" )) return WebResponse.BLANK_RESPONSE;
 
+        tellListeners( request );
         WebResponse response = newResponse( request );
+        tellListeners( response );
         updateClient( response );
         return getFrameContents( request.getTarget() );
+    }
+
+
+    private void tellListeners( WebRequest request ) {
+        List listeners;
+
+        synchronized (_clientListeners) {
+            listeners = new ArrayList( _clientListeners );
+        }
+
+        for (Iterator i = listeners.iterator(); i.hasNext();) {
+            ((WebClientListener) i.next()).requestSent( this, request );
+        }
+    }
+
+
+    private void tellListeners( WebResponse response ) {
+        List listeners;
+
+        synchronized (_clientListeners) {
+            listeners = new ArrayList( _clientListeners );
+        }
+
+        for (Iterator i = listeners.iterator(); i.hasNext();) {
+            ((WebClientListener) i.next()).responseReceived( this, response );
+        }
+    }
+
+
+    /**
+     * Resets the state of this client, removing all cookies, frames, and per-client headers. This does not affect
+     * any listeners or preferences which may have been set.
+     **/
+    public void clearContents() {
+        _frameContents = new Hashtable();
+        _cookies = new Hashtable();
+        _headers = new HeaderDictionary();
     }
 
 
@@ -181,6 +224,26 @@ public class WebClient implements FrameHolder {
     }
 
 
+    /**
+     * Adds a listener to watch for requests and responses.
+     */
+    public void addClientListener( WebClientListener listener ) {
+        synchronized (_clientListeners) {
+            if (listener != null && !_clientListeners.contains( listener )) _clientListeners.add( listener );
+        }
+    }
+
+
+    /**
+     * Removes a listener to watch for requests and responses.
+     */
+    public void removeClientListener( WebClientListener listener ) {
+        synchronized (_clientListeners) {
+            _clientListeners.remove( listener );
+        }
+    }
+
+
 //------------------------------------------ protected members -----------------------------------
 
 
@@ -272,6 +335,8 @@ public class WebClient implements FrameHolder {
     private HeaderDictionary _headers = new HeaderDictionary();
 
     private boolean _exceptionsThrownOnErrorStatus = HttpUnitOptions.getExceptionsThrownOnErrorStatus();
+
+    private List _clientListeners = new ArrayList();
 
 
     /**

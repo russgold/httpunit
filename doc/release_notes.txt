@@ -12,12 +12,13 @@ Limitations:
 
 Revision History:
 
-22-Feb-2000 1.3.5
+28-Feb-2000
 Acknowledgements:
     Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
     Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
     Thanks to Alex Chaffee for implementing context parameters for web.xml in ServletUnit
     Thanks to Jochen Hiller for supplying code to use jaxp to select a parser rather than being hardcoded to xerces
+    Thanks to Oliver Imbusch for adding the WebClientListener behavior
 
 Problems fixed:
     1. hasParameterNamed and hasParameterStartingWithPrefix now check all types of parameters, not just <INPUT> fields
@@ -58,6 +59,7 @@ Additions:
      11. HttpUnit can now use any jaxp-compliant parser, rather than just xerces.
      12. MessageBodyWebRequest's constructors and inner class are now public, allowing outside code to create new request classes.
      13. WebClient now exposes the protected method writeMessageBody to ease implementation of new subclasses
+     14. WebClient can now accept a listener of type WebClientListener to report on each request sent and response received.
 
 Notes:
     1. Parameter validation is now handled by the form. Requests created from the form while parameter validation is

@@ -46,6 +46,7 @@ public class HttpUnitSuite {
         result.addTest( FormSubmitTest.suite() );
         result.addTest( Base64Test.suite() );
         result.addTest( PseudoServerTest.suite() );
+        result.addTest( WebClientTest.suite() );
         result.addTest( MessageBodyRequestTest.suite() );
         result.addTest( JTidyPrintWriterTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
