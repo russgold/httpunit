@@ -7,11 +7,16 @@ Known problems:
     3. The regression test "pseudo-server" does not appear to run properly under JDK 1.4
 
 Limitations:
-    1. HttpUnit does not support JavaScript
+    1. JavaScript support is minimal
     2. JDK 1.2 or higher is required
 
 
 Revision History:
+ 2-Aug-2002
+Additions:
+    1. Added JavaScript support for document.links and document.<link name> and the link 'onMouseOver' event.
+    2. You may now call link.mouseOver() to trigger the 'onMouseOver' event.
+
  1-Aug-2002
 Additions:
     1. You may now follow a link by calling link.click() rather than client.getResponse( link.getRequest() ).

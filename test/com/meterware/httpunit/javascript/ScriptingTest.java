@@ -23,6 +23,7 @@ import com.meterware.httpunit.HttpUnitTest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebLink;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -108,6 +109,31 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testDocumentFindLinks() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+                                            "function getFound( object ) {" +
+                                            "  return (object == null) ? \"did not find \" : \"found \";" +
+                                            "  }" +
+                                            "function viewLinks() { " +
+                                            "  alert( \"found \" + document.links.length + \" link(s)\" );" +
+                                            "  alert( getFound( document.reallink ) + \"link 'reallink'\" );" +
+                                            "  alert( getFound( document.nolink ) + \"link 'nolink'\" );" +
+                                            "}" +
+                                            "</script></head>" +
+                                            "<body onLoad='viewLinks()'>" +
+                                            "<a href='something' name='reallink'>first</a>" +
+                                            "<a href='else'>second</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        JavaScript.run( response );
+        assertEquals( "Alert message", "found 2 link(s)", response.popNextAlert() );
+        assertEquals( "Alert message", "found link 'reallink'", response.popNextAlert() );
+        assertEquals( "Alert message", "did not find link 'nolink'", response.popNextAlert() );
+        assertNull( "Alert should have been removed", response.getNextAlert() );
+    }
+
+
     public void testSetFormFieldValue() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad=\"document.realform.color.value='green'\">" +
@@ -118,6 +144,23 @@ public class ScriptingTest extends HttpUnitTest {
         JavaScript.run( response );
         WebForm form = response.getFormWithName( "realform" );
         assertEquals( "color parameter value", "green", form.getParameterValue( "color" ) );
+    }
+
+
+    public void testLinkMouseOverEvent() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='realform'><input name='color' value='blue'></form>" +
+                                            "<a href='#' onMouseOver=\"document.realform.color.value='green'\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        JavaScript.run( response );
+        WebForm form = response.getFormWithName( "realform" );
+        WebLink link = response.getLinks()[0];
+        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
+        link.mouseOver();
+        assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
     }
 
 

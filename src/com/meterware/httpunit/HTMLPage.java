@@ -132,13 +132,27 @@ public class HTMLPage extends ParsedHTML {
 
         public Object get( String propertyName ) {
             WebForm wf = getFormWithName( propertyName );
-            if (wf == null) return super.get( propertyName );
-            return wf.getScriptableObject();
+            if (wf != null) return wf.getScriptableObject();
+
+            WebLink wl = getLinkWithName( propertyName );
+            if (wl != null) return wl.getScriptableObject();
+
+            return super.get( propertyName );
         }
 
 
         public String getTitle() throws SAXException {
             return HTMLPage.this.getTitle();
+        }
+
+
+        public WebLink.Scriptable[] getLinks() {
+            WebLink[] links = HTMLPage.this.getLinks();
+            WebLink.Scriptable[] result = new WebLink.Scriptable[ links.length ];
+            for (int i = 0; i < links.length; i++) {
+                result[i] = links[i].getScriptableObject();
+            }
+            return result;
         }
 
 

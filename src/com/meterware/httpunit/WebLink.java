@@ -43,6 +43,9 @@ import org.xml.sax.SAXException;
  **/
 public class WebLink extends WebRequestSource {
 
+    private Scriptable _scriptable;
+
+
     /**
      * Returns the URL referenced by this link. This may be a relative URL.
      **/
@@ -72,10 +75,28 @@ public class WebLink extends WebRequestSource {
 
 
     /**
-     * Submits a request as though the user had clicked on this link.
+     * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
      **/
     public void click() throws IOException, SAXException {
         submitRequest();
+    }
+
+
+    /**
+     * Simulates moving the mouse over the link. Will fire the 'onMouseOver' event if defined.
+     **/
+    public void mouseOver() {
+        String event = NodeUtils.getNodeAttribute( getNode(), "onmouseover" );
+        if (event.length() > 0) getScriptableObject().doEvent( event );
+    }
+
+
+    /**
+     * Returns an object which provides scripting access to this link.
+     **/
+    public Scriptable getScriptableObject() {
+        if (_scriptable == null) _scriptable = new Scriptable();
+        return _scriptable;
     }
 
 
@@ -206,7 +227,11 @@ public class WebLink extends WebRequestSource {
     }
 
 
- //--------------------------------------------------- package members --------------------------------------------------
+    public class Scriptable extends ScriptableObject {
+    }
+
+
+//--------------------------------------------------- package members --------------------------------------------------
 
 
     /**
