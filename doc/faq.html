@@ -61,7 +61,7 @@ the character set.
 Non-English form handling is supported as well. Any parameter values entered into a form will be encoded as the same
 character set as the document containing the form. The server code will then have to handle those characters
  appropriately. In Java, that would be converting them to Unicode with statements such as<blockquote><code>
-String rawName = request.getParameter( "name" );
+String rawName = request.getParameter( "name" );<br>
 String japaneseName = new String(name.getBytes("8859_1"),"EUC_JP");
 </code></blockquote>
 where the proper encoding should be substituted for "EUC_JP". The <code>getBytes</code> call is needed to extract the raw bytes from the parameter string.
