@@ -32,7 +32,7 @@ import java.net.URLEncoder;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
-class UncheckedParameterHolder extends ParameterHolder {
+final class UncheckedParameterHolder extends ParameterHolder implements ParameterProcessor {
 
     private static final String[] NO_VALUES = new String[ 0 ];
     private final String _characterSet;
@@ -49,13 +49,32 @@ class UncheckedParameterHolder extends ParameterHolder {
     UncheckedParameterHolder( WebRequestSource source ) {
         _characterSet = source.getCharacterSet();
         _submitAsMime = source.isSubmitAsMime();
-        String[] names = source.getParameterNames();
-        for (int i = 0; i < names.length; i++) {
-            if (!source.isFileParameter( names[i] )) {
-                _parameters.put( names[i], source.getParameterValues( names[i] ) );
-            }
+
+        try {
+            source.recordPredefinedParameters( this );
+            source.recordParameters( this );
+        } catch (IOException e) {
+            throw new RuntimeException( "This should never happen" );
         }
     }
+
+
+//----------------------------------- ParameterProcessor methods -------------------------------------------------------
+
+
+    public void addParameter( String name, String value, String characterSet ) throws IOException {
+        Object[] values = (Object[]) _parameters.get( name );
+        _parameters.put( name, HttpUnitUtils.withNewValue( values, value ) );
+    }
+
+
+    public void addFile( String parameterName, UploadFileSpec fileSpec ) throws IOException {
+        Object[] values = (Object[]) _parameters.get( parameterName );
+        _parameters.put( parameterName, HttpUnitUtils.withNewValue( values, fileSpec ) );
+    }
+
+
+//----------------------------------- ParameterHolder methods ----------------------------------------------------------
 
 
     /**
@@ -82,15 +101,13 @@ class UncheckedParameterHolder extends ParameterHolder {
 
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
-            Object value = _parameters.get( name );
-            if (value instanceof String) {
-                processor.addParameter( name, (String) value, _characterSet );
-            } else if (value instanceof String[]) {
-                String[] values = (String[]) value;
-                for (int i = 0; i < values.length; i++) processor.addParameter( name, values[i], _characterSet );
-            } else if (value instanceof UploadFileSpec[]) {
-                UploadFileSpec[] files = (UploadFileSpec[]) value;
-                for (int i = 0; i < files.length; i++) processor.addFile( name, files[i] );
+            Object[] values = (Object[]) _parameters.get( name );
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] instanceof String) {
+                    processor.addParameter( name, (String) values[i], _characterSet );
+                } else if (values[i] instanceof UploadFileSpec) {
+                    processor.addFile( name, (UploadFileSpec) values[i] );
+                }
             }
         }
     }
@@ -108,11 +125,14 @@ class UncheckedParameterHolder extends ParameterHolder {
 
 
     String[] getParameterValues( String name ) {
-        Object result = _parameters.get( name );
-        if (result instanceof String) return new String[] { (String) result };
-        if (result instanceof String[]) return (String[]) result;
-        if (result instanceof UploadFileSpec) return new String[] { result.toString() };
-        return NO_VALUES;
+        Object[] values = (Object[]) _parameters.get( name );
+        if (values == null) return NO_VALUES;
+
+        String[] result = new String[ values.length ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = values[i].toString();
+        }
+        return result;
     }
 
 
@@ -122,7 +142,7 @@ class UncheckedParameterHolder extends ParameterHolder {
 
 
     void setParameter( String name, String value ) {
-        _parameters.put( name, value );
+        _parameters.put( name, new Object[] { value } );
     }
 
 

@@ -19,6 +19,9 @@ Additions:
     1. ServletUnit now supports HttpServletRequest.getParameterMap
     2. WebImage now supports getRequest() to return a request for retrieving the image
 
+Problems fixed:
+    1. Submitting a request created with parameter validation disabled would send disabled parameters as well as enabled ones.
+
 27-Aug-2002
 Additions:
     1. Reset buttons may now be clicked to reset the form

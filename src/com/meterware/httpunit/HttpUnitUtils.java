@@ -117,4 +117,20 @@ public class HttpUnitUtils {
         }
         return result;
     }
+
+
+    /**
+     * Returns a string array created by appending an object to an existing array. The existing array may be null.
+     **/
+    static Object[] withNewValue( Object[] oldValue, Object newValue ) {
+        Object[] result;
+        if (oldValue == null) {
+            result = new Object[] { newValue };
+        } else {
+            result = new Object[ oldValue.length+1 ];
+            System.arraycopy( oldValue, 0, result, 0, oldValue.length );
+            result[ oldValue.length ] = newValue;
+        }
+        return result;
+    }
 }
