@@ -311,6 +311,41 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testFrameProperties() throws Exception {
+        HttpUnitOptions.setExceptionsThrownOnScriptError( false );
+        defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
+        defineResource( "Target.html", "<html><head><script language='JavaScript'>" +
+                                       "function show_properties() {" +
+                                       "   alert( 'name=' + window.name );" +
+                                       "   alert( 'top url=' + window.top.location );" +
+                                       "   alert( '1st frame=' + top.frames[0].name );" +
+                                       "   alert( '2nd frame=' + window.top.frames[1].name );" +
+                                       "}" +
+                                       "</script></head><body>" +
+                                       "<a href=# onclick='show_properties()'>show</a>" +
+                                       "</body></html>" );
+        defineWebPage( "Form",    "This is a page with a simple form: " +
+                                  "<form action=submit><input name=name><input type=submit></form>" +
+                                  "<a href=Linker.html target=red>a link</a>");
+        defineResource( "Frames.html",
+                        "<html><head><title>Initial</title></head>" +
+                        "<frameset cols='20%,80%'>" +
+                        "    <frame src='Linker.html' name='red'>" +
+                        "    <frame src=Target.html name=blue>" +
+                        "</frameset></html>" );
+
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/Frames.html" );
+        WebResponse blue = wc.getFrameContents( "blue" );
+        blue.getLinkWith( "show" ).click();
+
+        assertEquals( "1st alert", "name=blue", wc.popNextAlert() );
+        assertEquals( "2nd alert", "top url=" + getHostPath() + "/Frames.html", wc.popNextAlert() );
+        assertEquals( "3rd alert", "1st frame=red", wc.popNextAlert() );
+        assertEquals( "4th alert", "2nd frame=blue", wc.popNextAlert() );
+    }
+
+
     public void testLocationProperty() throws Exception {
         defineResource( "Target.html", "You made it!" );
         defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +

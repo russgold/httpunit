@@ -555,6 +555,16 @@ public class WebResponse implements HTMLSegment {
         }
 
 
+        public Scriptable[] getFrames() throws SAXException {
+            String[] names = getFrameNames();
+            Scriptable[] frames = new Scriptable[ names.length ];
+            for (int i = 0; i < frames.length; i++) {
+                frames[i] = getSubframeContents( names[i] ).getScriptableObject();
+            }
+            return frames;
+        }
+
+
         public void load() throws SAXException {
             runScript( getReceivedPage().getScripts() );
             doEvent( getReceivedPage().getOnLoadEvent() );
@@ -581,7 +591,9 @@ public class WebResponse implements HTMLSegment {
          **/
         public Object get( String propertyName ) {
             if (propertyName.equals( "name" )) {
-                return getTarget().equals( WebRequest.TOP_FRAME ) ? _window.getName() : null;
+                return getTarget().equals( WebRequest.TOP_FRAME ) ? _window.getName() : getTarget();
+            } else if (propertyName.equalsIgnoreCase( "top" )) {
+                return _window.getFrameContents( WebRequest.TOP_FRAME ).getScriptableObject();
             } else if (propertyName.equalsIgnoreCase( "location" )) {
                 return WebResponse.this._url.toExternalForm();
             } else if (propertyName.equalsIgnoreCase( "opener" )) {

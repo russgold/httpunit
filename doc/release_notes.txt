@@ -11,9 +11,11 @@ Limitations:
 
 Revision History:
  9-Oct-2002
+Acknowledgements:
+    Thanks to Richard Harris for adding stubs for various unimplemented JavaScript Window properties.
 Additions:
-    1. Added support for the Window.opener property
-    2. Added support for the Window.name property for top-level frames
+    1. Added support for the following JavaScript Window properties: frames, name, opener, top
+    2. Added do-nothing stubs for the Window properties and functions: closed, close(), moveTo(), focus(), setTimeout()
 
  8-Oct-2002
 Acknowledgements:

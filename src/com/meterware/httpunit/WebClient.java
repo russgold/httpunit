@@ -344,10 +344,11 @@ public class WebClient {
 
 
     /**
-     * Returns the next javascript alert and removes it from the queue.
+     * Returns the next javascript alert and removes it from the queue. If the queue is empty,
+     * will return an empty string.
      */
     public String popNextAlert() {
-        if (_alerts.isEmpty()) throw new IllegalStateException( "Tried to pop a non-existent alert" );
+        if (_alerts.isEmpty()) return "";
         return (String) _alerts.removeFirst();
     }
 

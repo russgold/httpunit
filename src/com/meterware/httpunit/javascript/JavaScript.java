@@ -159,7 +159,7 @@ public class JavaScript {
 
         private void handleScriptException( Exception e, String badScript ) {
             final String errorMessage = badScript + " failed: " + e;
-            if (!(e instanceof EcmaError)) {
+            if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException)) {
                 throw new RuntimeException( errorMessage );
             } else if (isThrowExceptionsOnError()) {
                 throw new ScriptException( errorMessage );
@@ -277,6 +277,7 @@ public class JavaScript {
         private Document  _document;
         private Navigator _navigator;
         private Screen    _screen;
+        private ElementArray _frames;
 
 
         public String getClassName() {
@@ -299,8 +300,27 @@ public class JavaScript {
         }
 
 
+        public Scriptable jsGet_frames() throws SAXException, PropertyException, JavaScriptException, NotAFunctionException {
+            if (_frames == null) {
+                WebResponse.Scriptable scriptables[] = getDelegate().getFrames();
+                Window[] frames = new Window[ scriptables.length ];
+                for (int i = 0; i < frames.length; i++) {
+                    frames[ i ] = (Window) toScriptable( scriptables[ i ] );
+                }
+                _frames = (ElementArray) Context.getCurrentContext().newObject( this, "ElementArray" );
+                _frames.initialize( frames );
+            }
+            return _frames;
+        }
+
+
         public Navigator jsGet_navigator() {
             return _navigator;
+        }
+
+
+        public boolean jsGet_closed() {
+            return false;
         }
 
 
@@ -337,6 +357,22 @@ public class JavaScript {
 
         public String jsFunction_prompt( String message, String defaultResponse ) {
             return getDelegate().getUserResponse( message, defaultResponse );
+        }
+
+
+        public void jsFunction_moveTo( int x, int y ) {
+        }
+
+
+        public void jsFunction_focus() {
+        }
+
+
+        public void jsFunction_setTimeout() {
+        }
+
+
+        public void jsFunction_close() {
         }
 
 

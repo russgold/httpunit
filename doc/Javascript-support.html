@@ -9,13 +9,15 @@ Inline and included scripts are supported, as are the following DOM elements:
 <h3>Window</h3>
 <h4>properties</h4>
 <ul>
-<li>document - the associated Document object</li>
-<li>location - r/w full URL only</li>
+<li>document  - the associated Document object</li>
+<li>frames    - an array of subframes of this window</li>
+<li>location  - r/w full URL only</li>
+<li>name      - r/w the name of the window</li>
 <li>navigator - the Navigator object</li>
-<li>self - the Window itself</li>
-<li>window - a synonym for self</li>
-<li>name - r/w the name of the window (top-level frames only)</li>
-<li>opener - r/o the window which opened this one (top-level frames only)</li>
+<li>opener    - r/o the window which opened this one (top-level frames only)</li>
+<li>self      - the Window itself</li>
+<li>top       - the top frame in the frameset containing this window
+<li>window    - a synonym for self</li>
 </ul>
 <h4>events</h4>
 <ul>
@@ -26,8 +28,8 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>alert()   - queues up an alert message, accessible via WebResponse.getNextAlert() or popNextAlert()</li>
 <li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response. By default,
                 the callback returns true. Users may change this by supplying an implementation of DialogResponder.</li>
-<li>prompt() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
-<li>open()   - opens a new window. A callback will be generated to any WebWindowListener registered with the client.
+<li>prompt()  - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
+<li>open()    - opens a new window. A callback will be generated to any WebWindowListener registered with the client.</li>
 </ul>
 
 <h3>Navigator</h3>
