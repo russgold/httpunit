@@ -666,4 +666,17 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSetFromEmbeddedScript() throws Exception {
+        defineWebPage( "OnCommand", "<form name=\"testform\">" +
+                                    "<input type=text name=\"testfield\" value=\"old\">" +
+                                    "</form>" +
+                                    "<script language=\"JavaScript\">" +
+                                    "  document.testform.testfield.value=\"new\"" +
+                                    "</script>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Form parameter value", "new", response.getForms()[0].getParameterValue( "testfield") );
+    }
+
+
 }

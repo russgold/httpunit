@@ -10,6 +10,10 @@ Limitations:
 
 
 Revision History:
+27-Nov-2002
+Problems fixed:
+    1. Bug #644642: changes to form parameters made from immediate scripts were being discarded
+
 26-Nov-2002
 Problems fixed:
     1. Bug #641687: when neither NekoHTML.jar or Tidy.jar is in the classpath, an explanatory exception is now thrown

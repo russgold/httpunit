@@ -40,11 +40,19 @@ class ParsedHTML {
 
     private String _characterSet;
 
-    private WebForm[]    _forms;
-    private WebImage[]   _images;
-    private WebLink[]    _links;
-    private WebApplet[]  _applets;
     private WebResponse  _response;
+
+    private boolean      _updateForms;
+    private WebForm[]    _forms;
+
+    private boolean      _updateImages;
+    private WebImage[]   _images;
+
+    private boolean      _updateLinks;
+    private WebLink[]    _links;
+
+    private boolean      _updateApplets;
+    private WebApplet[]  _applets;
 
 
     ParsedHTML( WebResponse response, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
@@ -60,12 +68,15 @@ class ParsedHTML {
      * Returns the forms found in the page in the order in which they appear.
      **/
     public WebForm[] getForms() {
-        if (_forms == null) {
+        if (_forms == null || _updateForms) {
             NodeList forms = NodeUtils.getElementsByTagName( getRootNode(), "form" );
-
+            WebForm[] oldForms = _forms;
             _forms = new WebForm[ forms.getLength() ];
-            for (int i = 0; i < _forms.length; i++) {
+
+            if (oldForms != null) System.arraycopy( oldForms, 0, _forms, 0, oldForms.length );
+            for (int i = (oldForms == null ? 0 : oldForms.length); i < _forms.length; i++) {
                 _forms[i] = new WebForm( _response, _baseURL, _baseTarget, forms.item( i ), _characterSet );
+            _updateForms = false;
             }
         }
         return _forms;
@@ -102,7 +113,7 @@ class ParsedHTML {
      * Returns the links found in the page in the order in which they appear.
      **/
     public WebLink[] getLinks() {
-        if (_links == null) {
+        if (_links == null || _updateLinks) {
             final ArrayList list = new ArrayList();
             NodeUtils.processNodes( getRootNode().getChildNodes(), new NodeUtils.NodeAction() {
                 public boolean processElement( Element element ) {
@@ -113,7 +124,9 @@ class ParsedHTML {
                 public void processTextNodeValue( String value ) {
                 }
             } );
+            if (_links != null) for (int i = 0; i < _links.length; i++) list.set( i, _links[i] );
             _links = (WebLink[]) list.toArray( new WebLink[ list.size() ] );
+            _updateLinks = false;
         }
 
         return _links;
@@ -189,13 +202,16 @@ class ParsedHTML {
      * Returns the images found in the page in the order in which they appear.
      **/
     public WebImage[] getImages() {
-        if (_images == null) {
+        if (_images == null || _updateImages) {
             NodeList images = NodeUtils.getElementsByTagName( getRootNode(), "img" );
+            WebImage[] oldImages = _images;
 
             _images = new WebImage[ images.getLength() ];
-            for (int i = 0; i < _images.length; i++) {
+            if (oldImages != null) System.arraycopy( oldImages, 0, _images, 0, oldImages.length );
+            for (int i = (oldImages == null ? 0 : oldImages.length); i < _images.length; i++) {
                 _images[i] = new WebImage( _response, this, _baseURL, images.item( i ), _baseTarget );
             }
+            _updateImages = false;
         }
         return _images;
     }
@@ -244,13 +260,16 @@ class ParsedHTML {
      * Returns a proxy for each applet found embedded in this page.
      */
     public WebApplet[] getApplets() {
-        if (_applets == null) {
+        if (_applets == null || _updateApplets) {
             NodeList applets = NodeUtils.getElementsByTagName( getRootNode(), "applet" );
+            WebApplet[] oldApplets = _applets;
 
             _applets = new WebApplet[ applets.getLength() ];
-            for (int i = 0; i < _applets.length; i++) {
+            if (oldApplets != null) System.arraycopy( oldApplets, 0, _applets, 0, oldApplets.length );
+            for (int i = (oldApplets == null ? 0 : oldApplets.length); i < _applets.length; i++) {
                 _applets[i] = new WebApplet( _response, applets.item( i ), _baseTarget );
             }
+            _updateApplets = false;
         }
         return _applets;
     }
@@ -342,9 +361,7 @@ class ParsedHTML {
             throw new IllegalStateException( "The root node has already been defined as " + _rootNode + " and cannot be redefined as " + rootNode );
         _rootNode = rootNode;
 
-        _links = null;
-        _forms = null;
-        _images = null;
+        _updateLinks = _updateForms = _updateImages = _updateApplets = true;
     }
 
 
