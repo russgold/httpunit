@@ -334,11 +334,12 @@ public class WebRequest {
         private String _contentType = "text/plain";
 
         private static String[][] CONTENT_EXTENSIONS = {
-            { "text/plain", "txt", "text" },
-            { "text/html",  "htm", "html" },
-            { "image/gif",  "gif" },
-            { "image/jpeg", "jpg", "jpeg" },
-            { "image/png",  "png" }
+            { "text/plain",               "txt", "text" },
+            { "text/html",                "htm", "html" },
+            { "image/gif",                "gif" },
+            { "image/jpeg",               "jpg", "jpeg" },
+            { "image/png",                "png" },
+            { "application/octet-stream", "zip" }
         };
 
 
