@@ -216,9 +216,9 @@ public class Site {
         public void appendPageFooter( StringBuffer sb, WebPage currentPage ) {
             if (!currentPage.isLicense()) sb.append( "<hr/><p>" ).append( _copyRight.getNotice() ).append( FragmentTemplate.LINE_BREAK );
             if (currentPage.isMainPage()) {
-                sb.append( "<P class='sourceforge'>Hosted by <IMG SRC='http://sourceforge.net/sflogo.php?group_id=" );
+                sb.append( "<div class='sourceforge'>Hosted by <IMG SRC='http://sourceforge.net/sflogo.php?group_id=" );
                 sb.append( _groupId ).append( "&type=1' width='88' height='31' border='0' alt='SourceForge Logo' " );
-                sb.append( "naturalsizeflag='0' align='TOP'></p>" );
+                sb.append( "naturalsizeflag='0' align='TOP'></div>" );
             }
             sb.append( "</div>" ).append( FragmentTemplate.LINE_BREAK );
             sb.append( "</body></html>" );

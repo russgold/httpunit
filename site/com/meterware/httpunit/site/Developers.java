@@ -81,7 +81,7 @@ public class Developers extends FragmentTemplate {
 
         void appendTo( StringBuffer sb ) {
             sb.append( "<h2>" ).append( _type ).append( "</h2>" ).append( LINE_BREAK );
-            sb.append( "<dl>" ).append( LINE_BREAK );
+            sb.append( "<dl class='developers'>" ).append( LINE_BREAK );
             for (int i = 0; i < _developers.size(); i++) {
                 Developer developer = (Developer) _developers.get( i );
                 if (developer.isNameOnly()) {
