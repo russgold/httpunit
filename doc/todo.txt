@@ -3,6 +3,7 @@ o Prevent setParameter calls from working on requests built from links if valida
 
 Medium priority:
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
+o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Support IFRAME tag
 o Support reset button detection
 o Support _new frame tag

@@ -41,7 +41,7 @@ import javax.servlet.http.HttpSession;
  * This class represents the context in which a specific servlet request is being made.
  * It contains the objects needed to unit test the methods of a servlet.
  **/
-public class InvocationContextImpl implements InvocationContext {
+class InvocationContextImpl implements InvocationContext {
 
 
     /**

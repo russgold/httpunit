@@ -186,7 +186,7 @@ public abstract class HttpUnitOptions {
 
 
     /**
-     * If true, text matches in methods such as {@link HTMLFragment#getLinkWith} are
+     * If true, text matches in methods such as {@link HTMLSegment#getLinkWith} are
      * case insensitive. The default is true (matches ignore case).
      **/
     public static boolean getMatchesIgnoreCase() {
@@ -195,7 +195,7 @@ public abstract class HttpUnitOptions {
 
 
     /**
-     * If true, text matches in methods such as {@link HTMLFragment#getLinkWith} are
+     * If true, text matches in methods such as {@link HTMLSegment#getLinkWith} are
      * case insensitive. The default is true (matches ignore case).
      **/
     public static void setMatchesIgnoreCase( boolean ignoreCase ) {
