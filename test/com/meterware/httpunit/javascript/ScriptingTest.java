@@ -586,13 +586,14 @@ public class ScriptingTest extends HttpUnitTest {
                 "  var element = document.getElementById( id );\n" +
                 "  alert( 'element with id ' + id + ' has style.display ' + element.style.display );\n" +
                 "}\n" +
-                "function swapDisplay( id ) {" +
+                "function setDisplay( id, value ) {" +
                 "  var element = document.getElementById( id );\n" +
-                "  element.style.display = !element.style.display;\n" +
+                "  element.style.display = value;\n" +
                 "}\n" +
                 "function doAll() {\n" +
+                "  setDisplay('test','hidden'); \n" +
                 "  showDisplay('test');\n" +
-                "  swapDisplay('test'); \n" +
+                "  setDisplay('test','visible'); \n" +
                 "  showDisplay('test');\n" +
                 "}\n" +
                 "</script>" +
@@ -601,8 +602,8 @@ public class ScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         wc.getResponse( getHostPath() + "/start.html" );
 
-        assertEquals( "element with id test has style.display true", wc.popNextAlert() );
-        assertEquals( "element with id test has style.display false", wc.popNextAlert() );
+        assertEquals( "element with id test has style.display hidden", wc.popNextAlert() );
+        assertEquals( "element with id test has style.display visible", wc.popNextAlert() );
     }
 
 

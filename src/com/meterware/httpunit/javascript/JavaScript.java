@@ -696,7 +696,7 @@ public class JavaScript {
 
     static public class Style extends JavaScriptEngine {
 
-        private String _display = "true";
+        private String _display = "visible";
 
 
         public String getClassName() {
