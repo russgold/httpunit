@@ -33,6 +33,14 @@ public class WebResponse {
 
 
     /**
+     * Returns the URL which invoked this response.
+     **/
+    public URL getURL() {
+        return _url;
+    }
+
+
+    /**
      * Returns the content type of this response.
      **/
     public String getContentType() {
