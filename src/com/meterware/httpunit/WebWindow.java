@@ -38,6 +38,23 @@ public class WebWindow {
     /** A map of frame names to current contents. **/
     private FrameHolder _frameContents;
 
+    /** The name of the window, set via JavaScript. **/
+    private String _name = "";
+
+
+    public WebClient getClient() {
+        return _client;
+    }
+
+
+    /**
+     * Returns the name of this window. Windows created through normal HTML or browser commands have empty names,
+     * but JavaScript can set the name. A name may be used as a target for a request.
+     */
+    public String getName() {
+        return _name;
+    }
+
 
     /**
      * Submits a GET method request and returns a response.
@@ -64,9 +81,7 @@ public class WebWindow {
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         WebResponse response = _client.getResourceForWindow( request, this );
 
-        if (response != null) updateWindow( request.getTarget(), response );
-
-        return getFrameContents( request.getTarget() );
+        return response == null ? null : updateWindow( request.getTarget(), response );
     }
 
 
@@ -108,15 +123,16 @@ public class WebWindow {
      * Updates this web client based on a received response. This includes updating
      * cookies and frames.
      **/
-    void updateWindow( String requestTarget, WebResponse response ) throws MalformedURLException, IOException, SAXException {
-          _client.updateClient( response );
+    WebResponse updateWindow( String requestTarget, WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        _client.updateClient( response );
         if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
-            getResponse( response.getRefreshRequest() );
+            return getResponse( response.getRefreshRequest() );
         } else if (shouldFollowRedirect( response )) {
             delay( HttpUnitOptions.getRedirectDelay() );
-            getResponse( new RedirectWebRequest( response ) );
+            return getResponse( new RedirectWebRequest( response ) );
         } else {
             _client.updateFrameContents( this, requestTarget, response );
+            return response;
         }
     }
 
@@ -136,8 +152,8 @@ public class WebWindow {
     }
 
 
-    public WebClient getClient() {
-        return _client;
+    void setName( String name ) {
+        _name = name;
     }
 
 

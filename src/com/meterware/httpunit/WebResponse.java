@@ -546,7 +546,7 @@ public class WebResponse implements HTMLSegment {
 
 
         public ClientProperties getClientProperties() {
-            return _client.getClientProperties();
+            return _client == null ? ClientProperties.getDefaultProperties() : _client.getClientProperties();
         }
 
 
@@ -558,6 +558,32 @@ public class WebResponse implements HTMLSegment {
         public void load() throws SAXException {
             runScript( getReceivedPage().getScripts() );
             doEvent( getReceivedPage().getOnLoadEvent() );
+        }
+
+
+        public Scriptable open( String name, String urlString, String features, boolean replace )
+                throws IOException, SAXException {
+            WebWindow[] windows = _client.getOpenWindows();
+            for (int i = 0; i < windows.length; i++) {
+                WebWindow window = windows[i];
+                if (window.getName().equals( name )) return openInWindow( window, name, urlString, "_top" );
+            }
+
+            return openInWindow( _window, name, urlString, "_blank" );
+        }
+
+
+        private Scriptable openInWindow( WebWindow window, String name, String urlString, String target ) throws IOException, SAXException {
+            try {
+                if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
+                WebRequest request = new GetMethodWebRequest( getURL(), urlString, target );
+                WebResponse response = window.getResponse( request );
+                response._window.setName( name );
+                return response.getScriptableObject();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                throw e;
+            }
         }
 
 
@@ -668,7 +694,7 @@ public class WebResponse implements HTMLSegment {
 
 //------------------------------------------ package members ------------------------------------------------
 
-    final static String      BLANK_HTML     = "<html><head><title>Blank</title></head><body></body></html>";
+    final static String      BLANK_HTML     = "";
     final static WebResponse BLANK_RESPONSE = new DefaultWebResponse( BLANK_HTML );
 
 

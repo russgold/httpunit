@@ -20,6 +20,7 @@ Additions:
     1. Links, forms, and images now have a readable title property.
     2. The navigator object now supports the readable 'platform' property.
     3. The screen object is now supported, with properties availHeight and availWidth
+    4. The Window.open function is now supported
 
 Problems fixed:
     1. When not using Latin-1 encoding, URL string characters *, _, and - were improperly being encoded

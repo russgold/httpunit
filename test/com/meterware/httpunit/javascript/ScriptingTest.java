@@ -24,6 +24,8 @@ import com.meterware.httpunit.*;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import java.util.ArrayList;
+
 
 /**
  *
@@ -220,12 +222,69 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testDocumentTitle() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><title>Amazing!</title></head>" +
-                                            "<body onLoad='alert(\"Window title is \" + document.title)'></body>" );
+    public void testWindowOpen() throws Exception {
+        defineResource( "Target.html", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body>" +
+                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Target.html' );\">go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
         WebConversation wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) { windowsOpened.add( window ); }
+            public void windowClosed( WebClient client, WebWindow window ) {}
+        } );
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Alert message", "Window title is Amazing!", wc.popNextAlert() );
+        response.getLinks()[0].click();
+
+        assertFalse( "No window opened", windowsOpened.isEmpty() );
+        assertEquals( "New window message", "You made it!", ((WebWindow) windowsOpened.get( 0 )).getCurrentPage().getText() );
+        assertEquals( "New window name", "sample", ((WebWindow) windowsOpened.get( 0 )).getName() );
+    }
+
+
+    public void testWindowOpenNoContents() throws Exception {
+        defineResource( "Target.html", "You made it!" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body>" +
+                        "<a href='#' onClick=\"window.open( 'sample' );\">go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
+        WebConversation wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) { windowsOpened.add( window ); }
+            public void windowClosed( WebClient client, WebWindow window ) {}
+        } );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+
+        assertFalse( "No window opened", windowsOpened.isEmpty() );
+        assertEquals( "New window message", "", ((WebWindow) windowsOpened.get( 0 )).getCurrentPage().getText() );
+        assertEquals( "New window name", "sample", ((WebWindow) windowsOpened.get( 0 )).getName() );
+    }
+
+
+    public void testWindowReopen() throws Exception {
+        defineResource( "Target.html", "You made it!" );
+        defineResource( "Revise.html", "You changed it!" );
+        defineResource( "OnCommand.html", "<html><head><title>Amazing!</title></head>" +
+                        "<body>" +
+                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Target.html' );\">go</a>" +
+                        "<a href='#' onClick=\"window.open( 'sample', '" + getHostPath() + "/Revise.html' );\">go</a>" +
+                        "</body></html>" );
+        final ArrayList windowsOpened = new ArrayList();
+        WebConversation wc = new WebConversation();
+        wc.addWindowListener( new WebWindowListener() {
+            public void windowOpened( WebClient client, WebWindow window ) { windowsOpened.add( window ); }
+            public void windowClosed( WebClient client, WebWindow window ) {}
+        } );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        response.getLinks()[0].click();
+        assertEquals( "New window message", "You made it!", ((WebWindow) windowsOpened.get( 0 )).getCurrentPage().getText() );
+        response.getLinks()[1].click();
+
+        assertEquals( "Number of window openings", 1, windowsOpened.size() );
+        assertEquals( "Changed window message", "You changed it!", ((WebWindow) windowsOpened.get( 0 )).getCurrentPage().getText() );
     }
 
 
@@ -251,106 +310,6 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testDocumentFindForms() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
-                                            "function getFound( object ) {" +
-                                            "  return (object == null) ? \"did not find \" : \"found \";" +
-                                            "  }" +
-                                            "function viewForms() { " +
-                                            "  alert( \"found \" + document.forms.length + \" form(s)\" );" +
-                                            "  alert( getFound( document.realform ) + \"form 'realform'\" );" +
-                                            "  alert( getFound( document.forms[\"realform\"] ) + \"form 'forms[\'realform\']'\" );" +
-                                            "  alert( getFound( document.noform ) + \"form 'noform'\" ); }" +
-                                            "</script></head>" +
-                                            "<body onLoad='viewForms()'>" +
-                                            "<form name='realform'></form>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Alert message", "found 1 form(s)", wc.popNextAlert() );
-        assertEquals( "Alert message", "found form 'realform'", wc.popNextAlert() );
-        assertEquals( "Alert message", "found form 'forms[\'realform\']'", wc.popNextAlert() );
-        assertEquals( "Alert message", "did not find form 'noform'", wc.popNextAlert() );
-        assertNull( "Alert should have been removed", wc.getNextAlert() );
-    }
-
-
-    public void testDocumentFindLinks() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
-                                            "function getFound( object ) {" +
-                                            "  return (object == null) ? \"did not find \" : \"found \";" +
-                                            "  }" +
-                                            "function viewLinks() { " +
-                                            "  alert( \"found \" + document.links.length + \" link(s)\" );" +
-                                            "  alert( getFound( document.reallink ) + \"link 'reallink'\" );" +
-                                            "  alert( getFound( document.links[\"reallink\"] ) + \"link 'links[reallink]'\" );" +
-                                            "  alert( getFound( document.nolink ) + \"link 'nolink'\" );" +
-                                            "}" +
-                                            "</script></head>" +
-                                            "<body onLoad='viewLinks()'>" +
-                                            "<a href='something' name='reallink'>first</a>" +
-                                            "<a href='else'>second</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Alert message", "found 2 link(s)", wc.popNextAlert() );
-        assertEquals( "Alert message", "found link 'reallink'", wc.popNextAlert() );
-        assertEquals( "Alert message", "found link 'links[reallink]'", wc.popNextAlert() );
-        assertEquals( "Alert message", "did not find link 'nolink'", wc.popNextAlert() );
-        assertNull( "Alert should have been removed", wc.getNextAlert() );
-    }
-
-
-    public void testCaseSensitiveNames() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
-                                            "<body>" +
-                                            "<form name='item' action='run'></form>" +
-                                            "<a name='Item' href='sample.html'></a>" +
-                                            "<a href='#' name='first' onMouseOver='alert( document.item.action );'>1</a>" +
-                                            "<a href='#' name='second' onMouseOver='alert( document.Item.href );'>2</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
-        response.getLinkWithName( "first" ).mouseOver();
-        assertEquals( "form action", "run", wc.popNextAlert() );
-        response.getLinkWithName( "second" ).mouseOver();
-        assertEquals( "link href", getHostPath() + "/sample.html", wc.popNextAlert() );
-    }
-
-
-    public void testLinkMouseOverEvent() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
-                                            "<body>" +
-                                            "<form name='realform'><input name='color' value='blue'></form>" +
-                                            "<a href='#' onMouseOver=\"document.realform.color.value='green';return false;\">green</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
-        WebLink link = response.getLinks()[0];
-        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
-        link.mouseOver();
-        assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
-    }
-
-
-    public void testLinkClickEvent() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
-                                            "<body>" +
-                                            "<form name='realform'><input name='color' value='blue'></form>" +
-                                            "<a href='nothing.html' onClick=\"JavaScript:document.realform.color.value='green';return false;\">green</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
-        WebLink link = response.getLinks()[0];
-        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
-        link.click();
-        assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
-    }
-
-
     public void testScriptDisabled() throws Exception {
         HttpUnitOptions.setScriptingEnabled( false );
         defineResource( "nothing.html", "Should get here" );
@@ -367,109 +326,6 @@ public class ScriptingTest extends HttpUnitTest {
         link.click();
         assertEquals( "unchanged parameter value", "blue", form.getParameterValue( "color" ) );
         assertEquals( "Expected result", "Should get here", wc.getCurrentPage().getText() );
-    }
-
-
-    public void testHashDestinationOnEvent() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
-                                            "<body>" +
-                                            "<form name='realform'><input name='color' value='blue'></form>" +
-                                            "<a href='#' onClick=\"document.realform.color.value='green';\">green</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebForm form = response.getFormWithName( "realform" );
-        WebLink link = response.getLinks()[0];
-        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
-        response = link.click();
-        assertEquals( "changed parameter value", "green", response.getFormWithName( "realform" ).getParameterValue( "color" ) );
-    }
-
-
-    public void testLinkProperties() throws Exception {
-        defineResource( "somewhere.html?with=values", "you made it!" );
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
-                                            "<body>" +
-                                            "<a name=target href='nowhere.html'>" +
-                                            "<a name=control href='#' onClick=\"document.target.href='somewhere.html?with=values';\">green</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebLink link = response.getLinkWithName( "target" );
-        assertEquals( "initial value", "nowhere.html", link.getURLString() );
-        response.getLinkWithName( "control" ).click();
-        assertEquals( "changed reference", getHostPath() + "/somewhere.html?with=values", link.getRequest().getURL().toExternalForm() );
-        response = link.click();
-        assertEquals( "New page", "you made it!", response.getText() );
-    }
-
-
-    public void testLinkIndexes() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
-                                            "function alertLinks() { " +
-                                            "  for (var i=0; i < document.links.length; i++) {" +
-                                            "    alert( document.links[i].href );" +
-                                            "  }" +
-                                            "}" +
-                                            "</script></head>" +
-                                            "<body onLoad='alertLinks()'>" +
-                                            "<a href='demo.html'>green</a>" +
-                                            "<map name='map1'>" +
-                                            "  <area href='guide.html' alt='Guide' shape='rect' coords='0,0,118,28'>" +
-                                            "  <area href='search.html' alt='Search' shape='circle' coords='184,200,60'>" +
-                                            "</map>" +
-                                            "<a href='sample.html'>green</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Alert message", getHostPath() + "/demo.html", wc.popNextAlert() );
-        assertEquals( "Alert message", getHostPath() + "/guide.html", wc.popNextAlert() );
-        assertEquals( "Alert message", getHostPath() + "/search.html", wc.popNextAlert() );
-        assertEquals( "Alert message", getHostPath() + "/sample.html", wc.popNextAlert() );
-        assertNull( "Alert should have been removed", wc.getNextAlert() );
-    }
-
-
-    public void testDocumentFindImages() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
-                                            "function getFound( object ) {\n" +
-                                            "  return (object == null) ? \"did not find \" : \"found \";\n" +
-                                            "  }\n" +
-                                            "function viewImages() { \n" +
-                                            "  alert( \"found \" + document.images.length + \" images(s)\" );\n" +
-                                            "  alert( getFound( document.realimage ) + \"image 'realimage'\" )\n;" +
-                                            "  alert( getFound( document.images['realimage'] ) + \"image 'images[realimage]'\" )\n;" +
-                                            "  alert( getFound( document.noimage ) + \"image 'noimage'\" );\n" +
-                                            "  alert( '2nd image is ' + document.images[1].src ); }\n" +
-                                            "</script></head>\n" +
-                                            "<body onLoad='viewImages()'>\n" +
-                                            "<img name='realimage' src='pict1.gif'>\n" +
-                                            "<img name='2ndimage' src='pict2.gif'>\n" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Alert message", "found 2 images(s)", wc.popNextAlert() );
-        assertEquals( "Alert message", "found image 'realimage'", wc.popNextAlert() );
-        assertEquals( "Alert message", "found image 'images[realimage]'", wc.popNextAlert() );
-        assertEquals( "Alert message", "did not find image 'noimage'", wc.popNextAlert() );
-        assertEquals( "Alert message", "2nd image is pict2.gif", wc.popNextAlert() );
-        assertNull( "Alert should have been removed", wc.getNextAlert() );
-    }
-
-
-    public void testImageSwap() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head></head>" +
-                                            "<body>" +
-                                            "<img name='theImage' src='initial.gif'>" +
-                                            "<a href='#' onMouseOver=\"document.theImage.src='new.jpg';\">green</a>" +
-                                            "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        WebImage image = response.getImageWithName( "theImage" );
-        WebLink link = response.getLinks()[0];
-        assertEquals( "initial image source", "initial.gif", image.getSource() );
-        link.mouseOver();
-        assertEquals( "changed image source", "new.jpg", image.getSource() );
     }
 
 

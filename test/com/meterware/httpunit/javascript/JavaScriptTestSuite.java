@@ -38,6 +38,7 @@ public class JavaScriptTestSuite {
     public static Test suite() {
         TestSuite result = new TestSuite();
         result.addTest( ScriptingTest.suite() );
+        result.addTest( DocumentScriptingTest.suite() );
         result.addTest( FormScriptingTest.suite() );
         return result;
     }

@@ -25,6 +25,7 @@ Inline and included scripts are supported, as are the following DOM elements:
 <li>confirm() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response. By default,
                 the callback returns true. Users may change this by supplying an implementation of DialogResponder.</li>
 <li>prompt() - invokes a callback supplied via WebClient.setDialogResponder to return the user's response</li>
+<li>open()   - opens a new window. A callback will be generated to any WebWindowListener registered with the client.
 </ul>
 
 <h3>Navigator</h3>

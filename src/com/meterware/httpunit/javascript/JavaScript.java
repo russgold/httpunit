@@ -330,8 +330,26 @@ public class JavaScript {
         }
 
 
-        Scriptable toScriptable( ScriptableDelegate delegate ) {
-            return null;
+        public Window jsFunction_open( String name, Object url, String features, boolean replace )
+                throws PropertyException, JavaScriptException, NotAFunctionException, IOException, SAXException {
+            return (Window) toScriptable( getDelegate().open( name, toStringIfNotUndefined( url ), features, replace ) );
+        }
+
+
+        private String toStringIfNotUndefined( Object object ) {
+            return (object == null || Undefined.instance.equals( object )) ? null : object.toString();
+        }
+
+
+        Scriptable toScriptable( ScriptableDelegate delegate )
+                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
+            if (!(delegate instanceof WebResponse.Scriptable)) {
+                return null;
+            } else {
+                JavaScriptEngine element = (JavaScriptEngine) Context.getCurrentContext().newObject( this, "Window" );
+                element.initialize( this, delegate );
+                return element;
+            }
         }
 
 
