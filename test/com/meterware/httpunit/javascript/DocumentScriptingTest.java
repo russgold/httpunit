@@ -239,7 +239,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
                                             "  alert( getFound( document.realimage ) + \"image 'realimage'\" )\n;" +
                                             "  alert( getFound( document.images['realimage'] ) + \"image 'images[realimage]'\" )\n;" +
                                             "  alert( getFound( document.noimage ) + \"image 'noimage'\" );\n" +
-                                            "  alert( '2nd image is ' + document.images[1].src ); }\n" +
+                                            "  alert( document.images[1].name ); }\n" +
                                             "</script></head>\n" +
                                             "<body onLoad='viewImages()'>\n" +
                                             "<img name='realimage' src='pict1.gif'>\n" +
@@ -251,7 +251,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
         assertEquals( "Alert message", "found image 'realimage'", wc.popNextAlert() );
         assertEquals( "Alert message", "found image 'images[realimage]'", wc.popNextAlert() );
         assertEquals( "Alert message", "did not find image 'noimage'", wc.popNextAlert() );
-        assertEquals( "Alert message", "2nd image is pict2.gif", wc.popNextAlert() );
+        assertEquals( "Alert message", "2ndimage", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
 

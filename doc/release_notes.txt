@@ -14,6 +14,13 @@ Limitations:
 
 
 Revision History:
+13-Oct-2004:
+    Acknowledgements:
+        Thanks to Satish Kolli for fixing bug #1040770
+
+    Problems fixed:
+        1. bug #1040770 the Image.name JavaScript property is now supported
+
 5-Oct-2004:
     Acknowledgements:
         Thanks to Hanson Char for identifying a JDK 1.5 incompatibility.

@@ -105,6 +105,8 @@ public class WebImage extends FixedURLWebRequestSource {
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "src" )) {
                 return getSource();
+            } else if(propertyName.equalsIgnoreCase( "name" )) {
+                return getName();
             } else {
                return super.get( propertyName );
             }
