@@ -4,12 +4,12 @@ package com.meterware.pseudoserver;
 *
 * Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -38,6 +38,7 @@ public class WebResource {
     final static String DEFAULT_CONTENT_TYPE = "text/html";
 
     final static String DEFAULT_CHARACTER_SET = "iso-8859-1";
+    private boolean _closesConnection;
 
 
     public WebResource( String contents ) {
@@ -59,6 +60,8 @@ public class WebResource {
         _headers.addElement( header );
         if (header.toLowerCase().startsWith( "content-type" )) _hasExplicitContentTypeHeader = true;
         if (header.toLowerCase().startsWith( "content-length" )) _hasExplicitContentLengthHeader = true;
+        if (header.trim().toLowerCase().startsWith( "connection" ) &&
+            header.trim().toLowerCase().endsWith( "close") ) _closesConnection = true;
     }
 
 
@@ -105,6 +108,11 @@ public class WebResource {
         String[] headers = new String[ effectiveHeaders.size() ];
         effectiveHeaders.copyInto( headers );
         return headers;
+    }
+
+
+    boolean closesConnection() {
+        return _closesConnection;
     }
 
 
@@ -163,7 +171,7 @@ public class WebResource {
 
 
     public String toString() {
-        return "WebResource [code=" + _responseCode + "; type = " + _contentType 
+        return "WebResource [code=" + _responseCode + "; type = " + _contentType
 	     + "; charset = " + _characterSet + "]\n" + getContentsAsString();
     }
 

@@ -4,12 +4,12 @@ package com.meterware.pseudoserver;
 *
 * Copyright (c) 2000-2003, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -213,23 +213,29 @@ public class PseudoServer {
         final BufferedInputStream inputStream = new BufferedInputStream( socket.getInputStream() );
         final HttpResponseStream outputStream = new HttpResponseStream( socket.getOutputStream() );
 
-        HttpRequest request;
-        do {
-            request = new HttpRequest( inputStream );
-            respondToRequest( request, outputStream );
-        } while (!request.requestedCloseConnection() );
+        while (_active) {
+            HttpRequest request = new HttpRequest( inputStream );
+            boolean keepAlive = respondToRequest( request, outputStream );
+            if (!keepAlive) break;
+            while (_active && 0 == inputStream.available()) {
+                try { Thread.sleep(10); } catch (InterruptedException e) {}
+            }
+        }
         outputStream.close();
         socket.close();
     }
 
 
-    private void respondToRequest( HttpRequest request, HttpResponseStream response ) {
+    private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {
+        boolean keepAlive = request.wantsKeepAlive();
         try {
+            response.restart();
             response.setProtocol( request.getProtocol() );
             WebResource resource = getResource( request );
             if (resource == null) {
                 response.setResponse( HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + request.getURI() );
             } else {
+                if (resource.closesConnection()) keepAlive = false;
                 if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     response.setResponse( resource.getResponseCode(), "" );
                 }
@@ -245,6 +251,7 @@ public class PseudoServer {
             t.printStackTrace();
             response.setResponse( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
         }
+        return keepAlive;
     }
 
 
@@ -313,6 +320,11 @@ class HttpResponseStream {
 
     final private static String CRLF = "\r\n";
 
+    void restart() {
+        _headersWritten = false;
+        _headers.clear();
+    }
+
 
     void close() throws IOException {
         flushHeaders();
@@ -356,6 +368,7 @@ class HttpResponseStream {
     void write( WebResource resource ) throws IOException {
         flushHeaders();
         resource.writeTo( _stream );
+        _stream.flush();
     }
 
 
@@ -371,7 +384,6 @@ class HttpResponseStream {
             for (Enumeration e = _headers.elements(); e.hasMoreElements();) {
                 sendLine( (String) e.nextElement() );
             }
-            sendLine( "Connection: close" ); // TODO get rid of this
             sendText( CRLF );
             _headersWritten = true;
             _pw.flush();

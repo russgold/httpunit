@@ -191,13 +191,14 @@ class HttpRequest {
     }
 
 
-    boolean requestedCloseConnection() {
+    boolean wantsKeepAlive() {
+        return false;
 //        if ("Keep-alive".equalsIgnoreCase( getConnectionHeader() )) {
-//            return false;
+//            return true;
 //        } else if (_protocol.equals( "HTTP/1.1" )) {
-//            return "Close".equalsIgnoreCase( getConnectionHeader() );
+//            return !"Close".equalsIgnoreCase( getConnectionHeader() );
 //        } else {
-            return true;
+//            return false;
 //        }
     }
 

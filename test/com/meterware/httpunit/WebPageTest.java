@@ -55,12 +55,6 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
-    public void tearDown() throws Exception {
-        super.tearDown();
-        HttpUnitOptions.resetDefaultCharacterSet();
-    }
-
-
     public void testNoResponse() throws Exception {
         WebConversation wc = new WebConversation();
         try {
@@ -393,6 +387,7 @@ public class WebPageTest extends HttpUnitTest {
         HttpUnitOptions.setCheckContentLength( true );
         String page = "abcdefghijklmnop";
         defineResource( "alphabet.html", page, "text/plain" );
+        addResourceHeader( "alphabet.html", "Connection: close" );
         addResourceHeader( "alphabet.html", "Content-length: 26" );
 
         WebConversation wc = new WebConversation();
