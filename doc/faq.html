@@ -14,6 +14,7 @@
 <LI><A HREF="#charset">Why isn't HttpUnit handling my non-English pages?</A></LI>
 <LI><A HREF="#utf8">HttpUnit fails with an IllegalArgumentException: sun.io.CharToByteUTF-8, what do I do?</A></LI>
 <LI><A HREF="#buttons">HttpUnit is not finding the buttons in my forms. What is wrong?</A></LI>
+<LI><A HREF="#reload">Why do I get java.lang.IllegalAccessError when calling getResponse()?</A></LI>
 </OL>
 
 
@@ -82,6 +83,21 @@ JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested ac
 will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them, 
 call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page. 
 Once you have corrected any errors, HttpUnit should see your form buttons.
+
+<A NAME="#reload"><H2>Why do I get java.lang.IllegalAccessError when calling getResponse()?</H2></A>
+This happens when you use HttpUnit and JTidy with one of the JUnit graphical test runners, which reloads 
+classes every time to run a test. Unfortunately, this places different versions of the JTidy
+classes in different class loaders, so you get this error.  To avoid it,
+you can do any of the following:<ul><li>Use only the text test runner</li>
+<li>Disable all class reloading in JUnit by adding "loading=false" to <tt>junit.properties</tt> in your current directory</li>
+<li>Disable reloading of HttpUnit and JTidy by adding the following lines to <tt>excluded.properties</tt> in junit.jar<blockquote><code>
+excluded.10=com.meterware.httpunit.*<br>
+excluded.11=org.w3c.tidy.*
+</code></blockquote>
+This will require extracting the file, modifying it and then putting it back <em>in the same directory</em>, but it should allow your
+tests to reload safely.</ul>
+
+
 </BODY></HTML> 
 
 
