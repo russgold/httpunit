@@ -142,10 +142,10 @@ public class PseudoServer {
                 }
                 sendLine( ps, "" );
                 sendText( ps, resource.getContents() );
-                ps.close();
             }
         }
 
+        ps.close();
         socket.close();
     }
 

@@ -61,6 +61,20 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    public void testFindFormByName() throws Exception {
+        defineWebPage( "Default", "<form name=oneForm method=POST action = \"/servlet/Login\">" +
+                                  "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
+                                  "<br><Input name=typeless value=nothing>" +
+                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                                  "<br><Input type=submit value = \"Log in\">" +
+                                  "</form>" );
+                                     
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        assertNull( "Found nonexistent form", page.getFormWithName( "nobody" ) );
+        assertNotNull( "Did not find named form", page.getFormWithName( "oneform" ) );
+    }
+
+
     public void testFormParameters() throws Exception {
         WebForm form = _wc.getResponse( getHostPath() + "/OneForm.html" ).getForms()[0];
         String[] parameters = form.getParameterNames();

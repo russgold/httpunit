@@ -30,7 +30,7 @@ import java.net.HttpURLConnection;
 public class HttpNotFoundException extends HttpException {
 
 
-    HttpNotFoundException( String url ) {
+    public HttpNotFoundException( String url ) {
         super( HttpURLConnection.HTTP_NOT_FOUND, url );
     }
 

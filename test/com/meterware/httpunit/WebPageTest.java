@@ -114,5 +114,20 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    public void testNoLocalFile() throws Exception {
+        File file = new File( "temp.html" );
+        file.delete();
+
+        try {
+            WebConversation wc = new WebConversation();
+            WebRequest request = new GetMethodWebRequest( "file:" + file.getAbsolutePath() );
+            WebResponse simplePage = wc.getResponse( request );
+            fail( "Should have complained about missing file" );
+        } catch (java.io.FileNotFoundException e) {
+        }
+
+    }
+
+
                               
 }

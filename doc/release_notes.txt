@@ -8,11 +8,18 @@ Limitations: HttpUnit does not support JavaScript
 
 
 Revision History:
+21-Nov-00
+Additions:
+    1. Introductory ServletUnit functionality (parameters and sessions, but no JSP, no redirect, no forwarding)
+    2. WebConversation now has a new public base class: WebClient
+    3. Any message header may now be defined, using: WebClient.setHeaderField and will be sent on all subsequent requests
+    4. Forms may now be retrieved by their name attributes, using WebResponse.getFormWithName()
+
+16-Nov-00 1.2
 Acknowledgements:
     Thanks to Robert Krueger for providing an interface to the xerces parser for XML web responses.
     Thanks to Marco Tamanti and Gabriele Antonelli for suggesting ways to support file URLs
     
-16-Nov-00 1.2
 Problems corrected:
     1. Unnamed parameters are no longer submitted as part of a form request
     2. Searching for tables beginning with a string no longer aborts with NullPointerException if the table is missing cells

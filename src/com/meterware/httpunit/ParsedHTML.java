@@ -52,6 +52,19 @@ class ParsedHTML {
 
 
     /**
+     * Returns the form found in the page with the specified name.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm getFormWithName( String name ) {
+        WebForm[] forms = getForms();
+        for (int i = 0; i < forms.length; i++) {
+            if (forms[i].getName().equalsIgnoreCase( name )) return forms[i];
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the links found in the page in the order in which they appear.
      **/
     public WebLink[] getLinks() {

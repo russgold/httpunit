@@ -83,6 +83,26 @@ public class WebRequest {
     }
 
 
+    /**
+     * Returns the query string defined for this request.
+     **/
+    public String getQueryString() {
+        return getParameterString();
+    }
+
+
+    /**
+     * Returns the HTTP method defined for this request.
+     **/
+    abstract
+    public String getMethod();
+
+
+    public String toString() {
+        return getMethod() + " request for " + getURLString();
+    }
+
+
 
 //------------------------------------- protected members ------------------------------------
 

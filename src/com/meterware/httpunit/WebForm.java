@@ -34,7 +34,7 @@ public class WebForm {
 
 
     /**
-     * Returns the target for this link.
+     * Returns the target for this form.
      **/
     public String getTarget() {
         if (_node.getAttributes().getNamedItem( "target" ) == null) {
@@ -42,6 +42,14 @@ public class WebForm {
         } else {
             return getValue( _node.getAttributes().getNamedItem( "target" ) );
         }
+    }
+
+
+    /**
+     * Returns the name of the form.
+     **/
+    public String getName() {
+        return emptyIfNull( getValue( _node.getAttributes().getNamedItem( "name" ) ) );
     }
 
 

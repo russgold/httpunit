@@ -44,6 +44,14 @@ public class GetMethodWebRequest extends WebRequest {
     }
 
 
+    /**
+     * Returns the HTTP method defined for this request.
+     **/
+    public String getMethod() {
+        return "GET";
+    }
+
+
 //--------------------------------------- package members ---------------------------------------------
 
 

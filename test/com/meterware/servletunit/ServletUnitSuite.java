@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
@@ -19,19 +19,31 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.HttpURLConnection;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
- * This exception is thrown when an internal error is found on the server.
- * @author Seth Ladd
+ * Tests for the package.
  **/
-public class HttpInternalErrorException extends HttpException {
+public class ServletUnitSuite {
 
-
-    public HttpInternalErrorException( String url ) {
-        super( HttpURLConnection.HTTP_INTERNAL_ERROR, url );
+    public static void main(String args[]) {
+        junit.textui.TestRunner.run( suite() );
+    }
+	
+	
+    public static Test suite() {
+        TestSuite suite = new TestSuite();
+        suite.addTest( HttpServletRequestTest.suite() );
+        suite.addTest( HttpServletResponseTest.suite() );
+        suite.addTest( StatelessTest.suite() );
+        suite.addTest( StatefulTest.suite() );
+        suite.addTest( SessionTest.suite() );
+        return suite;
     }
 
 
 }
+

@@ -40,6 +40,14 @@ public class PostMethodWebRequest extends WebRequest {
     }
 
 
+    /**
+     * Returns the HTTP method defined for this request.
+     **/
+    public String getMethod() {
+        return "POST";
+    }
+
+
 //---------------------------------- WebRequest methods --------------------------------
 
 

@@ -20,17 +20,32 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.xml.sax.*;
-import org.w3c.dom.*;
+import java.io.IOException;
+import java.io.StringReader;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import java.net.URL;
+import java.net.HttpURLConnection;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.StringTokenizer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
- * A response from a web server to an Http request.
+ * A response from a web server to a web request.
  **/
+abstract
 public class WebResponse {
 
 
@@ -38,15 +53,7 @@ public class WebResponse {
      * Returns true if the response is HTML.
      **/
     public boolean isHTML() {
-        return _contentType.equals( HTML_CONTENT );
-    }
-
-
-    /**
-     * Returns the response code associated with this response.
-     **/
-    public int getResponseCode() {
-        return _responseCode;
+        return getContentType().equals( HTML_CONTENT );
     }
 
 
@@ -55,22 +62,6 @@ public class WebResponse {
      **/
     public URL getURL() {
         return _url;
-    }
-
-
-    /**
-     * Returns the content type of this response.
-     **/
-    public String getContentType() {
-        return _contentType;
-    }
-
-
-    /**
-     * Returns the character set used in this response.
-     **/
-    public String getCharacterSet() {
-        return _characterSet;
     }
 
 
@@ -91,6 +82,69 @@ public class WebResponse {
 
 
     /**
+     * Returns the response code associated with this response.
+     **/
+    abstract
+    public int getResponseCode();
+
+
+    /**
+     * Returns the content type of this response.
+     **/
+    public String getContentType() {
+        if (_contentType == null) readContentTypeHeader();
+        return _contentType;
+    }
+
+
+    /**
+     * Returns the character set used in this response.
+     **/
+    public String getCharacterSet() {
+        if (_characterSet == null) readContentTypeHeader();
+        return _characterSet;
+    }
+
+
+    /**
+     * Returns a list of new cookie names defined as part of this response.
+     **/
+    public String[] getNewCookieNames() {
+        String[] names = new String[ getNewCookies().size() ];
+        int i = 0;
+        for (Enumeration e = getNewCookies().keys(); e.hasMoreElements(); i++ ) {
+            names[i] = (String) e.nextElement();
+        }
+        return names;
+    }
+
+
+    /**
+     * Returns the new cookie value defined as part of this response.
+     **/
+    public String getNewCookieValue( String name ) {
+        return (String) getNewCookies().get( name );
+    }
+
+
+
+    /**
+     * Returns the value for the specified header field. If no such field is defined, will return null.
+     * No more than one header may be defined for each key.  
+     **/
+    abstract
+    public String getHeaderField( String fieldName );
+    
+    
+    /**
+     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
+     * which may be used to represent internal state of this object.
+     **/
+    abstract
+    public String getText();
+    
+    
+    /**
      * Returns the names of the frames found in the page in the order in which they appear.
      **/
     public String[] getFrameNames() throws SAXException {
@@ -110,6 +164,15 @@ public class WebResponse {
      **/
     public WebForm[] getForms() throws SAXException {
         return getReceivedPage().getForms();
+    }
+
+
+    /**
+     * Returns the form found in the page with the specified name.
+     * @exception SAXException thrown if there is an error parsing the response.
+     **/
+    public WebForm getFormWithName( String name ) throws SAXException {
+        return getReceivedPage().getFormWithName( name );
     }
 
 
@@ -198,45 +261,29 @@ public class WebResponse {
     }
 
 
-    /**
-     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
-     * which may be used to represent internal state of this object.
-     **/
-    public String getText() {
-        return _responseText;
-    }
-    
-    
     public String toString() {
-        return _responseText;
+        return getText();
     }
 
 
-//---------------------------------- package members --------------------------------
-
-
-    final static WebResponse BLANK_RESPONSE = new WebResponse( "<html><head></head><body></body></html>" );
+//----------------------------------------- protected members -----------------------------------------------
 
 
     /**
-     * Constructs a response object from an input stream.
-     * @param conversation the web conversation which received the response
+     * Constructs a response object.
      * @param url the url from which the response was received
      * @param inputStream the input stream from which the response can be read
      **/
-    WebResponse( WebConversation conversation, String target, URL url, URLConnection connection ) {
-        this( conversation, target, url, getResponseText( url, connection ) );
-        readHeaders( connection );
+    protected WebResponse( String target, URL url ) {
+        _url = url;
+        _target = target;
     }
 
 
-    /**
-     * Returns the web conversation of which this response is a part, and which contains the session
-     * context information required for further requests.
-     **/
-    WebConversation getWebConversation() {
-        return _conversation;
-    }
+//------------------------------------------ package members ------------------------------------------------
+
+
+    final static WebResponse BLANK_RESPONSE = new DefaultWebResponse( "<html><head></head><body></body></html>" );
 
 
     /**
@@ -260,9 +307,7 @@ public class WebResponse {
 //--------------------------------- private members --------------------------------------
 
 
-
-    final private static String endOfLine = System.getProperty( "line.separator" );
-
+    final private static String DEFAULT_CONTENT_HEADER = "text/plain; charset=us-ascii";
 
     final private static String HTML_CONTENT = "text/html";
 
@@ -270,13 +315,11 @@ public class WebResponse {
 
     private ReceivedPage _page;
 
-    private String _responseText;
+    private String _contentType;
 
-    private String _contentType = "text/plain";
+    private String _characterSet;
 
-    private String _characterSet = "us-ascii";
-
-    private int    _responseCode;
+    private Hashtable _newCookies;
 
 
     // the following variables are essentially final; however, the JDK 1.1 compiler does not handle final variables properly with
@@ -284,47 +327,41 @@ public class WebResponse {
 
     private URL    _url;
 
-    private WebConversation _conversation;
-
     private String _target;
 
 
-    /**
-     * Constructs a response object from a text response.
-     **/
-    private WebResponse( String responseText ) {
-        this( null, "", null, responseText );
-        _contentType = HTML_CONTENT;
-    }
-
-
-    /**
-     * Constructs a response object.
-     * @param conversation the web conversation which received the response
-     * @param url the url from which the response was received
-     * @param inputStream the input stream from which the response can be read
-     **/
-    private WebResponse( WebConversation conversation, String target, URL url, String responseText ) {
-        _conversation = conversation;
-        _url = url;
-        _target = target;
-        _responseText = responseText;
-    }
-
-
-    private static String getResponseText( URL url, URLConnection connection ) {
-        StringBuffer sb = new StringBuffer();
-        try {
-            BufferedReader input = new BufferedReader( new InputStreamReader( connection.getInputStream() ) );
-
-            String str;
-            while (null != ((str = input.readLine()))) {
-                sb.append( str ).append( endOfLine );
+    private Hashtable getNewCookies() {
+        if (_newCookies == null) {
+            _newCookies = new Hashtable();
+            String cookieHeader = getHeaderField( "Set-Cookie" );
+            if (cookieHeader != null) {
+                StringTokenizer st = new StringTokenizer( cookieHeader, "," );
+                while (st.hasMoreTokens()) recognizeOneCookie( st.nextToken() );
             }
-            input.close ();
-            return sb.toString();
-        } catch (IOException e) {
-            throw new RuntimeException( "Unable to retrieve data from URL: " + url.toExternalForm() + " (" + e + ")" );
+        }
+        return _newCookies;
+    }
+
+
+    private void recognizeOneCookie( String cookieSpec ) {
+        StringTokenizer st = new StringTokenizer( cookieSpec, "=;" );
+        String name = st.nextToken().trim();
+        String value = st.nextToken().trim();
+        _newCookies.put( name, value );
+    }
+
+
+    private void readContentTypeHeader() {
+        String contentHeader = getHeaderField( "Content-type" );
+        if (contentHeader == null) contentHeader = DEFAULT_CONTENT_HEADER;
+        StringTokenizer st = new StringTokenizer( contentHeader, ";=" );
+        _contentType = st.nextToken();
+        while (st.hasMoreTokens()) {
+            String parameter = st.nextToken();
+            if (st.hasMoreTokens()) {
+                String value = st.nextToken();
+                if (parameter.equalsIgnoreCase( "charset" )) _characterSet = value;
+            }
         }
     }
 
@@ -348,7 +385,7 @@ public class WebResponse {
     private ReceivedPage getReceivedPage() throws SAXException {
         if (_page == null) {
             if (!isHTML()) throw new RuntimeException( "Response is not HTML" );
-            _page = new ReceivedPage( _url, _target, _responseText );
+            _page = new ReceivedPage( _url, _target, getText() );
         }
         return _page;
     }
@@ -363,7 +400,7 @@ public class WebResponse {
             Object parser = constructor.newInstance( null );
 
             Class[] parseMethodArgTypes = { InputSource.class };
-            Object[] parseMethodArgs = { new InputSource( new StringReader( _responseText ) ) };
+            Object[] parseMethodArgs = { new InputSource( new StringReader( getText() ) ) };
             Method parseMethod = parserClass.getMethod( "parse", parseMethodArgTypes );
             parseMethod.invoke( parser, parseMethodArgs );
 
@@ -392,33 +429,48 @@ public class WebResponse {
    }
 
 
-    private void readHeaders( URLConnection connection ) {
-        readContentTypeHeader( connection );
-        try {
-            if (connection instanceof HttpURLConnection) {
-                _responseCode = ((HttpURLConnection) connection).getResponseCode();
-            } else {
-                _responseCode = HttpURLConnection.HTTP_OK;
-            }
-        } catch (IOException e) {
-        }
+}
+
+
+
+class DefaultWebResponse extends WebResponse {
+
+
+    DefaultWebResponse( String text ) {
+        super( "", null );
+        _responseText = text;
     }
 
 
-    private void readContentTypeHeader( URLConnection connection ) {
-        String contentHeader = connection.getContentType();
-        if (contentHeader != null) {
-            StringTokenizer st = new StringTokenizer( contentHeader, ";=" );
-            _contentType = st.nextToken();
-            while (st.hasMoreTokens()) {
-                String parameter = st.nextToken();
-                if (st.hasMoreTokens()) {
-                    String value = st.nextToken();
-                    if (parameter.equalsIgnoreCase( "charset" )) _characterSet = value;
-                }
-            }
-        }
+    /**
+     * Returns the response code associated with this response.
+     **/
+    public int getResponseCode() {
+        return HttpURLConnection.HTTP_OK;
     }
 
+
+    /**
+     * Returns the value for the specified header field. If no such field is defined, will return null.
+     **/
+    public String getHeaderField( String fieldName ) {
+        if (fieldName.equals( "Content-type" )) {
+            return "text/html; charset=us-ascii";
+        } else {
+            return null;
+        }
+    }
+    
+    
+    /**
+     * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
+     * which may be used to represent internal state of this object.
+     **/
+    public String getText() {
+        return _responseText;
+    }
+    
+    
+    private String _responseText;
 }
 

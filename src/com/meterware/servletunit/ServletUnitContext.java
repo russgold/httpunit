@@ -1,4 +1,4 @@
-package com.meterware.httpunit;
+package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
@@ -19,19 +19,35 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.HttpURLConnection;
 
 
-/**
- * This exception is thrown when an internal error is found on the server.
- * @author Seth Ladd
- **/
-public class HttpInternalErrorException extends HttpException {
+import java.util.Hashtable;
+
+class ServletUnitContext {
 
 
-    public HttpInternalErrorException( String url ) {
-        super( HttpURLConnection.HTTP_INTERNAL_ERROR, url );
+    /**
+     * Returns the session with the specified ID, if any.
+     **/
+    ServletUnitHttpSession getSession( String id ) {
+        return (ServletUnitHttpSession) _sessions.get( id );
     }
+
+
+    /**
+     * Creates a new session with a unique ID.
+     **/
+    ServletUnitHttpSession newSession() {
+        ServletUnitHttpSession result = new ServletUnitHttpSession();
+        _sessions.put( result.getId(), result );
+        return result;
+    }
+
+
+//------------------------------- private members ---------------------------
+
+
+    private Hashtable _sessions = new Hashtable();
 
 
 }

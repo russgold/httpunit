@@ -37,8 +37,20 @@ public class HttpException extends RuntimeException {
 
 
     HttpException( int responseCode, String reason ) {
-        super( reason );
+        _reason = reason;
         _responseCode = responseCode;
+    }
+
+
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer( "Error on HTTP request: " );
+        sb.append( _responseCode );
+        if (_reason != null) {
+            sb.append( " [" );
+            sb.append( _reason );
+            sb.append( " ]" );
+        }
+        return sb.toString();
     }
 
 
@@ -48,6 +60,8 @@ public class HttpException extends RuntimeException {
 
 
     private int _responseCode;
+
+    private String _reason;
 
 
 }

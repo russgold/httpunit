@@ -51,12 +51,14 @@ public class PseudoServerTest extends TestCase {
         int port = ps.getConnectedPort();
 
         WebConversation wc   = new WebConversation();
-        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/nothing" );
+        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + "/nothing.htm" );
         try {
             WebResponse response = wc.getResponse( request );
             fail( "Should have rejected the request" );
         } catch (HttpNotFoundException e) {
             assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
+        } finally {
+            ps.shutDown();
         }
     }
 
@@ -69,11 +71,15 @@ public class PseudoServerTest extends TestCase {
         ps.setResource( resourceName, resourceValue );
         int port = ps.getConnectedPort();
 
-        WebConversation wc   = new WebConversation();
-        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "requested resource", resourceValue, response.toString() );
-        assertEquals( "content type", "text/html", response.getContentType() );
+        try {
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "content type", "text/html", response.getContentType() );
+        } finally {
+            ps.shutDown();
+        }
     }
 
 
@@ -90,11 +96,42 @@ public class PseudoServerTest extends TestCase {
         ps.setResource( redirectName, "" );
         ps.addResourceHeader( redirectName, "Location: http://localhost:" + port + '/' + resourceName );
 
-        WebConversation wc   = new WebConversation();
-        WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
-        WebResponse response = wc.getResponse( request );
-        assertEquals( "requested resource", resourceValue, response.toString() );
-        assertEquals( "content type", "text/html", response.getContentType() );
+        try {
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + redirectName );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "content type", "text/html", response.getContentType() );
+        } finally {
+            ps.shutDown();
+        }
+    }
+
+
+
+    public void testCookies() throws Exception {
+        String resourceName = "something/interesting";
+        String resourceValue = "the desired content\r\n";
+
+        PseudoServer ps = new PseudoServer();
+        int port = ps.getConnectedPort();
+        ps.setResource( resourceName, resourceValue );
+        ps.addResourceHeader( resourceName, "Set-Cookie: age=12, name=george" );
+        ps.addResourceHeader( resourceName, "Set-Cookie: type=short" );
+
+        try {
+            WebConversation wc   = new WebConversation();
+            WebRequest request   = new GetMethodWebRequest( "http://localhost:" + port + '/' + resourceName );
+            WebResponse response = wc.getResponse( request );
+            assertEquals( "requested resource", resourceValue, response.toString() );
+            assertEquals( "content type", "text/html", response.getContentType() );
+            assertEquals( "number of cookies", 3, wc.getCookieNames().length );
+            assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
+            assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
+            assertEquals( "cookie 'type' value", "short", wc.getCookieValue( "type" ) );
+        } finally {
+            ps.shutDown();
+        }
     }
 }
 
