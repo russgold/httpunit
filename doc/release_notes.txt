@@ -17,9 +17,11 @@ Revision History:
 13-Oct-2004:
     Acknowledgements:
         Thanks to Satish Kolli for fixing bug #1040770
+        Thanks to Fabrizio Guistina for supplying an implementation of locale handling for ServletUnitHttpResponse
 
     Problems fixed:
         1. bug #1040770 the Image.name JavaScript property is now supported
+        2. bug #1044820 ServletUnit now implements HttpServletResponse.getLocale() and setLocale()
 
 5-Oct-2004:
     Acknowledgements:

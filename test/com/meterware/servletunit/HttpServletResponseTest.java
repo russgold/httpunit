@@ -22,6 +22,7 @@ package com.meterware.servletunit;
 import java.io.*;
 
 import java.util.Date;
+import java.util.Locale;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.*;
@@ -72,7 +73,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
         assertEquals( "Title", "Sample Page", response.getTitle() );
         assertEquals( "Content length", 65, response.getContentLength() );
         assertEquals( "Content encoding", "iso-8859-1", response.getCharacterSet() );
-        assertEquals( "Content header", "text/html", response.getHeaderField( "Content-type" ) );
+        assertEquals( "Content header", "text/html; charset=iso-8859-1", response.getHeaderField( "Content-type" ) );
     }
 
 
@@ -90,6 +91,18 @@ public class HttpServletResponseTest extends ServletUnitTest {
         WebResponse response = new ServletUnitWebResponse( null, FrameSelector.TOP_FRAME, null, servletResponse );
         assertEquals( "Character set", "iso-8859-8", response.getCharacterSet() );
         assertEquals( "Title", hebrewTitle, response.getTitle() );
+    }
+
+
+    public void testLocale() throws Exception {
+        ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
+        assertEquals( "Default locale", Locale.getDefault(), servletResponse.getLocale() );
+
+        servletResponse.setContentType( "text/html" );
+        servletResponse.setLocale( new Locale( "he", "IL" ) );
+        assertEquals( "Specified locale", new Locale( "he", "IL" ), servletResponse.getLocale() );
+        assertEquals( "Content type", "text/html; charset=iso-8859-8", servletResponse.getHeaderField( "Content-type" ) );
+
     }
 
 

@@ -27,13 +27,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Vector;
-import java.util.ArrayList;
-import java.util.TimeZone;
-import java.util.Date;
+import java.util.*;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.ServletOutputStream;
@@ -46,7 +40,9 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     // rfc1123-date is "Sun, 06 Nov 1994 08:49:37 GMT"
     private static final String RFC1123_DATE_SPEC = "EEE, dd MMM yyyy hh:mm:ss z";
     private boolean _committed;
+    private Locale _locale = Locale.getDefault();
 
+    private static final Hashtable ENCODING_MAP = new Hashtable();
 
     /**
      * @deprecated Use encodeURL(String url)
@@ -238,7 +234,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * the MIME body sent by this response.
      **/
     public String getCharacterEncoding() {
-        return _encoding;
+        return _encoding == null ? HttpUnitUtils.DEFAULT_CHARACTER_SET : _encoding;
     }
 
 
@@ -256,12 +252,6 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
         _contentType = typeAndEncoding[0];
         if (typeAndEncoding[1] != null) _encoding = typeAndEncoding[1];
-
-        if (_encoding.equalsIgnoreCase( HttpUnitUtils.DEFAULT_CHARACTER_SET  )) {
-            setHeader( "Content-Type", type );
-        } else {
-            setHeader( "Content-Type", _contentType + "; charset=" + _encoding );
-        }
     }
 
 
@@ -416,7 +406,17 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * By default, the response locale is the default locale for the server.
      **/
     public void setLocale( Locale locale ) {
-        throw new RuntimeException( "setLocale not implemented" );
+        _locale = locale;
+        if (_encoding == null) {
+            for (Iterator it = ENCODING_MAP.entrySet().iterator(); it.hasNext();) {
+                Map.Entry entry = (Map.Entry) it.next();
+                String locales = (String) entry.getValue();
+                if (locales.indexOf( locale.getLanguage() ) >= 0 || locales.indexOf( locale.toString() ) >= 0) {
+                    _encoding = (String) entry.getKey();
+                    return;
+                }
+            }
+        }
     }
 
 
@@ -424,7 +424,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      * Returns the locale assigned to the response.
      **/
     public Locale getLocale() {
-        throw new RuntimeException( "getLocale not implemented" );
+        return _locale;
     }
 
 
@@ -536,7 +536,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     private String _contentType = "text/plain";
 
-    private String _encoding    = HttpUnitUtils.DEFAULT_CHARACTER_SET;
+    private String _encoding;
 
     private PrintWriter  _writer;
 
@@ -558,6 +558,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     private void completeHeaders() {
         if (_headersComplete) return;
         addCookieHeader();
+        setHeader( "Content-Type", _contentType + "; charset=" + getCharacterEncoding() );
         _headersComplete = true;
     }
 
@@ -575,6 +576,26 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         }
         setHeader( "Set-Cookie", sb.toString() );
     }
+
+
+
+    static {
+        ENCODING_MAP.put( "iso-8859-1", "ca da de en es fi fr is it nl no pt sv " );
+        ENCODING_MAP.put( "iso-8859-2", "cs hr hu pl ro sh sk sl sq " );
+        ENCODING_MAP.put( "iso-8859-4", "et lt lv ");
+        ENCODING_MAP.put( "iso-8859-5", "be bg mk ru sr uk " );
+        ENCODING_MAP.put( "iso-8859-6", "ar " );
+        ENCODING_MAP.put( "iso-8859-7", "el " );
+        ENCODING_MAP.put( "iso-8859-8", "iw he " );
+        ENCODING_MAP.put( "iso-8859-9", "tr " );
+
+        ENCODING_MAP.put("Shift_JIS", "ja ");
+        ENCODING_MAP.put("EUC-KR",    "ko ");
+        ENCODING_MAP.put("TIS-620",   "th ");
+        ENCODING_MAP.put("GB2312",    "zh " );
+        ENCODING_MAP.put("Big5",      "zh_TW zh_HK " );
+    }
+
 }
 
 
