@@ -544,6 +544,15 @@ class TextFormControl extends FormControl {
 
     class Scriptable extends FormControl.Scriptable {
 
+        public Object get( String propertyName ) {
+            if (propertyName.equalsIgnoreCase( "value" )) {
+                return getValues()[0];
+            } else {
+                return super.get( propertyName );
+            }
+        }
+
+
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "value" )) {
                 _value[0] =_defaultValue[0] = value.toString();

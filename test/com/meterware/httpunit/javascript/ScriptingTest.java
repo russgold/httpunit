@@ -22,6 +22,7 @@ package com.meterware.httpunit.javascript;
 import com.meterware.httpunit.HttpUnitTest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.WebForm;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -104,6 +105,19 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Alert message", "found form 'realform'", response.popNextAlert() );
         assertEquals( "Alert message", "did not find form 'noform'", response.popNextAlert() );
         assertNull( "Alert should have been removed", response.getNextAlert() );
+    }
+
+
+    public void testSetFormFieldValue() throws Exception {
+        defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                            "<body onLoad=\"document.realform.color.value='green'\">" +
+                                            "<form name='realform'><input name='color' value='blue'></form>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        JavaScript.run( response );
+        WebForm form = response.getFormWithName( "realform" );
+        assertEquals( "color parameter value", "green", form.getParameterValue( "color" ) );
     }
 
 

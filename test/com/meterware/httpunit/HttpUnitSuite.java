@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -19,17 +19,24 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import com.meterware.pseudoserver.PseudoServerTest;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
 
 /**
  * Tests for the package.
  **/
 public class HttpUnitSuite {
+
+    private static Class[] NO_PARAMETERS = new Class[ 0 ];
+
 
     public static void main( String[] args ) {
         junit.textui.TestRunner.run( suite() );
@@ -54,15 +61,27 @@ public class HttpUnitSuite {
         result.addTest( JTidyPrintWriterTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );
+        addOptionalTestCase( result, "com.meterware.httpunit.javascript.ScriptingTest" );
+        addOptionalTestCase( result, "com.meterware.servletunit.ServletUnitSuite" );
         return result;
     }
 
 
     private static void addOptionalTestCase( TestSuite testSuite, String testCaseName ) {
         try {
-            testSuite.addTest( new TestSuite( Class.forName( testCaseName ) ) );
+            final Class testClass = Class.forName( testCaseName );
+            Method suiteMethod = testClass.getMethod( "suite", NO_PARAMETERS );
+            if (suiteMethod != null && Modifier.isStatic( suiteMethod.getModifiers() )) {
+                testSuite.addTest( (Test) suiteMethod.invoke( null, NO_PARAMETERS ) );
+            } else if (TestCase.class.isAssignableFrom( testClass )) {
+                testSuite.addTest( new TestSuite( testClass ) );
+            } else {
+                System.out.println( "Note: test suite " + testCaseName + " not a TestClass and has no suite() method" );
+            }
         } catch (ClassNotFoundException e) {
             System.out.println( "Note: test suite " + testCaseName + " not found; skipping." );
+        } catch (Exception e) {
+            System.out.println( "Note: unable to add " + testCaseName + ": " + e );
         }
     }
 

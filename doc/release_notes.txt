@@ -19,6 +19,7 @@ Additions:
        case you must set any parameters directly into the form.
     3. You may now obtain the current page from a web client by calling client.getCurrentPage() rather than
        client.getFrameContents( "_top" );
+    4. Added JavaScript support for form.<text field>.value
 
 29-Jul-2002
 Acknowledgements:

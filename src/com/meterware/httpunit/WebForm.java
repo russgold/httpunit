@@ -413,6 +413,13 @@ public class WebForm extends WebRequestSource {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { _action = newAction; }
 
+
+        public Object get( String propertyName ) {
+            final FormParameter parameter = getParameter( propertyName );
+            return parameter == UNKNOWN_PARAMETER ? null : parameter.getScriptableObject();
+        }
+
+
         public void setParameterValue( String name, String value ) {
             getParameter( name ).getScriptableObject().set( "value", value );
         }

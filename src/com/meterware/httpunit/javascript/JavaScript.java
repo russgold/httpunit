@@ -19,21 +19,19 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.HTMLPage;
-import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.ScriptEngine;
+import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebResponse;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.lang.reflect.InvocationTargetException;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ClassDefinitionException;
-import org.mozilla.javascript.PropertyException;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NotAFunctionException;
+import org.mozilla.javascript.PropertyException;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.xml.sax.SAXException;
 
@@ -54,6 +52,7 @@ public class JavaScript {
         ScriptableObject.defineClass( scope, Window.class );
         ScriptableObject.defineClass( scope, Document.class );
         ScriptableObject.defineClass( scope, Form.class );
+        ScriptableObject.defineClass( scope, Control.class );
         Window w = (Window) context.newObject( scope, "Window" );
 
         w.initialize( response.getScriptableObject() );
@@ -62,6 +61,9 @@ public class JavaScript {
 
     abstract static class JavaScriptEngine extends ScriptableObject implements ScriptEngine {
 
+        protected com.meterware.httpunit.ScriptableObject _scriptable;
+
+
         public void executeScript( String script ) {
             try {
                 Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
@@ -69,12 +71,64 @@ public class JavaScript {
                 throw new RuntimeException( "Script '" + script + "' failed: " + e );
             }
         }
+
+
+        void initialize( com.meterware.httpunit.ScriptableObject scriptable )
+                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+            _scriptable = scriptable;
+            _scriptable.setScriptEngine( this );
+        }
+
+
+        public boolean has( String propertyName, Scriptable scriptable ) {
+            return super.has( propertyName, scriptable ) ||
+                    (_scriptable != null && _scriptable.get( propertyName ) != null);
+        }
+
+
+        public Object get( String propertyName, Scriptable scriptable ) {
+            Object result = super.get( propertyName, scriptable );
+            if (result != NOT_FOUND) return result;
+            if (_scriptable == null) return NOT_FOUND;
+
+            final Object property = _scriptable.get( propertyName );
+            if (property == null) return NOT_FOUND;
+            if (!(property instanceof com.meterware.httpunit.ScriptableObject)) return property;
+
+            try {
+                return toScriptable( (com.meterware.httpunit.ScriptableObject) property );
+            } catch (PropertyException e) {
+                throw new RuntimeException( e.toString() );
+            } catch (NotAFunctionException e) {
+                throw new RuntimeException( e.toString() );
+            } catch (JavaScriptException e) {
+                throw new RuntimeException( e.toString() );
+            } catch (SAXException e) {
+                throw new RuntimeException( e.toString() );
+            }
+        }
+
+
+        public void put( String propertyName, Scriptable scriptable, Object value ) {
+            if (_scriptable == null || _scriptable.get( propertyName ) == null) {
+                super.put( propertyName, scriptable, value );
+            } else {
+                _scriptable.set( propertyName, value );
+            }
+        }
+
+
+        /**
+         * Converts a scriptable delegate obtained from a subobject into the appropriate Rhino-compatible Scriptable.
+         **/
+        abstract Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+                throws PropertyException, NotAFunctionException, JavaScriptException, SAXException;
+
     }
 
 
     static public class Window extends JavaScriptEngine {
 
-        private WebResponse.Scriptable _scriptable;
         private Document _document;
 
 
@@ -98,26 +152,34 @@ public class JavaScript {
         }
 
 
-        void initialize( WebResponse.Scriptable scriptable )
-                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException  {
-            _scriptable = scriptable;
-            _scriptable.setScriptEngine( this );
+        void initialize( com.meterware.httpunit.ScriptableObject scriptable )
+                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+            super.initialize( scriptable );
             _document = (Document) Context.getCurrentContext().newObject( this, "Document" );
-            _document.initialize( _scriptable.getDocument() );
+            _document.initialize( getDelegate().getDocument() );
 
-            _scriptable.load();
+            getDelegate().load();
         }
 
 
         public void jsFunction_alert( String message ) {
-            _scriptable.alert( message );
+            getDelegate().alert( message );
+        }
+
+
+        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate ) {
+            return null;
+        }
+
+
+        private WebResponse.Scriptable getDelegate() {
+            return (WebResponse.Scriptable) _scriptable;
         }
     }
 
 
     static public class Document extends JavaScriptEngine {
 
-        private HTMLPage.Scriptable _scriptable;
         private Scriptable _forms;
 
 
@@ -126,41 +188,15 @@ public class JavaScript {
         }
 
 
-        public boolean has( String propertyName, Scriptable scriptable ) {
-            return super.has( propertyName, scriptable ) || _scriptable.get( propertyName ) != null;
-        }
-
-
-        public Object get( String propertyName, Scriptable scriptable ) {
-            Object result = super.get( propertyName, scriptable );
-            if (result != NOT_FOUND) return result;
-            if (_scriptable == null) return NOT_FOUND;
-
-            final Object delegate = _scriptable.get( propertyName );
-            if (delegate == null) return NOT_FOUND;
-
-            try {
-                return toScriptable( (WebForm.Scriptable) delegate );
-            } catch (PropertyException e) {
-                throw new RuntimeException( e.toString() );
-            } catch (NotAFunctionException e) {
-                throw new RuntimeException( e.toString() );
-            } catch (JavaScriptException e) {
-                throw new RuntimeException( e.toString() );
-            }
-        }
-
-
-        void initialize( HTMLPage.Scriptable scriptable )
-                throws JavaScriptException, NotAFunctionException, PropertyException {
-            _scriptable = scriptable;
-            _scriptable.setScriptEngine( this );
+        void initialize( com.meterware.httpunit.ScriptableObject scriptable )
+                throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
+            super.initialize( scriptable );
             initializeForms();
         }
 
 
         public String jsGet_title() throws SAXException {
-            return _scriptable.getTitle();
+            return getDelegate().getTitle();
         }
 
 
@@ -169,40 +205,58 @@ public class JavaScript {
         }
 
 
-        private void initializeForms() throws PropertyException, NotAFunctionException, JavaScriptException {
-            WebForm.Scriptable scriptables[] = _scriptable.getForms();
+        private void initializeForms() throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+            WebForm.Scriptable scriptables[] = getDelegate().getForms();
             Form[] forms = new Form[ scriptables.length ];
             for (int i = 0; i < forms.length; i++) {
-                forms[i] = toScriptable( scriptables[i] );
+                forms[ i ] = (Form) toScriptable( scriptables[ i ] );
             }
             _forms = Context.getCurrentContext().newArray( this, forms );
         }
 
 
-        private Form toScriptable( final WebForm.Scriptable scriptable )
-                throws PropertyException, NotAFunctionException, JavaScriptException {
+        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+                throws PropertyException, JavaScriptException, NotAFunctionException, SAXException {
             final Form form = (Form) Context.getCurrentContext().newObject( this, "Form" );
-            form.initialize( scriptable );
+            form.initialize( delegate );
             return form;
         }
+
+
+        private HTMLPage.Scriptable getDelegate() {
+            return (HTMLPage.Scriptable) _scriptable;
+        }
+
     }
 
 
     static public class Form extends JavaScriptEngine {
-
-        private WebForm.Scriptable _scriptable;
-
 
         public String getClassName() {
             return "Form";
         }
 
 
-        void initialize( WebForm.Scriptable scriptable ) {
-            _scriptable = scriptable;
-            scriptable.setScriptEngine( this );
+        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate )
+                throws PropertyException, NotAFunctionException, JavaScriptException, SAXException {
+            final Control control = (Control) Context.getCurrentContext().newObject( this, "Control" );
+            control.initialize( delegate );
+            return control;
         }
+
     }
 
+
+    static public class Control extends JavaScriptEngine {
+
+        public String getClassName() {
+            return "Control";
+        }
+
+
+        Scriptable toScriptable( com.meterware.httpunit.ScriptableObject delegate ) {
+            return null;
+        }
+    }
 
 }
