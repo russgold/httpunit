@@ -166,8 +166,8 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "Num links in next page", 1, nextPage.getLinks().length );
         link = nextPage.getLinks()[0];
 
-        WebResponse thirdPage = wc.getResponse( link.getRequest() );
-        assertEquals( "Title of next page", "Initial", thirdPage.getTitle() );
+        wc.sendRequest( link.getRequest() );
+        assertEquals( "Title of next page", "Initial", wc.getFrameContents( link.getTarget() ).getTitle() );
     }
 
 
