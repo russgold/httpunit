@@ -1,9 +1,8 @@
 package com.meterware.servletunit;
-
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, Russell Gold
+ * Copyright (c) 2001-2003, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -34,7 +33,7 @@ import java.io.IOException;
 /**
  * An interface which represents the invocation of a servlet.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public interface InvocationContext {
 
@@ -72,14 +71,20 @@ public interface InvocationContext {
 
 
     /**
-     * Adds a request dispatcher to this context.
+     * Adds a request dispatcher to this context to simulate an include request.
      */
-    void pushIncludedContext( RequestDispatcher rd );
+    void pushIncludeRequest( RequestDispatcher rd, HttpServletRequest request, HttpServletResponse response ) throws ServletException;
+
+
+    /**
+     * Adds a request dispatcher to this context to simulate a forward request.
+     */
+    void pushForwardRequest( RequestDispatcher rd, HttpServletRequest request, HttpServletResponse response ) throws ServletException;
 
 
     /**
      * Removes the top request dispatcher from this context.
      */
-    void popContext();
+    void popRequest();
 
 }

@@ -21,11 +21,10 @@ package com.meterware.servletunit;
  *******************************************************************************************************************/
 import com.meterware.httpunit.HttpUnitUtils;
 
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.net.URL;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -36,7 +35,7 @@ class RequestContext {
 
     private Hashtable _parameters = new Hashtable();
     private Hashtable _visibleParameters;
-    private RequestContext _parentContext;
+    private HttpServletRequest _parentRequest;
     private URL _url;
 
 
@@ -47,19 +46,20 @@ class RequestContext {
     }
 
 
-    void setParentContext( RequestContext parentContext ) {
-        _parentContext = parentContext;
+    void setParentRequest( HttpServletRequest parentRequest ) {
+        _parentRequest = parentRequest;
         _visibleParameters = null;
-    }
-
-
-    RequestContext getParentContext() {
-        return _parentContext;
     }
 
 
     String getRequestURI() {
         return _url.getPath();
+    }
+
+
+    String getParameter( String name ) {
+        String[] parameters = (String[]) getParameters().get( name );
+        return parameters == null ? null : parameters[0];
     }
 
 
@@ -149,10 +149,15 @@ class RequestContext {
 
     private Hashtable getParameters() {
         if (_visibleParameters == null) {
-            if (_parentContext == null) {
+            if (_parentRequest == null) {
                 _visibleParameters = _parameters;
             } else {
-                _visibleParameters = (Hashtable) _parentContext.getParameters().clone();
+                _visibleParameters = new Hashtable();
+                final Map parameterMap = _parentRequest.getParameterMap();
+                for (Iterator i = parameterMap.keySet().iterator(); i.hasNext();) {
+                    Object key = i.next();
+                    _visibleParameters.put( key, parameterMap.get( key ) );
+                }
                 for (Enumeration e = _parameters.keys(); e.hasMoreElements();) {
                     Object key = e.nextElement();
                     _visibleParameters.put( key, _parameters.get( key ) );

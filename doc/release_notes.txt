@@ -7,17 +7,26 @@ Known problems:
 Limitations:
     1. JDK 1.3.1 or higher is required
     2. JavaScript support does not include some DOM properties
-    3. Document.cookie= does not restrict the cookie by path and domain
+    3. The JavaScript assignment Document.cookie= does not restrict the cookie by path and domain
 
 
 Revision History:
  13-Feb-2003
 Acknowledgements:
-    Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute
+    Thanks to Ron Hanson for catching the obsolete behavior of HttpServletRequest.setAttribute.
+    Thanks to Ron Hanson and also to Daniel Sheppard for help in adding capabilities to the RequestDispatcher implementation.
 
 Problems Fixed:
     1. Calling HttpServletRequest.setAttribute in ServletUnit no longer throws an IllegalStateException if the value
        had previously been defined.
+    2. Included and forwarded servlets now inherit parameters from their calling servlet.
+    3. Included servlets now have access to their path information as attributes, as per the spec.
+    4. Forwarded servlets now have access to their path information from the standard request methods, as required.
+
+Additions:
+    1. InvocationContext now supports include and forwarded servlets: calling pushIncludeRequest or pushForwardRequest
+       updates the servlet, request, and response properties of the context so that subsequent calls can be done from
+       the dispatched servlet. Calling popRequest reverts to the dispatching servlet.
 
  5-Feb-2003
 Acknowledgements:

@@ -52,7 +52,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     /**
      * Constructs a ServletUnitHttpRequest from a WebRequest object.
      **/
-    ServletUnitHttpRequest( ServletRequest servletRequest, WebRequest request, ServletUnitContext context, Dictionary clientHeaders, byte[] messageBody ) throws MalformedURLException {
+    ServletUnitHttpRequest( ServletMetaData servletRequest, WebRequest request, ServletUnitContext context, Dictionary clientHeaders, byte[] messageBody ) throws MalformedURLException {
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
         _servletRequest = servletRequest;
@@ -720,31 +720,12 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
-    String[] getRoles() {
-        return _roles == null ? NO_ROLES : _roles;
-    }
-
-
-    void pushRequestContext( RequestContext requestContext ) {
-        requestContext.setParentContext( _requestContext );
-        _requestContext = requestContext;
-    }
-
-
-    void popRequestContext() {
-        _requestContext = _requestContext.getParentContext();
-    }
-
-
-
 //--------------------------------------------- private members ----------------------------------------------
 
     final static private String LOOPBACK_ADDRESS = "127.0.0.1";
-    final static private String[] NO_ROLES = new String[0];
-
 
     private WebRequest                 _request;
-    private ServletRequest             _servletRequest;
+    private ServletMetaData             _servletRequest;
     private WebClient.HeaderDictionary _headers;
     private ServletUnitContext         _context;
     private ServletUnitHttpSession     _session;

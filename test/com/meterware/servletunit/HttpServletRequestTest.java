@@ -339,7 +339,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
     private final static byte[] NO_MESSAGE_BODY = new byte[0];
 
-    private final static ServletRequest NULL_SERVLET_REQUEST = new ServletRequest() {
+    private final static ServletMetaData NULL_SERVLET_REQUEST = new ServletMetaData() {
 
         public Servlet getServlet() throws ServletException {
             return null;

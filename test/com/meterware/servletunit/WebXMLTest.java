@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2002, Russell Gold
+* Copyright (c) 2001-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -27,6 +27,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.List;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -103,8 +105,10 @@ public class WebXMLTest extends TestCase {
         WebApplication app = new WebApplication( newDocument( wxs.asText() ) );
         assertTrue( "Did not require authorization", app.requiresAuthorization( new URL( "http://localhost/SimpleServlet" ) ) );
         assertTrue( "Should not require authorization", !app.requiresAuthorization( new URL( "http://localhost/FreeServlet" ) ) );
-        assertTrue( "Should have access", app.roleMayAccess( "supervisor", new URL( "http://localhost/SimpleServlet" ) ) );
-        assertTrue( "Should not have access", !app.roleMayAccess( "peon", new URL( "http://localhost/SimpleServlet" ) ) );
+
+        List roles = Arrays.asList( app.getPermittedRoles( new URL( "http://localhost/SimpleServlet" ) ) );
+        assertTrue( "Should have access", roles.contains( "supervisor" ) );
+        assertTrue( "Should not have access", !roles.contains( "peon" ) );
     }
 
 

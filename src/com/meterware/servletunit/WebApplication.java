@@ -26,12 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -134,7 +129,7 @@ class WebApplication {
     }
 
 
-    ServletRequest getServletRequest( URL url ) {
+    ServletMetaData getServletRequest( URL url ) {
         return _servletMapping.get( url );
     }
 
@@ -189,9 +184,9 @@ class WebApplication {
 
 
     /**
-     * Returns true of the specified role may access the desired URL path.
+     * Returns an array containing the roles permitted to access the specified URL.
      */
-    boolean roleMayAccess( String roleName, URL url ) {
+    String[] getPermittedRoles( URL url ) {
         String result;
         String file = url.getFile();
         if (_contextPath.equals( "" )) {
@@ -201,7 +196,7 @@ class WebApplication {
         } else {
             result = null;
         }
-        return getControllingConstraint( result ).hasRole( roleName );
+        return getControllingConstraint( result ).getPermittedRoles();
     }
 
 
@@ -429,19 +424,22 @@ class WebApplication {
         boolean controlsPath( String urlPath );
 
 
-        boolean hasRole( String roleName );
+        String[] getPermittedRoles();
     }
 
 
     static class NullSecurityConstraint implements SecurityConstraint {
+
+        private static final String[] NO_ROLES = new String[0];
+
 
         public boolean controlsPath( String urlPath ) {
             return false;
         }
 
 
-        public boolean hasRole( String roleName ) {
-            return true;
+        public String[] getPermittedRoles() {
+            return NO_ROLES;
         }
     }
 
@@ -450,7 +448,7 @@ class WebApplication {
 
         SecurityConstraintImpl( Element root ) throws SAXException {
             final NodeList roleNames = root.getElementsByTagName( "role-name" );
-            for (int i = 0; i < roleNames.getLength(); i++) _roles.add( getTextValue( roleNames.item( i ) ) );
+            for (int i = 0; i < roleNames.getLength(); i++) _roleList.add( getTextValue( roleNames.item( i ) ) );
 
             final NodeList resources = root.getElementsByTagName( "web-resource-collection" );
             for (int i = 0; i < resources.getLength(); i++) _resources.add( new WebResourceCollection( (Element) resources.item( i ) ) );
@@ -462,12 +460,16 @@ class WebApplication {
         }
 
 
-        public boolean hasRole( String roleName ) {
-            return _roles.contains( roleName );
+        public String[] getPermittedRoles() {
+            if (_roles == null) {
+                _roles = (String[]) _roleList.toArray( new String[ _roleList.size() ] );
+            }
+            return _roles;
         }
 
 
-        private ArrayList _roles = new ArrayList();
+        private String[]  _roles;
+        private ArrayList _roleList = new ArrayList();
         private ArrayList _resources = new ArrayList();
 
 
@@ -502,7 +504,7 @@ class WebApplication {
     }
 
 
-    static class ServletRequestImpl implements ServletRequest {
+    static class ServletRequestImpl implements ServletMetaData {
 
         private URL            _url;
         private String         _servletName;
@@ -641,7 +643,7 @@ class WebApplication {
         }
 
 
-        ServletRequest get( URL url ) {
+        ServletMetaData get( URL url ) {
             String file = url.getFile();
             if (!file.startsWith( _contextPath )) throw new HttpNotFoundException( "File path does not begin with '" + _contextPath + "'", url );
 

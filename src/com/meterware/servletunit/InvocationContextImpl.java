@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2002, Russell Gold
+* Copyright (c) 2001-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -26,13 +26,9 @@ import com.meterware.httpunit.WebResponse;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Dictionary;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.RequestDispatcher;
+import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,20 +106,33 @@ class InvocationContextImpl implements InvocationContext {
     }
 
 
-    public void pushIncludedContext( RequestDispatcher rd ) {
-        _request.pushRequestContext( (RequestContext) rd );
+    public void pushIncludeRequest( RequestDispatcher rd, HttpServletRequest request, HttpServletResponse response ) throws ServletException {
+        if (_servlet == null) throw new IllegalStateException( "Get the servlet for this context before pushing a request" );
+        _request = new IncludeRequestWrapper( request, rd );
+        _servletStack.push( _servlet );
+        _servlet = ((RequestDispatcherImpl) rd).getServletMetaData().getServlet();
     }
 
 
-    public void popContext() {
-        _request.popRequestContext();
+    public void pushForwardRequest( RequestDispatcher rd, HttpServletRequest request, HttpServletResponse response ) throws ServletException {
+        if (_servlet == null) throw new IllegalStateException( "Get the servlet for this context before pushing a request" );
+        _request = new ForwardRequestWrapper( request, rd );
+        _servletStack.push( _servlet );
+        _servlet = ((RequestDispatcherImpl) rd).getServletMetaData().getServlet();
+    }
+
+
+    public void popRequest() {
+        if (!( _request instanceof HttpServletRequestWrapper)) throw new IllegalStateException( "May not pop the initial request" );
+        _request = ((HttpServletRequestWrapper) _request).getBaseRequest();
+        _servlet = (Servlet) _servletStack.pop();
     }
 
 
     private boolean userIsAuthorized() {
-        final String[] roles = _request.getRoles();
+        String[] roles = _application.getPermittedRoles( _requestURL );
         for (int i = 0; i < roles.length; i++) {
-            if (_application.roleMayAccess( roles[i], _requestURL )) return true;
+            if (_request.isUserInRole( roles[i] )) return true;
         }
         return false;
     }
@@ -149,13 +158,14 @@ class InvocationContextImpl implements InvocationContext {
         _requestURL  = request.getURL();
         _target      = request.getTarget();
 
-        _request = new ServletUnitHttpRequest( _application.getServletRequest( _requestURL ), request, runner.getContext(),
-                                               clientHeaders, messageBody );
+        final ServletUnitHttpRequest suhr = new ServletUnitHttpRequest( _application.getServletRequest( _requestURL ), request, runner.getContext(),
+                                                       clientHeaders, messageBody );
+        _request = suhr;
         Cookie[] cookies = getCookies( clientHeaders );
-        for (int i = 0; i < cookies.length; i++) _request.addCookie( cookies[i] );
+        for (int i = 0; i < cookies.length; i++) suhr.addCookie( cookies[i] );
 
-        if (_application.usesBasicAuthentication()) _request.readBasicAuthentication();
-        else if (_application.usesFormAuthentication()) _request.readFormAuthentication();
+        if (_application.usesBasicAuthentication()) suhr.readBasicAuthentication();
+        else if (_application.usesFormAuthentication()) suhr.readFormAuthentication();
 
         HttpSession session = _request.getSession( /* create */ false );
         if (session != null) ((ServletUnitHttpSession) session).access();
@@ -171,9 +181,10 @@ class InvocationContextImpl implements InvocationContext {
     private ServletUnitClient _client;
 
     private WebApplication          _application;
-    private ServletUnitHttpRequest  _request;
+    private HttpServletRequest      _request;
     private ServletUnitHttpResponse _response = new ServletUnitHttpResponse();
     private URL                     _requestURL;
+    private Stack                   _servletStack = new Stack();
     private String                  _target;
 
     private Servlet                 _servlet;
@@ -196,6 +207,99 @@ class InvocationContextImpl implements InvocationContext {
         Cookie[] results = new Cookie[ cookies.size() ];
         cookies.copyInto( results );
         return results;
+    }
+}
+
+
+class DispatchedRequestWrapper extends HttpServletRequestWrapper {
+
+    RequestContext _requestContext;
+
+    public DispatchedRequestWrapper( HttpServletRequest request, RequestDispatcher dispatcher ) {
+        super( request );
+        _requestContext = (RequestContext) dispatcher;
+        _requestContext.setParentRequest( request );
+    }
+
+
+    public String getParameter( String s ) {
+        return _requestContext.getParameter( s );
+    }
+
+
+    public Enumeration getParameterNames() {
+        return _requestContext.getParameterNames();
+    }
+
+
+    public String[] getParameterValues( String s ) {
+        return _requestContext.getParameterValues( s );
+    }
+
+
+    public Map getParameterMap() {
+        return _requestContext.getParameterMap();
+    }
+
+}
+
+
+class IncludeRequestWrapper extends DispatchedRequestWrapper {
+
+    final static String REQUEST_URI  = "javax.servlet.include.request_uri";
+    final static String CONTEXT_PATH = "javax.servlet.include.context_path";
+    final static String SERVLET_PATH = "javax.servlet.include.servlet_path";
+    final static String PATH_INFO    = "javax.servlet.include.path_info";
+    final static String QUERY_STRING = "javax.servlet.include.query_string";
+
+    private Hashtable _attributes = new Hashtable();
+
+
+    public IncludeRequestWrapper( HttpServletRequest request, RequestDispatcher dispatcher ) {
+        super( request, dispatcher );
+        _attributes.put( REQUEST_URI, ((RequestDispatcherImpl) dispatcher ).getRequestURI() );
+        _attributes.put( CONTEXT_PATH, request.getContextPath() );
+        _attributes.put( SERVLET_PATH, ((RequestDispatcherImpl) dispatcher ).getServletMetaData().getServletPath() );
+        final String pathInfo = ((RequestDispatcherImpl) dispatcher ).getServletMetaData().getPathInfo();
+        if (pathInfo != null) _attributes.put( PATH_INFO, pathInfo );
+    }
+
+
+    public Object getAttribute( String s ) {
+        Object result = _attributes.get( s );
+        return (result != null) ? result : super.getAttribute( s );
+    }
+
+}
+
+
+class ForwardRequestWrapper  extends DispatchedRequestWrapper {
+
+    private RequestDispatcherImpl _requestContext;
+
+    public ForwardRequestWrapper( HttpServletRequest request, RequestDispatcher dispatcher ) {
+        super( request, dispatcher );
+        _requestContext = (RequestDispatcherImpl) dispatcher;
+    }
+
+
+    public String getRequestURI() {
+        return _requestContext.getRequestURI();
+    }
+
+
+    public String getQueryString() {
+        return super.getQueryString();
+    }
+
+
+    public String getServletPath() {
+        return _requestContext.getServletMetaData().getServletPath();
+    }
+
+
+    public String getPathInfo() {
+        return _requestContext.getServletMetaData().getPathInfo();
     }
 }
 

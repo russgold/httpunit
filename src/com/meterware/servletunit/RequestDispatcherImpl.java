@@ -26,7 +26,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletException;
-import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -35,22 +35,27 @@ import javax.servlet.Servlet;
  **/
 class RequestDispatcherImpl extends RequestContext implements RequestDispatcher {
 
-    private Servlet _servlet;
+    private ServletMetaData _servletMetaData;
 
 
-    public RequestDispatcherImpl( WebApplication application, URL url ) throws ServletException {
+    RequestDispatcherImpl( WebApplication application, URL url ) throws ServletException {
         super( url );
-         _servlet = application.getServletRequest( url ).getServlet();
+        _servletMetaData = application.getServletRequest( url );
+    }
+
+
+    public ServletMetaData getServletMetaData() {
+        return _servletMetaData;
     }
 
 
     public void forward( ServletRequest request, ServletResponse response ) throws ServletException, IOException {
         ((ServletUnitHttpResponse) response).restartResponse();
-        _servlet.service( request, response );
+        _servletMetaData.getServlet().service( new ForwardRequestWrapper( (HttpServletRequest) request, this ), response );
     }
 
 
     public void include( ServletRequest request, ServletResponse response ) throws ServletException, IOException {
-        _servlet.service( request, response );
+        _servletMetaData.getServlet().service( new IncludeRequestWrapper( (HttpServletRequest) request, this ), response );
     }
 }

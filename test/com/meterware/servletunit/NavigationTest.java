@@ -55,9 +55,9 @@ public class NavigationTest extends TestCase {
         sr.registerServlet( "origin", OriginServlet.class.getName() );
 
         WebClient wc = sr.newClient();
-        WebResponse response = wc.getResponse( "http://localhost/origin" );
+        WebResponse response = wc.getResponse( "http://localhost/origin?color=green" );
         assertNotNull( "No response received", response );
-        assertEquals( "requested resource", TargetServlet.RESPONSE_TEXT, response.getText() );
+        assertEquals( "Expected response", "color=null: path=/target", response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
     }
 
@@ -70,14 +70,26 @@ public class NavigationTest extends TestCase {
         ServletRunner sr = new ServletRunner( wxs.asInputStream(), "/context" );
 
         WebClient wc = sr.newClient();
-        WebResponse response = wc.getResponse( "http://localhost/context/origin" );
+        WebResponse response = wc.getResponse( "http://localhost/context/origin?color=green" );
         assertNotNull( "No response received", response );
-        assertEquals( "requested resource", TargetServlet.RESPONSE_TEXT, response.getText() );
+        assertEquals( "Expected response", "color=green: path=/context/target", response.getText() );
         assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
     }
 
 
+    public void testInclude() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/target", TargetServlet.class );
+        wxs.addServlet( "/origin", IncluderServlet.class );
 
+        ServletRunner sr = new ServletRunner( wxs.asInputStream(), "/context" );
+
+        WebClient wc = sr.newClient();
+        WebResponse response = wc.getResponse( "http://localhost/context/origin?color=green" );
+        assertNotNull( "No response received", response );
+        assertEquals( "Expected response", "expecting: color=blue: path=/context/origin", response.getText() );
+        assertEquals( "Returned cookie count", 0, response.getNewCookieNames().length );
+    }
 
 
     static class OriginServlet extends HttpServlet {
@@ -103,20 +115,19 @@ public class NavigationTest extends TestCase {
         static final String PREFIX = "expecting: ";
 
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
-            resp.getOutputStream().print( PREFIX );
-            getServletContext().getRequestDispatcher( "/target" ).include( req, resp );
+            resp.getWriter().print( PREFIX );
+            getServletContext().getRequestDispatcher( "/target?color=blue" ).include( req, resp );
         }
 
     }
 
 
     static class TargetServlet extends HttpServlet {
-        static String RESPONSE_TEXT = "the desired content\r\n";
-
         protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException,IOException {
             resp.setContentType( "text/plain" );
             PrintWriter pw = resp.getWriter();
-            pw.print( RESPONSE_TEXT );
+            pw.print( "color=" + req.getParameter( "color" ) );
+            pw.print( ": path=" + req.getRequestURI() );
             pw.close();
         }
 
