@@ -32,7 +32,6 @@
     <available property="javamail.present" classname="javax.mail.internet.MimeMultipart" />
     <available property="xerces.present" classname="org.apache.xerces.parsers.DOMParser" />
 </target>
-</target>
 
 
 <!--  ===================================================================  --> 
