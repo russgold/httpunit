@@ -20,13 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 
 import java.lang.reflect.Constructor;
@@ -40,6 +34,7 @@ import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -451,11 +446,22 @@ public class WebResponse implements HTMLSegment {
 
 
     final
-    protected void defineRawInputStream( InputStream inputStream ) {
+    protected void defineRawInputStream( InputStream inputStream ) throws IOException {
         if (_inputStream != null || _responseText != null) {
             throw new IllegalStateException( "Must be called before response text is defined." );
         }
-        _inputStream = inputStream;
+
+        if (encodedUsingGZIP()) {
+            _inputStream = new GZIPInputStream( inputStream );
+        } else {
+            _inputStream = inputStream;
+        }
+    }
+
+
+    private boolean encodedUsingGZIP() {
+        String encoding = getHeaderField( "Content-Encoding" );
+        return encoding != null && encoding.indexOf( "gzip" ) >= 0;
     }
 
 

@@ -3,7 +3,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001, Russell Gold
+ * Copyright (c) 2001-2002, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -26,9 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import java.io.IOException;
 
 
 /**
+ * An interface which represents the invocation of a servlet.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  **/
@@ -58,7 +60,7 @@ public interface InvocationContext {
      * Returns the final response from the servlet. Note that this method should
      * only be invoked after all processing has been done to the servlet response.
      **/
-    WebResponse getServletResponse();
+    WebResponse getServletResponse() throws IOException;
 
 
     /**

@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.Reader;
+import java.io.IOException;
 
 /**
  * A basic simulated servlet for testing the HttpUnit library.
@@ -34,7 +35,7 @@ public class PseudoServlet {
     /**
      * Returns a resource object as a result of a get request. 
      **/ 
-    public WebResource getResponse( String methodType ) {
+    public WebResource getResponse( String methodType ) throws IOException {
         if (methodType.equalsIgnoreCase( "GET" )) {
             return getGetResponse();
         } else if (methodType.equalsIgnoreCase( "PUT" )) {
@@ -50,7 +51,7 @@ public class PseudoServlet {
     /**
      * Returns a resource object as a result of a get request. 
      **/ 
-    public WebResource getGetResponse() {
+    public WebResource getGetResponse() throws IOException {
         throw new RuntimeException( "get not implemented" );
     }
 
@@ -58,7 +59,7 @@ public class PseudoServlet {
     /*
      * Returns a resource object as a result of a post request. 
      **/ 
-    public WebResource getPostResponse() {
+    public WebResource getPostResponse() throws IOException {
         throw new RuntimeException( "post not implemented" );
     }
 
@@ -66,7 +67,7 @@ public class PseudoServlet {
     /*
      * Returns a resource object as a result of a put request. 
      **/ 
-    public WebResource getPutResponse() {
+    public WebResource getPutResponse() throws IOException {
         throw new RuntimeException( "put not implemented" );
     }
 

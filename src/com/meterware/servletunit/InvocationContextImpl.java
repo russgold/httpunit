@@ -87,7 +87,7 @@ class InvocationContextImpl implements InvocationContext {
      * Returns the final response from the servlet. Note that this method should
      * only be invoked after all processing has been done to the servlet response.
      **/
-    public WebResponse getServletResponse() {
+    public WebResponse getServletResponse() throws IOException {
         if (_webResponse == null) {
             HttpSession session = _request.getSession( /* create */ false );
             if (session != null && session.isNew()) {

@@ -4,12 +4,12 @@ package com.meterware.servletunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletResponse;
 
 import com.meterware.httpunit.*;
-                      
+
 
 /**
  * A response from to a request from the simulated servlet environment.
@@ -52,7 +52,7 @@ class ServletUnitWebResponse extends WebResponse {
      * @param url the url from which the response was received
      * @param response the response populated by the servlet
      **/
-    ServletUnitWebResponse( String target, URL url, HttpServletResponse response ) {
+    ServletUnitWebResponse( String target, URL url, HttpServletResponse response ) throws IOException {
         super( target, url );
         _response = (ServletUnitHttpResponse) response;
         defineRawInputStream( new ByteArrayInputStream( _response.getContents() ) );
@@ -97,8 +97,8 @@ class ServletUnitWebResponse extends WebResponse {
     public String toString() {
         return "[ _response = " + _response + "]";
     }
-    
-    
+
+
 //-------------------------------------------- private members ------------------------------------------------
 
 

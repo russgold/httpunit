@@ -2,14 +2,14 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -31,7 +31,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
-                      
+
 
 /**
  * A response from a web server to an Http request.
@@ -118,7 +118,7 @@ class HttpWebResponse extends WebResponse {
 
     private Hashtable _headers = new Hashtable();
 
-    
+
     private void readResponseHeader( URLConnection connection ) {
         if (connection.getHeaderField(0) == null) throw new HttpNotFoundException( connection.getURL() );
 
@@ -166,7 +166,7 @@ class HttpWebResponse extends WebResponse {
 
         if (connection.getContentType() != null) {
             setContentTypeHeader( connection.getContentType() );
-        } 
+        }
     }
 
 

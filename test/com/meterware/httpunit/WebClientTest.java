@@ -20,12 +20,16 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 
-import java.util.List;
-import java.util.ArrayList;
-import java.net.MalformedURLException;
-import java.io.IOException;
-
 import junit.framework.TestSuite;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -34,7 +38,7 @@ import junit.framework.TestSuite;
  **/
 public class WebClientTest extends HttpUnitTest {
 
-    public static void main(String args[]) {
+    public static void main( String args[] ) {
         junit.textui.TestRunner.run( suite() );
     }
 
@@ -49,17 +53,58 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    public void testGZIPHandling() throws Exception {
+        String expectedResponse = "Here is my answer";
+        defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
+
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/Compressed.html" );
+        assertEquals( "Content-Encoding header", "gzip", wr.getHeaderField( "Content-encoding" ) );
+        assertEquals( "Content-Type", "text/plain", wr.getContentType() );
+        assertEquals( "Content", expectedResponse, wr.getText().trim() );
+    }
+
+
+    private class CompressedPseudoServlet extends PseudoServlet {
+
+        private String _responseText;
+
+
+        public CompressedPseudoServlet( String responseText ) {
+            _responseText = responseText;
+        }
+
+
+        public WebResource getGetResponse() throws IOException {
+            WebResource result = new WebResource( getCompressedContents(), "text/plain" );
+            result.addHeader( "Content-Encoding: gzip" );
+            return result;
+        }
+
+
+        private byte[] getCompressedContents() throws IOException {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            GZIPOutputStream gzip = new GZIPOutputStream( baos );
+            OutputStreamWriter out = new OutputStreamWriter( gzip );
+            out.write( _responseText );
+            out.flush();
+            out.close();
+            return baos.toByteArray();
+        }
+    }
+
+
     public void testClientListener() throws Exception {
-        defineWebPage( "Target",  "This is another page with <a href=Form.html target='_top'>one link</a>" );
-        defineWebPage( "Form",    "This is a page with a simple form: " +
-                                  "<form action=submit><input name=name><input type=submit></form>" +
-                                  "<a href=Target.html target=red>a link</a>");
+        defineWebPage( "Target", "This is another page with <a href=Form.html target='_top'>one link</a>" );
+        defineWebPage( "Form", "This is a page with a simple form: " +
+                "<form action=submit><input name=name><input type=submit></form>" +
+                "<a href=Target.html target=red>a link</a>" );
         defineResource( "Frames.html",
-                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
-                        "<FRAMESET cols='20%,80%'>" +
-                        "    <FRAME src='Target.html' name='red'>" +
-                        "    <FRAME src=Form.html name=blue>" +
-                        "</FRAMESET></HTML>" );
+                "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                "<FRAMESET cols='20%,80%'>" +
+                "    <FRAME src='Target.html' name='red'>" +
+                "    <FRAME src=Form.html name=blue>" +
+                "</FRAMESET></HTML>" );
 
         WebConversation wc = new WebConversation();
         ArrayList messageLog = new ArrayList();
@@ -67,19 +112,19 @@ public class WebClientTest extends HttpUnitTest {
 
         WebResponse response = wc.getResponse( getHostPath() + "/Frames.html" );
         assertEquals( "Num logged items", 6, messageLog.size() );
-        for (int i=0; i <3; i++) {
-            verifyRequestResponsePair( messageLog, 2*i );
+        for (int i = 0; i < 3; i++) {
+            verifyRequestResponsePair( messageLog, 2 * i );
         }
     }
 
 
     private void verifyRequestResponsePair( ArrayList messageLog, int i ) throws MalformedURLException {
-        assertTrue( "Logged item " + i + " is not a web request, but " + messageLog.get(i).getClass(),
-                    messageLog.get(i) instanceof WebRequest );
-        assertTrue( "Logged item " + (i+1) + " is not a web response, but " + messageLog.get(i+1).getClass(),
-                    messageLog.get(i+1) instanceof WebResponse );
-        assertEquals( "Response target", ((WebRequest) messageLog.get(i)).getTarget(), ((WebResponse) messageLog.get(i+1)).getTarget() );
-        assertEquals( "Response URL", ((WebRequest) messageLog.get(i)).getURL(), ((WebResponse) messageLog.get(i+1)).getURL() );
+        assertTrue( "Logged item " + i + " is not a web request, but " + messageLog.get( i ).getClass(),
+                messageLog.get( i ) instanceof WebRequest );
+        assertTrue( "Logged item " + (i + 1) + " is not a web response, but " + messageLog.get( i + 1 ).getClass(),
+                messageLog.get( i + 1 ) instanceof WebResponse );
+        assertEquals( "Response target", ((WebRequest) messageLog.get( i )).getTarget(), ((WebResponse) messageLog.get( i + 1 )).getTarget() );
+        assertEquals( "Response URL", ((WebRequest) messageLog.get( i )).getURL(), ((WebResponse) messageLog.get( i + 1 )).getURL() );
     }
 
 
@@ -100,7 +145,61 @@ public class WebClientTest extends HttpUnitTest {
 
         public void responseReceived( WebClient src, WebResponse resp ) {
             _messageLog.add( resp );
-       }
+        }
+    }
+
+
+    public void testRedirect() throws Exception {
+        String resourceName = "something/redirected";
+        String resourceValue = "the desired content";
+
+        String redirectName = "anOldOne";
+
+        defineResource( resourceName, resourceValue );
+        defineResource( redirectName, "ignored content", HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
+
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
+
+    public void testDuplicateHeaderRedirect() throws Exception {
+        String resourceName = "something/redirected";
+        String resourceValue = "the desired content";
+
+        String redirectName = "anOldOne";
+
+        defineResource( resourceName, resourceValue );
+        defineResource( redirectName, "ignored content", HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
+
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
+        assertEquals( "requested resource", resourceValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
+    }
+
+
+    public void testDisabledRedirect() throws Exception {
+        String resourceName = "something/redirected";
+        String resourceValue = "the desired content";
+
+        String redirectName = "anOldOne";
+        String redirectValue = "old content";
+
+        defineResource( resourceName, resourceValue );
+        defineResource( redirectName, redirectValue, HttpURLConnection.HTTP_MOVED_PERM );
+        addResourceHeader( redirectName, "Location: " + getHostPath() + '/' + resourceName );
+
+        HttpUnitOptions.setAutoRedirect( false );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + '/' + redirectName );
+        assertEquals( "requested resource", redirectValue, response.getText().trim() );
+        assertEquals( "content type", "text/html", response.getContentType() );
     }
 
 

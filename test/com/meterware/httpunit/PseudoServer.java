@@ -224,7 +224,7 @@ public class PseudoServer {
     }
 
 
-    private WebResource getResource( PseudoServlet servlet, HttpRequestStream request ) {
+    private WebResource getResource( PseudoServlet servlet, HttpRequestStream request ) throws IOException {
         servlet.init( request );
         return servlet.getResponse( request.getCommand() );
     }
