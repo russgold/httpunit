@@ -38,8 +38,7 @@ If you are using WinZip, stick to version 7.0 or later.
 
 <A NAME="org.xml.sax"><h3>What is the org.xml.sax package?</h3></A>
 You may be getting compile or runtime errors asking for the org.xml.sax package.
-This package is found in <a href="http://www.sf.net/projects/jtidy">JTidy</a>, the HTML parser used
-by HttpUnit. It is included in the download.
+You need to have xerces or another XML parser in your classpath. Xerces is included in the download.
 
 <A NAME="#reload"><h3>Why do I get java.lang.IllegalAccessError when calling getResponse()?</h3></A>
 <p>This happens when you use HttpUnit and certain versions of JTidy with one of the JUnit graphical test runners, which reloads
@@ -58,9 +57,8 @@ tests to reload safely.</ul></p>
 <h2>Server Issues</h2>
 
 <A NAME="proxy"><h3>Can I use HttpUnit through a proxy server?</h3></A>
-Yes. HttpUnit uses java.net.HttpURLConnection, so the
-<A HREF="http://www.javaworld.com/javaworld/javatips/jw-javatip42.html">normal Java way to use
-proxies</A> will work. At some point HttpUnit may support this more directly, but for now, you will need to set the system properties yourself.
+Yes. Call <code>WebClient.setProxyServer( host, port )</code> before sending your request.
+This feature is available in the <a href="http://www.httpunit.org/prerelease">latest pre-release build.</a>
 
 <A NAME="charset"><h3>Why isn't HttpUnit handling my non-English pages?</h3></A>
 Older versions of HttpUnit (through 1.2) incorrectly assumed that all pages were in the default character set for the client platform.
@@ -92,10 +90,14 @@ If you are using JUnit, call this method in your <code>setUp()</code> method.
 
 <A NAME="buttons"><h3>HttpUnit is not finding the buttons and parameters in my forms. What is wrong?</h3></A>
 This often happens when your HTML is not valid. Most browsers are extremely forgiving of bad HTML; however,
-JTidy (the HTML parser used by HttpUnit) is not. It expects tags to be nested according to the HTML specification and
-will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them,
+JTidy (the HTML parser originally used by HttpUnit) is not. It expects tags to be nested according to the HTML
+specification and will reject any that are not. JTidy can display error messages to tell you what is wrong. To see them,
 call <code>HttpUnitOptions.setParserWarningsEnabled( true )</code> before retrieving your HTML page.
 Once you have corrected any errors, HttpUnit should see your form buttons and parameters.
+
+The <a href="http://www.httpunit.org/prerelease">latest pre-release build</a> supports
+<a href="http://www.apache.org/~andyc/neko/doc/html/">NekoHTML</a>, a much more forgiving parser.
+It is strongly recommended that you use it in preference to JTidy, as it should correct problems like this.
 
 <A NAME="#badPost"><h3>Why doesn't my servlet see parameters on a POST request?</h3></A>
 Some older servlet engines, such as Tomcat 3.1, get confused when they see a charset attribute on the Content-Type

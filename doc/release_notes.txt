@@ -10,6 +10,13 @@ Limitations:
 
 
 Revision History:
+14-Oct-2002
+Acknowledgements:
+    Thanks to Stefan Renz for describing the correct way to set up proxy servers in Java 2 and later.
+Additions:
+    1. The proxy server may now be specified by calling WebClient.setProxyServer. This should also ensure that the
+       correct authorization header is sent.
+
 13-Oct-2002
 Notes:
     1. The NekoHTML parser is now supported. If it is present in the classpath, it will be used in preference to JTidy.

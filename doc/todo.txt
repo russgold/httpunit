@@ -1,14 +1,10 @@
-High priority:
-o better support for use with proxy server
-
 Medium priority:
-o replace JTidy with a simpler custom parser or NekoHTML
 o Support optional tags which hide their contents (as in IFRAME, OBJECT, etc.)
 o Check conformance with RFC 2109 - not currently sending $Version=1 string
 o Documentation, Documentation
 
 JavaScript priorities:
-o Document.write - will require replacing JTidy
+o Document.write - some more parser work is needed for this to work
 
 
 Possibles:

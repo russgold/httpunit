@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  * session context, computes relative URLs, and generally emulates the browser behavior
  * needed to build an automated test of a web site.
  *
- * @author Russell Gold
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author Jan Ohrstrom
  * @author Seth Ladd
  * @author Oliver Imbusch
@@ -47,6 +47,7 @@ public class WebClient {
     /** The current main window. **/
     private WebWindow _mainWindow = new WebWindow( this );
     private ArrayList _openWindows = new ArrayList();
+    private String _authorizationString;
 
 
     public WebWindow getMainWindow() {
@@ -267,8 +268,40 @@ public class WebClient {
      * Sets a username and password for a basic authentication scheme.
      **/
     public void setAuthorization( String userName, String password ) {
-        setHeaderField( "Authorization", "Basic " + Base64.encode( userName + ':' + password ) );
+        _authorizationString = "Basic " + Base64.encode( userName + ':' + password );
+        setHeaderField( "Authorization", _authorizationString );
     }
+
+
+    /**
+     * Specifies a proxy server to use. Note that at present this is global to all web clients in the VM.
+     */
+    public void setProxyServer( String proxyHost, int proxyPort ) {
+        System.setProperty( "proxyHost", proxyHost );
+        System.setProperty( "proxyPost", Integer.toString( proxyPort ) );
+    }
+
+
+    /**
+     * Returns the name of the active proxy server.
+     */
+    public String getProxyHost() {
+        return System.getProperty( "proxyHost" );
+    }
+
+
+    /**
+     * Returns the number of the active proxy port, or 0 is none is specified.
+     */
+    public int getProxyPort() {
+        try {
+            return Integer.parseInt( System.getProperty( "proxyPort" ) );
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+
 
 
     /**
@@ -421,7 +454,13 @@ public class WebClient {
         setHeaderField( "User-Agent", getClientProperties().getUserAgent() );
         Hashtable result = (Hashtable) _headers.clone();
         if (getCookieHeaderField() != null) result.put( "Cookie", getCookieHeaderField() );
+        if (_authorizationString != null) result.put( getAuthorizationHeaderName(), _authorizationString );
         return result;
+    }
+
+
+    private String getAuthorizationHeaderName() {
+        return getProxyHost() != null ? "Proxy-Authorization" : "Authorization";
     }
 
 
