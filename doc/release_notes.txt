@@ -10,10 +10,18 @@ Known problems:
 Limitations: HttpUnit does not support JavaScript
 
 Revision History:
+ 9-Nov-2001
+
+Acknowledgements:
+    Thanks to Dave Glowacki for finding and fixing another problem with parsing of link parameter names without values.
+
+Problems Fixed:
+    1. Links with parameters with no "=" were being treated as though they had "="
+
+ 8-Nov-2001
 Acknowledgements:
     Thanks to Bradley Smith for implementing getParameterNames in ServletUnit.
 
- 8-Nov-2001
 Problems fixed:
    1. ServletUnit was not decoding its request parameters
    2. ServletUnit's HttpRequest.getParameterNames method was not implemented
@@ -23,7 +31,7 @@ Additions:
    2. Disabled submit buttons may no longer be selected from a form
    3. When enabled, parameter validation now prevents changes to readonly controls.
    4. It is now possible to obtain the reason message associated with the status code, either from
-      HttpException.getResponseMessage() or if exceptions are disabled, from WebResponse.getResponseMessage()
+      HttpException.getResponseMessageweb() or if exceptions are disabled, from WebResponse.getResponseMessage()
 
  5-Nov-2001
 

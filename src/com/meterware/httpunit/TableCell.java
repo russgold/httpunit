@@ -21,10 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.Stack;
-import java.util.Vector;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 /**

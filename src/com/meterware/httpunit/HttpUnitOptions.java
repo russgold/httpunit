@@ -261,9 +261,9 @@ public class HttpUnitOptions {
 //--------------------------------- private members --------------------------------------
 
 
-    private static String DEFAULT_CONTENT_TYPE   = "text/plain";
-    private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
-    private static String DEFAULT_CHARACTER_SET  = "iso-8859-1";
+    private static final String DEFAULT_CONTENT_TYPE   = "text/plain";
+    private static final String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
+    private static final String DEFAULT_CHARACTER_SET  = "iso-8859-1";
 
     private static boolean _parserWarningsEnabled;
 

@@ -19,8 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.util.Dictionary;
-
 import java.io.Reader;
 
 /**

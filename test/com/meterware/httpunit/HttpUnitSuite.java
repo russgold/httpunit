@@ -29,33 +29,33 @@ import junit.framework.TestSuite;
  **/
 public class HttpUnitSuite {
 
-    public static void main(String args[]) {
+    public static void main( String[] args ) {
         junit.textui.TestRunner.run( suite() );
     }
 	
 	
     public static Test suite() {
-        TestSuite suite = new TestSuite();
-        suite.addTest( WebPageTest.suite() );
-        suite.addTest( WebLinkTest.suite() );
-        suite.addTest( HtmlTablesTest.suite() );
-        suite.addTest( WebFormTest.suite() );
-        suite.addTest( WebFrameTest.suite() );
-        suite.addTest( RequestTargetTest.suite() );
-        suite.addTest( FormParametersTest.suite() );
-        suite.addTest( FormSubmitTest.suite() );
-        suite.addTest( Base64Test.suite() );
-        suite.addTest( PseudoServerTest.suite() );
-        suite.addTest( MessageBodyRequestTest.suite() );
-        addOptionalTestCase( suite, "com.meterware.httpunit.XMLPageTest" );
-        addOptionalTestCase( suite, "com.meterware.httpunit.FileUploadTest" );
-        return suite;
+        TestSuite result = new TestSuite();
+        result.addTest( WebPageTest.suite() );
+        result.addTest( WebLinkTest.suite() );
+        result.addTest( HtmlTablesTest.suite() );
+        result.addTest( WebFormTest.suite() );
+        result.addTest( WebFrameTest.suite() );
+        result.addTest( RequestTargetTest.suite() );
+        result.addTest( FormParametersTest.suite() );
+        result.addTest( FormSubmitTest.suite() );
+        result.addTest( Base64Test.suite() );
+        result.addTest( PseudoServerTest.suite() );
+        result.addTest( MessageBodyRequestTest.suite() );
+        addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
+        addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );
+        return result;
     }
 
 
-    private static void addOptionalTestCase( TestSuite suite, String testCaseName ) {
+    private static void addOptionalTestCase( TestSuite testSuite, String testCaseName ) {
         try {
-            suite.addTest( new TestSuite( Class.forName( testCaseName ) ) );
+            testSuite.addTest( new TestSuite( Class.forName( testCaseName ) ) );
         } catch (ClassNotFoundException e) {
             System.out.println( "Note: test suite " + testCaseName + " not found; skipping." );
         }

@@ -19,11 +19,20 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
+import java.io.InterruptedIOException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.net.HttpURLConnection;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * A basic simulated web-server for testing the HttpUnit library.

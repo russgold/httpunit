@@ -19,11 +19,15 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.Reader;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.util.StringTokenizer;
+import java.util.Hashtable;
 
 
 class HttpRequestStream {

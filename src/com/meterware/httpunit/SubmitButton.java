@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000, Russell Gold
+* Copyright (c) 2000-2001, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -19,11 +19,7 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
-
-import java.util.*;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Node;
 
 /**
  * This class represents a suubmit button in an HTML form.
@@ -97,10 +93,10 @@ public class SubmitButton {
 
 //------------------------------------------ private members ----------------------------------
 
-    Node    _node;
-    String  _name;
-    String  _value;
-    boolean _isImageButton;
+    private Node    _node;
+    private String  _name;
+    private String  _value;
+    private boolean _isImageButton;
 
 
     private SubmitButton() {

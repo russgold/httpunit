@@ -19,7 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**

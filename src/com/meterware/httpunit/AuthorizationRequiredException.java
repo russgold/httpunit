@@ -30,13 +30,13 @@ public class AuthorizationRequiredException extends RuntimeException {
 
 
     AuthorizationRequiredException( String wwwAuthenticateHeader ) throws IOException {
-        int i = wwwAuthenticateHeader.indexOf( ' ' );
-        if (i < 0) {  // non-conforming header
+        final int index = wwwAuthenticateHeader.indexOf( ' ' );
+        if (index < 0) {  // non-conforming header
             _scheme = "Basic";
             _params = wwwAuthenticateHeader;
         } else {
-            _scheme = wwwAuthenticateHeader.substring( 0, i );
-            _params = wwwAuthenticateHeader.substring( i+1 );
+            _scheme = wwwAuthenticateHeader.substring( 0, index );
+            _params = wwwAuthenticateHeader.substring( index+1 );
         }
         _properties = new Properties();
         _properties.load( new ByteArrayInputStream( _params.getBytes() ) );

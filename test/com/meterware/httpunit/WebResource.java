@@ -19,11 +19,9 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.net.URL;
-
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.util.Vector;
 
 
 /**

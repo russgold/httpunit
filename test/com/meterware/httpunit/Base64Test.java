@@ -32,7 +32,7 @@ import junit.framework.TestSuite;
  **/
 public class Base64Test extends TestCase {
 
-    public static void main(String args[]) {
+    public static void main( String[] args ) {
         junit.textui.TestRunner.run( suite() );
     }
 

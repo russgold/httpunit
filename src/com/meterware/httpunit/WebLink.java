@@ -21,12 +21,10 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.net.URL;
 
-import java.util.Vector;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
@@ -34,7 +32,7 @@ import org.w3c.dom.Node;
  * structure of the link (as a DOM), or create a {@tag WebRequest} to simulate clicking
  * on the link.
  *
- * @author Russell Gold
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
  **/
 public class WebLink extends WebRequestSource {
@@ -54,8 +52,8 @@ public class WebLink extends WebRequestSource {
      * Strips a URL from its parameters
      **/
     private String getBareURL() {
-        String url = getURLString();
-        int questionMarkIndex = url.indexOf("?");
+        final String url = getURLString();
+        final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
             return url.substring(0, questionMarkIndex);
         }
@@ -77,8 +75,8 @@ public class WebLink extends WebRequestSource {
      * Gets all parameters from a URL
      **/
     private String getParametersString() {
-        String url = getURLString();
-        int questionMarkIndex = url.indexOf("?");
+        final String url = getURLString();
+        final int questionMarkIndex = url.indexOf("?");
         if (questionMarkIndex >= 1 && questionMarkIndex < url.length() - 1) {
             return url.substring(questionMarkIndex + 1);
         }
@@ -101,10 +99,11 @@ public class WebLink extends WebRequestSource {
      * add a pair key-value to the hashtable, creates an array of values if param already exists.
      **/
     private void stripOneParameter( Hashtable params, String param ) {
-        int index = param.indexOf( "=" );
-        String value = (index < 0 || index == param.length() - 1)
-                           ? ""
-                           : HttpUnitUtils.decode( param.substring( index + 1 ) );
+        final int index = param.indexOf( "=" );
+        String value = ((index < 0) ? null
+                           : ((index == param.length() - 1)
+                               ? ""
+                               : HttpUnitUtils.decode( param.substring( index + 1 ) )));
         String key = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
         params.put( key, withNewValue( (String[]) params.get( key ), value ) );
     }

@@ -19,8 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.util.Properties;
-import java.io.*;
 import java.net.URL;
 
 
@@ -75,6 +73,5 @@ public class HttpException extends RuntimeException {
     private URL _url;
 
     private String _responseMessage;
-
 
 }

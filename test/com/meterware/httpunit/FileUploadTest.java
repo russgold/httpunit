@@ -19,18 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
-import java.net.URL;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import java.util.*;
-
 import java.io.*;
-
-import org.w3c.dom.Document;
+import java.util.StringTokenizer;
 
 import javax.activation.DataSource;
 
@@ -38,6 +28,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * A unit test of the file upload simulation capability.

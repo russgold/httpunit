@@ -102,7 +102,7 @@ class ReceivedPage extends ParsedHTML {
                 matches.addElement( NodeUtils.getNodeAttribute( nl.item(i), "content" ) );
             }
         }
-        String result[] = new String[ matches.size() ];
+        String[] result = new String[ matches.size() ];
         matches.copyInto( result );
         return result;
     }

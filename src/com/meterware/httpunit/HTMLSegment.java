@@ -19,8 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
 /**
  * Represents the parse tree for a segment of HTML.
  * @author Russell Gold

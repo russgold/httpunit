@@ -301,7 +301,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebLink link = mapPage.getLinks()[0];
         WebRequest wr = link.getRequest();
         assertMatchingSet( "Request parameter names", new String[] { "arg1", "valueless" }, toStringArray( wr.getParameterNames() ) );
-        assertEquals( "Value of arg1", "", wr.getParameter( "arg1" ) );
+        assertEquals( "Value of arg1", null, wr.getParameter( "arg1" ) );
     }
 
 

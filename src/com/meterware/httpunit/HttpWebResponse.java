@@ -102,8 +102,8 @@ class HttpWebResponse extends WebResponse {
 //------------------------------------- private members -------------------------------------
 
 
-    final private static String END_OF_LINE   = System.getProperty( "line.separator" );
-    final private static String FILE_ENCODING = System.getProperty( "file.encoding" );
+    private final static String END_OF_LINE   = System.getProperty( "line.separator" );
+    private final static String FILE_ENCODING = System.getProperty( "file.encoding" );
 
 
     private int       _responseCode    = HttpURLConnection.HTTP_OK;

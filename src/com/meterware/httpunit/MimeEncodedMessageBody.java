@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
 
-import java.net.URLConnection;
-
 import java.util.Dictionary;
 import java.util.Enumeration;
 
@@ -68,21 +66,21 @@ class MimeEncodedMessageBody extends MessageBody {
                 writeLn( outputStream, "Content-Disposition: form-data; name=\"" + name + '"' );  // XXX need to handle non-ascii names here
                 writeLn( outputStream, "Content-Type: text/plain; charset=" + getRequest().getCharacterSet() );
                 writeLn( outputStream, "" );
-                writeLn( outputStream, values[i], getRequest().getCharacterSet() );
+                writeLn( outputStream, values[ i ], getRequest().getCharacterSet() );
             }
         }
 
         Dictionary files = getPostRequest().getSelectedFiles();
+        byte[] buffer = new byte[ 8 * 1024 ];
         for (Enumeration e = files.keys(); e.hasMoreElements();) {
-	    String name = (String) e.nextElement();
-	    WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );
+            String name = (String) e.nextElement();
+            WebRequest.UploadFileSpec spec = (WebRequest.UploadFileSpec) files.get( name );
             writeLn( outputStream, "--" + BOUNDARY );
             writeLn( outputStream, "Content-Disposition: form-data; name=\"" + encode( name ) + "\"; filename=\"" + encode( spec.getFileName() ) + '"' );   // XXX need to handle non-ascii names here
             writeLn( outputStream, "Content-Type: " + spec.getContentType() );
             writeLn( outputStream, "" );
 
             InputStream in = spec.getInputStream();
-            byte[] buffer = new byte[8 * 1024];
             int count = 0;
             do {
                 outputStream.write( buffer, 0, count );
@@ -91,7 +89,7 @@ class MimeEncodedMessageBody extends MessageBody {
 
             in.close();
             writeLn( outputStream, "" );
-	}
+        }
         writeLn( outputStream, "--" + BOUNDARY + "--" );
     }
 

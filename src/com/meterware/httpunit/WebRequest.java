@@ -4,12 +4,12 @@ package com.meterware.httpunit;
 *
 * Copyright (c) 2000-2001, Russell Gold
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-* documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
 * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
 * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 *
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions 
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
 * of the Software.
 *
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
@@ -61,7 +61,7 @@ public class WebRequest {
 
 
     /**
-     * Sets the file for a parameter upload in a web request. 
+     * Sets the file for a parameter upload in a web request.
      **/
     public void selectFile( String parameterName, File file ) {
         assertFileParameter( parameterName );
@@ -141,7 +141,7 @@ public class WebRequest {
     }
 
 
-    
+
     /**
      * Returns the final URL associated with this web request.
      **/
@@ -189,8 +189,8 @@ public class WebRequest {
     protected WebRequest( String urlString ) {
         this( (URL) null, urlString );
     }
-    
-    
+
+
     /**
      * Constructs a web request using a base URL and a relative URL string.
      **/
@@ -225,7 +225,7 @@ public class WebRequest {
         }
 
     }
-    
+
 
     /**
      * Constructs a web request using a base request and a relative URL string.
@@ -272,7 +272,7 @@ public class WebRequest {
             return _sourceForm.getCharacterSet();
         }
     }
-    
+
 
     /**
      * Performs any additional processing necessary to complete the request.
@@ -446,8 +446,8 @@ public class WebRequest {
 
 
     private void appendParameter( StringBuffer sb, String name, String value, boolean moreToCome ) {
-        sb.append( encode( name ) ).append( '=' );
-        sb.append( encode( value ) );
+        sb.append( encode( name ) );
+        if (value != null) sb.append( '=' ).append( encode( value ) );
         if (moreToCome) sb.append( '&' );
     }
 
@@ -587,14 +587,14 @@ public class WebRequest {
     }
 
 
-    private static void registerSSLProtocolHandler() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException { 
+    private static void registerSSLProtocolHandler() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String list = System.getProperty( PROTOCOL_HANDLER_PKGS );
         Method setMethod = System.class.getMethod( "setProperty", new Class[] { String.class, String.class } );
         if (list == null || list.length() == 0) {
             setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER } );
         } else if (list.indexOf( SSL_PROTOCOL_HANDLER ) < 0) {
             setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER + " | " + list } );
-        }    
+        }
     }
 
 
