@@ -263,66 +263,37 @@ public class WebLinkTest extends HttpUnitTest {
         // first link should not have any param
         request = links[0].getRequest();
         assertNotNull( request);
-        Enumeration e = request.getParameterNames();
-        assertNotNull( e);
-        assertTrue( "Should not have any params", !e.hasMoreElements() );
+        String[] names = request.getRequestParameterNames();
+        assertNotNull( names );
+        assertEquals( "Num parameters found", 0, names.length );
         assertEquals("Non Existent parameter should be empty","",request.getParameter("nonexistent"));
 
         // second link should have one parameter
-        request = links[1].getRequest();
-        assertNotNull( request );
-        e = request.getParameterNames();
-        assertTrue( "No parameter found", e.hasMoreElements() );
-        String paramName = (String)e.nextElement();
-        assertNotNull(paramName);
-        assertTrue( "More than one parameter found", !e.hasMoreElements());
-        assertEquals("param1",paramName);
-        assertEquals("value1",request.getParameter(paramName));
+        checkLinkParameters( links[1], new String[] { "param1" }, 
+		                     new String[][] { { "value1" } });
 
         // third link should have 2 parameters.  !! Order of parameters cannot be guaranted.
-        request = links[2].getRequest();
-        assertNotNull( request );
-        e = request.getParameterNames();
-        assertTrue( "No parameters found", e.hasMoreElements() );
-        paramName = (String)e.nextElement();
-        assertNotNull(paramName);
-        assertTrue( "Only one parameter found", e.hasMoreElements());
-        String paramName2 = (String)e.nextElement();
-        assertNotNull(paramName2);
-        assertTrue("different names",!paramName.equals(paramName2));
-        assertTrue("test names for param1",paramName.equals("param1") || paramName2.equals("param1"));
-        assertTrue("test names for param2",paramName.equals("param2") || paramName2.equals("param2"));
-        assertEquals("value1",request.getParameter("param1"));
-        assertEquals("value2",request.getParameter("param2"));
+        checkLinkParameters( links[2], new String[] { "param1", "param2" }, 
+		                     new String[][] { { "value1" }, { "value2" } });
 
         // fourth link should have 1 parameter with 2 values.
-        request = links[3].getRequest();
-        assertNotNull( request );
-        e = request.getParameterNames();
-        assertTrue( "No parameters found", e.hasMoreElements() );
-        paramName = (String)e.nextElement();
-        assertNotNull(paramName);
-        String[] values = request.getParameterValues("param1");
-        assertEquals("Length of ",2,values.length);
-        assertMatchingSet("Values",new String[] {"value1", "value3"}, values);
+        checkLinkParameters( links[3], new String[] { "param1" }, 
+		                     new String[][] { { "value1", "value3" } });
 
         // fifth link should have 2 parameters with one with 2 values.
-        request = links[4].getRequest();
-        assertNotNull( request );
-        e = request.getParameterNames();
-        assertTrue( "No parameters found", e.hasMoreElements() );
-        paramName = (String)e.nextElement();
-        assertNotNull(paramName);
-        assertTrue( "Only one parameter found", e.hasMoreElements() );
-        paramName2 = (String)e.nextElement();
-        assertNotNull(paramName2);
-        assertTrue("different names",!paramName.equals(paramName2));
-        values = request.getParameterValues("param1");
-        assertEquals("Length of ",2,values.length);
-        assertMatchingSet("Values for param1",new String[] {"value1", "value3"}, values);
-        assertMatchingSet("Values form param2",new String[] {"value2"}, request.getParameterValues("param2"));
-        assertEquals("value2",request.getParameter("param2"));
+        checkLinkParameters( links[4], new String[] { "param1", "param2" }, 
+		                     new String[][] { { "value1", "value3" }, { "value2" } });
     }
+
+
+	private void checkLinkParameters( WebLink link, String[] expectedNames, String[][] expectedValues ) {
+		WebRequest request = link.getRequest();
+		assertNotNull( request );
+		assertMatchingSet( "Parameter names", expectedNames, request.getRequestParameterNames() );
+		for (int i = 0; i < expectedValues.length; i++) {
+			assertMatchingSet( expectedNames[i] + " values", expectedValues[i], request.getParameterValues( expectedNames[i] ));
+		}
+	}
 
 
     public void testEncodedLinkParameters() throws Exception {
@@ -334,7 +305,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
         WebLink link = mapPage.getLinks()[0];
         WebRequest wr = link.getRequest();
-        assertMatchingSet( "Request parameter names", new String[] { "$dollar", "#hash" }, toStringArray( wr.getParameterNames() ) );
+        assertMatchingSet( "Request parameter names", new String[] { "$dollar", "#hash" }, wr.getRequestParameterNames() );
         assertEquals( "Value of $dollar", "%percent", wr.getParameter( "$dollar" ) );
         assertEquals( "Value of #hash", "&ampersand", wr.getParameter( "#hash" ) );
     }
@@ -349,7 +320,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
         WebLink link = mapPage.getLinks()[0];
         WebRequest wr = link.getRequest();
-        assertMatchingSet( "Request parameter names", new String[] { "arg1", "valueless" }, toStringArray( wr.getParameterNames() ) );
+        assertMatchingSet( "Request parameter names", new String[] { "arg1", "valueless" }, wr.getRequestParameterNames() );
         assertEquals( "Value of arg1", null, wr.getParameter( "arg1" ) );
     }
 
@@ -363,7 +334,7 @@ public class WebLinkTest extends HttpUnitTest {
         WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
         WebLink link = mapPage.getLinks()[0];
         WebRequest wr = link.getRequest();
-        assertMatchingSet( "Request parameter names", new String[] { "arg0", "arg1", "valueless" }, toStringArray( wr.getParameterNames() ) );
+        assertMatchingSet( "Request parameter names", new String[] { "arg0", "arg1", "valueless" }, wr.getRequestParameterNames() );
         assertMatchingSet( "Value of arg0", new String[] { "0", "2" }, wr.getParameterValues( "arg0" ) );
         assertEquals( "Actual query", "arg0=0&arg1&arg0=2&valueless=", wr.getQueryString() );
     }
@@ -383,15 +354,6 @@ public class WebLinkTest extends HttpUnitTest {
             wr.setParameter( "arg0", "3" );
             fail( "Did not prevent change to link parameters" );
         } catch (IllegalRequestParameterException e) {}
-    }
-
-
-    private String[] toStringArray( Enumeration e ) {
-        Vector v = new Vector();
-        while (e.hasMoreElements()) v.addElement( e.nextElement() );
-        String[] result = new String[ v.size() ];
-        v.copyInto( result );
-        return result;
     }
 
 
