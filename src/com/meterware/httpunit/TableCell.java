@@ -27,12 +27,23 @@ import java.util.Vector;
 import org.w3c.dom.*;
 
 
+/**
+ * A single cell in an HTML table.
+ **/
 public class TableCell extends ParsedHTML {
 
+    
+    /**
+     * Returns the number of columns spanned by this cell.
+     **/
     public int getColSpan() {
         return _colSpan;
     }
 
+
+    /**
+     * Returns the number of rows spanned by this cell.
+     **/
     public int getRowSpan() {
         return _rowSpan;
     }

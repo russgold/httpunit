@@ -33,6 +33,7 @@ public class WebResponse {
 
     /**
      * Returns the forms found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebForm[] getForms() throws SAXException {
         return getReceivedPage().getForms();
@@ -41,6 +42,7 @@ public class WebResponse {
 
     /**
      * Returns the links found in the page in the order in which they appear.
+     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebLink[] getLinks() throws SAXException {
         return getReceivedPage().getLinks();
@@ -50,6 +52,7 @@ public class WebResponse {
     /**
      * Returns the top-level tables found in this page in the order in which
      * they appear.
+     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public WebTable[] getTables() throws SAXException {
         return getReceivedPage().getTables();
@@ -58,6 +61,7 @@ public class WebResponse {
 
     /**
      * Returns a copy of the domain object model tree associated with this response.
+     * @exception SAXException thrown if there is an error parsing the response.
      **/
     public Document getDOM() throws SAXException {
         return (Document) getReceivedPage().getDOM();
@@ -67,6 +71,7 @@ public class WebResponse {
     /**
      * Returns the first table in the response which has the specified text in its first non-blank row and
      * non-blank column. Will recurse into any nested tables, as needed.
+     * @exception SAXException thrown if there is an error parsing the response.
      * @return the selected table, or null if none is found
      **/
     public WebTable getTableStartingWith( String text ) throws SAXException {

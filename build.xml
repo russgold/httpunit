@@ -5,8 +5,8 @@
 <project name="httpunit" default="jar" basedir=".">
     <property name="name" value="httpunit" /> 
     <property name="Name" value="HttpUnit" /> 
-    <property name="version" value="0.9.1" />
-    <property name="zip_version" value="0_9_1" /> 
+    <property name="version" value="0.9.5" />
+    <property name="zip_version" value="0_9_5" /> 
     <property name="src.dir" value="src" /> 
     <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
@@ -14,9 +14,10 @@
     <property name="docs.dir" value="doc" /> 
     <property name="build.dir" value="build" /> 
     <property name="build.classes" value="${build.dir}/classes" /> 
-    <property name="build.javadocs" value="${build.dir}/javadocs" /> 
+    <property name="javadoc.dir" value="${docs.dir}/api" /> 
     <property name="dist.dir" value="dist" /> 
-    <property name="classpath" value="" /> 
+    <property name="classpath" value="" />
+    <property name="web.dir" value="web" /> 
     <property name="packages" value="com.meterware.*" /> 
     <property name="build.compiler" value="classic" /> 
     
@@ -74,11 +75,11 @@
 <!--  Creates the API documentation                                        --> 
 <!--  ===================================================================  --> 
 <target name="javadocs" depends="prepare">
-    <mkdir dir="${build.javadocs}" /> 
+    <mkdir dir="${javadoc.dir}" /> 
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}" 
-             destdir="${build.javadocs}" author="true" version="true" 
-             windowtitle="${Name} API" doctitle="${Name}" 
-             bottom="Copyright © 2000 Russell Gold and meterware.com. All Rights Reserved." /> 
+             destdir="${javadoc.dir}" author="true" version="true" 
+             windowtitle="${Name} ${version} API" doctitle="${Name}" 
+             footer="Copyright © 2000 Russell Gold and meterware.com. All Rights Reserved." /> 
 </target>
 
 
@@ -100,8 +101,10 @@
     <copydir src="${lib.dir}" dest="${dist.dir}/lib" /> 
     <copyfile src="build.xml" dest="${dist.dir}/build.xml" /> 
     <copydir src="${docs.dir}" dest="${dist.dir}/doc" /> 
-    <copydir src="${build.javadocs}" dest="${dist.dir}/doc/api" /> 
     <copyfile src="readme.txt" dest="${dist.dir}/readme.txt" /> 
+    <copyfile src="index.html" dest="${dist.dir}/index.html" />
+    <replace file="${dist.dir}/index.html" token="var:dist " value="var:dist&gt;" /> 
+    <replace file="${dist.dir}/index.html" token="var:publish&gt;" value="var:publish " /> 
   </target>
 
 
@@ -113,12 +116,24 @@
 </target>
 
 
+<!--  ===================================================================  -->
+<!--  Publishes to a web site                                              -->
+<!--  ===================================================================  -->
+<target name="publish" depends="dist-zip">
+    <mkdir dir="${web.dir}" />
+    <copydir src="." dest="${web.dir}" includes="*.zip,index.html,doc/**"/>
+    <replace file="${web.dir}/index.html" token="var:dist&gt;"    value="var:dist " /> 
+    <replace file="${web.dir}/index.html" token="var:publish " value="var:publish&gt;" />
+    <replace file="${web.dir}/index.html" token="&lt;version&gt;"    value="${zip_version}" /> 
+</target>
+
+
 <!--  ===================================================================  --> 
 <!--  Cleans up generated stuff                                            --> 
 <!--  ===================================================================  --> 
 <target name="clean">
     <deltree dir="${build.dir}" /> 
-    <deltree dir="${dist.dir}" /> 
+    <deltree dir="${dist.dir}" />
 </target>
 
 
@@ -126,9 +141,9 @@
 <!--  Total cleanup                                                        --> 
 <!--  ===================================================================  --> 
 <target name="total-clean" depends="clean">
+    <delete file="${name}_${zip_version}.zip" /> 
     <deltree dir="${docs.dir}/api" />
     <deltree dir="${lib.dir}" /> 
-    <delete file="${name}_${zip_version}.zip" /> 
 </target>
  
 </project>
