@@ -8,6 +8,7 @@
     <property name="version" value="0.9" />
     <property name="zip_version" value="0_9" /> 
     <property name="src.dir" value="src" /> 
+    <property name="tstsrc.dir" value="test" /> 
     <property name="examples.dir" value="examples" /> 
     <property name="lib.dir" value="lib" /> 
     <property name="docs.dir" value="doc" /> 
@@ -43,7 +44,7 @@
 <!--  Compiles the test code                                               -->
 <!--  ===================================================================  --> 
 <target name="testcompile" depends="compile">
-    <javac srcdir="${src.dir}/test" destdir="${build.classes}" classpath="${classpath}" 
+    <javac srcdir="${tstsrc.dir}" destdir="${build.classes}" classpath="${classpath}" 
            debug="on" deprecation="off" optimize="on">
     </javac>
 </target>
@@ -91,9 +92,10 @@
     <mkdir dir="${dist.dir}/doc/api" /> 
     <mkdir dir="${dist.dir}/src" />
     <mkdir dir="${dist.dir}/src/test" />
+    <mkdir dir="${dist.dir}/test" />
     <mkdir dir="${dist.dir}/examples" /> 
     <copydir src="${src.dir}" dest="${dist.dir}/src" /> 
-    <copydir src="${src.dir}/test" dest="${dist.dir}/src/test" /> 
+    <copydir src="${tstsrc.dir}" dest="${dist.dir}/test" /> 
     <copydir src="${examples.dir}" dest="${dist.dir}/examples" /> 
     <copydir src="${lib.dir}" dest="${dist.dir}/lib" /> 
     <copyfile src="build.xml" dest="${dist.dir}/build.xml" /> 

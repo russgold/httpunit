@@ -48,8 +48,9 @@ public class HtmlTablesTest extends TestCase {
                                        "</table></body></html>" );
         _spanTable = new ReceivedPage( baseURL, HEADER + "<body><h2>Interesting data</h2>" +
                                        "<table summary=\"tough luck\">" +
-                                       "<tr><td>Colors</td><td colspan=2>Names</td></tr>" +
-                                       "<tr><td>Red</td><td>gules</td><td>rot</td></tr>" +
+                                       "<tr><td colspan=2>Colors</td><td>Names</td></tr>" +
+                                       "<tr><td>Red</td><td rowspan=\"2\"><b>gules</b></td><td>rot</td></tr>" +
+                                       "<tr><td>Green</td><td>vert</td></tr>" +
                                        "</table></body></html>" );
     }
 	
@@ -86,7 +87,9 @@ public class HtmlTablesTest extends TestCase {
 
     public void testNestedTable() {
         WebTable[] tables = _nestTable.getTables();
-        assertEquals( 1, tables.length );
+        assertEquals( "top level tables count", 1, tables.length );
+        assertEquals( "rows", 1, tables[0].getRowCount() );
+        assertEquals( "columns", 1, tables[0].getColumnCount() );
     }
 
 
@@ -95,6 +98,23 @@ public class HtmlTablesTest extends TestCase {
         assertEquals( "Two", table.getCell( 1, 0 ) );
         assertEquals( "3",   table.getCell( 2, 1 ) );
     }
+
+    public void testColumnSpan() {
+        WebTable table = _spanTable.getTables()[0];
+        assertEquals( "Colors", table.getCell( 0, 0 ) );
+        assertEquals( "Colors", table.getCell( 0, 1 ) );
+        assertEquals( "Names",  table.getCell( 0, 2 ) );
+    }
+
+    public void testRowSpan() {
+        WebTable table = _spanTable.getTables()[0];
+        assertEquals( 3, table.getRowCount() );
+        assertEquals( 3, table.getColumnCount() );
+        assertEquals( "gules", table.getCell( 1, 1 ) );
+        assertEquals( "gules", table.getCell( 2, 1 ) );
+        assertEquals( "vert",  table.getCell( 2, 2 ) );
+    }
+
 
 
     private final static String HEADER = "<html><head><title>A Sample Page</title></head>";

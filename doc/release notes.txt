@@ -1,8 +1,13 @@
 HttpUnit release notes
 
-27-Jun-00 0.9.1
+Known issues:
+    1. There is no way to access nested tables.
+    
+29-Jun-00 0.9.1
 Additions:
     1. The PostMethodWebRequest class is now public.
+    2. Row and column spans are now handled
+    3. Formatting inside table cells is ignored in computing the text value of a cell
     
 19-Jun-00 0.9
 Additions:
@@ -11,10 +16,6 @@ Additions:
     2. WebResponse now can return an array of the top-level tables in the HTML response.
        Each table may now be asked for its size and the contents of each of its cells.
 
-Known issues:
-    1. There is no way to access nested tables.
-    2. Row and column spans are not handled properly.
-    
 5-Jun-00   0.8.2
 Additions:
     WebResponse now has a getDOM method which permits examination of the DOM equivalent of the response.
