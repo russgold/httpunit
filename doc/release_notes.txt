@@ -10,8 +10,12 @@ Limitations: HttpUnit does not support JavaScript
 
                             
 Revision History:
+
+04-Jan-01
+Additions:
+    1. Initial implementation of file upload capability
     
-01-Jan-2001 1.2.1
+01-Jan-01 1.2.1
 Acknowledgements:
     Thanks to Toyoshi Ushio for helping with the handling of non-English scripts and for translating the home page and cookbook into Japanese.
     

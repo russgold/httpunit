@@ -175,9 +175,9 @@ public class WebPageTest extends HttpUnitTest {
                         "<input type=text name=name><input type=submit></form></body></html>" );
         setResourceCharSet( "HebrewForm.html", "iso-8859-8", true );
         defineResource( "SayHello", new PseudoServlet() {
-            public WebResource getPostResponse( Dictionary parameters ) {
+            public WebResource getPostResponse( Dictionary parameters, Dictionary headers ) {
                 try {
-                    String name = (String) parameters.get( "name" );
+                    String name = ((String[]) parameters.get( "name" ))[0];
                     WebResource result = new WebResource( "<html><body><table><tr><td>Hello, " + 
                                                           new String( name.getBytes( "iso-8859-1" ), "iso-8859-8" ) + 
                                                           "</td></tr></table></body></html>" );

@@ -29,6 +29,7 @@
 <!-- =================================================================== -->
 <target name="check_for_optional_packages">
     <available property="jsdk.present" classname="javax.servlet.http.HttpServlet" />
+    <available property="javamail.present" classname="javax.mail.internet.MimeMultipart" />
 </target>
 
 
@@ -48,6 +49,7 @@
     <javac srcdir="${src.dir}" destdir="${build.classes}" classpath="${classpath}" 
            debug="on" deprecation="on" optimize="off">
          <exclude name="**/servletunit/*" unless="jsdk.present" />
+         <exclude name="**/MimeEncodedMessageBody.java" unless="javamail.present" />
     </javac>
 </target>
 
@@ -59,12 +61,13 @@
     <javac srcdir="${tstsrc.dir}" destdir="${build.classes}" classpath="${classpath}" 
            debug="on" deprecation="on" optimize="off">
          <exclude name="**/servletunit/*" unless="jsdk.present" />
+         <exclude name="**/FileUploadTest.java" unless="javamail.present" />
     </javac>
 </target>
 
 
 <!--  ===================================================================  --> 
-<!--  Runs the test code (old)                                             -->
+<!--  Runs the test code                                                   -->
 <!--  Note: the classpath variable must be set on the command line         -->
 <!--  ===================================================================  -->
 <target name="test" depends="testcompile">

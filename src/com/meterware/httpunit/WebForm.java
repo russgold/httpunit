@@ -302,6 +302,22 @@ public class WebForm {
 
 
     /**
+     * Returns true if the named parameter accepts files for upload.
+     **/
+    public boolean isFileParameter( String name ) {
+        return TYPE_FILE.equals( getParameterTypes().get( name ) );
+    }
+
+
+    /**
+     * Returns true if this form is to be submitted using mime encoding (the default is URL encoding).
+     **/
+    public boolean isSubmitAsMime() {
+        return "multipart/form-data".equalsIgnoreCase( NodeUtils.getNodeAttribute( _node, "enctype" ) );
+    }
+
+
+    /**
      * Returns a copy of the domain object model subtree associated with this form.
      **/
     public Node getDOMSubtree() {
@@ -333,6 +349,9 @@ public class WebForm {
 
     /** The type of a parameter which accepts multiple predefined values. **/
     private final static Integer TYPE_MULTI_VALUED = new Integer(3);
+
+    /** The type of a parameter which accepts files for upload. **/
+    private final static Integer TYPE_FILE = new Integer(4);
 
 
     /** The URL of the page containing this form. **/
@@ -486,6 +505,8 @@ public class WebForm {
                     types.put( name, TYPE_SCALAR );
                 } else if (type.equals( "CHECKBOX" )) {
                     types.put( name, TYPE_MULTI_VALUED );
+                } else if (type.equals( "FILE" )) {
+                    types.put( name, TYPE_FILE );
                 }
             }
             HTMLSelectElement[] selections = getSelections();

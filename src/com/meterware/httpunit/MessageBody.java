@@ -19,27 +19,43 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import java.util.Dictionary;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import java.net.URLConnection;
+
 
 /**
- * A basic simulated servlet for testing the HttpUnit library.
+ * An abstract class representing the body of a POST method request.
  **/
 abstract
-public class PseudoServlet {
+class MessageBody {
 
 
-    final static public String CONTENTS = "contents";
+    MessageBody( PostMethodWebRequest request ) {
+        _request = request;
+    }
 
 
     /**
-     * Returns a resource object as a result of a post request. 
-     * @param parameters a mapping of parameter names to arrays of value string.
-     * @param headers a mapping of header names to header contents. Also contains a special 'header' named CONTENTS
-     *        which is the raw bytes of the request contents stored in a string.
-     **/ 
+     * Updates the headers for this request as needed.
+     **/
     abstract
-    public WebResource getPostResponse( Dictionary parameters, Dictionary headers );
+    void updateHeaders( URLConnection connection ) throws IOException;
+
+
+    /**
+     * Transmits the body of this request as a sequence of bytes.
+     **/
+    abstract
+    void writeTo( OutputStream outputStream ) throws IOException;
+
+
+    protected PostMethodWebRequest getRequest() {
+        return _request;
+    }
+
+
+    private PostMethodWebRequest _request;
+
 }
-
-
-

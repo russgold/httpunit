@@ -46,7 +46,17 @@ public class HttpUnitSuite {
         suite.addTest( FormSubmitTest.suite() );
         suite.addTest( Base64Test.suite() );
         suite.addTest( PseudoServerTest.suite() );
+        addOptionalTestCase( suite, "com.meterware.httpunit.FileUploadTest" );
         return suite;
+    }
+
+
+    private static void addOptionalTestCase( TestSuite suite, String testCaseName ) {
+        try {
+            suite.addTest( new TestSuite( Class.forName( testCaseName ) ) );
+        } catch (ClassNotFoundException e) {
+            System.out.println( "Test suite " + testCaseName + " not found; skipping." );
+        }
     }
 
 

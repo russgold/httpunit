@@ -203,7 +203,7 @@ public class PseudoServer {
             return (WebResource) resource;
         } else if (command.equals( "POST" ) && resource instanceof PseudoServlet) {
             Dictionary requestData = readRequest( br );
-            return ((PseudoServlet) resource).getPostResponse( getParameters( (String) requestData.get( "content" ) ) );
+            return ((PseudoServlet) resource).getPostResponse( getParameters( (String) requestData.get( PseudoServlet.CONTENTS ) ), requestData );
         } else {
             return null;
         }
@@ -231,7 +231,7 @@ public class PseudoServer {
             int contentLength = Integer.parseInt( (String) headers.get( "CONTENT-LENGTH" ) );
             char[] content = new char[ contentLength ];
             br.read( content );
-            headers.put( "content", new String( content ) );
+            headers.put( PseudoServlet.CONTENTS, new String( content ) );
         } catch (NumberFormatException e) {
         }
     }
@@ -242,10 +242,23 @@ public class PseudoServer {
         while (st.hasMoreTokens()) {
             String name = st.nextToken();
             if (st.hasMoreTokens()) {
-                parameters.put( name, decode( st.nextToken() ) );
+                addParameter( parameters, decode( name ), decode( st.nextToken() ) );
             }
         }
         return parameters;
+    }
+
+
+    private void addParameter( Hashtable parameters, String name, String value ) {
+        String[] oldValues = (String[]) parameters.get( name );
+        if (oldValues == null) {
+            parameters.put( name, new String[] { value } );
+        } else {
+            String[] values = new String[ oldValues.length+1 ];
+            System.arraycopy( oldValues, 0, values, 0, oldValues.length );
+            values[ oldValues.length ] = value;
+            parameters.put( name, values );
+        }
     }
 
 

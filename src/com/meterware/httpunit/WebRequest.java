@@ -33,6 +33,25 @@ public class WebRequest {
 
 
     /**
+     * Sets the file for a parameter upload in a web request. 
+     **/
+    public void selectFile( String parameterName, File file ) {
+        if (_sourceForm == null || !_sourceForm.isFileParameter( parameterName )) {
+            throw new IllegalNonFileParameterException( parameterName );
+        }
+        if (!isMimeEncoded()) throw new MultipartFormRequiredException();
+    }
+
+
+    /**
+     * Returns an enumeration of all parameters in this web request.
+     **/
+    public Enumeration getParameterNames() {
+        return _parameters.keys();
+    }
+
+
+    /**
      * Returns the value of a parameter in this web request.
      * @return the value of the named parameter, or null if it is not set.
      **/
@@ -40,8 +59,10 @@ public class WebRequest {
         Object value = _parameters.get( name );
         if (value instanceof String[]) {
             return ((String[]) value)[0];
+        } else if (value == null) {
+            return "";
         } else {
-            return (String) value;
+            return value.toString();
         }
     }
 
@@ -53,6 +74,7 @@ public class WebRequest {
         Object result = _parameters.get( name );
         if (result instanceof String) return new String[] { (String) result };
         if (result instanceof String[]) return (String[]) result;
+        if (result instanceof UploadFileSpec) return new String[] { result.toString() };
         return new String[0];
     }
 
@@ -139,7 +161,15 @@ public class WebRequest {
     protected WebRequest( URL urlBase, String urlString, String target, WebForm sourceForm, SubmitButton button ) {
         this( urlBase, urlString, target );
         _sourceForm   = sourceForm;
-        _submitButton = button;
+
+        if (button != null && button.getName().length() > 0) {
+            _parameters.put( button.getName(), button.getValue() );
+            if (button.isImageButton()) {
+                _imageButtonName = button.getName();
+                setSubmitPosition( 0, 0 );
+            }
+        }
+
     }
     
 
@@ -148,6 +178,36 @@ public class WebRequest {
      **/
     protected WebRequest( WebRequest baseRequest, String urlString ) throws MalformedURLException {
         this( baseRequest.getURL(), urlString );
+    }
+
+
+    /**
+     * Returns true if the specified parameter is a file field.
+     **/
+    protected boolean isFileParameter( String name ) {
+        return false;
+    }
+
+
+    /**
+     * Returns true if this request is to be MIME-encoded.
+     **/
+    final
+    protected boolean isMimeEncoded() {
+        return _sourceForm != null && _sourceForm.isSubmitAsMime();
+    }
+
+
+    /**
+     * Returns the character set required for this request.
+     **/
+    final
+    protected String getCharacterSet() {
+        if (_sourceForm == null) {
+            return "iso-8859-1";
+        } else {
+            return _sourceForm.getCharacterSet();
+        }
     }
     
 
@@ -180,14 +240,6 @@ public class WebRequest {
         StringBuffer sb = new StringBuffer();
         Enumeration e = _parameters.keys();
 
-        if (_submitButton != null && _submitButton.getName().length() > 0) {
-            appendParameter( sb, _submitButton.getName(), _submitButton.getValue(), e.hasMoreElements() || _submitButton.isImageButton() );
-            if (_submitButton.isImageButton()) {
-                appendParameter( sb, _submitButton.getName() + ".x", Integer.toString( _submitX ), true );
-                appendParameter( sb, _submitButton.getName() + ".y", Integer.toString( _submitY ), e.hasMoreElements() );
-            }
-        }
-
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
             Object value = _parameters.get( name );
@@ -208,8 +260,36 @@ public class WebRequest {
 
 
     void setSubmitPosition( int x, int y ) {
-        _submitX = x;
-        _submitY = y;
+        if (_imageButtonName == null) return;
+        _parameters.put( _imageButtonName + ".x", Integer.toString( x ) );
+        _parameters.put( _imageButtonName + ".y", Integer.toString( y ) );
+    }
+
+
+    static class UploadFileSpec {
+        UploadFileSpec( File file ) {
+            _file = file;
+        }
+
+
+        UploadFileSpec( File file, String contentType ) {
+            _file = file;
+            _contentType = contentType;
+        }
+
+
+        File getFile() {
+            return _file;
+        }
+
+
+        String getContentType() {
+            return _contentType;
+        }
+
+        private File _file;
+
+        private String _contentType;
     }
 
 
@@ -229,10 +309,8 @@ public class WebRequest {
     private String       _urlString;
     private Hashtable    _parameters = new Hashtable();
     private WebForm      _sourceForm;
-    private SubmitButton _submitButton;
+    private String       _imageButtonName;
     private String       _target = TOP_FRAME;
-    private int          _submitX;
-    private int          _submitY;
 
     private boolean      _httpsProtocolSupportEnabled;
 
@@ -245,7 +323,7 @@ public class WebRequest {
 
 
     private void appendParameter( StringBuffer sb, String name, String value, boolean moreToCome ) {
-        sb.append( name ).append( '=' );
+        sb.append( encode( name ) ).append( '=' );
         sb.append( encode( value ) );
         if (moreToCome) sb.append( '&' );
     }
@@ -277,7 +355,7 @@ public class WebRequest {
                 }
                 return result.toString();
             } catch (java.io.UnsupportedEncodingException e) {
-                return "????";
+                return "????";    // XXX should pass the exception through as IOException ultimately
             }
         }
     }
@@ -286,6 +364,7 @@ public class WebRequest {
     private void validateParameterValue( String name, String value ) {
         if (_sourceForm == null) return;
         if (_sourceForm.isTextParameter( name )) return;
+        if (_sourceForm.isFileParameter( name )) throw new IllegalFileParameterException( name );
         if (!inArray( name, _sourceForm.getParameterNames() )) throw new NoSuchParameterException( name );
         if (!inArray( value, _sourceForm.getOptionValues( name ) )) throw new IllegalParameterValueException( name, value );
     }
@@ -446,6 +525,75 @@ class SingleValuedParameterException extends IllegalRequestParameterException {
 
 
     private String _parameterName;
+
+}
+
+
+//============================= exception class IllegalFileParameterException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a file parameter to a text value.
+ **/
+class IllegalFileParameterException extends IllegalRequestParameterException {
+
+
+    IllegalFileParameterException( String parameterName ) {
+        _parameterName = parameterName;
+    }
+
+
+    public String getMessage() {
+        return "Parameter '" + _parameterName + "' is a file parameter and may not be set to a text value.";
+    }
+
+
+    private String _parameterName;
+
+}
+
+
+//============================= exception class IllegalNonFileParameterException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a non-file parameter to a file value.
+ **/
+class IllegalNonFileParameterException extends IllegalRequestParameterException {
+
+
+    IllegalNonFileParameterException( String parameterName ) {
+        _parameterName = parameterName;
+    }
+
+
+    public String getMessage() {
+        return "Parameter '" + _parameterName + "' is not a file parameter and may not be set to a file value.";
+    }
+
+
+    private String _parameterName;
+
+}
+
+
+//============================= exception class MultipartFormRequiredException ======================================
+
+
+/**
+ * This exception is thrown on an attempt to set a file parameter in a form that does not specify MIME encoding.
+ **/
+class MultipartFormRequiredException extends IllegalRequestParameterException {
+
+
+    MultipartFormRequiredException() {
+    }
+
+
+    public String getMessage() {
+        return "The request does not use multipart/form-data encoding, and cannot be used to upload files ";
+    }
+
 
 }
 

@@ -172,8 +172,8 @@ public class PseudoServerTest extends TestCase {
 
         try {
             ps.setResource( resourceName, new PseudoServlet() {
-                public WebResource getPostResponse( Dictionary parameters ) {
-                    return new WebResource( prefix + parameters.get( "name" ), "text/plain" );
+                public WebResource getPostResponse( Dictionary parameters, Dictionary headers ) {
+                    return new WebResource( prefix + ((String[]) parameters.get( "name" ))[0], "text/plain" );
                 }
             } );
  

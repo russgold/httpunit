@@ -112,7 +112,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
-        assertEquals( getHostPath() + "/ask?update=name&update.x=0&update.y=0&age=12", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/ask?update=name&update.y=0&update.x=0&age=12", request.getURL().toExternalForm() );
     }
 
                               
@@ -136,7 +136,7 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest( form.getSubmitButton( "update" ), 10, 15 );
-        assertEquals( getHostPath() + "/ask?update=name&update.x=10&update.y=15&age=12", request.getURL().toExternalForm() );
+        assertEquals( getHostPath() + "/ask?update=name&update.y=15&update.x=10&age=12", request.getURL().toExternalForm() );
     }
 
                               
