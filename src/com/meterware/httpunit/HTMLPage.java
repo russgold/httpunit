@@ -19,22 +19,21 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
-
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.Vector;
 
-import org.w3c.dom.*;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
-
 import org.xml.sax.SAXException;
 
 
@@ -88,7 +87,7 @@ public class HTMLPage extends ParsedHTML {
             } else {
                 try {
                     WebRequest req = new GetMethodWebRequest( getBaseURL(), src );
-                    sb.append( getResponse().getClient().getResource( req ).getText() );
+                    sb.append( getResponse().getWindow().getResource( req ).getText() );
                 } catch (IOException e) {
                     throw new RuntimeException( "Error loading included script: " + e );
                 }

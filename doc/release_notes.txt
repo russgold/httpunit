@@ -1,8 +1,7 @@
 HttpUnit release notes
 
 Known problems:
-    1. The "_new" and "_empty" frame targets are not handled correctly
-    2. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
+    1. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
        This behavior matches that currently used by IE and Navigator.
 
 Limitations:
@@ -14,6 +13,11 @@ Revision History:
  3-Oct-2002
 Acknowledgements:
     Thanks to Geert Bevin for fixing a problem with generation of cookie headers that affects some servers.
+
+Additions:
+    1. Following the "_blank" target now creates a new web window, with its own set of frames. Following links or submitting
+       forms will update the window from which the request originated. Requests may also now be initiated from an open window.
+       The list of open windows is a property of the web client.
 
 Problems fixed:
     1. The cookie header was being generated with a space after each ";" separator.

@@ -51,6 +51,7 @@ public class HttpUnitSuite {
         result.addTest( HtmlTablesTest.suite() );
         result.addTest( WebFormTest.suite() );
         result.addTest( WebFrameTest.suite() );
+        result.addTest( WebWindowTest.suite() );
         result.addTest( RequestTargetTest.suite() );
         result.addTest( FormParametersTest.suite() );
         result.addTest( FormSubmitTest.suite() );

@@ -20,15 +20,12 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import java.security.Provider;
-import java.security.Security;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,13 +33,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.URLStreamHandler;
 
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.security.Provider;
+import java.security.Security;
+
+import java.util.*;
 
 /**
  * A request sent to a web server.
@@ -442,8 +436,14 @@ public class WebRequest {
 
 //---------------------------------- package members --------------------------------
 
-    /** The name of the topmost frame. **/
+    /** The target indicating the topmost frame of a window. **/
     final static String TOP_FRAME = "_top";
+
+    /** The target indicating the parent of a frame. **/
+    final static String PARENT_FRAME = "_frame";
+
+    /** The target indicating a new, empty window. **/
+    final static String NEW_WINDOW = "_blank";
 
 
    WebRequestSource getWebRequestSource() {

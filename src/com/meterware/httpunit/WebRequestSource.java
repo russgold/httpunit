@@ -195,7 +195,7 @@ public class WebRequestSource extends ParameterHolder {
     protected WebResponse submitRequest( WebRequest request ) throws IOException, SAXException {
         return getDestination().equals( "#" )
                     ? _baseResponse
-                    : _baseResponse.getClient().sendRequest( request );
+                    : _baseResponse.getWindow().sendRequest( request );
     }
 
 

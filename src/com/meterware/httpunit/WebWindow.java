@@ -19,12 +19,10 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
-import java.lang.String;
-import java.util.List;
-import java.net.MalformedURLException;
-import java.net.HttpURLConnection;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.util.List;
 
 import org.xml.sax.SAXException;
 
@@ -66,7 +64,7 @@ public class WebWindow {
     public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
         WebResponse response = _client.getResourceForWindow( request, this );
 
-        if (response != null) updateWindow( response );
+        if (response != null) updateWindow( request.getTarget(), response );
 
         return getFrameContents( request.getTarget() );
     }
@@ -103,12 +101,6 @@ public class WebWindow {
     WebWindow( WebClient client ) {
         _client = client;
         _frameContents = new FrameHolder( _client, WebRequest.TOP_FRAME );
-
-        try {
-            _frameContents.updateFrames( new DefaultWebResponse( _client, null, WebResponse.BLANK_HTML ) );
-        } catch (IOException e) {
-        } catch (SAXException e) {
-        }
     }
 
 
@@ -116,16 +108,31 @@ public class WebWindow {
      * Updates this web client based on a received response. This includes updating
      * cookies and frames.
      **/
-    void updateWindow( WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        _client.updateClient( response );
+    void updateWindow( String requestTarget, WebResponse response ) throws MalformedURLException, IOException, SAXException {
+          _client.updateClient( response );
         if (HttpUnitOptions.getAutoRefresh() && response.getRefreshRequest() != null) {
             getResponse( response.getRefreshRequest() );
         } else if (shouldFollowRedirect( response )) {
             delay( HttpUnitOptions.getRedirectDelay() );
             getResponse( new RedirectWebRequest( response ) );
         } else {
-            _frameContents.updateFrames( response );
+            _client.getTargetWindow( this, requestTarget ).updateFrameContents( response );
         }
+    }
+
+
+    /**
+     * Returns the resource specified by the request. Does not update the client or load included framesets.
+     * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
+     */
+    WebResponse getResource( WebRequest request ) throws IOException {
+        return _client.getResourceForWindow( request, this );
+    }
+
+
+    private void updateFrameContents( WebResponse response ) throws IOException, SAXException {
+        response.setWindow( this );
+        _frameContents.updateFrames( response, response.getTarget() );
     }
 
 

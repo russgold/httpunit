@@ -21,11 +21,10 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.xml.sax.SAXException;
 
@@ -40,17 +39,19 @@ class FrameHolder {
     private Hashtable   _contents = new Hashtable();
     private Hashtable   _subFrames = new Hashtable();
     private String      _frameName;
-    private WebResponse _response = WebResponse.BLANK_RESPONSE;
 
 
     FrameHolder( WebClient client, String name ) {
         _client = client;
         _frameName = name;
+        DefaultWebResponse blankResponse = new DefaultWebResponse( _client, null, WebResponse.BLANK_HTML );
+        _contents.put( WebRequest.TOP_FRAME, blankResponse );
+        HttpUnitOptions.getScriptingEngine().associate( blankResponse );
     }
 
 
-    public WebResponse get( String frameName ) {
-        return (WebResponse) _contents.get( frameName );
+    WebResponse get( String target ) {
+        return (WebResponse) _contents.get( getFrameName( target ) );
     }
 
 
@@ -64,12 +65,23 @@ class FrameHolder {
     }
 
 
-    void updateFrames( WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        removeSubFrames( response.getTarget() );
-        _contents.put( response.getTarget(), response );
+    String getFrameName( String target ) {
+        if (WebRequest.TOP_FRAME.equalsIgnoreCase( target )) {
+            return _frameName;
+        } else if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
+            return _frameName;
+        } else {
+            return target;
+        }
+    }
+
+
+    void updateFrames( WebResponse response, String target ) throws MalformedURLException, IOException, SAXException {
+        removeSubFrames( target );
+        _contents.put( target, response );
 
         if (response.isHTML()) {
-            createSubFrames( response.getTarget(), response.getFrameNames() );
+            createSubFrames( target, response.getFrameNames() );
             WebRequest[] requests = response.getFrameRequests();
             for (int i = 0; i < requests.length; i++) _client.getResponse( requests[ i ] );
             HttpUnitOptions.getScriptingEngine().associate( response );

@@ -19,23 +19,15 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.LinkedList;
 import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
@@ -283,8 +275,8 @@ public class WebResponse implements HTMLSegment {
      * @param subFrameName the name of the desired frame as defined in the frameset.
      **/
     public WebResponse getSubframeContents( String subFrameName ) {
-        if (_client == null) throw new NoSuchFrameException( subFrameName );
-        return _client.getFrameContents( WebFrame.getNestedFrameName( _frameName, subFrameName ) );
+        if (_window == null) throw new NoSuchFrameException( subFrameName );
+        return _window.getFrameContents( WebFrame.getNestedFrameName( _frameName, subFrameName ) );
     }
 
 
@@ -578,7 +570,7 @@ public class WebResponse implements HTMLSegment {
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "location" )) {
                 try {
-                    getClient().getResponse( new GetMethodWebRequest( _url, value.toString(), _frameName ) );
+                    getWindow().getResponse( new GetMethodWebRequest( _url, value.toString(), _frameName ) );
                 } catch (IOException e) {
                     throw new RuntimeException( "Error handling 'location=': " + e );
                 } catch (SAXException e) {
@@ -670,6 +662,16 @@ public class WebResponse implements HTMLSegment {
     final static WebResponse BLANK_RESPONSE = new DefaultWebResponse( BLANK_HTML );
 
 
+    WebWindow getWindow() {
+        return _window;
+    }
+
+
+    void setWindow( WebWindow window ) {
+        _window = window;
+    }
+
+
     /**
      * Returns the frames found in the page in the order in which they appear.
      **/
@@ -685,11 +687,6 @@ public class WebResponse implements HTMLSegment {
         WebRequest[] result = new WebRequest[ requests.size() ];
         requests.copyInto( result );
         return result;
-    }
-
-
-    WebClient getClient() {
-        return _client;
     }
 
 
@@ -721,6 +718,8 @@ public class WebResponse implements HTMLSegment {
     final private static int UNINITIALIZED_INT = -2;
 
     private WebFrame[] _frames;
+
+    private WebWindow _window;
 
     private HTMLPage _page;
 

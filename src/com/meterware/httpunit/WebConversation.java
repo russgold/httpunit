@@ -53,7 +53,7 @@ public class WebConversation extends WebClient {
     /**
      * Creates a web response object which represents the response to the specified web request.
      **/
-    protected WebResponse newResponse( WebRequest request ) throws MalformedURLException, IOException {
+    protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException, IOException {
         URLConnection connection = openConnection( request.getURL() );
 	    sendHeaders( connection, request.getHeaderDictionary() );
         if (HttpUnitOptions.isLoggingHttpHeaders()) {
@@ -63,7 +63,7 @@ public class WebConversation extends WebClient {
             }
         }
         request.completeRequest( connection );
-        return new HttpWebResponse( this, request.getTarget(), request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
+        return new HttpWebResponse( this, frameName, request.getURL(), connection, getExceptionsThrownOnErrorStatus() );
     }
 
 

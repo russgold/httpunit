@@ -21,8 +21,10 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+
 import java.util.*;
 
 import org.xml.sax.SAXException;
@@ -120,7 +122,7 @@ public class WebClient {
      * May return null if the resource is a JavaScript URL which would normally leave the client unchanged.
      */
     public WebResponse getResource( WebRequest request ) throws IOException {
-        return getResourceForWindow( request, _mainWindow );
+        return _mainWindow.getResource( request );
     }
 
 
@@ -133,18 +135,28 @@ public class WebClient {
 
 
     private WebResponse getResource( WebRequest request, final WebWindow window ) throws IOException {
+        final String frameName = getTargetFrame( request.getTarget() );
         String urlString = request.getURLString().trim();
         if (urlString.startsWith( "about:" )) {
             return WebResponse.BLANK_RESPONSE;
         } else if (!urlString.startsWith( "javascript:" )) {
-            return newResponse( request );
+            return newResponse( request, frameName );
         } else {
             WebRequestSource wrs = request.getWebRequestSource();
             String result = (wrs == null) ? window.getCurrentPage().getScriptableObject().evaluateURL( urlString )
                                           : wrs.getScriptableDelegate().evaluateURL( urlString );
             if (result == null) return null;
 
-            return new DefaultWebResponse( this, request.getTarget(), request.getURL(), result );
+            return new DefaultWebResponse( this, frameName, request.getURL(), result );
+        }
+    }
+
+
+    private String getTargetFrame( String target ) {
+        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
+            return WebRequest.TOP_FRAME;
+        } else {
+            return target;
         }
     }
 
@@ -343,7 +355,7 @@ public class WebClient {
      * Creates a web response object which represents the response to the specified web request.
      **/
     abstract
-    protected WebResponse newResponse( WebRequest request ) throws MalformedURLException, IOException;
+    protected WebResponse newResponse( WebRequest request, String frameName ) throws MalformedURLException, IOException;
 
 
     /**
@@ -387,14 +399,25 @@ public class WebClient {
      * cookies and frames.
      **/
     final
-    protected void updateMainWindow( WebResponse response ) throws MalformedURLException, IOException, SAXException {
-        _mainWindow.updateWindow( response );
+    protected void updateMainWindow( String target, WebResponse response ) throws MalformedURLException, IOException, SAXException {
+        _mainWindow.updateWindow( target, response );
     }
 
 
     void updateClient( WebResponse response ) throws IOException {
         updateCookies( response );
         validateHeaders( response );
+    }
+
+
+    WebWindow getTargetWindow( WebWindow requestWindow, String target ) {
+        if (WebRequest.NEW_WINDOW.equalsIgnoreCase( target )) {
+            WebWindow window = new WebWindow( this );
+            _openWindows.add( window );
+            return window;
+        } else {
+            return requestWindow;
+        }
     }
 
 
