@@ -232,7 +232,7 @@ public class WebPageTest extends HttpUnitTest {
     public void testMetaRefreshURLRequest() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
-                      "<meta Http-equiv=refresh content='2;URL=" + refreshURL + "'></head>\n" +
+                      "<meta Http-equiv=refresh content='2;URL=NextPage.html'></head>\n" +
                       "<body>This has no data\n" +
                       "</body></html>\n";
         defineResource( "SimplePage.html", page );

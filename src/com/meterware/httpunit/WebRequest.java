@@ -53,6 +53,14 @@ public class WebRequest {
 
 
     /**
+     * Returns true if the specified parameter is a file field.
+     **/
+    public boolean isFileParameter( String name ) {
+        return _sourceForm != null && _sourceForm.isFileParameter( name );
+    }
+
+
+    /**
      * Sets the file for a parameter upload in a web request. 
      **/
     public void selectFile( String parameterName, File file ) {
@@ -221,14 +229,6 @@ public class WebRequest {
      **/
     protected WebRequest( WebRequest baseRequest, String urlString, String target ) throws MalformedURLException {
         this( baseRequest.getURL(), urlString, target );
-    }
-
-
-    /**
-     * Returns true if the specified parameter is a file field.
-     **/
-    protected boolean isFileParameter( String name ) {
-        return false;
     }
 
 

@@ -10,6 +10,11 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+16-Oct-2001
+   Problems corrected:
+       1. WebRequest.isFileParameter is now functioning and public
+       2. auto-redirect now handles relative URLs
+
 15-Oct-2001
    Problems corrected:
        1. The http-equiv meta tag was incorrectly matched as "http_equiv"
