@@ -82,20 +82,22 @@ public class StatefulTest extends TestCase {
 
 
     public void testStatePreservation() throws Exception {
-        final String resourceName = "something/interesting";
+        final String resourceName1 = "something/interesting/start";
+        final String resourceName2 = "something/continue";
 
         ServletRunner sr = new ServletRunner();
-        sr.registerServlet( resourceName, StatefulServlet.class.getName() );
+        sr.registerServlet( resourceName1, StatefulServlet.class.getName() );
+        sr.registerServlet( resourceName2, StatefulServlet.class.getName() );
         WebClient wc = sr.newClient();
 
-        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName );
+        WebRequest request   = new PostMethodWebRequest( "http://localhost/" + resourceName1 );
         request.setParameter( "color", "red" );
         WebResponse response = wc.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );
         assertEquals( "requested resource", "You selected red", response.getText() );
 
-        request = new GetMethodWebRequest( "http://localhost/" + resourceName );
+        request = new GetMethodWebRequest( "http://localhost/" + resourceName2 );
         response = wc.getResponse( request );
         assertNotNull( "No response received", response );
         assertEquals( "content type", "text/plain", response.getContentType() );

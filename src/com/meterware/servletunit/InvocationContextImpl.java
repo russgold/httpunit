@@ -91,7 +91,9 @@ class InvocationContextImpl implements InvocationContext {
         if (_webResponse == null) {
             HttpSession session = _request.getSession( /* create */ false );
             if (session != null && session.isNew()) {
-                _response.addCookie( new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, session.getId() ) );
+                Cookie cookie = new Cookie( ServletUnitHttpSession.SESSION_COOKIE_NAME, session.getId() );
+                cookie.setPath( _application.getContextPath() );
+                _response.addCookie( cookie );
             }
             _webResponse = new ServletUnitWebResponse( _client, _target, _requestURL, _response );
         }

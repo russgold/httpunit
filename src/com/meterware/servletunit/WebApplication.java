@@ -101,6 +101,11 @@ class WebApplication {
     }
 
 
+    String getContextPath() {
+        return _contextPath;
+    }
+
+
     /**
      * Registers a servlet class to be run.
      **/
