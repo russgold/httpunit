@@ -28,7 +28,6 @@ import junit.framework.TestSuite;
 
 import java.util.Vector;
 import java.util.Enumeration;
-import java.util.ArrayList;
 
 
 /**
@@ -224,10 +223,10 @@ public class WebLinkTest extends HttpUnitTest {
         request = links[1].getRequest();
         assertNotNull( request );
         e = request.getParameterNames();
-        assertTrue( e.hasMoreElements() );
+        assertTrue( "No parameter found", e.hasMoreElements() );
         String paramName = (String)e.nextElement();
         assertNotNull(paramName);
-        assertTrue(!e.hasMoreElements());
+        assertTrue( "More than one parameter found", !e.hasMoreElements());
         assertEquals("param1",paramName);
         assertEquals("value1",request.getParameter(paramName));
 
@@ -235,10 +234,10 @@ public class WebLinkTest extends HttpUnitTest {
         request = links[2].getRequest();
         assertNotNull( request );
         e = request.getParameterNames();
-        assertTrue( e.hasMoreElements() );
+        assertTrue( "No parameters found", e.hasMoreElements() );
         paramName = (String)e.nextElement();
         assertNotNull(paramName);
-        assertTrue(e.hasMoreElements());
+        assertTrue( "Only one parameter found", e.hasMoreElements());
         String paramName2 = (String)e.nextElement();
         assertNotNull(paramName2);
         assertTrue("different names",!paramName.equals(paramName2));
@@ -251,7 +250,7 @@ public class WebLinkTest extends HttpUnitTest {
         request = links[3].getRequest();
         assertNotNull( request );
         e = request.getParameterNames();
-        assertTrue( e.hasMoreElements() );
+        assertTrue( "No parameters found", e.hasMoreElements() );
         paramName = (String)e.nextElement();
         assertNotNull(paramName);
         String[] values = request.getParameterValues("param1");
@@ -262,10 +261,10 @@ public class WebLinkTest extends HttpUnitTest {
         request = links[4].getRequest();
         assertNotNull( request );
         e = request.getParameterNames();
-        assertTrue( e.hasMoreElements() );
+        assertTrue( "No parameters found", e.hasMoreElements() );
         paramName = (String)e.nextElement();
         assertNotNull(paramName);
-        assertTrue( e.hasMoreElements() );
+        assertTrue( "Only one parameter found", e.hasMoreElements() );
         paramName2 = (String)e.nextElement();
         assertNotNull(paramName2);
         assertTrue("different names",!paramName.equals(paramName2));
@@ -307,9 +306,11 @@ public class WebLinkTest extends HttpUnitTest {
 
 
     private String[] toStringArray( Enumeration e ) {
-        ArrayList al = new ArrayList();
-        while (e.hasMoreElements()) al.add( e.nextElement() );
-        return (String[]) al.toArray( new String[ al.size() ] );
+        Vector v = new Vector();
+        while (e.hasMoreElements()) v.addElement( e.nextElement() );
+        String[] result = new String[ v.size() ];
+        v.copyInto( result );
+        return result;
     }
 
 

@@ -33,7 +33,7 @@ import com.meterware.httpunit.*;
 /**
  * Tests the HttpSession implementation.
  **/
-public class SessionTest extends TestCase {
+public class SessionTest extends ServletUnitTest {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
@@ -79,6 +79,7 @@ public class SessionTest extends TestCase {
         assertTrue( "Session is still marked as new", !context.getSession( session.getId() ).isNew() );
 
     }
+
 
 
 }

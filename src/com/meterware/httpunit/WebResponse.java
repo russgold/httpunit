@@ -627,7 +627,7 @@ public class WebResponse implements HTMLSegment {
         String tokensToAdd = "";
         int numTokens = tokens.size();
         for (int i=numTokens - 1; i >= 0; i--) {
-            String token = (String) tokens.get(i);
+            String token = (String) tokens.elementAt(i);
             int equalsIndex = token.indexOf('=');
 
             // if this token has an equals sign (=) in it
@@ -647,7 +647,7 @@ public class WebResponse implements HTMLSegment {
                 // cookie attribute value
                 if ( !isTokenReservedWord(token,version) ) {
                     tokensToAdd =  token + tokensToAdd;
-                    String preceedingToken = (String) tokens.get(i - 1);
+                    String preceedingToken = (String) tokens.elementAt(i - 1);
                     char lastChar = preceedingToken.charAt(preceedingToken.length()-1);
                     if (lastChar != '=') {
                         tokensToAdd = ","+ tokensToAdd;
@@ -689,7 +689,7 @@ public class WebResponse implements HTMLSegment {
 
         try {
             while (st.nextToken() != StreamTokenizer.TT_EOF) {
-                tokens.add( st.sval.trim() );
+                tokens.addElement( st.sval.trim() );
             }
         }
         catch (IOException ioe) {

@@ -16,12 +16,17 @@ Revision History:
 Acknowledgements:
     Thanks to Oliver Imbusch for finding and fixing a problem with parsing of encoded link parameter names and values.
     Thanks to Paul Frantz for finding and fixing a problem with parsing of link parameter names without values.
+    Thanks to Didier Besset for new WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
 
 Problems Fixed:
     1. Links with parameters whose names were encoded were being mis-parsed
     2. Links with empty parameter values were being mis-parsed
-    3. All references to TestCase.assert except for one have been renamed to assertTrue in order to prepare for JDK 1.4
-       and JUnit 3.7 compatibility. HttpUnitTestCase implements assertTrue to continue support for JUnit 3.6 and earlier.
+    3. Most references to TestCase.assert have been renamed to assertTrue in order to prepare for JDK 1.4 and JUnit 3.7
+       compatibility. HttpUnitTest and ServletUnitTest implement assertTrue to continue support for JUnit 3.6 and earlier.
+    4. Some incompatibilities with JDK 1.1 had been inadvertantly introduced.
+
+Additions:
+    1. It is now possible to check a WebForm for the presence of a named parameter.
 
 25-Oct-2001 1.2.7
 

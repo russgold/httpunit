@@ -117,6 +117,8 @@ public class WebFormTest extends HttpUnitTest {
 
         assertEquals( "First checkbox",  "",   form.getParameterValue( "first" ) );
         assertEquals( "Second checkbox", "on", form.getParameterValue( "second" ) );
+        assertTrue( "Did not find parameter 'first'", form.hasParameterNamed( "first" ) );
+        assertTrue( "Did not find parameter with prefix 'sec'", form.hasParameterStartingWithPrefix( "sec" ) );
     }
 
 

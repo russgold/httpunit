@@ -24,7 +24,6 @@
     <property name="classpath" value="" />
     <property name="web.dir" value="web" /> 
     <property name="packages" value="com.meterware.*" /> 
-    <property name="build.compiler" value="classic" />
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
     
 <!-- =================================================================== -->

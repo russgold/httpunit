@@ -58,6 +58,34 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Returns true if a parameter with given name exists in this form.
+     **/
+    public boolean hasParameterNamed( String soughtName ) {
+        NamedNodeMap[] parameters = getParameters();
+
+        for (int i = 0; i < parameters.length; i++) {
+            String name = getValue( parameters[ i ].getNamedItem( "name" ) );
+            if (name.equals( soughtName )) return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Returns true if a parameter starting with given name exists,
+     **/
+    public boolean hasParameterStartingWithPrefix( String prefix ) {
+        NamedNodeMap[] parameters = getParameters();
+
+        for (int i = 0; i < parameters.length; i++) {
+            String name = getValue( parameters[i].getNamedItem( "name" ) );
+            if (name.startsWith( prefix )) return true;
+        }
+        return false;
+    }
+
+
+    /**
      * Returns an array containing the names of the parameters defined for this form,
      * in the order in which they appear.
      **/

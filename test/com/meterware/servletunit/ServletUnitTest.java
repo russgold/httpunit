@@ -41,6 +41,10 @@ public class ServletUnitTest extends TestCase {
         super( name );
     }
 
+    public static void assertTrue( String comment, boolean expression ) {
+        assert( comment, expression );
+    }
+
 
 //------------------------------------ protected members ------------------------------------------
 
