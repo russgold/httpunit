@@ -55,7 +55,7 @@ public class WebFrameTest extends HttpUnitTest {
 
         defineWebPage( "Linker",  "This is a trivial page with <a href=Target.html>one link</a>" );
         defineWebPage( "Target",  "This is another page with <a href=Form.html target=\"_top\">one link</a>" );
-        defineWebPage( "Form",    "This is a page with a simple form: " + 
+        defineWebPage( "Form",    "This is a page with a simple form: " +
                                   "<form action=submit><input name=name><input type=submit></form>" +
                                   "<a href=Linker.html target=red>a link</a>");
         defineResource( "Frames.html",
@@ -221,6 +221,25 @@ public class WebFrameTest extends HttpUnitTest {
         assertTrue( "Second response not the same as source frame contents", response == _wc.getFrameContents( "red" ) );
         assertMatchingSet( "Frames defined for the conversation", new String[] { "_top", "red", "blue" }, _wc.getFrameNames() );
         assertEquals( "URL for second request", getHostPath() + "/Linker.html", response.getURL().toExternalForm() );
+    }
+
+
+    public void testNestedCrossFrameLinks() throws Exception {
+        defineResource( "SuperFrames.html",
+                        "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
+                        "<FRAMESET cols=\"50%,50%\">" +
+                        "    <FRAME src=\"Frames.html\" name=\"red\">" +
+                        "    <FRAME src=\"Frames.html\" name=\"blue\">" +
+                        "</FRAMESET></HTML>" );
+        WebResponse response = _wc.getResponse( getHostPath() + "/SuperFrames.html" );
+        String topFrameNames[] = response.getFrameNames();
+        WebResponse topRedFrame = _wc.getFrameContents( topFrameNames[0] );
+        String frameNames[] = topRedFrame.getFrameNames();
+
+        _wc.getResponse( _wc.getFrameContents( frameNames[0] ).getLinks()[0].getRequest() );
+        WebResponse frameContent = _wc.getResponse( _wc.getFrameContents( frameNames[1] ).getLinks()[0].getRequest() );
+        assertTrue( "Second response not the same as source frame contents", frameContent == _wc.getFrameContents( frameNames[0] ) );
+        assertEquals( "URL for second request", getHostPath() + "/Linker.html", frameContent.getURL().toExternalForm() );
     }
 
 

@@ -128,7 +128,7 @@ public class WebResponse implements HTMLSegment {
      * Returns the target of the page.
      **/
     public String getTarget() {
-        return _target;
+        return _frameName;
     }
 
 
@@ -423,12 +423,12 @@ public class WebResponse implements HTMLSegment {
 
     /**
      * Constructs a response object.
-     * @param target the name of the frame to hold the response
+     * @param frameName the name of the frame to hold the response
      * @param url the url from which the response was received
      **/
-    protected WebResponse( String target, URL url ) {
+    protected WebResponse( String frameName, URL url ) {
         _url = url;
-        _target = target;
+        _frameName = frameName;
     }
 
 
@@ -447,7 +447,7 @@ public class WebResponse implements HTMLSegment {
         if (splitIndex < 0) splitIndex = 0;
         try {
             _refreshDelay = Integer.parseInt( contentTypeHeader.substring( 0, splitIndex ) );
-            _refreshRequest = new GetMethodWebRequest( _url, getRefreshURL( contentTypeHeader.substring( splitIndex+1 ) ), _target );
+            _refreshRequest = new GetMethodWebRequest( _url, getRefreshURL( contentTypeHeader.substring( splitIndex+1 ) ), _frameName );
         } catch (NumberFormatException e) {
             System.out.println( "Unable to interpret refresh tag: \"" + contentTypeHeader + '"' );
         }
@@ -548,7 +548,7 @@ public class WebResponse implements HTMLSegment {
 
     private URL    _url;
 
-    private String _target;
+    private String _frameName;
 
 
     protected void loadResponseText() throws IOException {
@@ -784,7 +784,7 @@ public class WebResponse implements HTMLSegment {
         NodeList nl = NodeUtils.getElementsByTagName( getReceivedPage().getOriginalDOM(), frameTagName );
         for (int i = 0; i < nl.getLength(); i++) {
             Node child = nl.item(i);
-            list.addElement( new WebFrame( getReceivedPage().getBaseURL(), child ) );
+            list.addElement( new WebFrame( getReceivedPage().getBaseURL(), child, _frameName ) );
         }
     }
 
@@ -793,7 +793,7 @@ public class WebResponse implements HTMLSegment {
         if (_page == null) {
             try {
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
-                _page = new ReceivedPage( _url, _target, getText(), getCharacterSet() );
+                _page = new ReceivedPage( _url, _frameName, getText(), getCharacterSet() );
             } catch (IOException e) {
                 throw new SAXException( e );
             }

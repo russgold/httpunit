@@ -32,18 +32,34 @@ class WebFrame {
 //---------------------------------------- package methods -----------------------------------------
 
 
-    WebFrame( URL baseURL, Node frameNode ) {
+    WebFrame( URL baseURL, Node frameNode, String parentFrameName ) {
         _element = frameNode;
         _baseURL = baseURL;
+        _name    = getFrameName( parentFrameName );
     }
 
 
     String getName() {
-        if (_name == null) {
-            _name = NodeUtils.getNodeAttribute( _element, "name" );
-            if (_name.length() == 0) _name = toString();
-        }
         return _name;
+    }
+
+
+    private String getFrameName( String parentFrameName ) {
+        final String relativeName = NodeUtils.getNodeAttribute( _element, "name" );
+        if (relativeName.length() == 0) return toString();
+        else return getNestedFrameName( parentFrameName, relativeName );
+    }
+
+
+    private static String getNestedFrameName( String parentFrameName, final String relativeName ) {
+        if (parentFrameName.equalsIgnoreCase( WebRequest.TOP_FRAME )) return relativeName;
+        return parentFrameName + ':' + relativeName;
+    }
+
+
+    static String getTargetFrameName( String sourceFrameName, final String relativeName ) {
+        if (sourceFrameName.indexOf( ':' ) < 0) return relativeName;
+        return sourceFrameName.substring( 0, sourceFrameName.lastIndexOf( ':' ) ) + ':' + relativeName;
     }
 
 

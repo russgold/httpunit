@@ -50,11 +50,11 @@ public class WebRequestSource extends ParameterHolder {
      **/
     public String getTarget() {
         if (getSpecifiedTarget().length() == 0) {
-            return _parentTarget;
+            return _pageFrame;
         } else if (getSpecifiedTarget().equalsIgnoreCase( "_self" )) {
-            return _parentTarget;
+            return _pageFrame;
         } else {
-            return getSpecifiedTarget();
+            return WebFrame.getTargetFrameName( _pageFrame, getSpecifiedTarget() );
         }
     }
 
@@ -123,12 +123,12 @@ public class WebRequestSource extends ParameterHolder {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebRequestSource( Node node, URL baseURL, String destination, String parentTarget ) {
+    WebRequestSource( Node node, URL baseURL, String destination, String pageFrame ) {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
         _node         = node;
         _baseURL      = baseURL;
         _destination  = destination;
-        _parentTarget = parentTarget;
+        _pageFrame    = pageFrame;
     }
 
 
@@ -174,8 +174,8 @@ public class WebRequestSource extends ParameterHolder {
 
     private static final String PARAM_DELIM = "&";
 
-    /** The target in which the parent response is to be rendered. **/
-    private String         _parentTarget;
+    /** The name of the frame in which the response containing this request source is rendered. **/
+    private String         _pageFrame;
 
     /** The URL of the page containing this entity. **/
     private URL            _baseURL;
