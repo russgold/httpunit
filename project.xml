@@ -73,17 +73,53 @@ Java test code to examine returned pages either as text, an XML DOM, or containe
 
   <dependencies>
 
-    <dependency>
-      <id>nekohtml</id>
-      <version>0.7.1</version>
-      <url>http://www.apache.org/~andyc/neko/doc/html/index.html</url>
-    </dependency>
+      <dependency>
+        <id>nekohtml</id>
+        <version>0.7.1</version>
+        <url>http://www.apache.org/~andyc/neko/doc/html/index.html</url>
+      </dependency>
 
-    <dependency>
-      <id>xerces</id>
-      <version>2.2.1</version>
-      <url>http://xml.apache.org/xerces2-j/index.html</url>
-    </dependency>
+      <dependency>
+        <id>jtidy</id>
+        <version>4Aug2000r7</version>
+        <jar>jtidy-4aug2000r7-dev.jar</jar>
+      </dependency>
+
+      <dependency>
+        <id>xml-apis</id>
+        <version>1.0.b2</version>
+        <url>http://xml.apache.org/xerces2-j/</url>
+      </dependency>
+
+      <dependency>
+        <id>junit</id>
+        <version>3.8</version>
+        <url>http://www.junit.org/</url>
+      </dependency>
+
+      <dependency>
+        <id>javamail</id>
+        <version>1.2</version>
+        <url>http://java.sun.com/</url>
+      </dependency>
+
+      <dependency>
+        <id>jaf</id>
+        <version>1.0.2</version>
+        <url>http://java.sun.com/</url>
+        <jar>activation-1.0.2.jar</jar>
+      </dependency>
+
+      <dependency>
+        <id>xerces</id>
+        <version>2.2.1</version>
+        <url>http://xml.apache.org/xerces2-j/</url>
+      </dependency>
+
+      <dependency>
+        <id>rhino</id>
+        <version>2.3</version>
+      </dependency>
 
       <dependency>
         <id>servletapi</id>
@@ -110,7 +146,7 @@ Java test code to examine returned pages either as text, an XML DOM, or containe
     <!-- Unit test cases -->
     <unitTest>
       <includes>
-        <include>**/*.java</include>
+        <include>**/*Test.java</include>
       </includes>
     </unitTest>
 

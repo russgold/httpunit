@@ -268,6 +268,16 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
     }
 
+    public void testSecureProperty() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");
+        ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+        assertFalse( "Incorrectly noted request as secure", request.isSecure() );
+
+        WebRequest secureReq = new GetMethodWebRequest( "https://localhost/simple");
+        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, secureReq, new ServletUnitContext(), new Hashtable(), NO_MESSAGE_BODY );
+        assertTrue( "Request not marked as secure", request.isSecure() );
+    }
+
     private void verifyLocales(ServletUnitHttpRequest request, Locale[] expectedLocales) {
         assertNotNull( "No default locale found", request.getLocale() );
         assertEquals( "default locale", expectedLocales[0], request.getLocale() );

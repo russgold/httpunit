@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -24,17 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.URLStreamHandler;
-
-import java.security.Provider;
-import java.security.Security;
 
 import java.util.*;
 
@@ -45,6 +39,7 @@ abstract
 public class WebRequest {
 
     private static URLStreamHandler JAVASCRIPT_STREAM_HANDLER = new JavascriptURLStreamHandler();
+    private static URLStreamHandler HTTPS_STREAM_HANDLER = new HttpsURLStreamHandler();
     private SubmitButton _button;
 
     /**
@@ -67,7 +62,6 @@ public class WebRequest {
      * Returns the final URL associated with this web request.
      **/
     public URL getURL() throws MalformedURLException {
-        if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) validateProtocol( getURLString() );
         if (getURLBase() == null || getURLBase().toString().indexOf( "?" ) < 0) {
             return newURL( getURLBase(), getURLString() );
         } else {
@@ -84,7 +78,15 @@ public class WebRequest {
     private URL newURL( final URL base, final String spec ) throws MalformedURLException {
         if (spec.toLowerCase().startsWith( "javascript:" )) {
             return new URL( "javascript", null, -1, spec.substring( "javascript:".length() ), JAVASCRIPT_STREAM_HANDLER );
+        } else if (spec.toLowerCase().startsWith( "https:" ) && !HttpsProtocolSupport.hasHttpsSupport()) {
+            return new URL( "https", null, -1, spec.substring( "https:".length() ), HTTPS_STREAM_HANDLER );
         } else {
+            if (getURLBase() == null || getURLString().indexOf( ':' ) > 0) {
+                if (getURLString().indexOf(':') <= 0) {
+                    throw new RuntimeException( "No protocol specified in URL '" + getURLString() + "'" );
+                }
+                HttpsProtocolSupport.verifyProtocolSupport( getURLString().substring( 0, getURLString().indexOf( ':' ) ) );
+            }
             return spec.startsWith( "?" ) ? new URL( base + spec ) : new URL( base, spec );
         }
     }
@@ -264,7 +266,7 @@ public class WebRequest {
      * Constructs a web request using an absolute URL string.
      **/
     protected WebRequest( String urlString ) {
-        this( (URL) null, urlString );
+        this( null, urlString );
     }
 
 
@@ -463,15 +465,6 @@ public class WebRequest {
 //--------------------------------------- private members ------------------------------------
 
 
-    /** The name of the system parameter used by java.net to locate protocol handlers. **/
-    private final static String PROTOCOL_HANDLER_PKGS  = "java.protocol.handler.pkgs";
-
-    /** The name of the JSSE class which provides support for SSL. **/
-    private final static String SunJSSE_PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
-
-    /** The name of the JSSE class which supports the https protocol. **/
-    private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
-
     private final ParameterHolder _parameterHolder;
 
     private URL          _urlBase;
@@ -479,67 +472,6 @@ public class WebRequest {
     private String       _target = TOP_FRAME;
     private Hashtable    _headers;
     private WebRequestSource _webRequestSource;
-
-    private boolean      _httpsProtocolSupportEnabled;
-
-
-    private void validateProtocol( String urlString ) {
-        if (urlString.indexOf(':') <= 0) {
-            throw new RuntimeException( "No protocol specified in URL '" + urlString + "'" );
-        }
-
-        String protocol = urlString.substring( 0, urlString.indexOf( ':' ) );
-        if (protocol.equalsIgnoreCase( "http" )) {
-            return;
-        } else if (protocol.equalsIgnoreCase( "https" )) {
-            validateHttpsProtocolSupport();
-        }
-    }
-
-
-    void validateHttpsProtocolSupport() {
-        if (!_httpsProtocolSupportEnabled) {
-            verifyHttpsSupport();
-            _httpsProtocolSupportEnabled = true;
-        }
-    }
-
-
-    private static boolean hasProvider( Class providerClass ) {
-        Provider[] list = Security.getProviders();
-        for (int i = 0; i < list.length; i++) {
-            if (list[i].getClass().equals( providerClass )) return true;
-        }
-        return false;
-    }
-
-    private static void verifyHttpsSupport() {
-        if (System.getProperty( "java.version" ).startsWith( "1.1" )) {
-            throw new RuntimeException( "https support requires Java 2" );
-        } else {
-            try {
-                Class providerClass = Class.forName( SunJSSE_PROVIDER_CLASS );
-                if (!hasProvider( providerClass )) Security.addProvider( (Provider) providerClass.newInstance() );
-                registerSSLProtocolHandler();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException( "https support requires the Java Secure Sockets Extension. See http://java.sun.com/products/jsse" );
-            } catch (Throwable e) {
-                throw new RuntimeException( "Unable to enable https support. Make sure that you have installed JSSE " +
-                                            "as described in http://java.sun.com/products/jsse/install.html: " + e );
-            }
-        }
-    }
-
-
-    private static void registerSSLProtocolHandler() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        String list = System.getProperty( PROTOCOL_HANDLER_PKGS );
-        Method setMethod = System.class.getMethod( "setProperty", new Class[] { String.class, String.class } );
-        if (list == null || list.length() == 0) {
-            setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER } );
-        } else if (list.indexOf( SSL_PROTOCOL_HANDLER ) < 0) {
-            setMethod.invoke( null, new String[] { PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER + " | " + list } );
-        }
-    }
 
 
 }
@@ -616,6 +548,17 @@ class JavascriptURLStreamHandler extends URLStreamHandler {
 
     protected URLConnection openConnection( URL u ) throws IOException {
         return null;
+    }
+}
+
+
+//======================================== class HttpsURLStreamHandler ============================================
+
+
+class HttpsURLStreamHandler extends URLStreamHandler {
+
+    protected URLConnection openConnection( URL u ) throws IOException {
+        throw new RuntimeException( "https support requires the Java Secure Sockets Extension. See http://java.sun.com/products/jsse" );
     }
 }
 

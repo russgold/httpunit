@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2003, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -45,7 +45,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
     private ServletInputStreamImpl _inputStream;
     private String                 _contentType;
-    private Vector _locales;
+    private Vector                 _locales;
+    private boolean                _secure;
 
 
     /**
@@ -59,6 +60,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _headers.addEntries( clientHeaders );
         _headers.addEntries( request.getHeaders() );
         _messageBody = messageBody;
+        _secure = request.getURL().getProtocol().equalsIgnoreCase( "https" );
         _contentType = (String) _headers.get( "Content-Type" );
         if (context == null) throw new IllegalArgumentException( "Context must not be null" );
 
@@ -492,7 +494,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns a boolean indicating whether this request was made using a secure channel, such as HTTPS.
      **/
     public boolean isSecure() {
-        throw new RuntimeException( "isSecure not implemented" );
+        return _secure;
     }
 
 
