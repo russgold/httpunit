@@ -28,6 +28,7 @@ import junit.framework.TestSuite;
 
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.ArrayList;
 
 
 /**
@@ -273,6 +274,42 @@ public class WebLinkTest extends HttpUnitTest {
         assertMatchingSet("Values for param1",new String[] {"value1", "value3"}, values);
         assertMatchingSet("Values form param2",new String[] {"value2"}, request.getParameterValues("param2"));
         assertEquals("value2",request.getParameter("param2"));
+    }
+
+
+    public void testEncodedLinkParameters() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "encodedLinks", "<html><head><title>Encode Test</title></head>" +
+                                       "<body>" +
+                                       "<a href=\"/request?%24dollar=%25percent&%23hash=%26ampersand\">request</a>" +
+                                       "</body></html>" );
+        WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
+        WebLink link = mapPage.getLinks()[0];
+        WebRequest wr = link.getRequest();
+        assertMatchingSet( "Request parameter names", new String[] { "$dollar", "#hash" }, toStringArray( wr.getParameterNames() ) );
+        assertEquals( "Value of $dollar", "%percent", wr.getParameter( "$dollar" ) );
+        assertEquals( "Value of #hash", "&ampersand", wr.getParameter( "#hash" ) );
+    }
+
+
+    public void testValuelessLinkParameters() throws Exception {
+        WebConversation wc = new WebConversation();
+        defineWebPage( "encodedLinks", "<html><head><title>Encode Test</title></head>" +
+                                       "<body>" +
+                                       "<a href=\"/request?arg1&valueless=\">request</a>" +
+                                       "</body></html>" );
+        WebResponse mapPage = wc.getResponse( getHostPath() + "/encodedLinks.html" );
+        WebLink link = mapPage.getLinks()[0];
+        WebRequest wr = link.getRequest();
+        assertMatchingSet( "Request parameter names", new String[] { "arg1", "valueless" }, toStringArray( wr.getParameterNames() ) );
+        assertEquals( "Value of arg1", "", wr.getParameter( "arg1" ) );
+    }
+
+
+    private String[] toStringArray( Enumeration e ) {
+        ArrayList al = new ArrayList();
+        while (e.hasMoreElements()) al.add( e.nextElement() );
+        return (String[]) al.toArray( new String[ al.size() ] );
     }
 
 

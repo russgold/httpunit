@@ -100,12 +100,12 @@ public class WebLink extends WebRequestSource {
     /**
      * add a pair key-value to the hashtable, creates an array of values if param already exists.
      **/
-    private void stripOneParameter(Hashtable params, String param) {
-        int index = param.indexOf("=");
-        if (index <= 0 || index == param.length() - 1) return;
-
-        String value = param.substring(index + 1);
-        String key = param.substring(0, index);
+    private void stripOneParameter( Hashtable params, String param ) {
+        int index = param.indexOf( "=" );
+        String value = (index < 0 || index == param.length() - 1)
+                           ? ""
+                           : HttpUnitUtils.decode( param.substring( index + 1 ) );
+        String key = (index < 0) ? param : HttpUnitUtils.decode( param.substring( 0, index ) );
         params.put( key, withNewValue( (String[]) params.get( key ), value ) );
     }
 

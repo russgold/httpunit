@@ -125,7 +125,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
         HttpServletRequest request = new ServletUnitHttpRequest( wr, new ServletUnitContext() );
 
         assertNull( "attribute should not be defined yet", request.getAttribute( "unset" ) );
-        assert( "attribute enumeration should be empty", !request.getAttributeNames().hasMoreElements() );
+        assertTrue( "attribute enumeration should be empty", !request.getAttributeNames().hasMoreElements() );
     }
 
 
@@ -139,9 +139,9 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals( "attribute one", value, request.getAttribute( "one" ) );
 
         Enumeration names = request.getAttributeNames();
-        assert( "attribute enumeration should not be empty", names.hasMoreElements() );
+        assertTrue( "attribute enumeration should not be empty", names.hasMoreElements() );
         assertEquals( "contents in enumeration", "one", names.nextElement() );
-        assert( "attribute enumeration should now be empty", !names.hasMoreElements() );
+        assertTrue( "attribute enumeration should now be empty", !names.hasMoreElements() );
     }
 
 
@@ -169,7 +169,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
 
         session = request.getSession();
         assertNotNull( "No session created", session );
-        assert( "Session not marked as new", session.isNew() );
+        assertTrue( "Session not marked as new", session.isNew() );
     }
 
 

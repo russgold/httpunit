@@ -44,4 +44,30 @@ public class HttpUnitUtils {
         return result;
     }
 
+    /**
+     * Returns an interpretation of the specified URL-encoded string.
+     * FIXME: currently assumes iso-8859-1 character set.
+     **/
+    static String decode( String byteString ) {
+        StringBuffer sb = new StringBuffer();
+        char[] chars = byteString.toCharArray();
+        char[] hexNum = { '0', '0', '0' };
+
+        int i = 0;
+        while (i < chars.length) {
+            if (chars[i] == '+') {
+                i++;
+                sb.append( ' ' );
+            } else if (chars[i] == '%') {
+                i++;
+                hexNum[1] = chars[i++];
+                hexNum[2] = chars[i++];
+                sb.append( (char) Integer.parseInt( new String( hexNum ), 16 ) );
+            } else {
+                sb.append( chars[i++] );
+            }
+        }
+        return sb.toString();
+    }
+
 }

@@ -149,7 +149,7 @@ class HttpRequestStream {
         while (st.hasMoreTokens()) {
             String name = st.nextToken();
             if (st.hasMoreTokens()) {
-                addParameter( parameters, decode( name ), decode( st.nextToken() ) );
+                addParameter( parameters, HttpUnitUtils.decode( name ), HttpUnitUtils.decode( st.nextToken() ) );
             }
         }
         return parameters;
@@ -166,29 +166,6 @@ class HttpRequestStream {
             values[ oldValues.length ] = value;
             parameters.put( name, values );
         }
-    }
-
-
-    private String decode( String byteString ) {
-        StringBuffer sb = new StringBuffer();
-        char[] chars = byteString.toCharArray();
-        char[] hexNum = { '0', '0', '0' };
-
-        int i = 0;
-        while (i < chars.length) {
-            if (chars[i] == '+') {
-                i++;
-                sb.append( ' ' );
-            } else if (chars[i] == '%') {
-                i++;
-                hexNum[1] = chars[i++];
-                hexNum[2] = chars[i++];
-                sb.append( (char) Integer.parseInt( new String( hexNum ), 16 ) );
-            } else {
-                sb.append( chars[i++] );
-            }
-        }
-        return sb.toString();
     }
 
 }

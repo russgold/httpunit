@@ -60,10 +60,10 @@ public class SessionTest extends TestCase {
         ServletUnitContext context = new ServletUnitContext();
         ServletUnitHttpSession session = context.newSession();
         assertNotNull( "Session is null", session );
-        assert( "Session is not marked as new", session.isNew() );
+        assertTrue( "Session is not marked as new", session.isNew() );
         ServletUnitHttpSession session2 = context.newSession();
-        assert( "New session has the same ID", !session.getId().equals( session2.getId() ) );
-        assert( "Different session returned", session.equals( context.getSession( session.getId() ) ) );
+        assertTrue( "New session has the same ID", !session.getId().equals( session2.getId() ) );
+        assertTrue( "Different session returned", session.equals( context.getSession( session.getId() ) ) );
     }
 
 
@@ -71,12 +71,12 @@ public class SessionTest extends TestCase {
         ServletUnitContext context = new ServletUnitContext();
         ServletUnitHttpSession session = context.newSession();
         long accessedAt = session.getLastAccessedTime();
-        assert( "Session is not marked as new", session.isNew() );
+        assertTrue( "Session is not marked as new", session.isNew() );
         try { Thread.currentThread().sleep( 50 ); } catch (InterruptedException e) {};
         assertEquals( "Initial access time", accessedAt, context.getSession( session.getId() ).getLastAccessedTime() ); 
         session.access();
-        assert( "Last access time not changed", accessedAt != context.getSession( session.getId() ).getLastAccessedTime() );
-        assert( "Session is still marked as new", !context.getSession( session.getId() ).isNew() );
+        assertTrue( "Last access time not changed", accessedAt != context.getSession( session.getId() ).getLastAccessedTime() );
+        assertTrue( "Session is still marked as new", !context.getSession( session.getId() ).isNew() );
 
     }
 
