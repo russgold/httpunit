@@ -54,6 +54,7 @@ import org.xml.sax.SAXException;
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
  * @author <a href="mailto:DREW.VARNER@oracle.com">Drew Varner</a>
+ * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
  **/
 abstract
 public class WebResponse implements HTMLSegment {
@@ -130,10 +131,7 @@ public class WebResponse implements HTMLSegment {
      * Returns the content type of this response.
      **/
     public String getContentType() {
-        if (_contentType == null) {
-            readContentTypeHeader();
-            if (_contentType == null) _contentType = DEFAULT_CONTENT_TYPE;
-        }
+        if (_contentType == null) readContentTypeHeader();
         return _contentType;
     }
 
@@ -445,9 +443,6 @@ public class WebResponse implements HTMLSegment {
      **/
     final private static int IETF_RFC2965 = 1;
 
-    final private static String DEFAULT_CONTENT_TYPE   = "text/plain";
-    final private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
-
     final private static String HTML_CONTENT = "text/html";
 
     private WebFrame[] _frames;
@@ -686,10 +681,15 @@ public class WebResponse implements HTMLSegment {
     private void readContentTypeHeader() {
         String contentHeader = (_contentHeader != null) ? _contentHeader
                                                         : getHeaderField( "Content-type" );
-        if (contentHeader == null) contentHeader = DEFAULT_CONTENT_HEADER;
-        String[] parts = HttpUnitUtils.parseContentTypeHeader( contentHeader );
-        _contentType = parts[0];
-        if (parts[1] != null) _characterSet = parts[1];
+        if (contentHeader == null) {
+            _contentType = HttpUnitOptions.getDefaultContentType();
+            _characterSet = HttpUnitOptions.getDefaultCharacterSet();
+            _contentHeader = _contentType + ";charset=" + _characterSet;
+        } else {
+            String[] parts = HttpUnitUtils.parseContentTypeHeader( contentHeader );
+            _contentType = parts[0];
+            if (parts[1] != null) _characterSet = parts[1];
+        }
     }
 
 

@@ -10,6 +10,14 @@ Limitations: HttpUnit does not support JavaScript
 
 Revision History:
 
+ 8-Aug-2001
+Acknowledgements:
+    Thanks to Dave Glowacki for the default content-type code.
+
+    Additions:
+       1. HttpUnitOptions.setDefaultContentType() lets you define a content-type to use when the web server does not
+          supply a Content-Type header.
+
  2-Aug-2001
     Problems Corrected:
        1. Set-Cookie headers are now processed even on responses with 4xx and 5xx status

@@ -22,19 +22,44 @@ package com.meterware.httpunit;
 
 
 /**
- * A collection of global options to control testing.
+ * A collection of global options to control HttpUnit's behavior.
  *
- * @author Russell Gold
+ * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
  **/
 abstract
 public class HttpUnitOptions {
 
+    /**
+     *  Resets all options to their default values.
+     */
+    public static void reset() {
+        _parserWarningsEnabled = false;
+        _exceptionsOnErrorStatus = true;
+        _parameterValuesValidated = true;
+        _imagesTreatedAsAltText = false;
+        _loggingHttpHeaders = false;
+        _matchesIgnoreCase = true;
+        _autoRefresh = false;
+        _redirectDelay = 0;
+        _characterSet = DEFAULT_CHARACTER_SET;
+        _contentType = DEFAULT_CONTENT_TYPE;
+    }
+
 
     /**
-     * Resets the default character set to the platform default encoding.
+     * Resets the default character set to the HTTP default encoding.
      **/
     public static void resetDefaultCharacterSet() {
         _characterSet = DEFAULT_CHARACTER_SET;
+    }
+
+
+    /**
+     * Resets the default content type to plain text.
+     **/
+    public static void resetDefaultContentType() {
+        _contentType = DEFAULT_CONTENT_TYPE;
     }
 
 
@@ -52,6 +77,22 @@ public class HttpUnitOptions {
      **/
     public static String getDefaultCharacterSet() {
         return _characterSet;
+    }
+
+
+    /**
+     * Sets the default content type for pages which do not specify one.
+     **/
+    public static void setDefaultContentType( String contentType ) {
+        _contentType = contentType;
+    }
+
+
+    /**
+     * Returns the content type to be used for pages which do not specify one.
+     **/
+    public static String getDefaultContentType() {
+        return _contentType;
     }
 
 
@@ -196,26 +237,12 @@ public class HttpUnitOptions {
     }
 
 
-//------------------------------  package methods ----------------------------------------
-
-
-    static void reset() {
-        _parserWarningsEnabled = false;
-        _exceptionsOnErrorStatus = true;
-        _parameterValuesValidated = true;
-        _imagesTreatedAsAltText = false;
-        _loggingHttpHeaders = false;
-        _matchesIgnoreCase = true;
-        _autoRefresh = false;
-        _redirectDelay = 0;
-        _characterSet = DEFAULT_CHARACTER_SET;
-    }
-
-
 //--------------------------------- private members --------------------------------------
 
 
-    private static String DEFAULT_CHARACTER_SET = "iso-8859-1";
+    private static String DEFAULT_CONTENT_TYPE   = "text/plain";
+    private static String DEFAULT_CONTENT_HEADER = DEFAULT_CONTENT_TYPE;
+    private static String DEFAULT_CHARACTER_SET  = "iso-8859-1";
 
     private static boolean _parserWarningsEnabled;
 
@@ -235,5 +262,6 @@ public class HttpUnitOptions {
 
     private static String _characterSet = DEFAULT_CHARACTER_SET;
 
+    private static String _contentType = DEFAULT_CONTENT_TYPE;
 }
 
