@@ -13,7 +13,11 @@ Limitations:
 
 
 Revision History:
- 8-Jul-2004
+ 9-Jul-2004
+   Additions:
+       1. rfe #974791: WebForm now supports submitNoButton to submit a form without any of its buttons. This permits
+          testing of server response to a Javascript-style submit without using JavaScript.
+
    Problems fixed:
        1. bug #986397: Subframe included fragments in their source attributes now ignore those fragments when generating requests.
 

@@ -93,6 +93,8 @@ public class WebFormTest extends HttpUnitTest {
             fail( "Should have rejected request as ambiguous" );
         } catch (IllegalRequestParameterException e) {
         }
+        WebResponse noButton = form.submitNoButton();
+        assertEquals( "Expected response", "You made it!", noButton.getText() );
     }
 
 

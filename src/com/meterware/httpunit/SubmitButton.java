@@ -29,6 +29,9 @@ import org.xml.sax.SAXException;
  **/
 public class SubmitButton extends Button {
 
+    private boolean _fake;
+
+
     public String getType() {
         return (isImageButton()?IMAGE_BUTTON_TYPE:SUBMIT_BUTTON_TYPE);
     }
@@ -95,6 +98,22 @@ public class SubmitButton extends Button {
     SubmitButton( WebForm form ) {
         super( form );
         _isImageButton = false;
+    }
+
+
+    static SubmitButton createFakeSubmitButton( WebForm form ) {
+        return new SubmitButton( form, /* fake */ true );
+    }
+
+
+    private SubmitButton( WebForm form, boolean fake ) {
+        this( form );
+        _fake = fake;
+    }
+
+
+    boolean isFake() {
+        return _fake;
     }
 
 

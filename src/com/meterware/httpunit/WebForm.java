@@ -81,6 +81,15 @@ public class WebForm extends WebRequestSource {
 
 
     /**
+     * Submits this form using the web client from which it was originally obtained, ignoring any buttons defined for the form.
+     * @since 1.5.5
+     **/
+     public WebResponse submitNoButton() throws SAXException, IOException {
+        return submit( SubmitButton.createFakeSubmitButton( this /* fake */ ) );
+    }
+
+
+    /**
      * Submits the form without also invoking the button's "onclick" event.
      */
     WebResponse doFormSubmit( SubmitButton button ) throws IOException, SAXException {
@@ -263,6 +272,8 @@ public class WebForm extends WebRequestSource {
         if (HttpUnitOptions.getParameterValuesValidated()) {
             if (button == null) {
                 throw new IllegalUnnamedSubmitButtonException();
+            } else if (button.isFake()) {
+                // bypass checks
             } else if (!getSubmitButtonVector().contains( button )) {
                 throw new IllegalSubmitButtonException( button );
             } else if (button.isDisabled()) {
