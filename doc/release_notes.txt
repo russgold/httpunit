@@ -19,6 +19,8 @@ Acknowledgements:
 
 Problems fixed:
     1. Applets were not loading properly from applets if a codebase was specified in the <applet> tag.
+    2. Bug #700889: Under certain cases, multiple <script> sections in a document caused a problem where only those HTML elements
+       defined before the first one were actually available to the scripts.
 
   9-Mar-2003
 Additions:

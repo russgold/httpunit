@@ -42,7 +42,9 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser {
     private static final String ATTRIBUTE_NAME_CASE = "http://cyberneko.org/html/properties/names/attrs";
 
     private DocumentAdapter _documentAdapter;
-    private ScriptableDelegate _scriptableObject;
+
+    /** The node representing the document. **/
+    private Node _documentNode;
 
 
     static NekoDOMParser newParser( DocumentAdapter adapter, URL url ) {
@@ -75,13 +77,13 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser {
 
 
     ScriptableDelegate getScriptableDelegate() {
-        if (_scriptableObject == null) {
+        if (_documentNode == null) {
             Node node = getCurrentElementNode();
             while (!(node instanceof Document)) node = node.getParentNode();
-            _documentAdapter.setRootNode( node );
-            _scriptableObject = _documentAdapter.getScriptableObject();
+            _documentNode = node;
         }
-        return _scriptableObject;
+        _documentAdapter.setRootNode( _documentNode );
+        return _documentAdapter.getScriptableObject();
     }
 
 

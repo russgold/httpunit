@@ -285,5 +285,19 @@ public class DocumentScriptingTest extends HttpUnitTest {
     }
 
 
+    public void testSetDocumentReparse() throws Exception {
+        defineResource( "index.html",
+                        "<html><head>" +
+                        "<script language='JavaScript ' >document.title = 'New title';</script>" +
+                        "</head><body><form name=\"aForm\"></form>" +
+                        "<script language='JavaScript'>alert(\"No of forms: \" + document.forms.length);</script>" +
+                        "</body></html>");
+
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/index.html" );
+        assertEquals("No of forms", response.getForms().length, 1);
+        assertEquals("JavaScript no of forms", "No of forms: 1", wc.popNextAlert());
+    }
+
 
 }
