@@ -104,7 +104,9 @@ public class CookieTest extends TestCase {
         checkAcceptance( 5, false, "www.meterware.com/servlets/special", "meterware", null );
         checkAcceptance( 6, false, "www.meterware.com/servlets/special", ".com", null );
         checkAcceptance( 7, false, "www.meterware.com/servlets/special", ".httpunit.org", null );
-        checkAcceptance( 8, false, "www.some.meterware.com/servlets/special", ".meterware.com", null );
+
+        // N.B. This cookie should be rejected if we are using strict domain matching, but is accepted with lenient matching.
+        checkAcceptance( 8, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
     }
 
 

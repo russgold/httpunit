@@ -356,7 +356,14 @@ public class CookieJar {
             if (!domainAttribute.startsWith(".")) return false;
             if (domainAttribute.lastIndexOf('.') == 0) return false;
             if (!sourceHost.endsWith( domainAttribute )) return false;
-            if (sourceHost.lastIndexOf( domainAttribute ) > sourceHost.indexOf( '.' )) return false;
+            if (!isLenientMatching() && sourceHost.lastIndexOf( domainAttribute ) > sourceHost.indexOf( '.' )) return false;
+            return true;
+        }
+
+
+        // set this to false to reject cookies when the host is of the form HD where D is the explicit domain attribute
+        // and H contains a dot. Apparently, most browsers are lenient.
+        private boolean isLenientMatching() {
             return true;
         }
 
