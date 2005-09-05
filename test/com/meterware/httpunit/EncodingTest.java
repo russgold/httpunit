@@ -234,4 +234,22 @@ public class EncodingTest extends HttpUnitTest {
     }
 
 
+    public void testSimpleEntityReplacement() throws Exception {
+        String rawString = "Cox&amp;&amp;Forkum";
+        assertEquals( "After substitution", "Cox&&Forkum", HttpUnitUtils.replaceEntities( rawString ) );
+    }
+
+
+    public void testSkipEntityReplacementOnBadString() throws Exception {
+        String rawString = "Cox&Forkum";
+        assertEquals( "After substitution", "Cox&Forkum", HttpUnitUtils.replaceEntities( rawString ) );
+    }
+
+
+    public void testSkipEntityReplacementOnUnhandledEntity() throws Exception {
+        String rawString = "&lt;something&gt;";
+        assertEquals( "After substitution", "&lt;something&gt;", HttpUnitUtils.replaceEntities( rawString ) );
+    }
+
+
 }

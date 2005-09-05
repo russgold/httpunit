@@ -64,7 +64,7 @@ public class ScriptingTest extends HttpUnitTest {
     public void testJavaScriptURLWithNoValue() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
-                                            "<a href='javascript:alert( \"Hi there!\" )'>go</a>" +
+                                            "<a href=\"javascript:alert( 'Hi there!' )\">go</a>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );

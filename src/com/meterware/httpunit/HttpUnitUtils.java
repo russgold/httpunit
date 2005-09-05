@@ -269,12 +269,12 @@ public class HttpUnitUtils {
         int ampIndex;
         while ((ampIndex = string.indexOf( '&', i )) >= 0) {
             int semiColonIndex = string.indexOf( ';', ampIndex+1 );
-            if (semiColonIndex < 0) continue;
+            if (semiColonIndex < 0) break;
+            i = ampIndex+1;
 
             String entityName = string.substring( ampIndex+1, semiColonIndex );
             if (entityName.equalsIgnoreCase( "amp" )) {
                 string = string.substring( 0, ampIndex ) + '&' + string.substring( semiColonIndex+1 );
-                i = ampIndex + 1;
             }
 
         }
