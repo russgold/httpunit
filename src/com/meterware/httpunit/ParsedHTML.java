@@ -569,19 +569,19 @@ class ParsedHTML {
         }
         protected boolean addToContext() { return true; }
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
-            getWebTable( pot ).addRow( (WebTable.TableRow) htmlElement );
+            getWebTable( pot ).addRow( (TableRow) htmlElement );
         }
     }
 
 
     static class TableCellFactory extends HTMLElementFactory {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
-            WebTable.TableRow tr = getTableRow( pot );
+            TableRow tr = getTableRow( pot );
             if (tr == null) return null;
             return tr.newTableCell( element );
         }
-        private WebTable.TableRow getTableRow( NodeUtils.PreOrderTraversal pot ) {
-            return (WebTable.TableRow) getClosestContext( pot, WebTable.TableRow.class );
+        private TableRow getTableRow( NodeUtils.PreOrderTraversal pot ) {
+            return (TableRow) getClosestContext( pot, TableRow.class );
         }
         protected boolean addToContext() { return true; }
         protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {

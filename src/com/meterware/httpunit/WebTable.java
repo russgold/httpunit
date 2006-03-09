@@ -303,47 +303,20 @@ public class WebTable extends HTMLElementBase {
 
 
     TableRow newTableRow( Element element ) {
-        return new TableRow( element );
+        return new TableRow( this, element );
     }
 
 
-    private TableRow[] getRows() {
+    /**
+     * Returns an array of rows for this table.
+     */
+    public TableRow[] getRows() {
         return (TableRow[]) _rows.toArray( new TableRow[ _rows.size() ] );
     }
 
 
-    class TableRow extends HTMLElementBase {
-
-        private ArrayList _cells = new ArrayList();
-
-        TableRow( Element rowNode ) {
-            super( rowNode );
-        }
-
-
-        TableCell[] getCells() {
-            return (TableCell[]) _cells.toArray( new TableCell[ _cells.size() ]);
-        }
-
-
-        TableCell newTableCell( Element element ) {
-            return new TableCell( _response, _frameName, element, _url, _baseTarget, _characterSet );
-        }
-
-
-        void addTableCell( TableCell cell ) {
-            _cells.add( cell );
-        }
-
-
-        protected ScriptableDelegate newScriptable() {
-            return new HTMLElementScriptable( this );
-        }
-
-
-        protected ScriptableDelegate getParentDelegate() {
-            return _response.getScriptableObject().getDocument();
-        }
+    TableCell newTableCell( Element element ) {
+        return new TableCell( _response, _frameName, element, _url, _baseTarget, _characterSet );
     }
 
 
