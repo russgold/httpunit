@@ -535,7 +535,7 @@ public class WebClientTest extends HttpUnitTest {
         });
 
         defineResource( "whereAmI", new PseudoServlet() {
-            public WebResource getGetResponse() throws IOException {
+            public WebResource getGetResponse() {
                 WebResource webResource = new WebResource( "found host header: " + getHeader( "Host" ) );
                 webResource.addHeader( "Set-Cookie: type=short" );
                 return webResource;
@@ -543,7 +543,7 @@ public class WebClientTest extends HttpUnitTest {
         } );
 
         defineResource( "checkCookies", new PseudoServlet() {
-            public WebResource getGetResponse() throws IOException {
+            public WebResource getGetResponse() {
                 return new WebResource( "found cookies: " + getHeader( "Cookie" ) );
             }
         } );
@@ -555,22 +555,6 @@ public class WebClientTest extends HttpUnitTest {
 
         wr = wc.getResponse( "http://meterware.com:" + getHostPort() + "/checkCookies" );
         assertEquals( "Submitted cookie header", "found cookies: type=short", wr.getText() );
-    }
-
-
-    public void testHostHeaderWithDNSOverride() throws Exception {
-        WebConversation wc = new WebConversation();
-        wc.getClientProperties().setDnsListener( new DNSListener() {
-            public String getIpAddress( String hostName ) { return "127.0.0.1"; }
-        });
-
-        try {
-            wc.getResponse( "http://meterware.com" );
-        } catch (ConnectException e) {
-        } catch (SocketException e) {
-        }
-
-        assertEquals( "Submitted host header", "meterware.com", wc.getHeaderField( "Host" ) );
     }
 
 
