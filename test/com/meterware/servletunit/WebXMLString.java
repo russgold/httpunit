@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2004, Russell Gold
+ * Copyright (c) 2001-2004, 2006 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -35,6 +35,8 @@ import java.io.UnsupportedEncodingException;
  **/
 class WebXMLString {
 
+    private String _displayName;
+
     private ArrayList _servlets = new ArrayList();
     private ArrayList _mappings = new ArrayList();
     private ArrayList _servletNames = new ArrayList();
@@ -66,6 +68,7 @@ class WebXMLString {
 //        result.append( "                       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" );
 //        result.append( "                       xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'>\n" );
 
+        if (_displayName != null) result.append( "  <display-name>" ).append( _displayName ).append( "</display-name>" );
         for (Iterator i = _contextParams.entrySet().iterator(); i.hasNext();) {
             Map.Entry entry = (Map.Entry) i.next();
             result.append( "  <context-param>\n    <param-name>" ).append( entry.getKey() );
@@ -142,6 +145,8 @@ class WebXMLString {
         _mappings.add( urlPattern );
         _servletNames.add( name );
     }
+
+    
     void addServlet( String name, String urlPattern, Class servletClass, Properties initParams ) {
         _initParams.put( name, initParams );
         addServlet( name, urlPattern, servletClass );
@@ -231,6 +236,10 @@ class WebXMLString {
             _resources.put( resourceName, result );
         }
         return result;
+    }
+
+    void setDisplayName( String displayName ) {
+        _displayName = displayName;
     }
 }
 

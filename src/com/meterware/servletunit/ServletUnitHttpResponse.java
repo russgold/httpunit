@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004,2006, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -394,7 +394,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      **/
     public void reset() {
         resetBuffer();
-        _headers = new Hashtable();
+        _headers.clear();
         _headersComplete = false;
         _status = SC_OK;
     }
@@ -448,14 +448,6 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 //---------------------------------------------- package methods --------------------------------------------------
 
     /**
-     * Returns the content type defined for this response.
-     **/
-    String getContentType() {
-        return _contentType;
-    }
-
-
-    /**
      * Returns the contents of this response.
      **/
     byte[] getContents() {
@@ -502,7 +494,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     String getHeaderField( String name ) {
         if (!_headersComplete) completeHeaders();
 
-        ArrayList values = null;
+        ArrayList values;
         synchronized (_headers) {
             values = (ArrayList) _headers.get( name.toUpperCase() );
         }
@@ -520,7 +512,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
      */
     public String[] getHeaderFields(String name) {
         if (!_headersComplete) completeHeaders();
-        ArrayList values = null;
+        ArrayList values;
         synchronized (_headers) {
             values = (ArrayList) _headers.get(name.toUpperCase());
         }
@@ -530,6 +522,20 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         return ((String[]) values.toArray(results));
 
     }
+
+//--------------------------------------- methods added to ServletRequest in Servlet API 2.4 ----------------------------
+
+    public void setCharacterEncoding(String string) {
+        _encoding = string;
+    }
+
+    /**
+     * Returns the content type defined for this response.
+     **/
+    public String getContentType() {
+        return _contentType;
+    }
+
 
 //------------------------------------------- private members ------------------------------------
 
@@ -548,7 +554,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
 
     private String _statusMessage = "OK";
 
-    private Hashtable _headers = new Hashtable();
+    private final Hashtable _headers = new Hashtable();
 
     private boolean _headersComplete;
 

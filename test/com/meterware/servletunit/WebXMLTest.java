@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2004, Russell Gold
+* Copyright (c) 2001-2004,2006, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -69,8 +69,30 @@ public class WebXMLTest extends TestCase {
     }
 
 
+    public void testRealPath() throws Exception {
+
+        WebXMLString wxs = new WebXMLString();
+        wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+        File webXml = createWebXml( new File( "build/base" ), wxs );
+
+        assertRealPath( "path with no context", new ServletRunner( webXml ), new File( "something.txt" ), "/something.txt" );
+        assertRealPath( "path with context", new ServletRunner( webXml, "/testing" ), new File( "build/base/something.txt" ), "/something.txt" );
+        assertRealPath( "path with no context, no slash", new ServletRunner( webXml ), new File( "something.txt" ), "something.txt" );
+        assertRealPath( "path with context, no slash", new ServletRunner( webXml, "/testing" ), new File( "build/base/something.txt" ), "something.txt" );
+    }
+
+    private void assertRealPath( String comment, ServletRunner sr, File expectedFile, String relativePath ) {
+        String realPath = sr.getSession(true).getServletContext().getRealPath( relativePath );
+        assertEquals( comment, expectedFile.getAbsolutePath(), realPath );
+    }
+
+
     private File createWebXml( WebXMLString wxs ) throws IOException {
-        File dir = new File( "build/META-INF" );
+        return createWebXml( new File("build"), wxs );
+    }
+
+    private File createWebXml( File parent, WebXMLString wxs ) throws IOException {
+        File dir = new File( parent, "META-INF" );
         dir.mkdirs();
         File webXml = new File( dir, "web.xml" );
         FileOutputStream fos = new FileOutputStream( webXml );
@@ -114,6 +136,35 @@ public class WebXMLTest extends TestCase {
         List roles = Arrays.asList( app.getPermittedRoles( new URL( "http://localhost/SimpleServlet" ) ) );
         assertTrue( "Should have access", roles.contains( "supervisor" ) );
         assertTrue( "Should not have access", !roles.contains( "peon" ) );
+    }
+
+
+    /**
+     * Verifies that the default display name is null.
+     */
+    public void testDefaultContextNameConfiguration() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        WebApplication app = new WebApplication( newDocument( wxs.asText() ) );
+        assertNull( "Context name should default to null", app.getDisplayName() );
+    }
+
+
+    /**
+     * Verifies that a web application can read its display name from the configuration.
+     * @throws Exception
+     */
+    public void testContextNameConfiguration() throws Exception {
+        WebXMLString wxs = new WebXMLString();
+        wxs.setDisplayName( "samples" );
+        wxs.addServlet( "simple", "/SimpleServlet", SimpleGetServlet.class );
+        WebApplication app = new WebApplication( newDocument( wxs.asText() ) );
+        assertEquals( "Display name", "samples", app.getDisplayName() );
+
+        ServletRunner sr = new ServletRunner( wxs.asInputStream() );
+        ServletUnitClient client = sr.newClient();
+        InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+        ServletContext servletContext = ic.getServlet().getServletConfig().getServletContext();
+        assertEquals( "Context name", "samples", servletContext.getServletContextName() );
     }
 
 

@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2005, Russell Gold
+* Copyright (c) 2000-2006, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -486,7 +486,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
-//--------------------------------- methods added to ServletRequest in JSDK 2.2 ------------------------------------------------
+//--------------------------------- methods added to ServletRequest in Servlet API 2.2 ------------------------------------------------
 
 
     /**
@@ -582,7 +582,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
 
 
 
-//--------------------------------- methods added to HttpServletRequest in JSDK 2.2 ------------------------------------------------
+//--------------------------------- methods added to HttpServletRequest in Servlet API 2.2 ------------------------------------------------
 
 
     /**
@@ -629,7 +629,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
-//--------------------------------------- methods added to ServletRequest in JSDK 2.3 ----------------------------
+//--------------------------------------- methods added to ServletRequest in Servlet API 2.3 ----------------------------
 
     /**
      * Returns a java.util.Map of the parameters of this request.
@@ -655,7 +655,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     }
 
 
-//--------------------------------------- methods added to HttpServletRequest in JSDK 2.3 ----------------------------
+//--------------------------------------- methods added to HttpServletRequest in Servlet API 2.3 ----------------------------
 
 
     /**
@@ -682,6 +682,24 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         return url;
     }
 
+
+//--------------------------------------- methods added to ServletRequest in Servlet API 2.4 ----------------------------
+
+    public int getRemotePort() {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getLocalName() {
+        return "localhost";
+    }
+
+    public String getLocalAddr() {
+        return "127.0.0.1";
+    }
+
+    public int getLocalPort() {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
 //--------------------------------------------- package members ----------------------------------------------
 

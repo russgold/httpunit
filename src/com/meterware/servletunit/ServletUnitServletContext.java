@@ -63,7 +63,7 @@ class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns the major version of the Java Servlet API that this servlet container supports.
-     * All implementations that comply with Version 2.3 must have this method return the integer 2.
+     * All implementations that comply with Version 2.4 must have this method return the integer 2.
      **/
     public int getMajorVersion() {
         return 2;
@@ -72,10 +72,10 @@ class ServletUnitServletContext implements ServletContext {
 
     /**
      * Returns the minor version of the Servlet API that this servlet container supports.
-     * All implementations that comply with Version 2.3 must have this method return the integer 3.
+     * All implementations that comply with Version 2.4 must have this method return the integer 4.
      **/
     public int getMinorVersion() {
-        return 3;
+        return 4;
     }
 
 
@@ -345,7 +345,7 @@ class ServletUnitServletContext implements ServletContext {
      * @since HttpUnit 1.3
      */
     public String getServletContextName() {
-        return null;
+        return _application.getDisplayName();
     }
 
 //------------------------------------------- package members ----------------------------------------------------

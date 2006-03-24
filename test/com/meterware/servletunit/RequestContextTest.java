@@ -367,6 +367,22 @@ public class RequestContextTest extends HttpUnitTest {
         public String getRealPath( String s ) {
             return null;
         }
+
+        public int getRemotePort() {
+            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public String getLocalName() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public String getLocalAddr() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public int getLocalPort() {
+            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        }
     }
 
 

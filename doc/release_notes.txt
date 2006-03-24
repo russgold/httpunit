@@ -14,6 +14,13 @@ Limitations:
 
 
 Revision History:
+23-Mar-2006:
+    Additions:
+        1. Added support for Servlet API 2.4
+        2. Implemented ServletContext.getServletContextName
+    Problems fixed:
+        1. ServletContext.getRealPath() now handles relative paths that do not start with a "/"
+
  8-Mar-2006:
     Acknowledgements:
         Thanks for Fabrizio Giustina for suggesting a way to make the TableRow object publically accessible.

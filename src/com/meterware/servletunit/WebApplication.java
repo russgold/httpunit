@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2004, Russell Gold
+ * Copyright (c) 2001-2004, 2006 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -90,6 +90,8 @@ class WebApplication implements SessionListenerDispatcher {
 
     private ServletUnitServletContext _servletContext;
 
+    private String _displayName;
+
 
     /**
      * Constructs a default application spec with no information.
@@ -122,6 +124,9 @@ class WebApplication implements SessionListenerDispatcher {
         if (contextPath != null && contextPath.length() > 0 && !contextPath.startsWith( "/" )) throw new IllegalArgumentException( "Context path " + contextPath + " must start with '/'" );
         _contextDir = file;
         _contextPath = contextPath == null ? "" : contextPath;
+        NodeList nl = document.getElementsByTagName( "display-name" );
+        if (nl.getLength() > 0) _displayName = XMLUtils.getTextValue( nl.item(0) ).trim();
+
         registerServlets( document );
         registerFilters( document );
         extractSecurityConstraints( document );
@@ -336,10 +341,11 @@ class WebApplication implements SessionListenerDispatcher {
 
 
     File getResourceFile( String path ) {
+        String relativePath = path.startsWith( "/" ) ? path.substring(1) : path;
         if (_contextDir == null) {
-            return new File( path.substring(1) );
+            return new File( relativePath );
         } else {
-            return new File( _contextDir, path.substring(1) );
+            return new File( _contextDir, relativePath );
         }
     }
 
@@ -501,6 +507,9 @@ class WebApplication implements SessionListenerDispatcher {
         return urlPattern.equals( urlPath );
     }
 
+    String getDisplayName() {
+        return _displayName;
+    }
 
 //============================================= SecurityCheckServlet class =============================================
 
