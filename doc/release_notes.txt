@@ -14,10 +14,11 @@ Limitations:
 
 
 Revision History:
-23-Mar-2006:
+24-Mar-2006:
     Additions:
         1. Added support for Servlet API 2.4
         2. Implemented ServletContext.getServletContextName
+        3. (PseudoServer) made HttpRequest class public
     Problems fixed:
         1. ServletContext.getRealPath() now handles relative paths that do not start with a "/"
 

@@ -33,7 +33,7 @@ import java.util.Hashtable;
  *
  * @since 1.6
  */
-class HttpRequest extends ReceivedHttpMessage {
+public class HttpRequest extends ReceivedHttpMessage {
 
     private String         _protocol;
     private String         _command;
