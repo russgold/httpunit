@@ -14,24 +14,19 @@ Limitations:
 
 
 Revision History:
-24-Mar-2006:
-    Additions:
-        1. Added support for Servlet API 2.4
-        2. Implemented ServletContext.getServletContextName
-        3. (PseudoServer) made HttpRequest class public
-    Problems fixed:
-        1. ServletContext.getRealPath() now handles relative paths that do not start with a "/"
-
- 8-Mar-2006:
+27-Mar-2006:
     Acknowledgements:
         Thanks for Fabrizio Giustina for suggesting a way to make the TableRow object publically accessible.
 
-    Additions:
-        1. patch #1413171 Web table rows are now directly accessible in a TableRow element.
-
- 5-Sep-2005:
     Problems fixed:
         1. bug #1063494 HTML entity replacement was looping indefinitely on strings with '&' and no ';'
+        2. ServletContext.getRealPath() now handles relative paths that do not start with a "/"
+
+    Additions:
+        1. patch #1413171 Web table rows are now directly accessible in a TableRow element.
+        2. Added support for Servlet API 2.4
+        3. Implemented ServletContext.getServletContextName
+        4. (PseudoServer) made HttpRequest class public
 
  6-Mar-2005 1.6.1
     Acknowledgements:
