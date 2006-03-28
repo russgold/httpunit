@@ -45,8 +45,8 @@ public class ParserPropertiesTest extends HttpUnitTest {
 
     public static TestSuite suite() {
         TestSuite ts = new TestSuite();
-        boolean isJTidy = parserClassHasSubstring( "Tidy" );
-        if (!isJTidy) ts.addTest( new ParserPropertiesTest( "testKeepCase" ) );
+        boolean supportsKeepCase = HTMLParserFactory.getHTMLParser().supportsPreserveTagCase();
+        if (supportsKeepCase) ts.addTest( new ParserPropertiesTest( "testKeepCase" ) );
         return ts;
     }
 
@@ -54,11 +54,6 @@ public class ParserPropertiesTest extends HttpUnitTest {
     public void tearDown() throws Exception {
         super.tearDown();
         HTMLParserFactory.reset();
-    }
-
-
-    private static boolean parserClassHasSubstring( final String parserCode ) {
-        return HTMLParserFactory.getHTMLParser().getClass().getName().indexOf( parserCode ) >= 0;
     }
 
 

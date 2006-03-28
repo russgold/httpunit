@@ -26,6 +26,7 @@ import com.meterware.httpunit.*;
 
 
 /**
+ * Tests that work under NekoHTML but not JTidy due to the ability to do script processing during parsing.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
@@ -134,6 +135,31 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
         assertNotNull( "The link was not found", link );
         assertEquals( "Link contents", "anything", link.getText() );
         assertNull( "Should not have found scripted link", response.getLinkWithID( "here" ) );
+    }
+
+
+    /**
+     * Verifies that nodes defined before a script section are available to that script section, even if a preceding
+     * script section has caused them to be cached. Currently does not work with JTidy since there is no way to parse
+     * only to a specific position in the document. It may be possible to fix this with some logic changes...
+     */
+    public void testFormsCaching() throws Exception {
+        defineWebPage(  "OnCommand",  "<form>" +
+                                      "  <input type='text' name='color' value='blue' >" +
+                                      "</form>" +
+                                      "<script type='JavaScript'>" +
+                                      "  alert( document.forms[0].color.value );" +
+                                      "</script>" +
+                                      "<form>" +
+                                      "  <input type='text' name='size' value='3' >" +
+                                      "</form>" +
+                                      "<script type='JavaScript'>" +
+                                      "  alert( document.forms[1].size.value );" +
+                                      "</script>" );
+        WebConversation wc = new WebConversation();
+        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        assertEquals( "Message 1", "blue", wc.popNextAlert() );
+        assertEquals( "Message 2", "3", wc.popNextAlert() );
     }
 
 

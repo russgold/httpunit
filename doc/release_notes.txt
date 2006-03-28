@@ -14,7 +14,12 @@ Limitations:
 
 
 Revision History:
-27-Mar-2006:
+27-Mar-2006
+    Additions:
+        Content and Parsing:
+            1. Created a custom HttpUnit DOM
+
+27-Mar-2006 1.6.2:
     Acknowledgements:
         Thanks for Fabrizio Giustina for suggesting a way to make the TableRow object publically accessible.
 

@@ -34,7 +34,11 @@ import junit.framework.TestSuite;
 public class HttpUnitSuite extends ConditionalTestSuite {
 
     public static void main( String[] args ) {
-        junit.textui.TestRunner.run( suite() );
+        try {
+            junit.textui.TestRunner.run( suite() );
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+        }
     }
 	
 	

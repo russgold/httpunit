@@ -1,8 +1,8 @@
-package com.meterware.httpunit.parsing;
+package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,56 +19,61 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.w3c.dom.html.HTMLDocument;
 
-import java.net.URL;
-import java.io.IOException;
-import java.io.StringReader;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
- * @author <a href="mailto:Artashes.Aghajanyan@lycos-europe.com">Artashes Aghajanyan</a>
  **/
-class NekoHTMLParser implements HTMLParser {
+abstract public class CharacterDataImpl extends NodeImpl implements CharacterData {
+
+    private String _data;
 
 
-    public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
-        try {
-            NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
-            parser.parse( new InputSource( new StringReader( pageText ) ) );
-            adapter.setDocument( (HTMLDocument) parser.getDocument() );
-        } catch (NekoDOMParser.ScriptException e) {
-             throw e.getException();
-        }
+    protected void initialize( DocumentImpl ownerDocument, String data ) {
+        super.initialize( ownerDocument );
+        _data = data;
     }
 
 
-    public String getCleanedText( String string ) {
-        return (string == null) ? "" : string.replace( NBSP, ' ' );
+    public String getData() throws DOMException {
+        return _data;
     }
 
 
-    public boolean supportsPreserveTagCase() {
-        return false;
+    public void setData( String data ) throws DOMException {
+        _data = data;
     }
 
 
-    public boolean supportsReturnHTMLDocument() {
-        return true;
+    public int getLength() {
+        return _data.length();
     }
 
 
-    public boolean supportsParserWarnings() {
-        return true;
+    public String substringData( int offset, int count ) throws DOMException {
+        return null;
     }
 
 
-    final private static char NBSP = (char) 160;   // non-breaking space, defined by nekoHTML
+    public void appendData( String arg ) throws DOMException {
+    }
+
+
+    public void insertData( int offset, String arg ) throws DOMException {
+    }
+
+
+    public void deleteData( int offset, int count ) throws DOMException {
+    }
+
+
+    public void replaceData( int offset, int count, String arg ) throws DOMException {
+    }
+
 }
-
-
-

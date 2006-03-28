@@ -1,8 +1,8 @@
-package com.meterware.httpunit.parsing;
+package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,56 +19,65 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.w3c.dom.html.HTMLDocument;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.DOMException;
 
-import java.net.URL;
-import java.io.IOException;
-import java.io.StringReader;
+import java.util.Hashtable;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
- * @author <a href="mailto:Artashes.Aghajanyan@lycos-europe.com">Artashes Aghajanyan</a>
  **/
-class NekoHTMLParser implements HTMLParser {
+public class NamedNodeMapImpl implements NamedNodeMap {
 
 
-    public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
-        try {
-            NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
-            parser.parse( new InputSource( new StringReader( pageText ) ) );
-            adapter.setDocument( (HTMLDocument) parser.getDocument() );
-        } catch (NekoDOMParser.ScriptException e) {
-             throw e.getException();
-        }
+    private Hashtable _items;
+    private Node[]    _itemArray;
+
+
+    NamedNodeMapImpl( Hashtable items ) {
+        _items     = (Hashtable) items.clone();
+        _itemArray = (Node[]) _items.values().toArray( new Node[ _items.size() ] );
     }
 
 
-    public String getCleanedText( String string ) {
-        return (string == null) ? "" : string.replace( NBSP, ' ' );
+    public Node getNamedItem( String name ) {
+        return (Node) _items.get( name );
     }
 
 
-    public boolean supportsPreserveTagCase() {
-        return false;
+    public Node setNamedItem( Node arg ) throws DOMException {
+        return null;
     }
 
 
-    public boolean supportsReturnHTMLDocument() {
-        return true;
+    public Node removeNamedItem( String name ) throws DOMException {
+        return null;
     }
 
 
-    public boolean supportsParserWarnings() {
-        return true;
+    public Node item( int index ) {
+        return _itemArray[ index ];
     }
 
 
-    final private static char NBSP = (char) 160;   // non-breaking space, defined by nekoHTML
+    public int getLength() {
+        return _items.size();
+    }
+
+
+    public Node getNamedItemNS( String namespaceURI, String localName ) {
+        return null;
+    }
+
+
+    public Node setNamedItemNS( Node arg ) throws DOMException {
+        return null;
+    }
+
+
+    public Node removeNamedItemNS( String namespaceURI, String localName ) throws DOMException {
+        return null;
+    }
 }
-
-
-

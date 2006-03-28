@@ -25,8 +25,8 @@ import com.meterware.httpunit.parsing.HTMLParserFactory;
 import com.meterware.httpunit.parsing.DocumentAdapter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.html.HTMLDocument;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -142,8 +142,9 @@ public class HTMLPage extends ParsedHTML {
 
 
         private NamedDelegate getNamedItem( NamedDelegate[] items, String name ) {
+            if (name ==  null) return null;
             for (int i = 0; i < items.length; i++) {
-                if (items[i].getName().equals( name )) return items[i];
+                if (name.equals( items[i].getName() )) return items[i];
             }
             return null;
         }
@@ -253,7 +254,7 @@ public class HTMLPage extends ParsedHTML {
 
     public void parse( String text, URL pageURL ) throws SAXException, IOException {
         HTMLParserFactory.getHTMLParser().parse( pageURL, text, new DocumentAdapter() {
-            public void setRootNode( Node rootNode ) { HTMLPage.this.setRootNode( rootNode ); }
+            public void setDocument( HTMLDocument document ) { HTMLPage.this.setRootNode( document ); }
             public String getIncludedScript( String srcAttribute ) throws IOException { return HTMLPage.this.getIncludedScript( srcAttribute ); }
             public ScriptableDelegate getScriptableObject() { return HTMLPage.this.getScriptableObject().getParent(); }
         });

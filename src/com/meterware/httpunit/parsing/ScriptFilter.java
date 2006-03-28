@@ -56,7 +56,7 @@ class ScriptFilter extends DefaultFilter {
     private int _scriptIndex;
 
     /** The parser in which this filter is running. **/
-    private NekoDOMParser _domParser;
+    private ScriptHandler _scriptHandler;
 
 
     /** Constructs a script object with the specified configuration. */
@@ -65,8 +65,8 @@ class ScriptFilter extends DefaultFilter {
     }
 
 
-    public void setParser( NekoDOMParser domParser ) {
-        _domParser = domParser;
+    public void setScriptHandler( ScriptHandler scriptHandler ) {
+        _scriptHandler = scriptHandler;
     }
 
 
@@ -89,7 +89,7 @@ class ScriptFilter extends DefaultFilter {
             _activeScriptBlock = new StringBuffer();
             _scriptLanguage = getScriptLanguage( attrs );
             String srcAttribute = attrs.getValue( "src" );
-            if (srcAttribute != null) _activeScriptBlock.append( _domParser.getIncludedScript( srcAttribute ) );
+            if (srcAttribute != null) _activeScriptBlock.append( _scriptHandler.getIncludedScript( srcAttribute ) );
         }
     }
 
@@ -97,7 +97,7 @@ class ScriptFilter extends DefaultFilter {
     private boolean isSupportedScript( QName element, XMLAttributes attrs ) {
         if (!element.rawname.equalsIgnoreCase( "script" ) || attrs == null) return false;
         String value = getScriptLanguage( attrs );
-        return _domParser.getScriptableDelegate().supportsScript( value );
+        return _scriptHandler.supportsScriptLanguage( value );
     }
 
 
@@ -147,8 +147,7 @@ class ScriptFilter extends DefaultFilter {
 
 
     protected String getTranslatedScript( final String language, final String scriptText ) throws IOException {
-        _domParser.getScriptableDelegate().getScriptEngine().clearCaches();
-        return _domParser.getScriptableDelegate().runScript( language, scriptText );
+        return _scriptHandler.runScript( language, scriptText );
     }
 
 

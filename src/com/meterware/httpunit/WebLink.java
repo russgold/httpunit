@@ -70,7 +70,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * @since 1.6
      **/
     public String getText() {
-        if (getNode().getNodeName().equalsIgnoreCase( "area" )) {
+        if (getElement().getNodeName().equalsIgnoreCase( "area" )) {
             return getAttribute( "alt" );
         } else {
             return super.getText();
@@ -167,7 +167,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * from that page.
      **/
     WebLink( WebResponse response, URL baseURL, Node node, FrameSelector sourceFrame, String defaultTarget, String characterSet ) {
-        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "href" ), sourceFrame, defaultTarget, characterSet );
+        super( response, node, baseURL, "href", sourceFrame, defaultTarget, characterSet );
     }
 
 

@@ -87,7 +87,7 @@ abstract class FormControl extends HTMLElementBase {
 
 
     private static Node newEmptyNode( WebForm form ) {
-        return form.getNode().getOwnerDocument().createElement( "httpunit-supplied" );
+        return form.getElement().getOwnerDocument().createElement( "httpunit-supplied" );
     }
 
 

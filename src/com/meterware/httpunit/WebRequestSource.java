@@ -39,6 +39,9 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     private FrameSelector _frame;
 
+    /** The name of the destination attribute used to create for the request, including anchors and parameters. **/
+    private String         _destinationAttribute;
+
 
     /**
      * Returns the ID associated with this request source.
@@ -171,14 +174,14 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
      * @param response the response from which this request source was extracted
      * @param node     the DOM subtree defining this request source
      * @param baseURL  the URL on which to base all releative URL requests
-     * @param destination the relative URL to which requests will be directed
+     * @param attribute the attribute which defines the relative URL to which requests will be directed
      **/
-    WebRequestSource( WebResponse response, Node node, URL baseURL, String destination, FrameSelector frame, String defaultTarget ) {
+    WebRequestSource( WebResponse response, Node node, URL baseURL, String attribute, FrameSelector frame, String defaultTarget ) {
         if (node == null) throw new IllegalArgumentException( "node must not be null" );
         _baseResponse  = response;
         _node          = node;
         _baseURL       = baseURL;
-        _destination   = destination;
+        _destinationAttribute = attribute;
         _frame         = frame;
         _defaultTarget = defaultTarget;
     }
@@ -190,20 +193,20 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     protected String getDestination() {
-        return _destination;
+        return getElement().getAttribute( _destinationAttribute );
     }
 
 
     protected void setDestination( String destination ) {
-        _destination = destination;
+        getElement().setAttribute( _destinationAttribute, destination );
     }
 
 
     /**
      * Returns the actual DOM for this request source, not a copy.
      **/
-    protected Node getNode() {
-        return _node;
+    protected Element getElement() {
+        return (Element) _node;
     }
 
 
@@ -320,9 +323,6 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     /** The URL of the page containing this entity. **/
     private URL            _baseURL;
-
-    /** The raw destination specified for the request, including anchors and parameters. **/
-    private String         _destination;
 
     /** The DOM node representing this entity. **/
     private Node           _node;

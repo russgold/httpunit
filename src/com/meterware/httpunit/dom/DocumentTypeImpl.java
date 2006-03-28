@@ -1,8 +1,8 @@
-package com.meterware.httpunit.parsing;
+package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,56 +19,68 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.w3c.dom.html.HTMLDocument;
 
-import java.net.URL;
-import java.io.IOException;
-import java.io.StringReader;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.DOMException;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
- * @author <a href="mailto:Artashes.Aghajanyan@lycos-europe.com">Artashes Aghajanyan</a>
  **/
-class NekoHTMLParser implements HTMLParser {
+public class DocumentTypeImpl extends NodeImpl implements DocumentType {
 
+//---------------------------------------------- DocumentType methods --------------------------------------------------
 
-    public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
-        try {
-            NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
-            parser.parse( new InputSource( new StringReader( pageText ) ) );
-            adapter.setDocument( (HTMLDocument) parser.getDocument() );
-        } catch (NekoDOMParser.ScriptException e) {
-             throw e.getException();
-        }
+    public NamedNodeMap getEntities() {
+        return null;
     }
 
 
-    public String getCleanedText( String string ) {
-        return (string == null) ? "" : string.replace( NBSP, ' ' );
+    public String getInternalSubset() {
+        return null;
     }
 
 
-    public boolean supportsPreserveTagCase() {
-        return false;
+    public String getName() {
+        return null;
     }
 
 
-    public boolean supportsReturnHTMLDocument() {
-        return true;
+    public NamedNodeMap getNotations() {
+        return null;
     }
 
 
-    public boolean supportsParserWarnings() {
-        return true;
+    public String getPublicId() {
+        return null;
     }
 
 
-    final private static char NBSP = (char) 160;   // non-breaking space, defined by nekoHTML
+    public String getSystemId() {
+        return null;
+    }
+
+//------------------------------------------------ NodeImpl methods ----------------------------------------------------
+
+
+    public String getNodeName() {
+        return null;
+    }
+
+
+    public short getNodeType() {
+        return 0;
+    }
+
+
+    public String getNodeValue() throws DOMException {
+        return null;
+    }
+
+
+    public void setNodeValue( String nodeValue ) throws DOMException {
+    }
 }
-
-
-

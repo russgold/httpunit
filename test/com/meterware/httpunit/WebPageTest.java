@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2004, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -27,6 +27,8 @@ import java.net.URL;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.w3c.dom.html.HTMLDocument;
+import org.w3c.dom.Document;
 
 
 
@@ -99,6 +101,20 @@ public class WebPageTest extends HttpUnitTest {
 
         WebResponse xhtmlPage = wc.getResponse( getHostPath() + "/XHTMLPage.html" );
         assertEquals( "XHTML Title", "An XHTML Page", xhtmlPage.getReceivedPage().getTitle() );
+    }
+
+
+    public void testHtmlDocument() throws Exception {
+        defineWebPage( "SimplePage",
+                        "This has no forms but it does\n" +
+                        "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
+                        " and <a name=here>an anchor</a>\n" +
+                        "<a href=\"basic.html\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" );
+        WebConversation wc = new WebConversation();
+        WebResponse simplePage = wc.getResponse( getHostPath() + "/SimplePage.html" );
+        Document dom = simplePage.getDOM();
+        assertNotNull( "No DOM created for document", dom );
+        assertTrue( "returned dom does not implement HTMLDocument, but is " + dom.getClass().getName(), dom instanceof HTMLDocument );
     }
 
 

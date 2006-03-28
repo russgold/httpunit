@@ -1,8 +1,8 @@
-package com.meterware.httpunit.parsing;
+package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,56 +19,57 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import org.w3c.dom.html.HTMLDocument;
-
-import java.net.URL;
-import java.io.IOException;
-import java.io.StringReader;
+import org.w3c.dom.html.HTMLMetaElement;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:bw@xmlizer.biz">Bernhard Wagner</a>
- * @author <a href="mailto:Artashes.Aghajanyan@lycos-europe.com">Artashes Aghajanyan</a>
  **/
-class NekoHTMLParser implements HTMLParser {
+public class HTMLMetaElementImpl extends HTMLElementImpl implements HTMLMetaElement {
 
-
-    public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
-        try {
-            NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
-            parser.parse( new InputSource( new StringReader( pageText ) ) );
-            adapter.setDocument( (HTMLDocument) parser.getDocument() );
-        } catch (NekoDOMParser.ScriptException e) {
-             throw e.getException();
-        }
+    ElementImpl create( DocumentImpl owner, String tagName ) {
+        HTMLMetaElementImpl element = new HTMLMetaElementImpl();
+        element.initialize( owner, tagName );
+        return element;
     }
 
 
-    public String getCleanedText( String string ) {
-        return (string == null) ? "" : string.replace( NBSP, ' ' );
+    public String getContent() {
+        return getAttributeWithNoDefault( "content" );
     }
 
 
-    public boolean supportsPreserveTagCase() {
-        return false;
+    public String getHttpEquiv() {
+        return getAttributeWithNoDefault( "http-equiv" );
     }
 
 
-    public boolean supportsReturnHTMLDocument() {
-        return true;
+    public String getName() {
+        return getAttributeWithNoDefault( "name" );
     }
 
 
-    public boolean supportsParserWarnings() {
-        return true;
+    public String getScheme() {
+        return getAttributeWithNoDefault( "scheme" );
     }
 
 
-    final private static char NBSP = (char) 160;   // non-breaking space, defined by nekoHTML
+    public void setContent( String content ) {
+        setAttribute( "content", content );
+    }
+
+
+    public void setHttpEquiv( String httpEquiv ) {
+        setAttribute( "http-equiv", httpEquiv );
+    }
+
+
+    public void setName( String name ) {
+        setAttribute( "name", name );
+    }
+
+
+    public void setScheme( String scheme ) {
+        setAttribute( "scheme", scheme );
+    }
 }
-
-
-

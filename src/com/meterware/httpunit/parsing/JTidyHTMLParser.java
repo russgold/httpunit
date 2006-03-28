@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002,2004, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,12 +20,18 @@ package com.meterware.httpunit.parsing;
  *
  *******************************************************************************************************************/
 import org.w3c.tidy.Tidy;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.html.HTMLDocument;
 import org.xml.sax.SAXException;
 
 import java.net.URL;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+
+import com.meterware.httpunit.dom.HTMLDocumentImpl;
 
 
 /**
@@ -37,7 +43,14 @@ class JTidyHTMLParser implements HTMLParser {
 
     public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
         try {
-            adapter.setRootNode( getParser( pageURL ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null ) );
+            Document jtidyDocument = getParser( pageURL ).parseDOM( new ByteArrayInputStream( pageText.getBytes( UTF_ENCODING ) ), null );
+            HTMLDocument htmlDocument = new HTMLDocumentImpl();
+            NodeList nl = jtidyDocument.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                Node importedNode = nl.item(i);
+                if (importedNode.getNodeType() != Node.DOCUMENT_TYPE_NODE) htmlDocument.appendChild( htmlDocument.importNode( importedNode, true ) );
+            }
+            adapter.setDocument( htmlDocument );
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException( "UTF-8 encoding failed" );
         }
@@ -55,7 +68,7 @@ class JTidyHTMLParser implements HTMLParser {
 
 
     public boolean supportsReturnHTMLDocument() {
-        return false;
+        return true;
     }
 
 

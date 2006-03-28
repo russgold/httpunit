@@ -39,8 +39,8 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
     private String    _characterSet;
 
 
-    public FixedURLWebRequestSource( WebResponse response, Node node, URL baseURL, String destination, FrameSelector frame, String defaultTarget, String characterSet ) {
-        super( response, node, baseURL, destination, frame, defaultTarget );
+    public FixedURLWebRequestSource( WebResponse response, Node node, URL baseURL, String attribute, FrameSelector frame, String defaultTarget, String characterSet ) {
+        super( response, node, baseURL, attribute, frame, defaultTarget );
         _characterSet = characterSet;
     }
 

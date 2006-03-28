@@ -23,6 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
+import org.w3c.dom.html.HTMLImageElement;
 
 import java.net.URL;
 import java.util.*;
@@ -315,7 +316,7 @@ class ParsedHTML {
     }
 
 
-    private void interpretScriptElement( Element element ) {
+    void interpretScriptElement( Element element ) {
         String script = getScript( element );
         if (script != null) {
             try {
@@ -762,7 +763,7 @@ class ParsedHTML {
 
 
     private WebImage toWebImage( Element child ) {
-        return new WebImage( _response, this, _baseURL, child, _frame, _baseTarget, _characterSet );
+        return new WebImage( _response, this, _baseURL, (HTMLImageElement) child, _frame, _baseTarget, _characterSet );
     }
 
 
@@ -988,7 +989,8 @@ class ParsedHTML {
 
 
     /**
-     * Specifies the root node for this HTML fragment.
+     * Specifies the root node for this HTML fragment.  It will be either an HTMLDocument or an HTMLElement
+     * representing a page fragment.
      */
     void setRootNode( Node rootNode ) {
         if (_rootNode != null && rootNode != _rootNode )

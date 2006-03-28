@@ -111,7 +111,6 @@ abstract public class HTMLParserFactory {
      */
     public static void setPreserveTagCase( boolean preserveTagCase ) {
         _preserveTagCase = preserveTagCase;
-        if (preserveTagCase) _returnHTMLDocument = false;
     }
 
 
@@ -119,7 +118,7 @@ abstract public class HTMLParserFactory {
      * Returns true if the current parser will return an HTMLDocument object rather than a Document object.
      */
     public static boolean isReturnHTMLDocument() {
-        return _returnHTMLDocument && getHTMLParser().supportsReturnHTMLDocument();
+        return _returnHTMLDocument && !isPreserveTagCase() && getHTMLParser().supportsReturnHTMLDocument();
     }
 
 

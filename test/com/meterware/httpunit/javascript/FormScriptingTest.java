@@ -1285,24 +1285,4 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
-    public void testFormsCaching() throws Exception {
-        defineWebPage(  "OnCommand",  "<form>" +
-                                      "  <input type='text' name='color' value='blue' >" +
-                                      "</form>" +
-                                      "<script type='JavaScript'>" +
-                                      "  alert( document.forms[0].color.value );" +
-                                      "</script>" +
-                                      "<form>" +
-                                      "  <input type='text' name='size' value='3' >" +
-                                      "</form>" +
-                                      "<script type='JavaScript'>" +
-                                      "  alert( document.forms[1].size.value );" +
-                                      "</script>" );
-        WebConversation wc = new WebConversation();
-        wc.getResponse( getHostPath() + "/OnCommand.html" );
-        assertEquals( "Message 1", "blue", wc.popNextAlert() );
-        assertEquals( "Message 2", "3", wc.popNextAlert() );
-    }
-
-
 }

@@ -782,7 +782,7 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource( "HasScript.html", "Javascript is enabled!" );
         defineResource( "Start.html",  "<html><head>" +
                                        "  <noscript>" +
-                                       "      <meta http-equiv='refresh' content='0;url=NoScript.html>'" +
+                                       "      <meta http-equiv='refresh' content='0;url=NoScript.html'>" +
                                        "  </noscript></head>" +
                                        "<body onload='document.form.submit()'>" +
                                        "<form name='form' action='HasScript.html'></form>" +

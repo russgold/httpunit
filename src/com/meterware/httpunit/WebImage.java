@@ -25,6 +25,7 @@ import com.meterware.httpunit.scripting.NamedDelegate;
 import java.net.URL;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.html.HTMLImageElement;
 
 
 /**
@@ -34,34 +35,30 @@ import org.w3c.dom.Node;
  **/
 public class WebImage extends FixedURLWebRequestSource {
 
-    private Node       _node;
-    private ParsedHTML _parsedHTML;
-    private Scriptable _scriptable;
-    private String     _src;
-    private String     _alt;
+    private HTMLImageElement _element;
+    private ParsedHTML       _parsedHTML;
+    private Scriptable       _scriptable;
 
 
-    WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, Node node, FrameSelector sourceFrame, String defaultTarget, String characterSet ) {
-        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "src" ), sourceFrame, defaultTarget, characterSet );
-        _node = node;
+    WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, HTMLImageElement element, FrameSelector sourceFrame, String defaultTarget, String characterSet ) {
+        super( response, element, baseURL, "src", sourceFrame, defaultTarget, characterSet );
+        _element = element;
         _parsedHTML = parsedHTML;
-        _src = NodeUtils.getNodeAttribute( _node, "src" );
-        _alt = NodeUtils.getNodeAttribute( _node, "alt" );
     }
 
 
     public String getName() {
-        return NodeUtils.getNodeAttribute( _node, "name" );
+        return _element.getName();
     }
 
 
     public String getSource() {
-        return _src;
+        return _element.getSrc();
     }
 
 
     public String getAltText() {
-        return _alt;
+        return _element.getAlt();
     }
 
 
@@ -70,11 +67,11 @@ public class WebImage extends FixedURLWebRequestSource {
 
             public boolean matchesCriteria( Object link, Object parentNode ) {
                 for (Node parent = (Node) parentNode; parent != null; parent = parent.getParentNode()) {
-                    if (parent.equals( ((WebLink) link).getNode() )) return true;
+                    if (parent.equals( ((WebLink) link).getElement() )) return true;
                 }
                 return false;
             }
-        }, _node.getParentNode() );
+        }, _element.getParentNode() );
     }
 
 
@@ -115,7 +112,7 @@ public class WebImage extends FixedURLWebRequestSource {
 
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "src" )) {
-                if (value != null) _src = value.toString();
+                if (value != null) _element.setSrc( value.toString() );
             } else {
                 super.set( propertyName, value );
             }

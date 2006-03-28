@@ -765,7 +765,7 @@ public class WebForm extends WebRequestSource {
 
 
         public ScriptableDelegate[] getElementsByTagName( String name ) throws SAXException {
-            return getDelegates( getHTMLPage().getElementsByTagName( getNode(), name ) );
+            return getDelegates( getHTMLPage().getElementsByTagName( getElement(), name ) );
         }
 
 
@@ -782,7 +782,7 @@ public class WebForm extends WebRequestSource {
      * from that page.
      **/
     WebForm( WebResponse response, URL baseURL, Node node, FrameSelector frame, String defaultTarget, String characterSet ) {
-        super( response, node, baseURL, NodeUtils.getNodeAttribute( node, "action" ), frame, defaultTarget );
+        super( response, node, baseURL, "action", frame, defaultTarget );
         _characterSet = characterSet;
     }
 
