@@ -37,14 +37,60 @@
     <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />
 
 <!-- =================================================================== -->
-<!-- Defines the classpath used for compilation and test.                -->
+<!-- Defines the classpath used for testing.                             -->
 <!-- =================================================================== -->
-<path id="base.classpath">
+<path id="test.classpath">
     <fileset dir="${jars.dir}">
-        <include name="*.jar"/>
-        <exclude name="nekohtml.jar" if="use.jtidy" />
+        <include name="activation.jar"/>
+        <include name="mailapi.jar" />
     </fileset>
 </path>
+
+
+
+
+<!--  ===================================================================  -->
+<!--  Prepares the build directory                                         -->
+<!--  ===================================================================  -->
+
+    <target name="check_jars_dir">
+        <path id="check.path">
+            <fileset dir="${jars.dir}"/>
+        </path>
+        <condition property="have.local.jars">
+            <or>
+                <available classname="org.cyberneko.html.HTMLConfiguration" classpathref="check.path"/>
+                <available classname="org.w3c.tidy.Tidy"                    classpathref="check.path"/>
+            </or>
+        </condition>
+    </target>
+
+    <target name="prepare_local_classpath" depends="check_jars_dir" if="have.local.jars">
+        <echo message="using local classpath"/>
+        <path id="base.classpath">
+            <fileset id="distributed.jars" dir="${jars.dir}"/>
+        </path>
+    </target>
+
+    <target name="prepare_repository_classpath" depends="check_jars_dir" unless="have.local.jars">
+        <echo message="using repository classpath"/>
+        <setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80"/>
+        <typedef classpath="${jars.dir}/ant-dependencies.jar" resource="dependencies.properties" />
+        <dependencies pathId="base.classpath" fileSetId="distributed.jars">
+            <dependency group="rhino"      version="1.5R4.1" />
+            <dependency group="junit"      version="3.8.1" />
+            <dependency group="nekohtml"   version="0.9.1" unless="use.jtidy"/>
+            <dependency group="servletapi" version="2.4" />
+            <dependency group="jtidy"      version="4aug2000r7-dev"/>
+            <dependency group="xerces"     version="2.6.1" artifact="xercesImpl"/>
+            <dependency group="xerces"     version="2.6.1" artifact="xmlParserAPIs"/>
+        </dependencies>
+    </target>
+
+<target name="prepare" depends="prepare_local_classpath,prepare_repository_classpath">
+    <tstamp />
+    <mkdir dir="${build.dir}" />
+</target>
 
 
 <!-- =================================================================== -->
@@ -54,7 +100,7 @@
     <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet"
                                            classpathref="base.classpath" />
     <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"
-                                           classpathref="base.classpath" />
+                                           classpathref="test.classpath" />
     <available property="jaxp.present"     classname="javax.xml.parsers.DocumentBuilderFactory"
                                            classpathref="base.classpath" />
     <available property="rhino.present"    classname="org.mozilla.javascript.Context"
@@ -65,15 +111,6 @@
                                            classpathref="base.classpath" />
     <available property="junit.present"    classname="junit.framework.Test"
                                            classpathref="base.classpath" />
-</target>
-
-
-<!--  ===================================================================  -->
-<!--  Prepares the build directory                                         -->
-<!--  ===================================================================  -->
-<target name="prepare">
-    <tstamp />
-    <mkdir dir="${build.dir}" />
 </target>
 
 
@@ -134,6 +171,7 @@
            debug="on" deprecation="off" optimize="off">
         <classpath>
             <path refid="base.classpath" />
+            <path refid="test.classpath" />
             <pathelement location="${build.classes}" />
         </classpath>
         <exclude name="**/servletunit/*" unless="jsdk.present" />
@@ -152,6 +190,7 @@
     <java classname="${test.class}" fork="yes" >
          <classpath>
              <path refid="base.classpath" />
+             <path refid="test.classpath" />
              <pathelement location="${build.classes}" />
              <pathelement location="META-INF" />
              <pathelement location="${test.classes}" />
@@ -240,12 +279,16 @@ Build-Time: ${TSTAMP}
             <include name="test/**" />
             <include name="examples/**" />
             <include name="lib/*.*" />
-            <include name="jars/*.*" />
             <exclude name="**/activation.jar"/>
             <exclude name="**/mailapi.jar" />
             <include name="doc/**/*.*" />
             <include name="doc/api/package-list" />
         </fileset>
+    </copy>
+    <mkdir dir="${archive.dir}/jars"/>
+    <copy todir="${archive.dir}/jars">
+        <mapper type="flatten"/>
+        <fileset refid="distributed.jars" />
     </copy>
 </target>
 

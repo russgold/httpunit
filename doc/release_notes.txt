@@ -14,6 +14,11 @@ Limitations:
 
 
 Revision History:
+28-Mar-2006:
+    Notes:
+        1. The build now uses the ant-dependencies task (see http://www.httpunit.org/doc/dependencies.html) rather than
+           keeping the dependent jars in cvs.
+           
 27-Mar-2006
     Additions:
         Content and Parsing:
