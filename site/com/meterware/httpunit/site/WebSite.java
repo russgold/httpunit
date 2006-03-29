@@ -21,14 +21,20 @@ package com.meterware.httpunit.site;
  *******************************************************************************************************************/
 import com.meterware.website.FragmentTemplate;
 import com.meterware.website.Site;
+import com.meterware.website.FilePageGenerator;
+import com.meterware.website.PageGenerator;
+import com.meterware.website.BasicSiteTemplate;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.xml.sax.SAXException;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class WebSite {
+public class WebSite extends Site {
 
 
     public static void main( String[] args ) {
@@ -40,12 +46,26 @@ public class WebSite {
                 FragmentTemplate.registerTemplate( new News() );
                 FragmentTemplate.registerTemplate( new Citations() );
                 FragmentTemplate.registerTemplate( new Developers() );
-                Site.generate( new File( "sitedocs/site.xml" ), new File( args[0] ) );
+                generate( new File( "sitedocs/site.xml" ), new File( args[0] ) );
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
+
+
+
+    public static void generate( File siteFile, File directory ) throws SAXException, IOException {
+        generate( siteFile, new FilePageGenerator( directory ) );
+    }
+
+
+    public static void generate( File siteFile, PageGenerator generator ) throws SAXException, IOException {
+        Site site = new WebSite();
+        BasicSiteTemplate template = new BasicSiteTemplate();
+        generate( site, siteFile, template, generator );
+    }
+
 
 
     private static void printUsage() {

@@ -1,6 +1,6 @@
 <?xml version='1.0' ?>
 <site project="HttpUnit" group-id="6550" logo="doc/images/HttpUnit.jpg">
-    <copyright owner="Russell Gold" dates="2000-2004"/>
+    <copyright owner="Russell Gold" dates="2000-2006"/>
 
     <page location="index.html" title="Home" mainPage="true">
         <fragment source="sitedocs/welcome.html"/>
@@ -11,7 +11,7 @@
         <fragment source="sitedocs/doc/license.html"/>
     </page>
 
-    <external location="http://prdownloads.sourceforge.net/httpunit/httpunit-1.6.zip?download" item="Download 1.6"/>
+    <external location="http://prdownloads.sourceforge.net/httpunit/httpunit-1.6.2.zip?download" item="Download 1.6.2"/>
 
     <space/>
     <page location="doc/cookbook.html" title="Cookbook">

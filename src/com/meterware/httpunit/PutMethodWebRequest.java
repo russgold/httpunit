@@ -39,8 +39,8 @@ public class PutMethodWebRequest extends MessageBodyWebRequest {
 
     /**
      * Constructs a web request using a specific absolute url string and input stream.
-     * @param urlString the URL to which the request should be issued
-     * @param source    an input stream which will provide the body of this request
+     * @param url         the URL to which the request should be issued
+     * @param source      an input stream which will provide the body of this request
      * @param contentType the MIME content type of the body, including any character set
      **/
     public PutMethodWebRequest( String url, InputStream source, String contentType ) {
