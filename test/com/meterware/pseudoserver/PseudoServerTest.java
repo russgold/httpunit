@@ -200,6 +200,27 @@ public class PseudoServerTest extends HttpUserAgentTest {
     }
 
 
+    /**
+     * Verifies that it is possible to disable the content-type header.
+     * @throws Exception
+     */
+    public void testDisableContentTypeHeader() throws Exception {
+        defineResource( "simple", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                WebResource resource = new WebResource( "a string" );
+                resource.suppressAutomaticContentTypeHeader();
+                return resource;
+            }
+        } );
+
+        SocketConnection conn = new SocketConnection( "localhost", getHostPort() );
+        SocketConnection.SocketResponse response = conn.getResponse( "GET", "/simple" );
+        assertEquals( "Response code", 200, response.getResponseCode() );
+        assertEquals( "Response", "a string", new String( response.getBody() ) );
+        assertNull( "Found a content type header", response.getHeader( "Content-Type" ) );
+    }
+
+
     public void testChunkedRequest() throws Exception {
         super.defineResource( "/chunkedServlet", new PseudoServlet() {
             public WebResource getPostResponse() {
