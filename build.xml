@@ -316,7 +316,7 @@ Build-Time: ${TSTAMP}
     <!--  ===================================================================  -->
     <!--  Compiles quicksite library                                           -->
     <!--  ===================================================================  -->
-    <target name="compile-quicksite">
+    <target name="compile-quicksite" depends="prepare">
         <mkdir dir="${quicksite.classes}" />
         <javac srcdir="${quicksite.dir}" destdir="${quicksite.classes}"
                debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">

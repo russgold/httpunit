@@ -28,7 +28,7 @@ import java.security.Security;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract public class HttpsProtocolSupport {
+abstract class HttpsProtocolSupport {
 
     /** The name of the system parameter used by java.net to locate protocol handlers. **/
     private final static String PROTOCOL_HANDLER_PKGS  = "java.protocol.handler.pkgs";

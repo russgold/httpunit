@@ -1,11 +1,8 @@
 <?xml version='1.0' ?>
 <citations>
     <section title='HttpUnit Extensions and Wrappers'>
-        <citation name='Canoo WebTest' url='http://webtest.canoo.com/webtest/manual/WebTestHome.html'>
-            Provides an XML wrapper to simplify web testing for non-Java programmers
-        </citation>
         <citation name="WebWalker" url="http://webwalker.sourceforge.net">
-            Another XML wrapper for HttpUnit
+            Provides an XML wrapper to simplify web testing for non-Java programmers
         </citation>
         <citation name="jWebUnit" url="http://jwebunit.sourceforge.net">
             A Java wrapper for HttpUnit which simplifies common, repetitive test steps
@@ -16,6 +13,10 @@
     </section>
 
     <section title="Articles">
+        <citation name="Test Web applications with HttpUnit"
+                  url="http://www.javaworld.com/javaworld/jw-04-2004/jw-0419-httpunit.html">
+            19 April 2004: Balazs Fejes, javaworld.com
+        </citation>
         <citation name="Build a Java Web App Using HttpUnit and the Test-driven Methodology, Part II"
                   url="http://www.devx.com/Java/Article/17991">
             4 December 2003: Wellie Chao, DevX.com
