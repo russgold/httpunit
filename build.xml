@@ -23,7 +23,6 @@
     <property name="build.dir" value="build" />
     <property name="build.classes" value="${build.dir}/classes" />
     <property name="test.classes" value="${build.dir}/testclasses" />
-    <property name="quicksite.classes" value="${build.dir}/qsclasses" />
     <property name="website.classes" value="${build.dir}/siteclasses" />
     <property name="example.classes" value="${build.dir}/examples" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
@@ -314,28 +313,14 @@ Build-Time: ${TSTAMP}
 
 
     <!--  ===================================================================  -->
-    <!--  Compiles quicksite library                                           -->
+    <!--  Compiles the website generator                                       -->
     <!--  ===================================================================  -->
-    <target name="compile-quicksite" depends="prepare">
-        <mkdir dir="${quicksite.classes}" />
-        <javac srcdir="${quicksite.dir}" destdir="${quicksite.classes}"
-               debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
-             <classpath>
-                 <path refid="base.classpath" />
-             </classpath>
-        </javac>
-    </target>
-
-
-    <!--  ===================================================================  -->
-    <!--  Compiles the website generator                                             -->
-    <!--  ===================================================================  -->
-    <target name="compile-site" depends="compile-quicksite">
+    <target name="compile-site">
         <mkdir dir="${website.classes}" />
         <javac srcdir="${website.dir}" destdir="${website.classes}"
                debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
              <classpath>
-                 <pathelement location="${quicksite.classes}" />
+                 <pathelement location="${jars.dir}/quicksite.jar" />
                  <path refid="base.classpath" />
              </classpath>
         </javac>
@@ -353,7 +338,7 @@ Build-Time: ${TSTAMP}
         <classpath>
             <path refid="base.classpath" />
             <pathelement location="${website.classes}" />
-            <pathelement location="${quicksite.classes}" />
+            <pathelement location="${jars.dir}/quicksite.jar" />
         </classpath>
         <arg path="${web.dir}"/>
     </java>
