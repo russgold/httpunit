@@ -27,10 +27,8 @@ import org.w3c.dom.html.HTMLImageElement;
  **/
 public class HTMLImageElementImpl extends HTMLElementImpl implements HTMLImageElement {
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLImageElementImpl element = new HTMLImageElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLImageElementImpl();
     }
 
 

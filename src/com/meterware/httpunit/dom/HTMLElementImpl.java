@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,24 +19,43 @@ package com.meterware.httpunit.dom;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+
 import org.w3c.dom.html.HTMLElement;
 import org.w3c.dom.NodeList;
+import org.mozilla.javascript.Scriptable;
 
 
 /**
- *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- **/
+ */
 public class HTMLElementImpl extends ElementImpl implements HTMLElement {
 
 
     public final static String UNSPECIFIED_ATTRIBUTE = null;
 
+    public Object get( String propertyName, Scriptable scriptable ) {
+        Object result = super.get( propertyName, scriptable );
+        if (result != NOT_FOUND) return result;
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLElementImpl element = new HTMLElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+        return ScriptingSupport.getNamedProperty( this, getJavaPropertyName( propertyName ), scriptable );
+    }
+
+    private String getJavaPropertyName( String propertyName ) {
+        if (propertyName.equals( "document" )) {
+            return "ownerDocument";
+        } else {
+            return propertyName;
+        }
+    }
+
+
+    public void put( String propertyName, Scriptable initialObject, Object value ) {
+        ScriptingSupport.setNamedProperty( this, getJavaPropertyName( propertyName ), value );
+    }
+
+
+    ElementImpl create() {
+        return new HTMLElementImpl();
     }
 
 
@@ -114,7 +133,7 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
 
     protected boolean getBooleanAttribute( String name ) {
         String value = getAttribute( name );
-        return (value.length() > 0 && value.equalsIgnoreCase( "true" ) );
+        return (value.length() > 0 && value.equalsIgnoreCase( "true" ));
     }
 
 
@@ -137,4 +156,5 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
     HTMLDocumentImpl getHtmlDocument() {
         return (HTMLDocumentImpl) getOwnerDocument();
     }
+
 }

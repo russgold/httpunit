@@ -20,20 +20,23 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.w3c.dom.*;
+import org.mozilla.javascript.ScriptableObject;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract public class NodeImpl implements Node {
+abstract public class NodeImpl extends ScriptableObject implements Node {
 
     private DocumentImpl _ownerDocument;
     private NodeImpl     _parentNode;
     private NodeImpl     _firstChild;
     private NodeImpl     _nextSibling;
     private NodeImpl     _previousSibling;
+    private Hashtable    _userData = new Hashtable( );
 
 
     protected void initialize( DocumentImpl ownerDocument ) {
@@ -41,6 +44,15 @@ abstract public class NodeImpl implements Node {
         if (ownerDocument == null) throw new IllegalArgumentException( "No owner document specified" );
         _ownerDocument = ownerDocument;
     }
+
+
+//------------------------------------------ ScriptableObject methods --------------------------------------------------
+
+    public String getClassName() {
+        return getClass().getName();
+    }
+
+//----------------------------------------------- Node methods ---------------------------------------------------------
 
 
     public Node getParentNode() {
@@ -208,6 +220,68 @@ abstract public class NodeImpl implements Node {
         return false;
     }
 
+//------------------------------------ DOM level 3 methods -------------------------------------------------------------
+
+    public Object setUserData( String key, Object data, UserDataHandler handler ) {
+        return _userData.put( key, data );
+    }
+
+
+    public Object getUserData( String key ) {
+        return _userData.get( key );
+    }
+
+
+    public Object getFeature( String feature, String version ) {
+        return null;
+    }
+
+
+    public boolean isEqualNode( Node arg ) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public String lookupNamespaceURI( String prefix ) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public String getBaseURI() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public short compareDocumentPosition( Node other ) throws DOMException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public String getTextContent() throws DOMException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public void setTextContent( String textContent ) throws DOMException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public boolean isSameNode( Node other ) {
+        return this == other;
+    }
+
+
+    public String lookupPrefix( String namespaceURI ) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+
+    public boolean isDefaultNamespace( String namespaceURI ) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+//----------------------------------------- implementation internals ---------------------------------------------------
 
     public NodeList getElementsByTagName( String name ) {
         ArrayList matchingElements = new ArrayList();
@@ -219,7 +293,7 @@ abstract public class NodeImpl implements Node {
     private void appendElementsWithTag( String name, ArrayList matchingElements ) {
         for (Node child = getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() != ELEMENT_NODE) continue;
-            if (name.equals( "*" ) || ((Element) child).getTagName().equals( name )) matchingElements.add( child );
+            if (name.equals( "*" ) || ((Element) child).getTagName().equalsIgnoreCase( name )) matchingElements.add( child );
             ((NodeImpl) child).appendElementsWithTag( name, matchingElements );
         }
     }
@@ -230,7 +304,7 @@ abstract public class NodeImpl implements Node {
             if (child.getNodeType() != ELEMENT_NODE) continue;
             String tagName = ((Element) child).getTagName();
             for (int i = 0; i < names.length; i++) {
-                if (tagName.equals( names[i] )) matchingElements.add( child );
+                if (tagName.equalsIgnoreCase( names[i] )) matchingElements.add( child );
             }
             ((NodeImpl) child).appendElementsWithTags( names, matchingElements );
         }

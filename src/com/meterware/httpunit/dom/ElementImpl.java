@@ -174,4 +174,21 @@ public class ElementImpl extends NodeImpl implements Element {
     }
 
 
+//------------------------------------- DOM level 3 methods ------------------------------------------------------------
+
+    public TypeInfo getSchemaTypeInfo() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setIdAttribute( String name, boolean isId ) throws DOMException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setIdAttributeNS( String namespaceURI, String localName, boolean isId ) throws DOMException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setIdAttributeNode( Attr idAttr, boolean isId ) throws DOMException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

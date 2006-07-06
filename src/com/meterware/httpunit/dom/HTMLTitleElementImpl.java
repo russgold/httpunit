@@ -29,10 +29,8 @@ import org.w3c.dom.Text;
  **/
 public class HTMLTitleElementImpl extends HTMLElementImpl implements HTMLTitleElement {
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLTitleElementImpl element = new HTMLTitleElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLTitleElementImpl();
     }
 
 

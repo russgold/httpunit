@@ -170,7 +170,7 @@ public class JavaScript {
                 context.setOptimizationLevel( -1 );
                 Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
                 Object result = f.call( context, this, this, NO_ARGS );
-                return (result instanceof Boolean) ? ((Boolean) result).booleanValue() : true;
+                return (!(result instanceof Boolean)) || ((Boolean) result).booleanValue();
             } catch (Exception e) {
                 handleScriptException( e, "Event '" + eventScript + "'" );
                 return false;

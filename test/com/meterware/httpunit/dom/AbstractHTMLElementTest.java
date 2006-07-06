@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class AbstractHTMLElementTest extends TestCase {
+abstract public class AbstractHTMLElementTest extends TestCase {
 
     protected HTMLDocumentImpl _htmlDocument;
 

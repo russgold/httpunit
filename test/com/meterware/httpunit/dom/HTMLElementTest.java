@@ -164,6 +164,7 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
 
         HTMLTitleElement title = (HTMLTitleElement) element;
         assertEquals( "initial title", "something here", title.getText() );
+
         title.setText( "what it says now" );
         NodeList childNodes = element.getChildNodes();
         assertEquals( "Number of child nodes", 1, childNodes.getLength() );

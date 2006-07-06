@@ -27,10 +27,8 @@ import org.w3c.dom.html.HTMLStyleElement;
  **/
 public class HTMLStyleElementImpl extends HTMLElementImpl implements HTMLStyleElement {
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLStyleElementImpl element = new HTMLStyleElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLStyleElementImpl();
     }
 
 

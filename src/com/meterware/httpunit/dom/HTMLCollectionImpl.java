@@ -20,22 +20,32 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.w3c.dom.html.HTMLCollection;
+import org.w3c.dom.html.HTMLElement;
+import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Scriptable;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class HTMLCollectionImpl implements HTMLCollection {
+public class HTMLCollectionImpl extends ScriptableObject implements HTMLCollection {
 
     private NodeList _list;
 
+    public static HTMLCollectionImpl createHTMLCollectionImpl( NodeList list ) {
+        HTMLCollectionImpl htmlCollection = new HTMLCollectionImpl();
+        htmlCollection.initialize( list );
+        return htmlCollection;
+    }
 
-    public HTMLCollectionImpl( NodeList list ) {
+    private void initialize( NodeList list ) {
         _list = list;
     }
 
+//------------------------------------------ HTMLCollection methods --------------------------------------------------
 
     public int getLength() {
         return _list.getLength();
@@ -48,7 +58,39 @@ public class HTMLCollectionImpl implements HTMLCollection {
 
 
     public Node namedItem( String name ) {
-        return null;
+        if (name == null) return null;
+
+        Node nodeByName = null;
+        for (int i = 0; i < getLength(); i++) {
+            Node node = item(i);
+            if (!(node instanceof HTMLElement)) continue;
+            if (name.equalsIgnoreCase( ((HTMLElement) node).getId() )) return node;
+            if (node instanceof HTMLFormElement && name.equalsIgnoreCase( ((HTMLFormElement) node).getName() )) nodeByName = node;
+        }
+        return nodeByName;
     }
 
+//------------------------------------------ ScriptableObject methods --------------------------------------------------
+
+    public String getClassName() {
+        return getClass().getName();
+    }
+
+
+    public Object get( String propertyName, Scriptable scriptable ) {
+        Object result = super.get( propertyName, scriptable );
+        if (result != NOT_FOUND) return result;
+
+        Object namedProperty = ScriptingSupport.getNamedProperty( this, propertyName, scriptable );
+        if (namedProperty != NOT_FOUND) return namedProperty;
+
+        Node namedItem = namedItem( propertyName );
+        return namedItem == null ? NOT_FOUND : namedItem;
+    }
+
+
+    public Object get( int index, Scriptable start ) {
+        if (index < 0 || index >= _list.getLength()) return NOT_FOUND;
+        return item( index );
+    }
 }

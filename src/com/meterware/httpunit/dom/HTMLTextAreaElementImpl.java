@@ -31,10 +31,8 @@ public class HTMLTextAreaElementImpl extends HTMLControl implements HTMLTextArea
 
     private String _value;
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLTextAreaElementImpl element = new HTMLTextAreaElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLTextAreaElementImpl();
     }
 
 

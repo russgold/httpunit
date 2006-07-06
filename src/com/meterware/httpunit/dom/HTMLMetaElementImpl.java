@@ -27,10 +27,8 @@ import org.w3c.dom.html.HTMLMetaElement;
  **/
 public class HTMLMetaElementImpl extends HTMLElementImpl implements HTMLMetaElement {
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLMetaElementImpl element = new HTMLMetaElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLMetaElementImpl();
     }
 
 

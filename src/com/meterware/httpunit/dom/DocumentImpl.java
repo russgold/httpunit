@@ -37,7 +37,7 @@ public class DocumentImpl extends NodeImpl implements Document {
     }
 
 
-    protected void initialize() {};
+    protected void initialize() {}
 
 
     public String getNodeName() {
@@ -171,5 +171,63 @@ public class DocumentImpl extends NodeImpl implements Document {
         }
     }
 
+
+//------------------------------------- DOM level 3 methods ------------------------------------------------------------
+
+    public String getInputEncoding() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getXmlEncoding() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Node renameNode( Node n, String namespaceURI, String qualifiedName ) throws DOMException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean getXmlStandalone() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setXmlStandalone( boolean xmlStandalone ) throws DOMException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getXmlVersion() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setXmlVersion( String xmlVersion ) throws DOMException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public boolean getStrictErrorChecking() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setStrictErrorChecking( boolean strictErrorChecking ) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getDocumentURI() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setDocumentURI( String documentURI ) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Node adoptNode( Node source ) throws DOMException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public DOMConfiguration getDomConfig() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void normalizeDocument() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
 }

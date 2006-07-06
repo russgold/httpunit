@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -27,10 +27,8 @@ import org.w3c.dom.html.HTMLHeadElement;
  **/
 public class HTMLHeadElementImpl extends HTMLElementImpl implements HTMLHeadElement {
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLHeadElementImpl element = new HTMLHeadElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLHeadElementImpl();
     }
 
 

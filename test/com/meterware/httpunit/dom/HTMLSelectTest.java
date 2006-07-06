@@ -72,7 +72,7 @@ public class HTMLSelectTest extends AbstractHTMLElementTest {
         assertProperties( "changed default selected", "defaultSelected", _options, new Boolean[] { Boolean.FALSE, Boolean.TRUE, Boolean.FALSE } );
         assertProperties( "changed selected", "selected", _options, new Boolean[] { Boolean.TRUE, Boolean.FALSE, Boolean.FALSE } );
 
-        _options[2].setSelected( true );
+        ((HTMLOptionElementImpl) _options[2]).setSelected( true );
         assertEquals( "remodified select index", 2, _select.getSelectedIndex() );
         assertProperties( "rechanged selected", "selected", _options, new Boolean[] { Boolean.FALSE, Boolean.FALSE, Boolean.TRUE } );
 
@@ -91,7 +91,7 @@ public class HTMLSelectTest extends AbstractHTMLElementTest {
         assertEquals( "select index", 1, _select.getSelectedIndex() );
         assertEquals( "initial value", "blue", _select.getValue() );
 
-        _options[0].setSelected( true );
+        ((HTMLOptionElementImpl) _options[0]).setSelected( true );
         assertEquals( "modified select index", 0, _select.getSelectedIndex() );
         assertProperties( "changed default selected", "defaultSelected", _options, new Boolean[] { Boolean.FALSE, Boolean.TRUE, Boolean.FALSE } );
         assertProperties( "changed selected", "selected", _options, new Boolean[] { Boolean.TRUE, Boolean.TRUE, Boolean.FALSE } );
@@ -110,7 +110,7 @@ public class HTMLSelectTest extends AbstractHTMLElementTest {
         assertEquals( "select index", 1, _select.getSelectedIndex() );
         assertEquals( "initial value", "blue", _select.getValue() );
 
-        _options[0].setSelected( true );
+        ((HTMLOptionElementImpl) _options[0]).setSelected( true );
         assertEquals( "modified select index", 0, _select.getSelectedIndex() );
         assertProperties( "changed default selected", "defaultSelected", _options, new Boolean[] { Boolean.FALSE, Boolean.TRUE, Boolean.FALSE } );
         assertProperties( "changed selected", "selected", _options, new Boolean[] { Boolean.TRUE, Boolean.FALSE, Boolean.FALSE } );
@@ -130,7 +130,7 @@ public class HTMLSelectTest extends AbstractHTMLElementTest {
 
 
     public void testSingleWithNothingSelected() throws Exception {
-        _options[1].setSelected( false );
+        ((HTMLOptionElementImpl) _options[1]).setSelected( false );
         assertEquals( "select index", 0, _select.getSelectedIndex() );
         assertEquals( "initial value", "red", _select.getValue() );
 
@@ -141,7 +141,7 @@ public class HTMLSelectTest extends AbstractHTMLElementTest {
     public void testMultipleWithNothingSelected() throws Exception {
         _select.setMultiple( true );
         _select.setSize( 3 );
-        _options[1].setSelected( false );
+        ((HTMLOptionElementImpl) _options[1]).setSelected( false );
         assertEquals( "select index", -1, _select.getSelectedIndex() );
         assertEquals( "initial value", null, _select.getValue() );
 

@@ -35,10 +35,8 @@ public class HTMLSelectElementImpl extends HTMLControl implements HTMLSelectElem
     public static final String TYPE_SELECT_MULTIPLE = "select-multiple";
 
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLSelectElementImpl element = new HTMLSelectElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLSelectElementImpl();
     }
 
 
@@ -75,7 +73,7 @@ public class HTMLSelectElementImpl extends HTMLControl implements HTMLSelectElem
 
 
     public HTMLCollection getOptions() {
-        return new HTMLCollectionImpl( getElementsByTagName( getHtmlDocument().toNodeCase( "option" ) ) );
+        return HTMLCollectionImpl.createHTMLCollectionImpl( getElementsByTagName( getHtmlDocument().toNodeCase( "option" ) ) );
     }
 
 
@@ -115,7 +113,7 @@ public class HTMLSelectElementImpl extends HTMLControl implements HTMLSelectElem
     public void setSelectedIndex( int selectedIndex ) {
         HTMLCollection options = getOptions();
         for (int i = 0; i < options.getLength(); i++) {
-            HTMLOptionElement optionElement = (HTMLOptionElement) options.item(i);
+            HTMLOptionElementImpl optionElement = (HTMLOptionElementImpl) options.item(i);
             optionElement.setSelected( i == selectedIndex );
         }
     }

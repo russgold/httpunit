@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -31,10 +31,8 @@ import java.util.ArrayList;
  **/
 public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElement {
 
-    ElementImpl create( DocumentImpl owner, String tagName ) {
-        HTMLFormElementImpl element = new HTMLFormElementImpl();
-        element.initialize( owner, tagName );
-        return element;
+    ElementImpl create() {
+        return new HTMLFormElementImpl();
     }
 
 
@@ -101,7 +99,7 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
     public HTMLCollection getElements() {
         ArrayList elements = new ArrayList();
         appendElementsWithTags( new String[] { "INPUT", "TEXTAREA", "BUTTON", "SELECT" }, elements );
-        return new HTMLCollectionImpl( new NodeListImpl( elements ) );
+        return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
     }
 
 
