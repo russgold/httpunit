@@ -38,7 +38,7 @@ class WebFrame extends HTMLElementBase {
     private URL         _baseURL;
 
 
-    protected ScriptableDelegate getParentDelegate() {
+    public ScriptableDelegate getParentDelegate() {
         return _response.getScriptableObject().getDocument();
     }
 

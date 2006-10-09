@@ -1,5 +1,6 @@
 package com.meterware.httpunit.scripting;
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.HTMLElement;
 
 /********************************************************************************************************************
  * $Id$
@@ -65,4 +66,6 @@ public interface ScriptingEngineFactory {
      */
     public void clearErrorMessages();
 
+
+    ScriptingHandler createHandler( HTMLElement elementBase );
 }

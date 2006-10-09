@@ -20,7 +20,10 @@ package com.meterware.httpunit.javascript;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.HTMLElement;
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 
 
 /**
@@ -76,11 +79,18 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
 
 
     public String[] getErrorMessages() {
-        return JavaScript.getErrorMessages();
+        return ScriptingEngineImpl.getErrorMessages();
     }
 
 
     public void clearErrorMessages() {
-        JavaScript.clearErrorMessages();
+        ScriptingEngineImpl.clearErrorMessages();
+    }
+
+
+    public ScriptingHandler createHandler( HTMLElement elementBase ) {
+        ScriptableDelegate delegate = elementBase.newScriptable();
+        delegate.setScriptEngine( elementBase.getParentDelegate().getScriptEngine( delegate ) );
+        return delegate;
     }
 }

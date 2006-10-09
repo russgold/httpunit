@@ -1,7 +1,7 @@
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2004, Russell Gold
+ * Copyright (c) 2001-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -28,6 +28,9 @@ import java.net.URL;
 import java.util.StringTokenizer;
 import java.io.IOException;
 
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
+
 
 /**
  * Base class for objects which can be clicked to generate new web requests.
@@ -41,6 +44,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     /** The name of the destination attribute used to create for the request, including anchors and parameters. **/
     private String         _destinationAttribute;
+    private ScriptingHandler _scriptable;
 
 
     /**
@@ -232,7 +236,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     protected WebResponse submitRequest( String event, final WebRequest request ) throws IOException, SAXException {
         WebResponse response = null;
-        if (event.length() == 0 || getScriptableDelegate().doEvent( event )) response = submitRequest( request );
+        if (event.length() == 0 || getScriptingHandler().doEvent( event )) response = submitRequest( request );
         if (response == null) response = getCurrentFrameContents();
         return response;
     }
@@ -283,6 +287,11 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
     public boolean isSupportedAttribute( String name ) {
         return false;
+    }
+
+
+    public Node getNode() {
+        return _node;
     }
 
 
@@ -374,5 +383,20 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 
 
     abstract protected String getEmptyParameterValue();
+
+    /**
+     * Returns the scriptable delegate.
+     */
+    public ScriptingHandler getScriptingHandler() {
+        if (_scriptable == null) {
+            _scriptable = HttpUnitOptions.getScriptingEngine().createHandler( this );
+        }
+        return _scriptable;
+    }
+
+    public ScriptableDelegate getParentDelegate() {
+        return getBaseResponse().getScriptableObject().getDocument();
+    }
+
 
 }

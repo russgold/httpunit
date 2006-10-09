@@ -322,7 +322,7 @@ class ParsedHTML {
             try {
                 _updateElements = false;
                 String language = NodeUtils.getNodeAttribute( element, "language", null );
-                if (!getResponse().getScriptableObject().supportsScript( language )) _enableNoScriptNodes = true;
+                if (!getResponse().getScriptableObject().supportsScriptLanguage( language )) _enableNoScriptNodes = true;
                 getResponse().getScriptableObject().runScript( language, script );
             } finally {
                 setRootNode( _rootNode );
@@ -431,8 +431,8 @@ class ParsedHTML {
 
     private HTMLElement toDefaultElement( Element element ) {
         return new HTMLElementBase( element ) {
-            protected ScriptableDelegate newScriptable() { return new HTMLElementScriptable( this ); }
-            protected ScriptableDelegate getParentDelegate() { return getResponse().getScriptableObject().getDocument(); }
+            public ScriptableDelegate newScriptable() { return new HTMLElementScriptable( this ); }
+            public ScriptableDelegate getParentDelegate() { return getResponse().getScriptableObject().getDocument(); }
         };
     }
 
@@ -1124,12 +1124,12 @@ class ParsedHTML {
         }
 
 
-        protected ScriptableDelegate newScriptable() {
+        public ScriptableDelegate newScriptable() {
             return null;
         }
 
 
-        protected ScriptableDelegate getParentDelegate() {
+        public ScriptableDelegate getParentDelegate() {
             return null;
         }
     }

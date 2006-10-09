@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -24,7 +24,6 @@ import com.meterware.httpunit.*;
 import com.meterware.httpunit.scripting.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.io.IOException;
 import java.net.URL;
 
@@ -39,11 +38,7 @@ import org.xml.sax.SAXException;
  **/
 public class JavaScript {
 
-    private final static Object[] NO_ARGS = new Object[0];
-
     private static boolean _throwExceptionsOnError = true;
-
-    private static ArrayList _errorMessages = new ArrayList();
 
 
     static boolean isThrowExceptionsOnError() {
@@ -53,16 +48,6 @@ public class JavaScript {
 
     static void setThrowExceptionsOnError( boolean throwExceptionsOnError ) {
         _throwExceptionsOnError = throwExceptionsOnError;
-    }
-
-
-    static void clearErrorMessages() {
-        _errorMessages.clear();
-    }
-
-
-    static String[] getErrorMessages() {
-        return (String[]) _errorMessages.toArray( new String[ _errorMessages.size() ] );
     }
 
 
@@ -110,100 +95,10 @@ public class JavaScript {
     }
 
 
-    abstract static class JavaScriptEngine extends ScriptableObject implements ScriptingEngine {
+    abstract static class JavaScriptEngine extends ScriptingEngineImpl {
 
         protected ScriptableDelegate _scriptable;
         protected JavaScriptEngine   _parent;
-
-
-        public boolean supportsScriptLanguage( String language ) {
-            return language == null || language.toLowerCase().startsWith( "javascript" );
-        }
-
-
-        public String executeScript( String language, String script ) {
-            if (!supportsScriptLanguage( language )) return "";
-            try {
-                script = script.trim();
-                if (script.startsWith( "<!--" )) {
-                    script = withoutFirstLine( script );
-                    if (script.endsWith( "-->" )) script = script.substring( 0, script.lastIndexOf( "-->" ));
-                }
-                Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
-                StringBuffer buffer = getDocumentWriteBuffer();
-                return buffer.toString();
-            } catch (Exception e) {
-                handleScriptException( e, "Script '" + script + "'" );
-                return "";
-            } finally {
-                discardDocumentWriteBuffer();
-            }
-        }
-
-
-        protected StringBuffer getDocumentWriteBuffer() {
-            throw new IllegalStateException( "may not run executeScript() from " + getClass() );
-        }
-
-
-        protected void discardDocumentWriteBuffer() {
-            throw new IllegalStateException( "may not run executeScript() from " + getClass() );
-        }
-
-
-        private String withoutFirstLine( String script ) {
-            for (int i=0; i < script.length(); i++) {
-                if (isLineTerminator( script.charAt(i) )) return script.substring( i ).trim();
-            }
-            return "";
-        }
-
-
-        private boolean isLineTerminator( char c ) {
-            return c == 0x0A || c == 0x0D;
-        }
-
-
-        public boolean performEvent( String eventScript ) {
-            try {
-                final Context context = Context.getCurrentContext();
-                context.setOptimizationLevel( -1 );
-                Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
-                Object result = f.call( context, this, this, NO_ARGS );
-                return (!(result instanceof Boolean)) || ((Boolean) result).booleanValue();
-            } catch (Exception e) {
-                handleScriptException( e, "Event '" + eventScript + "'" );
-                return false;
-            }
-        }
-
-
-        /**
-         * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
-         */
-        public String evaluateScriptExpression( String urlString ) {
-            try {
-                Object result = Context.getCurrentContext().evaluateString( this, urlString, "httpunit", 0, null );
-                return (result == null || result instanceof Undefined) ? null : result.toString();
-            } catch (Exception e) {
-                handleScriptException( e, "URL '" + urlString + "'" );
-                return null;
-            }
-        }
-
-
-        private void handleScriptException( Exception e, String badScript ) {
-            final String errorMessage = badScript + " failed: " + e;
-            if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException)) {
-                e.printStackTrace();
-                throw new RuntimeException( errorMessage );
-            } else if (isThrowExceptionsOnError()) {
-                e.printStackTrace();
-                throw new ScriptException( errorMessage );
-            } else {
-                _errorMessages.add( errorMessage );
-            }
-        }
 
 
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
@@ -338,10 +233,10 @@ public class JavaScript {
         }
 
 
-        protected ElementArray toElementArray( ScriptableDelegate[] scriptables ) {
+        protected ElementArray toElementArray( ScriptingHandler[] scriptables ) {
             JavaScriptEngine[] elements = new JavaScriptEngine[ scriptables.length ];
             for (int i = 0; i < elements.length; i++) {
-                elements[ i ] = (JavaScriptEngine) toScriptable( scriptables[ i ] );
+                elements[ i ] = (JavaScriptEngine) toScriptable( (ScriptableDelegate) scriptables[ i ] );
             }
             ElementArray result = ElementArray.newElementArray( this );
             result.initialize( elements );

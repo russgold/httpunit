@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,8 +19,9 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
-
+import org.w3c.dom.Node;
 
 /**
  * An interface which defines the common properties for an HTML element, which can correspond to any HTML tag.
@@ -74,7 +75,7 @@ public interface HTMLElement {
     /**
      * Returns the delegate which supports scripting this element.
      */
-    ScriptableDelegate getScriptableDelegate();
+    ScriptingHandler getScriptingHandler();
 
 
     /**
@@ -91,4 +92,17 @@ public interface HTMLElement {
      * @since 1.6.1
      */
     String getTagName();
+
+
+    ScriptableDelegate newScriptable();
+
+    /**
+     * Returns the scriptable delegate which can provide the scriptable delegate for this element.
+     */
+    ScriptableDelegate getParentDelegate();
+
+    /**
+     * Returns the DOM node underlying this element.
+     */
+    Node getNode();
 }

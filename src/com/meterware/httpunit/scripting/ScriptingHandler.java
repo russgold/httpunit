@@ -2,7 +2,7 @@ package com.meterware.httpunit.scripting;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,23 +20,17 @@ package com.meterware.httpunit.scripting;
  *
  *******************************************************************************************************************/
 
-
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface ScriptingEngine extends ScriptingHandler {
+public interface ScriptingHandler {
+    
+    boolean supportsScriptLanguage( String language );
 
+    boolean doEvent( String eventScript );
 
-    /**
-     * Returns a new scripting engine for the specified delegate.
-     */
-    public ScriptingEngine newScriptingEngine( ScriptableDelegate child );
+    String runScript( String language, String script );
 
-
-    /**
-     * Clears any cached values, permitting them to be recomputed as needed.
-     */
-    public void clearCaches();
-
+    String evaluateExpression( String urlString );
 }

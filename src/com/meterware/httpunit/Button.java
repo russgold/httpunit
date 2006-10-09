@@ -20,6 +20,7 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 
 import java.io.IOException;
 
@@ -100,9 +101,12 @@ public class Button extends FormControl {
      * @return true if subsequent actions should be performed.
      */
     final protected boolean doOnClickEvent() {
-        return _onClickEvent.length() == 0 || getScriptableDelegate().doEvent( _onClickEvent );
+        return _onClickEvent.length() == 0 || getScriptingHandler().doEvent( _onClickEvent );
     }
 
+//    public ScriptingHandler getScriptingHandler() {
+//        return (ScriptingHandler) getNode();
+//    }
 
     /**
      * Perform the normal action of this button.
@@ -122,12 +126,12 @@ public class Button extends FormControl {
     }
 
 
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
 
-    protected ScriptableDelegate getParentDelegate() {
+    public ScriptableDelegate getParentDelegate() {
         if (getForm() != null) return super.getParentDelegate();
         return _baseResponse.getScriptableObject().getDocument();
     }
@@ -145,13 +149,13 @@ public class Button extends FormControl {
         WITH_ID = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object button, Object id ) {
                 return ((Button) button).getID().equals( id );
-            };
+            }
         };
 
         WITH_LABEL = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object button, Object label ) {
                 return ((Button) button).getValue().equals( label );
-            };
+            }
         };
 
     }

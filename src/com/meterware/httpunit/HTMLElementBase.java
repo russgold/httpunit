@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,6 +21,7 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import org.w3c.dom.Node;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ abstract
 class HTMLElementBase implements HTMLElement {
 
     private Node        _node;
-    private ScriptableDelegate _scriptable;
+    private ScriptingHandler _scriptable;
     private List _supportedAttributes = new ArrayList();
 
 
@@ -62,10 +63,9 @@ class HTMLElementBase implements HTMLElement {
     /**
      * Returns a scriptable object which can act as a proxy for this control.
      */
-    public ScriptableDelegate getScriptableDelegate() {
+    public ScriptingHandler getScriptingHandler() {
         if (_scriptable == null) {
-            _scriptable = newScriptable();
-            _scriptable.setScriptEngine( getParentDelegate().getScriptEngine( _scriptable ) );
+            _scriptable = HttpUnitOptions.getScriptingEngine().createHandler( this );
         }
         return _scriptable;
     }
@@ -114,7 +114,7 @@ class HTMLElementBase implements HTMLElement {
     }
 
 
-    protected Node getNode() {
+    public Node getNode() {
         return _node;
     }
 
@@ -128,15 +128,9 @@ class HTMLElementBase implements HTMLElement {
      * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different
      * implementation of Scriptable.
      */
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new HTMLElementScriptable( this );
     }
-
-
-    /**
-     * Returns the scriptable delegate which can provide the scriptable delegate for this element.
-     */
-    abstract protected ScriptableDelegate getParentDelegate();
 
 
 }

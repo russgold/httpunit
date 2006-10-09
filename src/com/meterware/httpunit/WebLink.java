@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2006, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,8 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -53,8 +53,6 @@ public class WebLink extends FixedURLWebRequestSource {
 
     /** Predicate to match a link's name. **/
     public final static HTMLElementPredicate MATCH_NAME;
-
-    private Scriptable _scriptable;
 
 
     /**
@@ -104,7 +102,7 @@ public class WebLink extends FixedURLWebRequestSource {
      **/
     public void mouseOver() {
         String event = getAttribute( "onmouseover" );
-        if (event.length() > 0) getScriptableObject().doEvent( event );
+        if (event.length() > 0) getScriptingHandler().doEvent( event );
     }
 
 
@@ -151,11 +149,8 @@ public class WebLink extends FixedURLWebRequestSource {
 //----------------------------------------- WebRequestSource methods ---------------------------------------------------
 
 
-    /**
-     * Returns the scriptable delegate.
-     */
-    public ScriptableDelegate getScriptableDelegate() {
-        return getScriptableObject();
+    public ScriptableDelegate newScriptable() {
+        return new Scriptable();
     }
 
 
@@ -171,51 +166,39 @@ public class WebLink extends FixedURLWebRequestSource {
     }
 
 
-    /**
-     * Returns an object which provides scripting access to this link.
-     **/
-    Scriptable getScriptableObject() {
-        if (_scriptable == null) {
-            _scriptable = new Scriptable();
-            _scriptable.setScriptEngine( getBaseResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
-        }
-        return _scriptable;
-    }
-
-
     static {
         MATCH_URL_STRING = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 return HttpUnitUtils.contains( ((WebLink) htmlElement).getURLString(), (String) criteria );
-            };
+            }
         };
 
 
         MATCH_TEXT = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 return HttpUnitUtils.matches( ((WebLink) htmlElement).getText(), (String) criteria );
-            };
+            }
         };
 
 
         MATCH_CONTAINED_TEXT = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 return HttpUnitUtils.contains( ((WebLink) htmlElement).getText(), (String) criteria );
-            };
+            }
         };
 
 
         MATCH_ID = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 return HttpUnitUtils.matches( ((WebLink) htmlElement).getID(), (String) criteria );
-            };
+            }
         };
 
 
         MATCH_NAME = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 return HttpUnitUtils.matches( ((WebLink) htmlElement).getName(), (String) criteria );
-            };
+            }
         };
 
     }

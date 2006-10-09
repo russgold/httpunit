@@ -209,12 +209,12 @@ public class WebApplet extends HTMLElementBase {
     }
 
 
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new HTMLElementScriptable( this );
     }
 
 
-    protected ScriptableDelegate getParentDelegate() {
+    public ScriptableDelegate getParentDelegate() {
         return _response.getScriptableObject().getDocument();
     }
 

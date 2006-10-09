@@ -23,6 +23,9 @@ import org.w3c.dom.*;
 
 import java.util.Hashtable;
 
+import com.meterware.httpunit.scripting.ScriptingEngine;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>

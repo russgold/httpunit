@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2006, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -415,12 +415,16 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    public Scriptable getScriptableObject() {
+        return (Scriptable) getScriptingHandler();
+    }
+
     /**
      * Resets all parameters to their initial values.
      */
     public void reset() {
         String event = getAttribute( "onreset" );
-        if (event.length() == 0 || getScriptableObject().doEvent( event )) resetControls();
+        if (event.length() == 0 || getScriptingHandler().doEvent( event )) resetControls();
     }
 
 
@@ -432,17 +436,9 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    /**
-     * Returns an object which provides scripting access to this form.
-     **/
-    public Scriptable getScriptableObject() {
-        if (_scriptable == null) {
-            _scriptable = new Scriptable();
-            _scriptable.setScriptEngine( getBaseResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
-        }
-        return _scriptable;
+    public ScriptableDelegate newScriptable() {
+        return new Scriptable();
     }
-
 
 //---------------------------------- WebRequestSource methods --------------------------------
 
@@ -521,15 +517,6 @@ public class WebForm extends WebRequestSource {
      */
     public WebRequest newUnvalidatedRequest() {
         return newUnvalidatedRequest( null );
-    }
-
-
-    /**
-     * Returns the scriptable delegate.
-     */
-
-    public ScriptableDelegate getScriptableDelegate() {
-        return getScriptableObject();
     }
 
 
@@ -722,7 +709,7 @@ public class WebForm extends WebRequestSource {
                 final FormParameter parameter = getParameter( propertyName );
                 if (parameter != UNKNOWN_PARAMETER) return parameter.getScriptableObject();
                 FormControl control = getControlWithID( propertyName );
-                return control == null ? super.get( propertyName ) : control.getScriptableDelegate();
+                return control == null ? super.get( propertyName ) : control.getScriptingHandler();
             }
         }
 
@@ -758,7 +745,7 @@ public class WebForm extends WebRequestSource {
             FormControl[] controls = getFormControls();
             ScriptableDelegate[] result = new ScriptableDelegate[ controls.length ];
             for (int i = 0; i < result.length; i++) {
-                result[i] = controls[i].getScriptableDelegate();
+                result[i] = (ScriptableDelegate) controls[i].getScriptingHandler();
             }
             return result;
         }
@@ -815,9 +802,6 @@ public class WebForm extends WebRequestSource {
 
     /** A map of parameter names to form parameter objects. **/
     private Map            _formParameters;
-
-    /** The Scriptable object associated with this form. **/
-    private Scriptable _scriptable;
 
     private Vector _buttonVector;
 
@@ -921,7 +905,7 @@ public class WebForm extends WebRequestSource {
         MATCH_NAME = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 return HttpUnitUtils.matches( ((WebForm) htmlElement).getName(), (String) criteria );
-            };
+            }
         };
 
     }

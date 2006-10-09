@@ -1,11 +1,8 @@
 package com.meterware.httpunit.scripting;
-
-import com.meterware.httpunit.HTMLElement;
-
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -22,28 +19,29 @@ import com.meterware.httpunit.HTMLElement;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.HTMLElement;
 
 /**
  * An interface for objects which will be accessible via scripting.
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract public class ScriptableDelegate {
+abstract public class ScriptableDelegate implements ScriptingHandler {
 
     private ScriptingEngine _scriptEngine;
 
 
     private static final ScriptingEngine NULL_SCRIPT_ENGINE = new ScriptingEngine() {
         public boolean supportsScriptLanguage( String language ) { return false; }
-        public String executeScript( String language, String script ) { return ""; }
-        public boolean performEvent( String eventScript ) { return true; }
-        public String evaluateScriptExpression( String urlString ) { return null; }
+        public String runScript( String language, String script ) { return ""; }
+        public boolean doEvent( String eventScript ) { return true; }
+        public String evaluateExpression( String urlString ) { return null; }
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
         public void clearCaches() {}
     };
 
 
-    public boolean supportsScript( String language ) {
+    public boolean supportsScriptLanguage( String language ) {
         return getScriptEngine().supportsScriptLanguage( language );
     }
 
@@ -53,7 +51,7 @@ abstract public class ScriptableDelegate {
      **/
     public boolean doEvent( String eventScript ) {
         if (eventScript.length() == 0) return true;
-        return getScriptEngine().performEvent( eventScript );
+        return getScriptEngine().doEvent( eventScript );
     }
 
 
@@ -62,7 +60,7 @@ abstract public class ScriptableDelegate {
      * @return the replacement text, which may be empty.
      **/
     public String runScript( String language, String script ) {
-        return (script.length() == 0) ? "" : getScriptEngine().executeScript( language, script );
+        return (script.length() == 0) ? "" : getScriptEngine().runScript( language, script );
     }
 
 
@@ -71,7 +69,7 @@ abstract public class ScriptableDelegate {
      **/
     public String evaluateExpression( String urlString ) {
         if (urlString.length() == 0) return null;
-        return getScriptEngine().evaluateScriptExpression( urlString );
+        return getScriptEngine().evaluateExpression( urlString );
     }
 
 
@@ -121,7 +119,7 @@ abstract public class ScriptableDelegate {
     protected ScriptableDelegate[] getDelegates( final HTMLElement[] elements ) {
         ScriptableDelegate[] result = new ScriptableDelegate[ elements.length ];
         for (int i = 0; i < elements.length; i++) {
-            result[i] = elements[i].getScriptableDelegate();
+            result[i] = (ScriptableDelegate) elements[i].getScriptingHandler();
         }
         return result;
     }

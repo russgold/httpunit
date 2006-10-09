@@ -118,6 +118,7 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
         return super.getElementsByTagName( ((HTMLDocumentImpl) getOwnerDocument()).toNodeCase( name ) );
     }
 
+//---------------------------------------------- protected methods -----------------------------------------------------
 
     final protected String getAttributeWithDefault( String attributeName, String defaultValue ) {
         if (hasAttribute( attributeName )) return getAttribute( attributeName );

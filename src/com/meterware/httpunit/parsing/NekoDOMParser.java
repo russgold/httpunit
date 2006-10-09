@@ -121,7 +121,7 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
 
 
     public boolean supportsScriptLanguage( String language ) {
-        return getScriptableDelegate().supportsScript( language );
+        return getScriptableDelegate().supportsScriptLanguage( language );
     }
 
 

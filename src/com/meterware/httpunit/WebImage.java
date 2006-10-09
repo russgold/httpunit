@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,8 +19,8 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.net.URL;
 
@@ -37,7 +37,6 @@ public class WebImage extends FixedURLWebRequestSource {
 
     private HTMLImageElement _element;
     private ParsedHTML       _parsedHTML;
-    private Scriptable       _scriptable;
 
 
     WebImage( WebResponse response, ParsedHTML parsedHTML, URL baseURL, HTMLImageElement element, FrameSelector sourceFrame, String defaultTarget, String characterSet ) {
@@ -75,17 +74,6 @@ public class WebImage extends FixedURLWebRequestSource {
     }
 
 
-    /**
-     * Returns an object which provides scripting access to this link.
-     **/
-    public Scriptable getScriptableObject() {
-        if (_scriptable == null) {
-            _scriptable = new Scriptable();
-            _scriptable.setScriptEngine( getBaseResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
-        }
-        return _scriptable;
-    }
-
 
     public class Scriptable extends HTMLElementScriptable implements NamedDelegate {
 
@@ -119,15 +107,10 @@ public class WebImage extends FixedURLWebRequestSource {
         }
     }
 
-
 //---------------------------------- WebRequestSource methods ------------------------------------------
 
-
-    /**
-     * Returns the scriptable delegate.
-     */
-
-    public ScriptableDelegate getScriptableDelegate() {
-        return getScriptableObject();
+    public ScriptableDelegate newScriptable() {
+        return new Scriptable();
     }
+
 }

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 import java.net.URL;
 
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 
 /**
  * Represents a block-level element such as a paragraph or table cell, which can contain other elements.
@@ -35,8 +36,8 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
 abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HTMLElement {
 
 
-    private ScriptableDelegate _scriptable;
-    private Node               _node;
+    private ScriptingHandler _scriptable;
+    private Node             _node;
 
 
     /**
@@ -107,12 +108,19 @@ abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HT
     /**
      * Returns the delegate which supports scripting this element.
      */
-    public ScriptableDelegate getScriptableDelegate() {
+    public ScriptingHandler getScriptingHandler() {
         if (_scriptable == null) {
-            _scriptable = new HTMLElementScriptable( this );
-            _scriptable.setScriptEngine( getResponse().getScriptableObject().getDocument().getScriptEngine( _scriptable ) );
+            _scriptable = HttpUnitOptions.getScriptingEngine().createHandler( this );
         }
         return _scriptable;
+    }
+
+    public ScriptableDelegate getParentDelegate() {
+        return getResponse().getScriptableObject().getDocument();
+    }
+
+    public ScriptableDelegate newScriptable() {
+        return new HTMLElementScriptable( this );
     }
 
 
@@ -128,6 +136,10 @@ abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HT
         return false;
     }
 
+
+    public Node getNode() {
+        return _node;
+    }
 
 //----------------------------------------------- Object methods -------------------------------------------------------
 

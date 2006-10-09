@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.parsing.HTMLParserListener;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 
@@ -35,7 +36,10 @@ import java.util.Vector;
  **/
 public abstract class HttpUnitOptions {
 
-    final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
+    private static final String ORIGINAL_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
+    private static final String NEW_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.dom.DomBasedScriptingEngineFactory";
+
+    final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = ORIGINAL_SCRIPTING_ENGINE_FACTORY;
 
 
     /**
@@ -479,6 +483,15 @@ public abstract class HttpUnitOptions {
         public boolean isThrowExceptionsOnError() { return false; }
         public String[] getErrorMessages() { return new String[ 0 ]; }
         public void clearErrorMessages() {}
+        public ScriptingHandler createHandler( HTMLElement element ) { return NULL_SCRIPTING_HANDLER; }
+    };
+
+
+    private static final ScriptingHandler NULL_SCRIPTING_HANDLER = new ScriptingHandler() {
+        public boolean supportsScriptLanguage( String language ) { return false; }
+        public boolean doEvent( String eventScript ) { return true; }
+        public String runScript( String language, String script ) { return null; }
+        public String evaluateExpression( String urlString ) { return null; }
     };
 
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2006, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 import com.meterware.httpunit.parsing.DocumentAdapter;
 import org.w3c.dom.Document;
@@ -45,7 +46,7 @@ public class HTMLPage extends ParsedHTML {
     private Scriptable _scriptable;
 
 
-    HTMLPage( WebResponse response, FrameSelector frame, URL baseURL, String baseTarget, String characterSet ) throws IOException, SAXException {
+    HTMLPage( WebResponse response, FrameSelector frame, URL baseURL, String baseTarget, String characterSet ) {
         super( response, frame, baseURL, baseTarget, null, characterSet );
     }
 
@@ -141,10 +142,10 @@ public class HTMLPage extends ParsedHTML {
         }
 
 
-        private NamedDelegate getNamedItem( NamedDelegate[] items, String name ) {
+        private NamedDelegate getNamedItem( ScriptingHandler[] items, String name ) {
             if (name ==  null) return null;
             for (int i = 0; i < items.length; i++) {
-                if (name.equals( items[i].getName() )) return items[i];
+                if (items[i] instanceof NamedDelegate && name.equals( ((NamedDelegate) items[i]).getName() )) return (NamedDelegate) items[i];
             }
             return null;
         }
@@ -173,31 +174,31 @@ public class HTMLPage extends ParsedHTML {
         }
 
 
-        public WebLink.Scriptable[] getLinks() {
+        public ScriptingHandler[] getLinks() {
             WebLink[] links = HTMLPage.this.getLinks();
-            WebLink.Scriptable[] result = new WebLink.Scriptable[ links.length ];
+            ScriptingHandler[] result = new WebLink.Scriptable[ links.length ];
             for (int i = 0; i < links.length; i++) {
-                result[i] = links[i].getScriptableObject();
+                result[i] = links[i].getScriptingHandler();
             }
             return result;
         }
 
 
-        public WebForm.Scriptable[] getForms() {
+        public ScriptingHandler[] getForms() {
             WebForm[] forms = HTMLPage.this.getForms();
-            WebForm.Scriptable[] result = new WebForm.Scriptable[ forms.length ];
+            ScriptingHandler[] result = new WebForm.Scriptable[ forms.length ];
             for (int i = 0; i < forms.length; i++) {
-                result[i] = forms[i].getScriptableObject();
+                result[i] = forms[i].getScriptingHandler();
             }
             return result;
         }
 
 
-        public WebImage.Scriptable[] getImages() {
+        public ScriptingHandler[] getImages() {
             WebImage[] images = HTMLPage.this.getImages();
-            WebImage.Scriptable[] result = new WebImage.Scriptable[ images.length ];
+            ScriptingHandler[] result = new WebImage.Scriptable[ images.length ];
             for (int i = 0; i < images.length; i++) {
-                result[i] = images[i].getScriptableObject();
+                result[i] = images[i].getScriptingHandler();
             }
             return result;
         }
@@ -228,7 +229,7 @@ public class HTMLPage extends ParsedHTML {
 
         public ScriptableDelegate getElementWithID( String id ) {
             final HTMLElement elementWithID = HTMLPage.this.getElementWithID( id );
-            return elementWithID == null ? null : elementWithID.getScriptableDelegate();
+            return elementWithID == null ? null : (ScriptableDelegate) elementWithID.getScriptingHandler();
         }
 
 

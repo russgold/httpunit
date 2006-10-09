@@ -60,7 +60,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     private String  _baseTarget;
     private String  _refreshHeader;
-    private boolean _hasSubframes;
     private URL     _baseURL;
     private boolean _parsingPage;
 
@@ -833,7 +832,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     final static String      BLANK_HTML     = "";
 
-    final static WebResponse createBlankResponse() {
+    static WebResponse createBlankResponse() {
         return new DefaultWebResponse(BLANK_HTML);
     }
 
@@ -959,8 +958,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
             } while (count != -1);
         }
 
-        byte[] bytes = outputStream.toByteArray();
-        return bytes;
+        return outputStream.toByteArray();
     }
 
 
@@ -969,7 +967,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
         int available;
         do {
             timeLeft -= UNKNOWN_LENGTH_RETRY_INTERVAL;
-            try { Thread.sleep( UNKNOWN_LENGTH_RETRY_INTERVAL ); } catch (InterruptedException e) {}
+            try { Thread.sleep( UNKNOWN_LENGTH_RETRY_INTERVAL ); } catch (InterruptedException e) { /* do nothing */ }
             available = inputStream.available();
         } while (available == 0 && timeLeft > 0);
         return available;
@@ -1126,11 +1124,8 @@ public class WebResponse implements HTMLSegment, CookieSource {
     static String getDefaultEncoding() {
         if (_defaultEncoding == null) {
             for (int i = 0; i < DEFAULT_ENCODING_CANDIDATES.length; i++) {
-                try {
-                    _defaultEncoding = DEFAULT_ENCODING_CANDIDATES[i];
-                    "abcd".getBytes( _defaultEncoding );   // throws an exception if the encoding is not supported
-                    return _defaultEncoding;
-                } catch (UnsupportedEncodingException e) {
+                if (isSupportedCharacterSet( DEFAULT_ENCODING_CANDIDATES[i] )) {
+                    return _defaultEncoding = DEFAULT_ENCODING_CANDIDATES[i];
                 }
             }
         }
@@ -1141,11 +1136,16 @@ public class WebResponse implements HTMLSegment, CookieSource {
     private void setCharacterSet( String characterSet ) {
         if (characterSet == null) return;
 
+        _characterSet = isSupportedCharacterSet( characterSet ) ? characterSet : getDefaultEncoding();
+    }
+
+
+    private static boolean isSupportedCharacterSet( String characterSet ) {
         try {
             "abcd".getBytes( characterSet );
-            _characterSet = characterSet;
+            return true;
         } catch (UnsupportedEncodingException e) {
-            _characterSet = getDefaultEncoding();
+            return false;
         }
     }
 
@@ -1213,27 +1213,26 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
         private char[] _buffer;
-        private int    _start;
         private int    _end = -1;
 
 
         private String nextToken() {
-            _start = _end+1;
-            while (_start < _buffer.length && Character.isWhitespace( _buffer[ _start ] )) _start++;
-            if (_start >= _buffer.length) {
+            int start = _end + 1;
+            while (start < _buffer.length && Character.isWhitespace( _buffer[ start ] )) start++;
+            if (start >= _buffer.length) {
                 return "";
-            } else if (_buffer[ _start ] == '"') {
-                for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
-                return new String( _buffer, _start+1, _end-_start-1 );
-            } else if (_buffer[ _start ] == '\'') {
-                for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
-                return new String( _buffer, _start+1, _end-_start-1 );
-            } else if (_buffer[ _start ] == '=') {
-                _end = _start;
+            } else if (_buffer[ start ] == '"') {
+                for (_end = start +1; _end < _buffer.length && _buffer[ _end ] != '"'; _end++);
+                return new String( _buffer, start +1, _end-start -1 );
+            } else if (_buffer[ start ] == '\'') {
+                for (_end = start +1; _end < _buffer.length && _buffer[ _end ] != '\''; _end++);
+                return new String( _buffer, start +1, _end-start -1 );
+            } else if (_buffer[ start ] == '=') {
+                _end = start;
                 return "=";
             } else {
-                for (_end = _start+1; _end < _buffer.length && _buffer[ _end ] != '=' && !Character.isWhitespace( _buffer[ _end ] ); _end++);
-                return new String( _buffer, _start, (_end--)-_start );
+                for (_end = start +1; _end < _buffer.length && _buffer[ _end ] != '=' && !Character.isWhitespace( _buffer[ _end ] ); _end++);
+                return new String( _buffer, start, (_end--)-start );
             }
         }
     }
@@ -1249,13 +1248,13 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
         ByteTag getNextTag() throws UnsupportedEncodingException {
-            ByteTag byteTag = null;
+            ByteTag byteTag;
             do {
-                _start = _end+1;
-                while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
-                for (_end =_start+1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
-                if (_end >= _buffer.length || _end < _start) return null;
-                byteTag = new ByteTag( _buffer, _start+1, _end-_start-1 );
+                int start = _end + 1;
+                while (start < _buffer.length && _buffer[ start ] != '<') start++;
+                for (_end =start +1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
+                if (_end >= _buffer.length || _end < start) return null;
+                byteTag = new ByteTag( _buffer, start +1, _end-start -1 );
                 if (byteTag.getName().equalsIgnoreCase("script")) {
                     _scriptDepth++;
                     return byteTag;
@@ -1267,7 +1266,6 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
         private int _scriptDepth = 0;
-        private int _start = 0;
         private int _end   = -1;
 
         private byte[] _buffer;

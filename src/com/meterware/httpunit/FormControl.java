@@ -117,7 +117,7 @@ abstract class FormControl extends HTMLElementBase {
      * This default implementation returns the scriptable delegate for the control.
      */
     Object getDelegate() {
-        return getScriptableDelegate();
+        return getScriptingHandler();
     }
 
 
@@ -126,8 +126,8 @@ abstract class FormControl extends HTMLElementBase {
     }
 
 
-    protected ScriptableDelegate getParentDelegate() {
-        return getForm().getScriptableDelegate();
+    public ScriptableDelegate getParentDelegate() {
+        return (ScriptableDelegate) getForm().getScriptingHandler();
     }
 
 
@@ -266,7 +266,7 @@ abstract class FormControl extends HTMLElementBase {
      * Performs the 'onChange' event defined for this control.
      */
     protected void sendOnChangeEvent() {
-        if (_onChangeEvent.length() > 0) getScriptableDelegate().doEvent( _onChangeEvent );
+        if (_onChangeEvent.length() > 0) getScriptingHandler().doEvent( _onChangeEvent );
     }
 
 
@@ -274,7 +274,7 @@ abstract class FormControl extends HTMLElementBase {
      * Performs the 'onClick' event defined for this control.
      */
     protected void sendOnClickEvent() {
-        if (_onClickEvent.length() > 0) getScriptableDelegate().doEvent( _onClickEvent );
+        if (_onClickEvent.length() > 0) getScriptingHandler().doEvent( _onClickEvent );
     }
 
 
@@ -282,7 +282,7 @@ abstract class FormControl extends HTMLElementBase {
      * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different
      * implementation of Scriptable.
      */
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -410,7 +410,7 @@ class BooleanFormControl extends FormControl {
     private String[] _displayedValue;
 
 
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -605,7 +605,7 @@ class RadioGroupFormControl extends FormControl {
     Object getDelegate() {
         ScriptableDelegate[] delegates = new ScriptableDelegate[ getButtons().length ];
         for (int i = 0; i < delegates.length; i++) {
-            delegates[i] = getButtons()[i].getScriptableDelegate();
+            delegates[i] = (ScriptableDelegate) getButtons()[i].getScriptingHandler();
         }
         return delegates;
     }
@@ -737,7 +737,7 @@ abstract class TextFormControl extends FormControl {
     }
 
 
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -882,7 +882,7 @@ class FileSubmitFormControl extends FormControl {
     private UploadFileSpec _fileToUpload;
 
 
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 
@@ -1037,7 +1037,7 @@ class SelectionFormControl extends FormControl {
     }
 
 
-    protected ScriptableDelegate newScriptable() {
+    public ScriptableDelegate newScriptable() {
         return new Scriptable();
     }
 

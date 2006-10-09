@@ -552,9 +552,9 @@ public class WebClient {
 
     private boolean _exceptionsThrownOnErrorStatus = HttpUnitOptions.getExceptionsThrownOnErrorStatus();
 
-    private List _clientListeners = new ArrayList();
+    private final List _clientListeners = new ArrayList();
 
-    private List _windowListeners = new ArrayList();
+    private final List _windowListeners = new ArrayList();
 
     private DialogResponder _dialogResponder = new DialogAdapter();
 
@@ -648,7 +648,7 @@ public class WebClient {
 class RedirectWebRequest extends WebRequest {
 
 
-    RedirectWebRequest( WebResponse response ) throws MalformedURLException {
+    RedirectWebRequest( WebResponse response ) {
         super( response.getURL(), response.getHeaderField( "Location" ), response.getFrame(), response.getFrameName() );
         if (response.getReferer() != null) setHeaderField( "Referer", response.getReferer() );
     }

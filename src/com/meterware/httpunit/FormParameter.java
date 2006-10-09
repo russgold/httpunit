@@ -66,7 +66,7 @@ class FormParameter {
             ArrayList list = new ArrayList();
             for (int i = 0; i < _controls.length; i++) {
                 FormControl control = _controls[i];
-                list.add( control.getScriptableDelegate() );
+                list.add( control.getScriptingHandler() );
             }
             return list.toArray( new ScriptableDelegate[ list.size() ] );
         }

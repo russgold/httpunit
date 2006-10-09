@@ -1,10 +1,7 @@
 package com.meterware.httpunit.dom;
 
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.FunctionObject;
-import org.w3c.dom.Node;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -129,23 +126,12 @@ class ScriptingSupport {
     }
 
 
-    static Object evaluateExpression( Node node, String expression ) throws JavaScriptException {
-        try {
-            Context context = Context.enter();
-            context.initStandardObjects( null );
-            return Context.getCurrentContext().evaluateString( (Scriptable) node, expression, "httpunit", 0, null );
-        } finally {
-            Context.exit();
-        }
-    }
-
     public static boolean isConvertableTo( Class valueType, Class parameterType ) {
         if (valueType.equals( parameterType )) return true;
         if (parameterType.equals( String.class )) return true;
         if (valueType.equals( String.class ) && isNumericParameter( parameterType )) return true;
         if (Number.class.isAssignableFrom( valueType ) && isNumericParameter( parameterType )) return true;
-        if (valueType.equals( String.class ) && parameterType.equals( Boolean.class )) return true;
-        return false;
+        return valueType.equals( String.class ) && parameterType.equals( Boolean.class );
     }
 
     private static boolean isNumericParameter( Class parameterType ) {
