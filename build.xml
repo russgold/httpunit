@@ -110,13 +110,20 @@
                                            classpathref="base.classpath" />
     <available property="junit.present"    classname="junit.framework.Test"
                                            classpathref="base.classpath" />
+    <available property="dom3.present"     classname="org.w3c.dom.TypeInfo"
+                                           classpathref="base.classpath" />
 </target>
 
 
 <!--  ===================================================================  -->
 <!--  Compiles the source code                                             -->
 <!--  ===================================================================  -->
-<target name="compile" depends="prepare,check_for_optional_packages">
+<target name="compile-for-java2" depends="prepare,check_for_optional_packages" unless="dom3.present">
+    <mkdir dir="${build.classes}" />
+    <javac srcdir="src-1.4" destdir="${build.classes}"/>
+</target>
+
+<target name="compile" depends="prepare,check_for_optional_packages,compile-for-java2">
     <mkdir dir="${build.classes}" />
     <javac srcdir="${src.dir}" destdir="${build.classes}"
            debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
