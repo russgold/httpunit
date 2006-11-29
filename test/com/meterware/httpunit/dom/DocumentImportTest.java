@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2004-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -51,6 +51,7 @@ public class DocumentImportTest extends TestCase {
 
     /**
      * Verifies the importing of an attribute node with no children.
+     * @throws Exception thrown if an error occurs during the test.
      */
     public void testImportAttribute() throws Exception {
         Element element = _document.createElement( "rainbow" );
@@ -69,6 +70,7 @@ public class DocumentImportTest extends TestCase {
 
     /**
      * Verifies the importing of a text node.
+     * @throws Exception thrown if an error occurs during the test.
      */
     public void testImportText() throws Exception {
         String textValue = "something to say";
@@ -82,7 +84,58 @@ public class DocumentImportTest extends TestCase {
 
 
     /**
+     * Verifies the importing of a comment node.
+     * @throws Exception thrown if an error occurs during the test.
+     */
+    public void testImportComment() throws Exception {
+        String commentText = "something to say";
+        Comment original = _document.createComment( commentText );
+
+        Comment copy = (Comment) _document.importNode( original, false );
+        assertEquals( "Node type", Node.COMMENT_NODE, copy.getNodeType() );
+        assertEquals( "Node name", "#comment", copy.getNodeName() );
+        assertEquals( "length", commentText.length(), copy.getLength() );
+    }
+
+
+    /**
+     * Verifies the importing of a CData section.
+     * @throws Exception thrown if an error occurs during the test.
+     */
+    public void testImportCData() throws Exception {
+        String cDataText = "something <to> say";
+        CDATASection original = _document.createCDATASection( cDataText );
+
+        CDATASection copy = (CDATASection) _document.importNode( original, false );
+        assertEquals( "Node type", Node.CDATA_SECTION_NODE, copy.getNodeType() );
+        assertEquals( "Node name", "#cdata-section", copy.getNodeName() );
+        assertEquals( "length", cDataText.length(), copy.getLength() );
+        assertEquals( "value", cDataText, copy.getNodeValue() );
+    }
+
+
+    /**
+     * Verifies the importing of a processing instruction.
+     * @throws Exception thrown if an error occurs during the test.
+     */
+    public void testImportProcessingInstruction() throws Exception {
+        String target = "mememe";
+        String data   = "you you you";
+        ProcessingInstruction original = _document.createProcessingInstruction( target, data );
+        assertEquals( "Original node type", Node.PROCESSING_INSTRUCTION_NODE, original.getNodeType() );
+
+        ProcessingInstruction copy = (ProcessingInstruction) _document.importNode( original, false );
+        assertEquals( "Node type", Node.PROCESSING_INSTRUCTION_NODE, copy.getNodeType() );
+        assertEquals( "Node name", target, copy.getNodeName() );
+        assertEquals( "value", data, copy.getNodeValue() );
+        assertEquals( "target", target, copy.getTarget() );
+        assertEquals( "data", data, copy.getData() );
+    }
+
+
+    /**
      * Verifies the importing of a simple element with attributes.
+     * @throws Exception thrown if an error occurs during the test.
      */
     public void testImportElementWithAttributes() throws Exception {
         Element original = _document.createElement( "zork" );
@@ -100,6 +153,7 @@ public class DocumentImportTest extends TestCase {
 
     /**
      * Verifies the shallow importing of an element with children.
+     * @throws Exception thrown if an error occurs during the test.
      */
     public void testShallowImportElementWithChildren() throws Exception {
         Element original = _document.createElement( "zork" );
@@ -115,6 +169,7 @@ public class DocumentImportTest extends TestCase {
 
     /**
      * Verifies the deep importing of an element with children.
+     * @throws Exception thrown if an error occurs during the test.
      */
     public void testDeepImportElementWithChildren() throws Exception {
         Element original = _document.createElement( "zork" );

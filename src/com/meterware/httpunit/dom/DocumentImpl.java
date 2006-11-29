@@ -102,17 +102,17 @@ public class DocumentImpl extends NodeImpl implements Document {
 
 
     public Comment createComment( String data ) {
-        throw new UnsupportedOperationException( "Comment creation not supported ");
+        return CommentImpl.createComment( this, data );
     }
 
 
     public CDATASection createCDATASection( String data ) throws DOMException {
-        throw new UnsupportedOperationException( "CDATASection creation not supported ");
+        return CDATASectionImpl.createCDATASection( this, data );
     }
 
 
     public ProcessingInstruction createProcessingInstruction( String target, String data ) throws DOMException {
-        throw new UnsupportedOperationException( "ProcessingInstruction creation not supported ");
+        return ProcessingInstructionImpl.createProcessingImpl( this, target, data );
     }
 
 
@@ -130,10 +130,16 @@ public class DocumentImpl extends NodeImpl implements Document {
         switch (importedNode.getNodeType()) {
             case Node.ATTRIBUTE_NODE:
                 return AttrImpl.importNode( this, (Attr) importedNode );
-            case Node.TEXT_NODE:
-                return TextImpl.importNode( this, (Text) importedNode );
+            case Node.CDATA_SECTION_NODE:
+                return CDATASectionImpl.importNode( this, (CDATASection) importedNode );
+            case Node.COMMENT_NODE:
+                return CommentImpl.importNode( this, (Comment) importedNode );
             case Node.ELEMENT_NODE:
                 return ElementImpl.importNode( this, (Element) importedNode, deep );
+            case Node.PROCESSING_INSTRUCTION_NODE:
+                return ProcessingInstructionImpl.importNode( this, (ProcessingInstruction) importedNode );
+            case Node.TEXT_NODE:
+                return TextImpl.importNode( this, (Text) importedNode );
             default:
                 throw new DOMException( DOMException.NOT_SUPPORTED_ERR, "Cannot import node type " + importedNode.getNodeType() );
         }
@@ -175,59 +181,54 @@ public class DocumentImpl extends NodeImpl implements Document {
 //------------------------------------- DOM level 3 methods ------------------------------------------------------------
 
     public String getInputEncoding() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public String getXmlEncoding() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public Node renameNode( Node n, String namespaceURI, String qualifiedName ) throws DOMException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public boolean getXmlStandalone() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;
     }
 
     public void setXmlStandalone( boolean xmlStandalone ) throws DOMException {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public String getXmlVersion() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public void setXmlVersion( String xmlVersion ) throws DOMException {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public boolean getStrictErrorChecking() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;
     }
 
     public void setStrictErrorChecking( boolean strictErrorChecking ) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public String getDocumentURI() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public void setDocumentURI( String documentURI ) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public Node adoptNode( Node source ) throws DOMException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public DOMConfiguration getDomConfig() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public void normalizeDocument() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }
