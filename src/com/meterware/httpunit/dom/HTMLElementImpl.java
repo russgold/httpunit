@@ -59,11 +59,6 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
     }
 
 
-    protected void initialize( DocumentImpl owner, String tagName ) {
-        super.initialize( owner, tagName.toUpperCase() );
-    }
-
-
     public String getId() {
         return getAttributeWithNoDefault( "id" );
     }

@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2004-2006, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,16 +23,12 @@ import org.w3c.dom.*;
 
 import java.util.Hashtable;
 
-import com.meterware.httpunit.scripting.ScriptingEngine;
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class ElementImpl extends NodeImpl implements Element {
+public class ElementImpl extends NamespaceAwareNodeImpl implements Element {
 
-    private String _tagName;
     private Hashtable _attributes = new Hashtable();
 
 
@@ -43,14 +39,10 @@ public class ElementImpl extends NodeImpl implements Element {
     }
 
 
-    protected void initialize( DocumentImpl owner, String tagName ) {
-        super.initialize( owner );
-        _tagName = tagName;
-    }
-
-
-    public String getNodeName() {
-        return getTagName();
+    public static Element createElement( DocumentImpl owner, String namespaceURI, String qualifiedName ) {
+        ElementImpl element = new ElementImpl();
+        element.initialize( owner, namespaceURI, qualifiedName );
+        return element;
     }
 
 
@@ -65,11 +57,6 @@ public class ElementImpl extends NodeImpl implements Element {
 
 
     public void setNodeValue( String nodeValue ) throws DOMException {
-    }
-
-
-    public String getTagName() {
-        return _tagName;
     }
 
 
@@ -96,6 +83,13 @@ public class ElementImpl extends NodeImpl implements Element {
     }
 
 
+    public void setAttributeNS( String namespaceURI, String qualifiedName, String value ) throws DOMException {
+        Attr attribute = getOwnerDocument().createAttributeNS( namespaceURI, qualifiedName );
+        attribute.setValue( value );
+        setAttributeNodeNS( attribute );
+    }
+
+
     public void removeAttribute( String name ) throws DOMException {
         _attributes.remove( name );
     }
@@ -107,6 +101,16 @@ public class ElementImpl extends NodeImpl implements Element {
 
 
     public Attr setAttributeNode( Attr newAttr ) throws DOMException {
+        if (newAttr.getOwnerDocument() != getOwnerDocument()) throw new DOMException( DOMException.WRONG_DOCUMENT_ERR, "attribute must be from the same document as the element" );
+
+        ((AttrImpl) newAttr).setOwnerElement( this );
+        AttrImpl oldAttr = (AttrImpl) _attributes.put( newAttr.getName(), newAttr );
+        if (oldAttr != null) oldAttr.setOwnerElement( null );
+        return oldAttr;
+    }
+
+
+    public Attr setAttributeNodeNS( Attr newAttr ) throws DOMException {
         if (newAttr.getOwnerDocument() != getOwnerDocument()) throw new DOMException( DOMException.WRONG_DOCUMENT_ERR, "attribute must be from the same document as the element" );
 
         ((AttrImpl) newAttr).setOwnerElement( this );
@@ -138,20 +142,11 @@ public class ElementImpl extends NodeImpl implements Element {
     }
 
 
-    public void setAttributeNS( String namespaceURI, String qualifiedName, String value ) throws DOMException {
-    }
-
-
     public void removeAttributeNS( String namespaceURI, String localName ) throws DOMException {
     }
 
 
     public Attr getAttributeNodeNS( String namespaceURI, String localName ) {
-        return null;
-    }
-
-
-    public Attr setAttributeNodeNS( Attr newAttr ) throws DOMException {
         return null;
     }
 
@@ -167,7 +162,7 @@ public class ElementImpl extends NodeImpl implements Element {
 
 
     public static Element importNode( DocumentImpl document, Element original, boolean deep ) {
-        Element copy = document.createElement( original.getTagName() );
+        Element copy = document.createElementNS( original.getNamespaceURI(), original.getTagName() );
         NamedNodeMap attributes = original.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
             copy.setAttributeNode( (Attr) document.importNode( attributes.item(i), false ) );

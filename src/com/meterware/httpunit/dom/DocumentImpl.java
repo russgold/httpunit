@@ -152,14 +152,12 @@ public class DocumentImpl extends NodeImpl implements Document {
 
 
     public Element createElementNS( String namespaceURI, String qualifiedName ) throws DOMException {
-        if (namespaceURI != null) throw new UnsupportedOperationException( "Namespaces are not supported" );
-        return createElement( qualifiedName );
+        return ElementImpl.createElement( this, namespaceURI, qualifiedName );
     }
 
 
     public Attr createAttributeNS( String namespaceURI, String qualifiedName ) throws DOMException {
-        if (namespaceURI != null) throw new UnsupportedOperationException( "Namespaces are not supported" );
-        return createAttribute( qualifiedName );
+        return AttrImpl.createAttribute( this, namespaceURI, qualifiedName );
     }
 
 

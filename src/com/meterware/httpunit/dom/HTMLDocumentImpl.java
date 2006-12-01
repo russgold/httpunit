@@ -236,6 +236,13 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
     }
 
 
+    public Element createElementNS( String namespaceURI, String qualifiedName ) throws DOMException {
+        ElementImpl element = getExemplar( qualifiedName ).create();
+        element.initialize( this, namespaceURI, toNodeCase( qualifiedName ) );
+        return element;
+    }
+
+
 /*
     Element createScriptableElement( String tagName ) throws DOMException {
         try {

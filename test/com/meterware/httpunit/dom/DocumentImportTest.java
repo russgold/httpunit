@@ -152,6 +152,32 @@ public class DocumentImportTest extends TestCase {
 
 
     /**
+     * Verifies the importing of a simple element with attributes, both supporting namespaces.
+     * @throws Exception thrown if an error occurs during the test.
+     */
+    public void testImportNSElementWithNSAttributes() throws Exception {
+        Element original = _document.createElementNS( "http://funnyspace/", "fs:zork" );
+        original.setAttributeNS( "http://funnyspace/", "fs:version", "2.0" );
+        Attr size = _document.createAttributeNS( "http://funnyspace/", "fs:interactive" );
+        original.setAttributeNode( size );
+        verifyNSElementWithNSAttributes( "original", original );
+
+        Element copy = (Element) _document.importNode( original, /* deep */ false );
+        verifyNSElementWithNSAttributes( "copy", copy );
+    }
+
+
+    private void verifyNSElementWithNSAttributes( String comment, Element element ) {
+        assertEquals( comment + " node type", Node.ELEMENT_NODE, element.getNodeType() );
+        assertEquals( comment + " node name", "fs:zork", element.getNodeName() );
+        assertEquals( comment + " local name", "zork", element.getLocalName() );
+        assertEquals( comment + " namespace URI", "http://funnyspace/", element.getNamespaceURI() );
+        assertEquals( comment + " version attribute", "2.0", element.getAttribute( "fs:version" ) );
+        assertTrue( comment + " does not have interactive attribute", element.hasAttribute( "fs:interactive") );
+    }
+
+
+    /**
      * Verifies the shallow importing of an element with children.
      * @throws Exception thrown if an error occurs during the test.
      */

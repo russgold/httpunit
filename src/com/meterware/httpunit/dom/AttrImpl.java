@@ -40,6 +40,13 @@ public class AttrImpl extends NodeImpl implements Attr {
     }
 
 
+    public static Attr createAttribute( DocumentImpl owner, String namespaceURI, String qualifiedName ) {
+        AttrImpl attribute = new AttrImpl();
+        attribute.initialize( owner, qualifiedName );
+        return attribute;
+    }
+
+
     protected void initialize( DocumentImpl owner, String name ) {
         super.initialize( owner );
         _name = name;
@@ -98,7 +105,7 @@ public class AttrImpl extends NodeImpl implements Attr {
 
 
     public static Node importNode( Document document, Attr attr ) {
-        Attr attribute = document.createAttribute( attr.getName() );
+        Attr attribute = document.createAttributeNS( attr.getNamespaceURI(), attr.getName() );
         attribute.setValue( attr.getValue() );
         return attribute;
     }

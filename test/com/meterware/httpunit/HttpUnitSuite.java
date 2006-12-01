@@ -24,6 +24,7 @@ import com.meterware.httpunit.cookies.CookieTest;
 import com.meterware.httpunit.javascript.NekoEnhancedScriptingTest;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 import com.meterware.httpunit.parsing.ParsingTestSuite;
+import com.meterware.httpunit.dom.DomTestSuite;
 
 import junit.framework.TestSuite;
 
@@ -64,6 +65,8 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( NormalizeURLTest.suite() );
         result.addTest( TextBlockTest.suite() );
         result.addTest( EncodingTest.suite() );
+
+        result.addTest( DomTestSuite.suite() );
 
         if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("NekoHTML") >= 0) result.addTest( NekoEnhancedScriptingTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
