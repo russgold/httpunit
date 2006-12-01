@@ -1086,7 +1086,11 @@ public class WebResponse implements HTMLSegment, CookieSource {
             _contentHeader = _contentType + ";charset=" + _characterSet;
         } else {
             String[] parts = HttpUnitUtils.parseContentTypeHeader( contentHeader );
-            _contentType = parts[0];
+            if (null != _client && null != _client.getClientProperties().getOverrideContextType()) {
+                _contentType = _client.getClientProperties().getOverrideContextType();
+            } else {
+                _contentType = parts[0];
+            }
             if (parts[1] != null) setCharacterSet( parts[1] );
         }
     }

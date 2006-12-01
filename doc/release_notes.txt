@@ -14,6 +14,14 @@ Limitations:
 
 
 Revision History:
+ 1-Dec-2006:
+    Additions:
+        Content and Parsing:
+            1. Added "overrideContextType" property to ClientProperties to permit handling of files served with the
+               wrong content type.
+26-Nov-2006:
+    Notes: HttpUnit has been moved to subversion at http://svn.httpunit.org/svnroot/httpunit/trunk/httpunit
+
 31-Mar-2006:
     Additions:
         PseudoServer:

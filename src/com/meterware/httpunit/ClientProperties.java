@@ -211,7 +211,27 @@ public class ClientProperties {
 
 
     /**
+     * Returns the context type (if any) to use instead of the one specified by the server. Defaults to null.
+     * @return the overriding context type, or null if none is specified.
+     */
+    public String getOverrideContextType() {
+        return _overrideContextType;
+    }
+
+
+    /**
+     * All responses to this client will use the specified content type rather than the one specified by the server.
+     * Setting this to "text/html" will force all reponses to be interpreted as HTML.
+     * @param overrideContextType the new override to apply to context types.
+     */
+    public void setOverrideContextType( String overrideContextType ) {
+        _overrideContextType = overrideContextType;
+    }
+
+
+    /**
      * Specifies a listener for DNS requests from the client.
+     * @param dnsListener the new listener.
      */
     public void setDnsListener( DNSListener dnsListener ) {
         _dnsListener = dnsListener;
@@ -220,6 +240,7 @@ public class ClientProperties {
 
     /**
      * Returns the listener for DNS requests to be used by the client.
+     * @return the currently specified DNS listener, or null if none is specified.
      */
     DNSListener getDnsListener() {
         return _dnsListener;
@@ -236,6 +257,7 @@ public class ClientProperties {
     private String _applicationVersion  = "1.5";
     private String _userAgent;
     private String _platform            = "Java";
+    private String _overrideContextType = null;
     private int    _availWidth          = 800;
     private int    _availHeight         = 600;
 
@@ -260,6 +282,7 @@ public class ClientProperties {
         _applicationVersion  = source._applicationVersion;
         _userAgent           = source._userAgent;
         _platform            = source._platform;
+        _overrideContextType = source._overrideContextType;
         _iframeSupported     = source._iframeSupported;
         _acceptCookies       = source._acceptCookies;
         _acceptGzip          = source._acceptGzip;

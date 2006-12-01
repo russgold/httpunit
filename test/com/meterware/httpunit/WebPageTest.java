@@ -104,6 +104,24 @@ public class WebPageTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verify that even if a page does not claim to be HTML, that we can treat it as whatever we like.
+     * @throws Exception if an unexpected exception occurs during the test.
+     */
+    public void testForceAsHtml() throws Exception {
+        defineResource( "SimplePage.html", "<html><head><title>A Sample Page</title></head><body>Something here</body></html>", "text" );
+        WebConversation wc = new WebConversation();
+        try {
+            wc.getResponse( getHostPath() + "/SimplePage.html" ).getReceivedPage().getTitle();
+            fail( "should have complained that the page is not HTML" );
+        } catch (NotHTMLException e) {}
+        
+        wc.getClientProperties().setOverrideContextType( "text/html" );
+        WebResponse simplePage = wc.getResponse( getHostPath() + "/SimplePage.html" );
+        assertEquals( "HTML Title", "A Sample Page", simplePage.getReceivedPage().getTitle() );
+    }
+
+
     public void testHtmlDocument() throws Exception {
         defineWebPage( "SimplePage",
                         "This has no forms but it does\n" +
