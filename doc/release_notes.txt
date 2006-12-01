@@ -7,7 +7,7 @@ Known problems:
        be callable.
 
 Limitations:
-    1. JDK 1.3.1 or higher is required
+    1. JDK 1.4.2 or higher is required
     2. JavaScript support does not include some DOM properties
     3. The JavaScript assignment Document.cookie= does not restrict the cookie by path and domain
     4. Only table cells and explicit paragraphs are recognized as text blocks
@@ -20,7 +20,7 @@ Revision History:
             1. Added "overrideContextType" property to ClientProperties to permit handling of files served with the
                wrong content type.
 26-Nov-2006:
-    Notes: HttpUnit has been moved to subversion at http://svn.httpunit.org/svnroot/httpunit/trunk/httpunit
+    Notes: HttpUnit has been moved to subversion at http://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit
 
 31-Mar-2006:
     Additions:
