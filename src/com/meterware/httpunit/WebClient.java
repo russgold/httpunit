@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.PasswordAuthentication;
 
 import java.util.*;
 
@@ -49,8 +50,15 @@ public class WebClient {
 
     /** The current main window. **/
     private WebWindow _mainWindow = new WebWindow( this );
+
+    /** An authorization string to be sent with every request, whether challenged or not. May be null. **/
+    private String _fixedAuthorizationString;
+
+    /** An authorization string to be sent with the next request only. May be null. **/
     private String _authorizationString;
+
     private String _proxyAuthorizationString;
+    private Hashtable _credentials = new Hashtable();
 
 
     public WebWindow getMainWindow() {
@@ -208,7 +216,7 @@ public class WebClient {
      * @deprecated as of 1.4.6. Use ClientProperties#setUserAgent instead.
      **/
     public void setUserAgent( String userAgent ) {
-	    getClientProperties().setUserAgent( userAgent );
+        getClientProperties().setUserAgent( userAgent );
     }
 
 
@@ -217,17 +225,34 @@ public class WebClient {
      * @deprecated as of 1.4.6. Use ClientProperties#getUserAgent instead.
      **/
     public String getUserAgent() {
-	    return getClientProperties().getUserAgent();
+        return getClientProperties().getUserAgent();
     }
 
 
     /**
      * Sets a username and password for a basic authentication scheme.
+     * @deprecated as of 1.7. Use #setAuthentication for more accurate emulation of browser behavior.
      **/
     public void setAuthorization( String userName, String password ) {
-        _authorizationString = "Basic " + Base64.encode( userName + ':' + password );
+        _fixedAuthorizationString = "Basic " + Base64.encode( userName + ':' + password );
     }
 
+
+    /**
+     * Specifies a username and password for on-demand authentication. Will only send
+     * the authorization header when challenged for the specified realm.
+     * @param realm the realm for which the credentials apply.
+     * @param username the user to authenticate
+     * @param password the credentials for the user
+     */
+    public void setAuthentication( String realm, String username, String password ) {
+        _credentials.put( realm, new PasswordAuthentication( username, password.toCharArray() ) );
+    }
+
+
+    PasswordAuthentication getCredentialsForRealm( String realm ) {
+        return ((PasswordAuthentication) _credentials.get( realm ));
+    }
 
     /**
      * Specifies a proxy server to use for requests from this client.
@@ -409,8 +434,10 @@ public class WebClient {
         result.put( "User-Agent", getClientProperties().getUserAgent() );
         if (getClientProperties().isAcceptGzip()) result.put( "Accept-Encoding", "gzip" );
         AddHeaderIfNotNull( result, "Cookie", _cookieJar.getCookieHeaderField( targetURL ) );
+        if (_authorizationString == null) _authorizationString = _fixedAuthorizationString;
         AddHeaderIfNotNull( result, "Authorization", _authorizationString );
         AddHeaderIfNotNull( result, "Proxy-Authorization", _proxyAuthorizationString );
+        _authorizationString = null;
         return result;
     }
 
@@ -567,9 +594,7 @@ public class WebClient {
     private void validateHeaders( WebResponse response ) throws HttpException {
         if (!getExceptionsThrownOnErrorStatus()) return;
 
-        if (response.getHeaderField( "WWW-Authenticate" ) != null) {
-            throw new AuthorizationRequiredException( response.getHeaderField( "WWW-Authenticate" ) );
-        } else if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
+        if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
             throw new HttpInternalErrorException( response.getURL() );
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new HttpNotFoundException( response.getResponseMessage(), response.getURL() );
@@ -588,6 +613,34 @@ public class WebClient {
         return null;
     }
 
+
+    /**
+     * Sends a request and returns a response after dealing with any authentication challenge. If challenged and able
+     * to respond, resends the request after setting the authentication header (which will apply only for the that request).
+     * @param request the original request
+     * @param targetFrame the frame into which the result will be stored
+     * @return a response from the server
+     * @throws IOException if an exception (including authorization failure) occurs
+     */
+    WebResponse createResponse( WebRequest request, FrameSelector targetFrame ) throws IOException {
+        WebResponse response = newResponse( request, targetFrame );
+        AuthenticationChallenge challenge = new AuthenticationChallenge( this, request, response.getHeaderField( "WWW-Authenticate" ) );
+        if (!challenge.needToAuthenticate()) {
+            return response;
+        } else {
+            setOnetimeAuthenticationHeader( challenge.createAuthenticationHeader() );
+            WebResponse response2 = newResponse( request, targetFrame );
+            if (response2.getHeaderField( "WWW-Authenticate" ) != null && getExceptionsThrownOnErrorStatus()) {
+                throw AuthenticationChallenge.createException( response2.getHeaderField( "WWW-Authenticate" ) );
+            }
+            return response2;
+        }
+    }
+
+
+    private void setOnetimeAuthenticationHeader( String authorizationHeader ) {
+        _authorizationString = authorizationHeader;
+    }
 
 //==================================================================================================
 

@@ -19,10 +19,7 @@ package com.meterware.servletunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.HttpException;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.FrameSelector;
+import com.meterware.httpunit.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -205,7 +202,7 @@ class InvocationContextImpl implements InvocationContext {
         } else if (request.getRemoteUser() != null) {
             throw new AccessDeniedException( requestURL );
         } else if (_application.usesBasicAuthentication()) {
-            throw new BasicAuthenticationRequiredException( _application.getAuthenticationRealm() );
+            throw AuthorizationRequiredException.createBasicAuthenticationRequiredException( _application.getAuthenticationRealm() );
         } else if (!_application.usesFormAuthentication()) {
             throw new IllegalStateException( "Authorization required but no authentication method defined" );
         } else {

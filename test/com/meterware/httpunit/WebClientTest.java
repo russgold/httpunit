@@ -28,9 +28,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
+//
+//import HTTPClient.HTTPConnection;
+//import HTTPClient.HTTPResponse;
 
 
 /**
@@ -259,6 +261,58 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    public void testOnDemandBasicAuthentication() throws Exception {
+        defineResource( "getAuthorization", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String header = getHeader( "Authorization" );
+                if (header == null) {
+                    WebResource webResource = new WebResource( "unauthorized" );
+                    webResource.addHeader( "WWW-Authenticate: Basic realm=\"testrealm\"");
+                    return webResource;
+                } else {
+                    return new WebResource( header, "text/plain" );
+                }
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        wc.setAuthentication( "testrealm", "user", "password" );
+        WebResponse wr = wc.getResponse( getHostPath() + "/getAuthorization" );
+        assertEquals( "authorization", "Basic dXNlcjpwYXNzd29yZA==", wr.getText() );
+    }
+
+
+    /**
+     * Verifies that even though we have specified username and password for a realm,
+     * a request for a different realm will still result in an exception.
+     * @throws Exception if an unexpected exception is thrown.
+     */
+    public void testBasicAuthenticationRequestedForUnknownRealm() throws Exception {
+        defineResource( "getAuthorization", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String header = getHeader( "Authorization" );
+                if (header == null) {
+                    WebResource webResource = new WebResource( "unauthorized" );
+                    webResource.addHeader( "WWW-Authenticate: Basic realm=\"bogusrealm\"");
+                    return webResource;
+                } else {
+                    return new WebResource( header, "text/plain" );
+                }
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        wc.setAuthentication( "testrealm", "user", "password" );
+        try {
+            wc.getResponse( getHostPath() + "/getAuthorization" );
+            fail( "Should have rejected authentication" );
+        } catch (AuthorizationRequiredException e) {
+            assertEquals( "authorization scheme", "Basic", e.getAuthenticationScheme() );
+            assertEquals( "bogusrealm", e.getAuthenticationParameter( "realm" ) );
+        }
+    }
+
+
     public void testProxyServerAccessWithAuthentication() throws Exception {
         defineResource( "http://someserver.com/sample", new PseudoServlet() {
             public WebResource getGetResponse() {
@@ -272,17 +326,179 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verifies one-time digest authentication with no Quality of Protection (qop).
+     * @throws Exception
+     */
+    public void testRfc2109DigestAuthentication() throws Exception {
+        defineResource( "/dir/index.html", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String header = getHeader( "Authorization" );
+                if (header == null) {
+                    WebResource resource = new WebResource( "not authorized", HttpURLConnection.HTTP_UNAUTHORIZED );
+                    resource.addHeader( "WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
+                                        " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+                                        " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+                    return resource;
+                } else {
+                    return new WebResource( getHeader( "Authorization" ), "text/plain" );
+                }
+            }
+        });
+        WebConversation wc = new WebConversation();
+        wc.setAuthentication( "testrealm@host.com", "Mufasa", "CircleOfLife" );
+        WebResponse wr = wc.getResponse( getHostPath() + "/dir/index.html" );
+        HttpHeader expectedHeader
+                = new HttpHeader( "Digest username=\"Mufasa\"," +
+                                  "       realm=\"testrealm@host.com\"," +
+                                  "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+                                  "       uri=\"/dir/index.html\"," +
+                                  "       response=\"1949323746fe6a43ef61f9606e7febea\"," +
+                                  "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+        HttpHeader actualHeader = new HttpHeader( wr.getText() );
+        assertHeadersEquals( expectedHeader, actualHeader );
+    }
+
+
+    /**
+     * Verifies one-time digest authentication with no Quality of Protection (qop).
+     * @throws Exception
+     */
+//    public void testRfc2109DigestAuthenticationHttpClient() throws Exception {     //  todo delete this
+//        defineResource( "/dir/index.html", new PseudoServlet() {
+//            public WebResource getGetResponse() {
+//                String header = getHeader( "Authorization" );
+//                if (header == null) {
+//                    WebResource resource = new WebResource( "not authorized", HttpURLConnection.HTTP_UNAUTHORIZED );
+//                    resource.addHeader( "WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
+//                                        " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+//                                        " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+//                    return resource;
+//                } else {
+//                    return new WebResource( getHeader( "Authorization" ), "text/plain" );
+//                }
+//            }
+//        });
+//
+//        URL url = new URL( getHostPath() + "/dir/index.html" );
+//        HTTPConnection connection = new HTTPConnection( url );
+//        connection.addDigestAuthorization( "testrealm@host.com", "Mufasa", "CircleOfLife" );
+//        HTTPResponse httpResponse = connection.Get( url.getFile() );
+//
+//        HttpHeader expectedHeader
+//                = new HttpHeader( "Digest username=\"Mufasa\"," +
+//                                  "       realm=\"testrealm@host.com\"," +
+//                                  "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+//                                  "       uri=\"/dir/index.html\"," +
+//                                  "       response=\"e966c932a9242554e42c8ee200cec7f6\"," +
+//                                  "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+//        HttpHeader actualHeader = new HttpHeader( httpResponse.getText() );
+//        assertHeadersEquals( expectedHeader, actualHeader );
+//    }
+
+
+    /**
+     * Verifies one-time digest authentication with Quality of Protection (qop).
+     * @throws Exception
+     */
+    public void ntestQopDigestAuthentication() throws Exception {     //  todo enable this
+        defineResource( "/dir/index.html", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String header = getHeader( "Authorization" );
+                if (header == null) {
+                    WebResource resource = new WebResource( "not authorized", HttpURLConnection.HTTP_UNAUTHORIZED );
+                    resource.addHeader( "WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
+                                        " qop=\"auth,auth-int\"," +
+                                        " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+                                        " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+                    return resource;
+                } else {
+                    return new WebResource( getHeader( "Authorization" ), "text/plain" );
+                }
+            }
+        });
+        WebConversation wc = new WebConversation();
+        wc.setAuthentication( "testrealm@host.com", "Mufasa", "Circle Of Life" );
+        WebResponse wr = wc.getResponse( getHostPath() + "/dir/index.html" );
+        HttpHeader expectedHeader
+                = new HttpHeader( "Digest username=\"Mufasa\"," +
+                                  "       realm=\"testrealm@host.com\"," +
+                                  "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+                                  "       uri=\"/dir/index.html\"," +
+                                  "       qop=auth," +
+                                  "       nc=00000001," +
+                                  "       cnonce=\"0a4f113b\"," +
+                                  "       response=\"6629fae49393a05397450978507c4ef1\"," +
+                                  "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+        HttpHeader actualHeader = new HttpHeader( wr.getText() );
+        assertHeadersEquals( expectedHeader, actualHeader );
+    }
+
+
+    private void assertHeadersEquals( HttpHeader expectedHeader, HttpHeader actualHeader ) {
+        assertEquals( "Authentication type", expectedHeader.getLabel(), actualHeader.getLabel() );
+        if (!expectedHeader.equals( actualHeader )) {
+            Deltas deltas = new Deltas();
+            Set actualKeys = new HashSet( actualHeader.getProperties().keySet() );
+            for (Iterator eachKey = expectedHeader.getProperties().keySet().iterator(); eachKey.hasNext();) {
+                String key = (String) eachKey.next();
+                if (!actualKeys.contains( key )) {
+                    deltas.addMissingValue( key, expectedHeader.getProperty( key ));
+                } else {
+                    actualKeys.remove( key );
+                    deltas.compareValues( key, expectedHeader.getProperty( key ), actualHeader.getProperty( key ) );
+                }
+            }
+            for (Iterator eachKey = actualKeys.iterator(); eachKey.hasNext();) {
+                String key = (String) eachKey.next();
+                deltas.addExtraValue( key, actualHeader.getProperty( key ) );
+            }
+            fail( "Header not as expected: " + deltas );
+        }
+    }
+
+
+    static class Deltas {
+        private ArrayList _missingValues = new ArrayList();
+        private ArrayList _extraValues = new ArrayList();
+
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            if (!_missingValues.isEmpty()) sb.append( "missing: ").append( _missingValues );
+            if (!_extraValues.isEmpty()) sb.append( "extra: " ).append( _extraValues );
+            return sb.toString();
+        }
+
+
+        void addMissingValue( Object key, Object value ) {
+            _missingValues.add( key + "=" + value );
+        }
+
+        void addExtraValue( Object key, Object value ) {
+            _extraValues.add( key + "=" + value );
+        }
+
+        void compareValues( Object key, Object expected, Object actual ) {
+            if (!expected.equals( actual )) {
+                addMissingValue( key, expected );
+                addExtraValue( key, actual );
+            }
+        }
+    }
+
+
     public void testRefererHeader() throws Exception {
         String resourceName = "tellMe";
         String linkSource = "fromLink";
-	    String formSource = "fromForm";
+        String formSource = "fromForm";
 
         String page0 = getHostPath() + '/' + resourceName;
-	    String page1 = getHostPath() + '/' + linkSource;
-	    String page2 = getHostPath() + '/' + formSource;
+        String page1 = getHostPath() + '/' + linkSource;
+        String page2 = getHostPath() + '/' + formSource;
 
         defineResource( linkSource, "<html><head></head><body><a href=\"tellMe\">Go</a></body></html>" );
-	    defineResource( formSource, "<html><body><form action=\"tellMe\"><input type=submit></form></body></html>" );
+        defineResource( formSource, "<html><body><form action=\"tellMe\"><input type=submit></form></body></html>" );
         defineResource( resourceName, new PseudoServlet() {
             public WebResource getGetResponse() {
                 String referer = getHeader( "Referer" );
@@ -421,8 +637,8 @@ public class WebClientTest extends HttpUnitTest {
     public void testClientListener() throws Exception {
         defineWebPage( "Target", "This is another page with <a href=Form.html target='_top'>one link</a>" );
         defineWebPage( "Form", "This is a page with a simple form: " +
-                "<form action=submit><input name=name><input type=submit></form>" +
-                "<a href=Target.html target=red>a link</a>" );
+                               "<form action=submit><input name=name><input type=submit></form>" +
+                               "<a href=Target.html target=red>a link</a>" );
         defineResource( "Frames.html",
                 "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
                 "<FRAMESET cols='20%,80%'>" +
@@ -557,5 +773,4 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "Submitted cookie header", "found cookies: type=short", wr.getText() );
     }
 
-
-}
+ }

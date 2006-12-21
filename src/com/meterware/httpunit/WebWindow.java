@@ -158,15 +158,16 @@ public class WebWindow {
 
         WebResponse response = null;
         String urlString = request.getURLString().trim();
+        FrameSelector targetFrame = _frameContents.getTargetFrame( request );
         if (urlString.startsWith( "about:" )) {
-            response = new DefaultWebResponse( _client, _frameContents.getTargetFrame( request ), null, "" );
+            response = new DefaultWebResponse( _client, targetFrame, null, "" );
         } else if (!HttpUnitUtils.isJavaScriptURL( urlString )) {
-            response = _client.newResponse( request, _frameContents.getTargetFrame( request ) );
+            response = _client.createResponse( request, targetFrame );
         } else {
             WebRequestSource wrs = request.getWebRequestSource();
             String result = (wrs == null) ? getCurrentPage().getScriptableObject().evaluateExpression( urlString )
                                           : wrs.getScriptingHandler().evaluateExpression( urlString );
-            if (result != null) response = new DefaultWebResponse( _client, _frameContents.getTargetFrame( request ), request.getURL(), result );
+            if (result != null) response = new DefaultWebResponse( _client, targetFrame, request.getURL(), result );
         }
 
         if (response != null) _client.tellListeners( response );
