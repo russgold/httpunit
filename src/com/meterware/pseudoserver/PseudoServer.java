@@ -302,7 +302,7 @@ public class PseudoServer {
         if (_debug) System.out.println( "** Closing server thread: " + hashCode() );
         outputStream.close();
         socket.close();
-    }
+    }        
 
 
     private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {

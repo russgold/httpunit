@@ -14,6 +14,13 @@ Limitations:
 
 
 Revision History:
+26-Dec-2006:
+    Additions:
+       Content and Parsing:
+           1. Basic authentication now can support authorization only after challenge and different passwords for
+              different realms.
+           2. Added support for rudimentary (RFC 2109) digest authentication.
+
  1-Dec-2006:
     Additions:
         Content and Parsing:

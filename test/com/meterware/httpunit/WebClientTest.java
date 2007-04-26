@@ -31,8 +31,8 @@ import java.net.*;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
-import HTTPClient.HTTPConnection;
-import HTTPClient.HTTPResponse;
+//import HTTPClient.HTTPConnection;
+//import HTTPClient.HTTPResponse;
 
 
 /**
@@ -364,78 +364,44 @@ public class WebClientTest extends HttpUnitTest {
       * Verifies one-time digest authentication with Quality of Protection (qop).
       * @throws Exception
       */
-    public void testQopDigestAuthenticationhttp_client() throws Exception {     //  todo enable this
+    public void ntestQopDigestAuthenticationhttp_client() throws Exception {     //  todo enable this
         defineResource( "/dir/index.html", new PseudoServlet() {
             public WebResource getGetResponse() {
                 String header = getHeader( "Authorization" );
                 if (header == null) {
                     WebResource resource = new WebResource( "not authorized", HttpURLConnection.HTTP_UNAUTHORIZED );
                     resource.addHeader( "WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
-                            " qop=\"auth\"," +
-                            " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
-                            " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
+                                        " qop=\"auth\"," +
+                                        " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+                                        " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
                     return resource;
                 } else {
                     return new WebResource( getHeader( "Authorization" ), "text/plain" );
                 }
             }
         } );
-        URL url = new URL( getHostPath() + "/dir/index.html" );
-        HTTPConnection connection = new HTTPConnection( url );
-        connection.addDigestAuthorization( "testrealm@host.com", "Mufasa", "Circle Of Life" );
-        HTTPResponse httpResponse = connection.Get( url.getFile() );
+        String text = getPageContents( getHostPath() + "/dir/index.html", "testrealm@host.com", "Mufasa", "Circle Of Life" );
+        HttpHeader actualHeader = new HttpHeader( text );
         HttpHeader expectedHeader
                 = new HttpHeader( "Digest username=\"Mufasa\"," +
-                "       realm=\"testrealm@host.com\"," +
-                "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
-                "       uri=\"/dir/index.html\"," +
-                "       qop=auth," +
-                "       nc=00000001," +
-                "       cnonce=\"19530e1f777250e9d7ad02a93b187b9d\"," +
-                "       response=\"943fad0655736f7a2342daef67186ce6\"," +
-                "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
-        HttpHeader actualHeader = new HttpHeader( httpResponse.getText() );
+                                  "       realm=\"testrealm@host.com\"," +
+                                  "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+                                  "       uri=\"/dir/index.html\"," +
+                                  "       qop=auth," +
+                                  "       nc=00000001," +
+                                  "       cnonce=\"19530e1f777250e9d7ad02a93b187b9d\"," +
+                                  "       response=\"943fad0655736f7a2342daef67186ce6\"," +
+                                  "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
         String cnonce = actualHeader.getProperty( "cnonce" );
         assertHeadersEquals( expectedHeader, actualHeader );
     }
 
-
-    /**
-      * Verifies one-time digest authentication with Quality of Protection (qop).
-      * @throws Exception if an unexpected exception is thrown during the test.
-      */
-     public void ntestQopDigestAuthentication() throws Exception {     //  todo enable this
-         defineResource( "/dir/index.html", new PseudoServlet() {
-             public WebResource getGetResponse() {
-                 String header = getHeader( "Authorization" );
-                 if (header == null) {
-                     WebResource resource = new WebResource( "not authorized", HttpURLConnection.HTTP_UNAUTHORIZED );
-                     resource.addHeader( "WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
-                                         " qop=\"auth,auth-int\"," +
-                                         " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
-                                         " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
-                     return resource;
-                 } else {
-                     return new WebResource( getHeader( "Authorization" ), "text/plain" );
-                 }
-             }
-         });
-         WebConversation wc = new WebConversation();
-         wc.setAuthentication( "testrealm@host.com", "Mufasa", "Circle Of Life" );
-         WebResponse wr = wc.getResponse( getHostPath() + "/dir/index.html" );
-         HttpHeader expectedHeader
-                 = new HttpHeader( "Digest username=\"Mufasa\"," +
-                                   "       realm=\"testrealm@host.com\"," +
-                                   "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
-                                   "       uri=\"/dir/index.html\"," +
-                                   "       qop=auth," +
-                                   "       nc=00000001," +
-                                   "       cnonce=\"0a4f113b\"," +
-                                   "       response=\"6629fae49393a05397450978507c4ef1\"," +
-                                   "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"" );
-         HttpHeader actualHeader = new HttpHeader( wr.getText() );
-         assertHeadersEquals( expectedHeader, actualHeader );
-     }
+    private static String getPageContents( String pageAddress, String protectionDomain, String userName, String password ) throws Exception {
+        WebConversation wc = new WebConversation();
+        wc.setAuthentication( protectionDomain, userName, password );
+        WebResponse wr = wc.getResponse( pageAddress );
+        return wr.getText();
+    }
 
 
     private void assertHeadersEquals( HttpHeader expectedHeader, HttpHeader actualHeader ) {

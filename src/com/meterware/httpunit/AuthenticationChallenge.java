@@ -136,8 +136,6 @@ class AuthenticationChallenge extends HttpHeader {
                 try {
                     String a1 = A1( userName, password, realm, nonce );
                     String a2 = A2( uri, method );
-                    System.out.println( "A1 = " + a1 );
-                    System.out.println( "A2 = " + a2 );
                     String ha1 = H( a1 );
                     String ha2 = H( a2 );
                     return KD( ha1, nonce + ':' + ha2 );

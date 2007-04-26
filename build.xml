@@ -74,7 +74,7 @@
 
     <target name="prepare_repository_classpath" depends="check_jars_dir" unless="have.local.jars">
         <echo message="using repository classpath"/>
-     <!--   <setproxy proxyhost="specify your proxy host if needed" proxyport="80"/>  -->
+        <setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80"/>
         <typedef classpath="${jars.dir}/ant-dependencies.jar" resource="dependencies.properties" />
         <dependencies pathId="base.classpath" fileSetId="distributed.jars">
             <dependency group="rhino"      version="1.5R4.1" />
