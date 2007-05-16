@@ -395,7 +395,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
     public ScriptableDelegate getParentDelegate() {
-        return getBaseResponse().getScriptableObject().getDocument();
+        return getBaseResponse().getDocumentScriptable();
     }
 
 

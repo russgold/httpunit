@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,8 +21,12 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.cookies.CookieJar;
 import com.meterware.httpunit.cookies.CookieSource;
+import com.meterware.httpunit.dom.HTMLDocumentImpl;
+import com.meterware.httpunit.dom.DomWindow;
+import com.meterware.httpunit.dom.DomWindowProxy;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -46,7 +50,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
 abstract
-public class WebResponse implements HTMLSegment, CookieSource {
+public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     private static final String HTML_CONTENT  = "text/html";
     private static final String XHTML_CONTENT = "application/xhtml+xml";
@@ -626,8 +630,38 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
 
     public Scriptable getScriptableObject() {
-        if (_scriptable == null) _scriptable = new Scriptable();
-        return _scriptable;
+        return (Scriptable) getScriptingHandler();
+    }
+
+
+    public void setScriptingHandler( ScriptingHandler scriptingHandler ) {
+        _scriptingHandler = scriptingHandler;
+    }
+
+
+    public ScriptingHandler getScriptingHandler() {
+        if (_scriptingHandler == null) _scriptingHandler = HttpUnitOptions.getScriptingEngine().createHandler( this );
+        return _scriptingHandler;
+    }
+
+
+    public ScriptingHandler createJavascriptScriptingHandler() {
+        return new Scriptable();
+    }
+
+
+    public ScriptingHandler createDomScriptingHandler() {
+        if (!isHTML()) {
+            return new DomWindow( this );
+        } else {
+            try {
+                DomWindow handler = ((HTMLDocumentImpl) getReceivedPage().getRootNode()).getWindow();
+                handler.setProxy( this );
+                return handler;
+            } catch (SAXException e) {
+                return new DomWindow( this );
+            }
+        }
     }
 
 
@@ -640,20 +674,52 @@ public class WebResponse implements HTMLSegment, CookieSource {
     }
 
 
+    HTMLPage.Scriptable getDocumentScriptable() {
+        return getScriptableObject().getDocument();
+    }
+
+
+    public DomWindowProxy openNewWindow( String name, String relativeUrl ) throws IOException, SAXException {
+        if (relativeUrl == null || relativeUrl.trim().length() == 0) relativeUrl = "about:";
+        GetMethodWebRequest request = new GetMethodWebRequest( getURL(), relativeUrl, _frame, name );
+        return _window.getResponse( request );
+    }
+
+
+    public void close() {
+        if (getFrameName().equals( WebRequest.TOP_FRAME )) _window.close();
+    }
+
+
+    public void alert( String message ) {
+        _client.postAlert( message );
+    }
+
+
+    public boolean confirm( String message ) {
+        return _client.getConfirmationResponse( message );
+    }
+
+
+    public String prompt( String prompt, String defaultResponse ) {
+        return _client.getUserResponse( prompt, defaultResponse );
+    }
+
+
     public class Scriptable extends ScriptableDelegate implements NamedDelegate {
 
-        public void alert( String message ) {
-            _client.postAlert( message );
+        public void alertUser( String message ) {
+            alert( message );
         }
 
 
         public boolean getConfirmationResponse( String message ) {
-            return _client.getConfirmationResponse( message );
+            return confirm( message );
         }
 
 
         public String getUserResponse( String prompt, String defaultResponse ) {
-            return _client.getUserResponse( prompt, defaultResponse );
+            return prompt( prompt, defaultResponse );
         }
 
 
@@ -692,15 +758,13 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
         public Scriptable open( String urlString, String name, String features, boolean replace )
                 throws IOException, SAXException {
-            if (urlString == null || urlString.trim().length() == 0) urlString = "about:";
-            GetMethodWebRequest request = new GetMethodWebRequest( getURL(), urlString, _frame, name );
-            WebResponse response = _window.getResponse( request );
+            WebResponse response = (WebResponse) openNewWindow( name, urlString );
             return response == null ? null : response.getScriptableObject();
         }
 
 
-        public void close() {
-            if (getFrameName().equals( WebRequest.TOP_FRAME )) _window.close();
+        public void closeWindow() {
+            close();
         }
 
 
@@ -912,7 +976,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     private final WebClient _client;
 
-    private Scriptable _scriptable;
+    private ScriptingHandler _scriptingHandler;
 
 
     protected void loadResponseText() throws IOException {
@@ -1146,8 +1210,7 @@ public class WebResponse implements HTMLSegment, CookieSource {
 
     private static boolean isSupportedCharacterSet( String characterSet ) {
         try {
-            "abcd".getBytes( characterSet );
-            return true;
+            return "abcd".getBytes( characterSet ).length > 0;
         } catch (UnsupportedEncodingException e) {
             return false;
         }

@@ -50,6 +50,7 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( WebImageTest.suite() );
         result.addTest( HtmlTablesTest.suite() );
         result.addTest( WebFormTest.suite() );
+        result.addTest( DomTestSuite.suite() );
         result.addTest( WebFrameTest.suite() );
         result.addTest( WebWindowTest.suite() );
         result.addTest( RequestTargetTest.suite() );
@@ -65,9 +66,6 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( NormalizeURLTest.suite() );
         result.addTest( TextBlockTest.suite() );
         result.addTest( EncodingTest.suite() );
-
-        result.addTest( DomTestSuite.suite() );
-
         if (HTMLParserFactory.getHTMLParser().getClass().getName().indexOf("NekoHTML") >= 0) result.addTest( NekoEnhancedScriptingTest.suite() );
         addOptionalTestCase( result, "com.meterware.httpunit.XMLPageTest" );
         addOptionalTestCase( result, "com.meterware.httpunit.FileUploadTest" );

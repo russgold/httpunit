@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -224,7 +224,7 @@ public class WebPageTest extends HttpUnitTest {
     public void testMetaRefreshURLRequest() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
-                      "<meta Http-equiv=refresh content='2;URL=\"NextPage.html\"></head>\n" +
+                      "<meta Http-equiv=refresh content='2;URL=\"NextPage.html\"'></head>\n" +
                       "<body>This has no data\n" +
                       "</body></html>\n";
         defineResource( "SimplePage.html", page );
@@ -241,7 +241,7 @@ public class WebPageTest extends HttpUnitTest {
     public void testMetaRefreshAbsoluteURLRequestWithAmpersandEncoding() throws Exception {
         String refreshURL = "http://localhost:8080/someapp/secure/?username=abc&somevalue=abc";
         String page = "<html><head><title>Sample</title>" +
-                      "<meta Http-equiv=refresh content='2;URL=\"http://localhost:8080/someapp/secure/?username=abc&amp;somevalue=abc\"></head>\n" +
+                      "<meta Http-equiv=refresh content='2;URL=\"http://localhost:8080/someapp/secure/?username=abc&amp;somevalue=abc\"'></head>\n" +
                       "<body>This has no data\n" +
                       "</body></html>\n";
         defineResource( "SimplePage.html", page );
@@ -258,7 +258,7 @@ public class WebPageTest extends HttpUnitTest {
     public void testMetaRefreshURLRequestNoDelay() throws Exception {
         String refreshURL = getHostPath() + "/NextPage.html";
         String page = "<html><head><title>Sample</title>" +
-                      "<meta Http-equiv=refresh content='URL=\"NextPage.html\"></head>\n" +
+                      "<meta Http-equiv=refresh content='URL=\"NextPage.html\"'></head>\n" +
                       "<body>This has no data\n" +
                       "</body></html>\n";
         defineResource( "SimplePage.html", page );
@@ -494,8 +494,8 @@ public class WebPageTest extends HttpUnitTest {
     private String scriptToWriteAnotherDocument(String document, String targetWindow) {
         StringBuffer buff = new StringBuffer();
         buff.append("<script language=\"JavaScript\">\n");
-        buff.append("target = window.open('', '" + targetWindow + "');\n");
-        buff.append("target.document.write('" + document + "');\n");
+        buff.append( "target = window.open('', '" ).append( targetWindow ).append( "');\n" );
+        buff.append( "target.document.write('" ).append( document ).append( "');\n" );
         buff.append("target.document.close();\n");
         buff.append("</script>\n");
         return buff.toString();

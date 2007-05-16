@@ -1106,7 +1106,7 @@ public class FormScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         response.getLinks()[0].click();
         assertEquals( "Message 1", "selected item is blue", wc.popNextAlert() );
-        response.getScriptableObject().doEvent( "document.the_form.choices.value='red'" );
+        response.getScriptingHandler().doEvent( "document.the_form.choices.value='red'" );
         response.getLinks()[0].click();
         assertEquals( "Message 2", "selected item is red", wc.popNextAlert() );
     }

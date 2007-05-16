@@ -116,8 +116,9 @@ abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HT
     }
 
     public ScriptableDelegate getParentDelegate() {
-        return getResponse().getScriptableObject().getDocument();
+        return getResponse().getDocumentScriptable();
     }
+
 
     public ScriptableDelegate newScriptable() {
         return new HTMLElementScriptable( this );

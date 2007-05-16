@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006, Russell Gold
+ * Copyright (c) 2006-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -25,6 +25,7 @@ import org.w3c.dom.html.HTMLBodyElement;
 import org.w3c.dom.html.HTMLAnchorElement;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Context;
+import junit.framework.TestSuite;
 
 /**
  * Tests basic scripting via the DOM.
@@ -32,6 +33,11 @@ import org.mozilla.javascript.Context;
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class DomScriptingTest extends AbstractHTMLElementTest {
+
+
+    public static TestSuite suite() {
+        return new TestSuite( DomScriptingTest.class );
+    }
 
 
     public void testGetDocument() throws Exception {

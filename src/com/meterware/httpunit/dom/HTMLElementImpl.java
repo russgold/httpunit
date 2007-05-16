@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006, Russell Gold
+ * Copyright (c) 2006-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -32,26 +32,6 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
 
 
     public final static String UNSPECIFIED_ATTRIBUTE = null;
-
-    public Object get( String propertyName, Scriptable scriptable ) {
-        Object result = super.get( propertyName, scriptable );
-        if (result != NOT_FOUND) return result;
-
-        return ScriptingSupport.getNamedProperty( this, getJavaPropertyName( propertyName ), scriptable );
-    }
-
-    private String getJavaPropertyName( String propertyName ) {
-        if (propertyName.equals( "document" )) {
-            return "ownerDocument";
-        } else {
-            return propertyName;
-        }
-    }
-
-
-    public void put( String propertyName, Scriptable initialObject, Object value ) {
-        ScriptingSupport.setNamedProperty( this, getJavaPropertyName( propertyName ), value );
-    }
 
 
     ElementImpl create() {

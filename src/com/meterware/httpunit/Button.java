@@ -133,7 +133,7 @@ public class Button extends FormControl {
 
     public ScriptableDelegate getParentDelegate() {
         if (getForm() != null) return super.getParentDelegate();
-        return _baseResponse.getScriptableObject().getDocument();
+        return _baseResponse.getDocumentScriptable();
     }
 
 

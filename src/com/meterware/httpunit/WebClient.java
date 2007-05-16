@@ -207,6 +207,9 @@ public class WebClient {
      * Returns the properties associated with this client.
      */
     public ClientProperties getClientProperties() {
+        if (_clientProperties == null) {
+             _clientProperties = ClientProperties.getDefaultProperties().cloneProperties();
+        }
         return _clientProperties;
     }
 
@@ -585,7 +588,7 @@ public class WebClient {
 
     private DialogResponder _dialogResponder = new DialogAdapter();
 
-    private ClientProperties _clientProperties = ClientProperties.getDefaultProperties().cloneProperties();
+    private ClientProperties _clientProperties;
 
 
     /**

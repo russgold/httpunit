@@ -2,7 +2,7 @@ package com.meterware.httpunit.scripting;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -35,7 +35,7 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
         public boolean supportsScriptLanguage( String language ) { return false; }
         public String runScript( String language, String script ) { return ""; }
         public boolean doEvent( String eventScript ) { return true; }
-        public String evaluateExpression( String urlString ) { return null; }
+        public Object evaluateExpression( String urlString ) { return null; }
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
         public void clearCaches() {}
     };
@@ -67,9 +67,14 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
     /**
      * Evaluates the specified javascript expression, returning its value.
      **/
-    public String evaluateExpression( String urlString ) {
+    public Object evaluateExpression( String urlString ) {
         if (urlString.length() == 0) return null;
         return getScriptEngine().evaluateExpression( urlString );
+    }
+
+
+    public void clearCaches() {
+        getScriptEngine().clearCaches();
     }
 
 

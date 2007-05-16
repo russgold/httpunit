@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004-2006, Russell Gold
+ * Copyright (c) 2004-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -32,7 +32,7 @@ import com.meterware.httpunit.scripting.ScriptableDelegate;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract public class NodeImpl extends ScriptingEngineImpl implements Node {
+abstract public class NodeImpl extends AbstractDomComponent implements Node {
 
     private DocumentImpl _ownerDocument;
     private NodeImpl     _parentNode;
@@ -51,17 +51,7 @@ abstract public class NodeImpl extends ScriptingEngineImpl implements Node {
 
 //------------------------------------------ ScriptableObject methods --------------------------------------------------
 
-    public String getClassName() {
-        return getClass().getName();
-    }
-
 //------------------------------------------ ScriptingEngine methods --------------------------------------------------
-
-    public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) {
-        throw new UnsupportedOperationException( );
-    }
-
-    public void clearCaches() {}
 
 //----------------------------------------------- Node methods ---------------------------------------------------------
 

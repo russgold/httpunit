@@ -76,7 +76,9 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
                 script = withoutFirstLine( script );
                 if (script.endsWith( "-->" )) script = script.substring( 0, script.lastIndexOf( "-->" ));
             }
-            Context.getCurrentContext().evaluateString( this, script, "httpunit", 0, null );
+            Context context = Context.enter();
+            context.initStandardObjects( null );
+            context.evaluateString( this, script, "httpunit", 0, null );
             StringBuffer buffer = getDocumentWriteBuffer();
             return buffer.toString();
         } catch (Exception e) {
@@ -84,13 +86,15 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
             return "";
         } finally {
             discardDocumentWriteBuffer();
+            Context.exit();
         }
     }
 
 
     public boolean doEvent( String eventScript ) {
         try {
-            final Context context = Context.getCurrentContext();
+            Context context = Context.enter();
+            context.initStandardObjects( null );
             context.setOptimizationLevel( -1 );
             Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
             Object result = f.call( context, this, this, NO_ARGS );
@@ -98,6 +102,8 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
         } catch (Exception e) {
             handleScriptException( e, "Event '" + eventScript + "'" );
             return false;
+        } finally {
+            Context.exit();
         }
     }
 
@@ -105,13 +111,17 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
     /**
      * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
      */
-    public String evaluateExpression( String expression ) {
+    public Object evaluateExpression( String expression ) {
         try {
-            Object result = Context.getCurrentContext().evaluateString( this, expression, "httpunit", 0, null );
-            return (result == null || result instanceof Undefined) ? null : result.toString();
+            Context context = Context.enter();
+            context.initStandardObjects( null );
+            Object result = context.evaluateString( this, expression, "httpunit", 0, null );
+            return (result == null || result instanceof Undefined) ? null : result;
         } catch (Exception e) {
             handleScriptException( e, "URL '" + expression + "'" );
             return null;
+        } finally {
+            Context.exit();
         }
     }
 

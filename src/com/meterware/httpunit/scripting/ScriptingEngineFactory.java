@@ -1,11 +1,8 @@
 package com.meterware.httpunit.scripting;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.HTMLElement;
-
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -22,10 +19,12 @@ import com.meterware.httpunit.HTMLElement;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.WebResponse;
+import com.meterware.httpunit.HTMLElement;
 
 /**
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public interface ScriptingEngineFactory {
 
@@ -68,4 +67,7 @@ public interface ScriptingEngineFactory {
 
 
     ScriptingHandler createHandler( HTMLElement elementBase );
+
+
+    ScriptingHandler createHandler( WebResponse response );
 }

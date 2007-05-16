@@ -333,7 +333,7 @@ public class JavaScript {
 
 
         public void jsFunction_alert( String message ) {
-            getDelegate().alert( message );
+            getDelegate().alertUser( message );
         }
 
 
@@ -360,7 +360,7 @@ public class JavaScript {
 
 
         public void jsFunction_close() {
-            getDelegate().close();
+            getDelegate().closeWindow();
         }
 
 

@@ -224,7 +224,7 @@ public class WebTable extends HTMLElementBase {
 
 
     public ScriptableDelegate getParentDelegate() {
-        return _response.getScriptableObject().getDocument();
+        return _response.getDocumentScriptable();
     }
 
 

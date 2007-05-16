@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -484,6 +484,7 @@ public abstract class HttpUnitOptions {
         public String[] getErrorMessages() { return new String[ 0 ]; }
         public void clearErrorMessages() {}
         public ScriptingHandler createHandler( HTMLElement element ) { return NULL_SCRIPTING_HANDLER; }
+        public ScriptingHandler createHandler( WebResponse response ) { return NULL_SCRIPTING_HANDLER; }
     };
 
 
@@ -491,7 +492,8 @@ public abstract class HttpUnitOptions {
         public boolean supportsScriptLanguage( String language ) { return false; }
         public boolean doEvent( String eventScript ) { return true; }
         public String runScript( String language, String script ) { return null; }
-        public String evaluateExpression( String urlString ) { return null; }
+        public Object evaluateExpression( String urlString ) { return null; }
+        public void clearCaches() {}
     };
 
 

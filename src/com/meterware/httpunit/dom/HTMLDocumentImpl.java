@@ -34,6 +34,8 @@ import java.util.ArrayList;
 public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
 
     private static Hashtable _exemplars = new Hashtable();
+    private DomWindow _window;
+
 
     public Object get( String propertyName, Scriptable scriptable ) {
         if (propertyName.equals( "document" )) return this;
@@ -301,5 +303,13 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
         _exemplars.put( "a",        new HTMLAnchorElementImpl() );
         _exemplars.put( "area",     new HTMLAreaElementImpl() );
         _exemplars.put( "img",      new HTMLImageElementImpl() );
+    }
+
+
+    public DomWindow getWindow() {
+        if (_window == null) {
+            _window = new DomWindow( this );
+        }
+        return _window;
     }
 }

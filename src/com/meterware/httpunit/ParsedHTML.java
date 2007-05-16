@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -322,10 +322,10 @@ class ParsedHTML {
             try {
                 _updateElements = false;
                 String language = NodeUtils.getNodeAttribute( element, "language", null );
-                if (!getResponse().getScriptableObject().supportsScriptLanguage( language )) _enableNoScriptNodes = true;
-                getResponse().getScriptableObject().runScript( language, script );
+                if (!getResponse().getScriptingHandler().supportsScriptLanguage( language )) _enableNoScriptNodes = true;
+                getResponse().getScriptingHandler().runScript( language, script );
             } finally {
-                setRootNode( _rootNode );
+                clearCaches();
             }
         }
     }
@@ -432,7 +432,7 @@ class ParsedHTML {
     private HTMLElement toDefaultElement( Element element ) {
         return new HTMLElementBase( element ) {
             public ScriptableDelegate newScriptable() { return new HTMLElementScriptable( this ); }
-            public ScriptableDelegate getParentDelegate() { return getResponse().getScriptableObject().getDocument(); }
+            public ScriptableDelegate getParentDelegate() { return getResponse().getDocumentScriptable(); }
         };
     }
 
@@ -996,6 +996,11 @@ class ParsedHTML {
         if (_rootNode != null && rootNode != _rootNode )
             throw new IllegalStateException( "The root node has already been defined as " + _rootNode + " and cannot be redefined as " + rootNode );
         _rootNode = rootNode;
+        clearCaches();
+    }
+
+
+    private void clearCaches() {
         _links = null;
         _forms = null;
         _images = null;

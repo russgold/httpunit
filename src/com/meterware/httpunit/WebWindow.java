@@ -165,9 +165,9 @@ public class WebWindow {
             response = _client.createResponse( request, targetFrame );
         } else {
             WebRequestSource wrs = request.getWebRequestSource();
-            String result = (wrs == null) ? getCurrentPage().getScriptableObject().evaluateExpression( urlString )
+            Object result = (wrs == null) ? getCurrentPage().getScriptingHandler().evaluateExpression( urlString )
                                           : wrs.getScriptingHandler().evaluateExpression( urlString );
-            if (result != null) response = new DefaultWebResponse( _client, targetFrame, request.getURL(), result );
+            if (result != null) response = new DefaultWebResponse( _client, targetFrame, request.getURL(), result.toString() );
         }
 
         if (response != null) _client.tellListeners( response );

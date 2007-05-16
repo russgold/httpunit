@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002,2004, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,6 +20,7 @@ package com.meterware.httpunit.parsing;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLDocument;
@@ -52,5 +53,5 @@ public interface DocumentAdapter {
     /**
      * Returns the Scriptable object associated with the document
      */
-    public ScriptableDelegate getScriptableObject();
+    public ScriptingHandler getScriptingHandler();
 }

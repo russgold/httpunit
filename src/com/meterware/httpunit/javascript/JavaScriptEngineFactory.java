@@ -93,4 +93,9 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
         delegate.setScriptEngine( elementBase.getParentDelegate().getScriptEngine( delegate ) );
         return delegate;
     }
+
+
+    public ScriptingHandler createHandler( WebResponse response ) {
+        return response.createJavascriptScriptingHandler();
+    }
 }

@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,7 +19,7 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.dom.HTMLDocumentImpl;
 
 import java.net.URL;
@@ -121,19 +121,19 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
 
 
     public boolean supportsScriptLanguage( String language ) {
-        return getScriptableDelegate().supportsScriptLanguage( language );
+        return getScripingHandler().supportsScriptLanguage( language );
     }
 
 
     public String runScript( final String language, final String scriptText ) {
-        getScriptableDelegate().getScriptEngine().clearCaches();
-        return getScriptableDelegate().runScript( language, scriptText );
+        getScripingHandler().clearCaches();
+        return getScripingHandler().runScript( language, scriptText );
     }
 
 
-    private ScriptableDelegate getScriptableDelegate() {
+    private ScriptingHandler getScripingHandler() {
         _documentAdapter.setDocument( (HTMLDocument) getCurrentElement().getOwnerDocument() );
-        return _documentAdapter.getScriptableObject();
+        return _documentAdapter.getScriptingHandler();
     }
 
 

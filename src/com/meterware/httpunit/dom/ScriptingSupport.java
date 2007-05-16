@@ -89,15 +89,31 @@ class ScriptingSupport {
     }
 
 
-    static void setNamedProperty( NodeImpl element, String javaPropertyName, Object value ) {
+    static void setNamedProperty( AbstractDomComponent element, String javaPropertyName, Object value ) {
         Method setter = getPropertySetter( element.getClass(), javaPropertyName, value );
         if (setter == NO_SUCH_PROPERTY) return;
 
         try {
-            setter.invoke( element, new Object[] { value } );
+            setter.invoke( element, new Object[] { adjustedForSetter( value, setter ) } );
         } catch (IllegalAccessException e) { /* do nothing */
         } catch (InvocationTargetException e) { /* do nothing */
         }
+    }
+
+
+    private static Object adjustedForSetter( Object value, Method setter ) {
+        if (value == null) return null;
+        Class targetValueClass = setter.getParameterTypes()[0];
+        if (targetValueClass.equals( String.class )) return value.toString();
+        if (!(value instanceof Number) || !isNumericParameter( targetValueClass )) return value;
+
+        if (targetValueClass.getName().equals("int")) return new Integer( ((Number) value).intValue() );
+        if (targetValueClass.getName().equals("byte")) return new Byte( ((Number) value).byteValue() );
+        if (targetValueClass.getName().equals("long")) return new Long( ((Number) value).longValue() );
+        if (targetValueClass.getName().equals("short")) return new Short( ((Number) value).shortValue() );
+        if (targetValueClass.getName().equals("float")) return new Float( ((Number) value).intValue() );
+        if (targetValueClass.getName().equals("double")) return new Double( ((Number) value).intValue() );
+        return value;
     }
 
 
@@ -115,8 +131,8 @@ class ScriptingSupport {
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             if (method.getName().equalsIgnoreCase( setterName ) &&
-                    method.getParameterTypes().length == 1 &&
-                    isConvertableTo( value.getClass(), method.getParameterTypes()[0] )) {
+                method.getParameterTypes().length == 1 &&
+                isConvertableTo( value.getClass(), method.getParameterTypes()[0] )) {
                 methodMap.put( propertyName, method );
                 return method;
             }
