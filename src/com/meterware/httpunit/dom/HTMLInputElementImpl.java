@@ -32,7 +32,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
     private String _value;
     private Boolean _checked;
-    private TypeSpecificBehavior _behavior = new EditableTextBehavior();
+    private TypeSpecificBehavior _behavior = new EditableTextBehavior( this );
 
     ElementImpl create() {
         return new HTMLInputElementImpl();
@@ -192,17 +192,22 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
     }
 
 
+    static boolean equals( String s1, String s2 ) {
+        return s1 == null ? s2 == null : s1.equals( s2 );
+    }
+
+
     private void selectBehavior( String type ) {
         if (type == null || type.equals( "text") || type.equals( "password" ) || type.equals( "hidden" )) {
-            _behavior = new EditableTextBehavior();
+            _behavior = new EditableTextBehavior( this );
         } else if (type.equals( "checkbox" )) {
-            _behavior = new CheckboxBehavior();
+            _behavior = new CheckboxBehavior( this );
         } else if (type.equals( "radio" )) {
-            _behavior = new RadioButtonBehavior();
+            _behavior = new RadioButtonBehavior( this );
         } else if (type.equals( "reset" )) {
-            _behavior = new ResetButtonBehavior();
+            _behavior = new ResetButtonBehavior( this );
         } else {
-            _behavior = new DefaultBehavior();
+            _behavior = new DefaultBehavior( this );
         }
     }
 
@@ -221,6 +226,13 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
     class DefaultBehavior implements TypeSpecificBehavior {
 
+        private HTMLElementImpl _element;
+
+        public DefaultBehavior( HTMLElementImpl element ) {
+            _element = element;
+        }
+
+
         public String getValue() {
             return getDefaultValue();
         }
@@ -237,17 +249,29 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
         public void click() {}
 
+        protected void reportPropertyChanged( String propertyName ) {
+            _element.reportPropertyChanged( propertyName );
+        }
+
     }
 
 
     class EditableTextBehavior extends DefaultBehavior {
+
+        public EditableTextBehavior( HTMLElementImpl element ) {
+            super( element );
+        }
+
 
         public String getValue() {
             return _value != null ? _value : getDefaultValue();
         }
 
         public void setValue( String value ) {
+            if (HTMLInputElementImpl.equals( value, _value )) return;
+
             _value = value;
+            reportPropertyChanged( "value" );
         }
 
         public void reset() {
@@ -258,6 +282,11 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
     class CheckboxBehavior extends DefaultBehavior {
+
+        public CheckboxBehavior( HTMLElementImpl element ) {
+            super( element );
+        }
+
 
         public boolean getChecked() {
             return _checked != null ? _checked.booleanValue() : getDefaultChecked();
@@ -281,6 +310,11 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
     class RadioButtonBehavior extends CheckboxBehavior {
 
+        public RadioButtonBehavior( HTMLElementImpl element ) {
+            super( element );
+        }
+
+
         public void setChecked( boolean checked ) {
             if (checked) {
                 HTMLCollection elements = getForm().getElements();
@@ -303,6 +337,11 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
     class ResetButtonBehavior extends DefaultBehavior {
+
+        public ResetButtonBehavior( HTMLElementImpl element ) {
+            super( element );
+        }
+
 
         public void click() {
             getForm().reset();

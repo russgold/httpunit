@@ -22,18 +22,45 @@ package com.meterware.httpunit.dom;
 import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLCollection;
 import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Element;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import com.meterware.httpunit.scripting.FormScriptable;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElement {
+public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElement, FormScriptable {
 
+   
     ElementImpl create() {
         return new HTMLFormElementImpl();
     }
+
+
+    //------------------------------- ScriptableObject methods ----------------------------------------------------------
+
+
+    public Object get( String propertyName, Scriptable scriptable ) {
+        HTMLCollection elements = getElements();
+        for (int i=0; i < elements.getLength(); i++) {
+            Node node = elements.item( i );
+            NamedNodeMap attributes = node.getAttributes();
+            AttrImpl nameAttribute = (AttrImpl) attributes.getNamedItem( "name" );
+            if (nameAttribute != null && propertyName.equals( nameAttribute.getValue() )) return node;
+            AttrImpl idAttribute = (AttrImpl) attributes.getNamedItem( "id" );
+            if (idAttribute != null && propertyName.equals( idAttribute.getValue() )) return node;
+        }
+        return  super.get( propertyName, scriptable );
+    }
+
+    //------------------------------- HTMLFormElement methods ----------------------------------------------------------
 
 
     public String getAcceptCharset() {
@@ -53,6 +80,12 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
 
     public void setAction( String action ) {
         setAttribute( "action", action );
+    }
+
+
+    public void setParameterValue( String name, String value ) {
+        Object control = get( name, null );
+        if (control instanceof ScriptableObject) ((ScriptableObject) control).put( "value", this, value );
     }
 
 
@@ -98,7 +131,17 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
 
     public HTMLCollection getElements() {
         ArrayList elements = new ArrayList();
-        appendElementsWithTags( new String[] { "INPUT", "TEXTAREA", "BUTTON", "SELECT" }, elements );
+        String[] names = new String[]{"INPUT", "TEXTAREA", "BUTTON", "SELECT"};
+        for (Iterator each = preOrderIteratorAfteNode(); each.hasNext();) {
+            Node node = (Node) each.next();
+            if (node instanceof HTMLFormElement) break;
+
+            if (node.getNodeType() != ELEMENT_NODE) continue;
+            String tagName = ((Element) node).getTagName();
+            for (int i = 0; i < names.length; i++) {
+                if (tagName.equalsIgnoreCase( names[i] )) elements.add( node );
+            }
+        }
         return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
     }
 

@@ -19,12 +19,10 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
 
 import java.net.URL;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.html.HTMLTableCellElement;
 
 
 /**
@@ -32,12 +30,14 @@ import org.w3c.dom.Node;
  **/
 public class TableCell extends BlockElement {
 
+    private HTMLTableCellElement _element;
+
 
     /**
      * Returns the number of columns spanned by this cell.
      **/
     public int getColSpan() {
-        return _colSpan;
+        return _element.getColSpan();
     }
 
 
@@ -45,7 +45,7 @@ public class TableCell extends BlockElement {
      * Returns the number of rows spanned by this cell.
      **/
     public int getRowSpan() {
-        return _rowSpan;
+        return _element.getRowSpan();
     }
 
 
@@ -61,18 +61,10 @@ public class TableCell extends BlockElement {
 //---------------------------------------- package methods -----------------------------------------
 
 
-    TableCell( WebResponse response, FrameSelector frame, Element cellNode, URL url, String parentTarget, String characterSet ) {
-        super( response, frame, url, parentTarget, cellNode, characterSet );
-        _colSpan = getAttributeValue( cellNode, "colspan", 1 );
-        _rowSpan = getAttributeValue( cellNode, "rowspan", 1 );
+    TableCell( WebResponse response, FrameSelector frame, HTMLTableCellElement element, URL url, String parentTarget, String characterSet ) {
+        super( response, frame, url, parentTarget, element, characterSet );
+        _element = element;
     }
-
-
-//----------------------------------- private fields and methods -----------------------------------
-
-
-    private int     _colSpan;
-    private int     _rowSpan;
 
 
 }

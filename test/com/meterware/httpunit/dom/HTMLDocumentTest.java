@@ -226,4 +226,47 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         assertSame( "anchor 1", anchor1, anchors.item( 0 ) );
         assertSame( "anchor 3", anchor3, anchors.item( 1 ) );
     }
+
+
+    /**
+     * Verifies that the document has an empty write buffer by default.
+     */
+    public void testInitialWriteBuffer() throws Exception {
+        assertNotNull( "No write buffer was defined for the document", _htmlDocument.getWriteBuffer() );
+        assertEquals( "Default buffer size", 0, _htmlDocument.getWriteBuffer().length() );
+    }
+
+
+    /**
+     * Verifies that writing to the document updates the write buffer.
+     */
+    public void testWriteBufferUpdate() throws Exception {
+        _htmlDocument.write( "This is a test" );
+        assertNotNull( "No write buffer was defined for the document", _htmlDocument.getWriteBuffer() );
+        assertEquals( "Result of write buffer", "This is a test", _htmlDocument.getWriteBuffer().toString() );
+    }
+
+
+    /**
+     * Verifies that writing to the document updates the write buffer.
+     */
+    public void testWritelnBufferUpdate() throws Exception {
+        _htmlDocument.writeln( "This is a test" );
+        _htmlDocument.writeln( "And another." );
+        assertNotNull( "No write buffer was defined for the document", _htmlDocument.getWriteBuffer() );
+        assertEquals( "Result of write buffer", "This is a test\r\nAnd another.\r\n", _htmlDocument.getWriteBuffer().toString() );
+    }
+
+
+    /**
+     * Verifies that clearing the write buffer leaves it ready for new writes.
+     */
+    public void testBufferClear() throws Exception {
+        _htmlDocument.write( "This is a test" );
+        _htmlDocument.clearWriteBuffer();
+        assertEquals( "Cleared buffer length", 0, _htmlDocument.getWriteBuffer().length() );
+        _htmlDocument.write( "And another." );
+        assertNotNull( "No write buffer was defined for the document", _htmlDocument.getWriteBuffer() );
+        assertEquals( "Result of write buffer", "And another.", _htmlDocument.getWriteBuffer().toString() );
+    }
 }

@@ -910,7 +910,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
-    boolean replaceText( String text, String contentType ) {
+    public boolean replaceText( String text, String contentType ) {
         if (_parsingPage) return false;
         _responseText = text;
         _inputStream = null;

@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.FormScriptable;
 
 import java.io.IOException;
 import java.io.File;
@@ -415,8 +416,8 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public Scriptable getScriptableObject() {
-        return (Scriptable) getScriptingHandler();
+    public FormScriptable getScriptableObject() {
+        return (FormScriptable) getScriptingHandler();
     }
 
     /**
@@ -680,13 +681,18 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public class Scriptable extends HTMLElementScriptable implements NamedDelegate {
+    public class Scriptable extends HTMLElementScriptable implements NamedDelegate, FormScriptable {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); _presetParameters = null; }
 
 
         public void submit() throws IOException, SAXException {
             submitRequest( getScriptedSubmitRequest() );
+        }
+
+
+        public boolean doEvent( String eventScript ) {
+            return super.doEvent( eventScript );
         }
 
 

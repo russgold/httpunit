@@ -221,7 +221,7 @@ public class JavaScript {
         private String getScriptableClassName( ScriptableDelegate delegate ) {
             if (delegate instanceof WebResponse.Scriptable) return "Window";
             if (delegate instanceof HTMLPage.Scriptable) return "Document";
-            if (delegate instanceof WebForm.Scriptable) return "Form";
+            if (delegate instanceof FormScriptable) return "Form";
             if (delegate instanceof WebLink.Scriptable) return "Link";
             if (delegate instanceof WebImage.Scriptable) return "Image";
             if (delegate instanceof SelectionOptions) return "Options";
@@ -376,8 +376,8 @@ public class JavaScript {
         }
 
 
-        protected StringBuffer getDocumentWriteBuffer() {
-            return jsGet_document().getWriteBuffer();
+        protected String getDocumentWriteBuffer() {
+            return jsGet_document().getWriteBuffer().toString();
         }
 
 

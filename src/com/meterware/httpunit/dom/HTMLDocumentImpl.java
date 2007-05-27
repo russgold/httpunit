@@ -35,6 +35,7 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
 
     private static Hashtable _exemplars = new Hashtable();
     private DomWindow _window;
+    private StringBuffer _writeBuffer;
 
 
     public Object get( String propertyName, Scriptable scriptable ) {
@@ -49,15 +50,6 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
 
     public void put( String propertyName, Scriptable initialObject, Object value ) {
         ScriptingSupport.setNamedProperty( this, getJavaPropertyName( propertyName ), value );
-    }
-
-
-    private String getJavaPropertyName( String propertyName ) {
-        if (propertyName.equals( "document" )) {
-            return "ownerDocument";
-        } else {
-            return propertyName;
-        }
     }
 
 
@@ -215,14 +207,22 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
 
 
     public void close() {
+        if (getWindow().replaceText( getWriteBuffer().toString(), getMimeType()) ) clearWriteBuffer();
+    }
+
+
+    private String getMimeType() {
+        return "text/html";
     }
 
 
     public void write( String text ) {
+        getWriteBuffer().append( text );
     }
 
 
     public void writeln( String text ) {
+        getWriteBuffer().append( text ).append( (char) 0x0d ).append( (char) 0x0a );
     }
 
 
@@ -303,6 +303,10 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
         _exemplars.put( "a",        new HTMLAnchorElementImpl() );
         _exemplars.put( "area",     new HTMLAreaElementImpl() );
         _exemplars.put( "img",      new HTMLImageElementImpl() );
+        _exemplars.put( "td",       new HTMLTableCellElementImpl() );
+        _exemplars.put( "th",       new HTMLTableCellElementImpl() );
+        _exemplars.put( "tr",       new HTMLTableRowElementImpl() );
+        _exemplars.put( "table",    new HTMLTableElementImpl() );
     }
 
 
@@ -311,5 +315,16 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
             _window = new DomWindow( this );
         }
         return _window;
+    }
+
+
+    StringBuffer getWriteBuffer() {
+        if (_writeBuffer == null) _writeBuffer = new StringBuffer();
+        return _writeBuffer;
+    }
+
+
+    public void clearWriteBuffer() {
+        _writeBuffer = null;
     }
 }

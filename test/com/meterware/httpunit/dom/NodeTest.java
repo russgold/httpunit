@@ -24,6 +24,8 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 import org.w3c.dom.*;
 
+import java.util.Iterator;
+
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -326,6 +328,48 @@ public class NodeTest extends TestCase {
         assertEquals( "Number of deepClone's children", 2, childNodes.getLength() );
         assertTrue( "First child is not an element", childNodes.item(0) instanceof Element );
         assertEquals( "First cloned child's children", 3, childNodes.item(0).getChildNodes().getLength() );
+    }
+
+
+    /**
+     * Verifies that we can iterate through nodes in order
+     */
+    public void testPreOrderIterator() throws Exception {
+        Iterator each = ((NodeImpl)_element).preOrderIterator();
+        Node[] expectedNodes = { _element, _foo1, _bar1, _text, _foo2, _bar2 };
+        for (int i = 0; i < expectedNodes.length; i++) {
+            assertTrue( "Iterator prematurely terminated after " + i + " nodes", each.hasNext() );
+            assertSame( "Node " + (1 + i) + ":", expectedNodes[i], each.next() );
+        }
+        assertFalse( "Iterator should have terminated after " + expectedNodes.length + " nodes", each.hasNext() );
+    }
+
+
+    /**
+     * Verifies that we can iterate through nodes in order
+     */
+    public void testPreOrderIteratorFromANode() throws Exception {
+        Iterator each = ((NodeImpl)_text).preOrderIterator();
+        Node[] expectedNodes = { _text, _foo2, _bar2 };
+        for (int i = 0; i < expectedNodes.length; i++) {
+            assertTrue( "Iterator prematurely terminated after " + i + " nodes", each.hasNext() );
+            assertSame( "Node " + (1 + i) + ":", expectedNodes[i], each.next() );
+        }
+        assertFalse( "Iterator should have terminated after " + expectedNodes.length + " nodes", each.hasNext() );
+    }
+
+
+    /**
+     * Verifies that we can iterate through nodes in order
+     */
+    public void testPreOrderIteratorAfterANode() throws Exception {
+        Iterator each = ((NodeImpl)_foo1).preOrderIteratorAfteNode();
+        Node[] expectedNodes = { _bar1, _text, _foo2, _bar2 };
+        for (int i = 0; i < expectedNodes.length; i++) {
+            assertTrue( "Iterator prematurely terminated after " + i + " nodes", each.hasNext() );
+            assertSame( "Node " + (1 + i) + ":", expectedNodes[i], each.next() );
+        }
+        assertFalse( "Iterator should have terminated after " + expectedNodes.length + " nodes", each.hasNext() );
     }
 
 

@@ -64,6 +64,7 @@ public class DomScriptingTest extends AbstractHTMLElementTest {
         assertEquals( "title after script", "new value", _htmlDocument.getTitle() );
     }
 
+    // todo test document.write, document.writeln - window must override getDocumentWriteBuffer, discardDocumentWriteBuffer(?)
 
     public void testElementPutTitle() throws Exception {
         HTMLBodyElement body = (HTMLBodyElement) createElement( "body" );

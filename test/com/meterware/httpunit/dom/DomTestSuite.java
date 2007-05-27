@@ -39,9 +39,11 @@ public class DomTestSuite {
         result.addTest( NodeTest.suite() );
         result.addTest( DocumentImportTest.suite() );
 
+        result.addTest( HTMLDocumentTest.suite() );
         result.addTest( HTMLElementTest.suite() );
         result.addTest( HTMLSelectTest.suite() );
         result.addTest( HTMLFormTest.suite() );
+        result.addTest( HTMLTableTest.suite() );
         result.addTest( DomWindowTest.suite() );
 
         result.addTest( DomScriptingTest.suite() );

@@ -22,6 +22,10 @@ package com.meterware.httpunit.dom;
 import org.w3c.dom.*;
 
 import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 /**
  *
@@ -30,7 +34,7 @@ import java.util.Hashtable;
 public class ElementImpl extends NamespaceAwareNodeImpl implements Element {
 
     private Hashtable _attributes = new Hashtable();
-
+    private ArrayList _listeners = new ArrayList( );
 
     static ElementImpl createElement( DocumentImpl owner, String tagName ) {
         ElementImpl element = new ElementImpl();
@@ -45,6 +49,26 @@ public class ElementImpl extends NamespaceAwareNodeImpl implements Element {
         return element;
     }
 
+
+    public void addDomListener( DomListener listener ) {
+        synchronized (_listeners) {
+            _listeners.add( listener );
+        }
+    }
+
+
+    protected void reportPropertyChanged( String propertyName ) {
+        ArrayList listeners;
+        synchronized( _listeners ) {
+            listeners = (ArrayList) _listeners.clone();
+        }
+
+        for (Iterator each = listeners.iterator(); each.hasNext();) {
+            ((DomListener) each.next()).propertyChanged( this, propertyName );
+        }
+    }
+
+//---------------------------------------- Element methods -------------------------------------------------------------
 
     public short getNodeType() {
         return ELEMENT_NODE;
@@ -77,9 +101,12 @@ public class ElementImpl extends NamespaceAwareNodeImpl implements Element {
 
 
     public void setAttribute( String name, String value ) throws DOMException {
+        if (value.equals( getAttribute( name ))) return;
+
         Attr attribute = getOwnerDocument().createAttribute( name );
         attribute.setValue( value );
         setAttributeNode( attribute );
+        reportPropertyChanged( name );
     }
 
 

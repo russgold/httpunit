@@ -186,7 +186,7 @@ public class HTMLPage extends ParsedHTML {
 
         public ScriptingHandler[] getForms() {
             WebForm[] forms = HTMLPage.this.getForms();
-            ScriptingHandler[] result = new WebForm.Scriptable[ forms.length ];
+            ScriptingHandler[] result = new ScriptingHandler[ forms.length ];
             for (int i = 0; i < forms.length; i++) {
                 result[i] = forms[i].getScriptingHandler();
             }

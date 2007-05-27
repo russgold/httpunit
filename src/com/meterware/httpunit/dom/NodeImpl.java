@@ -23,10 +23,7 @@ import org.w3c.dom.*;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-
-import com.meterware.httpunit.javascript.ScriptingEngineImpl;
-import com.meterware.httpunit.scripting.ScriptingEngine;
-import com.meterware.httpunit.scripting.ScriptableDelegate;
+import java.util.Iterator;
 
 /**
  *
@@ -300,6 +297,13 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
     }
 
 
+    protected NodeList getElementsByTagNames( String[] names ) {
+        ArrayList matchingElements = new ArrayList();
+        appendElementsWithTags( names, matchingElements );
+        return new NodeListImpl( matchingElements );
+    }
+
+
     void appendElementsWithTags( String[] names, ArrayList matchingElements ) {
         for (Node child = getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child.getNodeType() != ELEMENT_NODE) continue;
@@ -326,4 +330,60 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
         }
     }
 
+
+    public Iterator preOrderIterator() {
+        return new PreOrderIterator( this );
+    }
+
+
+    public Iterator preOrderIteratorAfteNode() {
+        return new PreOrderIterator( PreOrderIterator.nextNode( this ) );
+    }
+
+
+    protected String getJavaPropertyName( String propertyName ) {
+        if (propertyName.equals( "document" )) {
+            return "ownerDocument";
+        } else {
+            return propertyName;
+        }
+    }
+
+
+    static class PreOrderIterator implements Iterator {
+        private NodeImpl _nextNode;
+
+
+        PreOrderIterator( NodeImpl currentNode ) {
+            _nextNode = currentNode;
+        }
+
+
+        public boolean hasNext() {
+            return null != _nextNode;
+        }
+
+
+        public Object next() {
+            NodeImpl currentNode = _nextNode;
+            _nextNode = nextNode( _nextNode );
+            return currentNode;
+        }
+
+
+        public void remove() {
+            throw new java.lang.UnsupportedOperationException();
+        }
+
+
+        static NodeImpl nextNode( NodeImpl node ) {
+            if (node._firstChild != null) return node._firstChild;
+            if (node._nextSibling != null) return node._nextSibling;
+            while (node._parentNode != null) {
+                node = node._parentNode;
+                if (node._nextSibling != null) return node._nextSibling;
+            }
+            return null;
+        }
+    }
 }

@@ -24,6 +24,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLImageElement;
+import org.w3c.dom.html.HTMLTableCellElement;
+import org.w3c.dom.html.HTMLTableRowElement;
 
 import java.net.URL;
 import java.util.*;
@@ -563,7 +565,7 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             WebTable wt = getWebTable( pot );
             if (wt == null) return null;
-            return wt.newTableRow( element );
+            return wt.newTableRow( (HTMLTableRowElement) element );
         }
         private WebTable getWebTable( NodeUtils.PreOrderTraversal pot ) {
             return (WebTable) getClosestContext( pot, WebTable.class );
@@ -579,7 +581,7 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             TableRow tr = getTableRow( pot );
             if (tr == null) return null;
-            return tr.newTableCell( element );
+            return tr.newTableCell( (HTMLTableCellElement) element );
         }
         private TableRow getTableRow( NodeUtils.PreOrderTraversal pot ) {
             return (TableRow) getClosestContext( pot, TableRow.class );

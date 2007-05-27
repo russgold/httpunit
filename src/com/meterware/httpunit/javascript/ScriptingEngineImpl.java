@@ -79,8 +79,7 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
             Context context = Context.enter();
             context.initStandardObjects( null );
             context.evaluateString( this, script, "httpunit", 0, null );
-            StringBuffer buffer = getDocumentWriteBuffer();
-            return buffer.toString();
+            return getDocumentWriteBuffer();
         } catch (Exception e) {
             handleScriptException( e, "Script '" + script + "'" );
             return "";
@@ -127,7 +126,7 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
 
 //------------------------------------------ protected methods ---------------------------------------------------------
 
-    protected StringBuffer getDocumentWriteBuffer() {
+    protected String getDocumentWriteBuffer() {
         throw new IllegalStateException( "may not run runScript() from " + getClass() );
     }
 

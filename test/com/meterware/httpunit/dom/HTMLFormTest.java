@@ -22,6 +22,8 @@ package com.meterware.httpunit.dom;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 import org.w3c.dom.html.*;
+import org.w3c.dom.Element;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  *
@@ -34,6 +36,7 @@ public class HTMLFormTest extends AbstractHTMLElementTest {
     private HTMLInputElement _radio1[], _radio2[], _checkbox[];
     private HTMLInputElement _submitInput, _resetInput, _buttonInput;
     private HTMLTextAreaElement _textArea;
+    private Element _body;
 
 
     public static void main( String[] args ) {
@@ -49,11 +52,13 @@ public class HTMLFormTest extends AbstractHTMLElementTest {
     protected void setUp() throws Exception {
         super.setUp();
         _form = (HTMLFormElement) createElement( "form", new String[][] { { "action", "go_here" } } );
-        _htmlDocument.appendChild( _form );
+        _body = _htmlDocument.createElement( "body" );
+        _htmlDocument.appendChild( _body );
+        _body.appendChild( _form );
 
         _textField     = (HTMLInputElement) createElement( "input", new String[][] { { "name", "text" }, { "type", "text" }, { "value", "initial" } } );
-        _passwordField = (HTMLInputElement) createElement( "input", new String[][] { { "name", "password" }, { "type", "password" } } );
-        _hiddenField   = (HTMLInputElement) createElement( "input", new String[][] { { "name", "hidden" }, { "type", "hidden" }, { "value", "saved" } } );
+        _passwordField = (HTMLInputElement) createElement( "input", new String[][] { { "id", "password" }, { "type", "password" } } );
+        _hiddenField   = (HTMLInputElement) createElement( "input", new String[][] { { "id", "hidden" }, { "type", "hidden" }, { "value", "saved" } } );
         _defaultField  = (HTMLInputElement) createElement( "input", new String[][] { { "name", "default" }, { "value", "zero" } } );
         _submitInput   = (HTMLInputElement) createElement( "input", new String[][] { { "name", "submit" }, { "type", "submit" }, { "value", "go" } } );
         _buttonInput   = (HTMLInputElement) createElement( "input", new String[][] { { "name", "button" }, { "type", "button" }, { "value", "go" } } );
@@ -212,6 +217,39 @@ public class HTMLFormTest extends AbstractHTMLElementTest {
     }
 
 
+    /**
+     * Verifies that controls in the document body after the form but before the next form are included in the form collection of elements.
+     * @throws Exception
+     */
+    public void testImproperFormElements() throws Exception {
+        HTMLElement[] elements = { _textField, _passwordField, _hiddenField, _textArea };
+        HTMLElement[] improperElements = {  _checkbox[0], _checkbox[1], _resetInput, _submitInput };
+        _form.appendChild( _htmlDocument.createElement( "i" ) ).appendChild( _htmlDocument.createTextNode( "Some controls" ) );
+        for (int i = 0; i < elements.length; i++) {
+            HTMLElement element = elements[i];
+            _form.appendChild( element );
+        }
+        for (int i = 0; i < improperElements.length; i++) {
+            HTMLElement element = improperElements[i];
+            _body.appendChild( element );
+        }
+        Element form = _htmlDocument.createElement( "form" );
+        _body.appendChild( form );
+        form.appendChild( _htmlDocument.createElement( "button" ) );
+        
+        HTMLCollection collection = _form.getElements();
+        assertNotNull( "No collection returned", collection );
+        assertEquals( "Number of elements", elements.length + improperElements.length, collection.getLength() );
+        for (int i = 0; i < elements.length; i++) {
+            assertSame( "Form element " + i, elements[i], collection.item(i) );
+        }
+        for (int i = 0; i < improperElements.length; i++) {
+            int j = elements.length + i;
+            assertSame( "Form element " + j, improperElements[i], collection.item(j) );
+        }
+    }
+
+
     public void testResetInput() throws Exception {
         _form.appendChild( _textArea );
         _textArea.setDefaultValue( "Original" );
@@ -221,6 +259,26 @@ public class HTMLFormTest extends AbstractHTMLElementTest {
         _textArea.setValue( "Changed this" );
         _resetInput.click();
         assertEquals( "value after reset", "Original", _textArea.getValue() );
+    }
+
+
+    public void testGetControlByName() throws Exception {
+        _form.appendChild( _textField );
+        _form.appendChild( _passwordField );
+        _form.appendChild( _hiddenField );
+        _form.appendChild( _defaultField );
+
+        verifyNamedControlAndValue( "text", _textField, "initial" );
+        verifyNamedControlAndValue( "hidden", _hiddenField, "saved" );
+      }
+
+
+    private void verifyNamedControlAndValue( String name, HTMLInputElement textField, String expectedValue ) {
+        Object o = ((HTMLFormElementImpl) _form).get( name, null );
+        assertTrue( "Result should be scriptable, is " + o, o instanceof ScriptableObject );
+        ScriptableObject control = (ScriptableObject) o;
+        assertSame( "control", textField, control );
+        assertEquals( "field value", expectedValue, control.get( "value", null ) );
     }
 
 }

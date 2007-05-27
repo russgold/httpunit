@@ -22,6 +22,8 @@ package com.meterware.httpunit;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.html.HTMLTableCellElement;
+import org.w3c.dom.html.HTMLTableRowElement;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -302,7 +304,7 @@ public class WebTable extends HTMLElementBase {
     }
 
 
-    TableRow newTableRow( Element element ) {
+    TableRow newTableRow( HTMLTableRowElement element ) {
         return new TableRow( this, element );
     }
 
@@ -315,7 +317,7 @@ public class WebTable extends HTMLElementBase {
     }
 
 
-    TableCell newTableCell( Element element ) {
+    TableCell newTableCell( HTMLTableCellElement element ) {
         return new TableCell( _response, _frameName, element, _url, _baseTarget, _characterSet );
     }
 

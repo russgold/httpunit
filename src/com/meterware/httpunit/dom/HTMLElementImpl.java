@@ -119,6 +119,12 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
     }
 
 
+    protected int getIntegerAttribute( String name, int defaultValue ) {
+        String value = getAttribute( name );
+        return value.length() == 0 ? defaultValue : Integer.parseInt( value );
+    }
+
+
     protected void setAttribute( String name, boolean disabled ) {
         setAttribute( name, disabled ? "true" : "false" );
     }
