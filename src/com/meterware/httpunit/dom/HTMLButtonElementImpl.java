@@ -1,6 +1,6 @@
-package com.meterware.httpunit.scripting;
+package com.meterware.httpunit.dom;
 /********************************************************************************************************************
- * $Id$
+ * $Id: HTMLSelectElementImpl.java 767 2006-07-06 04:02:07Z russgold $
  *
  * Copyright (c) 2007, Russell Gold
  *
@@ -19,17 +19,40 @@ package com.meterware.httpunit.scripting;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import org.w3c.dom.html.HTMLButtonElement;
 
 /**
- * @author <a href="mailto:russgold@gmail.com">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  */
-public interface FormScriptable {
-
-    void setAction( String newAction );
+public class HTMLButtonElementImpl extends HTMLControl implements HTMLButtonElement {
 
 
-    boolean doEvent( String eventScript );
+    ElementImpl create() {
+        return new HTMLButtonElementImpl();
+    }
 
 
-    void setParameterValue( String name, String value );
+    public String getAccessKey() {
+        return getAttributeWithNoDefault( "accesskey" );
+    }
+
+
+    public void setAccessKey( String accessKey ) {
+        setAttribute( "accesskey", accessKey );
+    }
+
+
+    public String getValue() {
+        return getAttributeWithNoDefault( "value" );
+    }
+
+
+    public void setValue( String value ) {
+        setAttribute( "value", value );
+    }
+
+
+    public String getType() {
+        return getAttributeWithDefault( "type", "submit" );
+    }
 }

@@ -1,4 +1,4 @@
-package com.meterware.httpunit.scripting;
+package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,17 +19,44 @@ package com.meterware.httpunit.scripting;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import org.w3c.dom.Node;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
- * @author <a href="mailto:russgold@gmail.com">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit,org">Russell Gold</a>
  */
-public interface FormScriptable {
+class ElementRegistry {
 
-    void setAction( String newAction );
-
-
-    boolean doEvent( String eventScript );
+    private Map _map = new HashMap();
 
 
-    void setParameterValue( String name, String value );
+    /**
+     * Registers an HttpUnit element for a node.
+     * @return the registered element
+     */
+    Object registerElement( Node node, HTMLElement htmlElement ) {
+        _map.put( node, htmlElement );
+        return htmlElement;
+    }
+
+
+    /**
+     * Returns the HttpUnit element associated with the specified DOM element, if any.
+     */
+    Object getRegisteredElement( Node node ) {
+        return _map.get( node );
+    }
+
+
+    Iterator iterator() {
+        return _map.values().iterator();
+    }
+
+
+    boolean hasNode( Node node ) {
+        return _map.containsKey( node );
+    }
 }

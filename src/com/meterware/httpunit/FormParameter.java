@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, Russell Gold
+ * Copyright (c) 2002-2003,2006-2007 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -86,9 +86,10 @@ class FormParameter {
     void setValues( String[] values ) {
         ArrayList list = new ArrayList( values.length );
         list.addAll( Arrays.asList( values ) );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimRequiredValues( list );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimUniqueValue( list );
-        for (int i = 0; i < getControls().length; i++) getControls()[i].claimValue( list );
+        FormControl[] controls = getControls();
+        for (int i = 0; i < controls.length; i++) controls[i].claimRequiredValues( list );
+        for (int i = 0; i < controls.length; i++) controls[i].claimUniqueValue( list );
+        for (int i = 0; i < controls.length; i++) controls[i].claimValue( list );
         if (!list.isEmpty()) throw new UnusedParameterValueException( _name, (String) list.get(0) );
     }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2004, 2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,8 +21,8 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.io.IOException;
 
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import com.meterware.httpunit.dom.HTMLControl;
 
 /**
  * This class represents a submit button in an HTML form.
@@ -89,9 +89,9 @@ public class SubmitButton extends Button {
 //------------------------------------------ package members ----------------------------------
 
 
-    SubmitButton( WebForm form, Node node ) {
-        super( form, node );
-        _isImageButton = NodeUtils.getNodeAttribute( node, "type" ).equalsIgnoreCase( IMAGE_BUTTON_TYPE );
+    SubmitButton( WebForm form, HTMLControl control ) {
+        super( form, control );
+        _isImageButton = control.getType().equalsIgnoreCase( IMAGE_BUTTON_TYPE );
     }
 
 
@@ -136,14 +136,14 @@ public class SubmitButton extends Button {
      * if the control is 'successful'.
      **/
     String[] getValues() {
-        return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValueAttribute() );
+        return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValue() );
     }
 
 
     void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
         if (_pressed && !isDisabled() && getName().length() > 0) {
-            if (getValueAttribute().length() > 0) {
-                processor.addParameter( getName(), getValueAttribute(), characterSet );
+            if (getValue().length() > 0) {
+                processor.addParameter( getName(), getValue(), characterSet );
             }
             if (_isImageButton) {
                 processor.addParameter( getName() + ".x", Integer.toString( _x ), characterSet );

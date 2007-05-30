@@ -154,6 +154,16 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         anchor1.setHref( "first" );
         body.appendChild( anchor1 );
 
+        HTMLAreaElement area1 = (HTMLAreaElement) createElement( "area" );
+        area1.setHref( "area" );
+        body.appendChild( area1 );
+
+        HTMLIFrameElement iframe = (HTMLIFrameElement) createElement( "iframe" );
+        body.appendChild( iframe );
+        HTMLAnchorElement hiddenAnchor = (HTMLAnchorElement) createElement( "a" );
+        hiddenAnchor.setHref( "hidden" );
+        iframe.appendChild( hiddenAnchor );
+
         HTMLAnchorElement anchor2 = (HTMLAnchorElement) createElement( "a" );
         anchor2.setHref( "tent" );
         body.appendChild( anchor2 );
@@ -162,14 +172,11 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         anchor3.setName( "ship" );
         body.appendChild( anchor3 );
 
-        HTMLAreaElement area1 = (HTMLAreaElement) createElement( "area" );
-        body.appendChild( area1 );
-
         HTMLCollection links = _htmlDocument.getLinks();
         assertNotNull( "Did not get the links collection", links );
         assertEquals( "Number of links", 3, links.getLength() );
-        assertSame( "link 1", area1,   links.item( 0 ) );
-        assertSame( "link 2", anchor1, links.item( 1 ) );
+        assertSame( "link 1", anchor1, links.item( 0 ) );
+        assertSame( "link 2", area1,   links.item( 1 ) );
         assertSame( "link 3", anchor2, links.item( 2 ) );
     }
 
@@ -185,6 +192,12 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         form1.setId( "left" );
         body.appendChild( form1 );
 
+        HTMLIFrameElement iframe = (HTMLIFrameElement) createElement( "iframe" );
+        body.appendChild( iframe );
+        HTMLFormElement hiddenForm = (HTMLFormElement) createElement( "form" );
+        hiddenForm.setId( "hidden" );
+        iframe.appendChild( hiddenForm );
+
         HTMLFormElement form2 = (HTMLFormElement) createElement( "form" );
         form2.setName( "right" );
         body.appendChild( form2 );
@@ -197,6 +210,9 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
 
         assertSame( "form 1 by id", form1, forms.namedItem( "left" ) );
         assertSame( "form 2 by name", form2, forms.namedItem( "right" ) );
+
+        _htmlDocument.setIFramesEnabled( false );
+        assertEquals( "Forms found with iframes disabled", 3, _htmlDocument.getForms().getLength() );
     }
 
 

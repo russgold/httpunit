@@ -1,4 +1,4 @@
-package com.meterware.httpunit.scripting;
+package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
@@ -19,17 +19,24 @@ package com.meterware.httpunit.scripting;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import org.w3c.dom.html.HTMLCollection;
 
 /**
- * @author <a href="mailto:russgold@gmail.com">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  */
-public interface FormScriptable {
+public interface HTMLContainerElement {
 
-    void setAction( String newAction );
-
-
-    boolean doEvent( String eventScript );
+    HTMLCollection getLinks();
 
 
-    void setParameterValue( String name, String value );
+    HTMLCollection getImages();
+
+
+    HTMLCollection getApplets();
+
+
+    HTMLCollection getForms();
+
+
+    HTMLCollection getAnchors();
 }

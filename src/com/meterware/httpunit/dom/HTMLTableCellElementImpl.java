@@ -20,15 +20,47 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.w3c.dom.html.HTMLTableCellElement;
+import org.w3c.dom.html.HTMLCollection;
 
 /**
  * @author <a href="mailto:russgold@gmail.com">Russell Gold</a>
  */
-public class HTMLTableCellElementImpl extends HTMLElementImpl implements HTMLTableCellElement, AttributeNameAdjusted {
+public class HTMLTableCellElementImpl extends HTMLElementImpl implements HTMLTableCellElement, HTMLContainerElement, AttributeNameAdjusted {
 
     ElementImpl create() {
         return new HTMLTableCellElementImpl();
     }
+
+
+//------------------------------------------ HTMLContainerElement methods ----------------------------------------------
+
+
+    public HTMLCollection getLinks() {
+        return getHtmlDocument().getContainerDelegate().getLinks( this );
+    }
+
+
+    public HTMLCollection getImages() {
+        return getHtmlDocument().getContainerDelegate().getImages( this );
+    }
+
+
+    public HTMLCollection getApplets() {
+        return getHtmlDocument().getContainerDelegate().getApplets( this );
+    }
+
+
+    public HTMLCollection getForms() {
+        return getHtmlDocument().getContainerDelegate().getForms( this );
+    }
+
+
+    public HTMLCollection getAnchors() {
+        return getHtmlDocument().getContainerDelegate().getAnchors( this );
+    }
+
+
+//-------------------------------------------- HTMLTableCellElement methods --------------------------------------------
 
 
     public String getAbbr() {

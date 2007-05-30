@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2004-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -25,17 +25,22 @@ import org.w3c.dom.Node;
 import org.mozilla.javascript.*;
 
 import java.util.Hashtable;
-import java.util.ArrayList;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
+public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTMLContainerElement {
 
     private static Hashtable _exemplars = new Hashtable();
     private DomWindow _window;
     private StringBuffer _writeBuffer;
+    private HTMLContainerDelegate _containerDelegate = new HTMLContainerDelegate( SKIP_IFRAMES );
+
+
+    public void setIFramesEnabled( boolean enabled ) {
+        _containerDelegate = new HTMLContainerDelegate( enabled ? SKIP_IFRAMES : null );
+    }
 
 
     public Object get( String propertyName, Scriptable scriptable ) {
@@ -51,6 +56,37 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
     public void put( String propertyName, Scriptable initialObject, Object value ) {
         ScriptingSupport.setNamedProperty( this, getJavaPropertyName( propertyName ), value );
     }
+
+
+//------------------------------------------ HTMLContainerElement methods ----------------------------------------------
+
+
+    public HTMLCollection getLinks() {
+        return _containerDelegate.getLinks( this );
+    }
+
+
+    public HTMLCollection getImages() {
+        return _containerDelegate.getImages( this );
+    }
+
+
+    public HTMLCollection getApplets() {
+        return _containerDelegate.getApplets( this );
+    }
+
+
+    public HTMLCollection getForms() {
+        return _containerDelegate.getForms( this );
+    }
+
+
+    public HTMLCollection getAnchors() {
+        return _containerDelegate.getAnchors( this );
+    }
+
+
+//-------------------------------------------- HTMLDocument methods ----------------------------------------------------
 
 
     public String getTitle() {
@@ -146,53 +182,6 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
     }
 
 
-    public HTMLCollection getImages() {
-        ArrayList elements = new ArrayList();
-        appendElementsWithTags( new String[] {"img"}, elements );
-        return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
-    }
-
-
-    public HTMLCollection getApplets() {
-        return null;
-    }
-
-
-    public HTMLCollection getLinks() {
-        ArrayList elements = new ArrayList();
-        appendElementsWithTags( new String[] {"area"}, elements );
-
-        NodeList nodeList = getElementsByTagName( "A" );
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item( i );
-            if (node.getAttributes().getNamedItem( "href" ) != null) {
-                elements.add( node );
-            }
-        }
-        return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
-    }
-
-
-    public HTMLCollection getForms() {
-        ArrayList elements = new ArrayList();
-        appendElementsWithTags( new String[] {"form"}, elements );
-        return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
-    }
-
-
-    public HTMLCollection getAnchors() {
-        NodeList nodeList = getElementsByTagName( "A" );
-        ArrayList elements = new ArrayList();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item( i );
-            if (node.getAttributes().getNamedItem( "name" ) != null) {
-                elements.add( node );
-            }
-        }
-        return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
-    }
-
-
     public String getCookie() {
         return null;
     }
@@ -245,23 +234,6 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
     }
 
 
-/*
-    Element createScriptableElement( String tagName ) throws DOMException {
-        try {
-            ElementImpl element = (ElementImpl) Context.getCurrentContext().newObject( this, getExemplar( tagName ).getClassName() );
-            element.initialize( this, toNodeCase( tagName ) );
-            return element;
-        } catch (PropertyException e) {
-            throw new RuntimeException( e );
-        } catch (NotAFunctionException e) {
-            throw new RuntimeException( e );
-        } catch (JavaScriptException e) {
-            throw new RuntimeException( e );
-        }
-    }
-
-*/
-
     public NodeList getElementsByTagName( String name ) {
         return super.getElementsByTagName( toNodeCase( name ) );
     }
@@ -286,6 +258,11 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
     }
 
 
+    HTMLContainerDelegate getContainerDelegate() {
+        return _containerDelegate;
+    }
+
+
     static {
         _exemplars.put( "html",     new HTMLHtmlElementImpl() );
         _exemplars.put( "head",     new HTMLHeadElementImpl() );
@@ -299,6 +276,7 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
         _exemplars.put( "select",   new HTMLSelectElementImpl() );
         _exemplars.put( "option",   new HTMLOptionElementImpl() );
         _exemplars.put( "input",    new HTMLInputElementImpl() );
+        _exemplars.put( "button",   new com.meterware.httpunit.dom.HTMLButtonElementImpl() );
         _exemplars.put( "textarea", new HTMLTextAreaElementImpl() );
         _exemplars.put( "a",        new HTMLAnchorElementImpl() );
         _exemplars.put( "area",     new HTMLAreaElementImpl() );
@@ -307,6 +285,8 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument {
         _exemplars.put( "th",       new HTMLTableCellElementImpl() );
         _exemplars.put( "tr",       new HTMLTableRowElementImpl() );
         _exemplars.put( "table",    new HTMLTableElementImpl() );
+        _exemplars.put( "p",        new HTMLParagraphElementImpl() );
+        _exemplars.put( "iframe",   new HTMLIFrameElementImpl() );
     }
 
 

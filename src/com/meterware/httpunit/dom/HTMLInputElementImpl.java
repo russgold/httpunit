@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006, Russell Gold
+ * Copyright (c) 2006-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -32,7 +32,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
     private String _value;
     private Boolean _checked;
-    private TypeSpecificBehavior _behavior = new EditableTextBehavior( this );
+    private TypeSpecificBehavior _behavior;
 
     ElementImpl create() {
         return new HTMLInputElementImpl();
@@ -48,7 +48,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
     public void click() {
-        _behavior.click();
+        getBehavior().click();
     }
 
 
@@ -77,7 +77,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
     public boolean getChecked() {
-        return _behavior.getChecked();
+        return getBehavior().getChecked();
     }
 
 
@@ -132,7 +132,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
     public void setChecked( boolean checked ) {
-        _behavior.setChecked( checked );
+        getBehavior().setChecked( checked );
     }
 
 
@@ -167,17 +167,17 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
     public String getValue() {
-        return _behavior.getValue();
+        return getBehavior().getValue();
     }
 
 
     public void setValue( String value ) {
-        _behavior.setValue( value );
+        getBehavior().setValue( value );
     }
 
 
-    void reset() {
-        _behavior.reset();
+    public void reset() {
+        getBehavior().reset();
     }
 
 
@@ -212,6 +212,12 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
     }
 
 
+    private TypeSpecificBehavior getBehavior() {
+        if (_behavior == null) selectBehavior( getType().toLowerCase() );
+        return _behavior;
+    }
+
+
     interface TypeSpecificBehavior {
         void setValue( String value );
         String getValue();
@@ -234,10 +240,16 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
 
         public String getValue() {
-            return getDefaultValue();
+            return _value != null ? _value : getDefaultValue();
         }
 
-        public void setValue( String value ) {}
+        public void setValue( String value ) {
+            if (HTMLInputElementImpl.equals( value, _value )) return;
+
+            _value = value;
+            reportPropertyChanged( "value" );
+        }
+
 
         public boolean getChecked() {
             return getDefaultChecked();
@@ -263,16 +275,6 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
         }
 
 
-        public String getValue() {
-            return _value != null ? _value : getDefaultValue();
-        }
-
-        public void setValue( String value ) {
-            if (HTMLInputElementImpl.equals( value, _value )) return;
-
-            _value = value;
-            reportPropertyChanged( "value" );
-        }
 
         public void reset() {
             _value = null;
@@ -322,7 +324,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
                     Node node = elements.item(i);
                     if (!(node instanceof HTMLInputElementImpl)) continue;
                     HTMLInputElementImpl input = (HTMLInputElementImpl) node;
-                    if (input.getName().equals( getName() ) && input.getType().equalsIgnoreCase( "radio" )) input.setState( false );
+                    if (getName().equals( input.getName() ) && input.getType().equalsIgnoreCase( "radio" )) input.setState( false );
                 }
             }
             setState( checked );

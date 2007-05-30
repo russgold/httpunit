@@ -20,6 +20,7 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.w3c.dom.*;
+import org.w3c.dom.html.HTMLIFrameElement;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -37,6 +38,12 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
     private NodeImpl     _nextSibling;
     private NodeImpl     _previousSibling;
     private Hashtable    _userData = new Hashtable( );
+
+    static IteratorMask SKIP_IFRAMES = new IteratorMask() {
+        public boolean skipSubtree( Node subtreeRoot ) {
+            return subtreeRoot instanceof HTMLIFrameElement;
+        }
+    };
 
 
     protected void initialize( DocumentImpl ownerDocument ) {
@@ -336,8 +343,18 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
     }
 
 
-    public Iterator preOrderIteratorAfteNode() {
+    public Iterator preOrderIterator( IteratorMask mask ) {
+        return new PreOrderIterator( this, mask );
+    }
+
+
+    public Iterator preOrderIteratorAfterNode() {
         return new PreOrderIterator( PreOrderIterator.nextNode( this ) );
+    }
+
+
+    public Iterator preOrderIteratorAfterNode( IteratorMask mask ) {
+        return new PreOrderIterator( PreOrderIterator.nextNode( this ), mask );
     }
 
 
@@ -350,12 +367,24 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
     }
 
 
+    interface IteratorMask {
+        boolean skipSubtree( Node subtreeRoot );
+    }
+
+
     static class PreOrderIterator implements Iterator {
         private NodeImpl _nextNode;
+        private IteratorMask _mask;
 
 
         PreOrderIterator( NodeImpl currentNode ) {
             _nextNode = currentNode;
+        }
+
+
+        PreOrderIterator( NodeImpl currentNode, IteratorMask mask ) {
+            this( currentNode );
+            _mask = mask;
         }
 
 
@@ -367,6 +396,7 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
         public Object next() {
             NodeImpl currentNode = _nextNode;
             _nextNode = nextNode( _nextNode );
+            while (_mask != null && _nextNode != null && _mask.skipSubtree( _nextNode )) _nextNode = nextSubtree( _nextNode );
             return currentNode;
         }
 
@@ -378,6 +408,11 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
 
         static NodeImpl nextNode( NodeImpl node ) {
             if (node._firstChild != null) return node._firstChild;
+            return nextSubtree( node );
+        }
+
+
+        private static NodeImpl nextSubtree( NodeImpl node ) {
             if (node._nextSibling != null) return node._nextSibling;
             while (node._parentNode != null) {
                 node = node._parentNode;

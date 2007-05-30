@@ -128,5 +128,4 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
         }
         return result;
     }
-
 }

@@ -26,12 +26,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLImageElement;
 import org.w3c.dom.html.HTMLTableCellElement;
 import org.w3c.dom.html.HTMLTableRowElement;
+import org.w3c.dom.html.HTMLCollection;
 
 import java.net.URL;
 import java.util.*;
 import java.io.IOException;
 
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.dom.HTMLContainerElement;
+import com.meterware.httpunit.dom.HTMLDocumentImpl;
+import com.meterware.httpunit.dom.HTMLControl;
 
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -66,20 +70,12 @@ class ParsedHTML {
     private HashMap      _elementsByName = new HashMap();
 
     /** map of DOM elements to HTML elements **/
-    private HashMap      _elements = new HashMap();
+    private ElementRegistry _registry = new ElementRegistry();
 
-    private ArrayList    _formsList = new ArrayList();
-    private WebForm[]    _forms;
     private WebForm      _activeForm;
 
-    private ArrayList    _imagesList = new ArrayList();
-    private WebImage[]   _images;
-
-    private ArrayList    _linkList = new ArrayList();
-    private WebLink[]    _links;
-
-    private ArrayList      _blocksList = new ArrayList();
-    private TextBlock[] _blocks;
+    private ArrayList    _blocksList = new ArrayList();
+    private TextBlock[]  _blocks;
 
     private ArrayList    _appletList = new ArrayList();
     private WebApplet[]  _applets;
@@ -89,6 +85,7 @@ class ParsedHTML {
 
     private ArrayList    _frameList = new ArrayList();
     private WebFrame[]   _frames;
+
 
 
     ParsedHTML( WebResponse response, FrameSelector frame, URL baseURL, String baseTarget, Node rootNode, String characterSet ) {
@@ -103,13 +100,20 @@ class ParsedHTML {
 
     /**
      * Returns the forms found in the page in the order in which they appear.
+     * 
+     * @return an array of objects representing the forms in the page or portion of a page.
      **/
     public WebForm[] getForms() {
-        if (_forms == null) {
-            loadElements();
-            _forms = (WebForm[]) _formsList.toArray( new WebForm[ _formsList.size() ] );
+        HTMLCollection forms = ((HTMLContainerElement) _rootNode).getForms();
+        WebForm[] result = new WebForm[ forms.getLength() ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (WebForm) _registry.getRegisteredElement( forms.item( i ) );
+            if (result[i] == null) {
+                result[i] = new WebForm( _response, _baseURL, forms.item( i ), _frame, _baseTarget, _characterSet, _registry );
+                _registry.registerElement( forms.item( i ), result[i] );
+            }
         }
-        return _forms;
+        return result;
     }
 
 
@@ -117,11 +121,16 @@ class ParsedHTML {
      * Returns the links found in the page in the order in which they appear.
      **/
     public WebLink[] getLinks() {
-        if (_links == null) {
-            loadElements();
-            _links = (WebLink[]) _linkList.toArray( new WebLink[ _linkList.size() ] );
+        HTMLCollection links = ((HTMLContainerElement) _rootNode).getLinks();
+        WebLink[] result = new WebLink[ links.getLength() ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (WebLink) _registry.getRegisteredElement( links.item( i ) );
+            if (result[i] == null) {
+                result[i] = new WebLink( _response, _baseURL, links.item( i ), _frame, _baseTarget, _characterSet );
+                _registry.registerElement( links.item( i ), result[i] );
+            }
         }
-        return _links;
+        return result;
     }
 
 
@@ -139,13 +148,18 @@ class ParsedHTML {
 
     /**
      * Returns the images found in the page in the order in which they appear.
-     **/
+     */
     public WebImage[] getImages() {
-        if (_images == null) {
-            loadElements();
-            _images = (WebImage[]) _imagesList.toArray( new WebImage[ _imagesList.size() ] );
+        HTMLCollection images = ((HTMLContainerElement) _rootNode).getImages();
+        WebImage[] result = new WebImage[ images.getLength() ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (WebImage) _registry.getRegisteredElement( images.item( i ) );
+            if (result[i] == null) {
+                result[i] = new WebImage( _response, this, _baseURL, (HTMLImageElement) images.item( i ), _frame, _baseTarget, _characterSet );
+                _registry.registerElement( images.item( i ), result[i] );
+            }
         }
-        return _images;
+        return result;
     }
 
 
@@ -216,7 +230,7 @@ class ParsedHTML {
     public HTMLElement[] getElementsWithAttribute( String name, String value ) {
         loadElements();
         ArrayList elements = new ArrayList();
-        for (Iterator i = _elements.values().iterator(); i.hasNext();) {
+        for (Iterator i = _registry.iterator(); i.hasNext();) {
             HTMLElement element = (HTMLElement) i.next();
             if (value.equals( element.getAttribute( name ))) elements.add( element );
         }
@@ -247,10 +261,10 @@ class ParsedHTML {
         HTMLElement[] elements = new HTMLElement[ nl.getLength() ];
         for (int i = 0; i < elements.length; i++) {
             Node node = nl.item(i);
-            elements[i] = (HTMLElement) _elements.get( node );
+            elements[i] = (HTMLElement) _registry.getRegisteredElement( node );
             if (elements[i] == null) {
                 elements[i] = toDefaultElement( (Element) node );
-                _elements.put( node, elements[i] );
+                _registry.registerElement( node, elements[i] );
             }
         }
         return elements;
@@ -601,7 +615,7 @@ class ParsedHTML {
 
         private HTMLElement newControlWithoutForm( ParsedHTML parsedHTML, Element element ) {
             if ((element.getNodeName().equalsIgnoreCase( "button" ) || element.getNodeName().equalsIgnoreCase( "input" )) &&
-                    isValidNonFormButtonType( NodeUtils.getNodeAttribute( element, "type" ) )) {
+                isValidNonFormButtonType( NodeUtils.getNodeAttribute( element, "type" ) )) {
                 return parsedHTML.toButtonWithoutForm( element );
             } else {
                 return null;
@@ -618,10 +632,7 @@ class ParsedHTML {
             return getRootContext( pot )._activeForm;
         }
 
-        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
-            WebForm form = getForm( pot );
-            if (form != null) form.addFormControl( (FormControl) htmlElement );
-        }
+        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {}
     }
 
 
@@ -706,8 +717,8 @@ class ParsedHTML {
                 if (factory == null || !factory.isRecognized( getClientProperties() )) return true;
                 if (pot.getClosestContext( ContentConcealer.class ) != null) return true;
 
-                if (!_elements.containsKey( element )) factory.recordElement( pot, element, ParsedHTML.this );
-                if (factory.addToContext()) pot.pushContext( _elements.get( element ) );
+                if (!_registry.hasNode( element )) factory.recordElement( pot, element, ParsedHTML.this );
+                if (factory.addToContext()) pot.pushContext( _registry.getRegisteredElement( element ) );
 
                 return true;
             }
@@ -735,12 +746,12 @@ class ParsedHTML {
 
 
     private Button toButtonWithoutForm( Element element ) {
-        return new Button( _response, element );
+        return new Button( _response, (HTMLControl) element );
     }
 
 
     private WebForm toWebForm( Element element ) {
-        return new WebForm( _response, _baseURL, element, _frame, _baseTarget, _characterSet );
+        return new WebForm( _response, _baseURL, element, _frame, _baseTarget, _characterSet, _registry );
     }
 
 
@@ -795,7 +806,7 @@ class ParsedHTML {
 
 
     private void addToMaps( Node node, HTMLElement htmlElement ) {
-        _elements.put( node, htmlElement );
+        _registry.registerElement( node, htmlElement );
         if (htmlElement.getID() != null) _elementsByID.put( htmlElement.getID(), htmlElement );
         if (htmlElement.getName() != null) addNamedElement( htmlElement.getName(), htmlElement );
     }
@@ -815,9 +826,6 @@ class ParsedHTML {
 
 
     private ArrayList getListForElement( HTMLElement element ) {
-        if (element instanceof WebLink) return _linkList;
-        if (element instanceof WebForm) return _formsList;
-        if (element instanceof WebImage) return _imagesList;
         if (element instanceof WebApplet) return _appletList;
         if (element instanceof WebTable) return _tableList;
         if (element instanceof WebFrame) return _frameList;
@@ -998,14 +1006,12 @@ class ParsedHTML {
         if (_rootNode != null && rootNode != _rootNode )
             throw new IllegalStateException( "The root node has already been defined as " + _rootNode + " and cannot be redefined as " + rootNode );
         _rootNode = rootNode;
+        if (rootNode instanceof HTMLDocumentImpl) ((HTMLDocumentImpl) rootNode).setIFramesEnabled( getClientProperties().isIframeSupported());
         clearCaches();
     }
 
 
     private void clearCaches() {
-        _links = null;
-        _forms = null;
-        _images = null;
         _applets = null;
         _tables = null;
         _frames = null;

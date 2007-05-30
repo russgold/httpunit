@@ -21,7 +21,6 @@ package com.meterware.httpunit.dom;
  *******************************************************************************************************************/
 import org.w3c.dom.html.*;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.NodeList;
 
 /**
  * @author <a href="mailto:russgold@gmail.com">Russell Gold</a>

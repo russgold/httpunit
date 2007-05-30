@@ -22,7 +22,7 @@ package com.meterware.httpunit.dom;
 
 import org.w3c.dom.html.HTMLElement;
 import org.w3c.dom.NodeList;
-import org.mozilla.javascript.Scriptable;
+import org.w3c.dom.Attr;
 
 
 /**
@@ -108,8 +108,8 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
 
 
     protected boolean getBooleanAttribute( String name ) {
-        String value = getAttribute( name );
-        return (value.length() > 0 && value.equalsIgnoreCase( "true" ));
+        Attr attr = getAttributeNode( name );
+        return attr != null && !attr.getValue().equalsIgnoreCase( "false" );
     }
 
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006, Russell Gold
+ * Copyright (c) 2006-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -132,7 +132,7 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
     public HTMLCollection getElements() {
         ArrayList elements = new ArrayList();
         String[] names = new String[]{"INPUT", "TEXTAREA", "BUTTON", "SELECT"};
-        for (Iterator each = preOrderIteratorAfteNode(); each.hasNext();) {
+        for (Iterator each = preOrderIteratorAfterNode(); each.hasNext();) {
             Node node = (Node) each.next();
             if (node instanceof HTMLFormElement) break;
 

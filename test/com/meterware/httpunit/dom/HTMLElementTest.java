@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2004-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -256,6 +256,14 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
     }
 
 
+    public void testButtonElement() throws Exception {
+        doElementTest( "button", HTMLButtonElement.class, new Object[][] { { "accesskey", "C" }, { "disabled", Boolean.TRUE, Boolean.FALSE },
+                                                                         { "name", "here" }, { "tabindex", new Integer(1), new Integer(0) },
+                                                                         { "type", "button", "submit", "ro" }, { "value", "230" } } );
+        // XXX blur, focus, select, click
+    }
+
+
     public void testTextAreaElement() throws Exception {
         doElementTest( "textarea", HTMLTextAreaElement.class, new Object[][] { { "accesskey", "C" }, { "cols", new Integer(1), new Integer(0) },
                                                                                { "disabled", Boolean.TRUE, Boolean.FALSE }, { "name", "here" },
@@ -290,9 +298,23 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
     }
 
 
+    public void testParagraphElement() throws Exception {
+        doElementTest( "p", HTMLParagraphElement.class,
+                       new Object[][] { { "title", "here" }, { "id", "aaa"}, {"align", "top"} } );
+    }
+
+
+    public void testIFrameElement() throws Exception {
+        doElementTest( "iframe", HTMLIFrameElement.class,
+                       new Object[][] { { "align", "center" }, { "src", "aaa"} } );
+    }
+
+
     // XXX form.getLength, form.submit
     // XXX input.blur, input.focus, input.select, input.click
     // XXX a.blur, a.focus
+    // XXX iframe.longDescm iframe.name, iframe.width, iframe.height, iframe.scrolling
+    // XXX iframe.marginheight, iframe.marginwidth, iframe.frameborder
 
 
 }

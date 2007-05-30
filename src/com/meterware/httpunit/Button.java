@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,11 +20,12 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
-import com.meterware.httpunit.scripting.ScriptingHandler;
+import com.meterware.httpunit.dom.HTMLControl;
+import com.meterware.httpunit.dom.HTMLInputElementImpl;
+import com.meterware.httpunit.dom.HTMLButtonElementImpl;
 
 import java.io.IOException;
 
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 
@@ -52,15 +53,15 @@ public class Button extends FormControl {
     }
 
 
-    Button( WebForm form, Node node ) {
-        super( form, node );
-        _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
+    Button( WebForm form, HTMLControl control ) {
+        super( form, control );
+        _onClickEvent = NodeUtils.getNodeAttribute( control, "onclick" );
     }
 
 
-    Button( WebResponse response, Node node ) {
-        super( null, node );
-        _onClickEvent = NodeUtils.getNodeAttribute( node, "onclick" );
+    Button( WebResponse response, HTMLControl control ) {
+        super( null, control );
+        _onClickEvent = NodeUtils.getNodeAttribute( control, "onclick" );
         _baseResponse = response;
     }
 
@@ -69,7 +70,9 @@ public class Button extends FormControl {
      * Returns the value associated with this button.
      **/
     public String getValue() {
-        return getValueAttribute();
+        return emptyIfNull( getNode() instanceof HTMLInputElementImpl
+                                ? ((HTMLInputElementImpl) getNode()).getValue()
+                                : ((HTMLButtonElementImpl) getNode()).getValue() );
     }
 
 
@@ -104,10 +107,7 @@ public class Button extends FormControl {
         return _onClickEvent.length() == 0 || getScriptingHandler().doEvent( _onClickEvent );
     }
 
-//    public ScriptingHandler getScriptingHandler() {
-//        return (ScriptingHandler) getNode();
-//    }
-
+    
     /**
      * Perform the normal action of this button.
      */

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2006, Russell Gold
+* Copyright (c) 2000-2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.html.HTMLFormElement;
+import org.w3c.dom.html.HTMLCollection;
 import org.xml.sax.SAXException;
 
 
@@ -46,11 +48,30 @@ import org.xml.sax.SAXException;
  **/
 public class WebForm extends WebRequestSource {
     private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
+
+    private final static String[] NO_VALUES = new String[0];
+
     private Button[] _buttons;
+
+    /** The submit buttons in this form. **/
+    private SubmitButton[] _submitButtons;
+
+    /** The character set in which the form will be submitted. **/
+    private String         _characterSet;
+
+    private Vector _buttonVector;
+
+    private FormControl[] _presetParameters;
+    private ArrayList     _presets;
+
+    private ElementRegistry _registry;
+
 
 
     /** Predicate to match a link's name. **/
     public final static HTMLElementPredicate MATCH_NAME;
+    private HTMLFormElement _domElement;
+
 
     /**
      * Submits this form using the web client from which it was originally obtained.
@@ -774,9 +795,11 @@ public class WebForm extends WebRequestSource {
      * Contructs a web form given the URL of its source page and the DOM extracted
      * from that page.
      **/
-    WebForm( WebResponse response, URL baseURL, Node node, FrameSelector frame, String defaultTarget, String characterSet ) {
+    WebForm( WebResponse response, URL baseURL, Node node, FrameSelector frame, String defaultTarget, String characterSet, ElementRegistry registry ) {
         super( response, node, baseURL, "action", frame, defaultTarget );
         _characterSet = characterSet;
+        _registry = registry;
+        _domElement = (HTMLFormElement) node;
     }
 
 
@@ -794,26 +817,6 @@ public class WebForm extends WebRequestSource {
 
 
 //---------------------------------- private members --------------------------------
-
-    private final static String[] NO_VALUES = new String[0];
-
-    /** The attributes of the form parameters. **/
-    private FormControl[] _formControls;
-
-    /** The submit buttons in this form. **/
-    private SubmitButton[] _submitButtons;
-
-    /** The character set in which the form will be submitted. **/
-    private String         _characterSet;
-
-    /** A map of parameter names to form parameter objects. **/
-    private Map            _formParameters;
-
-    private Vector _buttonVector;
-
-    private FormControl[] _presetParameters;
-    private ArrayList     _presets;
-
 
     private SubmitButton getDefaultButton() {
         if (getSubmitButtons().length == 1) {
@@ -849,17 +852,8 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    private ArrayList _controlList = new ArrayList();
-
     FormControl newFormControl( Node child ) {
         return FormControl.newFormParameter( this, child );
-    }
-
-
-    void addFormControl( FormControl control ) {
-        _controlList.add( control );
-        _formControls = null;
-        _formParameters = null;
     }
 
 
@@ -867,10 +861,21 @@ public class WebForm extends WebRequestSource {
      * Returns an array of form parameter attributes for this form.
      **/
     private FormControl[] getFormControls() {
-        if (_formControls == null) {
-            _formControls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
+        HTMLCollection controlElements = _domElement.getElements();
+        FormControl[] controls = new FormControl[ controlElements.getLength() ];
+        for (int i = 0; i < controls.length; i++) {
+            controls[i] = getControlForNode( controlElements.item( i ) );
         }
-        return _formControls;
+        return controls;
+    }
+
+
+    private FormControl getControlForNode( Node node ) {
+        if (_registry.hasNode( node )) {
+            return (FormControl) _registry.getRegisteredElement( node );
+        } else {
+            return (FormControl) _registry.registerElement( node, newFormControl( node ) );
+        }
     }
 
 
@@ -885,22 +890,20 @@ public class WebForm extends WebRequestSource {
      * controls with a particular name. Unnamed parameters are ignored.
      */
     private Map getFormParameters() {
-        if (_formParameters == null) {
-            _formParameters = new HashMap();
-            loadFormParameters( getPresetParameters() );
-            loadFormParameters( getFormControls() );
-        }
-        return _formParameters;
+        Map formParameters = new HashMap();
+        loadFormParameters( formParameters, getPresetParameters() );
+        loadFormParameters( formParameters, getFormControls() );
+        return formParameters;
     }
 
 
-    private void loadFormParameters( FormControl[] controls ) {
+    private void loadFormParameters( Map formParameters, FormControl[] controls ) {
         for (int i = 0; i < controls.length; i++) {
             if (controls[i].getName().length() == 0) continue;
-            FormParameter parameter = (FormParameter) _formParameters.get( controls[i].getName() );
+            FormParameter parameter = (FormParameter) formParameters.get( controls[i].getName() );
             if (parameter == null) {
                 parameter = new FormParameter();
-                _formParameters.put( controls[i].getName(), parameter );
+                formParameters.put( controls[i].getName(), parameter );
             }
             parameter.addControl( controls[i] );
         }

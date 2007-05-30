@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2004-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -346,7 +346,7 @@ public class NodeTest extends TestCase {
 
 
     /**
-     * Verifies that we can iterate through nodes in order
+     * Verifies that we can iterate through nodes in order, starting from a specific node.
      */
     public void testPreOrderIteratorFromANode() throws Exception {
         Iterator each = ((NodeImpl)_text).preOrderIterator();
@@ -360,11 +360,29 @@ public class NodeTest extends TestCase {
 
 
     /**
-     * Verifies that we can iterate through nodes in order
+     * Verifies that we can iterate through nodes in order, starting after a specific node.
      */
     public void testPreOrderIteratorAfterANode() throws Exception {
-        Iterator each = ((NodeImpl)_foo1).preOrderIteratorAfteNode();
+        Iterator each = ((NodeImpl)_foo1).preOrderIteratorAfterNode();
         Node[] expectedNodes = { _bar1, _text, _foo2, _bar2 };
+        for (int i = 0; i < expectedNodes.length; i++) {
+            assertTrue( "Iterator prematurely terminated after " + i + " nodes", each.hasNext() );
+            assertSame( "Node " + (1 + i) + ":", expectedNodes[i], each.next() );
+        }
+        assertFalse( "Iterator should have terminated after " + expectedNodes.length + " nodes", each.hasNext() );
+    }
+
+
+    /**
+     * Verifies that we can iterate through nodes in order skipping a specified subtree.
+     */
+    public void testPreOrderIteratorWithMask() throws Exception {
+        Iterator each = ((NodeImpl)_element).preOrderIterator( new NodeImpl.IteratorMask() {
+            public boolean skipSubtree( Node subtreeRoot ) {
+                return subtreeRoot == _foo1;
+            }
+        });
+        Node[] expectedNodes = { _element,  _bar2 };
         for (int i = 0; i < expectedNodes.length; i++) {
             assertTrue( "Iterator prematurely terminated after " + i + " nodes", each.hasNext() );
             assertSame( "Node " + (1 + i) + ":", expectedNodes[i], each.next() );
