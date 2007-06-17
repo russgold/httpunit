@@ -20,6 +20,7 @@ package com.meterware.httpunit.dom;
 *
 *******************************************************************************************************************/
 import java.io.IOException;
+import java.net.URL;
 
 import org.xml.sax.SAXException;
 import org.w3c.dom.html.HTMLDocument;
@@ -151,5 +152,10 @@ public class DomWindow extends AbstractDomComponent {
 
     boolean replaceText( String string, String mimeType ) {
         return _proxy.replaceText( string, mimeType );
+    }
+
+
+    public URL getUrl() {
+        return _proxy.getURL();
     }
 }

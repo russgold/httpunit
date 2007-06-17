@@ -27,6 +27,8 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Context;
 import junit.framework.TestSuite;
 
+import java.net.URL;
+
 /**
  * Tests basic scripting via the DOM.
  *
@@ -117,6 +119,9 @@ public class DomScriptingTest extends AbstractHTMLElementTest {
 
 
     public void testDocumentLinksCollection() throws Exception {
+        TestWindowProxy proxy = new TestWindowProxy( _htmlDocument );
+        proxy.setUrl( new URL( "http://localhost" ) );
+        _htmlDocument.getWindow().setProxy( proxy );
         HTMLBodyElement body = addBodyElement();
         appendLink( body, "red", "red.html" );
         appendLink( body, "blue", "blue.html" );
@@ -127,7 +132,7 @@ public class DomScriptingTest extends AbstractHTMLElementTest {
         assertTrue( "Object is not a link element", second instanceof HTMLAnchorElement );
         assertEquals( "Link ID", "blue", ((HTMLAnchorElement) second).getId() );
 
-        assertEquals( "red link href", "red.html", evaluateExpression( _htmlDocument, "links.red.href" ) );
+        assertEquals( "red link href", "http://localhost/red.html", evaluateExpression( _htmlDocument, "links.red.href" ) );
     }
 
 

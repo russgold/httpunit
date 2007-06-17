@@ -25,6 +25,8 @@ import org.w3c.dom.Node;
 import org.mozilla.javascript.*;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  *
@@ -48,6 +50,12 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
 
         Object result = super.get( propertyName, scriptable );
         if (result != NOT_FOUND) return result;
+
+        Element element = getElementById( propertyName );
+        if (element != null) return element;
+
+        NodeList elements = getElementsByName( propertyName );
+        if (elements.getLength() >= 1) return elements.item( 0 );
 
         return ScriptingSupport.getNamedProperty( this, getJavaPropertyName( propertyName ), scriptable );
     }
@@ -216,7 +224,14 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
 
 
     public NodeList getElementsByName( String elementName ) {
-        return null;
+        ArrayList elements = new ArrayList();
+        for (Iterator each = preOrderIterator(); each.hasNext();) {
+            Node node = (Node) each.next();
+            if (!(node instanceof HTMLElementImpl)) continue;
+            HTMLElementImpl element = (HTMLElementImpl) node;
+            if (elementName.equals( element.getAttributeWithNoDefault( "name" ) )) elements.add( element );
+        }
+        return new NodeListImpl( elements );
     }
 
 
@@ -276,7 +291,7 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
         _exemplars.put( "select",   new HTMLSelectElementImpl() );
         _exemplars.put( "option",   new HTMLOptionElementImpl() );
         _exemplars.put( "input",    new HTMLInputElementImpl() );
-        _exemplars.put( "button",   new com.meterware.httpunit.dom.HTMLButtonElementImpl() );
+        _exemplars.put( "button",   new HTMLButtonElementImpl() );
         _exemplars.put( "textarea", new HTMLTextAreaElementImpl() );
         _exemplars.put( "a",        new HTMLAnchorElementImpl() );
         _exemplars.put( "area",     new HTMLAreaElementImpl() );
@@ -287,12 +302,14 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
         _exemplars.put( "table",    new HTMLTableElementImpl() );
         _exemplars.put( "p",        new HTMLParagraphElementImpl() );
         _exemplars.put( "iframe",   new HTMLIFrameElementImpl() );
+        _exemplars.put( "applet",   new HTMLAppletElementImpl() );
     }
 
 
     public DomWindow getWindow() {
         if (_window == null) {
             _window = new DomWindow( this );
+            setParentScope( _window );
         }
         return _window;
     }

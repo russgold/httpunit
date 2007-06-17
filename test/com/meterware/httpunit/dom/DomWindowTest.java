@@ -20,12 +20,9 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.w3c.dom.html.HTMLDocument;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.Stack;
+import java.net.URL;
 
-import com.meterware.httpunit.scripting.ScriptingHandler;
 import junit.framework.TestSuite;
 
 /**
@@ -33,9 +30,7 @@ import junit.framework.TestSuite;
  */
 public class DomWindowTest extends AbstractHTMLElementTest {
 
-    private Stack  _proxyCalls = new Stack();
-    private String _answer;
-    private String _replacementText = null;
+    private TestWindowProxy _proxy;
 
 
     public static TestSuite suite() {
@@ -64,7 +59,7 @@ public class DomWindowTest extends AbstractHTMLElementTest {
         assertEquals( "Title of document in new window", "broken (next.html)", document.getTitle() );
 
         window2.close();
-        assertLastProxyMethod( "close" );
+        TestWindowProxy.assertLastProxyMethod( "close" );
     }
 
 
@@ -81,14 +76,11 @@ public class DomWindowTest extends AbstractHTMLElementTest {
     }
 
 
-    private void assertLastProxyMethod( String method ) {
-        assertEquals( "Last proxy method called", method, popProxyCall() );
-    }
-
-
     private DomWindow createMainWindow() {
         DomWindow window = _htmlDocument.getWindow();
-        window.setProxy( new TestWindowProxy( _htmlDocument ) );
+        _proxy = new TestWindowProxy( _htmlDocument );
+        window.setProxy( _proxy );
+        TestWindowProxy.clearProxyCalls();
         return window;
     }
 
@@ -99,7 +91,7 @@ public class DomWindowTest extends AbstractHTMLElementTest {
     public void testAlert() throws Exception {
         DomWindow window = createMainWindow();
         window.alert( "A little message" );
-        assertLastProxyMethod( "alert( A little message )" );
+        TestWindowProxy.assertLastProxyMethod( "alert( A little message )" );
     }
 
     /**
@@ -107,12 +99,12 @@ public class DomWindowTest extends AbstractHTMLElementTest {
      */
     public void testConfirm() throws Exception {
         DomWindow window = createMainWindow();
-        _answer = "no";
+        _proxy.setAnswer( "no" );
         assertFalse( "Should have said no", window.confirm( "Time to quit?" ) );
-        assertLastProxyMethod( "confirm( Time to quit? )" );
-        _answer = "yes";
+        TestWindowProxy.assertLastProxyMethod( "confirm( Time to quit? )" );
+        _proxy.setAnswer( "yes" );
         assertTrue( "Should have said yes", window.confirm( "Want to stay?" ) );
-        assertLastProxyMethod( "confirm( Want to stay? )" );
+        TestWindowProxy.assertLastProxyMethod( "confirm( Want to stay? )" );
     }
 
 
@@ -121,12 +113,12 @@ public class DomWindowTest extends AbstractHTMLElementTest {
      */
     public void testPrompt() throws Exception {
         DomWindow window = createMainWindow();
-        _answer = null;
+        _proxy.setAnswer( null );
         assertEquals( "User default choice", "0", window.prompt( "How many choices?", "0" ) );
-        assertLastProxyMethod( "prompt( How many choices? )" );
-        _answer = "blue";
+        TestWindowProxy.assertLastProxyMethod( "prompt( How many choices? )" );
+        _proxy.setAnswer( "blue" );
         assertEquals( "Explicit user choice", "blue", window.prompt( "What is your favorite color?", "yellow" ) );
-        assertLastProxyMethod( "prompt( What is your favorite color? )" );
+        TestWindowProxy.assertLastProxyMethod( "prompt( What is your favorite color? )" );
     }
 
     /**
@@ -136,8 +128,17 @@ public class DomWindowTest extends AbstractHTMLElementTest {
         DomWindow window = createMainWindow();
         window.getDocument().write( "A bit of text" );
         window.getDocument().close();
-        assertNotNull( "No text replacement occurred", _replacementText );
-        assertEquals( "Replacement text", "A bit of text", _replacementText );
+        assertNotNull( "No text replacement occurred", _proxy.getReplacementText() );
+        assertEquals( "Replacement text", "A bit of text", _proxy.getReplacementText() );
+    }
+
+    /**
+     * Verifies that the window can report its URL, which it obtains via its prozy.
+     */
+    public void testWindowUrl() throws Exception {
+        DomWindow window = createMainWindow();
+        _proxy.setUrl( new URL( "http://localhost") );
+        assertEquals( "Window url", new URL( "http://localhost" ), window.getUrl() );
     }
 
     // todo test getNavigator
@@ -157,67 +158,5 @@ public class DomWindowTest extends AbstractHTMLElementTest {
         window.moveTo( 10, 20 );
     }
 
-
-    private String popProxyCall() {
-        if (_proxyCalls.isEmpty()) return "";
-        return (String) _proxyCalls.pop();
-    }
-
-
-    private void pushProxyCall( String call ) {
-        _proxyCalls.push( call );
-    }
-
-
-    class TestWindowProxy implements DomWindowProxy {
-
-        private HTMLDocumentImpl _document;
-
-
-        public TestWindowProxy( HTMLDocumentImpl htmlDocument ) {
-            _document = htmlDocument;
-            _document.getWindow().setProxy( this );
-        }
-
-
-        public ScriptingHandler getScriptingHandler() {
-            return _document.getWindow();
-        }
-
-
-        public DomWindowProxy openNewWindow( String name, String relativeUrl ) throws IOException, SAXException {
-            HTMLDocumentImpl document = new HTMLDocumentImpl();
-            document.setTitle( name + " (" + relativeUrl + ')' );
-            return new TestWindowProxy( document );
-        }
-
-
-        public void close() {
-            pushProxyCall( "close" );
-        }
-
-
-        public void alert( String message ) {
-            pushProxyCall( "alert( " + message + " )" );
-        }
-
-
-        public boolean confirm( String message ) {
-            pushProxyCall( "confirm( " + message + " )" );
-            return _answer.equals( "yes" );
-        }
-
-
-        public String prompt( String prompt, String defaultResponse ) {
-            pushProxyCall( "prompt( " + prompt + " )" );
-            return _answer == null ? defaultResponse : _answer;
-        }
-
-
-        public boolean replaceText( String text, String contentType ) {
-            _replacementText = text;
-            return true;
-        }
-    }
 
 }

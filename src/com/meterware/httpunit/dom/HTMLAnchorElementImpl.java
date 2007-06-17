@@ -21,6 +21,9 @@ package com.meterware.httpunit.dom;
  *******************************************************************************************************************/
 import org.w3c.dom.html.HTMLAnchorElement;
 
+import java.net.URL;
+import java.net.MalformedURLException;
+
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -38,7 +41,11 @@ public class HTMLAnchorElementImpl extends HTMLElementImpl implements HTMLAnchor
 
 
     public String getHref() {
-        return getAttributeWithNoDefault( "href" );
+        try {
+            return new URL( ((HTMLDocumentImpl) getOwnerDocument()).getWindow().getUrl(), getAttributeWithNoDefault( "href" ) ).toExternalForm();
+        } catch (MalformedURLException e) {
+            return e.toString();
+        }
     }
 
 

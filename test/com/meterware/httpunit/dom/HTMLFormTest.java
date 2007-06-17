@@ -242,11 +242,27 @@ public class HTMLFormTest extends AbstractHTMLElementTest {
         assertEquals( "Number of elements", elements.length + improperElements.length, collection.getLength() );
         for (int i = 0; i < elements.length; i++) {
             assertSame( "Form element " + i, elements[i], collection.item(i) );
+            assertSame( "Form for element " + i, _form, ((HTMLControl) elements[i]).getForm() );
         }
         for (int i = 0; i < improperElements.length; i++) {
             int j = elements.length + i;
             assertSame( "Form element " + j, improperElements[i], collection.item(j) );
+            assertSame( "Form for element " + j, _form, ((HTMLControl) improperElements[i]).getForm() );
         }
+    }
+
+
+    /**
+     * Verifies that we can recognize buttons without forms.
+     * @throws Exception
+     */
+    public void testFormDetection() throws Exception {
+        _body.insertBefore( _buttonInput, _form );
+        _body.appendChild( _textField );
+        _body.appendChild( _htmlDocument.createElement( "form" ) );
+
+        assertNull( "button should not be part of any form", _buttonInput.getForm() );
+        assertSame( "Form for text field", _form, _textField.getForm() );
     }
 
 

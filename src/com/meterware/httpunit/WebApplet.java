@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002, 2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -33,6 +33,7 @@ import java.util.List;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.html.HTMLAppletElement;
 import org.xml.sax.SAXException;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
@@ -48,17 +49,17 @@ public class WebApplet extends HTMLElementBase {
     private WebResponse _response;
     private String      _baseTarget;
 
-    private URL         _codeBase;
-    private String      _className;
     private Applet      _applet;
     private HashMap     _parameters;
     private String[]    _parameterNames;
 
     final private String CLASS_EXTENSION = ".class";
+    private HTMLAppletElement _element;
 
 
-    public WebApplet( WebResponse response, Node rootNode, String baseTarget ) {
-        super( rootNode );
+    public WebApplet( WebResponse response, HTMLAppletElement element, String baseTarget ) {
+        super( element );
+        _element = element;
         _response   = response;
         _baseTarget = baseTarget;
     }
@@ -68,15 +69,12 @@ public class WebApplet extends HTMLElementBase {
      * Returns the URL of the codebase used to find the applet classes
      */
     public URL getCodeBaseURL() throws MalformedURLException {
-        if (_codeBase == null) {
-            _codeBase = new URL( _response.getURL(), getCodeBase() );
-        }
-        return _codeBase;
+        return new URL( _response.getURL(), getCodeBase() );
     }
 
 
     private String getCodeBase() {
-        final String codeBaseAttribute = getAttribute( "codebase", "/" );
+        final String codeBaseAttribute = _element.getCodeBase();
         return codeBaseAttribute.endsWith( "/" ) ? codeBaseAttribute : (codeBaseAttribute + "/");
     }
 
@@ -85,14 +83,12 @@ public class WebApplet extends HTMLElementBase {
      * Returns the name of the applet main class.
      */
     public String getMainClassName() {
-        if (_className == null) {
-            _className = getAttribute( "code" );
-            if (_className.endsWith( CLASS_EXTENSION )) {
-                _className = _className.substring( 0, _className.lastIndexOf( CLASS_EXTENSION ));
-            }
-            _className = _className.replace( '/', '.' ).replace( '\\', '.' );
+        String className = _element.getCode();
+        if (className.endsWith( CLASS_EXTENSION )) {
+            className = className.substring( 0, className.lastIndexOf( CLASS_EXTENSION ));
         }
-        return _className;
+        className = className.replace( '/', '.' ).replace( '\\', '.' );
+        return className;
     }
 
 

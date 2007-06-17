@@ -90,7 +90,9 @@ class HTMLContainerDelegate {
     }
 
 
-    HTMLCollection getApplets( NodeImpl node ) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+    HTMLCollection getApplets( NodeImpl rootNode ) {
+        ArrayList elements = new ArrayList();
+        rootNode.appendElementsWithTags( new String[] {"applet"}, elements );
+        return HTMLCollectionImpl.createHTMLCollectionImpl( new NodeListImpl( elements ) );
     }
 }

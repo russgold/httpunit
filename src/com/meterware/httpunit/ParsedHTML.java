@@ -23,10 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
-import org.w3c.dom.html.HTMLImageElement;
-import org.w3c.dom.html.HTMLTableCellElement;
-import org.w3c.dom.html.HTMLTableRowElement;
-import org.w3c.dom.html.HTMLCollection;
+import org.w3c.dom.html.*;
 
 import java.net.URL;
 import java.util.*;
@@ -72,13 +69,8 @@ class ParsedHTML {
     /** map of DOM elements to HTML elements **/
     private ElementRegistry _registry = new ElementRegistry();
 
-    private WebForm      _activeForm;
-
     private ArrayList    _blocksList = new ArrayList();
     private TextBlock[]  _blocks;
-
-    private ArrayList    _appletList = new ArrayList();
-    private WebApplet[]  _applets;
 
     private ArrayList    _tableList = new ArrayList();
     private WebTable[]   _tables;
@@ -100,20 +92,22 @@ class ParsedHTML {
 
     /**
      * Returns the forms found in the page in the order in which they appear.
-     * 
+     *
      * @return an array of objects representing the forms in the page or portion of a page.
      **/
     public WebForm[] getForms() {
         HTMLCollection forms = ((HTMLContainerElement) _rootNode).getForms();
         WebForm[] result = new WebForm[ forms.getLength() ];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (WebForm) _registry.getRegisteredElement( forms.item( i ) );
-            if (result[i] == null) {
-                result[i] = new WebForm( _response, _baseURL, forms.item( i ), _frame, _baseTarget, _characterSet, _registry );
-                _registry.registerElement( forms.item( i ), result[i] );
-            }
+            result[i] = getWebForm( forms.item( i ) );
         }
         return result;
+    }
+
+
+    private WebForm getWebForm( Node node ) {
+        WebForm webForm = (WebForm) _registry.getRegisteredElement( node );
+        return webForm != null ? webForm : (WebForm) _registry.registerElement( node, toWebForm( (Element) node ) );
     }
 
 
@@ -138,11 +132,16 @@ class ParsedHTML {
      * Returns a proxy for each applet found embedded in this page.
      */
     public WebApplet[] getApplets() {
-        if (_applets == null) {
-            loadElements();
-            _applets = (WebApplet[]) _appletList.toArray( new WebApplet[ _appletList.size() ] );
+        HTMLCollection applets = ((HTMLContainerElement) _rootNode).getApplets();
+        WebApplet[] result = new WebApplet[ applets.getLength() ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (WebApplet) _registry.getRegisteredElement( applets.item( i ) );
+            if (result[i] == null) {
+                result[i] = new WebApplet( _response, (HTMLAppletElement) applets.item( i ), _baseTarget );
+                _registry.registerElement( applets.item( i ), result[i] );
+            }
         }
-        return _applets;
+        return result;
     }
 
 
@@ -457,12 +456,6 @@ class ParsedHTML {
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
             return parsedHTML.toWebForm( element );
         }
-
-
-        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {
-            super.addToLists( pot, htmlElement );
-            getRootContext( pot )._activeForm = (WebForm) htmlElement;
-        }
     }
 
 
@@ -609,8 +602,12 @@ class ParsedHTML {
     static class FormControlFactory extends HTMLElementFactory {
 
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
-            final WebForm form = getForm( pot );
-            return form == null ? newControlWithoutForm( parsedHTML, element ) : form.newFormControl( element );
+            HTMLFormElement form = ((HTMLControl) element).getForm();
+            if (form == null) {
+                return newControlWithoutForm( parsedHTML, element );
+            } else {
+                return parsedHTML.getWebForm( form ).newFormControl( element );
+            }
         }
 
         private HTMLElement newControlWithoutForm( ParsedHTML parsedHTML, Element element ) {
@@ -626,13 +623,6 @@ class ParsedHTML {
         private boolean isValidNonFormButtonType( String buttonType ) {
             return buttonType.equals( "" ) || buttonType.equalsIgnoreCase( "button" );
         }
-
-
-        private WebForm getForm( NodeUtils.PreOrderTraversal pot ) {
-            return getRootContext( pot )._activeForm;
-        }
-
-        protected void addToLists( NodeUtils.PreOrderTraversal pot, HTMLElement htmlElement ) {}
     }
 
 
@@ -781,7 +771,7 @@ class ParsedHTML {
 
 
     private WebApplet toWebApplet( Element element ) {
-        return new WebApplet( _response, element, _baseTarget );
+        return new WebApplet( _response, (HTMLAppletElement) element, _baseTarget );
     }
 
 
@@ -826,7 +816,6 @@ class ParsedHTML {
 
 
     private ArrayList getListForElement( HTMLElement element ) {
-        if (element instanceof WebApplet) return _appletList;
         if (element instanceof WebTable) return _tableList;
         if (element instanceof WebFrame) return _frameList;
         if (element instanceof BlockElement) return _blocksList;
@@ -1012,7 +1001,6 @@ class ParsedHTML {
 
 
     private void clearCaches() {
-        _applets = null;
         _tables = null;
         _frames = null;
         _blocks = null;

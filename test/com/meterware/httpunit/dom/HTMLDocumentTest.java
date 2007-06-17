@@ -21,8 +21,12 @@ package com.meterware.httpunit.dom;
  *******************************************************************************************************************/
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.html.*;
 import junit.framework.TestSuite;
+import com.meterware.pseudoserver.HttpUserAgentTest;
+
+import java.net.URL;
 
 /**
  * Test for HTMLDocumentImpl.
@@ -111,6 +115,66 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         _htmlDocument.setBody( body );
 
         assertSame( "Body element", body, _htmlDocument.getBody() );
+    }
+
+
+    /**
+     * Verifies retrieving elements by their ID attribute.
+     */
+    public void testGetElementsById() throws Exception {
+        HTMLElement body = (HTMLElement) createElement( "body" );
+        _htmlDocument.setBody( body );
+        body.setId( "abc" );
+
+
+        HTMLAnchorElement anchor1 = (HTMLAnchorElement) createElement( "a" );
+        anchor1.setHref( "first" );
+        anchor1.setId( "sea" );
+        body.appendChild( anchor1 );
+
+        HTMLImageElement image1 = (HTMLImageElement) createElement( "img" );
+        image1.setId( "see" );
+        body.appendChild( image1 );
+
+        assertSame( "Body element", body, _htmlDocument.getElementById( "abc" ) );
+        assertSame( "Anchor element", anchor1, _htmlDocument.getElementById( "sea" ) );
+        assertSame( "Image element", image1, _htmlDocument.getElementById( "see" ) );
+    }
+
+
+    /**
+     * Verifies retrieving elements by their name attribute.
+     */
+    public void testGetElementsByName() throws Exception {
+        HTMLElement body = (HTMLElement) createElement( "body" );
+        _htmlDocument.setBody( body );
+
+        HTMLAnchorElement anchor1 = (HTMLAnchorElement) createElement( "a" );
+        anchor1.setHref( "first" );
+        anchor1.setName( "see" );
+        body.appendChild( anchor1 );
+
+        HTMLImageElement image1 = (HTMLImageElement) createElement( "img" );
+        image1.setName( "see" );
+        body.appendChild( image1 );
+
+        assertElementsByName( _htmlDocument, "see", new HTMLElement[] { anchor1, image1 } );
+        assertElementsByName( _htmlDocument, "abc", new HTMLElement[0] );
+    }
+
+
+    private void assertElementsByName( HTMLDocument document, String name, HTMLElement[] expectedElements ) {
+        NodeList actualElements = document.getElementsByName( name );
+        HttpUserAgentTest.assertMatchingSet( "Elements with name '" + name + "'", expectedElements, toArray( actualElements ) );
+    }
+
+
+    private Object[] toArray( NodeList list ) {
+        Object[] result = new Object[ list.getLength() ];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = list.item( i );
+        }
+        return result;
     }
 
 
@@ -284,5 +348,18 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         _htmlDocument.write( "And another." );
         assertNotNull( "No write buffer was defined for the document", _htmlDocument.getWriteBuffer() );
         assertEquals( "Result of write buffer", "And another.", _htmlDocument.getWriteBuffer().toString() );
+    }
+
+    /**
+     * Verifies that the href of a link will be based on the URL of the enclosing window.
+     */
+    public void testLinkHref() throws Exception {
+        TestWindowProxy proxy = new TestWindowProxy( _htmlDocument );
+        _htmlDocument.getWindow().setProxy( proxy );
+        _htmlDocument.setBody( (HTMLElement) _htmlDocument.createElement( "body" ) );
+        HTMLAnchorElementImpl link = (HTMLAnchorElementImpl) _htmlDocument.createElement( "a" );
+        link.setAttribute( "href", "main.html" );
+        proxy.setUrl( new URL( "http://localhost/aux.html" ) );
+        assertEquals( "referenced URL", new URL( "http://localhost/main.html").toExternalForm(), link.getHref() );
     }
 }

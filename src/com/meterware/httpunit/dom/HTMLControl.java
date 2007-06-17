@@ -21,6 +21,9 @@ package com.meterware.httpunit.dom;
  *******************************************************************************************************************/
 import org.w3c.dom.Node;
 import org.w3c.dom.html.HTMLFormElement;
+import org.w3c.dom.html.HTMLCollection;
+
+import java.util.Iterator;
 
 /**
  *
@@ -36,7 +39,28 @@ public class HTMLControl extends HTMLElementImpl {
     public HTMLFormElement getForm() {
         Node parent = getParentNode();
         while (parent != null && !("form".equalsIgnoreCase( parent.getNodeName() ))) parent = parent.getParentNode();
-        return (HTMLFormElement) parent;
+        if (parent != null) return (HTMLFormElement) parent;
+
+        for (Iterator here = preOrderIterator(); here.hasNext();) {
+            Object o = here.next();
+            if (o instanceof HTMLFormElement) return getPreviousForm( (HTMLFormElement) o );
+        }
+        return getLastFormInDocument();
+    }
+
+
+    private HTMLFormElement getPreviousForm( HTMLFormElement nextForm ) {
+        HTMLCollection forms = getHtmlDocument().getForms();
+        for (int i = 0; i < forms.getLength(); i++) {
+            if (nextForm == forms.item( i )) return i == 0 ? null : (HTMLFormElement) forms.item( i-1 );
+        }
+        return null;
+    }
+
+
+    private HTMLFormElement getLastFormInDocument() {
+        HTMLCollection forms = getHtmlDocument().getForms();
+        return forms.getLength() == 0 ? null : (HTMLFormElement) forms.item( forms.getLength()-1 );
     }
 
 

@@ -121,17 +121,17 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
 
 
     public boolean supportsScriptLanguage( String language ) {
-        return getScripingHandler().supportsScriptLanguage( language );
+        return getScriptingHandler().supportsScriptLanguage( language );
     }
 
 
     public String runScript( final String language, final String scriptText ) {
-        getScripingHandler().clearCaches();
-        return getScripingHandler().runScript( language, scriptText );
+        getScriptingHandler().clearCaches();
+        return getScriptingHandler().runScript( language, scriptText );
     }
 
 
-    private ScriptingHandler getScripingHandler() {
+    private ScriptingHandler getScriptingHandler() {
         _documentAdapter.setDocument( (HTMLDocument) getCurrentElement().getOwnerDocument() );
         return _documentAdapter.getScriptingHandler();
     }

@@ -30,6 +30,8 @@ import org.mozilla.javascript.Scriptable;
  */
 public abstract class AbstractDomComponent extends ScriptingEngineImpl {
 
+    private static int _anonymousFunctionNum;
+
     public String getClassName() {
         return getClass().getName();
     }
@@ -41,6 +43,11 @@ public abstract class AbstractDomComponent extends ScriptingEngineImpl {
 
 
     public void clearCaches() {}
+
+
+    public boolean has( String name, Scriptable start ) {
+        return super.has( name, start ) || ScriptingSupport.hasNamedProperty( this, getJavaPropertyName( name ), start );
+    }
 
 
     public Object get( String propertyName, Scriptable scriptable ) {
@@ -59,5 +66,10 @@ public abstract class AbstractDomComponent extends ScriptingEngineImpl {
     public void put( String propertyName, Scriptable initialObject, Object value ) {
         super.put( propertyName, initialObject, value );
         ScriptingSupport.setNamedProperty( this, getJavaPropertyName( propertyName ), value );
+    }
+
+
+    protected static String createAnonymousFunctionName() {
+        return "anon_" + (++_anonymousFunctionNum);
     }
 }

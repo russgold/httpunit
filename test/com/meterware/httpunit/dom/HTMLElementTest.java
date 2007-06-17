@@ -275,14 +275,14 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
 
 
     public void testAnchorElement() throws Exception {
-        doElementTest( "a", HTMLAnchorElement.class, new Object[][] { { "accesskey", "U" }, { "charset", "utf-8" }, { "href", "arrow.html" }, { "hreflang", "en" },
+        doElementTest( "a", HTMLAnchorElement.class, new Object[][] { { "accesskey", "U" }, { "charset", "utf-8" }, { "hreflang", "en" },
                                                                       { "name", "here" }, { "rel", "link" }, { "rev", "index" }, { "target", "green" },
                                                                       { "type", "text/html" } } );
     }
 
 
     public void testAreaElement() throws Exception {
-        doElementTest( "area", HTMLAreaElement.class, new Object[][] { { "accesskey", "U" }, { "alt", "[draw]" }, { "coords", "30,40,20" }, { "href", "arrow.html" },
+        doElementTest( "area", HTMLAreaElement.class, new Object[][] { { "accesskey", "U" }, { "alt", "[draw]" }, { "coords", "30,40,20" },
                                                                        { "nohref", Boolean.TRUE, Boolean.FALSE }, { "shape", "circle" },  { "tabindex", new Integer(4), new Integer(0) },
                                                                        { "target", "green" } } );
     }
@@ -307,6 +307,15 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
     public void testIFrameElement() throws Exception {
         doElementTest( "iframe", HTMLIFrameElement.class,
                        new Object[][] { { "align", "center" }, { "src", "aaa"} } );
+    }
+
+
+    public void testAppletElement() throws Exception {
+        doElementTest( "applet", HTMLAppletElement.class,
+                       new Object[][] { { "align", "center" },/* { "alt", "an applet" }, { "archive", "my.jar" },*/
+                                        { "code", "here.There" }, { "codebase", "there", "/" }, /*{ "height", "17" },
+                                        { "hspace", "2" }, { "name", "applet" }, { "object", "a file here" },
+                                        { "vspace", "3" }, { "width", "80"}*/ } );
     }
 
 

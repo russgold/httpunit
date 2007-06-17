@@ -20,6 +20,9 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.w3c.dom.*;
+import org.w3c.dom.html.HTMLElement;
+
+import java.util.Iterator;
 
 /**
  *
@@ -147,6 +150,12 @@ public class DocumentImpl extends NodeImpl implements Document {
 
 
     public Element getElementById( String elementId ) {
+        for (Iterator each = preOrderIterator(); each.hasNext();) {
+            Node node = (Node) each.next();
+            if (!(node instanceof HTMLElement)) continue;
+            HTMLElement element = (HTMLElement) node;
+            if (elementId.equals( element.getId() )) return element;
+        }
         return null;
     }
 

@@ -27,6 +27,17 @@ class ScriptingSupport {
     private static Hashtable _classSetterMaps = new Hashtable();
 
 
+    static boolean hasNamedProperty( Object element, String javaPropertyName, Scriptable scriptable ) {
+        Method getter = getPropertyGetter( element.getClass(), javaPropertyName );
+        if (getter != NO_SUCH_PROPERTY) {
+            return true;
+        } else {
+            Object function = getFunctionObject( element.getClass(), javaPropertyName, scriptable );
+            return function != null;
+        }
+    }
+
+
     static Object getNamedProperty( Object element, String javaPropertyName, Scriptable scriptable ) {
         Method getter = getPropertyGetter( element.getClass(), javaPropertyName );
         if (getter == NO_SUCH_PROPERTY) {

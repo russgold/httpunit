@@ -23,6 +23,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.xml.sax.SAXException;
 
@@ -47,6 +48,13 @@ public interface DomWindowProxy {
 
 
     String prompt( String prompt, String defaultResponse );
+
+
+    /**
+     * Returns the URL associated with the window.
+     * @return the URL associated with the window.
+     */
+    URL getURL();
 
 
     /**

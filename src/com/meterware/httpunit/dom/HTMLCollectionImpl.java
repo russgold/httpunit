@@ -61,11 +61,11 @@ public class HTMLCollectionImpl extends ScriptableObject implements HTMLCollecti
         if (name == null) return null;
 
         Node nodeByName = null;
-        for (int i = 0; i < getLength(); i++) {
+        for (int i = 0; null == nodeByName && i < getLength(); i++) {
             Node node = item(i);
-            if (!(node instanceof HTMLElement)) continue;
+            if (!(node instanceof HTMLElementImpl)) continue;
             if (name.equalsIgnoreCase( ((HTMLElement) node).getId() )) return node;
-            if (node instanceof HTMLFormElement && name.equalsIgnoreCase( ((HTMLFormElement) node).getName() )) nodeByName = node;
+            if (name.equalsIgnoreCase( ((HTMLElementImpl) node).getAttributeWithNoDefault( "name" )) ) nodeByName = node;
         }
         return nodeByName;
     }

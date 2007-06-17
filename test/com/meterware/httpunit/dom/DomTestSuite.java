@@ -47,6 +47,7 @@ public class DomTestSuite {
         result.addTest( DomWindowTest.suite() );
 
         result.addTest( DomScriptingTest.suite() );
+        result.addTest( DomEventScriptingTest.suite() );
         return result;
     }
 

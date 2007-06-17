@@ -32,6 +32,8 @@ import org.w3c.dom.html.HTMLDocument;
 import org.w3c.dom.html.HTMLBodyElement;
 import org.xml.sax.SAXException;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.JavaScriptException;
 
 /**
  * The scripting engine factory which relies directly on the DOM.
@@ -50,28 +52,26 @@ public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
 
 
     public void associate( WebResponse response ) {
-        Context context = Context.enter();
-        context.initStandardObjects( null );
-        ScriptingHandler scriptingHandler = response.getScriptingHandler();
-        if (scriptingHandler instanceof DomWindow) {
-            ((DomWindow) scriptingHandler).setProxy( response );
-        }
     }
 
 
     public void load( WebResponse response ) {
         try {
-            Document document = response.getDOM();
-            if (!(document instanceof HTMLDocument)) return;
+            Context context = Context.enter();
+            context.initStandardObjects( null );
 
-            HTMLBodyElement body = (HTMLBodyElement) ((HTMLDocument) document).getBody();
+            HTMLDocument htmlDocument = ((DomWindow) response.getScriptingHandler()).getDocument();
+            if (!(htmlDocument instanceof HTMLDocumentImpl)) return;
+
+            HTMLBodyElementImpl body = (HTMLBodyElementImpl) htmlDocument.getBody();
             if (body == null) return;
-            String onLoadEvent = body.getAttribute( "onload" );
+            Function onLoadEvent = body.getOnloadEvent();
             if (onLoadEvent == null) return;
-
-            ((ScriptingEngine) body).doEvent( onLoadEvent );
-        } catch (SAXException e) {
-            // do nothing if this fails.
+            onLoadEvent.call( context, body, body, new Object[0] );
+        } catch (JavaScriptException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } finally {
+            Context.exit();
         }
     }
 

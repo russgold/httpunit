@@ -21,6 +21,8 @@ package com.meterware.httpunit.dom;
  *******************************************************************************************************************/
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Scriptable;
 
 import java.util.List;
 
@@ -28,7 +30,7 @@ import java.util.List;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class NodeListImpl implements NodeList {
+public class NodeListImpl extends ScriptableObject implements NodeList {
 
     private List _list;
 
@@ -47,4 +49,20 @@ public class NodeListImpl implements NodeList {
         return _list.size();
     }
 
+
+    public String getClassName() {
+        return NodeListImpl.class.getName();
+    }
+
+
+    public Object get( String name, Scriptable start ) {
+        if ("length".equals( name )) return new Integer( getLength() );
+        return NOT_FOUND;
+    }
+
+
+    public Object get( int index, Scriptable start ) {
+        if (index < 0 || index >= getLength()) return NOT_FOUND;
+        return item( index );
+    }
 }
