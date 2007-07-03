@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.dom.HTMLElementImpl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -87,13 +88,15 @@ public class WebLink extends FixedURLWebRequestSource {
 
     /**
      * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
-     * If clicking results in submitting a request (that is, there is no 'onClick' event or it returns true,
-     * this method will return the result of that submission; otherwise, it will
-     * return the updated contents of the frame containing this link. Note that if an event updates a different frame
+     * Returns the updated contents of the frame containing the link. Note that if the click updates a different frame,
      * that frame will not be returned by this method.
      **/
     public WebResponse click() throws IOException, SAXException {
-        return submitRequest( getAttribute( "onclick" ), getRequest() );
+        String event = getAttribute( "onclick" );
+        if (event.length() == 0 || getScriptingHandler().doEvent( event )) {
+            ((HTMLElementImpl) getNode()).doClickAction();
+        }
+        return getCurrentFrameContents();
     }
 
 

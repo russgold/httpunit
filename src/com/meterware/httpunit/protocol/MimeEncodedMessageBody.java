@@ -1,8 +1,8 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.protocol;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2002, 2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,33 +30,25 @@ import java.io.OutputStream;
 class MimeEncodedMessageBody extends MessageBody {
 
 
-    public MimeEncodedMessageBody( PostMethodWebRequest request ) {
-        super( request );
+    MimeEncodedMessageBody( String characterSet ) {
+        super( characterSet );
     }
 
 
     /**
      * Returns the content type of this message body.
      **/
-    String getContentType() {
+    public String getContentType() {
         return "multipart/form-data; boundary=" + BOUNDARY;
-    }
-
-
-    /**
-     * Returns the request associated with this message body, cast to a POST request.
-     **/
-    PostMethodWebRequest getPostRequest() {
-        return (PostMethodWebRequest) getRequest();
     }
 
 
     /**
      * Transmits the body of this request as a sequence of bytes.
      **/
-    void writeTo( OutputStream outputStream ) throws IOException {
+    public void writeTo( OutputStream outputStream, ParameterCollection parameters ) throws IOException {
         MimeEncoding encoding = new MimeEncoding( outputStream );
-        getRequest().getParameterHolder().recordParameters( encoding );
+        parameters.recordParameters( encoding );
         encoding.sendClose();
     }
 
@@ -86,7 +78,7 @@ class MimeEncodedMessageBody extends MessageBody {
 
 
     private void writeLn( OutputStream os, String value ) throws IOException {
-        writeLn( os, value, getRequest().getCharacterSet() );
+        writeLn( os, value, getCharacterSet() );
     }
 
 
@@ -107,9 +99,9 @@ class MimeEncodedMessageBody extends MessageBody {
 
             writeLn( _outputStream, "--" + BOUNDARY );
             writeLn( _outputStream, "Content-Disposition: form-data; name=\"" + name + '"' );  // XXX need to handle non-ascii names here
-            writeLn( _outputStream, "Content-Type: text/plain; charset=" + getRequest().getCharacterSet() );
+            writeLn( _outputStream, "Content-Type: text/plain; charset=" + getCharacterSet() );
             writeLn( _outputStream, "" );
-            writeLn( _outputStream, fixLineEndings( value ), getRequest().getCharacterSet() );
+            writeLn( _outputStream, fixLineEndings( value ), getCharacterSet() );
         }
 
 

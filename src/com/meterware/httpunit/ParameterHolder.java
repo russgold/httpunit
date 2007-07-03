@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,6 +19,10 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.protocol.UploadFileSpec;
+import com.meterware.httpunit.protocol.ParameterProcessor;
+import com.meterware.httpunit.protocol.ParameterCollection;
+
 import java.io.IOException;
 
 
@@ -26,9 +30,9 @@ import java.io.IOException;
  * This abstract class is extended by classes which hold parameters for web requests. Note that it is an abstract class
  * rather than an interface in order to keep its methods package-local.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract class ParameterHolder {
+abstract class ParameterHolder implements ParameterCollection {
 
     /**
      * Specifies the position at which an image button (if any) was clicked. This default implementation does nothing.
@@ -42,13 +46,6 @@ abstract class ParameterHolder {
      **/
     abstract
     void recordPredefinedParameters( ParameterProcessor processor ) throws IOException;
-
-
-    /**
-     * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
-     **/
-    abstract
-    void recordParameters( ParameterProcessor processor ) throws IOException;
 
 
     /**

@@ -169,6 +169,11 @@ public class DocumentScriptingTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verifies that a link which simply specifies a fragment identifier does not cause a new request to be sent to the
+     * server, so that the current response is unchanged.
+     * @throws Exception
+     */
     public void testHashDestinationOnEvent() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +

@@ -39,6 +39,14 @@ public class HTMLElementImpl extends ElementImpl implements HTMLElement {
     }
 
 
+    public void click() {
+        doClickAction();
+    }
+
+
+    public void doClickAction() {}
+
+
     public String getId() {
         return getAttributeWithNoDefault( "id" );
     }

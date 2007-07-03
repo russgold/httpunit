@@ -20,10 +20,9 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.*;
-import com.meterware.httpunit.dom.HTMLControl;
-import com.meterware.httpunit.dom.HTMLInputElementImpl;
-import com.meterware.httpunit.dom.HTMLSelectElementImpl;
-import com.meterware.httpunit.dom.HTMLTextAreaElementImpl;
+import com.meterware.httpunit.dom.*;
+import com.meterware.httpunit.protocol.ParameterProcessor;
+import com.meterware.httpunit.protocol.UploadFileSpec;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

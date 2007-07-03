@@ -19,7 +19,6 @@ package com.meterware.httpunit.dom;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 
 import java.io.IOException;
@@ -62,4 +61,7 @@ public interface DomWindowProxy {
      * to do the replacement.
      */
     boolean replaceText( String text, String contentType );
+
+
+    DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException;
 }

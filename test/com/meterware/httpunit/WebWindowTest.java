@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2004, 2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -46,6 +46,11 @@ public class WebWindowTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verifies that clicking on a link that specifies the _blank target creates a new window, populated with
+     * the contents of the referenced page.
+     * @throws Exception on any unexpected problem.
+     */
     public void testNewTarget() throws Exception {
         defineResource( "goHere", "You made it!" );
         defineWebPage( "start", "<a href='goHere' id='go' target='_blank'>here</a>" );
@@ -54,12 +59,11 @@ public class WebWindowTest extends HttpUnitTest {
         assertEquals( "Number of initial windows", 1, wc.getOpenWindows().length );
         WebWindow main = wc.getMainWindow();
         WebResponse initialPage = main.getResponse( getHostPath() + "/start.html" );
-        WebResponse newPage = initialPage.getLinkWithID( "go" ).click();
+        initialPage.getLinkWithID( "go" ).click();
         assertEquals( "Number of windows after following link", 2, wc.getOpenWindows().length );
         assertEquals( "Main page in original window", initialPage, main.getCurrentPage() );
         WebWindow other = wc.getOpenWindows()[1];
         assertEquals( "New window contents", "You made it!", other.getCurrentPage().getText() );
-        assertEquals( "Return from open", "You made it!", newPage.getText() );
 
         main.close();
         assertTrue( "Original main window is not closed", main.isClosed() );
@@ -104,8 +108,7 @@ public class WebWindowTest extends HttpUnitTest {
         assertEquals( "# Open windows", 2, wc.getOpenWindows().length );
         WebWindow other = wc.getOpenWindows()[1];
         WebResponse result = other.getCurrentPage().getLinkWithID( "go" ).click();
-        assertEquals( "New frame contents", "You made it!", result.getText() );
-        assertSame( "'somewhere' frame", result, initialPage.getSubframeContents( "somewhere") );
+        assertEquals( "New frame contents", "You made it!", initialPage.getSubframeContents( "somewhere").getText() );
     }
 
 

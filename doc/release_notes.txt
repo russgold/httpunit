@@ -14,6 +14,10 @@ Limitations:
 
 
 Revision History:
+28-Jun-2007:
+    Notes: WebLink.click() now only returns the contents of the frame containing the link. Previously, if there was no
+    event involved and the link included a frame reference, it would return the contents of the referenced frame.
+    
 26-Dec-2006:
     Additions:
        Content and Parsing:

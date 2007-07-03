@@ -37,7 +37,6 @@ import org.xml.sax.EntityResolver;
 public class HttpUnitUtils {
 
     public static final int DEFAULT_TEXT_BUFFER_SIZE = 2048;
-    public static final int DEFAULT_BUFFER_SIZE = 128;
     public static final String DEFAULT_CHARACTER_SET = "iso-8859-1";
 
 

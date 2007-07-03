@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2004,2007 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.PasswordAuthentication;
 
@@ -91,7 +90,7 @@ public class WebClient {
      * Submits a GET method request and returns a response.
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
-    public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException, SAXException {
+    public WebResponse getResponse( String urlString ) throws IOException, SAXException {
         return _mainWindow.getResponse( urlString );
     }
 
@@ -99,7 +98,7 @@ public class WebClient {
     /**
      * Submits a web request and returns a response. This is an alternate name for the getResponse method.
      */
-    public WebResponse sendRequest( WebRequest request ) throws MalformedURLException, IOException, SAXException {
+    public WebResponse sendRequest( WebRequest request ) throws IOException, SAXException {
         return _mainWindow.sendRequest( request );
     }
 
@@ -117,7 +116,7 @@ public class WebClient {
      * cookies as requested by the server.
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
-    public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
+    public WebResponse getResponse( WebRequest request ) throws IOException, SAXException {
         return _mainWindow.getResponse( request );
     }
 
@@ -418,7 +417,7 @@ public class WebClient {
      * @param targetFrame the frame in which the response should be stored
      **/
     abstract
-    protected WebResponse newResponse( WebRequest request, FrameSelector targetFrame ) throws MalformedURLException, IOException;
+    protected WebResponse newResponse( WebRequest request, FrameSelector targetFrame ) throws IOException;
 
 
     /**
@@ -455,7 +454,7 @@ public class WebClient {
      * cookies and frames.  This method is required by ServletUnit, which cannot call the updateWindow method directly.
      **/
     final
-    protected void updateMainWindow( FrameSelector frame, WebResponse response ) throws MalformedURLException, IOException, SAXException {
+    protected void updateMainWindow( FrameSelector frame, WebResponse response ) throws IOException, SAXException {
         getMainWindow().updateWindow( frame.getName(), response, new RequestContext() );
     }
 
@@ -664,7 +663,7 @@ public class WebClient {
 
 
         public Object get( Object fieldName ) {
-            return (String) super.get( matchPreviousFieldName( fieldName.toString() ) );
+            return super.get( matchPreviousFieldName( fieldName.toString() ) );
         }
 
 

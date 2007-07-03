@@ -362,7 +362,7 @@ class ParsedHTML {
 
     /**
      * Returns the contents of an included script, given its src attribute.
-     * @param srcAttribute
+     * @param srcAttribute the location of the script.
      * @return the contents of the script.
      * @throws java.io.IOException if there is a problem retrieving the script
      */
@@ -1026,6 +1026,11 @@ class ParsedHTML {
      **/
     Node getOriginalDOM() {
         return getRootNode();
+    }
+
+
+    HTMLElement getElement( Node node ) {
+        return (HTMLElement) _registry.getRegisteredElement( node );
     }
 
 

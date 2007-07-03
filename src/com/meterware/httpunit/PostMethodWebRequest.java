@@ -19,9 +19,11 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.protocol.MessageBody;
+import com.meterware.httpunit.protocol.URLEncodedString;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 
 
@@ -47,7 +49,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
      **/
     public PostMethodWebRequest( String urlString, InputStream source, String contentType ) {
         super( urlString );
-        _body = new InputStreamMessageBody( this, source, contentType );
+        _body = new InputStreamMessageBody( source, contentType );
     }
 
 
@@ -64,8 +66,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
      * and is required for requests which include file parameters. This method may only be called for a request
      * which was not created from a form.
      **/
-    public void setMimeEncoded( boolean mimeEncoded )
-    {
+    public void setMimeEncoded( boolean mimeEncoded ) {
         super.setMimeEncoded( mimeEncoded );
     }
 
@@ -106,12 +107,10 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
     protected MessageBody getMessageBody() {
         if (_body == null) {
-            _body = isMimeEncoded() ? (MessageBody) new MimeEncodedMessageBody( this )
-                                    : (MessageBody) new URLEncodedMessageBody( this );
+            _body = MessageBody.createPostMethodMessageBody( isMimeEncoded(), getCharacterSet() );
         }
         return _body;
     }
-
 
 //----------------------------------- package members -----------------------------------
 
@@ -142,49 +141,5 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
 
     private MessageBody _body;
 
-}
-
-
-
-//============================= class URLEncodedMessageBody ======================================
-
-/**
- * A POST method request message body which uses the default URL encoding.
- **/
-class URLEncodedMessageBody extends MessageBody {
-
-
-    URLEncodedMessageBody( PostMethodWebRequest request ) {
-        super( request );
-    }
-
-
-    /**
-     * Returns the content type of this message body.
-     **/
-    String getContentType() {
-        return "application/x-www-form-urlencoded" +
-                  (!HttpUnitOptions.isPostIncludesCharset() ? ""
-                                                            : "; charset=" + getRequest().getCharacterSet());
-    }
-
-
-    /**
-     * Transmits the body of this request as a sequence of bytes.
-     **/
-    void writeTo( OutputStream outputStream ) throws IOException {
-        outputStream.write( getParameterString().getBytes() );
-    }
-
-
-    private String getParameterString() {
-        try {
-            URLEncodedString encoder = new URLEncodedString();
-            getRequest().getParameterHolder().recordParameters( encoder );
-            return encoder.getString();
-        } catch (IOException e) {
-            throw new RuntimeException( "Programming error: " + e );   // should never happen
-        }
-    }
 }
 

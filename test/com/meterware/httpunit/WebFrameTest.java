@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2004,2007 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -271,6 +271,10 @@ public class WebFrameTest extends HttpUnitTest {
     }
 
 
+    /**
+     * Verifies that a link in one subframe can update the contents of a different subframe of the same frame.
+     * @throws Exception if any method throws an unexpected exception
+     */
     public void testNestedCrossFrameLinks() throws Exception {
         defineResource( "SuperFrames.html",
                         "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +
@@ -283,12 +287,15 @@ public class WebFrameTest extends HttpUnitTest {
         FrameSelector nestedBlueFrame = _wc.getFrameContents( "red" ).getSubframeContents( "blue" ).getFrame();
 
         _wc.getResponse( _wc.getFrameContents( nestedRedFrame ).getLinks()[0].getRequest() );
-        WebResponse frameContent = _wc.getFrameContents( nestedBlueFrame ).getLinks()[0].click();
-        assertTrue( "Second response not the same as source frame contents", frameContent == _wc.getFrameContents( nestedRedFrame ) );
-        assertEquals( "URL for second request", getHostPath() + "/Linker.html", frameContent.getURL().toExternalForm() );
+        _wc.getFrameContents( nestedBlueFrame ).getLinks()[0].click();
+        assertEquals( "URL for second request", getHostPath() + "/Linker.html", _wc.getFrameContents( nestedRedFrame ).getURL().toExternalForm() );
     }
 
 
+    /**
+     * Verifies that a link in one subframe can update the original subframe or the top-level window.
+     * @throws Exception if any method throws an unexpected exception
+     */
     public void testCrossLevelLinks() throws Exception {
         defineResource( "SuperFrames.html",
                         "<HTML><HEAD><TITLE>Initial</TITLE></HEAD>" +

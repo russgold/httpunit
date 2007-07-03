@@ -20,11 +20,13 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.httpunit.protocol.ParameterCollection;
+import com.meterware.httpunit.protocol.MessageBody;
+
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -91,7 +93,7 @@ public class MessageBodyWebRequest extends WebRequest {
 
 
     protected void writeMessageBody( OutputStream stream ) throws IOException {
-        getMessageBody().writeTo( stream );
+        getMessageBody().writeTo( stream, getParameterHolder() );
     }
 
 
@@ -123,8 +125,8 @@ public class MessageBodyWebRequest extends WebRequest {
     public static class InputStreamMessageBody extends MessageBody {
 
 
-        public InputStreamMessageBody( MessageBodyWebRequest request, InputStream source, String contentType ) {
-            super( request );
+        public InputStreamMessageBody( InputStream source, String contentType ) {
+            super( null );
             _source = source;
             _contentType = contentType;
         }
@@ -133,7 +135,7 @@ public class MessageBodyWebRequest extends WebRequest {
         /**
          * Returns the content type of this message body.
          **/
-        String getContentType() {
+        public String getContentType() {
             return _contentType;
         }
 
@@ -141,7 +143,7 @@ public class MessageBodyWebRequest extends WebRequest {
         /**
          * Transmits the body of this request as a sequence of bytes.
          **/
-        void writeTo( OutputStream outputStream ) throws IOException {
+        public void writeTo( OutputStream outputStream, ParameterCollection parameters ) throws IOException {
             byte[] buffer = new byte[8 * 1024];
             int count = 0;
             do {

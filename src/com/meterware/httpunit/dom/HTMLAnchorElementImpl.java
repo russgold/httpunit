@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006, Russell Gold
+ * Copyright (c) 2006-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -41,10 +41,15 @@ public class HTMLAnchorElementImpl extends HTMLElementImpl implements HTMLAnchor
 
 
     public String getHref() {
-        try {
-            return new URL( ((HTMLDocumentImpl) getOwnerDocument()).getWindow().getUrl(), getAttributeWithNoDefault( "href" ) ).toExternalForm();
-        } catch (MalformedURLException e) {
-            return e.toString();
+        String relativeLocation = getAttributeWithNoDefault( "href" );
+        if (relativeLocation.indexOf( ':' ) > 0 || relativeLocation.equals( "#" )) {
+            return relativeLocation;
+        } else {
+            try {
+                return new URL( ((HTMLDocumentImpl) getOwnerDocument()).getBaseUrl(), relativeLocation ).toExternalForm();
+            } catch (MalformedURLException e) {
+                return e.toString();
+            }
         }
     }
 
@@ -166,4 +171,13 @@ public class HTMLAnchorElementImpl extends HTMLElementImpl implements HTMLAnchor
         setAttribute( "tabindex", tabIndex );
     }
 
+
+    public void doClickAction() {
+        if (null == getHref() || getHref().startsWith( "#" )) return;
+        try {
+            ((HTMLDocumentImpl) getOwnerDocument()).getWindow().submitRequest( this, "GET", getHref(), getTarget(), new byte[0] );
+        } catch (Exception e) {
+            throw new RuntimeException( "Error clicking link: " + e );
+        }
+    }
 }

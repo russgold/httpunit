@@ -1,8 +1,8 @@
-package com.meterware.httpunit;
+package com.meterware.httpunit.protocol;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, Russell Gold
+ * Copyright (c) 2001-2002, 2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -28,7 +28,7 @@ import java.io.FileInputStream;
 /**
  * A description of a file to be uploaded as part of a form submission.
  *
- * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
+ * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class UploadFileSpec {
 
@@ -60,7 +60,7 @@ public class UploadFileSpec {
     }
 
 
-    InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() throws IOException {
         if (_inputStream == null) {
             _inputStream = new FileInputStream( _file );
         }
@@ -68,7 +68,7 @@ public class UploadFileSpec {
     }
 
 
-    String getFileName() {
+    public String getFileName() {
         if (_fileName == null) {
             _fileName = _file.getAbsolutePath();
         }

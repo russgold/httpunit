@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -24,6 +24,8 @@ import java.net.URL;
 import java.io.IOException;
 
 import org.w3c.dom.Node;
+import com.meterware.httpunit.protocol.UploadFileSpec;
+import com.meterware.httpunit.protocol.ParameterProcessor;
 
 
 /**
@@ -115,7 +117,7 @@ abstract class FixedURLWebRequestSource extends WebRequestSource {
     /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    void recordParameters( ParameterProcessor processor ) throws IOException {
+    public void recordParameters( ParameterProcessor processor ) throws IOException {
         Iterator i = getPresetParameterList().iterator();
         while (i.hasNext()) {
             PresetParameter o = (PresetParameter) i.next();

@@ -20,9 +20,8 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
-import com.meterware.httpunit.dom.HTMLControl;
-import com.meterware.httpunit.dom.HTMLInputElementImpl;
-import com.meterware.httpunit.dom.HTMLButtonElementImpl;
+import com.meterware.httpunit.dom.*;
+import com.meterware.httpunit.protocol.ParameterProcessor;
 
 import java.io.IOException;
 

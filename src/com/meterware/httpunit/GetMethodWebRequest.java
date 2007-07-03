@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import org.w3c.dom.Element;
+
 import java.net.URL;
 
 /**
@@ -75,6 +77,14 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( FixedURLWebRequestSource source ) {
         super( source );
+    }
+
+
+    /**
+     * Constructs a web request with a specific target.
+     **/
+    GetMethodWebRequest( WebResponse referer, Element sourceElement, URL urlBase, String urlString, String target ) {
+        super( referer, sourceElement, urlBase, urlString, target );
     }
 
 

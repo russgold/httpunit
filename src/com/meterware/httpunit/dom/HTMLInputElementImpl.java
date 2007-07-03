@@ -47,7 +47,7 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
     }
 
 
-    public void click() {
+    public void doClickAction() {
         getBehavior().click();
     }
 

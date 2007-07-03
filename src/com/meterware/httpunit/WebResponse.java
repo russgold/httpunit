@@ -27,6 +27,7 @@ import com.meterware.httpunit.cookies.CookieSource;
 import com.meterware.httpunit.dom.HTMLDocumentImpl;
 import com.meterware.httpunit.dom.DomWindow;
 import com.meterware.httpunit.dom.DomWindowProxy;
+import com.meterware.httpunit.dom.HTMLElementImpl;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -655,9 +656,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
             return new DomWindow( this );
         } else {
             try {
-                DomWindow handler = ((HTMLDocumentImpl) getReceivedPage().getRootNode()).getWindow();
-                handler.setProxy( this );
-                return handler;
+                return ((HTMLDocumentImpl) getReceivedPage().getRootNode()).getWindow();
             } catch (SAXException e) {
                 return new DomWindow( this );
             }
@@ -686,6 +685,15 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    public DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException {
+        if (method.equalsIgnoreCase( "get" )) {
+            return getWindow().sendRequest( new GetMethodWebRequest( this, sourceElement, getURL(), location, target ) );
+        } else {
+            return null;
+        }
+    }
+
+
     public void close() {
         if (getFrameName().equals( WebRequest.TOP_FRAME )) _window.close();
     }
@@ -703,6 +711,11 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     public String prompt( String prompt, String defaultResponse ) {
         return _client.getUserResponse( prompt, defaultResponse );
+    }
+
+
+    String getBaseTarget() {
+        return _baseTarget;
     }
 
 
@@ -1174,6 +1187,8 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
                 _page = new HTMLPage( this, _frame, _baseURL, _baseTarget, getCharacterSet() );
                 _page.parse( getText(), _pageURL );
                 if (_page == null) throw new IllegalStateException( "replaceText called in the middle of getReceivedPage()" );
+
+                ((HTMLDocumentImpl) _page.getRootNode()).getWindow().setProxy( this );
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException( e.toString() );

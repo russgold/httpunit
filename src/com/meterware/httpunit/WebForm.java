@@ -22,6 +22,8 @@ package com.meterware.httpunit;
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.FormScriptable;
+import com.meterware.httpunit.protocol.UploadFileSpec;
+import com.meterware.httpunit.protocol.ParameterProcessor;
 
 import java.io.IOException;
 import java.io.File;
@@ -587,7 +589,7 @@ public class WebForm extends WebRequestSource {
     /**
      * Iterates through the parameters in this holder, recording them in the supplied parameter processor.
      **/
-    void recordParameters( ParameterProcessor processor ) throws IOException {
+    public void recordParameters( ParameterProcessor processor ) throws IOException {
         FormControl[] controls = getFormControls();
         for (int i = 0; i < controls.length; i++) {
             controls[i].addValues( processor, getCharacterSet() );
@@ -634,7 +636,7 @@ public class WebForm extends WebRequestSource {
 
     /**
      * Sets the single value of a file upload parameter in this form.
-     * A more convenient way to do this than using {@link #setParameter(String,UploadFileSpec[])}
+     * A more convenient way to do this than using {@link #setParameter(String,com.meterware.httpunit.protocol.UploadFileSpec[])}
      * @since 1.6
      */
     public void setParameter( String name, File file ) {

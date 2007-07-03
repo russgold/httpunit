@@ -21,6 +21,7 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.protocol.UploadFileSpec;
 
 import java.lang.String;
 import java.util.ArrayList;

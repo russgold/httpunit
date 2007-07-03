@@ -27,6 +27,8 @@ import org.mozilla.javascript.*;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  *
@@ -323,5 +325,18 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
 
     public void clearWriteBuffer() {
         _writeBuffer = null;
+    }
+
+
+    URL getBaseUrl() {
+        NodeList list = getElementsByTagName( "base" );
+        if (list.getLength() == 0) return getWindow().getUrl();
+
+        HTMLBaseElement base = (HTMLBaseElement) list.item( 0 );
+        try {
+            return new URL( getWindow().getUrl(), base.getHref() );
+        } catch (MalformedURLException e) {
+            return getWindow().getUrl();
+        }
     }
 }

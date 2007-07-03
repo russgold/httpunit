@@ -18,6 +18,8 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.httpunit.protocol.MessageBody;
+
 import java.io.InputStream;
 
 /**
@@ -45,7 +47,7 @@ public class PutMethodWebRequest extends MessageBodyWebRequest {
      **/
     public PutMethodWebRequest( String url, InputStream source, String contentType ) {
         super( url );
-        _body = new InputStreamMessageBody( this, source, contentType );
+        _body = new InputStreamMessageBody( source, contentType );
     }
 
 

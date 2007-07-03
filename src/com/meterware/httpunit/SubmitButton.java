@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import org.xml.sax.SAXException;
 import com.meterware.httpunit.dom.HTMLControl;
+import com.meterware.httpunit.protocol.ParameterProcessor;
 
 /**
  * This class represents a submit button in an HTML form.

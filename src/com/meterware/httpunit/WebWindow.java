@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,10 +21,10 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import org.xml.sax.SAXException;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 
 /**
  * A window managed by a {@link com.meterware.httpunit.WebClient WebClient}.
@@ -98,7 +98,7 @@ public class WebWindow {
      * Submits a GET method request and returns a response.
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
-    public WebResponse getResponse( String urlString ) throws MalformedURLException, IOException, SAXException {
+    public WebResponse getResponse( String urlString ) throws IOException, SAXException {
         return getResponse( new GetMethodWebRequest( urlString ) );
     }
 
@@ -106,7 +106,7 @@ public class WebWindow {
     /**
      * Submits a web request and returns a response. This is an alternate name for the getResponse method.
      */
-    public WebResponse sendRequest( WebRequest request ) throws MalformedURLException, IOException, SAXException {
+    public WebResponse sendRequest( WebRequest request ) throws IOException, SAXException {
         return getResponse( request );
     }
 
@@ -116,7 +116,7 @@ public class WebWindow {
      * cookies as requested by the server.
      * @exception SAXException thrown if there is an error parsing the retrieved page
      **/
-    public WebResponse getResponse( WebRequest request ) throws MalformedURLException, IOException, SAXException {
+    public WebResponse getResponse( WebRequest request ) throws IOException, SAXException {
         final RequestContext requestContext = new RequestContext();
         final WebResponse response = getSubframeResponse( request, requestContext );
         requestContext.runScripts();
@@ -135,7 +135,7 @@ public class WebWindow {
      * Updates this web client based on a received response. This includes updating
      * cookies and frames.
      **/
-    WebResponse updateWindow( String requestTarget, WebResponse response, RequestContext requestContext ) throws MalformedURLException, IOException, SAXException {
+    WebResponse updateWindow( String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         _client.updateClient( response );
         if (getClient().getClientProperties().isAutoRefresh() && response.getRefreshRequest() != null) {
             return getResponse( response.getRefreshRequest() );
@@ -164,10 +164,12 @@ public class WebWindow {
         } else if (!HttpUnitUtils.isJavaScriptURL( urlString )) {
             response = _client.createResponse( request, targetFrame );
         } else {
-            WebRequestSource wrs = request.getWebRequestSource();
-            Object result = (wrs == null) ? getCurrentPage().getScriptingHandler().evaluateExpression( urlString )
-                                          : wrs.getScriptingHandler().evaluateExpression( urlString );
-            if (result != null) response = new DefaultWebResponse( _client, targetFrame, request.getURL(), result.toString() );
+            ScriptingHandler handler = request.getSourceScriptingHandler();
+            if (handler == null)  handler = getCurrentPage().getScriptingHandler();
+            Object result = handler.evaluateExpression( urlString );
+            if (result != null) {
+                response = new DefaultWebResponse( _client, targetFrame, request.getURL(), result.toString() );
+            }
         }
 
         if (response != null) _client.tellListeners( response );

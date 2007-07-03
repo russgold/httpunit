@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2004,2007 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,14 +19,22 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.protocol.UploadFileSpec;
+import com.meterware.httpunit.protocol.ParameterProcessor;
+import com.meterware.httpunit.dom.DomWindowProxy;
+import com.meterware.httpunit.scripting.ScriptingHandler;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.*;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Hashtable;
 
-import java.util.*;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * A request sent to a web server.
@@ -47,8 +55,10 @@ public class WebRequest {
     private String       _urlString;
     private Hashtable    _headers;
     private WebRequestSource _webRequestSource;
+    private WebResponse _referringPage;
 
     private SubmitButton _button;
+    private Element _sourceElement;
 
 
     /**
@@ -353,6 +363,17 @@ public class WebRequest {
     /**
      * Constructs a web request using a base URL, a relative URL string, and a target.
      **/
+    protected WebRequest( WebResponse referer, Element sourceElement, URL urlBase, String urlString, String target ) {
+        this( urlBase, urlString, referer.getFrame(), target != null ? target : referer.getBaseTarget() );
+        _sourceElement = sourceElement;
+        _referringPage = referer;
+        setHeaderField( REFERER_HEADER_NAME, referer.getURL().toExternalForm() );
+    }
+
+
+    /**
+     * Constructs a web request using a base URL, a relative URL string, and a target.
+     **/
     protected WebRequest( URL urlBase, String urlString, FrameSelector frame, String target ) {
         this( urlBase, urlString, frame, target, new UncheckedParameterHolder() );
     }
@@ -373,6 +394,7 @@ public class WebRequest {
     protected WebRequest( WebRequestSource requestSource, ParameterHolder parameterHolder ) {
         this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getFrame(), requestSource.getTarget(), parameterHolder );
         _webRequestSource = requestSource;
+        _sourceElement = requestSource.getElement();
         setHeaderField( REFERER_HEADER_NAME, requestSource.getBaseURL().toExternalForm() );
     }
 
@@ -516,10 +538,6 @@ public class WebRequest {
     /** The target indicating the same frame. **/
     static final String SAME_FRAME = "_self";
 
-    WebRequestSource getWebRequestSource() {
-        return _webRequestSource;
-    }
-
 
     Hashtable getHeaderDictionary() {
         if (_headers == null) {
@@ -534,72 +552,21 @@ public class WebRequest {
         return _headers == null ? null : (String) _headers.get( REFERER_HEADER_NAME );
     }
 
-}
 
-
-class URLEncodedString implements ParameterProcessor {
-
-    private StringBuffer _buffer = new StringBuffer( HttpUnitUtils.DEFAULT_BUFFER_SIZE );
-
-    private boolean _haveParameters = false;
-
-
-    public String getString() {
-        return _buffer.toString();
-    }
-
-
-    public void addParameter( String name, String value, String characterSet ) {
-        if (_haveParameters) _buffer.append( '&' );
-        _buffer.append( encode( name, characterSet ) );
-        if (value != null) _buffer.append( '=' ).append( encode( value, characterSet ) );
-        _haveParameters = true;
-    }
-
-
-    public void addFile( String parameterName, UploadFileSpec fileSpec ) {
-        throw new RuntimeException( "May not URL-encode a file upload request" );
-    }
-
-
-    /**
-     * Returns a URL-encoded version of the string, including all eight bits, unlike URLEncoder, which strips the high bit.
-     **/
-    private String encode( String source, String characterSet ) {
-        if (characterSet.equalsIgnoreCase( HttpUnitUtils.DEFAULT_CHARACTER_SET )) {
-            return URLEncoder.encode( source );
-        } else {
+    ScriptingHandler getSourceScriptingHandler() {
+        WebRequestSource wrs = _webRequestSource;
+        if (wrs != null) {
+            return wrs.getScriptingHandler();
+        } else if (_referringPage != null && _sourceElement != null) {
             try {
-                byte[] rawBytes = source.getBytes( characterSet );
-                StringBuffer result = new StringBuffer( 3*rawBytes.length );
-                for (int i = 0; i < rawBytes.length; i++) {
-                    int candidate = rawBytes[i] & 0xff;
-                    if (candidate == ' ') {
-                        result.append( '+' );
-                    } else if ((candidate >= 'A' && candidate <= 'Z') ||
-                               (candidate >= 'a' && candidate <= 'z') ||
-                               (candidate == '.') || (candidate == '-' ) ||
-                               (candidate == '*') || (candidate == '_') ||
-                               (candidate >= '0' && candidate <= '9')) {
-                        result.append( (char) rawBytes[i] );
-                    } else if (candidate < 16) {
-                        result.append( "%0" ).append( Integer.toHexString( candidate ).toUpperCase() );
-                    } else {
-                        result.append( '%' ).append( Integer.toHexString( candidate ).toUpperCase() );
-                    }
-                }
-                return result.toString();
-            } catch (java.io.UnsupportedEncodingException e) {
-                return "???";    // XXX should pass the exception through as IOException ultimately
+                _referringPage.getReceivedPage().getElement( _sourceElement ).getScriptingHandler();
+            } catch (SAXException e) {
+                return null;
             }
         }
+        return null;
     }
-
 }
-
-
-
-
 
 //======================================== class JavaScriptURLStreamHandler ============================================
 

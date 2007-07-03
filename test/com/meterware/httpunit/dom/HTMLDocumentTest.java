@@ -350,6 +350,7 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         assertEquals( "Result of write buffer", "And another.", _htmlDocument.getWriteBuffer().toString() );
     }
 
+
     /**
      * Verifies that the href of a link will be based on the URL of the enclosing window.
      */
@@ -360,6 +361,53 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         HTMLAnchorElementImpl link = (HTMLAnchorElementImpl) _htmlDocument.createElement( "a" );
         link.setAttribute( "href", "main.html" );
         proxy.setUrl( new URL( "http://localhost/aux.html" ) );
-        assertEquals( "referenced URL", new URL( "http://localhost/main.html").toExternalForm(), link.getHref() );
+        assertEquals( "referenced URL", "http://localhost/main.html", link.getHref() );
+    }
+
+
+    /**
+     * Verifies that the href of a link will be based on the base URL of the enclosing window, if there is one.
+     */
+    public void testLinkHrefUsingBase() throws Exception {
+        TestWindowProxy proxy = new TestWindowProxy( _htmlDocument );
+        _htmlDocument.getWindow().setProxy( proxy );
+        HTMLBaseElement baseElement = (HTMLBaseElement) _htmlDocument.createElement( "base" );
+        _headElement.appendChild( baseElement );
+        baseElement.setHref( "http://meterware.com/httpunit/" );
+        _htmlDocument.setBody( (HTMLElement) _htmlDocument.createElement( "body" ) );
+        HTMLAnchorElementImpl link = (HTMLAnchorElementImpl) _htmlDocument.createElement( "a" );
+        link.setAttribute( "href", "main.html" );
+        proxy.setUrl( new URL( "http://localhost/aux.html" ) );
+        assertEquals( "referenced URL", "http://meterware.com/httpunit/main.html", link.getHref() );
+    }
+
+
+    /**
+     * Verifies that the href of a javascript link does not use the enclosing window URL.
+     */
+    public void testJavascriptLinkHref() throws Exception {
+        TestWindowProxy proxy = new TestWindowProxy( _htmlDocument );
+        _htmlDocument.getWindow().setProxy( proxy );
+        _htmlDocument.setBody( (HTMLElement) _htmlDocument.createElement( "body" ) );
+        HTMLAnchorElementImpl link = (HTMLAnchorElementImpl) _htmlDocument.createElement( "a" );
+        link.setAttribute( "href", "javascript:doSomething(123)" );
+        proxy.setUrl( new URL( "http://localhost/aux.html" ) );
+        assertEquals( "referenced URL", "javascript:doSomething(123)", link.getHref() );
+    }
+
+
+    /**
+     * Verifies that a click on an href link will send a request for the referenced page.
+     */
+    public void testClickOnLink() throws Exception {
+        TestWindowProxy proxy = new TestWindowProxy( _htmlDocument );
+        _htmlDocument.getWindow().setProxy( proxy );
+        _htmlDocument.setBody( (HTMLElement) _htmlDocument.createElement( "body" ) );
+        HTMLAnchorElementImpl link = (HTMLAnchorElementImpl) _htmlDocument.createElement( "a" );
+        link.setAttribute( "href", "main.html" );
+        link.setAttribute( "target", "there" );
+        proxy.setUrl( new URL( "http://localhost/aux.html" ) );
+        link.click();
+        assertEquals( "method invocation", "submitRequest( GET, http://localhost/main.html, there, 0 bytes )", TestWindowProxy.popProxyCall() );
     }
 }

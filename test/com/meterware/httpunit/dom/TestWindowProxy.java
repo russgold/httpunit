@@ -126,4 +126,10 @@ class TestWindowProxy implements DomWindowProxy {
     public URL getURL() {
         return _url;
     }
+
+
+    public DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException {
+        pushProxyCall( "submitRequest( " + method + ", " + location + ", " + target + ", " + requestBody.length + " bytes )" );
+        return null;
+    }
 }
