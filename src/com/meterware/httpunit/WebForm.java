@@ -426,11 +426,6 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    void setSubmitAsMime( boolean mimeEncoded ) {
-        throw new IllegalStateException( "May not change the encoding for a validated request created from a form" );
-    }
-
-
     /**
      * Returns true if this form is to be submitted using mime encoding (the default is URL encoding).
      **/

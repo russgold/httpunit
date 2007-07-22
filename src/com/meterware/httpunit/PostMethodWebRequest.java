@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, 2004, Russell Gold
+* Copyright (c) 2000-2002, 2004, 2007 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -32,12 +32,35 @@ import java.net.URL;
  **/
 public class PostMethodWebRequest extends MessageBodyWebRequest {
 
-
     /**
      * Constructs a web request using a specific absolute url string.
      **/
     public PostMethodWebRequest( String urlString ) {
-        super( urlString );
+        this( urlString, false );
+    }
+
+
+    /**
+     * Constructs a web request using a specific absolute url string, with optional mime encoding.
+     **/
+    public PostMethodWebRequest( String urlString, boolean mimeEncoded ) {
+        super( urlString, mimeEncoded );
+    }
+
+
+    /**
+     * Constructs a web request with a specific target.
+     **/
+    public PostMethodWebRequest( URL urlBase, String urlString, String target ) {
+        this( urlBase, urlString, target, false );
+    }
+
+
+    /**
+     * Constructs a web request with a specific target, with optional mime encoding.
+     **/
+    public PostMethodWebRequest( URL urlBase, String urlString, String target, boolean mimeEncoded ) {
+        super( urlBase, urlString, target, mimeEncoded );
     }
 
 
@@ -48,26 +71,8 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
      * @param contentType the MIME content type of the body, including any character set
      **/
     public PostMethodWebRequest( String urlString, InputStream source, String contentType ) {
-        super( urlString );
+        super( urlString, false );
         _body = new InputStreamMessageBody( source, contentType );
-    }
-
-
-    /**
-     * Constructs a web request with a specific target.
-     **/
-    public PostMethodWebRequest( URL urlBase, String urlString, String target ) {
-        super( urlBase, urlString, target );
-    }
-
-
-    /**
-     * Selects whether MIME-encoding will be used for this request. MIME-encoding changes the way the request is sent
-     * and is required for requests which include file parameters. This method may only be called for a request
-     * which was not created from a form.
-     **/
-    public void setMimeEncoded( boolean mimeEncoded ) {
-        super.setMimeEncoded( mimeEncoded );
     }
 
 
@@ -96,11 +101,9 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
     /**
      * Returns true if selectFile may be called with this parameter.
      */
-    protected boolean maySelectFile( String parameterName )
-    {
+    protected boolean maySelectFile( String parameterName ) {
         return isMimeEncoded() && isFileParameter( parameterName );
     }
-
 
 //----------------------------- MessageBodyWebRequest methods ---------------------------
 
@@ -119,7 +122,7 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
      * Constructs a web request for a form submitted by clicking a button.
      **/
     PostMethodWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
-        super( sourceForm, button, x, y );
+        this( sourceForm, sourceForm, button, x, y );
     }
 
 
@@ -134,12 +137,6 @@ public class PostMethodWebRequest extends MessageBodyWebRequest {
     PostMethodWebRequest( WebForm sourceForm ) {
         super( sourceForm );
     }
-
-
-//---------------------------------- private members -------------------------------------
-
-
-    private MessageBody _body;
 
 }
 

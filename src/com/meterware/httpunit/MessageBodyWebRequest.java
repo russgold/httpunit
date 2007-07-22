@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2004, Russell Gold
+* Copyright (c) 2001-2004,2007 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,28 +38,34 @@ import java.net.URLConnection;
 abstract
 public class MessageBodyWebRequest extends WebRequest {
 
+    protected MessageBody _body;
+    private boolean _mimeEncoded;
+
 
     /**
      * Constructs a web request using a specific absolute url string.
      **/
-    protected MessageBodyWebRequest( String urlString ) {
+    protected MessageBodyWebRequest( String urlString, boolean mimeEncoded ) {
         super( urlString );
+        _mimeEncoded = mimeEncoded;
+    }
+
+
+    /**
+     * Constructs a web request using a specific absolute url string.
+     **/
+    protected MessageBodyWebRequest( String urlString, MessageBody messageBody ) {
+        super( urlString );
+        _body = messageBody;
     }
 
 
     /**
      * Constructs a web request with a specific target.
      **/
-    protected MessageBodyWebRequest( URL urlBase, String urlString, String target ) {
+    protected MessageBodyWebRequest( URL urlBase, String urlString, String target, boolean mimeEncoded ) {
         super( urlBase, urlString, target );
-    }
-
-
-    /**
-     * Constructs a web request for a form submitted via a button.
-     **/
-    protected MessageBodyWebRequest( WebForm sourceForm, SubmitButton button, int x, int y ) {
-        this( sourceForm, WebRequest.newParameterHolder( sourceForm ), button, x, y );
+        _mimeEncoded = mimeEncoded;
     }
 
 
@@ -70,6 +76,8 @@ public class MessageBodyWebRequest extends WebRequest {
      **/
     protected MessageBodyWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
         super( sourceForm, parameterHolder, button, x, y );
+        _mimeEncoded = parameterHolder.isSubmitAsMime();
+        setHeaderField( REFERER_HEADER_NAME, sourceForm.getBaseURL().toExternalForm() );
     }
 
 
@@ -78,15 +86,18 @@ public class MessageBodyWebRequest extends WebRequest {
      **/
     protected MessageBodyWebRequest( WebForm sourceForm ) {
         super( sourceForm, WebRequest.newParameterHolder( sourceForm ) );
+        _mimeEncoded = sourceForm.isSubmitAsMime();
+        setHeaderField( REFERER_HEADER_NAME, sourceForm.getBaseURL().toExternalForm() );
     }
 
 
     /**
-     * Subclasses must override this method to provide a message body for the
+     * Subclasses may override this method to provide a message body for the
      * request.
      **/
-    abstract
-    protected MessageBody getMessageBody();
+    protected MessageBody getMessageBody() {
+        return _body;
+    }
 
 
 //---------------------------------- WebRequest methods --------------------------------
@@ -116,6 +127,10 @@ public class MessageBodyWebRequest extends WebRequest {
         return getMessageBody().getContentType();
     }
 
+
+    public boolean isMimeEncoded() {
+        return _mimeEncoded;
+    }
 
 //============================= class InputStreamMessageBody ======================================
 

@@ -26,6 +26,7 @@ import java.net.URL;
 import java.io.IOException;
 
 import com.meterware.httpunit.scripting.ScriptingHandler;
+import com.meterware.httpunit.protocol.MessageBody;
 import org.xml.sax.SAXException;
 
 /**
@@ -128,8 +129,14 @@ class TestWindowProxy implements DomWindowProxy {
     }
 
 
-    public DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException {
-        pushProxyCall( "submitRequest( " + method + ", " + location + ", " + target + ", " + requestBody.length + " bytes )" );
+    public DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, MessageBody requestBody ) throws IOException, SAXException {
+        pushProxyCall( "submitRequest( " + method + ", " + location + ", " + target + ", " + stringifyMessageBody( requestBody ) + " )" );
         return null;
+    }
+
+
+    private String stringifyMessageBody( MessageBody requestBody ) {
+        if (requestBody == null) return "null";
+        return "something";
     }
 }

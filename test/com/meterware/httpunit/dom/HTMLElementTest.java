@@ -115,7 +115,7 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
         assertEquals( "number of controls in form", 0, form.getLength() );
         assertEquals( "default method", "GET", form.getMethod().toUpperCase() );
         assertNull( "form name should not be specified by default", form.getName() );
-        assertEquals( "default target", "_self", form.getTarget() );
+        assertNull( "default target is not null", form.getTarget() );
     }
 
 

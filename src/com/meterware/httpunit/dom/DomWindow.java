@@ -161,6 +161,6 @@ public class DomWindow extends AbstractDomComponent {
 
 
     void submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException {
-        _proxy.submitRequest( sourceElement, method, location, target, requestBody );
+        _proxy.submitRequest( sourceElement, method, location, target, null );
     }
 }

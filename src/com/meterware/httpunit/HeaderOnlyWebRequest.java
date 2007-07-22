@@ -83,11 +83,13 @@ public abstract class HeaderOnlyWebRequest extends WebRequest {
 
     HeaderOnlyWebRequest( WebRequestSource requestSource ) {
         super( requestSource, WebRequest.newParameterHolder( requestSource ) );
+        setHeaderField( REFERER_HEADER_NAME, requestSource.getBaseURL().toExternalForm() );
     }
 
 
     HeaderOnlyWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
         super( sourceForm, parameterHolder, button, x, y );
+        setHeaderField( REFERER_HEADER_NAME, sourceForm.getBaseURL().toExternalForm() );
     }
 
 

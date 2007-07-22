@@ -20,6 +20,7 @@ package com.meterware.httpunit.dom;
 *
 *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptingHandler;
+import com.meterware.httpunit.protocol.MessageBody;
 
 import java.io.IOException;
 import java.net.URL;
@@ -63,5 +64,5 @@ public interface DomWindowProxy {
     boolean replaceText( String text, String contentType );
 
 
-    DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException;
+    DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, MessageBody requestBody ) throws IOException, SAXException;
 }

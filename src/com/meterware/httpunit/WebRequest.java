@@ -21,7 +21,6 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.httpunit.protocol.UploadFileSpec;
 import com.meterware.httpunit.protocol.ParameterProcessor;
-import com.meterware.httpunit.dom.DomWindowProxy;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 
 import java.io.File;
@@ -59,6 +58,7 @@ public class WebRequest {
 
     private SubmitButton _button;
     private Element _sourceElement;
+    private String _characterSet;
 
 
     /**
@@ -395,7 +395,6 @@ public class WebRequest {
         this( requestSource.getBaseURL(), requestSource.getRelativePage(), requestSource.getFrame(), requestSource.getTarget(), parameterHolder );
         _webRequestSource = requestSource;
         _sourceElement = requestSource.getElement();
-        setHeaderField( REFERER_HEADER_NAME, requestSource.getBaseURL().toExternalForm() );
     }
 
 
@@ -417,6 +416,7 @@ public class WebRequest {
         _requestTarget = requestTarget;
         _urlString = urlString.toLowerCase().startsWith( "http" ) ? escape( urlString ) : urlString;
         _parameterHolder = parameterHolder;
+        _characterSet = parameterHolder.getCharacterSet();
     }
 
 
@@ -449,21 +449,10 @@ public class WebRequest {
 
 
     /**
-     * Selects whether MIME-encoding will be used for this request. MIME-encoding changes the way the request is sent
-     * and is required for requests which include file parameters. This method may only be called for a POST request
-     * which was not created from a form.
-     **/
-    protected void setMimeEncoded( boolean mimeEncoded )
-    {
-        _parameterHolder.setSubmitAsMime( mimeEncoded );
-    }
-
-
-    /**
      * Returns true if this request is to be MIME-encoded.
      **/
     protected boolean isMimeEncoded() {
-        return _parameterHolder.isSubmitAsMime();
+        return false;
     }
 
 
@@ -480,7 +469,7 @@ public class WebRequest {
      **/
     final
     protected String getCharacterSet() {
-        return _parameterHolder.getCharacterSet();
+        return _characterSet;
     }
 
 

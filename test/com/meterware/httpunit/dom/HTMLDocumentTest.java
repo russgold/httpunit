@@ -408,6 +408,6 @@ public class HTMLDocumentTest extends AbstractHTMLElementTest {
         link.setAttribute( "target", "there" );
         proxy.setUrl( new URL( "http://localhost/aux.html" ) );
         link.click();
-        assertEquals( "method invocation", "submitRequest( GET, http://localhost/main.html, there, 0 bytes )", TestWindowProxy.popProxyCall() );
+        assertEquals( "method invocation", "submitRequest( GET, http://localhost/main.html, there, null )", TestWindowProxy.popProxyCall() );
     }
 }

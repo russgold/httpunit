@@ -1,6 +1,8 @@
 package com.meterware.httpunit;
 /********************************************************************************************************************
-* Copyright (c) 2001, Russell Gold
+* $Id$
+*
+* Copyright (c) 2001,2007 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -46,8 +48,7 @@ public class PutMethodWebRequest extends MessageBodyWebRequest {
      * @param contentType the MIME content type of the body, including any character set
      **/
     public PutMethodWebRequest( String url, InputStream source, String contentType ) {
-        super( url );
-        _body = new InputStreamMessageBody( source, contentType );
+        super( url, new InputStreamMessageBody( source, contentType ) );
     }
 
 
@@ -57,15 +58,4 @@ public class PutMethodWebRequest extends MessageBodyWebRequest {
     public String getMethod() {
         return "PUT";
     }
-
-
-    /**
-     * Returns a message body based on the input stream.
-     **/
-    protected MessageBody getMessageBody() {
-        return _body;
-    }
-
-
-    private MessageBody _body;
 }

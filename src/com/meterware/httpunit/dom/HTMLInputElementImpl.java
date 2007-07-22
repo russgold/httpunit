@@ -23,6 +23,9 @@ import org.w3c.dom.html.HTMLInputElement;
 import org.w3c.dom.html.HTMLCollection;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
+import com.meterware.httpunit.protocol.ParameterProcessor;
+
+import java.io.IOException;
 
 /**
  *
@@ -187,6 +190,16 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
     }
 
 
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        getBehavior().addValues( getName(), processor, characterSet );
+    }
+
+
+    public void silenceSubmitButton() {
+        getBehavior().silenceSubmitButton();
+    }
+
+
     void setState( boolean checked ) {
         _checked = checked ? Boolean.TRUE : Boolean.FALSE;
     }
@@ -206,6 +219,8 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
             _behavior = new RadioButtonBehavior( this );
         } else if (type.equals( "reset" )) {
             _behavior = new ResetButtonBehavior( this );
+        } else if (type.equals( "submit" )) {
+            _behavior = new SubmitButtonBehavior( this );
         } else {
             _behavior = new DefaultBehavior( this );
         }
@@ -227,6 +242,12 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
 
         boolean getChecked();
         void setChecked( boolean checked );
+
+
+        void addValues( String name, ParameterProcessor processor, String characterSet ) throws IOException;
+
+
+        void silenceSubmitButton();
     }
 
 
@@ -265,6 +286,11 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
             _element.reportPropertyChanged( propertyName );
         }
 
+        public void addValues( String name, ParameterProcessor processor, String characterSet ) throws IOException {
+            processor.addParameter( name, getValue(), characterSet );
+        }
+
+        public void silenceSubmitButton() {}
     }
 
 
@@ -274,10 +300,33 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
             super( element );
         }
 
-
-
         public void reset() {
             _value = null;
+        }
+
+    }
+
+
+    class SubmitButtonBehavior extends DefaultBehavior {
+
+        private boolean _sendWithSubmit;
+
+        public SubmitButtonBehavior( HTMLElementImpl element ) {
+            super( element );
+        }
+
+        public void click() {
+            _sendWithSubmit = true;
+            ((HTMLFormElementImpl) getForm()).doSubmitAction();
+        }
+
+        public void addValues( String name, ParameterProcessor processor, String characterSet ) throws IOException {
+            if (!_sendWithSubmit) return;
+            super.addValues( name, processor, characterSet );
+        }
+
+        public void silenceSubmitButton() {
+            _sendWithSubmit = false;
         }
 
     }
@@ -288,7 +337,6 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
         public CheckboxBehavior( HTMLElementImpl element ) {
             super( element );
         }
-
 
         public boolean getChecked() {
             return _checked != null ? _checked.booleanValue() : getDefaultChecked();
@@ -307,6 +355,15 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
             setChecked( !getChecked() );
         }
 
+
+        public void addValues( String name, ParameterProcessor processor, String characterSet ) throws IOException {
+            if (!getDisabled() && getChecked()) processor.addParameter( name, getFormValue(), characterSet );
+        }
+
+
+        private String getFormValue() {
+            return _value == null ? "on" : _value;
+        }
     }
 
 
@@ -334,7 +391,6 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
         public void click() {
             setChecked( true );
         }
-
     }
 
 

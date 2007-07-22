@@ -43,6 +43,7 @@ public class DomTestSuite {
         result.addTest( HTMLElementTest.suite() );
         result.addTest( HTMLSelectTest.suite() );
         result.addTest( HTMLFormTest.suite() );
+        result.addTest( HTMLFormSubmitTest.suite() );
         result.addTest( HTMLTableTest.suite() );
         result.addTest( DomWindowTest.suite() );
 

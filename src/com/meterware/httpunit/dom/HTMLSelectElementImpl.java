@@ -24,6 +24,9 @@ import org.w3c.dom.html.HTMLElement;
 import org.w3c.dom.html.HTMLCollection;
 import org.w3c.dom.html.HTMLOptionElement;
 import org.w3c.dom.DOMException;
+import com.meterware.httpunit.protocol.ParameterProcessor;
+
+import java.io.IOException;
 
 /**
  *
@@ -135,6 +138,15 @@ public class HTMLSelectElementImpl extends HTMLControl implements HTMLSelectElem
 
     void clearSelected() {
         setSelectedIndex( -1 );
+    }
+
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        HTMLCollection options = getOptions();
+        String name = getName();
+        for (int i = 0; i < options.getLength();i++) {
+            ((HTMLOptionElementImpl) options.item( i )).addValueIfSelected( processor, name, characterSet );
+        }
     }
 
 

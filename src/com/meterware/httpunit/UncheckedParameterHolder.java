@@ -169,9 +169,4 @@ final class UncheckedParameterHolder extends ParameterHolder implements Paramete
     boolean isSubmitAsMime() {
         return _submitAsMime;
     }
-
-
-    void setSubmitAsMime( boolean mimeEncoded ) {
-        _submitAsMime = mimeEncoded;
-    }
 }

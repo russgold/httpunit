@@ -108,8 +108,4 @@ abstract class ParameterHolder implements ParameterCollection {
 
     abstract
     boolean isSubmitAsMime();
-
-
-    abstract
-    void setSubmitAsMime( boolean mimeEncoded );
 }

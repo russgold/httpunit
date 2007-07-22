@@ -250,8 +250,7 @@ public class FileUploadTest extends HttpUnitTest {
 
         defineResource( "ListParams", new MimeEcho() );
         WebConversation wc = new WebConversation();
-        PostMethodWebRequest formSubmit = new PostMethodWebRequest( getHostPath() + "/ListParams" );
-        formSubmit.setMimeEncoded( true );
+        PostMethodWebRequest formSubmit = new PostMethodWebRequest( getHostPath() + "/ListParams", /* mime-encoded */ true );
         formSubmit.selectFile( "message", "temp.txt", bais, "text/plain" );
         WebResponse encoding = wc.getResponse( formSubmit );
         assertEquals( "text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );

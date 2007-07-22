@@ -29,8 +29,11 @@ import org.mozilla.javascript.ScriptableObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.net.URL;
+import java.io.IOException;
 
 import com.meterware.httpunit.scripting.FormScriptable;
+import com.meterware.httpunit.protocol.URLEncodedString;
 
 /**
  *
@@ -120,7 +123,7 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
 
 
     public String getTarget() {
-        return getAttributeWithDefault( "target", "_self" );
+        return getAttributeWithNoDefault( "target" );
     }
 
 
@@ -161,6 +164,57 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
 
 
     public void submit() {
+        doSubmitAction();
+    }
+
+
+    /**
+     * Handles the actual form submission - does not handle the "submit" event.
+     */
+    void doSubmitAction() {
+        try {
+            if ("get".equalsIgnoreCase( getMethod() )) {
+                getDomWindow().submitRequest( this, getMethod(), getEffectiveUrl(), getTarget(), new byte[0] );
+            } else if ("post".equalsIgnoreCase( getMethod() )) {
+                getDomWindow().submitRequest( this, getMethod(), getAction(), getTarget(), new byte[0] );
+            }
+        } catch (Exception e) {
+            throw new RuntimeException( "Error submitting form: " + e );
+        }  finally {
+            silenceSubmitButtons();
+        }
+    }
+
+
+    private void silenceSubmitButtons() {
+        HTMLCollection controls = getElements();
+        for (int i = 0; i < controls.getLength(); i++) {
+            ((HTMLControl) controls.item( i )).silenceSubmitButton();
+        }
+    }
+
+
+    private String getEffectiveUrl() throws IOException {
+        StringBuffer spec = new StringBuffer( getAction() );
+        if ("get".equalsIgnoreCase( getMethod() )) {
+            URLEncodedString parameters = new URLEncodedString();
+            HTMLCollection controls = getElements();
+            for (int i = 0; i < controls.getLength(); i++) {
+                ((HTMLControl) controls.item( i )).addValues( parameters, "us-ascii" );
+            }
+            if ((spec.indexOf( "?" ) >= 0) && !(spec.toString().endsWith( "?" ))) {
+                spec.append( '&' );
+            } else {
+                spec.append( '?' );
+            }
+            spec.append( parameters.getString() );
+        }
+        return new URL( getDomWindow().getUrl(), spec.toString() ).toExternalForm();
+    }
+
+
+    private DomWindow getDomWindow() {
+        return ((HTMLDocumentImpl) getOwnerDocument()).getWindow();
     }
 
 }

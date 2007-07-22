@@ -24,6 +24,9 @@ import org.w3c.dom.html.HTMLFormElement;
 import org.w3c.dom.html.HTMLCollection;
 
 import java.util.Iterator;
+import java.io.IOException;
+
+import com.meterware.httpunit.protocol.ParameterProcessor;
 
 /**
  *
@@ -106,4 +109,9 @@ public class HTMLControl extends HTMLElementImpl {
 
     public void reset() {}
 
+
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {}
+
+
+    public void silenceSubmitButton() {}
 }

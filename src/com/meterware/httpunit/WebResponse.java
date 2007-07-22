@@ -28,6 +28,7 @@ import com.meterware.httpunit.dom.HTMLDocumentImpl;
 import com.meterware.httpunit.dom.DomWindow;
 import com.meterware.httpunit.dom.DomWindowProxy;
 import com.meterware.httpunit.dom.HTMLElementImpl;
+import com.meterware.httpunit.protocol.MessageBody;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -685,7 +686,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
-    public DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, byte[] requestBody ) throws IOException, SAXException {
+    public DomWindowProxy submitRequest( HTMLElementImpl sourceElement, String method, String location, String target, MessageBody requestBody ) throws IOException, SAXException {
         if (method.equalsIgnoreCase( "get" )) {
             return getWindow().sendRequest( new GetMethodWebRequest( this, sourceElement, getURL(), location, target ) );
         } else {

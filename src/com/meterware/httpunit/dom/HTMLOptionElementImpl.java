@@ -21,6 +21,9 @@ package com.meterware.httpunit.dom;
  *******************************************************************************************************************/
 import org.w3c.dom.html.HTMLOptionElement;
 import org.w3c.dom.Node;
+import com.meterware.httpunit.protocol.ParameterProcessor;
+
+import java.io.IOException;
 
 /**
  *
@@ -98,4 +101,21 @@ public class HTMLOptionElementImpl extends HTMLControl implements HTMLOptionElem
     public void reset() {
         _selected = null;
     }
+
+
+    void addValueIfSelected( ParameterProcessor processor, String name, String characterSet ) throws IOException {
+        if (getSelected()) {
+            String value = getValue();
+            if (value == null) value = readDisplayedValue();
+            processor.addParameter( name, value, characterSet );
+        }
+    }
+
+    private String readDisplayedValue() {
+        Node nextSibling = getNextSibling();
+        while (nextSibling != null && nextSibling.getNodeType() != Node.TEXT_NODE && nextSibling.getNodeType() != Node.ELEMENT_NODE) nextSibling = nextSibling.getNextSibling();
+        if (nextSibling == null || nextSibling.getNodeType() != Node.TEXT_NODE) return "";
+        return nextSibling.getNodeValue();
+    }
+
 }
