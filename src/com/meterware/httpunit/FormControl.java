@@ -1321,11 +1321,30 @@ class SelectionFormControl extends FormControl {
             _options = newArray;
         }
 
-
+				/**
+				 * get the Object at the given index
+				 * check that the index is not out of bounds 
+				 * @param index - the index of the object to get
+				 * @throw RuntimeException if index is out of bounds
+				 */
         public Object get( int index ) {
+        		// if the index is out of bounds
+            if (index < 0 || index >= _options.length) {
+            	// create a user friendly error message
+            	String msg="invalid index "+index+" for Options ";
+            	// by listing all possible options
+	            for (int i = 0; i < _options.length; i++) {
+                msg=msg+(_options[i]._text);
+                if (i>0)
+                  msg=msg+",";
+        	  	} // for
+	            // now throw a RunTimeException that would
+	            // have happened anyways with a less friendly message
+        	  	throw new RuntimeException(msg);
+        	  }	// if
             return _options[ index ];
-        }
-
+        } // get
+        
 
         /** Invoked when an option is set true. **/
         void optionSet( int i ) {
