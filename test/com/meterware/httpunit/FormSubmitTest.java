@@ -557,6 +557,29 @@ public class FormSubmitTest extends HttpUnitTest {
             assertTrue( "Did not include mention of bad URL type", success.getMessage().indexOf( "mailto" ) >= 0 );
         }
     }
+    
+    /**
+     * test that the enabled/disabled state of a button is accessible
+     */
+    public void testEnabledDisabled() throws Exception {
+    	// a web page with two checkboxes
+      defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+           "<input type=\"checkbox\" id=\"checkDisabled\" name=checkDisabled>Disabled" +
+           "<input type=\"checkbox\" id=\"checkEnabled\"  name=checkEnabled checked>Enabled" +
+           "</form>" );
+    	WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+    	String[] ids={"checkDisabled","checkEnabled"};
+    	for (int i=0;i<ids.length;i++) {
+    		String id=ids[i];
+    		Object o=page.getElementWithID(id); 
+    		if (o instanceof FormControl) {
+    			FormControl box=(FormControl)o;
+    			boolean result= !box.isDisabled();
+    		} else {
+    			throw new Exception("element with id "+id+"has invalid type "+o.getClass().getName()+" expected was FormControl");
+    	 		}
+     	} // for	
+    }
 
 
 //---------------------------------------------- private members ------------------------------------------------

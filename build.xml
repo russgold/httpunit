@@ -215,7 +215,7 @@
 <!--  ===================================================================  -->
 <!--  Runs the test code                                                   -->
 <!--  ===================================================================  -->
-<target name="test" depends="testcompile">
+<target name="test" depends="testcompile" description="run JUnit Test Suite tests">
     <java classname="${test.class}" fork="yes" >
          <classpath>
              <path refid="base.classpath" />
@@ -245,7 +245,7 @@
 <!--  ===================================================================  -->
 <!--  Creates the jar archive                                              -->
 <!--  ===================================================================  -->
-<target name="jar" depends="compile">
+<target name="jar" depends="compile" description="create the jar file">
     <mkdir dir="${lib.dir}" />
     <echo file="${build.dir}/info.txt">Manifest-Version: 1.0
 Sealed: false

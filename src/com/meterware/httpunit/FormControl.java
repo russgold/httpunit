@@ -42,7 +42,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract class FormControl extends HTMLElementBase {
+public abstract class FormControl extends HTMLElementBase {
 
     final static String[] NO_VALUE = new String[0];
 
@@ -165,7 +165,7 @@ abstract class FormControl extends HTMLElementBase {
     /**
      * Returns true if this control is disabled, meaning that it will not send a value to the server as part of a request.
      **/
-    boolean isDisabled() {
+    public boolean isDisabled() {
         return _control.getDisabled();
     }
 
@@ -406,8 +406,7 @@ abstract class FormControl extends HTMLElementBase {
 }
 
 
-abstract
-class BooleanFormControl extends FormControl {
+abstract class BooleanFormControl extends FormControl {
 
     private String[] _displayedValue;
 
@@ -523,152 +522,6 @@ class BooleanFormControl extends FormControl {
 
     private String[] toArray( String value ) {
         return new String[] { value };
-    }
-}
-
-
-
-class RadioButtonFormControl extends BooleanFormControl {
-
-    public String getType() {
-        return RADIO_BUTTON_TYPE;
-    }
-
-    public RadioButtonFormControl( WebForm form, HTMLInputElementImpl element ) {
-        super( form, element );
-    }
-
-
-    /**
-     * Returns true if only one control of this kind can have a value.
-     **/
-    public boolean isExclusive() {
-        return true;
-    }
-
-
-    String getQueryValue() {
-        return getValueAttribute();
-    }
-}
-
-
-class RadioGroupFormControl extends FormControl {
-
-    private List _buttonList = new ArrayList();
-    private RadioButtonFormControl[] _buttons;
-    private String[] _allowedValues;
-
-
-    public String getType() {
-        return UNDEFINED_TYPE;
-    }
-
-    public RadioGroupFormControl( WebForm form ) {
-        super( form );
-    }
-
-
-    void addRadioButton( RadioButtonFormControl control ) {
-        _buttonList.add( control );
-        _buttons = null;
-        _allowedValues = null;
-    }
-
-
-    public String[] getValues() {
-        for (int i = 0; i < getButtons().length; i++) {
-            if (getButtons()[i].isChecked()) return getButtons()[i].getValues();
-        }
-        return NO_VALUE;
-    }
-
-
-    /**
-     * Returns the option values defined for this radio button group.
-     **/
-    public String[] getOptionValues() {
-        ArrayList valueList = new ArrayList();
-        FormControl[] buttons = getButtons();
-        for (int i = 0; i < buttons.length; i++) {
-            valueList.addAll( Arrays.asList( buttons[i].getOptionValues() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
-    }
-
-
-    /**
-     * Returns the options displayed for this radio button group.
-     */
-    String[] getDisplayedOptions() {
-        ArrayList valueList = new ArrayList();
-        FormControl[] buttons = getButtons();
-        for (int i = 0; i < buttons.length; i++) {
-            valueList.addAll( Arrays.asList( buttons[i].getDisplayedOptions() ) );
-        }
-        return (String[]) valueList.toArray( new String[ valueList.size() ] );
-    }
-
-
-    Object getDelegate() {
-        ScriptableDelegate[] delegates = new ScriptableDelegate[ getButtons().length ];
-        for (int i = 0; i < delegates.length; i++) {
-            delegates[i] = (ScriptableDelegate) getButtons()[i].getScriptingHandler();
-        }
-        return delegates;
-    }
-
-
-    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
-        for (int i = 0; i < getButtons().length; i++) getButtons()[i].addValues( processor, characterSet );
-    }
-
-
-    /**
-     * Remove any required values for this control from the list, throwing an exception if they are missing.
-     **/
-    void claimRequiredValues( List values ) {
-        for (int i = 0; i < getButtons().length; i++) {
-            getButtons()[i].claimRequiredValues( values );
-        }
-    }
-
-
-    void claimUniqueValue( List values ) {
-        int matchingButtonIndex = -1;
-        for (int i = 0; i < getButtons().length && matchingButtonIndex < 0; i++) {
-            if (!getButtons()[i].isReadOnly() && values.contains( getButtons()[i].getQueryValue() )) matchingButtonIndex = i;
-        }
-        if (matchingButtonIndex <0) throw new IllegalParameterValueException( getButtons()[0].getName(), (String) values.get(0), getAllowedValues() );
-
-        boolean wasChecked = getButtons()[ matchingButtonIndex ].isChecked();
-        for (int i = 0; i < getButtons().length; i++) {
-            if (!getButtons()[i].isReadOnly()) getButtons()[i].setChecked( i == matchingButtonIndex );
-        }
-        values.remove( getButtons()[ matchingButtonIndex ].getQueryValue() );
-        if (!wasChecked) getButtons()[ matchingButtonIndex ].sendOnClickEvent();
-    }
-
-
-    void reset() {
-        for (int i = 0; i < getButtons().length; i++) getButtons()[i].reset();
-    }
-
-
-    private String[] getAllowedValues() {
-        if (_allowedValues == null) {
-            _allowedValues = new String[ getButtons().length ];
-            for (int i = 0; i < _allowedValues.length; i++) {
-                _allowedValues[i] = getButtons()[i].getQueryValue();
-            }
-        }
-        return _allowedValues;
-    }
-
-
-    private RadioButtonFormControl[] getButtons() {
-        if (_buttons == null) _buttons = (RadioButtonFormControl[]) _buttonList.toArray( new RadioButtonFormControl[ _buttonList.size() ] );
-        return _buttons;
     }
 }
 
