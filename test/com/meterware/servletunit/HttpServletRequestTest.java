@@ -89,6 +89,26 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals( "first header", "value", e.nextElement() );
         assertFalse( "Enumeration has spurious header value", e.hasMoreElements() );
     }
+    
+    /**
+     * test getting a date header;
+     * @throws Exception
+     */
+    public void testDateHeaderAccess() throws Exception {
+      WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+      String dateStr="Mon, 26 Jul 1997 05:00:00 GMT";
+      Date testDate=new Date(dateStr);
+      wr.setHeaderField( "Expires", dateStr );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
+      String dateStrRequest=request.getHeader("Expires");
+      assertTrue("Expires header field",dateStrRequest.equals(dateStr));
+      // invalid date headers return -1 
+      long requestDate=request.getDateHeader("invalid");
+      assertTrue("invalid date header field",requestDate==-1);
+      // valid date header field return the millisecs
+      requestDate=request.getDateHeader("Expires");
+      assertTrue("Expires date header field",requestDate==testDate.getTime());
+    }  
 
 
     private void assertContains( String comment, String string, Enumeration headerNames ) {
