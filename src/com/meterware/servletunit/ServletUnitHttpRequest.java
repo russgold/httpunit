@@ -138,7 +138,13 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * If the header can't be converted to a date, the method throws an IllegalArgumentException.
      **/
     public long getDateHeader( String name ) {
+    	try {
+    		String dateString=getHeader(name);
+    		Date headerDate=new Date(dateString);
+    		return headerDate.getTime();
+    	} catch (Exception e) {	
         return -1;
+    	}  
     }
 
 
