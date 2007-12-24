@@ -203,6 +203,43 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertNull( "unset parameter should be null", request.getParameterValues( "unset" ) );
     }
 
+    
+    /**
+     * test patch for
+     * [ 1705925 ] Bug in URL-decoding of GET-Request-Parameters
+     * http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550
+     * @throws Exception
+     */
+    
+    public void    testGetMethodRequestParametersEncodedWithDefaultCharacterSet_Hebrew()  throws Exception {
+    	String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
+    	String paramString = "param1=red&param2=%E0%E1%E2%E3"; // use iso-8859-8 to encode the data, then string is URL encoded
+    	HttpUnitOptions.setDefaultCharacterSet("ISO-8859-8");
+    	WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");
+    	wr.setParameter("param1", "red");
+    	wr.setParameter("param2", hebrewValue);
+    	ServletUnitHttpRequest request = new  ServletUnitHttpRequest(NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), new byte[0]);
+    	assertEquals( "param1 value", "red", request.getParameter("param1") );
+    	assertEquals( "param2 value", hebrewValue, request.getParameter("param2") );
+    }
+
+    /**
+     * test patch for
+     * [ 1705925 ] Bug in URL-decoding of GET-Request-Parameters
+     * http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550
+     * @throws Exception
+     */
+    public void testGetMethodRequestParametersEncodedWithDefaultCharacterSet_UTF8() throws  Exception {
+    	String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
+    	String paramString = "param1=red&param2=%E0%E1%E2%E3"; // use utf-8 to encode the data, then string is URL encoded
+    	HttpUnitOptions.setDefaultCharacterSet("UTF-8");
+    	WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");
+    	wr.setParameter("param1", "red");
+    	wr.setParameter("param2", hebrewValue);
+    	ServletUnitHttpRequest request = new  ServletUnitHttpRequest(NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), new byte[0]);
+    	assertEquals( "param1 value", "red", request.getParameter("param1") );
+    	assertEquals( "param2 value", hebrewValue, request.getParameter("param2") );
+    }
 
     public void notestInlineQueryString() throws Exception {     // TODO make this work
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple?color=red&color=blue&age=12" );

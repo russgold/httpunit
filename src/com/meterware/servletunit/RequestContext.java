@@ -19,6 +19,7 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.HttpUnitOptions;
 import com.meterware.httpunit.HttpUnitUtils;
 
 import java.util.*;
@@ -195,7 +196,9 @@ class RequestContext {
 
 
     private String getMessageEncoding() {
-        return _messageEncoding == null ? HttpUnitUtils.DEFAULT_CHARACTER_SET : _messageEncoding;
+    	 return _messageEncoding == null ?
+    	    /* Fixing 1705925: HttpUnitUtils.DEFAULT_CHARACTER_SET */
+    			HttpUnitOptions.getDefaultCharacterSet() : _messageEncoding;
     }
 
 
