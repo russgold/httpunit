@@ -146,7 +146,6 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "content type", "text/html", response.getContentType() );
     }
 
-
     public void testCookies() throws Exception {
         String resourceName = "something/baking";
         String resourceValue = "the desired content";
@@ -164,7 +163,10 @@ public class WebClientTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( request );
         assertEquals( "requested resource", resourceValue, response.getText().trim() );
         assertEquals( "content type", "text/html", response.getContentType() );
-        assertEquals( "number of cookies", 8, wc.getCookieNames().length );
+        String[] names=wc.getCookieNames();
+        // for (int i=0;i<names.length;i++)   	System.err.println(names[i]);
+        
+        assertEquals( "number of cookies", 8, names.length );
         assertEquals( "cookie 'HSBCLoginFailReason' value", "", wc.getCookieValue( "HSBCLoginFailReason" ) );
         assertEquals( "cookie 'age' value", "12", wc.getCookieValue( "age" ) );
         assertEquals( "cookie 'name' value", "george", wc.getCookieValue( "name" ) );
@@ -208,8 +210,11 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "number of cookies", 1, wc.getCookieNames().length );
         assertEquals( "cookie 'CUSTOMER' value", "WILE_E_COYOTE", wc.getCookieValue( "CUSTOMER" ) );
     }
-
-
+    
+    /**
+     * test setting a cookie manually
+     * @throws Exception
+     */
     public void testManualCookies() throws Exception {
         defineResource( "bounce", new CookieEcho() );
         WebConversation wc   = new WebConversation();
@@ -220,7 +225,59 @@ public class WebClientTest extends HttpUnitTest {
         response = wc.getResponse( getHostPath() + "/bounce" );
         assertEquals( "Cookies sent", "CUSTOMER=ROAD RUNNER", response.getText() );
     }
-
+    
+    
+    /**
+     * test for  1799532 ] Patched CookieJar for dealing with empty cookies
+     * I had a problem testing a web app that sent empty cookie values to the client.
+     * 
+     * Within the same http response, a cookie was set by the web app twice, once
+     * with some non-empty value and the second time with an empty value. The
+     * intention of the web app obviously was to delete the cookie, wich actually
+     * occurs in IE and Firefox.
+     *
+     * In HttpUnit though the cookie was stored with the empty value and sent back
+     * to the server in the next request. That confused the web app and caused
+     * application errors, because it didn't expect that cookie back with the
+     * empty value.
+     *
+     * I cannot really judge if this is actually a bug in HttpUnit or just more
+     * strict appliance of protocols than real Browsers do. Of course it is at
+     * least an ugly behaviour of the web app, but that wasn't my focus. It also
+     * seems from forums that others might have had the same problem.
+     * 
+     * To over come that problem, I had to change the CookieJar class in HttpUnit
+     *      
+     * to not store cookies with empty values, but remove them completely instead.
+     * The modified source file is attached (based on HttpUnit 1.6.2).
+     *
+     * Russel, please check if you want to integrate this modification in a future
+     * HttpUnit Release.
+     * 2007-12-28: wf@bitplan.com  - looked at
+     * 		http://www.ietf.org/rfc/rfc2109.txt
+     * there is no statement about empty value handling -the standard asks for 
+     * opaque handling ... no mocking about with values by the server ...
+     * @throws Exception
+     */
+    public void testEmptyCookie() throws Exception {
+      defineResource( "bounce", new CookieEcho() );
+      WebConversation wc   = new WebConversation();
+      wc.putCookie( "EMPTYVALUE", "non-empty" );
+      WebResponse response = wc.getResponse( getHostPath() + "/bounce" );
+      assertEquals( "Cookies sent", "EMPTYVALUE=non-empty", response.getText() );
+      wc.putCookie( "SOMECOOKIE","some value");
+      wc.putCookie( "EMPTYVALUE", null );
+      response = wc.getResponse( getHostPath() + "/bounce" );
+      // System.err.println(response.getText());
+      String[] names=wc.getCookieNames();
+      // should we expect a 1 or a two here?
+      // see also testCookies where 8 is currently the correct value and 7 would
+      // be if we handle empty strings as cookie deletions
+      // as long as 1799532 is rejected we'll go for a 2 here ... 
+      assertEquals( "number of cookies", 2, names.length );
+      //  for (int i=0;i<names.length;i++)   	System.err.println(names[i]);
+    }
+    
 
     class CookieEcho extends PseudoServlet {
 

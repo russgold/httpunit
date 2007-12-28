@@ -154,7 +154,12 @@ public class Cookie {
         return !CookieProperties.isPathMatchingStrict() || hostPath.startsWith( pathPattern );
     }
 
-
+    /**
+     * accept host if the given hostName fits to the given hostPattern
+     * @param hostPattern
+     * @param hostName
+     * @return true if there is a fit
+     */
     private static boolean acceptHost( String hostPattern, String hostName ) {
         return hostPattern.equalsIgnoreCase( hostName ) ||
                (hostPattern.startsWith( "." ) && hostName.endsWith( hostPattern ));
