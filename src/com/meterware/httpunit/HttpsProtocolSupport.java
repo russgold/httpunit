@@ -122,9 +122,24 @@ public abstract class HttpsProtocolSupport {
     }
 
 
+    /**
+     * get the Https Provider Class
+     * if it's been set already return it - otherwise
+     * check with the Security package and take the first available provider
+     * if all fails take the default provider class 
+     * @return
+     * @throws ClassNotFoundException
+     */
     private static Class getHttpsProviderClass() throws ClassNotFoundException {
         if (_httpsProviderClass == null) {
-            _httpsProviderClass = Class.forName( JSSE_PROVIDER_CLASS );
+        	// [ 1520925 ] SSL patch
+    			Provider[] sslProviders = Security.getProviders("SSLContext.SSLv3");
+    			if (sslProviders.length > 0) {
+    				_httpsProviderClass = sslProviders[0].getClass();
+    			}       	
+    			if (_httpsProviderClass == null) {
+    				_httpsProviderClass = Class.forName( JSSE_PROVIDER_CLASS );
+    			}	
         }
         return _httpsProviderClass;
     }
