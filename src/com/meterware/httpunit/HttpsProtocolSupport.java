@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2003, Russell Gold
+* Copyright (c) 2003-2007, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -35,9 +35,16 @@ abstract class HttpsProtocolSupport {
 
     /** The name of the JSSE class which provides support for SSL. **/
     private final static String SunJSSE_PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
+    // IBM Websphere:
+    // com.ibm.jsse.IBMJSSEProvider
+    // 	both ibm packages are inside ibmjsseprovider.jar that comes with WebSphere
 
     /** The name of the JSSE class which supports the https protocol. **/
     private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
+    // 741145: "sun.net.www.protocol.https";
+    // IBM Websphere:
+    // com.ibm.net.ssl.www.protocol
+    // 	both ibm packages are inside ibmjsseprovider.jar that comes with WebSphere
 
     private static Class _httpsProviderClass;
 

@@ -85,6 +85,11 @@ public class WebConversation extends WebClient {
     }
 
 
+    /**
+     * set the proxy server to the given proxyHost with the given proxy Port
+     * @param proxyHost - the hostname of the proxy e.g. proxy.somedomain.org
+     * @param proxyPort - the number of the port to use e.g. 8080
+     */
     public void setProxyServer( String proxyHost, int proxyPort ) {
         _proxyHost = proxyHost;
         _proxyPort = proxyPort;

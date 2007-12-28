@@ -259,9 +259,7 @@ public class WebClient {
     /**
      * Specifies a proxy server to use for requests from this client.
      */
-    public void setProxyServer( String proxyHost, int proxyPort ) {
-    }
-
+    public abstract void setProxyServer( String proxyHost, int proxyPort );
 
     /**
      * Specifies a proxy server to use, along with a user and password for authentication.
