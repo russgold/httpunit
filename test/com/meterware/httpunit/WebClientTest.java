@@ -514,7 +514,12 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
-    public void testRefererHeader() throws Exception {
+    /**
+     * test the Referer Header
+     * @param refererEnabled - true if it should not be stripped
+     * @throws Exception
+     */
+    public void dotestRefererHeader(boolean refererEnabled) throws Exception {
         String resourceName = "tellMe";
         String linkSource = "fromLink";
         String formSource = "fromForm";
@@ -533,18 +538,36 @@ public class WebClientTest extends HttpUnitTest {
         } );
 
         WebConversation wc   = new WebConversation();
+        wc.getClientProperties().setSendReferer(refererEnabled);        
         WebResponse response = wc.getResponse( page0 );
         assertEquals( "Content type", "text/plain", response.getContentType() );
         assertEquals( "Default Referer header", "null", response.getText().trim() );
 
         response = wc.getResponse( page1 );
         response = wc.getResponse( response.getLinks()[0].getRequest() );
-        assertEquals( "Link Referer header", page1, response.getText().trim() );
-
+        String expected=page1;
+        if (!refererEnabled)	expected="null";
+        assertEquals( "Link Referer header", expected, response.getText().trim() );
         response = wc.getResponse( page2 );
         response = wc.getResponse( response.getForms()[0].getRequest() );
-        assertEquals( "Form Referer header", page2, response.getText().trim() );
+        expected=page2;
+        if (!refererEnabled)	expected="null";
+        assertEquals( "Form Referer header", expected, response.getText().trim() );
     }
+
+    public void testRefererHeader() throws Exception {
+    	dotestRefererHeader(true);
+    }	
+
+    /**
+     * test the referer Header twice - with and without stripping it according to
+     *  [ 844084 ] Block HTTP referer
+     * @throws Exception
+     */
+    public void testRefererHeaderWithStrippingReferer() throws Exception {
+    	dotestRefererHeader(false);
+    }
+
 
 
     public void testRedirectedRefererHeader() throws Exception {

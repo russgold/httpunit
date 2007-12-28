@@ -245,6 +245,23 @@ public class ClientProperties {
     DNSListener getDnsListener() {
         return _dnsListener;
     }
+    
+		/**
+		 * @return the whether Referer information should be stripped from the
+		 * header
+		 */
+		public boolean isSendReferer() {
+			return _sendReferer;
+		}
+
+
+		/**
+		 * set whether Referer information should be stripped
+		 * @param referer the _sendReferer to set
+		 */
+		public void setSendReferer(boolean referer) {
+			_sendReferer = referer;
+		}
 
 
     ClientProperties cloneProperties() {
@@ -268,14 +285,24 @@ public class ClientProperties {
     private boolean _autoRefresh   = false;
 
     private DNSListener _dnsListener;
+    private boolean _sendReferer;
 
     private static ClientProperties _defaultProperties = new ClientProperties();
 
 
+    /**
+     * default Constructor
+     *
+     */
     private ClientProperties() {
+    	_sendReferer=true;
     }
 
 
+    /**
+     * copy constructor
+     * @param source - the ClientProperties to copy from
+     */
     private ClientProperties( ClientProperties source ) {
         _applicationCodeName = source._applicationCodeName;
         _applicationName     = source._applicationName;
@@ -288,5 +315,8 @@ public class ClientProperties {
         _acceptGzip          = source._acceptGzip;
         _autoRedirect        = source._autoRedirect;
         _autoRefresh         = source._autoRefresh;
+        _sendReferer         = source._sendReferer;
     }
+
+
 }

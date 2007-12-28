@@ -112,6 +112,10 @@ public class WebConversation extends WebClient {
 //---------------------------------- private members --------------------------------
 
 
+    /**
+     * open a connection for the given uniform resource locator
+     * @param url - the url to use
+     */
     private URLConnection openConnection( URL url ) throws MalformedURLException, IOException {
         URLConnection connection = url.openConnection();
         if (connection instanceof HttpURLConnection) ((HttpURLConnection) connection).setInstanceFollowRedirects( false );
@@ -120,17 +124,27 @@ public class WebConversation extends WebClient {
     }
 
 
+    /**
+     * send the headers for the given connection based on the given Dictionary of headers
+     * @param connection
+     * @param headers
+     */
     private void sendHeaders( URLConnection connection, Dictionary headers ) {
+    		boolean sendReferer = getClientProperties().isSendReferer();
         for (Enumeration e = headers.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
-            connection.setRequestProperty( key, (String) headers.get( key ) );
-            if (HttpUnitOptions.isLoggingHttpHeaders()) {
-                if (key.equalsIgnoreCase( "authorization" ) || key.equalsIgnoreCase( "proxy-authorization") ) {
-                    System.out.println( "Sending:: " + key + ": " + headers.get( key ) );
-                } else {
-                    System.out.println( "Sending:: " + key + ": " + connection.getRequestProperty( key ) );
-                }
-            }
-        }
+            if ( sendReferer || !"referer".equalsIgnoreCase( key ) ) {
+	            connection.setRequestProperty( key, (String) headers.get( key ) );
+	            if (HttpUnitOptions.isLoggingHttpHeaders()) {
+	                if (key.equalsIgnoreCase( "authorization" ) || key.equalsIgnoreCase( "proxy-authorization") ) {
+	                    System.out.println( "Sending:: " + key + ": " + headers.get( key ) );
+	                } else {
+	                    System.out.println( "Sending:: " + key + ": " + connection.getRequestProperty( key ) );
+	                }
+	            }
+        		} else if (HttpUnitOptions.isLoggingHttpHeaders()) {
+        				System.out.println( "Blocked sending referer:: "+ connection.getRequestProperty( key ) );
+        		}		
+        } // for
     }
 }
