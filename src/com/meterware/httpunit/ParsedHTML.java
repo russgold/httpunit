@@ -331,7 +331,17 @@ class ParsedHTML {
     }
 
 
+    /**
+     * interpret the given script element
+     * @param element
+     */
     void interpretScriptElement( Element element ) {
+    	  // proposed patch 1152036
+    	  // not enabled by wf@bitplan.com since it would brake
+    	  // com.meterware.httpunit.javascript.NekoEnhancedScriptingTest - testNoScriptSections
+    		// if (!HttpUnitOptions.isScriptingEnabled()) {
+    		// 	return;
+    		/// }
         String script = getScript( element );
         if (script != null) {
             try {
