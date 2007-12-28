@@ -90,6 +90,12 @@ public class Cookie {
         return _value;
     }
 
+    /**
+     * Sets the value associated with this cookie.
+     */
+    public void setValue(String value) {
+      _value = value;
+    }    
 
     /**
      * Returns the path to which this cookie is restricted.

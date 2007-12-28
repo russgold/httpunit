@@ -273,8 +273,9 @@ public class WebClientTest extends HttpUnitTest {
       // should we expect a 1 or a two here?
       // see also testCookies where 8 is currently the correct value and 7 would
       // be if we handle empty strings as cookie deletions
-      // as long as 1799532 is rejected we'll go for a 2 here ... 
-      assertEquals( "number of cookies", 2, names.length );
+      // as long as 1799532 is rejected we'll go for a 2 here ...
+      // [ 1371208 ] Patch for Cookie bug #1371204 has a solution to use 1 ...
+      assertEquals( "number of cookies", 1, names.length );
       //  for (int i=0;i<names.length;i++)   	System.err.println(names[i]);
     }
     
