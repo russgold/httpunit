@@ -51,6 +51,14 @@ public class ServletUnitClient extends WebClient {
     public static ServletUnitClient newClient( InvocationContextFactory factory ) {
         return new ServletUnitClient( factory );
     }
+    
+    /**
+     * Specifies a proxy server to use for requests from this client.
+     */
+    public void setProxyServer( String proxyHost, int proxyPort ) {
+    	// not implemented 
+    }
+
 
 
     /**
