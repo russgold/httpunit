@@ -35,15 +35,15 @@ public abstract class HttpsProtocolSupport {
         
        
     // Sun Microsystems:
-    private final static String SunJSSE_PROVIDER_CLASS    = "com.sun.net.ssl.internal.ssl.Provider";
+    public final static String SunJSSE_PROVIDER_CLASS    = "com.sun.net.ssl.internal.ssl.Provider";
     // 741145: "sun.net.www.protocol.https";
-    private final static String SunJSSE_PROVIDER_CLASS2   = "sun.net.www.protocol.https";    
-    private final static String SunSSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
+    public final static String SunJSSE_PROVIDER_CLASS2   = "sun.net.www.protocol.https";    
+    public final static String SunSSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
     
     // IBM WebSphere
     // 	both ibm packages are inside ibmjsseprovider.jar that comes with WebSphere
-    private final static String IBMJSSE_PROVIDER_CLASS    = "com.ibm.jsse.IBMJSSEProvider";
-    private final static String IBMSSL_PROTOCOL_HANDLER   = "com.ibm.net.ssl.www.protocol";
+    public final static String IBMJSSE_PROVIDER_CLASS    = "com.ibm.jsse.IBMJSSEProvider";
+    public final static String IBMSSL_PROTOCOL_HANDLER   = "com.ibm.net.ssl.www.protocol";
 
     /** The name of the JSSE class which provides support for SSL. **/
     private static String JSSE_PROVIDER_CLASS=SunJSSE_PROVIDER_CLASS;
@@ -57,11 +57,12 @@ public abstract class HttpsProtocolSupport {
     private static boolean _httpsProtocolSupportEnabled;
     
     /**
-     * use the given SSL providers
+     * use the given SSL providers - reset the one used so far
      * @param className
      * @param handlerName
      */
     public static void useProvider(String className,String handlerName) {
+    	_httpsProviderClass = null;
     	JSSE_PROVIDER_CLASS  =className;
     	SSL_PROTOCOL_HANDLER =handlerName;
     }
@@ -130,7 +131,7 @@ public abstract class HttpsProtocolSupport {
      * @return
      * @throws ClassNotFoundException
      */
-    private static Class getHttpsProviderClass() throws ClassNotFoundException {
+    public static Class getHttpsProviderClass() throws ClassNotFoundException {
         if (_httpsProviderClass == null) {
         	// [ 1520925 ] SSL patch
     			Provider[] sslProviders = Security.getProviders("SSLContext.SSLv3");
@@ -154,12 +155,16 @@ public abstract class HttpsProtocolSupport {
     }
 
 
+    /**
+     * register the Secure Socket Layer Protocol Handler
+     */
     private static void registerSSLProtocolHandler() {
         String list = System.getProperty( PROTOCOL_HANDLER_PKGS );
         if (list == null || list.length() == 0) {
             System.setProperty( PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER );
         } else if (list.indexOf( SSL_PROTOCOL_HANDLER ) < 0) {
-            System.setProperty( PROTOCOL_HANDLER_PKGS, SSL_PROTOCOL_HANDLER + " | " + list );
+        	// [ 1516007 ] Default SSL provider not being used
+          System.setProperty( PROTOCOL_HANDLER_PKGS, list + " | " + SSL_PROTOCOL_HANDLER );
         }
     }
 }

@@ -24,6 +24,7 @@ import com.meterware.httpunit.cookies.CookieTest;
 import com.meterware.httpunit.javascript.NekoEnhancedScriptingTest;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 import com.meterware.httpunit.parsing.ParsingTestSuite;
+import com.meterware.httpunit.ssl.HttpsProtocolSupportTest;
 import com.meterware.httpunit.dom.DomTestSuite;
 
 import junit.framework.TestSuite;
@@ -59,6 +60,7 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( Base64Test.suite() );
         result.addTest( PseudoServerTest.suite() );
         result.addTest( WebClientTest.suite() );
+        result.addTest(HttpsProtocolSupportTest.suite());
         result.addTest( MessageBodyRequestTest.suite() );
         result.addTest( WebAppletTest.suite() );
         result.addTest( CookieTest.suite() );

@@ -10,3 +10,4 @@ web
 .project
 .classpath
 *.zip
+.svn
