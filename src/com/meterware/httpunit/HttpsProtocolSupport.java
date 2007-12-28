@@ -28,30 +28,50 @@ import java.security.Security;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract class HttpsProtocolSupport {
+public abstract class HttpsProtocolSupport {
 
     /** The name of the system parameter used by java.net to locate protocol handlers. **/
     private final static String PROTOCOL_HANDLER_PKGS  = "java.protocol.handler.pkgs";
+        
+       
+    // Sun Microsystems:
+    private final static String SunJSSE_PROVIDER_CLASS    = "com.sun.net.ssl.internal.ssl.Provider";
+    // 741145: "sun.net.www.protocol.https";
+    private final static String SunJSSE_PROVIDER_CLASS2   = "sun.net.www.protocol.https";    
+    private final static String SunSSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
+    
+    // IBM WebSphere
+    // 	both ibm packages are inside ibmjsseprovider.jar that comes with WebSphere
+    private final static String IBMJSSE_PROVIDER_CLASS    = "com.ibm.jsse.IBMJSSEProvider";
+    private final static String IBMSSL_PROTOCOL_HANDLER   = "com.ibm.net.ssl.www.protocol";
 
     /** The name of the JSSE class which provides support for SSL. **/
-    private final static String SunJSSE_PROVIDER_CLASS = "com.sun.net.ssl.internal.ssl.Provider";
-    // IBM Websphere:
-    // com.ibm.jsse.IBMJSSEProvider
-    // 	both ibm packages are inside ibmjsseprovider.jar that comes with WebSphere
-
+    private static String JSSE_PROVIDER_CLASS=SunJSSE_PROVIDER_CLASS;
     /** The name of the JSSE class which supports the https protocol. **/
-    private final static String SSL_PROTOCOL_HANDLER   = "com.sun.net.ssl.internal.www.protocol";
-    // 741145: "sun.net.www.protocol.https";
-    // IBM Websphere:
-    // com.ibm.net.ssl.www.protocol
-    // 	both ibm packages are inside ibmjsseprovider.jar that comes with WebSphere
+    private static String SSL_PROTOCOL_HANDLER   = SunSSL_PROTOCOL_HANDLER ;
 
     private static Class _httpsProviderClass;
 
     private static boolean _httpsSupportVerified;
 
     private static boolean _httpsProtocolSupportEnabled;
-
+    
+    /**
+     * use the given SSL providers
+     * @param className
+     * @param handlerName
+     */
+    public static void useProvider(String className,String handlerName) {
+    	JSSE_PROVIDER_CLASS  =className;
+    	SSL_PROTOCOL_HANDLER =handlerName;
+    }
+    
+    /**
+     * use the IBM WebShpere handlers
+     */
+    public static void useIBM() {
+    	useProvider(IBMJSSE_PROVIDER_CLASS,IBMSSL_PROTOCOL_HANDLER);
+    }
 
     /**
      * Returns true if the JSSE extension is installed.
@@ -104,7 +124,7 @@ abstract class HttpsProtocolSupport {
 
     private static Class getHttpsProviderClass() throws ClassNotFoundException {
         if (_httpsProviderClass == null) {
-            _httpsProviderClass = Class.forName( SunJSSE_PROVIDER_CLASS );
+            _httpsProviderClass = Class.forName( JSSE_PROVIDER_CLASS );
         }
         return _httpsProviderClass;
     }
