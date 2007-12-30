@@ -194,7 +194,44 @@ public class FormParametersTest extends HttpUnitTest {
         } catch (WebForm.NoSuchParameterException e) {
         }
     }
+    
+    /**
+     * check that an UnusedParameterValueException is thrown if a parameter value is not supplied
+     * @throws Exception
+     */
+    public void testUnusedParameterValue() throws Exception {
+      defineWebPage( "Default", "<form method=GET action = '/ask'>" +
+      													"<Select name=colors><Option>blue<Option>red</Select>" +
+      													"<Input type=submit></form>" );
+      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+      WebRequest request = page.getForms()[0].getRequest();
+      try {
+        request.setParameter( "colors", new String[] { "blue", "red" } );
+      	fail( "Should have rejected set of unused parameter value" );
+      } catch (FormParameter.UnusedParameterValueException e) {
+      	// System.err.println(e.getMessage());
+      }   	
+    }
 
+    /**
+     * check that an UnusedParameterValueException is not
+     * thrown if a parameter value is not supplied
+     * @throws Exception
+     */
+    public void testBug1843978() throws Exception {
+      defineWebPage( "http://www.w3.org/1999/xhtml", "Default", "<form method=GET action = '/ask'>" +
+      													"<Select name=colors><Option>blue<Option>red</Select>" +
+      													"<Input type=submit></form>" );
+      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+      // System.err.println(page.getText());
+      WebRequest request = page.getForms()[0].getRequest();
+      try {
+        request.setParameter( "colors", "blue"  );
+      } catch (FormParameter.UnusedParameterValueException e) {
+      	fail( "Should not have rejected set of unused parameter value" );
+      	// System.err.println(e.getMessage());
+      }   	
+    }
 
      public void testMultipleTextParameterValidation() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +

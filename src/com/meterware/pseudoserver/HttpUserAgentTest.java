@@ -88,10 +88,29 @@ public class HttpUserAgentTest extends TestCase {
         _server.setSendCharacterSet( resourceName, reportCharSet );
     }
 
+    /**
+     * define a Web Page with the given page name and boy adding the html and body tags with pageName as the title of the page
+     * use the given xml names space if it is not null 
+     * @param xmlns
+     * @param pageName
+     * @param body
+     */
+    protected void defineWebPage( String xmlns,String pageName, String body ) {
+    	if (xmlns==null)
+    		xmlns="";
+    	else
+    		xmlns=" xmlns=\""+xmlns+"\"";
+      defineResource( pageName + ".html", "<html"+xmlns+"><head><title>" + pageName + "</title></head>\n" +
+                                          "<body>" + body + "</body></html>" );
+  }
 
+    /**
+     * define a Web Page with the given page name and boy adding the html and body tags with pageName as the title of the page
+     * @param pageName
+     * @param body
+     */
     protected void defineWebPage( String pageName, String body ) {
-        defineResource( pageName + ".html", "<html><head><title>" + pageName + "</title></head>\n" +
-                                            "<body>" + body + "</body></html>" );
+    	defineWebPage(null,pageName,body);
     }
 
 
