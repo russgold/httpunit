@@ -185,6 +185,7 @@ public class ServletRunner {
      * Sets a application context parameter.
      * @param name - the name of the parameter to set
      * @param value - the value of the parameter to set
+     * @deprecated - test case for this function deactivated wf 2007-12-30
      */
     public void setContextParameter(String name, Object value){
      	getApplication().getServletContext().setAttribute(name, value);

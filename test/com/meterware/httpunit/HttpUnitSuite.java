@@ -60,7 +60,7 @@ public class HttpUnitSuite extends ConditionalTestSuite {
         result.addTest( Base64Test.suite() );
         result.addTest( PseudoServerTest.suite() );
         result.addTest( WebClientTest.suite() );
-        result.addTest(HttpsProtocolSupportTest.suite());
+        result.addTest( HttpsProtocolSupportTest.suite());
         result.addTest( MessageBodyRequestTest.suite() );
         result.addTest( WebAppletTest.suite() );
         result.addTest( CookieTest.suite() );

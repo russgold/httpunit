@@ -231,7 +231,7 @@
 <!--  ===================================================================  -->
 <!--  Runs the test code                                                   -->
 <!--  ===================================================================  -->
-<target name="servlettest" depends="testcompile">
+<target name="servlettest" depends="testcompile" description="run JUnit servlet Suite tests">
     <java classname="${servlet.test.class}" fork="yes" >
          <classpath>
              <path refid="base.classpath" />
