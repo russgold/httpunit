@@ -446,7 +446,10 @@ class ParsedHTML {
     static class DefaultElementFactory extends HTMLElementFactory {
 
         HTMLElement toHTMLElement( NodeUtils.PreOrderTraversal pot, ParsedHTML parsedHTML, Element element ) {
-            if (element.getAttribute( "id" ).equals( "" )) return null;
+        	  // [ 1531005 ] getElementsWithAttribute **FIX**
+            //if (element.getAttribute( "id" ).equals( "" )) { 
+            //	return null;
+            //}	
             return parsedHTML.toDefaultElement( element );
         }
 
