@@ -204,10 +204,38 @@ public class WebXMLTest extends TestCase {
         assertEquals( "init parameter: cone", "waffle", sc.getInitParameter( "cone" ) );
         assertEquals( "init parameter: topping", "", sc.getInitParameter( "topping" ) );
         assertNull( "ServletContext.getInitParameter() should be null", sc.getInitParameter( "shoesize" ) );
+    }
+    
+    /**
+     * test for Patch [ 1838699 ] setContextParameter in ServletRunner
+     * @throws Exception
+     */
+    public void testSetContextParameter() throws Exception {
+      WebXMLString wxs = new WebXMLString();
+      wxs.addServlet( "/SimpleServlet", SimpleGetServlet.class );
+      wxs.addContextParam( "icecream", "vanilla" );
 
+      ServletRunner sr = new ServletRunner( wxs.asInputStream() );
+      ServletUnitClient client = sr.newClient();
+      sr.setContextParameter("icecream", "strawberry");
+      assertEquals( "Context parameter 'icecream'", "strawberry", sr.getContextParameter( "icecream" ) );
+      InvocationContext ic = client.newInvocation( "http://localhost/SimpleServlet" );
+
+      javax.servlet.ServletContext sc = ((HttpServlet) ic.getServlet()).getServletContext();
+      assertNotNull( "ServletContext should not be null", sc );
+      assertEquals( "ServletContext.getInitParameter()", "strawberry", sc.getInitParameter( "icecream" ) );
+      assertNull( "ServletContext.getInitParameter() should be null", sc.getInitParameter( "shoesize" ) );    	
     }
 
 
+    /**
+     * create a new document based on the given contents
+     * @param contents
+     * @return the new document
+     * @throws UnsupportedEncodingException
+     * @throws SAXException
+     * @throws IOException
+     */
     private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException {
        return HttpUnitUtils.newParser().parse( toInputStream( contents ) );
     }

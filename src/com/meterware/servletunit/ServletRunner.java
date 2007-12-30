@@ -173,12 +173,22 @@ public class ServletRunner {
 
     /**
      * Returns the value of the named context parameter found in the application definition.
+     * @param name - the name of the parameter to get
+     * @return - the context parameter with the given name
      */
     public String getContextParameter( String name ) {
         Object value = _application.getContextParameters().get( name );
         return value == null ? null : value.toString();
     }
 
+    /**
+     * Sets a application context parameter.
+     * @param name - the name of the parameter to set
+     * @param value - the value of the parameter to set
+     */
+    public void setContextParameter(String name, Object value){
+     	getApplication().getServletContext().setAttribute(name, value);
+    }
 
     /**
      * Shuts down the servlet container, returning any resources held by it.
