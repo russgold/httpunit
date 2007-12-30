@@ -620,6 +620,20 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "Content-Type", "text/plain", wr.getContentType() );
         assertEquals( "Content", expectedResponse, wr.getText().trim() );
     }
+    
+    /**
+     * try to validate support request
+     * [ 885326 ] In CONTENT-ENCODING: gzip, EOFException happens.
+     * -- disabled by wf 2007-12-30 - does lead to a javascript problem and
+     * not fit for a reqular test since it depends on an outsided website not under control of the project
+     * @throws Exception
+     */
+    public void xtestGZIPHandling2() throws Exception {
+    	String 	url = "http://sourceforge.net/project/showfiles.php?group_id=6550";
+    	WebConversation	conversation = new WebConversation();
+    	WebRequest 	request = new GetMethodWebRequest(url);
+    	WebResponse	response = conversation.getResponse(request);
+    }
 
 
     private class CompressedPseudoServlet extends PseudoServlet {
