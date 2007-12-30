@@ -96,12 +96,16 @@ public class HttpUserAgentTest extends TestCase {
      * @param body
      */
     protected void defineWebPage( String xmlns,String pageName, String body ) {
+    	String preamble="";
     	if (xmlns==null)
     		xmlns="";
-    	else
+    	else {
+    		preamble ="<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
+      	preamble+="<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
     		xmlns=" xmlns=\""+xmlns+"\"";
-      defineResource( pageName + ".html", "<html"+xmlns+"><head><title>" + pageName + "</title></head>\n" +
-                                          "<body>" + body + "</body></html>" );
+    	}	
+      defineResource( pageName + ".html", preamble+"<html"+xmlns+">\n<head><title>" + pageName + "</title></head>\n" +
+                                          "<body>\n" + body + "\n</body>\n</html>" );
   }
 
     /**

@@ -880,6 +880,11 @@ class SelectionFormControl extends FormControl {
 
     class Scriptable extends FormControl.Scriptable {
 
+    	  /**
+    	   * get the Object with the given property name
+    	   * @param propertyName - the name of the property to get
+    	   * @return the Object for the property
+    	   */
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "options" )) {
                 return _selectionOptions;
@@ -895,6 +900,11 @@ class SelectionFormControl extends FormControl {
         }
 
 
+        /**
+         * get the Object at the given index
+         * @param index - the index of the object to get
+         * @return the object at the given index
+         */
         public Object get(int index) {
             return _selectionOptions.get( index );
         }
@@ -1045,7 +1055,9 @@ class SelectionFormControl extends FormControl {
         private Option[] _options;
 
         Options( Node selectionNode ) {
-            NodeList nl = ((Element) selectionNode).getElementsByTagName( "option" );
+        	  // BR [ 1843978 ] Accessing Options in a form is in lower case
+        	  // calls for uppercase "option" here ... pending as of 2007-12-30
+            NodeList nl = ((Element) selectionNode).getElementsByTagName( "OPTION" );
 
             _options = new Option[ nl.getLength() ];
             for (int i = 0; i < _options.length; i++) {

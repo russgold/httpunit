@@ -216,6 +216,8 @@ public class FormParametersTest extends HttpUnitTest {
     /**
      * check that an UnusedParameterValueException is not
      * thrown if a parameter value is not supplied
+     * See BR 1843978
+     *   also BR 1449658 
      * @throws Exception
      */
     public void testBug1843978() throws Exception {
