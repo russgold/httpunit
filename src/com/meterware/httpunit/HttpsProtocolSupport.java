@@ -128,7 +128,7 @@ public abstract class HttpsProtocolSupport {
      * if it's been set already return it - otherwise
      * check with the Security package and take the first available provider
      * if all fails take the default provider class 
-     * @return
+     * @return the HttpsProviderClass
      * @throws ClassNotFoundException
      */
     public static Class getHttpsProviderClass() throws ClassNotFoundException {
