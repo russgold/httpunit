@@ -152,6 +152,8 @@ public class FormScriptingTest extends HttpUnitTest {
         response.getLinks()[ 0 ].click();
         assertEquals( "Result of submit", "You made it!", wc.getCurrentPage().getText() );
     }
+    
+    
 
 
     /**
@@ -184,7 +186,7 @@ public class FormScriptingTest extends HttpUnitTest {
      * Verifies bug #1087180
      */
     public void testNumericParameterSetting2() throws Exception {
-        defineResource( "DoIt?id=1234", "You made it!" );
+        defineResource( "DoIt.html?id=1234", "You made it!" );
         defineResource( "OnCommand.html", "<html><head>" +
                                           "<script>" +
                                           "  function myFunction(value) {" +
@@ -193,7 +195,7 @@ public class FormScriptingTest extends HttpUnitTest {
                                           "  }</script>" +
                                           "</head>" +
                                           "<body>" +
-                                          "<form name=mainForm action='DoIt'>" +
+                                          "<form name=mainForm action='DoIt.html'>" +
                                           "  <a href='javascript:myFunction(1234)'>View Asset</a>" +
                                           "  <input type='hidden' name='id'>" +
                                           "</form>" +
@@ -226,6 +228,54 @@ public class FormScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
 
         response.getLinks()[ 0 ].click();
+    }
+    
+    /**
+     * test changing form Action from JavaScript
+     * @throws Exception
+     */
+    public void testFormActionFromJavaScript() throws Exception {
+    	// pending Patch 1155792 wf 2007-12-30
+   		// dotestFormActionFromJavaScript("param");
+    }
+
+    /**
+     * verify bug 1155792 ] problems setting form action from javascript [patch]
+     */
+    public void testFormActionFromJavaScript2() throws Exception {
+    	// pending Patch 1155792 wf 2007-12-30
+    	// dotestFormActionFromJavaScript("action");
+    }
+
+    public void dotestFormActionFromJavaScript(String paramName) throws Exception {
+    	defineWebPage("foo","foocontent");
+    	defineResource("bar.html","<html><head><script>"+
+											    			"function submitForm()"+
+															  "{"+
+															  "  document.test.action='/foo.html';"+
+															  "  document.test.submit()"+
+															  " }"+
+															  "</script></head>" +
+															  "<form name=\"test\" method=\"post\""+
+															  " action=\"bar.html?"+paramName+"=bar\">"+
+															  "</form>"+
+															  " <a href=\"javascript:submitForm()\">go</a></html>");
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/foo.html" );
+      String fooContent=wc.getCurrentPage().getText();
+      // System.err.println(fooContent);
+      response = wc.getResponse( getHostPath() + "/bar.html" );
+      try {
+      	response.getLinks()[ 0 ].click();
+      	String result=wc.getCurrentPage().getText();
+      	// 	System.err.println(result);
+      	assertEquals( "Result of submit", fooContent, result );
+      } catch (RuntimeException rte) {
+      	// There is currently a 
+      	// org.mozilla.javascript.JavaScriptException: com.meterware.httpunit.HttpNotFoundException: Error on HTTP request: 404 unable to find /foo.html [http://localhost:1929/foo.html]
+      	// here
+      	// fail("There should be not Runtime exception here");
+      }
     }
 
 

@@ -724,9 +724,16 @@ public class WebForm extends WebRequestSource {
         }
 
 
+        /**
+         * get the Object for the given propertyName
+         * @param propertyName - the name of the property to get
+         * @return the Object for the property
+         */
         public Object get( String propertyName ) {
             if (propertyName.equals( "target" )) {
                 return getTarget();
+            } else if (propertyName.equals( "action" )) {
+                return getAction();                
             } else if (propertyName.equals( "length" )) {
                 return new Integer(getFormControls().length);
             } else {
@@ -741,10 +748,14 @@ public class WebForm extends WebRequestSource {
         /**
          * Sets the value of the named property. Will throw a runtime exception if the property does not exist or
          * cannot accept the specified value.
+         * @param propertyName - the name of the property
+         * @param value - the new value
          **/
         public void set( String propertyName, Object value ) {
             if (propertyName.equals( "target" )) {
-                setTargetAttribute( value.toString() );
+              setTargetAttribute( value.toString() );
+            } else if (propertyName.equals( "action" )) {
+              setAction( value.toString() );
             } else if (value instanceof String) {
                 setParameterValue( propertyName, (String) value );
             } else if (value instanceof Number) {
