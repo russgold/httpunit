@@ -492,7 +492,12 @@ public class WebClient {
     }
 
 
-    CookieJar getCookieJar() {
+    /**
+     * Support Request [ 1288796 ] getCookieJar() in WebClient
+     * @deprecated - use with care - was not public in the past
+     * @return the cookie jar
+     */
+    public CookieJar getCookieJar() {
         return _cookieJar;
     }
 
