@@ -14,6 +14,18 @@ Limitations:
 
 
 Revision History:
+30-Dec-2007:
+	1853311  	[PATCH] setExceptionsThrownOnScriptError not working    	   2007-12-18 17:53  	 5  	Closed  	wolfgang_fahl  	gwrba
+	1853073 	[PATCH] getElementByID support 	  2007-12-18 15:29 	5 	Closed 	wolfgang_fahl 	gcc
+	1853071 	[PATCH] Comment DOM support 	  2007-12-18 15:28 	5 	Closed 	wolfgang_fahl 	gcc
+	1853053 	[PATCH] ServletContext requires getContextPath() 	  2007-12-18 14:38 	5 	Closed 	wolfgang_fahl 	gcc
+	1843978 	Accessing Options in a form is in lower case 	  2007-12-04 11:35 	5 	Closed 	wolfgang_fahl 	mkempa
+	1791608 	failed: TypeError: undefined is not a function. 	* 2007-09-10 16:20 	5 	Closed 	wolfgang_fahl 	thisisananth
+	1705925 	Bug in URL-decoding of GET-Request-Parameters 	* 2007-04-23 16:30 	5 	Closed 	wolfgang_fahl 	sthuebner
+	1516007 	Default SSL provider not being used 	* 2006-07-02 23:05 	5 	Closed 	wolfgang_fahl 	trajanoAccepting Donations
+	1449658 	Problems setting value of a select-box in a XHTML document 	* 2006-03-14 16:25 	5 	Closed 	wolfgang_fahl 	bkuser
+	1243721 	SSL doesn't work with IBM JDK 	* 2005-07-23 23:21 	5 	Closed 	wolfgang_fahl 	jherbst
+	  
  5-Jul-2007:
     Notes: The PostMethodWebRequest.setMimeEncoded method has been removed. Mime encoding, if desired, should now be
     specified when constructing the object.

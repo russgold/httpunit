@@ -1,6 +1,6 @@
 <?xml version='1.0' ?>
 <site project="HttpUnit" group-id="6550" logo="doc/images/HttpUnit.jpg">
-    <copyright owner="Russell Gold" dates="2000-2006"/>
+    <copyright owner="Russell Gold" dates="2000-2007"/>
 
     <page location="index.html" title="Home" mainPage="true">
         <fragment source="sitedocs/welcome.html"/>

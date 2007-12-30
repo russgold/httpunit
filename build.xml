@@ -326,7 +326,7 @@ Revision: ${revision}
 <!--  ===================================================================  -->
 <!--  Packages the distribution with ZIP                                   -->
 <!--  ===================================================================  -->
-<target name="dist-zip" depends="dist">
+<target name="dist-zip" depends="dist" description="create the distribution with zip">
     <zip zipfile="${name}-${version}.zip" basedir="${dist.dir}" includes="**" />
 </target>
 
