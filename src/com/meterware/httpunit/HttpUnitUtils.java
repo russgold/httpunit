@@ -43,6 +43,8 @@ public class HttpUnitUtils {
     /**
      * Returns the content type and encoding as a pair of strings.
      * If no character set is specified, the second entry will be null.
+     * @param header the header to parse
+     * @return a string array with the content type and the content charset
      **/
     public static String[] parseContentTypeHeader( String header ) {
         String[] result = new String[] { "text/plain", null };
@@ -52,13 +54,20 @@ public class HttpUnitUtils {
             String parameter = st.nextToken();
             if (st.hasMoreTokens()) {
                 String value = stripQuotes( st.nextToken() );
-                if (parameter.trim().equalsIgnoreCase( "charset" )) result[1] = value;
+                if (parameter.trim().equalsIgnoreCase( "charset" )) {
+                	result[1] = value;
+                }
             }
         }
         return result;
     }
 
 
+    /**
+     * strip the quotes from a value
+     * @param value
+     * @return the stripped value
+     */
     public static String stripQuotes( String value ) {
         if (value.startsWith( "'" ) || value.startsWith( "\"" )) value = value.substring( 1 );
         if (value.endsWith( "'" ) || value.endsWith( "\"" )) value = value.substring( 0, value.length()-1 );

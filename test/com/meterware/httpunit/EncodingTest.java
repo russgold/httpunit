@@ -55,6 +55,30 @@ public class EncodingTest extends HttpUnitTest {
         String actual = HttpUnitUtils.decode( encodedString , "EUC-JP" );
         assertEquals( "decoded string" , expected , actual);
     }
+    
+    /**
+     * test parseContentHeader
+     * @throws Exception
+     */
+    public void testParseContentHeader() throws Exception {
+    	String headers[]={
+    		"text/plain",
+    		"text/html; charset=Cp1252",
+    		"text/html; charset=iso-8859-8",
+    		"text/html; charset=EUC-JP"
+    	};
+    	String expected[][]={
+    			{"text/plain",null},
+    			{"text/html","Cp1252"},
+    			{"text/html","iso-8859-8"},
+    			{"text/html","EUC-JP"}
+    	};
+    	for (int i=0;i<headers.length;i++) {
+    		String result[]=HttpUnitUtils.parseContentTypeHeader(headers[i]);
+        assertEquals( "header "+i , expected[i][0] , result[0]);
+        assertEquals( "header "+i , expected[i][1] , result[1]);
+    	} // for	
+    }
 
 
     public void testSpecifiedEncoding() throws Exception {
