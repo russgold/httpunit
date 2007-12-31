@@ -42,6 +42,8 @@ public class WebConversation extends WebClient {
 
     private String _proxyHost;
     private int _proxyPort;
+    private int _connectTimeout = -1;
+    private int _readTimeout = -1;    
 
 
     /**
@@ -65,6 +67,11 @@ public class WebConversation extends WebClient {
                 System.setProperty( "proxyPort", Integer.toString( _proxyPort ) );
             }
             URLConnection connection = openConnection( getRequestURL( request ) );
+            // [ 1518901 ] enable http connect and read timeouts (needs JDK 1.5)
+            // XXX enable for 1.7 release in 2008
+            // comment out if you need this and have JDK 1.5
+            // if (_connectTimeout>=0) connection.setConnectTimeout( _connectTimeout );
+            // if (_readTimeout>=0)    connection.setReadTimeout( _readTimeout );            
             if (HttpUnitOptions.isLoggingHttpHeaders()) {
                 String urlString = request.getURLString();
                 System.out.println( "\nConnecting to " + request.getURL().getHost() );
@@ -96,7 +103,46 @@ public class WebConversation extends WebClient {
     }
 
 
-    private URL getRequestURL( WebRequest request ) throws MalformedURLException {
+    /**
+		 * @return the _connectTimeout -1 means it is not set (the default)
+		 */
+		public int get_connectTimeout() {
+			return _connectTimeout;
+		}
+
+
+		/**
+		 * set the connectionTimout -1 means it is not set (the default)
+		 * @param timeout the _connectTimeout to set
+		 */
+		public void set_connectTimeout(int timeout) {
+			_connectTimeout = timeout;
+		}
+
+
+		/**
+		 * @return the _readTimeout -1 means it is not set (the default)
+		 */
+		public int get_readTimeout() {
+			return _readTimeout;
+		}
+
+
+		/**
+		 * @param timeout the _readTimeout to set -1 means it is not set (the default)
+		 */
+		public void set_readTimeout(int timeout) {
+			_readTimeout = timeout;
+		}
+
+
+		/**
+		 * get the Uniform Resource Locator for this request
+		 * @param request
+		 * @return the URL
+		 * @throws MalformedURLException
+		 */
+		private URL getRequestURL( WebRequest request ) throws MalformedURLException {
         DNSListener dnsListener = getClientProperties().getDnsListener();
         if (dnsListener == null) return request.getURL();
 
