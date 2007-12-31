@@ -45,7 +45,7 @@ public class SubmitButton extends Button {
     }
 
 
-    /**
+		/**
      * Performs the action associated with clicking this button after running any 'onClick' script.
      * For a submit button this typically submits the form.
      *
@@ -140,18 +140,71 @@ public class SubmitButton extends Button {
         return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValue() );
     }
 
+    /**
+     * should we allow unnamed Image Buttons?
+     */
+    private static boolean allowUnnamedImageButton=false;
+    
+    /**
+		 * @return the allowUnnamedImageButton
+		 */
+		public static boolean isAllowUnnamedImageButton() {
+			return allowUnnamedImageButton;
+		}
 
-    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
-        if (_pressed && !isDisabled() && getName().length() > 0) {
-            if (getValue().length() > 0) {
-                processor.addParameter( getName(), getValue(), characterSet );
-            }
-            if (_isImageButton) {
-                processor.addParameter( getName() + ".x", Integer.toString( _x ), characterSet );
-                processor.addParameter( getName() + ".y", Integer.toString( _y ), characterSet );
-            }
-        }
+		/**
+		 * @param allowUnnamedImageButton the allowUnnamedImageButton to set
+		 */
+		public static void setAllowUnnamedImageButton(boolean allowUnnamedImageButton) {
+			SubmitButton.allowUnnamedImageButton = allowUnnamedImageButton;
+		}
+
+    
+    /**
+     * return whether this is a validImageButton
+     * @return true if it is an image Button
+     */
+    public boolean isValidImageButton() {
+      String buttonName = getName();
+      boolean valid=this.isImageButton();
+      if (!allowUnnamedImageButton)
+      	valid=valid && buttonName != null && buttonName.length() > 0;
+    	return valid;
     }
+    
+    /**
+     * return the name of the positionParameter for this button (if this is an image Button)
+     * @param direction e.g. "x" or "y"
+     * @return the name e.g. "image.x" or just "x"
+     */
+    public String positionParameterName(String direction) {
+    	// [ 1443333 ] Allow unnamed Image input elments to submit x,y values
+      String buttonName = getName();
+    	String buttonPrefix="";        	
+     	if (buttonName != null && buttonName.length() > 0) {
+     		buttonPrefix=buttonName+".";
+     	}	
+    	return buttonPrefix+direction;
+    }
+    
+    /**
+     * addValues if not disabled and pressed
+     * @param processor - the ParameterProcessor used
+     * @characterSet - the active character set
+     * @throws IOException if addValues fails
+     */
+    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+      if (_pressed && !isDisabled()) {
+        String buttonName = getName();
+        if (buttonName != null && buttonName.length() > 0 && getValue().length() > 0) {
+        	processor.addParameter( getName(), getValue(), characterSet );
+       	}
+        if (isValidImageButton()) {
+          processor.addParameter( positionParameterName("x"), Integer.toString( _x ), characterSet );
+          processor.addParameter( positionParameterName("y"), Integer.toString( _y ), characterSet );
+        }
+      } // if  
+    }    
 
 
 //------------------------------------------ private members ----------------------------------

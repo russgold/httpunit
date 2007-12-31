@@ -23,6 +23,7 @@ import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.io.IOException;
 
 import junit.framework.Test;
@@ -114,8 +115,12 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "Expected response", "You made it!", _wc.getCurrentPage().getText() );
     }
 
-
-    public void testSubmitFromPositionalButton() throws Exception {
+    
+    /**
+     * test clicking on a Positional Button with a given name "update"
+     * @throws Exception
+     */
+    public void testSubmitFromPositionalButton() throws Exception {    	
         defineResource( "ask?age=12&update=name&update.x=5&update.y=15", "You made it!", "text/plain" );
         defineWebPage( "Default", "<form id='form' method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -123,8 +128,39 @@ public class WebFormTest extends HttpUnitTest {
                                   "</form>" );
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         SubmitButton button = page.getFormWithID( "form" ).getSubmitButton( "update" );
+        assertEquals("x param name",button.positionParameterName("x"),"update.x");
+        assertEquals("y param name",button.positionParameterName("y"),"update.y");
         button.click( 5, 15 );
         assertEquals( "Result of click", "You made it!", _wc.getCurrentPage().getText() );
+    }
+
+
+    /**
+     * test clicking on a unnamed Image Button
+     * see also FormSubmitTest.testUnnamedImageButtonDefaultSubmit
+     * @throws Exception
+     */
+    public void testSubmitFromUnnamedImageButton() throws Exception {
+    	boolean oldAllowUnnamedImageButton=SubmitButton.isAllowUnnamedImageButton();
+    	SubmitButton.setAllowUnnamedImageButton(true);
+      defineResource( "ask?age=12", "Unnamed Image Button ignored!", "text/plain" );
+      defineResource( "ask?age=12&x=5&y=15", "You made it!", "text/plain" );
+      defineWebPage( "Default", "<form id='form' method=GET action = \"/ask\">" +
+                                "<Input type=text name=age value=12>" +
+                                "<Input type=image id=imageid value=name src=\"\">" +
+                                "</form>" );    
+      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+      SubmitButton button = page.getFormWithID( "form" ).getSubmitButtonWithID( "imageid" );
+      assertEquals("empty button name",button.getName(),"");
+      assertEquals("x param name",button.positionParameterName("x"),"x");
+      assertEquals("y param name",button.positionParameterName("y"),"y");
+      button.click( 5, 15 );
+      WebResponse response=_wc.getCurrentPage();
+      URL url=response.getURL();
+      // reset for other test
+    	SubmitButton.setAllowUnnamedImageButton(oldAllowUnnamedImageButton);
+      // System.err.println(url.getPath());      
+      assertEquals( "Result of click", "You made it!", response.getText() );
     }
 
 

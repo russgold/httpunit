@@ -281,6 +281,11 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test behaviour of UnnameImageButtons
+     * see also WebFormTest.testSubmitFromUnnamedImageButton
+     * @throws Exception
+     */
     public void testUnnamedImageButtonDefaultSubmit() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -289,10 +294,16 @@ public class FormSubmitTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         WebRequest request = form.getRequest();
-        assertEquals( getHostPath() + "/ask?age=12", request.getURL().toExternalForm() );
+        String urlString=request.getURL().toExternalForm();
+        assertEquals( getHostPath() + "/ask?age=12", urlString);
     }
 
 
+    /**
+     * test behavoir of positional image buttons
+     * see also WebFormTest.testSubmitFromPositionalButton
+     * @throws Exception
+     */
     public void testImageButtonPositionalSubmit() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +

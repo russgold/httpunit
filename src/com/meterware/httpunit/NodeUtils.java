@@ -36,7 +36,13 @@ import com.meterware.httpunit.parsing.HTMLParserFactory;
  **/
 class NodeUtils {
 
-
+  /**
+   * get the attribute with the given name from the given node as an int value
+   * @param node - the node to look in
+   * @param attributeName - the attribute's name to look for
+   * @param defaultValue
+   * @return - the value - defaultValue as default 
+   */
     public static int getAttributeValue( Node node, String attributeName, int defaultValue ) {
         NamedNodeMap nnm = node.getAttributes();
         Node attribute = nnm.getNamedItem( attributeName );
@@ -50,11 +56,24 @@ class NodeUtils {
     }
 
 
+    /**
+     * get the attribute with the given name from the given node
+     * @param node - the node to look in
+     * @param attributeName - the attribute's name to look for
+     * @return - the value - "" as default
+     */
     public static String getNodeAttribute( Node node, String attributeName ) {
         return getNodeAttribute( node, attributeName, "" );
     }
 
 
+    /**
+     * get the attribute with the given name from the given node
+     * @param node - the node to look in
+     * @param attributeName - the attribute's name to look for
+     * @param defaultValue
+     * @return - the value - defaultValue as default
+     */
     public static String getNodeAttribute( Node node, String attributeName, String defaultValue ) {
         NamedNodeMap attributes = node.getAttributes();
         if (attributes == null) return defaultValue;
@@ -64,11 +83,20 @@ class NodeUtils {
     }
 
 
+    /**
+     * check whether the given Attribute in the Node is Present
+     * @param node - the node to check
+     * @param attributeName - the attribute name to check
+     * @return true if the attribute is present
+     */
     static boolean isNodeAttributePresent( Node node, final String attributeName ) {
         return node.getAttributes().getNamedItem( attributeName ) != null;
     }
 
 
+    /**
+     * common Node action methods
+     */
     interface NodeAction {
         /**
          * Does appropriate processing on specified element. Will return false if the subtree below the element

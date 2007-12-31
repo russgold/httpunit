@@ -90,8 +90,13 @@ class HTMLElementBase implements HTMLElement {
     }
 
 
+    /**
+     * construct me from a node
+     * @param node - the node to get me from
+     */
     protected HTMLElementBase( Node node ) {
         _node = node;
+        // default attributes every html element can have
         supportAttribute( "id" );
         supportAttribute( "class" );
         supportAttribute( "title" );
@@ -99,6 +104,12 @@ class HTMLElementBase implements HTMLElement {
     }
 
 
+    /**
+     * get the Attribute with the given name - by delegating to
+     * NodeUtils
+     * @param name - the name of the attribute to get
+     * @return the attribute
+     */
     public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( getNode(), name );
     }

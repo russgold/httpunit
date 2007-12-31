@@ -81,8 +81,10 @@ final class UncheckedParameterHolder extends ParameterHolder implements Paramete
      * Specifies the position at which an image button (if any) was clicked.
      **/
     void selectImageButtonPosition( SubmitButton imageButton, int x, int y ) {
-        setParameter( imageButton.getName() + ".x", Integer.toString( x ) );
-        setParameter( imageButton.getName() + ".y", Integer.toString( y ) );
+    	if (imageButton.isValidImageButton()) {
+        setParameter( imageButton.positionParameterName("x"), Integer.toString( x ) );
+        setParameter( imageButton.positionParameterName("y"), Integer.toString( y ) );
+    	}  
     }
 
 

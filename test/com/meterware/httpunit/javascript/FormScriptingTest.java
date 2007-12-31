@@ -234,16 +234,18 @@ public class FormScriptingTest extends HttpUnitTest {
      * test changing form Action from JavaScript
      * @throws Exception
      */
-    public void testFormActionFromJavaScript() throws Exception {
+    public void xtestFormActionFromJavaScript() throws Exception {
     	// pending Patch 1155792 wf 2007-12-30
+    	// XXX activate in due course
    		// dotestFormActionFromJavaScript("param");
     }
 
     /**
      * verify bug 1155792 ] problems setting form action from javascript [patch]
      */
-    public void testFormActionFromJavaScript2() throws Exception {
+    public void xtestFormActionFromJavaScript2() throws Exception {
     	// pending Patch 1155792 wf 2007-12-30
+    	// XXX activate in due course
     	// dotestFormActionFromJavaScript("action");
     }
 

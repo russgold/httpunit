@@ -64,6 +64,8 @@ public class WebRequest {
     /**
      * Sets the value of a header to be sent with this request. A header set here will override any matching header set
      * in the WebClient when the request is actually sent.
+     * @param headerName - the name of the header
+     * @param headerValue - the value to be set
      */
     public void setHeaderField( String headerName, String headerValue ) {
         getHeaderDictionary().put( headerName, headerValue );
@@ -71,6 +73,7 @@ public class WebRequest {
 
     /**
      * Returns a copy of the headers to be sent with this request.
+     * @return the dictionary of headers
      **/
     public Dictionary getHeaders() {
         return (Dictionary) getHeaderDictionary().clone();
@@ -79,6 +82,8 @@ public class WebRequest {
 
     /**
      * Returns the final URL associated with this web request.
+     * @return the Uniform Resource Locator for this Web request
+     * @throws MalformedURLException if the URL is not o.k. 
      **/
     public URL getURL() throws MalformedURLException {
         if (getURLBase() == null || getURLBase().toString().indexOf( "?" ) < 0) {
@@ -93,6 +98,9 @@ public class WebRequest {
 
     /**
      * Creates a new URL, handling the case where the relative URL begins with a '?'
+     * @param base - the URL to start from
+     * @param spec - additional specification string
+     * @return the URL
      */
     private URL newURL( final URL base, final String spec ) throws MalformedURLException {
         if (spec.toLowerCase().startsWith( "javascript:" )) {
@@ -381,10 +389,16 @@ public class WebRequest {
 
     /**
      * Constructs a web request from a form.
+     * @param sourceForm - the WebForm to startFrom
+     * @param parameterHolder - the parameter holder
+     * @param button - the submit button
+     * @param x - x position
+     * @param y - y position
      **/
     protected WebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
         this( sourceForm, parameterHolder );
-        if (button != null && button.isImageButton() && button.getName().length() > 0) {
+        // [ 1443333 ] Allow unnamed Image input elements to submit x,y values
+        if (button != null && button.isValidImageButton() ) {
             _button = button;
             _parameterHolder.selectImageButtonPosition( _button, x, y );
         }
