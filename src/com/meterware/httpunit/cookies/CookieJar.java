@@ -66,6 +66,11 @@ public class CookieJar {
     }
 
 
+    /**
+     * find the cookies in the given Header String array
+     * @param cookieHeader - the strings to look for cookies
+     * @param recipe - the recipe to use
+     */
     private void findCookies( String cookieHeader[], CookieRecipe recipe ) {
         for (int i = 0; i < cookieHeader.length; i++) {
             recipe.findCookies( cookieHeader[i] );
@@ -162,6 +167,8 @@ public class CookieJar {
 
     /**
      * Returns the value of the specified cookie.
+     * @name - the name of the cookie to get the value for
+     * @return the value of the cookie
      **/
     public String getCookieValue( String name ) {
         Cookie cookie = getCookie( name );
@@ -231,6 +238,10 @@ public class CookieJar {
     }
 
 
+    /**
+     * base class for the cookie recipies - there are two different implementations
+     * of this
+     */
     abstract class CookieRecipe {
 
         /**
@@ -284,6 +295,9 @@ public class CookieJar {
         /**
          * Tokenizes a cookie header and returns the tokens in a
          * <code>Vector</code>.
+         * handles the broken syntax for expires= fields ...
+         * @param cookieHeader - the header to read
+         * @return a Vector of cookieTokens as name=value pairs
          **/
         private Vector getCookieTokens(String cookieHeader) {
             StringReader sr = new StringReader(cookieHeader);
@@ -302,11 +316,23 @@ public class CookieJar {
 
             // set up characters to separate tokens
             st.whitespaceChars(59,59); //semicolon
+            // and here we run into trouble ...
+            // see http://www.mnot.net/blog/2006/10/27/cookie_fun
+            // ... Notice something about the above? It uses a comma inside of the date, 
+            // without quoting the value. This makes it difficult for generic processors to handle the Set-Cookie header.
             st.whitespaceChars(44,44); //comma
 
             try {
                 while (st.nextToken() != StreamTokenizer.TT_EOF) {
-                    tokens.addElement( st.sval.trim() );
+                	String tokenContent=st.sval;
+                	// fix expires comma delimiter token problem
+                	if (tokenContent.toLowerCase().startsWith("expires=")) {
+                		if (st.nextToken() != StreamTokenizer.TT_EOF) {
+                			tokenContent+=","+st.sval;
+                		}	// if
+                	} // if        		
+                	tokenContent=tokenContent.trim();
+                  tokens.addElement( tokenContent );
                 }
             }
             catch (IOException ioe) {
@@ -325,6 +351,10 @@ public class CookieJar {
     }
 
 
+    /**
+     * cookie Factory - creates cookies for URL s 
+     *
+     */
     class CookiePress {
 
         private StringBuffer _value = new StringBuffer();
@@ -332,6 +362,10 @@ public class CookieJar {
         private URL     _sourceURL;
 
 
+        /**
+         * create a cookie press for the given URL
+         * @param sourceURL
+         */
         public CookiePress( URL sourceURL ) {
             _sourceURL = sourceURL;
         }
@@ -349,9 +383,16 @@ public class CookieJar {
         }
 
 
+        /**
+         * add from a token
+         * @param recipe - the recipe to use
+         * @param token - the token to use
+         * @param equalsIndex - the position of the equal sign
+         */
         void addTokenWithEqualsSign( CookieRecipe recipe, String token, int equalsIndex ) {
-            String name = token.substring( 0, equalsIndex ).trim();
-            _value.insert( 0, token.substring( equalsIndex + 1 ).trim() );
+            String name = token.substring( 0, equalsIndex  ).trim();
+            String value= token.substring( equalsIndex + 1 ).trim();
+            _value.insert( 0, value );
             if (recipe.isCookieAttribute( name.toLowerCase() )) {
                 _attributes.put( name.toLowerCase(), _value.toString() );
             } else {
@@ -442,6 +483,11 @@ public class CookieJar {
      **/
     class RFC2109CookieRecipe extends CookieRecipe {
 
+    	  /**
+    	   * check whether the given lower case String is a cookie attribute
+    	   * @param stringLowercase - the string to check
+    	   * @return true - if the string is the name of a valid cookie attribute
+    	   */
         protected boolean isCookieAttribute( String stringLowercase ) {
             return stringLowercase.equals("path") ||
                    stringLowercase.equals("domain") ||

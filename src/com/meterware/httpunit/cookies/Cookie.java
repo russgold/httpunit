@@ -19,8 +19,13 @@ package com.meterware.httpunit.cookies;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.TimeZone;
 import java.net.URL;
 
 
@@ -37,12 +42,30 @@ public class Cookie {
     private String _path;
 
     private String _domain;
-
+    
     private long _expiredTime;
-
+    
+		/**
+		 * @return the _expiredTime in milliseconds
+		 */
+		public long getExpiredTime() {
+			return _expiredTime;
+		}
+    
+    /**
+     * DateFormat to be used to format original Netscape cookies
+     */
+    private final static DateFormat originalCookieFormat = 
+    	 new SimpleDateFormat("EEE,dd-MMM-yyyy HH:mm:ss z", Locale.US);
+    
+    static {
+      originalCookieFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     /**
      * Constructs a cookie w/o any domain or path restrictions.
+     * @param name - the name of the cookie
+     * @param value - the value of the cookie
      */
     Cookie( String name, String value ) {
         _name = name;
@@ -50,28 +73,58 @@ public class Cookie {
     }
 
 
+    /**
+     * Constructs a cookie w/o any domain or path restrictions.
+     * @param name - the name of the cookie
+     * @param value - the value of the cookie
+     * @param attributes - a map of attributes for the cookie
+     */
     Cookie( String name, String value, Map attributes ) {
         this( name, value );
         for (Iterator iterator = attributes.keySet().iterator(); iterator.hasNext();) {
             String key = (String) iterator.next();
             String attributeValue = (String) attributes.get( key );
             if (key.equalsIgnoreCase( "path" )) {
-                _path = attributeValue;
+              _path = attributeValue;
             } else if (key.equalsIgnoreCase( "domain" )) {
-                _domain = attributeValue;
+              _domain = attributeValue;
             } else if (key.equalsIgnoreCase( "max-age" )) {
-                _expiredTime = System.currentTimeMillis() + getAgeInMsec( attributeValue );
-            }
+              _expiredTime = System.currentTimeMillis() + getAgeInMsec( attributeValue );
+            } else if (key.equalsIgnoreCase( "expires" )) {
+            	_expiredTime = getAgeInMsecFromDate( attributeValue );
+            }            
         }
     }
 
 
+    /**
+     * get the age of the cookie in Milliseconds from a string representaiton in seconds
+     * @param maxAgeValue - the string with the age in seconds
+     * @return - the integer millisecond value or 0 if conversion fails
+     */
     private int getAgeInMsec( String maxAgeValue ) {
         try {
             return 1000 * Integer.parseInt( maxAgeValue );
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+    
+    /**
+     * return the age of a cookie in milliesconds from a string formatted date value
+     * @param dateValue - the string to parse
+     * @return - milliseconds as integer or 0 if parsing fails
+     */
+    private long getAgeInMsecFromDate( String dateValue ) {
+      try {
+       	// SimpleDateFormat isn't thread-safe
+        synchronized(originalCookieFormat) {
+        	long age=originalCookieFormat.parse( dateValue ).getTime();
+        	return age;
+        }
+    	} catch (ParseException e) {
+    		return 0;
+    	}
     }
 
 
@@ -147,10 +200,23 @@ public class Cookie {
         return first == second || (first != null && first.equals( second ));
     }
 
-
-    boolean mayBeSentTo( URL url ) {
+    /**
+     * check whether the cookie is expired
+     * @return true if the _expiredTime is higher than the current System time
+     */
+    public boolean isExpired() {
+    	boolean expired=_expiredTime != 0 && _expiredTime <= System.currentTimeMillis();
+    	return expired;
+    }
+    
+    /**
+     * may this cookie be sent to the given url?
+     * @param url - the unform resource locator to check
+     * @return true if the cookie is not expired and the path is accepted if a domain is set
+     */
+    public boolean mayBeSentTo( URL url ) {
         if (getDomain() == null) return true;
-        if (_expiredTime != 0 && _expiredTime <= System.currentTimeMillis()) return false;
+        if (isExpired()) return false;
 
         return acceptHost( getDomain(), url.getHost() ) && acceptPath( getPath(), url.getPath() );
     }
@@ -170,4 +236,6 @@ public class Cookie {
         return hostPattern.equalsIgnoreCase( hostName ) ||
                (hostPattern.startsWith( "." ) && hostName.endsWith( hostPattern ));
     }
+
+
 }
