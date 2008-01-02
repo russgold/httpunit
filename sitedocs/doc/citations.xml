@@ -4,9 +4,6 @@
         <citation name="WebWalker" url="http://webwalker.sourceforge.net">
             Provides an XML wrapper to simplify web testing for non-Java programmers
         </citation>
-        <citation name="jWebUnit" url="http://jwebunit.sourceforge.net">
-            A Java wrapper for HttpUnit which simplifies common, repetitive test steps
-        </citation>
         <citation name="morebot" url="http://morebot.sourceforge.net">
             A Java spider for smoke-testing web sites easily
         </citation>

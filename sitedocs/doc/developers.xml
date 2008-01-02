@@ -2,10 +2,13 @@
 <developers>
     <group type="Maintainers">
         <developer username="russgold" name="Russell Gold" email="russgold@httpunit.org">
-            The author and maintainer of HttpUnit, Russell has been developing software for over 20 years, and has been
+            The author and maintainer of HttpUnit, Russell has been developing software for over 25 years, and has been
             programming in Java since 1996.  He is currently working for Oracle in Moorestown, NJ on the OC4J application
             server.
         </developer>
+    </group>
+    <group type="Committers">
+        <developer username="wolfgang_fahl" name="Wolfgang Fahl" email="http://sourceforge.net/sendmessage.php?touser=1220573"/>
     </group>
     <group type="Contributors (partial list)">
         <developer name="Artashes Aghajanyan" email="Artashes.Aghajanyan@lycos-europe.com"/>

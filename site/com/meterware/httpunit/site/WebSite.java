@@ -133,6 +133,8 @@ public class WebSite extends Site {
                 super.setLocation( "http://sourceforge.net/project/project_donations.php?group_id=" + _groupId );
             } else if (type.equalsIgnoreCase( "cvs" )) {
                 super.setLocation( "http://sourceforge.net/cvs/?group_id=" + _groupId );
+            } else if (type.equalsIgnoreCase( "svn" )) {
+                super.setLocation( "http://sourceforge.net/svn/?group_id=" + _groupId );
             }
         }
 

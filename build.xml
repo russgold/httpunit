@@ -346,7 +346,7 @@ Revision: ${revision}
     <!--  ===================================================================  -->
     <!--  Compiles the website generator                                       -->
     <!--  ===================================================================  -->
-    <target name="compile-site">
+    <target name="compile-site" depends="prepare">
         <mkdir dir="${website.classes}" />
         <javac srcdir="${website.dir}" destdir="${website.classes}"
                debug="${debug}" deprecation="${deprecation}" optimize="${optimize}">
