@@ -47,6 +47,7 @@ abstract public class CharacterDataImpl extends NodeImpl implements CharacterDat
 
 
     public void setData( String data ) throws DOMException {
+        if (data == null) data = "";
         _data = data;
     }
 
