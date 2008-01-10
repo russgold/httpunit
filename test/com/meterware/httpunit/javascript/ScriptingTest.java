@@ -686,6 +686,26 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "element with id test has style.visibility hidden", wc.popNextAlert() );
         assertEquals( "element with id test has style.visibility visible", wc.popNextAlert() );
     }
+    
+    /**
+     * test for Patch proposal 1653410
+     *
+     */
+    public void xtestSetAttribute() {
+    	/*
+			 * Comment By: Mattias Jiderhamn (mattias78)
+       * Date: 2008-01-08 15:49
+    	 * 
+    	A minimal snippet:
+
+    		<input type="text" id="foo" name="foo" myattr="bar" />
+    		...
+    		var field = document.getElementById("foo");
+    		var attributeValue = field.getAttribute("myattr");
+    		alert("The attribute value is " + attributeValue);
+    		field.setAttribute("myattr", "new_attribute_value");
+      */    		
+    }
 
 
      public void testTagNameNodeNameProperties() throws Exception {
