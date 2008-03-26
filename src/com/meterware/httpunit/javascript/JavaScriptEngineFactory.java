@@ -19,6 +19,7 @@ package com.meterware.httpunit.javascript;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.HTMLElement;
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
@@ -50,8 +51,8 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException( e.toString() );
+        	HttpUnitUtils.handleException(e);
+           throw new RuntimeException( e.toString() );
         }
     }
 

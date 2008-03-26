@@ -181,7 +181,7 @@ public class JavaScript {
             try {
                 return (ScriptingEngine) toScriptable( child );
             } catch (Exception e) {
-                e.printStackTrace();
+                HttpUnitUtils.handleException(e);
                 throw new RuntimeException( e.toString() );
             }
         }

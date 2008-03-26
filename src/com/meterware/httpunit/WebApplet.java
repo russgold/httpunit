@@ -187,7 +187,7 @@ public class WebApplet extends HTMLElementBase {
         try {
             return _response.getApplets();
         } catch (SAXException e) {
-            e.printStackTrace();  // should never happen.
+        	HttpUnitUtils.handleException(e); // should never happen.
             return null;
         }
     }

@@ -21,6 +21,7 @@ package com.meterware.servletunit;
  *******************************************************************************************************************/
 import com.meterware.httpunit.HttpInternalErrorException;
 import com.meterware.httpunit.HttpNotFoundException;
+import com.meterware.httpunit.HttpUnitUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -992,7 +993,7 @@ class WebApplication implements SessionListenerDispatcher {
                 try {
                     servletConfiguration.getServlet();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                		HttpUnitUtils.handleException(e);
                     throw new RuntimeException( "Unable to autoload servlet: " + servletConfiguration.getClassName() + ": " + e );
                 }
             }

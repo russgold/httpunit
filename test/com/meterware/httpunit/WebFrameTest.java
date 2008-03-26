@@ -474,7 +474,7 @@ public class WebFrameTest extends HttpUnitTest {
     	"</Head>\n"+
     	"<Body>\n"+
     	"<Form id=f1 name=\"submit_to_parent\" method=\"Post\">\n"+
-    	"<input type=\"text\" name=\"user\" value=\"\" />\n"+
+    	"<input type=\"text\" name=\"name\" value=\"\" />\n"+
     	"<input type=\"text\" name=\"password\" value=\"\" />\n"+
     	"<input type=\"submit\" name=\"Ok\" value=\"login\" onClick=\"SubmitToParent('Submit')\" />\n"+
     	"</Form>\n"+
@@ -486,14 +486,21 @@ public class WebFrameTest extends HttpUnitTest {
       WebResponse response = _wc.getResponse( getHostPath() + "/Login.html" );
       WebResponse bottomFrame = _wc.getFrameContents("login"); // load the <Iframe>
     	WebForm form = bottomFrame.getFormWithName("submit_to_parent");
-    	form.setParameter("user","aa");
+    	form.setParameter("name","aa");
     	form.setParameter("password","xx");
+    	boolean oldDebug=	HttpUnitUtils.EXCEPTION_DEBUG;
+  		HttpUnitUtils.EXCEPTION_DEBUG=false;
     	try  {
     		WebResponse submitResponse = form.submit(); // This response contains the same page, does not log the user in. Load the same //page
     	} catch (ScriptException se) {
     		// TODO clarify what should happen here ...
+    		String msg=se.getMessage();
+    		// Event 'SubmitToParent('Submit')' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot read property "name" from undefined
+    		assertTrue(msg.startsWith("Event"));
+    		// System.err.println(msg);
     		// throw se;
     	}
+    	HttpUnitUtils.EXCEPTION_DEBUG=oldDebug;
     }
 
     /**

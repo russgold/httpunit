@@ -22,6 +22,7 @@ package com.meterware.httpunit.dom;
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptingEngine;
+import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.HTMLElement;
 
@@ -69,7 +70,7 @@ public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
             if (onLoadEvent == null) return;
             onLoadEvent.call( context, body, body, new Object[0] );
         } catch (JavaScriptException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        	HttpUnitUtils.handleException(e);
         } finally {
             Context.exit();
         }

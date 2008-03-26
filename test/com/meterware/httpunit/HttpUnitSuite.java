@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -28,13 +28,18 @@ import com.meterware.httpunit.ssl.HttpsProtocolSupportTest;
 import com.meterware.httpunit.dom.DomTestSuite;
 
 import junit.framework.TestSuite;
+import junit.framework.Test;
 
 
 /**
- * Tests for the package.
+ * Tests for the httpunit package.
  **/
 public class HttpUnitSuite extends ConditionalTestSuite {
 
+	  /**
+	   * entry point to run suite from command line
+	   * @param args - command line arguments
+	   */
     public static void main( String[] args ) {
         try {
             junit.textui.TestRunner.run( suite() );
@@ -44,7 +49,11 @@ public class HttpUnitSuite extends ConditionalTestSuite {
     }
 	
 	
-    public static TestSuite suite() {
+    /**
+     * get the suite of tests
+     * @return the test suite
+     */
+    public static Test suite() {
         TestSuite result = new TestSuite();
         result.addTest( WebPageTest.suite() );
         result.addTest( WebLinkTest.suite() );

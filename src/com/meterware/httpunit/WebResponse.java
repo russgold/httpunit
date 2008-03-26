@@ -543,7 +543,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
             return (Document) getReceivedPage().getDOM();
         } else {
             try {
-                return HttpUnitUtils.newParser().parse( new InputSource( new StringReader( getText() ) ) );
+                return HttpUnitUtils.parse( new InputSource( new StringReader( getText() ) ) );
             } catch (IOException e) {
                 throw new SAXException( e );
             }
@@ -1191,8 +1191,8 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
                 ((HTMLDocumentImpl) _page.getRootNode()).getWindow().setProxy( this );
             } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException( e.toString() );
+            	HttpUnitUtils.handleException(e);
+               throw new RuntimeException( e.toString() );
             } finally {
                 _parsingPage = false;
             }

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!--
  * http://sourceforge.net/projects/httpunit/
- * Copyright (c) 2002-2007 Russell Gold
+ * Copyright (c) 2002-2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -94,12 +94,18 @@
         </path>
     </target>
 
+		<!-- use ant-dependencies special ant-task to optionally download missing parts from maven repository -->
     <target name="prepare_repository_classpath" depends="check_jars_dir" unless="have.local.jars">
         <echo message="using repository classpath"/>
+    	  <!-- Russell's proxy -->
         <setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80"/>
         <typedef classpath="${jars.dir}/ant-dependencies.jar" resource="dependencies.properties" />
         <dependencies pathId="base.classpath" fileSetId="distributed.jars">
-            <dependency group="rhino"      version="1.5R4.1" />
+        	  <!-- get from http://www.ibiblio.org/maven/rhino/jars/ -->
+        	  <!-- newer version
+            <dependency group="rhino"      artifact="js" version="1.6R5" website="http://www.mozilla.org/rhino/download.html"  />
+            -->
+	          <dependency group="rhino"      artifact="rhino" version="1.5R4.1" website="http://www.mozilla.org/rhino/download.html"  />
             <dependency group="junit"      version="3.8.1" />
             <dependency group="nekohtml"   version="0.9.1" unless="use.jtidy"/>
             <dependency group="servletapi" version="2.4" />
@@ -269,7 +275,7 @@ Revision: ${revision}
     <javadoc packagenames="${packages}" sourcepath="${basedir}/${src.dir}"
              destdir="${javadoc.dir}" author="true" version="true"
              windowtitle="${Name} ${version} API" doctitle="${Name}"
-             footer="Copyright &amp;copy; 2000-2006 Russell Gold. See &lt;a target=&quot;_top&quot; href=&quot;../license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
+             footer="Copyright &amp;copy; 2000-2008 Russell Gold. See &lt;a target=&quot;_top&quot; href=&quot;../license.html&quot;&gt;license agreement&lt;/A&gt; for rights granted." >
         <classpath refid="base.classpath"/>
     </javadoc>
 </target>

@@ -31,10 +31,12 @@ import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.FrameSelector;
 
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpSession;
+import javax.xml.parsers.DocumentBuilder;
 
 
 /**
@@ -114,10 +116,20 @@ public class ServletRunner {
 
     /**
      * Constructor which expects an input stream containing the web.xml for the application.
-     **/
+     * @param webXML
+     * @param contextPath
+     * @throws IOException
+     * @throws SAXException
+     */
     public ServletRunner( InputStream webXML, String contextPath ) throws IOException, SAXException {
-        _application = new WebApplication( HttpUnitUtils.newParser().parse( new InputSource( webXML ) ), contextPath );
-        completeInitialization( contextPath );
+ 			InputSource inputSource=new InputSource( webXML );
+ 			Document doc=HttpUnitUtils.parse(inputSource);
+ 			try {
+ 	 			_application = new WebApplication( doc, contextPath );
+ 	 			completeInitialization( contextPath );
+ 			} catch (java.net.MalformedURLException mue) {
+ 				throw mue;
+ 			}
     }
 
 

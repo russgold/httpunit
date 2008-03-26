@@ -35,16 +35,15 @@ import java.io.StringReader;
  **/
 class NekoHTMLParser implements HTMLParser {
 
-
-    public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
-        try {
-            NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
-            parser.parse( new InputSource( new StringReader( pageText ) ) );
-            adapter.setDocument( (HTMLDocument) parser.getDocument() );
-        } catch (NekoDOMParser.ScriptException e) {
-             throw e.getException();
-        }
-    }
+  public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
+      try {
+          NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
+          parser.parse( new InputSource( new StringReader( pageText ) ) );
+          adapter.setDocument( (HTMLDocument) parser.getDocument() );
+      } catch (NekoDOMParser.ScriptException e) {
+           throw e.getException();
+      }     
+  }
 
 
     public String getCleanedText( String string ) {

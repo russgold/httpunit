@@ -22,6 +22,7 @@ package com.meterware.httpunit.javascript;
 
 import org.mozilla.javascript.*;
 import com.meterware.httpunit.scripting.ScriptingEngine;
+import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.ScriptException;
 
 import java.util.ArrayList;
@@ -48,13 +49,18 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
     }
 
 
+    /**
+     * handle Exceptions 
+     * @param e - the exception to handle
+     * @param badScript - the script that caused the problem
+     */
     static public void handleScriptException( Exception e, String badScript ) {
         final String errorMessage = badScript + " failed: " + e;
         if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException)) {
-            e.printStackTrace();
+          HttpUnitUtils.handleException(e);
             throw new RuntimeException( errorMessage );
         } else if (JavaScript.isThrowExceptionsOnError()) {
-            e.printStackTrace();
+          HttpUnitUtils.handleException(e);
             throw new ScriptException( errorMessage );
         } else {
             _errorMessages.add( errorMessage );
@@ -90,13 +96,21 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
     }
 
 
+    /**
+     * handle the event that has the given script attached
+     * by compiling the eventScript as a function and  executing it
+     * @param eventScript - the script to use
+     */
     public boolean doEvent( String eventScript ) {
         try {
             Context context = Context.enter();
             context.initStandardObjects( null );
             context.setOptimizationLevel( -1 );
+            // wrap the eventScript into a function
             Function f = context.compileFunction( this, "function x() { " + eventScript + "}", "httpunit", 0, null );
+            // call the function with no arguments
             Object result = f.call( context, this, this, NO_ARGS );
+            // return the result of the function or false if it is not boolean
             return (!(result instanceof Boolean)) || ((Boolean) result).booleanValue();
         } catch (Exception e) {
             handleScriptException( e, "Event '" + eventScript + "'" );
@@ -109,6 +123,7 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
 
     /**
      * Evaluates the specified string as JavaScript. Will return null if the script has no return value.
+     * @param expression - the expression to evaluate
      */
     public Object evaluateExpression( String expression ) {
         try {

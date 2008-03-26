@@ -27,6 +27,8 @@ import java.net.Socket;
 
 import java.util.*;
 
+import com.meterware.httpunit.HttpUnitUtils;
+
 /**
  * A basic simulated web-server for testing user agents without a web server.
  **/
@@ -110,7 +112,7 @@ public class PseudoServer {
                     } catch (InterruptedIOException e) {
                     } catch (IOException e) {
                         System.out.println( "Error in pseudo server: " + e );
-                        e.printStackTrace();
+                        HttpUnitUtils.handleException(e);
                     } catch (InterruptedException e) {
                         System.out.println( "Interrupted. Shutting down" );
                         _active = false;

@@ -48,6 +48,7 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
 
     /**
      * Executes the specified scripted event.
+     * @parm eventScript - the eventScript to execute
      **/
     public boolean doEvent( String eventScript ) {
         if (eventScript.length() == 0) return true;

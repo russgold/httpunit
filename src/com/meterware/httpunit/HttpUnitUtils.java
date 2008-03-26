@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,12 +21,15 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
@@ -38,7 +41,20 @@ public class HttpUnitUtils {
 
     public static final int DEFAULT_TEXT_BUFFER_SIZE = 2048;
     public static final String DEFAULT_CHARACTER_SET = "iso-8859-1";
+    /**
+     * set to true to debug Exception handling
+     */
+    public static boolean EXCEPTION_DEBUG=true;
 
+    /**
+     * handle Exceptions and thowables
+     * @param th 
+     */
+    public static void handleException(Throwable th) {
+    	if (EXCEPTION_DEBUG) {
+    		th.printStackTrace();
+    	}	
+    }  
 
     /**
      * Returns the content type and encoding as a pair of strings.
@@ -154,7 +170,49 @@ public class HttpUnitUtils {
         }
         return buffer.toByteArray();
     }
-
+    
+    /**
+     * parse an InputStream to a string (for debugging)
+     * @param is
+     * @return
+     */
+    public static String parseISToString(java.io.InputStream is){
+    	java.io.DataInputStream din = new java.io.DataInputStream(is);
+    	StringBuffer sb = new StringBuffer();
+    	try{
+    		String line = null;
+    		while((line=din.readLine()) != null){
+    			sb.append(line+"\n");
+    		}
+    	}catch(Exception ex){
+    		ex.getMessage();
+    	}finally{
+    		try{
+    			is.close();
+    		}catch(Exception ex){}
+    		}
+    		return sb.toString();
+    }
+    
+    /**
+     * parse the given inputSource with a new Parser
+     * @param inputSource
+     * @return the document parsed from the input Source
+     */
+    public static Document parse(InputSource inputSource) throws SAXException,IOException {
+    	DocumentBuilder db=newParser();
+    	try {
+    		Document doc=db.parse( inputSource );
+  			return doc;  			
+    	} catch (java.net.MalformedURLException mue) {
+    		if (EXCEPTION_DEBUG) {
+    			InputStream is=inputSource.getByteStream();
+    			is.reset();
+    			System.err.println(parseISToString(is));
+    		}	
+    		throw mue;
+    	}
+    }
 
 
     /**
