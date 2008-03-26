@@ -405,7 +405,10 @@ public class WebFrameTest extends HttpUnitTest {
         assertEquals( "Title of 'red' frame", "Linker", _wc.getFrameContents( "red" ).getTitle() );
     }
 
-
+    /**
+     * test I frame detection
+     * @throws Exception
+     */
     public void testIFrameDetection() throws Exception {
         defineWebPage( "Frame",  "This is a trivial page with <a href='mailto:russgold@httpunit.org'>one link</a>" +
                                  "and <iframe name=center src='Contents.html'><form name=hidden></form></iframe>" );
@@ -425,7 +428,78 @@ public class WebFrameTest extends HttpUnitTest {
         assertEquals( "Number of links in iframe", 1, _wc.getFrameContents( "center" ).getLinks().length );
     }
 
+    /**
+     * test I Frame with a Form according to mail to mailinglist of 2008-03-25
+     * Problems with IFrames by Allwyn D'souza
+     * @throws Exception
+     */
+    public void testIFrameForm() throws Exception {
+    	String login="//Login.html (main page that is loaded - this page embed the IFrame).\n"+
+    	" \n"+
+    	"<html>\n"+
+    	"<Head>\n"+
+    	"<Script>\n"+
+    	"<!--\n"+
+    	"function SetLoginForm(name, password, Submit) {\n"+
+    	"  document.loginForm.name.value = name;\n"+
+    	"  document.loginForm.password.value = password;\n"+
+    	" \n"+
+    	"  document.loginForm.submit();\n"+
+    	"}\n"+
+    	"-->\n"+
+    	"</Script>\n"+
+    	"</Head>\n"+
+    	"<Body>\n"+
+    	"<Form name=\"loginForm\" action=\"/LoginController\" method=\"Post\">\n"+
+    	"<input type=\"hidden\" name=\"name\" value=\"\" />\n"+
+    	"<input type=\"hidden\" name=\"password\" value=\"\" />\n"+
+    	"</Form>\n"+
+    	"<Center>\n"+
+    	"<IFrame name=\"login\" id=\"login\" src=\"LoginDialog.html\" />\n"+
+    	"</Center>\n"+
+    	"</Body>\n"+
+    	"</html>\n";
 
+    	String loginDialog="// LoginDialog.html - IFrame\n"+
+    	" \n"+
+    	"<html>\n"+
+    	"<Head>\n"+
+    	"<Script>\n"+
+    	"<!--\n"+
+    	"function SubmitToParent(action) {\n"+
+    	"  parent.SetLoginForm(document.submit_to_parent.name.value,document.submit_to_parent.password.value);\n"+
+    	"}\n"+
+    	"-->\n"+
+    	"</Script>\n"+
+    	"</Head>\n"+
+    	"<Body>\n"+
+    	"<Form id=f1 name=\"submit_to_parent\" method=\"Post\">\n"+
+    	"<input type=\"text\" name=\"user\" value=\"\" />\n"+
+    	"<input type=\"text\" name=\"password\" value=\"\" />\n"+
+    	"<input type=\"submit\" name=\"Ok\" value=\"login\" onClick=\"SubmitToParent('Submit')\" />\n"+
+    	"</Form>\n"+
+    	"</Body>\n"+
+    	"</html>\n";
+
+    	defineWebPage("Login",login);
+    	defineWebPage("LoginDialog",loginDialog);
+      WebResponse response = _wc.getResponse( getHostPath() + "/Login.html" );
+      WebResponse bottomFrame = _wc.getFrameContents("login"); // load the <Iframe>
+    	WebForm form = bottomFrame.getFormWithName("submit_to_parent");
+    	form.setParameter("user","aa");
+    	form.setParameter("password","xx");
+    	try  {
+    		WebResponse submitResponse = form.submit(); // This response contains the same page, does not log the user in. Load the same //page
+    	} catch (ScriptException se) {
+    		// TODO clarify what should happen here ...
+    		// throw se;
+    	}
+    }
+
+    /**
+     * test I frames that are disabled
+     * @throws Exception
+     */
     public void testIFrameDisabled() throws Exception {
         defineWebPage( "Frame",  "This is a trivial page with <a href='mailto:russgold@httpunit.org'>one link</a>" +
                                  "and <iframe name=center src='Contents.html'><form name=hidden></form></iframe>" );
