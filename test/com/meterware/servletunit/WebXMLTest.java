@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2004,2006, Russell Gold
+* Copyright (c) 2001-2004,2006,2008 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -37,6 +37,10 @@ import junit.framework.TestSuite;
 import junit.framework.TestCase;
 
 
+/**
+ * Tests for Web xml access 
+ *
+ */
 public class WebXMLTest extends TestCase {
 
     public static void main(String args[]) {
@@ -238,7 +242,7 @@ public class WebXMLTest extends TestCase {
      * @throws IOException
      */
     private Document newDocument( String contents ) throws UnsupportedEncodingException, SAXException, IOException {
-       return HttpUnitUtils.newParser().parse( toInputStream( contents ) );
+       return HttpUnitUtils.parse( toInputStream( contents ) );
     }
 
 

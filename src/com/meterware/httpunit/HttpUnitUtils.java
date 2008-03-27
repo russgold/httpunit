@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -202,18 +203,48 @@ public class HttpUnitUtils {
     public static Document parse(InputSource inputSource) throws SAXException,IOException {
     	DocumentBuilder db=newParser();
     	try {
-    		Document doc=db.parse( inputSource );
+    		Document doc=db.parse(inputSource);
   			return doc;  			
     	} catch (java.net.MalformedURLException mue) {
     		if (EXCEPTION_DEBUG) {
+    			String msg=mue.getMessage();
+    			if (msg!=null) {
+    				System.err.println(msg);
+    			}	
     			InputStream is=inputSource.getByteStream();
     			is.reset();
-    			System.err.println(parseISToString(is));
+    			String content=parseISToString(is);
+    			System.err.println(content);
     		}	
     		throw mue;
     	}
     }
-
+    
+    /**
+     * parse the given inputStream with a new Parser
+     * @param inputStream
+     * @return the document parsed from the input Stream
+     */
+    public static Document parse(InputStream inputStream) throws SAXException,IOException {
+    	DocumentBuilder db=newParser();
+    	try {
+    		Document doc=db.parse(inputStream);
+  			return doc;  			
+    	} catch (java.net.MalformedURLException mue) {
+    		if (EXCEPTION_DEBUG) {
+    			String msg=mue.getMessage();
+    			if (msg!=null) {
+    				System.err.println(msg);
+    			}	
+    			InputStream is=inputStream;
+    			is.reset();
+    			String content=parseISToString(is);
+    			System.err.println(content);
+    		}	
+    		throw mue;
+    	}
+    }
+    
 
     /**
      * creates a parser using JAXP API.

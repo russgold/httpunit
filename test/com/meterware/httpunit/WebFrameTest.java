@@ -431,9 +431,10 @@ public class WebFrameTest extends HttpUnitTest {
     /**
      * test I Frame with a Form according to mail to mailinglist of 2008-03-25
      * Problems with IFrames by Allwyn D'souza
+     * TODO activate test when it's clear how it should work
      * @throws Exception
      */
-    public void testIFrameForm() throws Exception {
+    public void xtestIFrameForm() throws Exception {
     	String login="//Login.html (main page that is loaded - this page embed the IFrame).\n"+
     	" \n"+
     	"<html>\n"+
@@ -490,6 +491,7 @@ public class WebFrameTest extends HttpUnitTest {
     	form.setParameter("password","xx");
     	boolean oldDebug=	HttpUnitUtils.EXCEPTION_DEBUG;
   		HttpUnitUtils.EXCEPTION_DEBUG=false;
+  		HttpUnitUtils.EXCEPTION_DEBUG=true;
     	try  {
     		WebResponse submitResponse = form.submit(); // This response contains the same page, does not log the user in. Load the same //page
     	} catch (ScriptException se) {
@@ -497,8 +499,8 @@ public class WebFrameTest extends HttpUnitTest {
     		String msg=se.getMessage();
     		// Event 'SubmitToParent('Submit')' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot read property "name" from undefined
     		assertTrue(msg.startsWith("Event"));
-    		// System.err.println(msg);
-    		// throw se;
+    		System.err.println(msg);
+    		throw se;
     	}
     	HttpUnitUtils.EXCEPTION_DEBUG=oldDebug;
     }

@@ -63,6 +63,8 @@ class WebXMLString {
     String asText() {
         StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n" );
         result.append( "<!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/web-app_2_3.dtd'>" );
+        // uncomment the next line if you get java.net.MalformedURLException problems
+        // result.append("<!DOCTYPE web-app>");
         result.append( "<web-app>\n" );
 //        result.append( "<web-app version='2.4' xmlns='http://java.sun.com/xml/ns/j2ee'\n " );
 //        result.append( "                       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" );

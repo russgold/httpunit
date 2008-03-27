@@ -102,10 +102,10 @@
         <typedef classpath="${jars.dir}/ant-dependencies.jar" resource="dependencies.properties" />
         <dependencies pathId="base.classpath" fileSetId="distributed.jars">
         	  <!-- get from http://www.ibiblio.org/maven/rhino/jars/ -->
-        	  <!-- newer version
             <dependency group="rhino"      artifact="js" version="1.6R5" website="http://www.mozilla.org/rhino/download.html"  />
-            -->
-	          <dependency group="rhino"      artifact="rhino" version="1.5R4.1" website="http://www.mozilla.org/rhino/download.html"  />
+	      	  <!-- older version
+	          < dependency group="rhino"      artifact="rhino" version="1.5R4.1" website="http://www.mozilla.org/rhino/download.html"  />
+	          -->
             <dependency group="junit"      version="3.8.1" />
             <dependency group="nekohtml"   version="0.9.1" unless="use.jtidy"/>
             <dependency group="servletapi" version="2.4" />
