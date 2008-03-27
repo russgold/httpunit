@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2007, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -39,7 +39,9 @@ public abstract class HttpUnitOptions {
     private static final String ORIGINAL_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
     private static final String NEW_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.dom.DomBasedScriptingEngineFactory";
 
+    // comment out the scripting engine not to be used
     final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = ORIGINAL_SCRIPTING_ENGINE_FACTORY;
+    //final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = NEW_SCRIPTING_ENGINE_FACTORY;
 
 
     /**

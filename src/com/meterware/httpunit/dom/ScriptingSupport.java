@@ -153,14 +153,21 @@ class ScriptingSupport {
     }
 
 
+    /**
+     * check whether the valueType is convertable to the parameterType
+     * @param valueType
+     * @param parameterType
+     * @return
+     */
     public static boolean isConvertableTo( Class valueType, Class parameterType ) {
         if (valueType.equals( parameterType )) return true;
         if (parameterType.equals( String.class )) return true;
         if (valueType.equals( String.class ) && isNumericParameter( parameterType )) return true;
         if (Number.class.isAssignableFrom( valueType ) && isNumericParameter( parameterType )) return true;
+        if (valueType.equals(Boolean.class )&&parameterType.equals(boolean .class)) return true; 
         return valueType.equals( String.class ) && parameterType.equals( Boolean.class );
     }
-
+    
     private static boolean isNumericParameter( Class parameterType ) {
         if (parameterType.isPrimitive() && !(parameterType.equals( boolean.class ))) return true;
         return Number.class.isAssignableFrom( parameterType );

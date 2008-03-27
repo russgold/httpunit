@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006, Russell Gold
+ * Copyright (c) 2006-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -39,6 +39,12 @@ public abstract class NamespaceAwareNodeImpl extends NodeImpl {
     }
 
 
+    /**
+     * initialize the name space
+     * @param owner
+     * @param namespaceURI
+     * @param qualifiedName
+     */
     protected void initialize( DocumentImpl owner, String namespaceURI, String qualifiedName ) {
         initialize( owner );
         _tagName = qualifiedName;
@@ -48,8 +54,8 @@ public abstract class NamespaceAwareNodeImpl extends NodeImpl {
         } else {
             _localName = qualifiedName.substring( qualifiedName.indexOf(':') + 1 );
         }
+        setParentScope(owner); 
     }
-
 
     public String getNodeName() {
         return getTagName();

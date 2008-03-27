@@ -62,6 +62,7 @@ class WebXMLString {
 
     String asText() {
         StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n" );
+        // comment out the next line if you get java.net.MalformedURLException problems
         result.append( "<!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/web-app_2_3.dtd'>" );
         // uncomment the next line if you get java.net.MalformedURLException problems
         // result.append("<!DOCTYPE web-app>");
