@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -274,6 +274,22 @@ public class DocumentScriptingTest extends HttpUnitTest {
         assertEquals( "initial image source", "initial.gif", image.getSource() );
         link.mouseOver();
         assertEquals( "changed image source", "new.jpg", image.getSource() );
+    }
+
+    /**
+     * test jsFunction_createElement() 
+     * @author Mark Childerson
+     * @since 2008-03-26
+     * @throws Exception
+     * TODO activate by renaming to testCreateElement
+     */
+    public void XtestCreateElement() throws Exception {
+    	defineResource("OnCommand.html", 
+		                   "<html><head><title>Amazing!</title></head>"+
+		                   "<body onLoad='var elem=document.createElement(\"input\");elem.id=\"hellothere\";alert(elem.id);'></body>");
+			WebConversation wc = new WebConversation();
+			wc.getResponse( getHostPath() + "/OnCommand.html" );
+			assertEquals( "Alert message", "hellothere", wc.popNextAlert() );
     }
 
 
