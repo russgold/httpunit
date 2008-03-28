@@ -74,6 +74,11 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
     }
 
 
+    /**
+     * run the given script
+     * @param language - the language of the script
+     * @param script - the script to run
+     */
     public String runScript( String language, String script ) {
         if (!supportsScriptLanguage( language )) return "";
         try {

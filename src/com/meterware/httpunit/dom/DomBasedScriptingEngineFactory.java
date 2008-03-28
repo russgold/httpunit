@@ -19,6 +19,8 @@ package com.meterware.httpunit.dom;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.javascript.JavaScript;
+import com.meterware.httpunit.javascript.ScriptingEngineImpl;
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptingEngine;
@@ -26,6 +28,7 @@ import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.HTMLElement;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
@@ -33,6 +36,7 @@ import org.w3c.dom.html.HTMLDocument;
 import org.w3c.dom.html.HTMLBodyElement;
 import org.xml.sax.SAXException;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
 
@@ -41,6 +45,10 @@ import org.mozilla.javascript.JavaScriptException;
  */
 public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
 
+	
+		/**
+		 * check whether this ScriptingEngineFactory is enabled
+		 */
     public boolean isEnabled() {
         try {
             Class.forName( "org.mozilla.javascript.Context" );
@@ -56,7 +64,12 @@ public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
     }
 
 
+    /**
+     * load
+     * @param response
+     */
     public void load( WebResponse response ) {
+    		Function onLoadEvent=null;
         try {
             Context context = Context.enter();
             context.initStandardObjects( null );
@@ -66,34 +79,45 @@ public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
 
             HTMLBodyElementImpl body = (HTMLBodyElementImpl) htmlDocument.getBody();
             if (body == null) return;
-            Function onLoadEvent = body.getOnloadEvent();
+            onLoadEvent = body.getOnloadEvent();
             if (onLoadEvent == null) return;
             onLoadEvent.call( context, body, body, new Object[0] );
         } catch (JavaScriptException e) {
-        	HttpUnitUtils.handleException(e);
+        	ScriptingEngineImpl.handleScriptException(e, onLoadEvent.toString());
+        	// HttpUnitUtils.handleException(e);
+        } catch (EcmaError ee) {
+        	//throw ee;
+        	ScriptingEngineImpl.handleScriptException(ee, onLoadEvent.toString());        	
         } finally {
             Context.exit();
         }
     }
 
-
+    /**
+     * setter for the throwExceptions flag
+     * @param throwExceptions - true if Exceptions should be thrown
+     */
     public void setThrowExceptionsOnError( boolean throwExceptions ) {
-        //To change body of implemented methods use File | Settings | File Templates.
+      JavaScript.setThrowExceptionsOnError( throwExceptions );
     }
 
 
+    /**
+     * getter for the throwExceptions flag
+     * @return - true if Exceptions should be thrown
+     */
     public boolean isThrowExceptionsOnError() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    	return JavaScript.isThrowExceptionsOnError();
     }
 
 
     public String[] getErrorMessages() {
-        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+      return ScriptingEngineImpl.getErrorMessages();
     }
 
 
     public void clearErrorMessages() {
-        //To change body of implemented methods use File | Settings | File Templates.
+      ScriptingEngineImpl.clearErrorMessages();
     }
 
 

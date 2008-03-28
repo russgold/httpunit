@@ -152,7 +152,11 @@ public class ScriptingTest extends HttpUnitTest {
         assertNull( "Alert should have been removed", wc.getNextAlert() );
     }
 
-
+    /**
+     * check that setExceptionsThrownOnScriptError can be set to false
+     * by trying onLoad with an undefined function
+     * @throws Exception
+     */
     public void testOnLoadErrorBypass() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body onLoad='noSuchFunction()'>" +

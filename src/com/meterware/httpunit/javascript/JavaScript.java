@@ -41,12 +41,12 @@ public class JavaScript {
     private static boolean _throwExceptionsOnError = true;
 
 
-    static boolean isThrowExceptionsOnError() {
+    public static boolean isThrowExceptionsOnError() {
         return _throwExceptionsOnError;
     }
 
 
-    static void setThrowExceptionsOnError( boolean throwExceptionsOnError ) {
+    public static void setThrowExceptionsOnError( boolean throwExceptionsOnError ) {
         _throwExceptionsOnError = throwExceptionsOnError;
     }
 
