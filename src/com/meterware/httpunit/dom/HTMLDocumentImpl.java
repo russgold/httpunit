@@ -307,13 +307,19 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
         _exemplars.put( "applet",   new HTMLAppletElementImpl() );
     }
 
-
+    
+    /**
+     * get the Window
+     * @return the window
+     */
     public DomWindow getWindow() {
-        if (_window == null) {
-            _window = new DomWindow( this );
-            setParentScope( _window );
-        }
-        return _window;
+    	// if there is now window yet
+      if (_window == null) {
+      	// create a window for this document
+         _window = new DomWindow( this );
+        setParentScope( _window );
+      }
+      return _window;
     }
 
 

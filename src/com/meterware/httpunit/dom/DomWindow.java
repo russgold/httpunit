@@ -25,6 +25,8 @@ import java.net.URL;
 import org.xml.sax.SAXException;
 import org.w3c.dom.html.HTMLDocument;
 
+import com.meterware.httpunit.scripting.ScriptingHandler;
+
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  */
@@ -33,6 +35,10 @@ public class DomWindow extends AbstractDomComponent {
     private DomWindowProxy _proxy;
     private HTMLDocumentImpl _document;
 
+    /**
+     * construct me from a document
+     * @param document
+     */
     public DomWindow( HTMLDocumentImpl document ) {
         _document = document;
     }
@@ -81,7 +87,11 @@ public class DomWindow extends AbstractDomComponent {
      */
     public DomWindow open( String urlString, String name, String features, boolean replace ) {
         try {
-            return (DomWindow) _proxy.openNewWindow( name, urlString ).getScriptingHandler();
+        	if (_proxy==null) {
+        		throw new RuntimeException("DomWindow.open failed for '"+name+"' _proxy is null");
+        	}
+        	ScriptingHandler result=_proxy.openNewWindow( name, urlString ).getScriptingHandler();
+          return (DomWindow) result;
         } catch (IOException e) {
             return null;
         } catch (SAXException e) {

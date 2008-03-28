@@ -1180,6 +1180,11 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    /**
+     * get the received Page
+     * @return the received page
+     * @throws SAXException
+     */
     HTMLPage getReceivedPage() throws SAXException {
         if (_page == null) {
             try {
