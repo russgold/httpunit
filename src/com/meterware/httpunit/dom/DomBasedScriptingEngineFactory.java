@@ -21,6 +21,7 @@ package com.meterware.httpunit.dom;
 *******************************************************************************************************************/
 import com.meterware.httpunit.javascript.JavaScript;
 import com.meterware.httpunit.javascript.ScriptingEngineImpl;
+import com.meterware.httpunit.javascript.JavaScript.Window;
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptingEngine;
@@ -39,6 +40,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * The scripting engine factory which relies directly on the DOM.
@@ -59,9 +61,21 @@ public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
         }
     }
 
-
+    
+    /**
+     * associate me with a webresponse
+     * @param response - the WebResponse to use
+     */
     public void associate( WebResponse response ) {
-    }
+      try {
+        // JavaScript.run( response ); // can't do this (yet?)      	
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+      	HttpUnitUtils.handleException(e);
+      	throw new RuntimeException( e.toString() );
+      }
+    }  
 
 
     /**

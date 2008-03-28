@@ -54,7 +54,7 @@ public class JavaScript {
     /**
      * Initiates JavaScript execution for the specified web response.
      */
-    static void run( WebResponse response ) throws IllegalAccessException, InstantiationException,
+    public static void run( WebResponse response ) throws IllegalAccessException, InstantiationException,
             InvocationTargetException, ClassDefinitionException, NotAFunctionException,
             PropertyException, SAXException, JavaScriptException {
         Context context = Context.enter();
@@ -95,12 +95,19 @@ public class JavaScript {
     }
 
 
+    /**
+     * abstract Engine for JavaScript
+     */
     abstract static class JavaScriptEngine extends ScriptingEngineImpl {
 
         protected ScriptableDelegate _scriptable;
         protected JavaScriptEngine   _parent;
 
-
+        /**
+         * initialize JavaScript for the given ScriptEngine
+         * @parent - the Script Engine to use
+         * @scriptable - the scriptable object to do the initialization for
+         */
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws SAXException, PropertyException, JavaScriptException, NotAFunctionException {
             _scriptable = scriptable;
@@ -317,6 +324,11 @@ public class JavaScript {
         }
 
 
+        /**
+         * initialize JavaScript for the given ScriptEngine
+         * @parent - the Script Engine to use
+         * @scriptable - the scriptable object to do the initialization for
+         */
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );

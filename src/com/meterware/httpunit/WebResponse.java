@@ -43,6 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * A response to a web request from a web server.
@@ -632,8 +633,15 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 //---------------------------------------- JavaScript methods ----------------------------------------
 
 
+    /**
+     * get the scriptable object for this WebResponse
+     */
     public Scriptable getScriptableObject() {
-        return (Scriptable) getScriptingHandler();
+    		ScriptingHandler result=this.getScriptingHandler();
+    		if (!(result instanceof Scriptable)) {
+    			throw new RuntimeException("getScriptableObject failed for "+result.getClass().getName()+" - not a Scriptable");
+    		}
+        return (Scriptable) result;
     }
 
 

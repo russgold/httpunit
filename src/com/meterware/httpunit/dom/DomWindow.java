@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.xml.sax.SAXException;
+import org.mozilla.javascript.Scriptable;
 import org.w3c.dom.html.HTMLDocument;
 
 import com.meterware.httpunit.scripting.ScriptingHandler;
@@ -30,7 +31,7 @@ import com.meterware.httpunit.scripting.ScriptingHandler;
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  */
-public class DomWindow extends AbstractDomComponent {
+public class DomWindow extends AbstractDomComponent implements Scriptable {
 
     private DomWindowProxy _proxy;
     private HTMLDocumentImpl _document;

@@ -28,7 +28,7 @@ import org.mozilla.javascript.Scriptable;
 /**
  * @author <a href="mailto:mailto:russgold@httpunit.org">Russell Gold</a>
  */
-public abstract class AbstractDomComponent extends ScriptingEngineImpl {
+public abstract class AbstractDomComponent extends ScriptingEngineImpl implements Scriptable {
 
     private static int _anonymousFunctionNum;
 
