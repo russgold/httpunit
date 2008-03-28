@@ -90,7 +90,13 @@ public class DomWindow extends AbstractDomComponent {
         	if (_proxy==null) {
         		throw new RuntimeException("DomWindow.open failed for '"+name+"' _proxy is null");
         	}
-        	ScriptingHandler result=_proxy.openNewWindow( name, urlString ).getScriptingHandler();
+        	
+        	DomWindowProxy newWindow=_proxy.openNewWindow( name, urlString );
+        	if (newWindow==null) {
+        		// throw new RuntimeException("DomWindow.open failed for '"+name+"','"+urlString+"' openNewWindow returned null");
+        		return null;
+        	}	
+        	ScriptingHandler result=newWindow.getScriptingHandler();
           return (DomWindow) result;
         } catch (IOException e) {
             return null;

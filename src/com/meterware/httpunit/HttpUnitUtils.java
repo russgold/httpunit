@@ -342,8 +342,14 @@ public class HttpUnitUtils {
     }
 
 
+    /**
+     * check whether the URL is a java script url
+     * @param urlString - the string to analyze
+     * @return - true if this is a javascript url
+     */
     static boolean isJavaScriptURL( String urlString ) {
-        return urlString.toLowerCase().startsWith( "javascript:" );
+    		boolean result=urlString.toLowerCase().startsWith( "javascript:" );
+        return result;
     }
 
 

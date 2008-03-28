@@ -689,10 +689,17 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    /**
+     * open a a new Window with the given name and relative URL
+     * @param name - the name of the window
+     * @param relativeURL - the relative URL to be used
+     * @return the WebResponse as a DomWindowProxy
+     */
     public DomWindowProxy openNewWindow( String name, String relativeUrl ) throws IOException, SAXException {
         if (relativeUrl == null || relativeUrl.trim().length() == 0) relativeUrl = "about:";
         GetMethodWebRequest request = new GetMethodWebRequest( getURL(), relativeUrl, _frame, name );
-        return _window.getResponse( request );
+        WebResponse response=_window.getResponse( request );
+        return response;
     }
 
 
