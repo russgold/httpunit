@@ -655,7 +655,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * create a DOMScriptingHandler
-     * @return the dom scriptin
+     * @return the DOM scripting handler (the window)
      */
     public ScriptingHandler createDomScriptingHandler() {
         if (!isHTML()) {
