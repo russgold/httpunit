@@ -56,6 +56,15 @@ public class HttpUnitUtils {
     		th.printStackTrace();
     	}	
     }  
+    
+    /**
+     * are we running in the Eclipse IDE?
+     * @return
+     */
+    public static boolean isEclipse() {
+    	StackTraceElement[] ste = new Throwable().getStackTrace();
+    	return (ste[ste.length - 1].getClassName().startsWith("org.eclipse.jdt"));    	
+    }
 
     /**
      * Returns the content type and encoding as a pair of strings.
