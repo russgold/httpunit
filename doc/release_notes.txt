@@ -14,6 +14,10 @@ Limitations:
 
 
 Revision History:
+26-Mar-2008:
+    Additions:
+       PseudoServer - now handles timeouts on requests
+
 30-Dec-2007:
 	1853311  	[PATCH] setExceptionsThrownOnScriptError not working    	   2007-12-18 17:53  	 5  	Closed  	wolfgang_fahl  	gwrba
 	1853073 	[PATCH] getElementByID support 	  2007-12-18 15:29 	5 	Closed 	wolfgang_fahl 	gcc

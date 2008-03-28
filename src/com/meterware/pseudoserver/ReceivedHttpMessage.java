@@ -35,12 +35,10 @@ abstract class ReceivedHttpMessage {
     private Reader         _reader;
     private Hashtable      _headers = new Hashtable();
     private byte[]         _requestBody;
-    private String         _messageHeader;
 
 
     ReceivedHttpMessage( InputStream inputStream ) throws IOException {
-        _messageHeader = readHeaderLine( inputStream );
-        interpretMessageHeader( _messageHeader );
+        interpretMessageHeader( readHeaderLine( inputStream ) );
         readHeaders( inputStream );
         readMessageBody( inputStream );
     }

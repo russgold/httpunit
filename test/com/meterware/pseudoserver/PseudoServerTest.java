@@ -88,6 +88,26 @@ public class PseudoServerTest extends HttpUserAgentTest {
     /**
      * This tests simple access to the server without using any client classes.
      */
+    public void testBadlyFormedMessageViaSocket() throws Exception {
+        defineResource( "sample", "Get this", "text/plain" );
+        Socket socket = new Socket( "localhost", getHostPort() );
+        OutputStream os = socket.getOutputStream();
+        InputStream is = new BufferedInputStream( socket.getInputStream() );
+
+        os.write( "GET /sample HTTP/1.0".getBytes() );
+
+        StringBuffer sb = new StringBuffer();
+        int b;
+        while (-1 != (b = is.read())) sb.append( (char) b );
+        String result = sb.toString();
+        assertTrue( "Did not find matching protocol", result.startsWith( "HTTP/1.0" ) );
+        assertTrue( "Did not find expected error message", result.indexOf( "400" ) > 0 );
+    }
+
+
+    /**
+     * This tests simple access to the server without using any client classes.
+     */
     public void testProxyGetViaSocket() throws Exception {
         defineResource( "http://someserver.com/sample", "Get this", "text/plain" );
         Socket socket = new Socket( "localhost", getHostPort() );

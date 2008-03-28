@@ -123,15 +123,30 @@ public class PseudoServer {
                     _serverSocket = null;
                 } catch (IOException e) {
                 }
+                debug( "Pseudoserver shutting down" );
             }
         };
+        debug( "Starting pseudoserver" );
         t.start();
     }
 
 
     public void shutDown() {
-        if (_debug) System.out.println( "** Requested shutdown of pseudoserver: " + hashCode() );
+        debug( "Requested shutdown of pseudoserver" );
         _active = false;
+    }
+
+
+    private void debug( String message ) {
+        if (!_debug) return;
+        message = replaceDebugToken( message, "thread", "thread (" + Thread.currentThread().getName() + ")" );
+        message = replaceDebugToken( message, "server", "server " + _serverNum );
+        System.out.println( "** " + message );
+    }
+
+
+    private static String replaceDebugToken( String message, String token, String replacement ) {
+        return message.indexOf( token ) < 0 ? message : message.replaceFirst( token, replacement );
     }
 
 
@@ -289,26 +304,33 @@ public class PseudoServer {
         socket.setSoTimeout( _socketTimeout );
         socket.setTcpNoDelay( true );
 
-        if (_debug) System.out.println( "** Created server thread: " + hashCode() );
+        debug( "Created server thread " + socket.getInetAddress() + ':' + socket.getPort() );
         final BufferedInputStream inputStream = new BufferedInputStream( socket.getInputStream() );
         final HttpResponseStream outputStream = new HttpResponseStream( socket.getOutputStream() );
 
-        while (_active) {
-            HttpRequest request = new HttpRequest( inputStream );
-            boolean keepAlive = respondToRequest( request, outputStream );
-            if (!keepAlive) break;
-            while (_active && 0 == inputStream.available()) {
-                try { Thread.sleep( INPUT_POLL_INTERVAL ); } catch (InterruptedException e) {}
+        try {
+            while (_active) {
+                HttpRequest request = new HttpRequest( inputStream );
+                boolean keepAlive = respondToRequest( request, outputStream );
+                if (!keepAlive) break;
+                while (_active && 0 == inputStream.available()) {
+                    try { Thread.sleep( INPUT_POLL_INTERVAL ); } catch (InterruptedException e) {}
+                }
             }
+        } catch (IOException e) {
+            outputStream.restart();
+            outputStream.setProtocol( "HTTP/1.0" );
+            outputStream.setResponse( HttpURLConnection.HTTP_BAD_REQUEST, e.toString() );
         }
-        if (_debug) System.out.println( "** Closing server thread: " + hashCode() );
+        debug( "Closing server thread" );
         outputStream.close();
         socket.close();
-    }        
+        debug( "Server thread closed" );
+    }
 
 
     private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {
-        if (_debug) System.out.println( "** Server thread " + hashCode() + " handling request: " + request );
+        debug( "Server thread handling request: " + request );
         boolean keepAlive = isKeepAlive( request );
         WebResource resource = null;
         try {
@@ -324,7 +346,7 @@ public class PseudoServer {
                 }
                 String[] headers = resource.getHeaders();
                 for (int i = 0; i < headers.length; i++) {
-                    if (_debug) System.out.println( "** Server thread " + hashCode() + " sending header: " + headers[i] );
+                    debug( "Server thread sending header: " + headers[i] );
                     response.addHeader( headers[i] );
                 }
             }
