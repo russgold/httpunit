@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2007, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -40,6 +40,7 @@ import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -652,12 +653,21 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    /**
+     * create a DOMScriptingHandler
+     * @return the dom scriptin
+     */
     public ScriptingHandler createDomScriptingHandler() {
         if (!isHTML()) {
             return new DomWindow( this );
         } else {
             try {
-                return ((HTMLDocumentImpl) getReceivedPage().getRootNode()).getWindow();
+            		HTMLPage page=this.getReceivedPage();
+            		Node rootNode=page.getRootNode();
+            		HTMLDocumentImpl document=(HTMLDocumentImpl) rootNode;
+            		DomWindow result=document.getWindow();
+            		result.setProxy(this);
+                return result;
             } catch (SAXException e) {
                 return new DomWindow( this );
             }
