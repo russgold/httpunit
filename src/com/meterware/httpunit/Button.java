@@ -20,7 +20,9 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.dom.*;
+import com.meterware.httpunit.parsing.ScriptHandler;
 import com.meterware.httpunit.protocol.ParameterProcessor;
 
 import java.io.IOException;
@@ -37,8 +39,7 @@ public class Button extends FormControl {
 
     static final public HTMLElementPredicate WITH_ID;
     static final public HTMLElementPredicate WITH_LABEL;
-
-    private String _onClickEvent = "";
+    
     private WebResponse _baseResponse;
 
 
@@ -52,15 +53,18 @@ public class Button extends FormControl {
     }
 
 
+    /**
+     * construct a button from the given html control and assign the event handlers for onclick, onmousedown and onmouseup
+     * @param form
+     * @param control
+     */
     Button( WebForm form, HTMLControl control ) {
         super( form, control );
-        _onClickEvent = NodeUtils.getNodeAttribute( control, "onclick" );
     }
 
 
     Button( WebResponse response, HTMLControl control ) {
         super( null, control );
-        _onClickEvent = NodeUtils.getNodeAttribute( control, "onclick" );
         _baseResponse = response;
     }
 
@@ -96,17 +100,8 @@ public class Button extends FormControl {
     public boolean isDisabled() {
         return super.isDisabled();
     }
-
-
-    /**
-     * Does the 'onClick' event defined for this button.
-     * @return true if subsequent actions should be performed.
-     */
-    final protected boolean doOnClickEvent() {
-        return _onClickEvent.length() == 0 || getScriptingHandler().doEvent( _onClickEvent );
-    }
-
-    
+   
+  
     /**
      * Perform the normal action of this button.
      */

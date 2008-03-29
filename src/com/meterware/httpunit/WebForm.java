@@ -442,8 +442,8 @@ public class WebForm extends WebRequestSource {
      * Resets all parameters to their initial values.
      */
     public void reset() {
-        String event = getAttribute( "onreset" );
-        if (event.length() == 0 || getScriptingHandler().doEvent( event )) resetControls();
+    	if (handleEvent("onreset"))
+    		resetControls();
     }
 
 
@@ -706,11 +706,6 @@ public class WebForm extends WebRequestSource {
 
         public void submit() throws IOException, SAXException {
             submitRequest( getScriptedSubmitRequest() );
-        }
-
-
-        public boolean doEvent( String eventScript ) {
-            return super.doEvent( eventScript );
         }
 
 

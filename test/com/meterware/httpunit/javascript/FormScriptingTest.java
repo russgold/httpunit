@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2007, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -446,7 +446,7 @@ public class FormScriptingTest extends HttpUnitTest {
             fail( "Should not have been able to set color" );
         } catch (Exception e) {}
 
-        form.getScriptableObject().doEvent( "document.spectrum.color[1].disabled=false" );
+        form.getScriptableObject().doEventScript( "document.spectrum.color[1].disabled=false" );
 
         assertMatchingSet( "Color choices", new String[] { "red", "green" }, form.getOptionValues( "color" ) );
         form.setParameter( "color", "green" );
@@ -583,6 +583,38 @@ public class FormScriptingTest extends HttpUnitTest {
         assertEquals( "color parameter value", "green", form.getParameterValue( "color" ) );
     }
 
+    /**
+     * test for onMouseDownEvent support patch 884146 
+     * by Björn Beskow - bbeskow
+     * @throws Exception
+     */
+    public void testCheckboxOnMouseDownEvent() throws Exception {
+      defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name='the_form'>" +
+                                          "  <input type='checkbox' name='color' value='blue' " +
+                                          "         onMouseDown='alert( \"color-blue is now \" + document.the_form.color.checked );'>" +
+                                          "</form>" +
+                                          "<a href='#' onMouseDown='document.the_form.color.checked=true;'>blue</a>" +
+                                          "</body></html>" );
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      WebForm form = response.getFormWithName( "the_form" );
+      assertEquals( "Initial state", null, form.getParameterValue( "color" ) );
+
+      assertEquals( "Alert message before change", null, wc.getNextAlert() );
+      form.removeParameter( "color" );
+      assertEquals( "Alert message w/o change", null, wc.getNextAlert() );
+      form.setParameter( "color", "blue" );
+      assertEquals( "Alert after change", "color-blue is now true", wc.popNextAlert() );
+      form.removeParameter( "color" );
+      assertEquals( "Alert after change", "color-blue is now false", wc.popNextAlert() );
+
+      assertEquals( "Changed state", null, form.getParameterValue( "color" ) );
+      response.getLinks()[ 0 ].click();
+      assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
+      assertEquals( "Alert message after JavaScript change", null, wc.getNextAlert() );
+  }
 
     /**
      * test the onChange event
@@ -723,6 +755,10 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test the radio button properties via index
+     * @throws Exception
+     */
     public void testIndexedRadioProperties() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
                                             "function viewRadio( radio ) { \n" +
@@ -743,7 +779,41 @@ public class FormScriptingTest extends HttpUnitTest {
         verifyRadio( /* default */ wc, true,  /* checked */ true,  /* value */ "good" );
         verifyRadio( /* default */ wc, false, /* checked */ false, /* value */ "bad" );
     }
+    
+    /**
+     * test onMouseDownEvent for radio buttons
+     * @throws Exception
+     */
+    public void testRadioOnMouseDownEvent() throws Exception {
+      defineResource(  "OnCommand.html",  "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name='the_form'>" +
+                                          "  <input type='radio' name='color' value='blue' " +
+                                          "         onMouseDown='alert( \"color is now blue\" );'>" +
+                                          "  <input type='radio' name='color' value='red' checked" +
+                                          "         onMouseDown='alert( \"color is now red\" );'>" +
+                                          "</form>" +
+                                          "<a href='#' onMouseDown='document.the_form.color[1].checked=false; document.the_form.color[0].checked=true;'>blue</a>" +
+                                          "</body></html>" );
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      WebForm form = response.getFormWithName( "the_form" );
+      assertEquals( "Initial state", "red", form.getParameterValue( "color" ) );
 
+      assertEquals( "Alert message before change", null, wc.getNextAlert() );
+      form.setParameter( "color", "red" );
+      assertEquals( "Alert message w/o change", null, wc.getNextAlert() );
+      form.setParameter( "color", "blue" );
+      assertEquals( "Alert after change", "color is now blue", wc.popNextAlert() );
+      form.setParameter( "color", "red" );
+      assertEquals( "Alert after change", "color is now red", wc.popNextAlert() );
+
+      assertEquals( "Changed state", "red", form.getParameterValue( "color" ) );
+      response.getLinks()[ 0 ].click();
+      assertEquals( "Final state", "blue", form.getParameterValue( "color" ) );
+      assertEquals( "Alert message after JavaScript change", null, wc.getNextAlert() );
+      
+    }   
 
     private void verifyRadio( WebClient wc, boolean defaultChecked, boolean checked, String value ) {
         assertEquals( "Message " + 1 + "-1", "radio ready default = " + defaultChecked, wc.popNextAlert() );
@@ -1163,7 +1233,7 @@ public class FormScriptingTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
         response.getLinks()[0].click();
         assertEquals( "Message 1", "selected item is blue", wc.popNextAlert() );
-        response.getScriptingHandler().doEvent( "document.the_form.choices.value='red'" );
+        response.getScriptingHandler().doEventScript( "document.the_form.choices.value='red'" );
         response.getLinks()[0].click();
         assertEquals( "Message 2", "selected item is red", wc.popNextAlert() );
     }

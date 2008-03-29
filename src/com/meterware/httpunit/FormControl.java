@@ -48,8 +48,6 @@ public abstract class FormControl extends HTMLElementBase {
 
     final static String[] NO_VALUE = new String[0];
 
-    private final String  _onChangeEvent;
-    private final String  _onClickEvent;
     private final WebForm _form;
     private HTMLControl _control;
 
@@ -97,10 +95,7 @@ public abstract class FormControl extends HTMLElementBase {
     FormControl( WebForm form, HTMLControl control ) {
         super( control );
         _control = control;
-        _form           = form;
-        _onChangeEvent  = NodeUtils.getNodeAttribute( control, "onchange" );
-        _onClickEvent   = NodeUtils.getNodeAttribute( control, "onclick" );
-
+        _form               = form;
         supportAttribute( "tabindex" );
         supportAttribute( "disabled" );
         //      Add all custom attributes
@@ -273,22 +268,66 @@ public abstract class FormControl extends HTMLElementBase {
 
     /**
      * Performs the 'onChange' event defined for this control.
+     * @deprecated since 1.7 use doOnChangeEvent instead
      */
     protected void sendOnChangeEvent() {
-        if (_onChangeEvent.length() > 0) {
-        	ScriptingHandler handler=getScriptingHandler();
-        	handler.doEvent( _onChangeEvent );
-        }
+    	doOnChangeEvent();
+    }
+    
+    /**
+     * Performs the 'onchange' event defined for this control.
+     */
+    protected boolean doOnChangeEvent() {
+    	return handleEvent("onchange");
     }
 
 
     /**
      * Performs the 'onClick' event defined for this control.
+     * @deprecated since 1.7 use doOnClickEvent instead
      */
     protected void sendOnClickEvent() {
-        if (_onClickEvent.length() > 0) getScriptingHandler().doEvent( _onClickEvent );
+      doOnClickEvent();
+    }
+    
+   
+    /**
+     * Performs the 'onClick' event defined for this control.
+     */
+    protected  boolean doOnClickEvent() {
+    	return handleEvent("onclick");
     }
 
+
+    /**
+     * Performs the 'onMouseUp' event defined for this control.
+    * @deprecated since 1.7 use doOnMouseUpEvent instead
+     */
+    protected void sendOnMouseUpEvent() {
+    	doOnMouseUpEvent();
+    }
+
+    /**
+     * Performs the 'onMouseUp' event defined for this control.
+     */
+    protected boolean doOnMouseUpEvent() {
+    	return handleEvent("onmouseup");
+    }
+
+    /**
+     * Performs the 'onMouseDown' event defined for this control.
+     * @deprecated since 1.7 use doOnMouseDownEvent instead
+     */
+    protected void sendOnMouseDownEvent() {
+    	doOnMouseDownEvent();
+    }
+    
+    /**
+     * Performs the 'onMouseDown' event defined for this control.
+     */
+    protected boolean doOnMouseDownEvent() {
+    	return handleEvent("onmousedown");
+    }
 
     /**
      * Creates and returns a scriptable object for this control. Subclasses should override this if they use a different

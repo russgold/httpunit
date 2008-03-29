@@ -1,8 +1,8 @@
 package com.meterware.httpunit.scripting;
 /********************************************************************************************************************
- * $Id$
+ * $Header$
  *
- * Copyright (c) 2007, Russell Gold
+ * Copyright (c) 2007-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,13 +23,18 @@ package com.meterware.httpunit.scripting;
 /**
  * @author <a href="mailto:russgold@gmail.com">Russell Gold</a>
  */
-public interface FormScriptable {
+public interface FormScriptable extends ScriptingEventHandler{
 
+	/**
+	 * set the action
+	 * @param newAction
+	 */
     void setAction( String newAction );
 
-
-    boolean doEvent( String eventScript );
-
-
+    /**
+     * set the value of a parameter
+     * @param name - the name of the parameter to set
+     * @param value - the value to use for the parameter
+     */
     void setParameterValue( String name, String value );
 }

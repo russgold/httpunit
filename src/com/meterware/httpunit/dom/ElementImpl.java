@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004-2006, Russell Gold
+ * Copyright (c) 2004-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -94,6 +94,10 @@ public class ElementImpl extends NamespaceAwareNodeImpl implements Element {
     }
 
 
+    /**
+     * get the attribute with the given name
+     * @param name - the name of the attribute to get
+     */
     public String getAttribute( String name ) {
         Attr attr = getAttributeNode( name );
         return attr == null ? "" : attr.getValue();
@@ -108,7 +112,25 @@ public class ElementImpl extends NamespaceAwareNodeImpl implements Element {
         setAttributeNode( attribute );
         reportPropertyChanged( name );
     }
-
+    
+    /**
+     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
+     * execute the script if it's assigned by calling doEvent for the script
+     * @param eventName
+     * @return
+     */
+    public boolean handleEvent(String eventName) {
+    	// check whether onclick is activated
+    	if (eventName.toLowerCase().equals("onclick")) {
+    		handleEvent("onmousedown");
+    	}
+      String eventScript = getAttribute( eventName );
+      boolean result=doEventScript(eventScript);
+      if (eventName.toLowerCase().equals("onclick")) {
+    		handleEvent("onmouseup");
+    	}
+      return result;
+    }
 
     public void setAttributeNS( String namespaceURI, String qualifiedName, String value ) throws DOMException {
         Attr attribute = getOwnerDocument().createAttributeNS( namespaceURI, qualifiedName );

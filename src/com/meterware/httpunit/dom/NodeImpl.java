@@ -31,7 +31,7 @@ import java.util.Iterator;
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 abstract public class NodeImpl extends AbstractDomComponent implements Node {
-
+ 
     private DocumentImpl _ownerDocument;
     private NodeImpl     _parentNode;
     private NodeImpl     _firstChild;

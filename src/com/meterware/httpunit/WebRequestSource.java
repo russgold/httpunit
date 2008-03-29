@@ -233,14 +233,50 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
 
-
+    /**
+     * submit the given event for the given request
+     * @param event
+     * @param request
+     * @return
+     * @throws IOException
+     * @throws SAXException
+     */
     protected WebResponse submitRequest( String event, final WebRequest request ) throws IOException, SAXException {
         WebResponse response = null;
-        if (event.length() == 0 || getScriptingHandler().doEvent( event )) response = submitRequest( request );
+        if (doEventScript( event )) 
+        	response = submitRequest( request );
         if (response == null) response = getCurrentFrameContents();
         return response;
     }
-
+    
+    /**
+     * handle the event that has the given script attached
+     * by compiling the eventScript as a function and  executing it
+     * @param eventScript - the script to use
+     * @deprecated since 1.7 - use doEventScript instead
+     */
+    public boolean doEvent( String eventScript ) {
+    	return doEventScript(eventScript);
+    }
+    
+    /**
+     * optional do the event if it's defined
+     * @param event
+     * @return
+     */
+    public boolean doEventScript(String eventScript) {
+    	return this.getScriptingHandler().doEventScript(eventScript);
+    }
+    
+    /**
+     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
+     * execute the script if it's assigned by calling doEvent for the script
+     * @param eventName
+     * @return
+     */
+    public boolean handleEvent(String eventName) {
+    	return this.getScriptingHandler().handleEvent(eventName);
+    }
 
     protected WebResponse getCurrentFrameContents() {
         return getCurrentFrame( getBaseResponse().getWindow(), _frame );

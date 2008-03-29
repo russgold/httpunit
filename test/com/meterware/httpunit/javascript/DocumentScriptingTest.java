@@ -167,14 +167,35 @@ public class DocumentScriptingTest extends HttpUnitTest {
         link.click();
         assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
     }
+    
+    /**
+     * test a mouse event on a link
+     * @throws Exception
+     */
+    public void testLinkMouseDownEvent() throws Exception {
+      defineResource(  "nothing.html",  "<html><head></head><body</body></html>");
+      defineResource(  "OnMouseDown.html",  "<html><head></head>" +
+                                          "<body>" +
+                                          "<form name='realform'><input name='color' value='blue'></form>" +
+                                          "<a href='nothing.html' onMouseDown=\"JavaScript:document.realform.color.value='green';return false;\">green</a>" +
+                                          "</body></html>" );
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnMouseDown.html" );
+      WebForm form = response.getFormWithName( "realform" );
+      WebLink link = response.getLinks()[0];
+      assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
+      link.click();
+      assertEquals( "changed parameter value", "green", form.getParameterValue( "color" ) );
+    }
 
 
     /**
-     * Verifies that a link which simply specifies a fragment identifier does not cause a new request to be sent to the
+     * Verifies that a link which simply specifies a 
+     * fragment identifier does not cause a new request to be sent to the
      * server, so that the current response is unchanged.
      * @throws Exception
      */
-    public void testHashDestinationOnEvent() throws Exception {
+    public void testHashDestinationOnClickEvent() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +
                                             "<form name='realform'><input name='color' value='blue'></form>" +
@@ -189,6 +210,24 @@ public class DocumentScriptingTest extends HttpUnitTest {
         assertEquals( "changed parameter value", "green", response.getFormWithName( "realform" ).getParameterValue( "color" ) );
     }
 
+    /**
+     * check on MouseDownEvent handling
+     * @throws Exception
+     */
+    public void testHashDestinationOnMouseDownEvent() throws Exception {
+        defineResource(  "OnMouseDown.html",  "<html><head></head>" +
+                                            "<body>" +
+                                            "<form name='realform'><input name='color' value='blue'></form>" +
+                                            "<a href='#' onMouseDown=\"document.realform.color.value='green';\">green</a>" +
+                                            "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/OnMouseDown.html" );
+        WebForm form = response.getFormWithName( "realform" );
+        WebLink link = response.getLinks()[0];
+        assertEquals( "initial parameter value", "blue", form.getParameterValue( "color" ) );
+        response = link.click();
+        assertEquals( "changed parameter value", "green", response.getFormWithName( "realform" ).getParameterValue( "color" ) );
+    }
 
     public void testLinkProperties() throws Exception {
         defineResource( "somewhere.html?with=values", "you made it!" );

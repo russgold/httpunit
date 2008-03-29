@@ -31,10 +31,15 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
     private ScriptingEngine _scriptEngine;
 
 
-    private static final ScriptingEngine NULL_SCRIPT_ENGINE = new ScriptingEngine() {
+    /**
+     * a dummy ScriptingEngine implementation
+     */
+    public static final ScriptingEngine NULL_SCRIPT_ENGINE = new ScriptingEngine() {
         public boolean supportsScriptLanguage( String language ) { return false; }
         public String runScript( String language, String script ) { return ""; }
-        public boolean doEvent( String eventScript ) { return true; }
+        public boolean doEventScript( String eventScript ) { return true; }
+        public boolean doEvent(String eventScript ){ return true; }
+        public boolean handleEvent(String eventName) { return true; }
         public Object evaluateExpression( String urlString ) { return null; }
         public ScriptingEngine newScriptingEngine( ScriptableDelegate child ) { return this; }
         public void clearCaches() {}
@@ -44,17 +49,37 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
     public boolean supportsScriptLanguage( String language ) {
         return getScriptEngine().supportsScriptLanguage( language );
     }
-
+    
+    /**
+     * handle the event that has the given script attached
+     * by compiling the eventScript as a function and  executing it
+     * @param eventScript - the script to use
+     * @deprecated since 1.7 - use doEventScript instead
+     */
+    public boolean doEvent( String eventScript ) {
+    	return doEventScript(eventScript);
+    }
+    
 
     /**
      * Executes the specified scripted event.
      * @parm eventScript - the eventScript to execute
      **/
-    public boolean doEvent( String eventScript ) {
+    public boolean doEventScript( String eventScript ) {
         if (eventScript.length() == 0) return true;
-        return getScriptEngine().doEvent( eventScript );
+        return getScriptEngine().doEventScript( eventScript );
     }
-
+    
+    /**
+     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
+     * execute the script if it's assigned by calling doEvent for the script
+     * @param eventName
+     * @return
+     */
+    public boolean handleEvent(String eventName) {
+    	String eventScript=(String)get(eventName);
+    	return doEventScript(eventScript);
+    }
 
     /**
      * Executes the specified script, returning any intended replacement text.
@@ -83,7 +108,7 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
      * Returns the value of the named property. Will return null if the property does not exist.
      **/
     public Object get( String propertyName ) {
-        return null;
+      return null;
     }
 
 

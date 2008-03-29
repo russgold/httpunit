@@ -24,12 +24,11 @@ package com.meterware.httpunit.scripting;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface ScriptingHandler {
+public interface ScriptingHandler extends ScriptingEventHandler {
     
     boolean supportsScriptLanguage( String language );
 
-    boolean doEvent( String eventScript );
-
+   
     String runScript( String language, String script );
 
     Object evaluateExpression( String urlString );

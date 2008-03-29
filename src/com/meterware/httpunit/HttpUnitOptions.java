@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 
+import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.parsing.HTMLParserListener;
@@ -488,17 +489,8 @@ public abstract class HttpUnitOptions {
         public boolean isThrowExceptionsOnError() { return false; }
         public String[] getErrorMessages() { return new String[ 0 ]; }
         public void clearErrorMessages() {}
-        public ScriptingHandler createHandler( HTMLElement element ) { return NULL_SCRIPTING_HANDLER; }
-        public ScriptingHandler createHandler( WebResponse response ) { return NULL_SCRIPTING_HANDLER; }
-    };
-
-
-    private static final ScriptingHandler NULL_SCRIPTING_HANDLER = new ScriptingHandler() {
-        public boolean supportsScriptLanguage( String language ) { return false; }
-        public boolean doEvent( String eventScript ) { return true; }
-        public String runScript( String language, String script ) { return null; }
-        public Object evaluateExpression( String urlString ) { return null; }
-        public void clearCaches() {}
+        public ScriptingHandler createHandler( HTMLElement element ) { return ScriptableDelegate.NULL_SCRIPT_ENGINE; }
+        public ScriptingHandler createHandler( WebResponse response ) { return ScriptableDelegate.NULL_SCRIPT_ENGINE; }
     };
 
 

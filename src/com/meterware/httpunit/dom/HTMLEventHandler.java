@@ -1,8 +1,8 @@
 package com.meterware.httpunit.dom;
 /********************************************************************************************************************
- * $Id$
+ * $Header$
  *
- * Copyright (c) 2007, Russell Gold
+ * Copyright (c) 2007-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,6 +23,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Context;
 
 /**
+ * the handler for HTML events
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  */
 class HTMLEventHandler {
@@ -33,17 +34,31 @@ class HTMLEventHandler {
     private Function _handler;
 
 
+    /**
+     * create a handler for the given HTML Event
+     * @param baseElement
+     * @param handlerName
+     */
     public HTMLEventHandler( HTMLElementImpl baseElement, String handlerName ) {
         _baseElement = baseElement;
         _handlerName = handlerName;
     }
 
 
+    /**
+     * set the handler Function for this event Handler
+     * @param handler
+     */
     void setHandler( Function handler ) {
         _handler = handler;
     }
 
 
+    /**
+     * get the (cached) handler Function for this event Handler
+     * on first access compile the function
+     * @return
+     */
     Function getHandler() {
         if (_handler == null) {
             String attribute = _baseElement.getAttributeWithNoDefault( _handlerName );

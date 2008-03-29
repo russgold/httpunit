@@ -514,7 +514,7 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "4th page", "You made it!", wc.getCurrentPage().getText() );
 
         response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        response.getScriptingHandler().doEvent( "window.location.href='" + getHostPath() + "/Target.html'" );
+        response.getScriptingHandler().doEventScript( "window.location.href='" + getHostPath() + "/Target.html'" );
         assertEquals( "5th page URL", getHostPath() + "/Target.html", wc.getCurrentPage().getURL().toExternalForm() );
         assertEquals( "5th page", "You made it!", wc.getCurrentPage().getText() );
     }

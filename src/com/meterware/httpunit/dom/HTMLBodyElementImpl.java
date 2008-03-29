@@ -35,9 +35,13 @@ public class HTMLBodyElementImpl extends HTMLElementImpl implements HTMLBodyElem
         return new HTMLBodyElementImpl();
     }
 
-
+    /**
+     * 
+     * @return the onload event
+     */
     public Function getOnloadEvent() {
-        if (getParentScope() == null && getOwnerDocument() instanceof Scriptable) setParentScope( (Scriptable) getOwnerDocument() );
+        if (getParentScope() == null && getOwnerDocument() instanceof Scriptable)
+        	setParentScope( (Scriptable) getOwnerDocument() );
         return _onLoad.getHandler();
     }
 

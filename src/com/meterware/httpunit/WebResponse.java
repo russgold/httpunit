@@ -790,7 +790,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
         public void load() throws SAXException {
             if (isHTML()) {
                 getReceivedPage().getForms();         // TODO be more explicit here - don't care about forms, after all
-                doEvent( getReceivedPage().getOnLoadEvent() );
+                doEventScript( getReceivedPage().getOnLoadEvent() );
             }
         }
 

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2006, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -87,16 +87,15 @@ public class WebLink extends FixedURLWebRequestSource {
 
 
     /**
-     * Submits a request as though the user had clicked on this link. Will also fire the 'onClick' event if defined.
+     * Submits a request as though the user had clicked on this link. Will also fire the 'onClick', 'onMouseDown' and 'onMouseUp' event if defined.
      * Returns the updated contents of the frame containing the link. Note that if the click updates a different frame,
      * that frame will not be returned by this method.
      **/
     public WebResponse click() throws IOException, SAXException {
-        String event = getAttribute( "onclick" );
-        if (event.length() == 0 || getScriptingHandler().doEvent( event )) {
-            ((HTMLElementImpl) getNode()).doClickAction();
-        }
-        return getCurrentFrameContents();
+      if (handleEvent("onclick")) {
+          ((HTMLElementImpl) getNode()).doClickAction();
+      }
+      return getCurrentFrameContents();
     }
 
 
@@ -104,8 +103,7 @@ public class WebLink extends FixedURLWebRequestSource {
      * Simulates moving the mouse over the link. Will fire the 'onMouseOver' event if defined.
      **/
     public void mouseOver() {
-        String event = getAttribute( "onmouseover" );
-        if (event.length() > 0) getScriptingHandler().doEvent( event );
+    	handleEvent("onmouseover");
     }
 
 

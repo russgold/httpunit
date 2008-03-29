@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -71,7 +71,36 @@ class HTMLElementBase implements HTMLElement {
         }
         return _scriptable;
     }
-
+    
+    /**
+     * handle the event that has the given script attached
+     * by compiling the eventScript as a function and  executing it
+     * @param eventScript - the script to use
+     * @deprecated since 1.7 - use doEventScript instead
+     */
+    public boolean doEvent( String eventScript ) {
+    	return doEventScript(eventScript);
+    }
+    
+    /**
+     * optional do the event if it's defined
+     * @param event
+     * @return
+     */
+    public boolean doEventScript(String eventScript) {
+    	return this.getScriptingHandler().doEventScript(eventScript);
+    }
+    
+    /**
+     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
+     * execute the script if it's assigned by calling doEvent for the script
+     * @param eventName
+     * @return
+     */
+    public boolean handleEvent(String eventName) {
+    	return this.getScriptingHandler().handleEvent(eventName);
+    }
+   
 
     /**
      * Returns the text value of this block.

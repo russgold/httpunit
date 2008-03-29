@@ -56,6 +56,8 @@ public class TableCell extends BlockElement {
     public String asText() {
         return getText();
     }
+    
+  
 
 
 //---------------------------------------- package methods -----------------------------------------

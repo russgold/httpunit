@@ -126,6 +126,15 @@ public class JavaScript {
             return _scriptable instanceof IdentifiedDelegate ? ((IdentifiedDelegate) _scriptable).getID() : "";
         }
 
+        /**
+         * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
+         * execute the script if it's assigned by calling doEvent for the script
+         * @param eventName
+         * @return
+         */
+        public boolean handleEvent(String eventName) {
+        	return _scriptable.handleEvent(eventName);
+        }
 
         public boolean has( String propertyName, Scriptable scriptable ) {
             return super.has( propertyName, scriptable ) ||
@@ -233,14 +242,14 @@ public class JavaScript {
          */
         private String getScriptableClassName( ScriptableDelegate delegate ) {
             if (delegate instanceof WebResponse.Scriptable) return "Window";
-            if (delegate instanceof HTMLPage.Scriptable) return "Document";
-            if (delegate instanceof FormScriptable) return "Form";
-            if (delegate instanceof WebLink.Scriptable) return "Link";
-            if (delegate instanceof WebImage.Scriptable) return "Image";
-            if (delegate instanceof SelectionOptions) return "Options";
-            if (delegate instanceof SelectionOption) return "Option";
-            if (delegate instanceof Input) return "Control";
-            if (delegate instanceof DocumentElement) return "HTMLElement";
+            if (delegate instanceof HTMLPage.Scriptable)    return "Document";
+            if (delegate instanceof FormScriptable)         return "Form";
+            if (delegate instanceof WebLink.Scriptable)     return "Link";
+            if (delegate instanceof WebImage.Scriptable)    return "Image";
+            if (delegate instanceof SelectionOptions)       return "Options";
+            if (delegate instanceof SelectionOption)        return "Option";
+            if (delegate instanceof Input)                  return "Control";
+            if (delegate instanceof DocumentElement)        return "HTMLElement";
 
             throw new IllegalArgumentException( "Unknown ScriptableDelegate class: " + delegate.getClass() );
         }

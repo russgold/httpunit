@@ -19,6 +19,7 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.ScriptingEventHandler;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import org.w3c.dom.Node;
@@ -29,7 +30,7 @@ import org.w3c.dom.Node;
  * @since 1.5.2
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public interface HTMLElement {
+public interface HTMLElement extends ScriptingEventHandler {
 
     /**
      * Returns the ID associated with this element. IDs are unique throughout the HTML document.
@@ -81,7 +82,7 @@ public interface HTMLElement {
      * @since 1.6
      */
     boolean isSupportedAttribute( String name );
-
+    
 
     /**
      * Returns the delegate which supports scripting this element.

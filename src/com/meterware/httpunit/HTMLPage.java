@@ -125,9 +125,16 @@ public class HTMLPage extends ParsedHTML {
         return result;
     }
 
+    /**
+     * scriptable for HTML Page
+     */
 
     public class Scriptable extends ScriptableDelegate {
 
+    	  /**
+    	   * get the Object with the given propertyName
+    	   * @param propertyName - the name of the property
+    	   */
         public Object get( String propertyName ) {
             NamedDelegate delegate = getNamedItem( getForms(), propertyName );
             if (delegate != null) return delegate;
@@ -138,7 +145,7 @@ public class HTMLPage extends ParsedHTML {
             delegate = getNamedItem( getImages(), propertyName );
             if (delegate != null) return delegate;
 
-            return super.get( propertyName );
+            return null;
         }
 
 

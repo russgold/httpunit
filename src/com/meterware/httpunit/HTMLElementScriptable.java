@@ -61,6 +61,15 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
     }
     
     /**
+     * get the content of the given attribute
+     * @param attributeName
+     * @return
+     */
+    public String getAttribute(String attributeName) {
+    	return _element.getAttribute(attributeName);
+    }
+    
+    /**
      * set the attribute with the given attribute name to the given value
      * @param attributeName
      * @param value
@@ -76,6 +85,25 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
     public void removeAttribute( String attributeName ) {
     	_element.removeAttribute( attributeName );
     }    
+    
+    /**
+     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
+     * execute the script if it's assigned by calling doEvent for the script
+     * @param eventName
+     * @return
+     */
+    public boolean handleEvent(String eventName) {
+    	// check whether onclick is activated
+    	if (eventName.toLowerCase().equals("onclick")) {
+    		handleEvent("onmousedown");
+    	}
+      String eventScript = getAttribute( eventName );
+      boolean result=doEventScript(eventScript);
+      if (eventName.toLowerCase().equals("onclick")) {
+    		handleEvent("onmouseup");
+    	}
+      return result;
+    }
 
     /**
      * construct me from a given element
