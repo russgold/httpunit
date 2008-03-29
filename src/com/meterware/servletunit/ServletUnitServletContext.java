@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2003, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -23,17 +23,17 @@ package com.meterware.servletunit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Vector;
 import java.util.Set;
+import java.util.Vector;
 
-import javax.servlet.*;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 
 
@@ -41,6 +41,9 @@ import javax.servlet.*;
  * This class is a private implementation of the ServletContext class.
  **/
 class ServletUnitServletContext implements ServletContext {
+
+    private PrintStream _logStream = System.out;
+
 
     ServletUnitServletContext( WebApplication application ) {
         _application = application;
@@ -203,7 +206,8 @@ class ServletUnitServletContext implements ServletContext {
      * Writes the specified message to a servlet log file, usually an event log.
      * The name and type of the servlet log file is specific to the servlet container.
      **/
-    public void log( String message ) {  // XXX change this to use something testable
+    public void log( String message ) {  
+        _logStream.println(message);
     }
 
 
@@ -220,8 +224,11 @@ class ServletUnitServletContext implements ServletContext {
      * The name and type of the servlet log file is specific to the servlet container, usually an event log.
      **/
     public void log( String message, Throwable t ) {
-        log( message );
-        log( "  " + t );
+        _logStream.print(message);
+        _logStream.print(":");
+        if(t != null) {
+            t.printStackTrace(_logStream);
+        }
     }
 
 
@@ -371,5 +378,15 @@ class ServletUnitServletContext implements ServletContext {
 
     private Hashtable getContextParams() {
         return _application.getContextParameters();
+    }
+
+    /**
+     * Allows the test to determine where the log messages should be written.
+     * Defaults to {@link System#out}
+     * @param logStream where to write the log messages
+     * @see #log(String)
+     */
+    public void setLogStream(PrintStream logStream) {
+        this._logStream = logStream;
     }
 }
