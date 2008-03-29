@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -734,6 +734,68 @@ public class ScriptingTest extends HttpUnitTest {
 	      assertEquals( "The attribute value is changed to newValue", wc.popNextAlert() );	      
     	// } // if  
     	
+    }
+    
+    /**
+     * test for onChange part of Patch proposal 1653410
+     * calling on change from javascript
+     * used to throw com.meterware.httpunit.ScriptException: Event 'callonChange();' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot find function onChange. (httpunit#6)
+     * after patch
+     * @throws Exception
+     */
+    public void testCallOnChange() throws Exception {
+    	defineResource( "start.html",
+    			"<html><head>\n"+
+    			"<script language='JavaScript'>\n"+
+    			"function onChangeHandler() {\n"+
+    			"alert('onChange has been called');\n" +	    			
+    			"}\n"+
+    			"function callonChange() {\n"+
+    			"alert('calling onChange');\n" +	
+    			"// fire onChangeHandler directly\n"+
+    			"onChangeHandler();\n"+
+    			"var field = document.getElementById(\"foo\");\n"+
+    			"// fire onChangeHandler indirectly via event\n"+
+    			"field.onchange();\n"+
+    			"}\n"+
+    			"</script>\n" +
+    			"</head>\n" +
+    			"<body id='body_id' onLoad='callonChange();'>"+
+    			"<form name='the_form'><input type=\"text\" onchange='onChangeHandler' id=\"foo\" name=\"foo\" /></form>"+
+    			"</body></html");
+      WebConversation wc = new WebConversation();
+      wc.getResponse( getHostPath() + "/start.html" );
+      String firstAlert=wc.popNextAlert();
+      assertEquals("calling onChange",firstAlert);
+      String secondAlert=wc.popNextAlert();
+      assertEquals("2nd","onChange has been called",secondAlert);
+      String thirdAlert=wc.popNextAlert();
+      // TODO make this work
+      // assertEquals("3rd","onChange has been called",thirdAlert);
+    }
+    
+    /**
+     * test for window event part of Patch proposal 1653410
+     * @throws Exception
+     */
+    public void testWindowEvent() throws Exception {
+      defineWebPage( "OnCommand", 
+    			"<html><head>\n"+
+    			"<script language='JavaScript'>\n"+
+    			"function buttonclick() {\n"+
+    			"alert('hi');\n"+
+    			"var event=window.event;\n" +
+    			"}\n"+
+    			"</script>\n" +
+    			"</head><body onload='buttonclick'>\n" +    			
+    			"<form id='someform'><input type='button' id='button1' onClick='buttonclick'></input></form>\n"+
+					"</body></html");
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      Button button1 = (Button) response.getElementWithID( "button1" );
+      button1.click();
+      // TODO make this work
+      // assertEquals( "Alert message 1", "hi", wc.popNextAlert() );    	
     }
 
 

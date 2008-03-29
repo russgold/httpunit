@@ -29,8 +29,23 @@ import com.meterware.httpunit.scripting.DocumentElement;
  **/
 class HTMLElementScriptable extends ScriptableDelegate implements DocumentElement {
 
+	  /**
+	   * the element that I am scripting for
+	   */
     private HTMLElement _element;
+    
 
+    /**
+		 * @return the _element
+		 */
+		protected HTMLElement get_element() {
+			return _element;
+		}
+
+		/**
+     * get the property with the given name
+     * @param propertyName - the name of the property to get
+     */
     public Object get( String propertyName ) {
         if (propertyName.equals( "nodeName" )) {
             return _element.getTagName();
@@ -62,7 +77,10 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
     	_element.removeAttribute( attributeName );
     }    
 
-
+    /**
+     * construct me from a given element
+     * @param element
+     */
     public HTMLElementScriptable( HTMLElement element ) {
         _element = element;
     }

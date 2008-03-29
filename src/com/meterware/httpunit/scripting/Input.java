@@ -59,4 +59,11 @@ public interface Input extends IdentifiedDelegate, NamedDelegate {
      */
     void click() throws IOException, SAXException;
 
+    /**
+     * fire a on change event
+     *
+     */
+    public void sendOnChangeEvent();
+
+
 }

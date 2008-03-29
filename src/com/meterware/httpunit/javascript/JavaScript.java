@@ -350,6 +350,10 @@ public class JavaScript {
         }
 
 
+        /**
+         * javascript alert handling
+         * @param message - the alert message
+         */
         public void jsFunction_alert( String message ) {
             getDelegate().alertUser( message );
         }
@@ -943,6 +947,11 @@ public class JavaScript {
         public void jsFunction_select() {}
 
 
+        /**
+         * click via javascript
+         * @throws IOException
+         * @throws SAXException
+         */
         public void jsFunction_click() throws IOException, SAXException {
             getDelegate().click();
         }
@@ -967,7 +976,13 @@ public class JavaScript {
         public void jsFunction_removeAttribute( String attributeName ) throws JavaScriptException {
             getDelegate().removeAttribute( attributeName );
         }
-        
+
+        /** Allow calling onchange() from within a JavaScript function */
+        public void jsFunction_onchange() throws JavaScriptException {
+        	Input myInput=this.getDelegate();
+        	myInput.sendOnChangeEvent();
+        }
+
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );

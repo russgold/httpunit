@@ -89,6 +89,11 @@ public abstract class FormControl extends HTMLElementBase {
     }
 
 
+    /**
+     * initialize the given form control from a Webform and a HTMLControl
+     * @param form
+     * @param control
+     */
     FormControl( WebForm form, HTMLControl control ) {
         super( control );
         _control = control;
@@ -270,7 +275,10 @@ public abstract class FormControl extends HTMLElementBase {
      * Performs the 'onChange' event defined for this control.
      */
     protected void sendOnChangeEvent() {
-        if (_onChangeEvent.length() > 0) getScriptingHandler().doEvent( _onChangeEvent );
+        if (_onChangeEvent.length() > 0) {
+        	ScriptingHandler handler=getScriptingHandler();
+        	handler.doEvent( _onChangeEvent );
+        }
     }
 
 
@@ -369,23 +377,41 @@ public abstract class FormControl extends HTMLElementBase {
         return (value == null) ? "" : value;
     }
 
+    /**
+     * implementation of Scriptable input elements
+     */
     class Scriptable extends HTMLElementScriptable implements Input {
 
+    	  /**
+    	   * get my Name
+    	   * @return the name of this scriptable
+    	   */
         public String getName() {
             return FormControl.this.getName();
         }
 
 
+        /**
+         * get my ID
+         * @return the id of this scriptable
+         */
         public String getID() {
             return FormControl.this.getID();
         }
 
 
+        /**
+         * construct a Scriptable
+         */
         public Scriptable() {
             super( FormControl.this );
         }
 
 
+        /**
+         * get the given property
+         * @param propertyName - the name of the property to get
+         */
         public Object get( String propertyName ) {
             if (propertyName.equalsIgnoreCase( "name" )) {
                 return FormControl.this.getName();
@@ -423,8 +449,34 @@ public abstract class FormControl extends HTMLElementBase {
            super.setAttribute( attributeName, value );          
         }
         
+        /**
+         * allow calling click for this control
+         */
         public void click() throws IOException, SAXException {
+        	// TODO check whether the empty body of this method was correct
+        	// call onclick event handler
+        	HTMLElement element=this.get_element();
+        	if (element instanceof FormControl) {
+        		FormControl control=(FormControl)element;
+        		control.sendOnClickEvent();
+        	}	
         }
+        
+        /**
+         * allow firing a sendOnChangeEvent
+         *
+         */
+        public void sendOnChangeEvent() {
+        	// TODO check why the test for this does not work although
+        	// the javascript function call is done in the corresponding testcase
+        	// testCallOnChange()
+        	HTMLElement element=this.get_element();
+        	if (element instanceof FormControl) {
+        		FormControl control=(FormControl)element;
+        		control.sendOnChangeEvent();
+        	}
+        }
+
     }
 
 }
@@ -634,6 +686,10 @@ abstract class TextFormControl extends FormControl {
     }
 
 
+    /**
+     * claim values and fire onChange Event if a change occured 
+     * @param values - the list of values
+     */
     void claimValue( List values ) {
         if (isReadOnly()) return;
 

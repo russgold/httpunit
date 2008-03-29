@@ -566,6 +566,10 @@ public class WebClient {
     }
 
 
+    /**
+     * simulate an alert by remembering the alert message on a Stack
+     * @param message - the alert message to post
+     */
     void postAlert( String message ) {
         _alerts.addLast( message );
     }
