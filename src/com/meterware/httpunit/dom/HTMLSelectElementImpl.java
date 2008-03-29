@@ -47,13 +47,21 @@ public class HTMLSelectElementImpl extends HTMLControl implements HTMLSelectElem
     }
 
 
+
+    /**
+     * simulate blur
+     */
     public void blur() {
+    	handleEvent("onblur");
     }
 
 
+    /**
+     * simulate focus;
+     */
     public void focus() {
+    	handleEvent("onfocus");
     }
-
 
     public String getType() {
         return isMultiSelect() ? TYPE_SELECT_MULTIPLE : TYPE_SELECT_ONE;

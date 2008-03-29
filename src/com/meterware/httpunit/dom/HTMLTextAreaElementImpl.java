@@ -36,11 +36,19 @@ public class HTMLTextAreaElementImpl extends HTMLControl implements HTMLTextArea
     }
 
 
+    /**
+     * simulate blur
+     */
     public void blur() {
+    	handleEvent("onblur");
     }
 
 
+    /**
+     * simulate focus;
+     */
     public void focus() {
+    	handleEvent("onfocus");
     }
 
 

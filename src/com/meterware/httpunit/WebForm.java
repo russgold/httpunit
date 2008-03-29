@@ -809,7 +809,7 @@ public class WebForm extends WebRequestSource {
     /**
      * Returns the form control which is part of this form with the specified ID.
      */
-    FormControl getControlWithID( String id ) {
+    public FormControl getControlWithID( String id ) {
         FormControl[] controls = getFormControls();
         for (int i = 0; i < controls.length; i++) {
             FormControl control = controls[i];

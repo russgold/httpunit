@@ -42,11 +42,19 @@ public class HTMLInputElementImpl extends HTMLControl implements HTMLInputElemen
     }
 
 
+    /**
+     * simulate blur
+     */
     public void blur() {
+    	handleEvent("onblur");
     }
 
 
+    /**
+     * simulate focus;
+     */
     public void focus() {
+    	handleEvent("onfocus");
     }
 
 

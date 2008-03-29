@@ -113,14 +113,19 @@ public class HTMLAnchorElementImpl extends HTMLElementImpl implements HTMLAnchor
         setAttribute( "type", type );
     }
 
-
+    /**
+     * simulate blur
+     */
     public void blur() {
+    	handleEvent("onblur");
     }
 
-
+    /**
+     * simulate focus;
+     */
     public void focus() {
+    	handleEvent("onfocus");
     }
-
 
     public String getAccessKey() {
         return getAttributeWithNoDefault( "accesskey" );

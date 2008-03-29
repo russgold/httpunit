@@ -297,6 +297,7 @@ public abstract class FormControl extends HTMLElementBase {
     protected  boolean doOnClickEvent() {
     	return handleEvent("onclick");
     }
+    
 
 
     /**
@@ -499,6 +500,21 @@ public abstract class FormControl extends HTMLElementBase {
         		FormControl control=(FormControl)element;
         		control.sendOnClickEvent();
         	}	
+        }
+        
+        /**
+         * simulate blur
+         */
+        public void blur() {
+        	handleEvent("onblur");
+        }
+
+
+        /**
+         * simulate focus;
+         */
+        public void focus() {
+        	handleEvent("onfocus");
         }
         
         /**
