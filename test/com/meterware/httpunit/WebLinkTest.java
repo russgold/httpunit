@@ -69,6 +69,40 @@ public class WebLinkTest extends HttpUnitTest {
         assertNotNull( links );
         assertEquals( 0, links.length );
     }
+    
+    /**
+     * test for Bug report 1908117 by firebird74
+     * http://www.w3.org/Addressing/URL/url-spec.html
+		 * says
+     *    Spaces and control characters in URLs must be escaped for transmission in HTTP
+     * so %20 ist used for space/blank
+     * trying out 
+     * <html>
+		 * <body>
+     * <a href="http://www.bit plan.com">BITlan blank link</a>
+     * </body>
+     * </html>
+     * in different browers gives different results.
+     * Firefox 2.0.0.13 will not show a link at all
+     * Internet Explorer 6.0 will show a link that has http://www.bit%20plan.com
+     * as it's target
+     * @throws Exception
+     */
+    public void testLinkToURLWithBlanks() throws Exception {
+      defineWebPage( "urlwithblank", 
+      		"<a href='http://bla.fasel.com/a/b/lorem ipsum.pdf'>link with blank</a>"+
+      		"<a href='http://bla.fasel.com/a/b/lorem%20ipsum.pdf'>link with blank</a>");
+    	WebConversation wc = new WebConversation();
+      WebResponse resp = wc.getResponse( getHostPath() + "/urlwithblank.html" );
+    	WebLink [] webLinks = resp.getLinks();
+    	assertTrue("There should be two link but there are "+webLinks.length,webLinks.length==2);
+    	String blankLink1="http://bla.fasel.com/a/b/loremipsum.pdf";
+    	String blankLink2="http://bla.fasel.com/a/b/lorem%20ipsum.pdf";
+    	WebLink link1 = webLinks[0];
+    	assertTrue("the blank in the link1 should be removed but we got '"+link1.getURLString()+"'",link1.getURLString().equals(blankLink1));
+    	WebLink link2 = webLinks[1];
+    	assertTrue("the blank %20 in the link2 should not be converted but we got '"+link2.getURLString()+"'",link2.getURLString().equals(blankLink2));    	
+    }
 
 
     public void testLinks() throws Exception {
