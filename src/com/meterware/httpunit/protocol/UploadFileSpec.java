@@ -2,7 +2,7 @@ package com.meterware.httpunit.protocol;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2002, 2007, Russell Gold
+ * Copyright (c) 2001-2008, 2007, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -92,12 +92,17 @@ public class UploadFileSpec {
 
     private String _contentType = "text/plain";
 
+    /**
+     * the default content extensions
+     */
     private static String[][] CONTENT_EXTENSIONS = {
         { "text/plain",               "txt", "text" },
         { "text/html",                "htm", "html" },
         { "image/gif",                "gif" },
         { "image/jpeg",               "jpg", "jpeg" },
         { "image/png",                "png" },
+        { "image/tiff",               "tif", "tiff" },
+        { "application/pdf",          "pdf" },        
         { "application/octet-stream", "zip" }
     };
 

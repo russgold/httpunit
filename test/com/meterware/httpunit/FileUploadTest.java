@@ -256,48 +256,74 @@ public class FileUploadTest extends HttpUnitTest {
         assertEquals( "text/plain:message.name=temp.txt&message.lines=2", encoding.getText().trim() );
     }
 
+    /**
+     * test the file content type for a given file
+     * @param file
+     * @param expected
+     */
+    protected void doTestFileContentType(File file, String contentType,String expected) throws Exception {
+      defineResource( "ListParams", new MimeEcho() );
+      defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
+                                "<Input type=file name=message>" +
+                                "</form>" );
+      WebConversation wc = new WebConversation();
+      WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
+      WebResponse simplePage = wc.getResponse( request );
+      WebRequest formSubmit = simplePage.getForms()[0].getRequest();
+      if (contentType==null) {
+      	formSubmit.selectFile( "message", file );
+      }	else {
+      	formSubmit.selectFile( "message", file ,contentType);
+      }
+      WebResponse encoding = wc.getResponse( formSubmit );
+      assertEquals( expected,expected, encoding.getText().trim() );
 
+      file.delete();    	
+    }
+    
+    /**
+     * create a file from the given byte contents
+     * @param name - the name of the file
+     * @param content - the bytes to use as content
+     * @return
+     * @throws Exception
+     */
+    private File createFile(String name,byte[] content) throws Exception {
+    	File file = new File(name);
+    	FileOutputStream fos = new FileOutputStream( file );
+    	fos.write( content, 0, content.length );
+    	fos.close();
+    	return file;
+    }	
+    	
+    /**
+     * test the file content type for several file types e.g. a gif image
+     * modified for patch 1415415
+     * @throws Exception
+     */
     public void testFileContentType() throws Exception {
-        File file = new File( "temp.gif" );
-        FileOutputStream fos = new FileOutputStream( file );
-        fos.write( new byte[] { 1, 2, 3, 4, 0x7f, 0x23 }, 0, 6 );
-        fos.close();
-
-        defineResource( "ListParams", new MimeEcho() );
-        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
-                                  "<Input type=file name=message>" +
-                                  "</form>" );
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
-        WebResponse simplePage = wc.getResponse( request );
-        WebRequest formSubmit = simplePage.getForms()[0].getRequest();
-        formSubmit.selectFile( "message", file );
-        WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "image/gif:message.name=temp.gif&message.lines=1", encoding.getText().trim() );
-
-        file.delete();
+      File file = createFile("temp.gif", new byte[] { 1, 2, 3, 4, 0x7f, 0x23 } );
+      doTestFileContentType(file,null,"image/gif:message.name=temp.gif&message.lines=1");
+      file = createFile("1x1.tif", new byte[] { 
+      		(byte)0x03,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x01,(byte)0x03,(byte)0x00,(byte)0x01,(byte)0x00,
+      		(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x02,(byte)0x01,(byte)0x03,(byte)0x00,(byte)0x03,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x8A,(byte)0x00,
+      		(byte)0x00,(byte)0x00,(byte)0x03,(byte)0x01,(byte)0x03,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x06,(byte)0x01,
+      		(byte)0x03,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x02,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x11,(byte)0x01,(byte)0x04,(byte)0x00,(byte)0x01,(byte)0x00,
+      		(byte)0x00,(byte)0x00,(byte)0x08,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x15,(byte)0x01,(byte)0x03,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x03,(byte)0x00,
+      		(byte)0x00,(byte)0x00,(byte)0x16,(byte)0x01,(byte)0x04,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x17,(byte)0x01,
+      		(byte)0x04,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x03,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x1C,(byte)0x01,(byte)0x03,(byte)0x00,(byte)0x01,(byte)0x00,
+      		(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x00,(byte)0x08,(byte)0x00,(byte)0x08,(byte)0x00,(byte)0x08});
+      doTestFileContentType(file,null,"image/tiff:message.name=1x1.tif&message.lines=1");
     }
 
 
+    /**
+     * test the file content type for some ".new" file
+     * @throws Exception
+     */
     public void testSpecifiedFileContentType() throws Exception {
-        File file = new File( "temp.new" );
-        FileOutputStream fos = new FileOutputStream( file );
-        fos.write( new byte[] { 1, 2, 3, 4, 0x7f, 0x23 }, 0, 6 );
-        fos.close();
-
-        defineResource( "ListParams", new MimeEcho() );
-        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
-                                  "<Input type=file name=message>" +
-                                  "</form>" );
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
-        WebResponse simplePage = wc.getResponse( request );
-        WebRequest formSubmit = simplePage.getForms()[0].getRequest();
-        formSubmit.selectFile( "message", file, "x-application/new" );
-        WebResponse encoding = wc.getResponse( formSubmit );
-        assertEquals( "x-application/new:message.name=temp.new&message.lines=1", encoding.getText().trim() );
-
-        file.delete();
+      File file = createFile( "temp.new" , new byte[] { 1, 2, 3, 4, 0x7f, 0x23 });
+      doTestFileContentType(file,"x-application/new","x-application/new:message.name=temp.new&message.lines=1");
     }
 }
 
