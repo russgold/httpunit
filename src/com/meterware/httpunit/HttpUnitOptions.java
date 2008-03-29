@@ -25,6 +25,8 @@ import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.parsing.HTMLParserListener;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -36,12 +38,12 @@ import java.util.Vector;
  **/
 public abstract class HttpUnitOptions {
 
-    private static final String ORIGINAL_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
+    public static final String ORIGINAL_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
     private static final String NEW_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.dom.DomBasedScriptingEngineFactory";
 
     // comment out the scripting engine not to be used
     final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = ORIGINAL_SCRIPTING_ENGINE_FACTORY;
-    // final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = NEW_SCRIPTING_ENGINE_FACTORY;
+    //final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = NEW_SCRIPTING_ENGINE_FACTORY;
 
 
     /**
@@ -59,6 +61,7 @@ public abstract class HttpUnitOptions {
         _contentType = DEFAULT_CONTENT_TYPE;
         _postIncludesCharset = false;
         _exceptionsThrownOnScriptError = true;
+        _customAttributes = null;
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
     }
@@ -498,6 +501,27 @@ public abstract class HttpUnitOptions {
         public void clearCaches() {}
     };
 
+
+    /**
+     * Add the name of a custom attribute that should be supported for form controls.
+     * @deprecated for new Scripting engine
+     */
+    public static void addCustomAttribute(String attributeName) {
+        if(_customAttributes == null)
+            _customAttributes = new HashSet();
+        _customAttributes.add(attributeName);
+    }
+
+    /**
+     * Get the Set of custom attribute names to be supported by form controls.
+     * @deprecated for new scripting engine
+     */
+    static Set getCustomAttributes() {
+        return _customAttributes;
+    }
+
+
+    private static Set _customAttributes = null;
 
     private static boolean _exceptionsOnErrorStatus = true;
 

@@ -693,12 +693,11 @@ public class ScriptingTest extends HttpUnitTest {
     
     /**
      * test for Patch proposal 1653410
-     *
+     * Date: 2008-01-08 15:49
+		 * @author Mattias Jiderhamn (mattias78)
      */
-    public void xtestSetAttribute() {
+    public void testSetAttribute() throws Exception {
     	/*
-			 * Comment By: Mattias Jiderhamn (mattias78)
-       * Date: 2008-01-08 15:49
     	 * 
     	A minimal snippet:
 
@@ -709,6 +708,32 @@ public class ScriptingTest extends HttpUnitTest {
     		alert("The attribute value is " + attributeValue);
     		field.setAttribute("myattr", "new_attribute_value");
       */    		
+    	// will only work with Dom based scripting engine before patch
+    	// needs addCustomAttribute for old scriptin engine
+    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    		HttpUnitOptions.addCustomAttribute("myattr");
+    	}	
+	    	defineResource( "start.html",
+	    			"<html><head>\n"+
+	    			"<script language='JavaScript'>\n"+
+	    			"function testAttributes() {\n"+
+	    			"var field = document.getElementById(\"foo\");"+
+	    			"var attributeValue = field.getAttribute(\"myattr\");"+
+	    			"alert('The attribute value is ' + attributeValue);\n" +	    			
+	      		"field.setAttribute(\"myattr\", \"newValue\");\n"+
+	      		"alert('The attribute value is changed to ' + field.getAttribute('myattr'));\n" +
+	    			"}\n"+
+	    			"</script>\n" +
+	    			"</head>\n" +
+	    			"<body id='body_id' onLoad='testAttributes();'>"+
+	    			"<form name='the_form'><input type=\"text\" id=\"foo\" name=\"foo\" myattr=\"bar\" /></form>"+
+	    			"</body></html");
+	      WebConversation wc = new WebConversation();
+	      wc.getResponse( getHostPath() + "/start.html" );
+	      assertEquals( "The attribute value is bar", wc.popNextAlert() );
+	      assertEquals( "The attribute value is changed to newValue", wc.popNextAlert() );	      
+    	// } // if  
+    	
     }
 
 

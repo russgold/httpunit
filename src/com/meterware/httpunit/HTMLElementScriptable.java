@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -44,6 +44,23 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
             return super.get( propertyName );
         }
     }
+    
+    /**
+     * set the attribute with the given attribute name to the given value
+     * @param attributeName
+     * @param value
+     */
+    public void setAttribute( String attributeName, Object value ) {
+    	_element.setAttribute( attributeName, value );
+    }
+    
+    /**
+     * remove the given attribute
+     * @param attributeName
+     */
+    public void removeAttribute( String attributeName ) {
+    	_element.removeAttribute( attributeName );
+    }    
 
 
     public HTMLElementScriptable( HTMLElement element ) {

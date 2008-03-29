@@ -125,10 +125,30 @@ abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HT
     }
 
 
+    /**
+     * get the attribute with the given name
+     * @param name - the name of the attribute to get
+     */
     public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( _node, name );
     }
 
+    /**
+     * set the attribute with the given name to the given value
+     * @param name - the name of the attribute to set
+     * @param value - the value to use
+     */
+    public void setAttribute( final String name, final Object value ) {
+    	NodeUtils.setNodeAttribute( _node, name,  (value == null) ? null : value.toString() );
+    }
+
+    /**
+     * remove the attribute with the given name
+     * @param name - the name of the attribute
+     */
+    public void removeAttribute( final String name ) {
+    	NodeUtils.removeNodeAttribute( _node, name );
+    }    
 
     /**
      * Returns true if this element may have an attribute with the specified name.

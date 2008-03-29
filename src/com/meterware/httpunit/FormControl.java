@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2007, Russell Gold
+* Copyright (c) 2001-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -32,8 +32,10 @@ import org.xml.sax.SAXException;
 
 import java.util.Hashtable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Set;
 import java.io.IOException;
 
 
@@ -96,6 +98,13 @@ public abstract class FormControl extends HTMLElementBase {
 
         supportAttribute( "tabindex" );
         supportAttribute( "disabled" );
+        //      Add all custom attributes
+        Set customAttributes = HttpUnitOptions.getCustomAttributes();
+        if(customAttributes != null) {
+            for(Iterator iter = customAttributes.iterator(); iter.hasNext(); ) {
+                supportAttribute((String)iter.next());
+            }
+        }        
     }
 
 
@@ -388,6 +397,11 @@ public abstract class FormControl extends HTMLElementBase {
         }
 
 
+        /**
+         * set the given property to the given value
+         * @param propertyName - the property to set
+         * @param value - the value to use
+         */
         public void set( String propertyName, Object value ) {
             if (propertyName.equalsIgnoreCase( "value" )) {
                 setValueAttribute( value.toString() );
@@ -398,7 +412,17 @@ public abstract class FormControl extends HTMLElementBase {
             }
         }
 
-
+        /**
+         * set the given attribute to  the given value
+         * @param attributeName - the name of the attribute to set
+         * @param value - the value to use
+         */
+        public void setAttribute(String attributeName, Object value) {
+           // Value set by JavaScript, make sure attribute is supported
+           supportAttribute(attributeName);
+           super.setAttribute( attributeName, value );          
+        }
+        
         public void click() throws IOException, SAXException {
         }
     }

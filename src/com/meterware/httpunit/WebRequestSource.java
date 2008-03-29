@@ -1,7 +1,7 @@
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2006, Russell Gold
+ * Copyright (c) 2001-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -280,9 +280,30 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     protected void addPresetParameter( String name, String value );
 
 
+    /**
+     * get the attribute value for the given name
+     * @param name - the name of the attribute to get
+     */
     public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( _node, name );
     }
+    
+    /**
+     * set the attribute with the given name to the given value
+     * @param name - the name of the attribute
+     * @param value - the value to use
+     */
+    public void setAttribute( final String name, final Object value ) {
+    	NodeUtils.setNodeAttribute( getNode(), name,  (value == null) ? null : value.toString() );
+    }
+
+    /**
+     * remove the given attribute
+     * @param name - the name of the attribute to remove
+     */
+    public void removeAttribute( final String name ) {
+    	NodeUtils.removeNodeAttribute( getNode(), name );
+    }    
 
 
     public boolean isSupportedAttribute( String name ) {

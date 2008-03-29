@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -82,7 +82,25 @@ class NodeUtils {
         return (attribute == null) ? defaultValue : attribute.getNodeValue();
     }
 
-
+    /**
+     * set the attribute with the given attribute to the given value in the given node
+     * @param node
+     * @param attributeName - the attribute's name to look for
+     * @param value - the value to set
+     */
+    static void setNodeAttribute( Node node, String attributeName, String value ) {
+    	((Element)node).setAttributeNS(null, attributeName, value );
+    }
+    
+    /**
+     * remove the given attribute from the given node based on the attribute's name
+     * @param node
+     * @param attributeName
+     */
+    static void removeNodeAttribute( Node node, String attributeName ) {
+    	((Element)node).removeAttribute( attributeName );
+    }
+    
     /**
      * check whether the given Attribute in the Node is Present
      * @param node - the node to check

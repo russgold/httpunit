@@ -6,7 +6,7 @@ import org.xml.sax.SAXException;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -32,10 +32,31 @@ public interface Input extends IdentifiedDelegate, NamedDelegate {
 
     Object get( String propertyName );
 
-
+    /**
+     * set the given property to the given value
+     * @param propertyName
+     * @param value
+     */
     void set( String propertyName, Object value );
+    /**
+     * set the given attribute to the given value
+     * @param attributeName
+     * @param value
+     * @since 1.7
+     */
+    void setAttribute( String attributeName, Object value );
+    /**
+     * remove the given attribute
+     * @param attributeName
+     * @since 1.7
+     */
+    void removeAttribute( String attributeName );
 
-
+    /**
+     * simulate a click
+     * @throws IOException
+     * @throws SAXException
+     */
     void click() throws IOException, SAXException;
 
 }

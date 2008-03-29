@@ -23,8 +23,10 @@ import org.w3c.dom.Node;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 /**
@@ -37,7 +39,7 @@ class HTMLElementBase implements HTMLElement {
 
     private Node        _node;
     private ScriptingHandler _scriptable;
-    private List _supportedAttributes = new ArrayList();
+    private Set _supportedAttributes = new HashSet();
 
 
     public String getID() {
@@ -113,6 +115,23 @@ class HTMLElementBase implements HTMLElement {
     public String getAttribute( final String name ) {
         return NodeUtils.getNodeAttribute( getNode(), name );
     }
+    
+    /**
+     * set the Attribute with the given name - by delegating to NodeUtils
+     * @param name - the name of the attribute to set
+     * @param value - the value to set
+     */
+    public void setAttribute( final String name, final Object value ) {
+       NodeUtils.setNodeAttribute( getNode(), name,  (value == null) ? null : value.toString() );
+    }
+         
+    /**
+     * remove the Attribute with the given name - by delegating to NodeUtils
+     * @param name - the name of the attribute to remove
+     */   
+    public void removeAttribute( final String name ) {
+       NodeUtils.removeNodeAttribute( getNode(), name );
+    }    
 
 
     public boolean isSupportedAttribute( String name ) {

@@ -584,6 +584,10 @@ public class FormScriptingTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test the onChange event
+     * @throws Exception
+     */
     public void testSetFormTextOnChangeEvent() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head></head>" +
                                             "<body>" +

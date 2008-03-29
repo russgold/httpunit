@@ -2,7 +2,7 @@ package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -225,6 +225,12 @@ public class JavaScript {
         }
 
 
+        /**
+         * get the classname of the given ScriptableDelegate
+         * @param delegate - the object to get the class name for
+         * @return - the simple local class name for the delegate e.g. Window, Document, Form, Link, Image, Options, Option, Control, HTMLElement
+         * @throws an IllegalArgumentException if the delegate is not known
+         */
         private String getScriptableClassName( ScriptableDelegate delegate ) {
             if (delegate instanceof WebResponse.Scriptable) return "Window";
             if (delegate instanceof HTMLPage.Scriptable) return "Document";
@@ -801,7 +807,9 @@ public class JavaScript {
         }
     }
 
-
+    /**
+     * HTML Element support for JavaScript
+     */
     static public class HTMLElement extends JavaScriptEngine {
 
         private Style _style;
@@ -914,6 +922,9 @@ public class JavaScript {
     }
 
 
+    /**
+     * Javascript support for any control 
+     */
     static public class Control extends JavaScriptEngine {
 
         private Form _form;
@@ -942,6 +953,21 @@ public class JavaScript {
         }
 
 
+        /** Support getting value of arbitrary attribute */
+        public Object jsFunction_getAttribute( String attributeName ) throws JavaScriptException {
+            return getDelegate().get( attributeName );
+        }
+
+        /** Support getting value of arbitrary attribute */
+        public void jsFunction_setAttribute( String attributeName, Object value ) throws JavaScriptException {
+            getDelegate().setAttribute( attributeName, value );
+        }
+
+        /** Support getting value of arbitrary attribute */
+        public void jsFunction_removeAttribute( String attributeName ) throws JavaScriptException {
+            getDelegate().removeAttribute( attributeName );
+        }
+        
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {
             super.initialize( parent, scriptable );
@@ -1048,7 +1074,9 @@ public class JavaScript {
 
 }
 
-
+/**
+ * special exception for the Rhino Javscript engine
+ */
 class RhinoException extends RuntimeException {
 
     private Exception _cause;
