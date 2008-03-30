@@ -908,5 +908,48 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Result page", "No javascript here", response.getText() );
     }
 
-
+    /**
+     * @see https://sourceforge.net/forum/forum.php?thread_id=1808696&forum_id=20294
+     * by kauffman81
+     */
+    public void testJavaScriptConfirmPopUp() throws Exception {
+    	String target="<html><body>After click we want to see this!</body></html>";
+      defineResource( "Target.html",  target);    	
+      defineResource( "Popup.html","<html><head><script language='JavaScript'>"+      	 
+       "// 	This is the javascript that handles the onclick event\n"+       	 
+       "function verify_onBorrar(form){\n"+ 
+       "  alert(form.id);\n"+       
+       /* TODO check this javascript code
+        * if uncommented it will throw
+          com.meterware.httpunit.ScriptException: Event 'verify_onBorrar(this.form)' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot read property "0" from undefined (httpunit#3)
+       "	for(var i = 0;i<form.selection[i].length;i++){\n"+ 
+       "		if(form.selection[i].checked){\n"+ 
+       "			if(confirm('blablabla')){\n"+ 
+       "				form.action = 'Target.html';\n"+  
+       "				form.submit(); \n"+
+       "			} // if\n"+    	
+       "		} // if\n"+    	
+       "	} // for\n"+    	
+       */
+       "} // verify_onBorrar\n"+    	
+       "</script></head>\n"+    	
+       "<body>\n"+
+       "	<form id='someform' name='someform'>"+
+       "		<input type='button' id='button1' class='button' value='say hi' onclick=\"alert('hi')\"/>"+
+       "		<input type='button' id='delete' class='button' value='delete' onclick='verify_onBorrar(this.form)'/></form>\n"+
+       "	</form>\n"+
+       "</body></html>");
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/Popup.html" );
+      Button button1 = (Button) response.getElementWithID( "button1" );
+      button1.click();
+      String alert1=wc.popNextAlert();
+      assertEquals("hi",alert1);
+      Button button2 = (Button) response.getElementWithID( "delete" );
+      button2.click();
+      String alert2=wc.popNextAlert();
+      // TODO activate this check
+      // System.err.println("alert 2 is "+alert2);
+      // assertEquals("someform",alert2);
+    }
 }
