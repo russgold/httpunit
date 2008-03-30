@@ -322,7 +322,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
      * @throws Exception
      * TODO activate by renaming to testCreateElement
      */
-    public void XtestCreateElement() throws Exception {
+    public void xtestCreateElement() throws Exception {
     	defineResource("OnCommand.html", 
 		                   "<html><head><title>Amazing!</title></head>"+
 		                   "<body onLoad='var elem=document.createElement(\"input\");elem.id=\"hellothere\";alert(elem.id);'></body>");

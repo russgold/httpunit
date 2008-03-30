@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Map;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import com.meterware.httpunit.HttpUnitUtils;
@@ -61,7 +62,23 @@ class WebXMLString {
         return new ByteArrayInputStream( asText().getBytes( "UTF-8" ) );
     }
 
-
+    // the stream for testing the dtd file
+    public static InputStream dtdStream=null;
+    
+    //  Document type definition to be used - should be one of the dtds available in META-INF
+    public static String dtd="web-app_2_3.dtd"; 
+    
+    /**
+     * check that the dtd is on the CLASSPATH
+     * @return
+     */
+    public static boolean isDtdOnClasspath() {
+    	if (dtdStream==null) {        		
+    		dtdStream=WebXMLString.class.getClassLoader().getResourceAsStream(dtd);
+    	}	
+    	return dtdStream!=null;	
+    }
+    
     /**
      * return me as a Text/String containing the XML descriptor accoding
      * to the Sun Microsystems's specification
@@ -70,12 +87,15 @@ class WebXMLString {
      * @return
      */
     String asText() {
-        StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n" );
-        if (!HttpUnitUtils.isEclipse()) {
-          result.append( "<!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/web-app_2_3.dtd'>" );
-        } else {  
-        	result.append("<!DOCTYPE web-app>");
-        }	
+        StringBuffer result = new StringBuffer( "<?xml version='1.0' encoding='UTF-8'?>\n" );                
+        String doctype="<!DOCTYPE web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN' 'http://java.sun.com/dtd/"+dtd+"'>";
+        // if the dtd file is not on the CLASSPATH there will be nasty java.net.MalformedURLException problems
+    		// work - around if dtd is not in CLASSPATH so that only the one test case
+        // that checks the isDtdOnClassPath condition will fail 
+      	if (!isDtdOnClasspath()) {        		
+      		doctype="<!DOCTYPE web-app>";
+      	}	
+        result.append(doctype);
         result.append( "<web-app>\n" );
 //        result.append( "<web-app version='2.4' xmlns='http://java.sun.com/xml/ns/j2ee'\n " );
 //        result.append( "                       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" );

@@ -57,6 +57,25 @@ public class WebXMLTest extends TestCase {
         super( name );
     }
 
+    /**
+     * if the dtd file is not on the CLASSPATH there will be nasty java.net.MalformedURLException problems
+     * for the Eclipse environment we'll give advice what to do
+     * 
+     * @throws Exception
+     */
+    public void testDTDClassPath() throws Exception {
+    	boolean isDtdOnClasspath=WebXMLString.isDtdOnClasspath();
+    	String msg=WebXMLString.dtd+" should be on CLASSPATH - you might want to check that META-INF is on the CLASSPATH";
+    	if (!isDtdOnClasspath) {
+    		System.err.println(msg);
+    		if (HttpUnitUtils.isEclipse()) {        	
+      		System.err.println("You seem to be running in the Eclipse environment you might want to check the project settings build path to include the META-INF directory");
+      		System.err.println("To do this select properties/Java Build Path from your project, click 'Add Class Folder' and select the META-INF directory of the httpunit project");
+      	}
+    		System.err.println("the other tests will work around the problem by changing the DOCTYPE to avoid lots of java.net.MalformedURLExceptions");
+      }
+      assertTrue(msg,isDtdOnClasspath);
+    }
 
     public void testBasicAccess() throws Exception {
 
