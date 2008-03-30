@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2006, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -593,18 +593,155 @@ public class WebClientTest extends HttpUnitTest {
         response = wc.getResponse( response.getLinks()[0].getRequest() );
         assertEquals( "Link Referer header", getHostPath() + '/' + linkSource, response.getText().trim() );
     }
+    
+  /**
+   * test for patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+   * @author james abley
+   * @throws Exception
+   */
+  public void testSelfReferentialRedirect() throws Exception {
+    String resourceName = "something/redirected";
+    
+    defineResource(resourceName, "ignored content",
+            HttpURLConnection.HTTP_MOVED_PERM);
+    addResourceHeader(resourceName, "Location: " + getHostPath() + '/'
+            + resourceName);
+
+    WebConversation wc = new WebConversation();
+    try {
+        wc.getResponse(getHostPath() + '/' + resourceName);
+        fail("Should have thrown a RecursiveRedirectionException");
+    } catch (RecursiveRedirectionException expected) {
+    }
+  }
+
+  /**
+   * test for patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+   * @author james abley
+   * @throws Exception
+   */
+  public void testLoopingMalformedRedirect() throws Exception {
+      String resourceAName = "something/redirected";
+      String resourceBName = "something/else/redirected";
+      String resourceCName = "another/redirect";
+
+      // Define a linked list of 'A points to B points to C points to A...'
+      defineResource(resourceAName, "ignored content",
+              HttpURLConnection.HTTP_MOVED_PERM);
+      addResourceHeader(resourceAName, "Location: " + getHostPath() + '/'
+              + resourceBName);
+
+      defineResource(resourceBName, "ignored content",
+              HttpURLConnection.HTTP_MOVED_TEMP);
+      addResourceHeader(resourceBName, "Location: " + getHostPath() + "/"
+              + resourceCName);
+      
+      defineResource(resourceCName, "ignored content", 
+              HttpURLConnection.HTTP_MOVED_PERM);
+      addResourceHeader(resourceCName, "Location: " + getHostPath() + "/" 
+              + resourceAName);
+
+      WebConversation wc = new WebConversation();
+      try {
+          wc.getResponse(getHostPath() + '/' + resourceAName);
+          fail("Should have thrown a RecursiveRedirectionException");
+      } catch (RecursiveRedirectionException expected) {
+      }
+  }
+
+  /**
+   * test for patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+   * @author james abley
+   * @throws Exception
+   */
+  public void testRedirectHistoryIsClearedOut() throws Exception {
+      String resourceName = "something/interesting";
+      String resourceValue = "something interesting";
+      
+      defineResource(resourceName, resourceValue);
+      
+      String redirectName = "something/redirected";
+      
+      defineResource(redirectName, "ignored content",
+              HttpURLConnection.HTTP_MOVED_PERM);
+      addResourceHeader(redirectName, "Location: " + getHostPath() + '/'
+              + resourceName);
+
+      // Normal behaviour first time through - redirects to resource
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse(getHostPath() + "/" + redirectName);
+      assertEquals("OK response", 200, response.getResponseCode());
+      assertEquals("Expected response string", resourceValue, response.getText().trim());
+      assertEquals("Content type", "text/html", response.getContentType());
+      
+      // Can we get the resource again, or is the redirect urls not being cleared out?
+      try {
+          wc.getResponse(getHostPath() + "/" + redirectName);
+          assertEquals("OK response", 200, response.getResponseCode());
+          assertEquals("Expected response string", resourceValue, response.getText().trim());
+          assertEquals("Content type", "text/html", response.getContentType());
+      } catch (RecursiveRedirectionException e) {
+          fail("Not expecting RecursiveRedirectionException - " 
+                  + "list of redirection urls should be new for each " 
+                  + "client-initiated request");
+      }
+  }
+
+  /**
+   * test for patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+   * @author james abley
+   * @throws Exception
+   */
+  public void testRedirectionLeadingToMalformedURLStillClearsOutRedirectionList() throws Exception {
+      String resourceAName = "something/redirected";
+      String resourceBName = "something/else/redirected";
+      String resourceCName = "another/redirect";
+
+      // Define a linked list of 'A points to B points to C points to A...'
+      defineResource(resourceAName, "ignored content",
+              HttpURLConnection.HTTP_MOVED_PERM);
+      addResourceHeader(resourceAName, "Location: " + getHostPath() + '/'
+              + resourceBName);
+
+      defineResource(resourceBName, "ignored content",
+              HttpURLConnection.HTTP_MOVED_TEMP);
+      addResourceHeader(resourceBName, "Location: " + getHostPath() + "/"
+              + resourceCName);
+      
+      defineResource(resourceCName, "ignored content", 
+              HttpURLConnection.HTTP_MOVED_PERM);
+      addResourceHeader(resourceCName, "Location: NotAProtocolThatIKnowOf://ThisReallyShouldThrowAnException");
+
+      WebConversation wc = new WebConversation();
+      try {
+          wc.getResponse(getHostPath() + '/' + resourceAName);
+          fail("Should have thrown a MalformedURLException");
+      } catch (MalformedURLException expected) {
+          try {
+              wc.getResponse(getHostPath() + "/" + resourceAName);
+          } catch (RecursiveRedirectionException e) {
+              fail("Not expecting RecursiveRedirectionException");
+          } catch (MalformedURLException expected2) {
+              
+          }
+      }
+  }
 
 
+  /**
+   * test GZIP begin disabled
+   * @throws Exception
+   */
     public void testGZIPDisabled() throws Exception {
-        String expectedResponse = "Here is my answer";
-        defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
+      String expectedResponse = "Here is my answer";
+      defineResource( "Compressed.html", new CompressedPseudoServlet( expectedResponse ) );
 
-        WebConversation wc = new WebConversation();
-        wc.getClientProperties().setAcceptGzip( false );
-        WebResponse wr = wc.getResponse( getHostPath() + "/Compressed.html" );
-        assertNull( "Should not have received a Content-Encoding header", wr.getHeaderField( "Content-encoding" ) );
-        assertEquals( "Content-Type", "text/plain", wr.getContentType() );
-        assertEquals( "Content", expectedResponse, wr.getText().trim() );
+      WebConversation wc = new WebConversation();
+      wc.getClientProperties().setAcceptGzip( false );
+      WebResponse wr = wc.getResponse( getHostPath() + "/Compressed.html" );
+      assertNull( "Should not have received a Content-Encoding header", wr.getHeaderField( "Content-encoding" ) );
+      assertEquals( "Content-Type", "text/plain", wr.getContentType() );
+      assertEquals( "Content", expectedResponse, wr.getText().trim() );
     }
 
 

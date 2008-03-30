@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2007, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,7 +21,11 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.xml.sax.SAXException;
 import com.meterware.httpunit.scripting.ScriptingHandler;
@@ -50,7 +54,26 @@ public class WebWindow {
 
 
     static final String NO_NAME = "$$HttpUnit_Window$$_";
-
+    
+    /**
+     * The urls that have been encountered as redirect locations in the course 
+     * of a single client-initiated request
+     * @since patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+     */
+    private final Set _redirects;
+    
+    /** True if seen initial request 
+     * @since patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+     */
+    private boolean _isInitialRequest = true;
+    
+    /** 
+     * Cache the initial client request to ensure that the _redirects 
+     * structure gets reset. 
+     * @since patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+     */
+    private WebRequest _initialRequest;
+        
 
     /**
      * Returns the web client associated with this window.
@@ -115,15 +138,35 @@ public class WebWindow {
     /**
      * Submits a web request and returns a response, using all state developed so far as stored in
      * cookies as requested by the server.
+     * @see patch [ 1155415 ] Handle redirect instructions which can lead to a loop
      * @exception SAXException thrown if there is an error parsing the retrieved page
      * @return the WebResponse or null
      **/
     public WebResponse getResponse( WebRequest request ) throws IOException, SAXException {
-        final RequestContext requestContext = new RequestContext();
-        final WebResponse response = getSubframeResponse( request, requestContext );
-        requestContext.runScripts();
-        return response == null ? null : response.getWindow().getFrameContents( response.getFrame() ); // javascript might replace the response in its frame
-    }
+			//  Need to have some sort of ExecuteAroundMethod to ensure that the 
+			//  redirects data structure gets cleared down upon exit - not 
+			//  straightforward, since this could be a recursive call
+	    if (_isInitialRequest) {
+	        _initialRequest = request;
+	        _isInitialRequest = false;
+	    }
+	
+	    WebResponse result = null;
+	
+	    try {
+	      final RequestContext requestContext = new RequestContext();
+	      final WebResponse response = getSubframeResponse( request, requestContext );
+	      requestContext.runScripts();
+	      result = response == null ? null : response.getWindow().getFrameContents( response.getFrame() ); // javascript might replace the response in its frame
+	    } finally {
+	       if (null != request && request.equals(_initialRequest)) {
+	          _redirects.clear();
+	          _initialRequest = null;
+	          _isInitialRequest = true;
+	      }
+	    }
+	    return result;    
+		}
 
 
     /**
@@ -247,10 +290,15 @@ public class WebWindow {
     }
 
 
+    /**
+     * construct a WebWindow from a given client
+     * @param client - the client to construct me from
+     */
     WebWindow( WebClient client ) {
         _client = client;
         _frameContents = new FrameHolder( this );
         _name = NO_NAME + _client.getOpenWindows().length;
+        _redirects = new HashSet();
     }
 
 
@@ -284,13 +332,60 @@ public class WebWindow {
     }
 
 
-    private boolean shouldFollowRedirect( WebResponse response ) {
+    /**
+     * check whether redirect is configured
+     * @param response
+     * @return
+     */
+    private boolean redirectConfigured( WebResponse response ) {
         return getClient().getClientProperties().isAutoRedirect()
             && response.getResponseCode() >= HttpURLConnection.HTTP_MOVED_PERM
             && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
             && response.getHeaderField( "Location" ) != null;
     }
 
+    /**
+     * check wether we should follow the redirect given in the response
+     * make sure we don't run into a recursion
+     * @param response
+     * @return
+     */
+    private boolean shouldFollowRedirect( WebResponse response ) {
+    	// first check whether redirect is configured for this response
+    	// this is the old pre [ 1155415 ] Handle redirect instructions which can lead to a loop
+    	// shouldFollowRedirect method - just renamed
+      if (!redirectConfigured(response))
+      	return false;
+      // now do the recursion check
+      String redirectLocation = response.getHeaderField("Location");
+      
+      URL url = null;
+
+      try {
+          if (redirectLocation != null) {
+              url = new URL(response.getURL(), redirectLocation);
+          }
+      } catch (MalformedURLException e) {
+          // Fall through and allow existing exception handling code deal 
+          // with any exception - we don't know at this stage whether it is
+          // a redirect instruction, although it is highly likely, given 
+          // there is a location header present in the response!
+      }
+      
+      switch (response.getResponseCode()) {
+      	case HttpURLConnection.HTTP_MOVED_PERM:
+  	    case HttpURLConnection.HTTP_MOVED_TEMP:	// Fall through
+  	        if (null != url && _redirects.contains(url)) {
+  	            // We have already been instructed to redirect to that location in
+  	            // the course of this attempt to resolve the resource
+  	            throw new RecursiveRedirectionException(url, 
+  	                    "Unable to process request due to redirection loop");
+  	        }
+  	        _redirects.add(url);
+      		break;
+      }    
+      return redirectLocation != null;
+    }  
 
     FrameSelector getTopFrame() {
         return _frameContents.getTopFrame();
