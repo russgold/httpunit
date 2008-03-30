@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2007, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -830,6 +830,11 @@ public class WebForm extends WebRequestSource {
     }
 
 
+    /**
+     * get the Vector of submit buttons - will always contain at least
+     * one button - if the original vector has none a faked submit button will be added
+     * @return a Vector with the submit buttons
+     */
     private Vector getSubmitButtonVector() {
         if (_buttonVector == null) {
             _buttonVector = new Vector();
@@ -839,7 +844,12 @@ public class WebForm extends WebRequestSource {
                 if (control instanceof SubmitButton) _buttonVector.add( control );
             }
 
-            if (_buttonVector.isEmpty()) _buttonVector.addElement( new SubmitButton( this ) );
+            /**
+             * make sure that there is always at least one submit button
+             * if none is in the Vector add a faked one
+             */
+            if (_buttonVector.isEmpty()) 
+            	_buttonVector.addElement( SubmitButton.createFakeSubmitButton( this ) );
         }
         return _buttonVector;
     }

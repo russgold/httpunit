@@ -142,6 +142,10 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    /**
+     * check that submit buttons will be detected
+     * @throws Exception
+     */
     public void testSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -156,6 +160,23 @@ public class FormSubmitTest extends HttpUnitTest {
                            form.getRequest( "update" ).getRequestParameterNames() );
     }
 
+
+    /**
+     * check that a fake submit button will be added and marked as such
+     * test for [ 1159887 ] patch for RFE 1159884
+     * by Rafal Krzewski 
+     * @throws Exception
+     */
+    public void testFakeSubmitButtonAddition() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=text name=age value=12>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        SubmitButton[] buttons = form.getSubmitButtons();
+        assertEquals( "num detected submit buttons", 1, buttons.length );
+        assertTrue("the only submit button returned should be a fake",buttons[0].isFake());
+    }
 
     public void testNonSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +

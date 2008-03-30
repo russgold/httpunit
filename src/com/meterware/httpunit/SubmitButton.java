@@ -113,7 +113,13 @@ public class SubmitButton extends Button {
     }
 
 
-    boolean isFake() {
+    /**
+     * getter for the fake flag
+     * Returns true for synthetic submit buttons, created by HttpUnit in forms that contain no
+     * submit buttons, or used during {@link WebForm#submitNoButton()} call.
+     * @return - whether this button is a faked button inserted by httpunit
+     */
+    public boolean isFake() {
         return _fake;
     }
 
