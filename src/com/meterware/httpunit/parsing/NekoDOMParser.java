@@ -64,6 +64,13 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
     private DocumentAdapter _documentAdapter;
 
 
+    /**
+     * construct a new NekoDomParser with the given adapter and url
+     * @param adapter
+     * @param url
+     * @return - the new parser
+     * patch [ 1211154 ] NekoDOMParser default to lowercase by Dan Allen
+     */
     static NekoDOMParser newParser( DocumentAdapter adapter, URL url ) {
         final HTMLConfiguration configuration = new HTMLConfiguration();
         if (!HTMLParserFactory.getHTMLParserListeners().isEmpty() || HTMLParserFactory.isParserWarningsEnabled()) {
@@ -74,9 +81,12 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
         final ScriptFilter javaScriptFilter = new ScriptFilter( configuration );
         configuration.setProperty( FILTERS, new XMLDocumentFilter[] { javaScriptFilter } );
         if (HTMLParserFactory.isPreserveTagCase()) {
-            configuration.setProperty( TAG_NAME_CASE, "match" );
-            configuration.setProperty( ATTRIBUTE_NAME_CASE, "no-change" );
-        }
+          configuration.setProperty( TAG_NAME_CASE, "match" );
+          configuration.setProperty( ATTRIBUTE_NAME_CASE, "no-change" );
+        } else {
+        	configuration.setProperty( TAG_NAME_CASE, "lower" );
+        	configuration.setProperty( ATTRIBUTE_NAME_CASE, "lower" );
+        }        
 
         try {
             final NekoDOMParser domParser = new NekoDOMParser( configuration, adapter );

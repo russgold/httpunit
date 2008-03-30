@@ -45,8 +45,12 @@ public class ParserPropertiesTest extends HttpUnitTest {
 
     public static TestSuite suite() {
         TestSuite ts = new TestSuite();
-        boolean supportsKeepCase = HTMLParserFactory.getHTMLParser().supportsPreserveTagCase();
-        if (supportsKeepCase) ts.addTest( new ParserPropertiesTest( "testKeepCase" ) );
+        HTMLParser parser = HTMLParserFactory.getHTMLParser();
+        boolean supportsKeepCase = parser.supportsPreserveTagCase();
+        if (supportsKeepCase) 
+        	ts.addTest( new ParserPropertiesTest( "testKeepCase" ) );
+        if (parser instanceof NekoHTMLParser)
+        	ts.addTest( new ParserPropertiesTest( "testLowerCase" ) );
         return ts;
     }
 
@@ -60,29 +64,60 @@ public class ParserPropertiesTest extends HttpUnitTest {
     public ParserPropertiesTest( String name ) {
         super( name );
     }
-
-    public void testKeepCase() throws Exception {
-        defineResource( "SimplePage.html",
-                        "<HTML><head><title>A Sample Page</title></head>\n" +
-                        "<body>This has no forms but it does\n" +
-                        "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
-                        " and <a name=here>an <B>anchor</B></a>\n" +
-                        "</body></HTML>\n" );
-        WebConversation wc = new WebConversation();
-        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
-        verifyMatchingBoldNodes( wc, request, new String[] { "active", "anchor" } );
-        HTMLParserFactory.setPreserveTagCase( true );
-        verifyMatchingBoldNodes( wc, request, new String[] { "active" } );
-    }
-
-
+    
+    /**
+     * verify the upper/lower case handling
+     * @param wc
+     * @param request
+     * @param boldNodeContents
+     * @throws IOException
+     * @throws SAXException
+     */
     private void verifyMatchingBoldNodes( WebConversation wc, WebRequest request, String[] boldNodeContents ) throws IOException, SAXException {
-        WebResponse simplePage = wc.getResponse( request );
-        Document doc = simplePage.getDOM();
-        NodeList nlist = doc.getElementsByTagName( "b" );
-        assertEquals( "Number of nodes with tag 'b':", boldNodeContents.length, nlist.getLength() );
-        for (int i = 0; i < nlist.getLength(); i++) {
-            assertEquals( "Element " + i, boldNodeContents[i], nlist.item( i ).getFirstChild().getNodeValue() );
-        }
+      WebResponse simplePage = wc.getResponse( request );
+      Document doc = simplePage.getDOM();
+      NodeList nlist = doc.getElementsByTagName( "b" );
+      assertEquals( "Number of nodes with tag 'b':", boldNodeContents.length, nlist.getLength() );
+      for (int i = 0; i < nlist.getLength(); i++) {
+          assertEquals( "Element " + i, boldNodeContents[i], nlist.item( i ).getFirstChild().getNodeValue() );
+      }
     }
+
+    /**
+     * test the preserveTagCase configuration feature ofh the HTMLParserFactory
+     * @param preserveTagCase
+     * @throws Exception
+     */
+    public void doTestKeepCase(boolean preserveTagCase, String[] expected1, String[] expected2) throws Exception {
+      defineResource( "SimplePage.html",
+                      "<HTML><head><title>A Sample Page</title></head>\n" +
+                      "<body>This has no forms but it does\n" +
+                      "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
+                      " and <a name=here>an <B>anchor</B></a>\n" +
+                      "</body></HTML>\n" );
+      WebConversation wc = new WebConversation();
+      WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+      verifyMatchingBoldNodes( wc, request, expected1 );
+      HTMLParserFactory.setPreserveTagCase( preserveTagCase);
+      verifyMatchingBoldNodes( wc, request, expected2 );
+    }
+    
+    /**
+     * test the keepcase setting
+     * @throws Exception
+     */
+    public void testKeepCase() throws Exception {
+    	doTestKeepCase(true,new String[] { "active", "anchor" },new String[] { "active" });
+    }
+    
+    /**
+     * test for path [ 1211154 ] NekoDOMParser default to lowercase
+     * by Dan Allen 
+     * @throws Exception
+     */
+    public void testLowerCase() throws Exception {
+     	doTestKeepCase(false,new String[] { "active", "anchor" },new String[] { "active", "anchor" }); 	
+    }
+
+
 }

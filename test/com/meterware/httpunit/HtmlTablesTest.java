@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -83,7 +83,75 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( 1, tables.length );
     }
 
+    /**
+     * test for patch [ 1117822 ] Patch for purgeEmptyCells() problem
+     * by Glen Stampoultzis
+     * @throws Exception
+     */
+    public void testPurgeEmptyCells()   throws Exception {
+			 defineWebPage( "StrangeSpan", "<h2>Interesting data</h2>" +
+	         "<table class=\"headerTable\" width=\"97%\" cellspacing=\"2\" cellpadding=\"0\" border=\"0\" id=\"personalTable\">\n" +
+	         "        <tr>\n" +
+	         "          <th colspan=\"6\"><img src=\"images/curve-left.gif\" align=\"top\" border=\"0\">Notifications:</th>\n" +
+	         "        </tr>\n" +
+	         "\n" +
+	         "<tr> <td width=\"10\">&nbsp;</td>\n" +
+	         "          <td colspan=\"5\">None</td>\n" +
+	         "\n" +
+	         "</tr> <tr>\n" +
+	         "          <th colspan=\"6\"><img src=\"images/curve-left.gif\" align=\"top\" border=\"0\">Watches:</th>\n" +
+	         "        </tr>\n" +
+	         "\n" +
+	         "<tr> <td>&nbsp;</td>\n" +
+	         "          <td colspan=\"5\">None</td>\n" +
+	         "</tr> <tr>\n" +
+	         "          <th colspan=\"6\"><img src=\"images/curve-left.gif\" align=\"top\" border=\"0\">Messages:</th>\n" +
+	         "\n" +
+	         "        </tr>\n" +
+	         "\n" +
+	         "<tr> <td>&nbsp;</td>\n" +
+	         "          <td colspan=\"5\">None</td>\n" +
+	         "</tr> <tr>\n" +
+	         "          <th colspan=\"6\"><img src=\"images/curve-left.gif\" align=\"top\" border=\"0\">Favourite Documents:</th>\n" +
+	         "        </tr>\n" +
+	         "\n" +
+	         "<tr> <td>&nbsp;</td>\n" +
+	         "\n" +
+	         "          <td colspan=\"5\">None</td>\n" +
+	         "</tr>\t</table>" );			
+			WebTable table = _wc.getResponse( getHostPath() + "/StrangeSpan.html" ).getTables()[0];
+      assertNotNull( table );
+			 
+			assertEquals(6, table.getColumnCount());
+			assertEquals(8, table.getRowCount());
+			table.purgeEmptyCells();
+			assertEquals("after purging Cells there should be 2 columns left",2, table.getColumnCount());
+			assertEquals(8, table.getRowCount());
+			String[][] text = table.asText();
+			int row = 0;
+			assertEquals("Notifications:", text[row][0]);
+			assertEquals("Notifications:", text[row++][1]);
+			assertEquals("", text[row][0]);
+			assertEquals("None", text[row++][1]);
+			assertEquals("Watches:", text[row][0]);
+			assertEquals("Watches:", text[row++][1]);
+			assertEquals("", text[row][0]);
+			assertEquals("None", text[row++][1]);
+			assertEquals("Messages:", text[row][0]);
+			assertEquals("Messages:", text[row++][1]);
+			assertEquals("", text[row][0]);
+			assertEquals("None", text[row++][1]);
+			assertEquals("Favourite Documents:", text[row][0]);
+			assertEquals("Favourite Documents:", text[row++][1]);
+			assertEquals("", text[row][0]);
+			assertEquals("None", text[row++][1]);
+    }
 
+
+    /** 
+     * test finding the Table Size
+     * @throws Exception
+     */
     public void testFindTableSize() throws Exception {
         WebTable table = _wc.getResponse( getHostPath() + "/OneTable.html" ).getTables()[0];
         assertEquals( 5, table.getRowCount() );
