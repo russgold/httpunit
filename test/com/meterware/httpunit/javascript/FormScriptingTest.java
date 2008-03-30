@@ -375,6 +375,11 @@ public class FormScriptingTest extends HttpUnitTest {
         assertDisabledNormalButtonCanNotBeClicked( form, "changee" );
     }
 
+    /**
+     * also fix for [ 1124024 ] Formcontrol and isDisabled should be public
+     * by wolfgang fahl
+     * @param form
+     */
     private void assertSubmitButtonDisabled( WebForm form ) {
         assertTrue( "Button should have been Disabled", form.getSubmitButton( "change" ).isDisabled() );
     }

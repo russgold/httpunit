@@ -880,14 +880,21 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Constructs a response object.
+     * @see [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)
      * @param frame the frame to hold the response
      * @param url the url from which the response was received
+     * 
      **/
     protected WebResponse( WebClient client, FrameSelector frame, URL url ) {
         _client = client;
         _baseURL = _pageURL = url;
         _baseTarget = frame.getName();
         _frame = frame;
+        // intialize window for interception as described in
+        // https://sourceforge.net/tracker/index.php?func=detail&aid=1159844&group_id=6550&atid=356550
+        if (client!=null) {
+        	_window = client.getMainWindow();
+        }	
     }
 
 
