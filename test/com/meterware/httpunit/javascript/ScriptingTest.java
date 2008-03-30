@@ -952,4 +952,27 @@ public class ScriptingTest extends HttpUnitTest {
       // System.err.println("alert 2 is "+alert2);
       // assertEquals("someform",alert2);
     }
+    
+    /**
+     * test for function in external javascript
+     * https://sourceforge.net/forum/forum.php?thread_id=1406498&forum_id=20294
+     * @throws Exception
+     */
+    public void testJavaScriptFromSource() throws Exception {
+    	 defineResource( "someScript.js","function someFunction() {\n"+ 
+       	 	"	alert('somefunction called')"+ 
+       		"}\n"); 		
+    	 defineResource( "Script.html","<html><head>\n"+ 
+    		"<script language='JavaScript' src='someScript.js' />\n"+ 
+    	 	"<script language='JavaScript'>\n" +
+    	 	"function testFunction() {\n"+ 
+    	 	"	var retValue = someFunction(); //Here some function is part of SomeScript.js\n"+ 
+    		"}\n"+ 		
+    		"</script></head><body onload='testFunction()'></body></html>");
+       WebConversation wc = new WebConversation();
+       WebResponse response = wc.getResponse( getHostPath() + "/Script.html" );
+       // com.meterware.httpunit.ScriptException: Event 'testFunction()' failed: org.mozilla.javascript.EcmaError: ReferenceError: "someFunction" is not defined. (httpunit#1)
+       String alert1=wc.popNextAlert();
+       assertEquals("somefunction called",alert1);
+    }   
 }
