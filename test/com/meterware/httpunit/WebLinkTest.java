@@ -149,8 +149,8 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "URL with break at end", endbreak,"http://localhost/somewhere");
         //System.err.println(endbreak+"='"+endbreak+"'");
         String midbreak=response.getLinkWithID( "midbreak" ).getRequest().getURL().toExternalForm() ;
-        System.err.println(midbreak+"='"+midbreak+"'");
-        //assertEquals( "URL across linebreak", midbreak,"http://localhost/somewhere");
+        //System.err.println(midbreak+"='"+midbreak+"'");
+        assertEquals( "URL across linebreak", midbreak,"http://localhost/somewhere");
     }
 
 
