@@ -1213,8 +1213,15 @@ class SelectionFormControl extends FormControl {
         protected abstract boolean claimUniqueValues( List values, Option[] options );
 
 
+        /**
+         * report if there are no matches
+         * be aware of [ 1100437 ] Patch for ClassCastException in FormControl
+         * TODO implement patch if test get's available
+         * @param values
+         */
         final protected void reportNoMatches( List values ) {
-            if (!_listBox) throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
+            if (!_listBox) 
+            	throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
         }
 
 
@@ -1386,6 +1393,11 @@ class SelectionFormControl extends FormControl {
         }
 
 
+        /**
+         * claim the values
+         * be aware of [ 1100437 ] Patch for ClassCastException in FormControl
+         * TODO implement patch if test get's available  - the (String) cast might fail
+         */
         protected boolean claimUniqueValues( List values, Option[] options ) {
             boolean changed = false;
             for (int i = 0; i < values.size(); i++) {

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2005, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -114,6 +114,8 @@ public class WebTable extends HTMLElementBase {
 
     /**
      * Removes all rows and all columns from this table which have no visible text in them.
+     * patch [ 1117822 ] Patch for purgeEmptyCells() problem
+     * by Glen Stampoultzis 
      **/
     public void purgeEmptyCells() {
         int numRowsWithText = 0;
@@ -124,16 +126,27 @@ public class WebTable extends HTMLElementBase {
 
 
         // look for rows and columns with any text in a non-spanning cell
-        for (int i = 0; i < rowHasText.length; i++) {
-            for (int j = 0; j < columnHasText.length; j++) {
-                if (getCellAsText(i,j).trim().length() == 0) continue;
-                if (getTableCell(i,j).getColSpan() == 1 && getTableCell(i,j).getRowSpan() == 1) {
-                    if (!rowHasText[i]) numRowsWithText++;
-                    if (!columnHasText[j]) numColumnsWithText++;
-                    rowHasText[i] = columnHasText[j] = true;
-                } else if (!spanningCells.containsKey( getTableCell(i,j) )) {
-                    spanningCells.put( getTableCell(i,j), new int[] { i, j } );
-                }
+        for (int row = 0; row < rowHasText.length; row++) {
+          for (int col = 0; col < columnHasText.length; col++) {
+              if (getCellAsText(row,col).trim().length() == 0) continue;
+              if (getTableCell(row,col).getColSpan() == 1 && getTableCell(row,col).getRowSpan() == 1) {
+                  if (!rowHasText[row]) numRowsWithText++;
+                  if (!columnHasText[col]) numColumnsWithText++;
+                  rowHasText[row] = columnHasText[col] = true;
+              } else if (!spanningCells.containsKey( getTableCell(row,col) )) {
+                  // gstamp: altered the original code to deal with two issues:
+                  // Firstly only the coordinates of the first spanning cell
+                  // are added to the Map.  The old code was using the last
+                  // set of coordinates.
+                  // Secondly I mark the starting coordinates as containing
+                  // text which keeps the next section of code from removing
+                  // the starting row/column.
+                  if (spanningCells.get( getTableCell(row,col) ) == null ) {
+                      if (!rowHasText[row]) numRowsWithText++;
+                      if (!columnHasText[col]) numColumnsWithText++;
+                      rowHasText[row] = columnHasText[col] = true;
+                      spanningCells.put( getTableCell(row,col), new int[] { row, col } );
+                  }                }
             }
         }
 
