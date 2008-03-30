@@ -164,8 +164,13 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     }
 
 
+    /**
+     * get the relative URL for a weblink
+     * change spaces to %20
+     * @return
+     */
     protected String getRelativeURL() {
-        String result = HttpUnitUtils.trimAll( HttpUnitUtils.trimFragment( getDestination() ) );
+        String result = HttpUnitUtils.encodeSpaces( HttpUnitUtils.trimFragment( getDestination() ) );
         if (result.trim().length() == 0) result = getBaseURL().getFile();
         return result;
     }

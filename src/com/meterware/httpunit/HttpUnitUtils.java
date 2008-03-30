@@ -354,23 +354,36 @@ public class HttpUnitUtils {
 
 
     /**
-     * Trims not only whitespace from the ends, but also from the middle. Spaces within quotes are respected.
+     * Trims whitespace from the ends, and encodes from the middle. 
+     * Spaces within quotes are respected.
      */
-    static String trimAll( String s ) {
+    static String encodeSpaces( String s ) {
         s = s.trim();
-        if (s.indexOf( ' ' ) < 0) return s;
+        // if no spaces we are fine
+        if (s.indexOf( ' ' ) < 0) 
+        	return s;
 
         boolean inQuotes = false;
         StringBuffer sb = new StringBuffer();
         char[] chars = s.toCharArray();
+        // loop over oper the chars of the URL
         for (int i = 0; i < chars.length; i++) {
-            char aChar = chars[i];
-            if (aChar == '"' || aChar == '\'' ) {
-                inQuotes = !inQuotes;
-                sb.append( aChar );
-            } else if (inQuotes || (aChar > ' ')) {
-                sb.append( aChar );
-            }
+        	// get the current character
+          char aChar = chars[i];
+          // toggle quotation and add quote
+          if (aChar == '"' || aChar == '\'' ) {
+            inQuotes = !inQuotes;
+            sb.append( aChar );
+            // append everything in quotes and printable chars above space      
+          } else if (inQuotes) {
+            sb.append( aChar );
+          } else if (aChar > ' ') {
+            sb.append( aChar );
+          } else if (aChar==' ') {
+          	// encode spaces
+          	// TODO check what to do about breaking testLinkUrlAcrossLineBreaks then ...
+          	// sb.append("%20");
+          }
         }
         return sb.toString();
     }
