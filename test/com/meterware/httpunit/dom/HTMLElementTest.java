@@ -310,10 +310,15 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
     }
 
 
+    /**
+     * test the Applet Element
+     * changed default codebase from "/" to "." according to bug report [ 1895501 ] Handling no codebase attribute in APPLET tag
+     * @throws Exception
+     */
     public void testAppletElement() throws Exception {
         doElementTest( "applet", HTMLAppletElement.class,
                        new Object[][] { { "align", "center" },/* { "alt", "an applet" }, { "archive", "my.jar" },*/
-                                        { "code", "here.There" }, { "codebase", "there", "/" }, /*{ "height", "17" },
+                                        { "code", "here.There" }, { "codebase", "there", "." }, /*{ "height", "17" },
                                         { "hspace", "2" }, { "name", "applet" }, { "object", "a file here" },
                                         { "vspace", "3" }, { "width", "80"}*/ } );
     }

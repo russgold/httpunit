@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2007, Russell Gold
+ * Copyright (c) 2007, 2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -71,8 +71,12 @@ public class HTMLAppletElementImpl extends HTMLElementImpl implements HTMLApplet
     }
 
 
+    /**
+     * get the codebase of this applet
+     * modified for bug report [ 1895501 ] Handling no codebase attribute in APPLET tag
+     */
     public String getCodeBase() {
-        return getAttributeWithDefault( "codebase", "/" );
+        return getAttributeWithDefault( "codebase", "." );
     }
 
 

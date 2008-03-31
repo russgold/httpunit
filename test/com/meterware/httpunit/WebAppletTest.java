@@ -193,6 +193,24 @@ public class WebAppletTest extends HttpUnitTest {
         applet.getAppletContext().showDocument( new URL( getHostPath() + "/next.html" ) );
         assertEquals( "current page URL", getHostPath() + "/next.html", wc.getCurrentPage().getURL().toExternalForm() );
     }
+    
+    /**
+     * test for bug report [ 1895501 ] Handling no codebase attribute in APPLET tag
+     * by lacton
+     * @throws Exception
+     */
+    public void testAppletWithinADirectory() throws Exception {
+      defineWebPage( "directory/start", "<applet code='"+SimpleApplet.class.getName()+"'></applet>" );
+      mapToClasspath( "/directory" );
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/directory/start.html" );
+      WebApplet wa = response.getApplets()[0];
+      assertEquals( "Applet codebase", getHostPath() + "/directory/", wa.getCodeBaseURL().toExternalForm() );
+      Applet applet = wa.getApplet();
+      assertNotNull( "Applet was not loaded", applet );
+      assertEquals( "Applet class", SimpleApplet.class.getName(), applet.getClass().getName() );
+    }
+
 
 
     public static class SimpleApplet extends Applet {
