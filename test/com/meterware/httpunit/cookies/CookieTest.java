@@ -104,6 +104,10 @@ public class CookieTest extends TestCase {
     }
 
 
+    /**
+     * check the CookieAcceptance
+     * @throws Exception
+     */
     public void testCookieAcceptance() throws Exception {
         checkAcceptance( 1, true,  "www.meterware.com/servlets/special", null, null );
         checkAcceptance( 2, true,  "www.meterware.com/servlets/special", ".meterware.com", "/servlets" );
@@ -116,13 +120,22 @@ public class CookieTest extends TestCase {
         checkAcceptance( 9, false, "www.meterware.com/servlets/special", "www.meterware.com", null );
     }
 
+    /**
+     * check whether the given cookie is accepted
+     * @param index
+     * @param shouldAccept
+     * @param urlString
+     * @param specifiedDomain
+     * @param specifiedPath
+     * @throws MalformedURLException
+     */
 
     private void checkAcceptance( int index, boolean shouldAccept, String urlString,
                                   String specifiedDomain, String specifiedPath ) throws MalformedURLException {
         CookieJar jar = newJar( urlString, specifiedDomain, specifiedPath );
 
         if (shouldAccept) {
-            assertNotNull( "Rejected cookie " + index + "( " + specifiedDomain + " from " + urlString + ")", jar.getCookie( "name" ) );
+            assertNotNull( "Rejected cookie " + index + "( " + specifiedDomain + " from " + urlString + ") should have been accepted", jar.getCookie( "name" ) );
         } else {
             assertNull( "Cookie " + index + " should have been rejected", jar.getCookie( "name" ) );
         }
@@ -229,6 +242,18 @@ public class CookieTest extends TestCase {
                               new String[] { "myStuff=1234; path=/foo; HttpOnly"} ) );
       assertEquals( "cookie 'myStuff' value", "1234", jar.getCookieValue( "myStuff" ) );
     }
+    
+    /**
+     * test for bug report [ 1533762 ] Valid cookies are rejected
+     * by Alexey Bulat 
+     * TODO enable when working patch is available
+     * @throws Exception
+     */
+    public void xtestCookiesRejection1533762() throws Exception {
+      checkAcceptance( 1, true, "admin.automation.testing.com.ru", ".testing.com.ru", null );
+      checkAcceptance( 2, true, "admin.automation.testing.com.ru", ".admin.automation.testing.com.ru",null);
+    }
+    
 
     private void checkHeader( int index, CookieJar jar, String expectedHeader, String targetURLString ) throws MalformedURLException {
         assertEquals( "header " + index, expectedHeader, jar.getCookieHeaderField( new URL( "http://" + targetURLString ) ) );
@@ -275,6 +300,16 @@ public class CookieTest extends TestCase {
     }
 
 
+    /**
+     * check the cookieListener call Back 
+     * @param listener
+     * @param index
+     * @param status
+     * @param urlString
+     * @param specifiedDomain
+     * @param specifiedPath
+     * @throws MalformedURLException
+     */
     private void checkCallback( MockListener listener, int index, int status, String urlString,
                                 String specifiedDomain, String specifiedPath ) throws MalformedURLException {
         if (status == 0) {

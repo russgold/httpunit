@@ -421,11 +421,20 @@ public class CookieJar {
         }
 
 
+        /**
+         * add the given cookie if it is valid
+         * @param cookie
+         */
         private void addCookieIfValid( Cookie cookie ) {
             if (acceptCookie( cookie )) addUniqueCookie( cookie );
         }
 
 
+        /**
+         * accept the given cookie
+         * @param cookie
+         * @return
+         */
         private boolean acceptCookie( Cookie cookie ) {
             if (cookie.getPath() == null) {
                 cookie.setPath( getParentPath( _sourceURL.getPath() ) );
@@ -468,8 +477,15 @@ public class CookieJar {
         }
 
 
+        /**
+         * get the domainAttribute Status for the given domainAttribute with the given sourceHost
+         * @param domainAttribute
+         * @param sourceHost
+         * @return
+         */
         private int getDomainAttributeStatus( String domainAttribute, String sourceHost ) {
-            if (!domainAttribute.startsWith(".")) domainAttribute = '.' + domainAttribute;
+            if (!domainAttribute.startsWith(".")) 
+            	domainAttribute = '.' + domainAttribute;
 
             if (domainAttribute.lastIndexOf('.') == 0) {
                 return CookieListener.DOMAIN_ONE_DOT;
@@ -482,8 +498,7 @@ public class CookieJar {
                 return CookieListener.ACCEPTED;
             }
         }
-
-
+        
         private boolean reportCookieRejected( int reason, String attribute, String source ) {
             CookieProperties.reportCookieRejected( reason, attribute, source );
             return false;
