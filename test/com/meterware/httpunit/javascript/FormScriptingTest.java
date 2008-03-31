@@ -331,10 +331,10 @@ public class FormScriptingTest extends HttpUnitTest {
      * test changing form Action from JavaScript
      * @throws Exception
      */
-    public void xtestFormActionFromJavaScript() throws Exception {
+    public void testFormActionFromJavaScript() throws Exception {    	
     	// pending Patch 1155792 wf 2007-12-30
-    	// XXX activate in due course
-   		// dotestFormActionFromJavaScript("param");
+    	// TODO activate in due course
+   		dotestFormActionFromJavaScript("param");
     }
 
     /**
@@ -343,10 +343,19 @@ public class FormScriptingTest extends HttpUnitTest {
     public void xtestFormActionFromJavaScript2() throws Exception {
     	// pending Patch 1155792 wf 2007-12-30
     	// TODO activate in due course
-    	// dotestFormActionFromJavaScript("action");
+    	dotestFormActionFromJavaScript("action");
     }
 
+    /**
+     * test doing a form action from Javascript
+     * @param paramName
+     * @throws Exception
+     */
     public void dotestFormActionFromJavaScript(String paramName) throws Exception {
+    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    		return;
+    	}
+    	
     	defineWebPage("foo","foocontent");
     	defineResource("bar.html","<html><head><script>"+
 											    			"function submitForm()"+
@@ -374,7 +383,7 @@ public class FormScriptingTest extends HttpUnitTest {
       	// There is currently a 
       	// org.mozilla.javascript.JavaScriptException: com.meterware.httpunit.HttpNotFoundException: Error on HTTP request: 404 unable to find /foo.html [http://localhost:1929/foo.html]
       	// here
-      	// fail("There should be not Runtime exception here");
+      	fail("There should be no "+rte.getMessage()+" Runtime exception here");
       }
     }
 

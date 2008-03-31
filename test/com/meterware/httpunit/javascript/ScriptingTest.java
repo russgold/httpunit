@@ -113,6 +113,37 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "New page", "You made it!", wc.getCurrentPage().getText() );
     }
 
+    /**
+     * test the given javaScript function
+     * @param script
+     */
+    public WebConversation doTestJavaScript(String script) throws Exception {
+      defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>\n" +
+      		"function javaScriptFunction() {\n"+
+      		script+
+      		"}\n"+
+          "</script></head>" +
+          "<body>" +
+          "<a href=\"javascript:javaScriptFunction()\">go</a>" +
+          "</body></html>" );
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      response.getLinkWith( "go" ).click();
+      return wc;    	
+    }
+    
+    /**
+     * test for bug report [ 1508516 ] Javascript method: "undefined" is not supported
+     * @throws Exception
+     */
+    public void testUndefined() throws Exception {
+    	WebConversation wc=doTestJavaScript("if (typeof(xyzDefinitelyNotDefined) == 'undefined') {\n"+
+    			"alert ('blabla');\n"+
+    			"return;\n"+
+    			"}");
+      assertEquals( "Alert message", "blabla", wc.popNextAlert() );
+    	
+    }
 
     public void testJavaScriptURLWithIncludedFunction() throws Exception {
         defineResource( "saycheese.js", "function sayCheese() { alert( \"Cheese!\" ); }" );
