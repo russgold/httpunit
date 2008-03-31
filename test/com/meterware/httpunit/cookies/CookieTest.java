@@ -204,6 +204,20 @@ public class CookieTest extends TestCase {
                                              new String[] { "zero", "zero", "first", "second", "fourth", "gone" },
                                              jar.getCookieNames() );
     }
+    
+    /**
+     * test for [ 1488617 ] alternate patch for cookie bug #1371204
+     * @throws Exception
+     */
+    public void testSingleUserCookie() throws Exception {
+      CookieJar jar = new CookieJar();
+      jar.putSingleUseCookie("zero","nil","sourceforge.net","test/me");
+      Cookie cookie=jar.getCookie("zero");
+      assertTrue(cookie!=null);
+      assertEquals(cookie.getDomain(),"sourceforge.net");
+      assertEquals(cookie.getValue(),"nil");
+      assertEquals(cookie.getPath(),"test/me");            
+    }
 
 
     private void checkHeader( int index, CookieJar jar, String expectedHeader, String targetURLString ) throws MalformedURLException {

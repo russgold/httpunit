@@ -2,7 +2,7 @@ package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2004,2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -138,7 +138,25 @@ public class CookieJar {
         }
     }
 
-
+    /**
+     * Define a non-global cookie.  This cookie can be overwritten by subsequent cookie definitions
+     * in http headers.  This cookie definition requires a domain and path.  If a global cookie is 
+     * defined with the same name, this cookie is not added.
+     */
+    public void putSingleUseCookie(String name, String value, String domain, String path) {
+    	for (Iterator iterator = _globalCookies.iterator(); iterator.hasNext();) {
+    		Cookie cookie = (Cookie) iterator.next();
+    		if (name.equals( cookie.getName() )) return;
+    	}
+     
+     	for (Iterator iterator = _cookies.iterator(); iterator.hasNext();) {
+     	    Cookie cookie = (Cookie) iterator.next();
+     	    if (name.equals( cookie.getName() )) iterator.remove();
+     	}
+     
+     	_cookies.add( new Cookie( name, value, domain, path) );
+    }
+    
     /**
      * Returns the name of all the active cookies in this cookie jar.
      **/

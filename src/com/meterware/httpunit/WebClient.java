@@ -29,6 +29,8 @@ import java.net.PasswordAuthentication;
 import java.util.*;
 
 import org.xml.sax.SAXException;
+
+import com.meterware.httpunit.cookies.Cookie;
 import com.meterware.httpunit.cookies.CookieJar;
 
 
@@ -193,7 +195,14 @@ public class WebClient {
         return _cookieJar.getCookieNames();
     }
 
-
+    /**
+     * Returns an object containing the details of the named cookie
+     * @since [ 1488617 ] alternate patch for cookie bug #1371204
+     */
+    public Cookie getCookieDetails( String name ) {
+    	return _cookieJar.getCookie( name );
+    }
+    
     /**
      * Returns the value of the specified cookie.
      **/

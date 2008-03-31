@@ -19,6 +19,7 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+import com.meterware.httpunit.cookies.Cookie;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
@@ -146,6 +147,10 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "content type", "text/html", response.getContentType() );
     }
 
+    /**
+     * test cookies
+     * @throws Exception
+     */
     public void testCookies() throws Exception {
         String resourceName = "something/baking";
         String resourceValue = "the desired content";
@@ -175,6 +180,12 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "cookie 'p30waco_sso' value", "3.0,en,us,AMERICA,Drew", wc.getCookieValue( "p30waco_sso" ) );
         assertEquals( "cookie 'PORTAL30_SSO_TEST' value", "X", wc.getCookieValue( "PORTAL30_SSO_TEST" ) );
         assertEquals( "cookie 'SESSION_ID' value", "17585,Dzm5LzbRPnb95QkUyIX+7w5RDT7p6OLuOVZ91AMl4hsDATyZ1ej+FA==", wc.getCookieValue( "SESSION_ID" ) );
+        // addition for [ 1488617 ] alternate patch for cookie bug #1371204
+        Cookie cookie=wc.getCookieDetails("age");
+        assertTrue(cookie!=null);
+        assertEquals(cookie.getDomain(),"localhost");
+        assertEquals(cookie.getValue(),"12");
+        assertEquals(cookie.getPath(),"/something");            
     }
 
 

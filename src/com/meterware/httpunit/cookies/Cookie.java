@@ -2,7 +2,7 @@ package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -71,7 +71,19 @@ public class Cookie {
         _name = name;
         _value = value;
     }
-
+    
+    /**
+     * construct a cookie with domain and path restrictions
+     * @param name
+     * @param value
+     * @param domain
+     * @param path
+     */
+    Cookie( String name, String value, String domain, String path) {
+    	this(name, value);
+     	_path = path;
+     	_domain = domain;
+    }
 
     /**
      * Constructs a cookie w/o any domain or path restrictions.
