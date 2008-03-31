@@ -35,8 +35,10 @@ import junit.framework.TestSuite;
 
 public class RequestDispatcherTest extends TestCase {
 
-    final String outerServletName = "something/interesting";
-    final String innerServletName = "something/more";
+    final String outerServletName  = "something/interesting";
+    final String innerServletName  = "something/more";
+    final String decodeExampleName = "repository/Default%20repository";
+
 
     final static String REQUEST_URI  = "javax.servlet.include.request_uri";
     final static String CONTEXT_PATH = "javax.servlet.include.context_path";
@@ -66,6 +68,7 @@ public class RequestDispatcherTest extends TestCase {
         super.setUp();
         WebXMLString wxs = new WebXMLString();
         wxs.addServlet( outerServletName, RequestDispatcherServlet.class );
+        wxs.addServlet( decodeExampleName, RequestDispatcherServlet.class );
         wxs.addServlet( innerServletName, IncludedServlet.class );
         _runner = new ServletRunner( wxs.asInputStream(), "/sample");
     }
@@ -142,6 +145,21 @@ public class RequestDispatcherTest extends TestCase {
 //        assertNull( "query string attribute not null", "param=revised&param2=new", restoredRequest.getAttribute( QUERY_STRING ) );
     }
 
+    /**
+     * test for fix of bug [ 1323031 ] getPathInfo does not decode request URL
+     * by Hugh Winkler -
+     */
+    public void testDecodeRequestURL() throws Exception {
+      InvocationContext ic = _runner.newClient().newInvocation( "http://localhost/sample/" + decodeExampleName );
+
+      final HttpServletRequest request = ic.getRequest();
+      RequestDispatcherServlet servlet = (RequestDispatcherServlet) ic.getServlet();
+      RequestDispatcher rd = servlet.getServletContext().getRequestDispatcher( "/" + innerServletName + "?param=revised&param2=new" );
+      String path=request.getPathInfo();
+      String servletPath=request.getServletPath();
+      // System.err.println("servletPath='"+servletPath+"'\npath='"+path+"'");
+      assertEquals(servletPath,"/repository/Default repository");
+    }  
 
 
 

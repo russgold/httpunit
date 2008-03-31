@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2001-2004, 2006 Russell Gold
+ * Copyright (c) 2001-2004, 2006,2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -785,13 +785,21 @@ class WebApplication implements SessionListenerDispatcher {
         }
 
 
+        /**
+         * get the ServletPath
+         * the decoded ServletPath
+         */
         public String getServletPath() {
-            return _mapping == null ? null : _mapping.getServletPath( _fullServletPath );
+            return _mapping == null ? null : HttpUnitUtils.decode(_mapping.getServletPath( _fullServletPath ));
         }
 
 
+        /**
+         * get the Path Information
+         * @return the decode path
+         */
         public String getPathInfo() {
-            return _mapping == null ? null : _mapping.getPathInfo( _fullServletPath );
+            return _mapping == null ? null : HttpUnitUtils.decode(_mapping.getPathInfo( _fullServletPath ));
         }
 
 
@@ -827,6 +835,10 @@ class WebApplication implements SessionListenerDispatcher {
     }
 
 
+    /**
+     * mapping for WebResources
+     *
+     */
     static class WebResourceMapping {
 
         private WebResourceConfiguration _configuration;
