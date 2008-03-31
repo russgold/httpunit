@@ -342,7 +342,7 @@ public class FormScriptingTest extends HttpUnitTest {
      */
     public void xtestFormActionFromJavaScript2() throws Exception {
     	// pending Patch 1155792 wf 2007-12-30
-    	// XXX activate in due course
+    	// TODO activate in due course
     	// dotestFormActionFromJavaScript("action");
     }
 
@@ -370,6 +370,7 @@ public class FormScriptingTest extends HttpUnitTest {
       	// 	System.err.println(result);
       	assertEquals( "Result of submit", fooContent, result );
       } catch (RuntimeException rte) {
+      	// TODO activate this test
       	// There is currently a 
       	// org.mozilla.javascript.JavaScriptException: com.meterware.httpunit.HttpNotFoundException: Error on HTTP request: 404 unable to find /foo.html [http://localhost:1929/foo.html]
       	// here

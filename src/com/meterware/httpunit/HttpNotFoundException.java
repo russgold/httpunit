@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2001,2008 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -30,11 +30,21 @@ import java.net.URL;
  **/
 public class HttpNotFoundException extends HttpException {
 
+	  /**
+	   * construct a HttpNotFoundException (404 Error)
+	   * @param responseMessage
+	   * @param baseURL
+	   */
     public HttpNotFoundException( String responseMessage, URL baseURL ) {
         super( HttpURLConnection.HTTP_NOT_FOUND, responseMessage, baseURL );
     }
 
 
+    /**
+     * construct a HttpNotFoundException (404 Error)
+     * @param url
+     * @param t
+     */
     public HttpNotFoundException( URL url, Throwable t ) {
         this( t.toString(), url );
     }
