@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2004,2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,6 +21,7 @@ package com.meterware.httpunit.parsing;
  *******************************************************************************************************************/
 import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
+import org.w3c.dom.Document;
 import org.w3c.dom.html.HTMLDocument;
 
 import java.net.URL;
@@ -35,11 +36,18 @@ import java.io.StringReader;
  **/
 class NekoHTMLParser implements HTMLParser {
 
+	/**
+	 * parse the given URL with the given pageText using the given document adapter
+	 * @param pageURL
+	 * @param pageText
+	 * @param adapter
+	 */
   public void parse( URL pageURL, String pageText, DocumentAdapter adapter ) throws IOException, SAXException {
       try {
           NekoDOMParser parser = NekoDOMParser.newParser( adapter, pageURL );
           parser.parse( new InputSource( new StringReader( pageText ) ) );
-          adapter.setDocument( (HTMLDocument) parser.getDocument() );
+          Document doc=parser.getDocument();
+         	adapter.setDocument( (HTMLDocument)doc );
       } catch (NekoDOMParser.ScriptException e) {
            throw e.getException();
       }     
@@ -55,7 +63,10 @@ class NekoHTMLParser implements HTMLParser {
         return false;
     }
 
-
+    public boolean supportsForceTagCase() {
+      return false;
+    }
+    
     public boolean supportsReturnHTMLDocument() {
         return true;
     }

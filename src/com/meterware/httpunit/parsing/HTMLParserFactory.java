@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -40,6 +40,9 @@ abstract public class HTMLParserFactory {
     private static boolean    _preserveTagCase;
     private static boolean    _returnHTMLDocument;
     private static boolean    _parserWarningsEnabled;
+    // for parsers that support forcing Case
+    private static boolean	  _forceUpper;
+    private static boolean    _forceLower;    
 
 
     /**
@@ -50,6 +53,8 @@ abstract public class HTMLParserFactory {
         _returnHTMLDocument = true;
         _parserWarningsEnabled = false;
         _htmlParser = null;
+        _forceUpper = false;
+        _forceLower = false;        
     }
 
 
@@ -107,10 +112,18 @@ abstract public class HTMLParserFactory {
     /**
      * Specifies whether the parser should preserve the case of HTML tags and attributes. Not every parser can
      * support this capability.  Note that enabling this will disable support for the HTMLDocument class.
+     * override any previous behaviour configured by calling {@link #setForceUpperCase(boolean)} or 
+     * {@link #setForceLowerCase(boolean)}
      * @see #setReturnHTMLDocument
+     * @see #setForceUpperCase(boolean)
+     * @see #setForceLowerCase(boolean)
      */
     public static void setPreserveTagCase( boolean preserveTagCase ) {
         _preserveTagCase = preserveTagCase;
+        if (preserveTagCase) {
+        	_forceLower = false;
+        	_forceUpper = false;
+        }	
     }
 
 
@@ -125,13 +138,76 @@ abstract public class HTMLParserFactory {
     /**
      * Specifies whether the parser should return an HTMLDocument object rather than a Document object.
      * Not every parser can support this capability.  Note that enabling this will disable preservation of tag case.
+     * and/or the forcing of the tag case to upper or lower case.
      * @see #setPreserveTagCase
+     * @see #setForceUpperCase(boolean)
+     * @see #setForceLowerCase(boolean)
      */
     public static void setReturnHTMLDocument( boolean returnHTMLDocument ) {
         _returnHTMLDocument = returnHTMLDocument;
-        if (returnHTMLDocument) _preserveTagCase = false;
+        if (returnHTMLDocument) {
+        	_preserveTagCase = false;
+         	_forceLower = false;
+        	_forceUpper = false;        	
+        }
     }
 
+    /**
+     * Specifies whether the parser should force the case of HTML tags and attributes to be upper case. Not 
+     * every parser can support this capability.  Note that enabling this will disable support for the 
+     * HTMLDocument class and override any previous behaviour configured by enabling 
+     * {@link #setPreserveTagCase(boolean)} or {@link #setForceLowerCase(boolean)}
+     * @see #setReturnHTMLDocument
+     * @see #setPreserveTagCase(boolean)
+     * @see #setForceLowerCase(boolean)
+     * @param forceUpper 
+     * 				boolean indicating whether to enable this functionality
+     */
+    public static void setForceUpperCase(boolean forceUpper) {
+        _forceUpper = forceUpper;
+        if (_forceUpper) {
+            _forceLower = false;
+            _preserveTagCase = false;
+            // _returnHTMLDocument = false;
+        }
+    }
+
+    /**
+     * Return true if the current parser will support forcing the tags and attributes to upper case
+     * @return boolean flag
+     */
+    public static boolean getForceUpperCase() {
+        return _forceUpper && getHTMLParser().supportsPreserveTagCase();
+    }
+
+
+    /**
+     * Specifies whether the parser should force the case of HTML tags and attributes to lower case. Not
+     * every parser can support this capability.  Note that enabling this will disable support for the 
+     * HTMLDocument class and override any previous behaviour configured by enabling 
+     * {@link #setPreserveTagCase(boolean)} or {@link #setForceUpperCase(boolean)} 
+     * @see #setReturnHTMLDocument
+     * @see #setPreserveTagCase(boolean)
+     * @see #setForceUpperCase(boolean)
+     * @param forceLower
+     * 				boolean indicating whether to enable this functionality
+     */
+    public static void setForceLowerCase(boolean forceLower) {
+        _forceLower = forceLower;
+        if (_forceLower) {
+            _forceUpper = false;
+            _preserveTagCase = false;
+            // _returnHTMLDocument = false;
+        }
+    }
+
+    /**
+     * Return true if the current parser will support forcing the tags and attributes to lower case
+     * @return boolean flag
+     */
+    public static boolean getForceLowerCase() {
+        return _forceLower && getHTMLParser().supportsPreserveTagCase();
+    }
 
     /**
      * Returns true if parser warnings are enabled.

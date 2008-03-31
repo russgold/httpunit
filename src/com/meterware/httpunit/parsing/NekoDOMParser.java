@@ -2,7 +2,7 @@ package com.meterware.httpunit.parsing;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2007, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -70,6 +70,7 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
      * @param url
      * @return - the new parser
      * patch [ 1211154 ] NekoDOMParser default to lowercase by Dan Allen
+     * patch [ 1176688 ] Allow configuration of neko parser properties by James Abley
      */
     static NekoDOMParser newParser( DocumentAdapter adapter, URL url ) {
         final HTMLConfiguration configuration = new HTMLConfiguration();
@@ -86,7 +87,17 @@ class NekoDOMParser extends org.apache.xerces.parsers.DOMParser implements Scrip
         } else {
         	configuration.setProperty( TAG_NAME_CASE, "lower" );
         	configuration.setProperty( ATTRIBUTE_NAME_CASE, "lower" );
-        }        
+        	
+        	if (HTMLParserFactory.getForceUpperCase()) {
+        		configuration.setProperty(TAG_NAME_CASE, "upper");
+        		configuration.setProperty(ATTRIBUTE_NAME_CASE, "upper");
+        	}
+        	// this is the default as of patch [ 1211154 ] ... just for people who rely on patch [ 1176688 ]
+        	if (HTMLParserFactory.getForceLowerCase()) {
+        		configuration.setProperty(TAG_NAME_CASE, "lower");
+        		configuration.setProperty(ATTRIBUTE_NAME_CASE, "lower");
+        	}
+        }	
 
         try {
             final NekoDOMParser domParser = new NekoDOMParser( configuration, adapter );

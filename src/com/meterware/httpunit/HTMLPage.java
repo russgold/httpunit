@@ -260,9 +260,16 @@ public class HTMLPage extends ParsedHTML {
     }
 
 
+    /**
+     * parse the given test with the given URL
+     * @param text
+     * @param pageURL
+     * @throws SAXException
+     * @throws IOException
+     */
     public void parse( String text, URL pageURL ) throws SAXException, IOException {
         HTMLParserFactory.getHTMLParser().parse( pageURL, text, new DocumentAdapter() {
-            public void setDocument( HTMLDocument document ) { HTMLPage.this.setRootNode( document ); }
+            public void setDocument(HTMLDocument document ) { HTMLPage.this.setRootNode( document ); }
             public String getIncludedScript( String srcAttribute ) throws IOException { return HTMLPage.this.getIncludedScript( srcAttribute ); }
             public ScriptingHandler getScriptingHandler() { return getResponse().getScriptingHandler(); }
         });
