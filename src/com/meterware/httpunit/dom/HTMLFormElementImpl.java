@@ -112,8 +112,15 @@ public class HTMLFormElementImpl extends HTMLElementImpl implements HTMLFormElem
     }
 
 
+    /**
+     * getter for the name
+     * @see org.w3c.dom.html.HTMLFormElement#getName()
+     */
     public String getName() {
-        return getAttributeWithNoDefault( "name" );
+    	String result=getAttributeWithNoDefault( "name" );
+    	if (result==null)
+    		result=this.getId();
+      return result; 
     }
 
 

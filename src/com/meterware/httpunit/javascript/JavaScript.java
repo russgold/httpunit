@@ -882,7 +882,10 @@ public class JavaScript {
         public String getClassName() {
             return "Form";
         }
-
+        
+        public String jsGet_name() {
+          return getDelegate().getName();
+        }
 
         public String jsGet_action() {
             return getDelegate().getAction();

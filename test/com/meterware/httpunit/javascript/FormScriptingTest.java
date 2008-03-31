@@ -53,7 +53,25 @@ public class FormScriptingTest extends HttpUnitTest {
     public FormScriptingTest( String name ) {
         super( name );
     }
-
+    
+    /**
+     * test to access form name in java script
+     * @throws Exception
+     */
+    public void testFormNameProperty() throws Exception {
+           defineWebPage(  "OnCommand",  "<form name='the_form_with_name'/>" +
+                                         "<script type='JavaScript'>" +
+                                         "  alert( document.forms[0].name );" +
+                                         "</script>" +
+                                         "<form id='the_form_with_id'/>" +
+                                         "<script type='JavaScript'>" +
+                                         "  alert( document.forms[1].name );" +
+                                         "</script>" );
+           WebConversation wc = new WebConversation();
+            wc.getResponse( getHostPath() + "/OnCommand.html" );
+            assertEquals( "Message 1", "the_form_with_name", wc.popNextAlert() );
+            assertEquals( "Message 2", "the_form_with_id", wc.popNextAlert() );
+    }
 
     public void testElementsProperty() throws Exception {
         defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
