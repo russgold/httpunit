@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2006, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -26,6 +26,7 @@ import com.meterware.httpunit.HttpUnitUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.*;
@@ -49,6 +50,10 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private boolean                _secure;
     private RequestContext         _requestContext;
     private String                 _charset;
+    private boolean                _gotReader;
+    private boolean                _gotInputStream;
+    private BufferedReader         _reader;
+    
 
 
     /**
@@ -337,12 +342,22 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      *
      */
     public ServletInputStream getInputStream() throws IOException {
-        if (_inputStream == null) {
-            _inputStream = new ServletInputStreamImpl( _messageBody );
-        }
-        return _inputStream;
+      if (_gotReader) {
+        throw new IllegalStateException("getReader() has already been called for this request");
+      }
+      initializeInputStream();
+      _gotInputStream = true;
+      return _inputStream;
     }
 
+    /**
+     * initialize the inputStream
+     */
+    private void initializeInputStream() {
+   	  if (_inputStream == null) {
+         _inputStream = new ServletInputStreamImpl( _messageBody );
+      }
+    }
 
     /**
      * Returns the name of the character encoding style used in this
@@ -465,10 +480,24 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     /**
      * Returns the body of the request as a <code>BufferedReader</code>
      * that translates character set encodings.
+     * @since [ 1221537 ] Patch: ServletUnitHttpRequest.getReader not implemented yet
+     * @author Tim  - timmorrow (SourceForge)
+     * @return the reader
      **/
     public BufferedReader getReader() throws IOException {
-        throwNotImplementedYet();
-        return null;
+    	if (_gotInputStream) {
+    	     throw new IllegalStateException("getInputStream() has already been called on this request");
+    	}
+    	if (_reader == null) {
+    	  initializeInputStream();
+    	  String encoding = getCharacterEncoding();
+    	  if (encoding == null) {
+    	    encoding = HttpUnitUtils.DEFAULT_CHARACTER_SET;
+    	  }
+    	  _reader = new BufferedReader(new InputStreamReader(_inputStream, encoding));
+    	  _gotReader = true;
+    	}
+    	return _reader;
     }
 
 

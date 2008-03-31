@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2005 by Russell Gold
+* Copyright (c) 2000-2008 by Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -21,6 +21,7 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import java.util.*;
 import java.net.MalformedURLException;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.BufferedInputStream;
@@ -537,9 +538,116 @@ public class HttpServletRequestTest extends ServletUnitTest {
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
         verifyLocales( request, new Locale[] { Locale.FRENCH, Locale.US, Locale.ENGLISH } );
     }
+  
+  /*
+   * Test for patch [ 1246438 ] For issue 1221537; ServletUnitHttpRequest.getReader not impl
+   * by Tim
+   */
+  public void testGetInputStreamSameObject() throws Exception {
+      byte[] bytes = new byte[0];
+      InputStream stream = new ByteArrayInputStream( bytes );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), bytes );
+
+      InputStream first = request.getInputStream();
+      InputStream second = request.getInputStream();
+      assertSame("Different InputStreams", first, second);
+  }
 
 
-    public void ntestSpecifiedCharEncoding() throws Exception {    // xxx turn this back on
+  public void testGetInputStreamAfterGetReader() throws Exception {
+      byte[] bytes = new byte[0];
+      InputStream stream = new ByteArrayInputStream( bytes );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), bytes );
+      
+      request.getReader();
+      try {
+          request.getInputStream();
+          fail("Expected IllegalStateException");
+      } catch (IllegalStateException e) {
+          // Expected
+      }
+  }
+
+
+  public void testGetInputStream() throws Exception {
+      String body = "12345678901234567890";
+      InputStream stream = new ByteArrayInputStream( body.getBytes( "UTF-8" ) );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), body.getBytes() );
+
+      BufferedInputStream bis = new BufferedInputStream( request.getInputStream() );
+      byte[] buffer = new byte[ request.getContentLength() ];
+      bis.read( buffer );
+      assertEquals( "Request content", body, new String( buffer, "UTF-8" ) );
+  }
+
+
+  public void testGetReaderSameObject() throws Exception {
+      byte[] bytes = new byte[0];
+      InputStream stream = new ByteArrayInputStream( bytes );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), bytes );
+
+      BufferedReader first = request.getReader();
+      BufferedReader second = request.getReader();
+      assertSame("Different Readers", first, second);
+  }
+
+
+  public void testGetReaderAfterGetInputStream() throws Exception {
+      byte[] bytes = new byte[0];
+      InputStream stream = new ByteArrayInputStream( bytes );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), bytes );
+
+      request.getInputStream();
+      try {
+          request.getReader();
+          fail("Expected IllegalStateException");
+      } catch (IllegalStateException e) {
+          // Expected
+      }
+  }
+
+
+  public void testGetReaderDefaultCharset() throws Exception {
+      String body = "12345678901234567890";
+      InputStream stream = new ByteArrayInputStream( body.getBytes( HttpUnitUtils.DEFAULT_CHARACTER_SET ) );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), body.getBytes() );
+
+      char[] buffer = new char[body.length()];
+      request.getReader().read(buffer);
+      assertEquals( "Request content", body, new String( buffer) );
+  }
+
+
+  /**
+   * test the reader with a Specific Character set (here UTF-8)
+   * @throws Exception
+   * TODO make work an switch back on
+   */
+  public void xtestGetReaderSpecificCharset() throws Exception {
+      //String body = "東京";
+      String body = "\u05d0\u05d1\u05d2\u05d3";
+      InputStream stream = new ByteArrayInputStream( body.getBytes( "UTF-8" ) );
+      WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain; charset=UTF-8" );
+      HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), body.getBytes() );
+
+      char[] buffer = new char[body.length()];
+      request.getReader().read(buffer);
+      assertEquals( "Request content", body, new String( buffer) );
+  }
+
+
+  /**
+   * test the specific character encoding
+   * (here hebrew)
+   * @throws Exception
+   */
+   public void testSpecifiedCharEncoding() throws Exception {   
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
         String paramString = "param1=red&param2=%E0%E1%E2%E3";  // use iso-8859-8 to encode the data
         WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
@@ -550,7 +658,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
-    public void ntestSpecifiedCharEncoding2() throws Exception {
+    public void testSpecifiedCharEncoding2() throws Exception {
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
         HttpUnitOptions.setDefaultCharacterSet( "iso-8859-8" );
         WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
@@ -566,7 +674,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
-    public void ntestSuppliedCharEncoding() throws Exception {   // xxx turn this back on
+    public void testSuppliedCharEncoding() throws Exception {   // xxx turn this back on
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
         String paramString = "param1=red&param2=%E0%E1%E2%E3";  // use iso-8859-8 to encode the data, then string is URL encoded
         WebRequest wr = new PostMethodWebRequest( "http://localhost/simple" );
