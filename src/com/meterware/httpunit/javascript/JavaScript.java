@@ -842,7 +842,15 @@ public class JavaScript {
         public Style jsGet_style() {
             return _style;
         }
-
+        
+        /**
+         * arbitrary attribute access 
+         * @param attributeName
+         * @return
+         */
+        public Object jsFunction_getAttribute(String attributeName) {
+        	return _scriptable.get(attributeName);
+        }
 
         void initialize( JavaScriptEngine parent, ScriptableDelegate scriptable )
                 throws JavaScriptException, NotAFunctionException, PropertyException, SAXException {

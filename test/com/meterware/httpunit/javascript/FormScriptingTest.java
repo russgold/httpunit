@@ -72,6 +72,85 @@ public class FormScriptingTest extends HttpUnitTest {
             assertEquals( "Message 1", "the_form_with_name", wc.popNextAlert() );
             assertEquals( "Message 2", "the_form_with_id", wc.popNextAlert() );
     }
+    
+    /**
+     * test to access attributes from java script
+     * @throws Exception
+     */
+    public void testGetAttributeForBody() throws Exception {
+    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    		// TODO try making this work
+    		return;
+    	}
+
+      defineWebPage(  "OnCommand", "<html><head><title>test</title>\n"+
+      		"<script type='text/javascript'>\n"+
+      		"function show (attr) {\n"+
+// TODO make this work      		
+      		"  var body=document.body;\n"+
+      		"  //var body=document.getElementById('thebody');\n"+
+      		"  alert(body.getAttribute(attr));\n"+
+      		"}\n"+
+      		"</script></head>\n"+
+      		"<body id='thebody' bgcolor='#FFFFCC' text='#E00000' link='#0000E0' alink='#000080' vlink='#000000'>\n"+
+      		"<a href=\"javascript:show('bgcolor')\">background color?</a><br>\n"+
+      		"<a href=\"javascript:show('text')\">text color?</a><br>\n"+
+      		"<a href=\"javascript:show('link')\">linkcolor non visited</a><br>\n"+
+      		"<a href=\"javascript:show('alink')\">link color activated links?</a>\n"+
+      		"<a href=\"javascript:show('vlink')\">link color non visited</a><br>\n"+
+      		"</body></html>");
+      	WebConversation wc = new WebConversation();
+      	WebResponse response=wc.getResponse( getHostPath() + "/OnCommand.html" );
+      	// the page for testing externally
+      	// System.err.println(response.getText());
+      	
+      	WebLink[] links=response.getLinks();
+      	for (int i=0;i<links.length;i++) {
+      		links[ i ].click();
+      	}
+      	String expected[]={
+      			"#FFFCC","#E0000","#000E0","#00080","#40000"
+      	};
+      	for (int i=0;i<links.length;i++) {
+      		assertEquals( "Message for link  "+i, expected[i], wc.popNextAlert() );
+      	}	
+    }
+    
+    /**
+     * test to access attributes from java script
+     * @throws Exception
+     */
+    public void testGetAttributeForDiv() throws Exception {
+    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    		// TODO try making this work
+    		return;
+    	}
+    	
+      defineWebPage(  "OnCommand", "<html><head><title>test</title>\n"+
+      		"<script type='text/javascript'>\n"+
+      		"function show (id,attr) {\n"+
+      		"  var element=document.getElementById(id);\n"+
+      		"  alert(element.getAttribute(attr));\n"+
+      		"}\n"+
+      		"</script></head>\n"+
+      		"<body> <div id='div1' align='left'>\n"+
+      		"<a href=\"javascript:show('div1','align')\">align attribute of div</a><br>\n"+
+      		"</div></body></html>");
+      	WebConversation wc = new WebConversation();
+      	WebResponse response=wc.getResponse( getHostPath() + "/OnCommand.html" );
+      	// the page for testing externally
+      	// System.err.println(response.getText());
+      	WebLink[] links=response.getLinks();      	
+      	for (int i=0;i<links.length;i++) {
+      		links[ i ].click();
+      	}
+      	String expected[]={
+      			"left"
+      	};
+      	for (int i=0;i<links.length;i++) {
+      		assertEquals( "Message for link  "+i, expected[i], wc.popNextAlert() );
+      	}	
+    }
 
     public void testElementsProperty() throws Exception {
         defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
