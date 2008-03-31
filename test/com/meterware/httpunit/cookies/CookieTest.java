@@ -2,7 +2,7 @@ package com.meterware.httpunit.cookies;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2004,2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -209,7 +209,7 @@ public class CookieTest extends TestCase {
      * test for [ 1488617 ] alternate patch for cookie bug #1371204
      * @throws Exception
      */
-    public void testSingleUserCookie() throws Exception {
+    public void testSingleUseCookie() throws Exception {
       CookieJar jar = new CookieJar();
       jar.putSingleUseCookie("zero","nil","sourceforge.net","test/me");
       Cookie cookie=jar.getCookie("zero");
@@ -219,6 +219,16 @@ public class CookieTest extends TestCase {
       assertEquals(cookie.getPath(),"test/me");            
     }
 
+    /**
+     * test for bug report [ 1672385 ] HttpOnly cookie looses all cookie info
+     * @throws Exception
+     */
+    public void testHttpOnlyCookies() throws Exception {
+      CookieJar jar = new CookieJar(
+              new TestSource( new URL( "http://www.meterware.com" ),
+                              new String[] { "myStuff=1234; path=/foo; HttpOnly"} ) );
+      assertEquals( "cookie 'myStuff' value", "1234", jar.getCookieValue( "myStuff" ) );
+    }
 
     private void checkHeader( int index, CookieJar jar, String expectedHeader, String targetURLString ) throws MalformedURLException {
         assertEquals( "header " + index, expectedHeader, jar.getCookieHeaderField( new URL( "http://" + targetURLString ) ) );
