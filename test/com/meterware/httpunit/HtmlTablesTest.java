@@ -146,6 +146,34 @@ public class HtmlTablesTest extends HttpUnitTest {
 			assertEquals("", text[row][0]);
 			assertEquals("None", text[row++][1]);
     }
+    
+  /**
+   * test for bug report [ 1295782 ] Method purgeEmptyCells Truncates Table
+   * by ahansen 2005-09-19 22:47
+   * @throws Exception
+   */
+  public void testPurgeEmptyCells2() throws Exception {
+    defineWebPage( "BrokenSpan", "<h2>Broken Span</h2>" +
+        "<table id=\"testTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">" +
+        "   <tr>" +
+        "       <td><img src=\"test.jpg\"/></td>" +
+        "       <td colspan=\"2\">h3</td>" +
+        "   </tr>" +
+        "   <tr>" +
+        "       <td colspan=\"2\">a</td>" +
+        "       <td>1</td>" +
+        "   </tr>" +
+        "</table>"
+        );          	
+    WebResponse page = _wc.getResponse( getHostPath() + "/BrokenSpan.html" );
+    WebTable table = page.getTables()[0];
+    //String expected="WebTable:\n[0]:   [0]=  [1]=h3  [2]=h3\n[1]:   [0]=a  [1]=a  [2]=1";
+    String expected=table.toString();
+    table.purgeEmptyCells();
+    assertEquals("1st",table.toString(),expected);
+    table.purgeEmptyCells();
+    assertEquals("2nd",table.toString(),expected);
+  }
 
 
     /** 
