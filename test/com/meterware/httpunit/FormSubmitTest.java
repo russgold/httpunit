@@ -210,6 +210,10 @@ public class FormSubmitTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test that a disabled submitButton can not be submitted
+     * @throws Exception
+     */
     public void testDisabledSubmitButtonDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Input type=text name=age value=12>" +
@@ -232,7 +236,26 @@ public class FormSubmitTest extends HttpUnitTest {
             fail( "Allowed to click a disabled button" );
         } catch (IllegalStateException e) {}
     }
-
+    
+    /**
+     * test that a disabled Button can be detected by accessing the disabled() function
+     * for bug report [ 1124024 ] Formcontrol and isDisabled should be public
+     * by Wolfgang Fahl
+     * @throws Exception
+     */
+    public void testButtonDisabledFlagAccess() throws Exception {
+        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+                                  "<Input type=button id=button1 name=button1 >" +
+                                  "<Input type=button name=button2 disabled>" +
+                                  "</form>" );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebForm form = page.getForms()[0];
+        Button[] buttons = form.getButtons();
+        assertTrue( "Enabled button marked as disabled", !buttons[0].isDisabled() );
+        assertTrue( "Disabled button not marked as disabled", buttons[1].isDisabled() );
+        FormControl control=form.getControlWithID("button1");
+        assertTrue(control.getClass().getName(),control instanceof Button);
+    }
 
     public void testButtonIDDetection() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
