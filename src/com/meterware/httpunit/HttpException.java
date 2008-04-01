@@ -39,9 +39,18 @@ public class HttpException extends RuntimeException {
         System.err.println(responseCode);
     }
 
-
     /**
-     * throw a http Exception with the given responseCode and Message
+     * throw a http Exception with the given responseCode and cause
+     * @param responseCode
+     * @param cause
+     */
+    protected HttpException( int responseCode, Throwable cause ) {
+      _responseCode = responseCode;
+      _cause = cause;
+    }
+    
+    /**
+     * throw a http Exception with the given responseCode and Message and base url
      * @param responseCode
      * @param responseMessage
      * @param baseURL
@@ -51,7 +60,20 @@ public class HttpException extends RuntimeException {
         _responseCode = responseCode;
         _url = baseURL;
     }
-
+    
+    /**
+     * throw a http Exception with the given responseCode and Message, base url and cause
+     * @param responseCode
+     * @param responseMessage
+     * @param baseURL
+     * @param cause
+     */
+    protected HttpException( int responseCode, String responseMessage, URL baseURL, Throwable cause ) {
+      _responseMessage = responseMessage;
+      _responseCode = responseCode;
+      _url = baseURL;
+      _cause = cause;
+    }
 
     /**
      * get the Message for the http Exception
@@ -96,5 +118,15 @@ public class HttpException extends RuntimeException {
     private int _responseCode;
     private URL _url;
     private String _responseMessage;
-
+    
+    /**
+     * get the cause (if any)
+     */
+    public Throwable getCause() {
+      return _cause;
+    }
+    	 
+     
+    private Throwable _cause;
+    	 
 }

@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2001, 2008 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
@@ -31,13 +31,22 @@ import java.net.URL;
 public class HttpInternalErrorException extends HttpException {
 
 
+	  /**
+	   * construct an internal http error form an url
+	   * @param url
+	   */
     public HttpInternalErrorException( URL url ) {
         super( HttpURLConnection.HTTP_INTERNAL_ERROR, "Internal Error", url );
     }
 
 
+    /**
+     * construct an internal HTTP Error from a URL and a throwable
+     * @param url
+     * @param t
+     */
     public HttpInternalErrorException( URL url, Throwable t ) {
-        super( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString(), url );
+        super( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString(), url,t  );
     }
 
 }
