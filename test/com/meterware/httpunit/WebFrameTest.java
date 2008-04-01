@@ -489,9 +489,7 @@ public class WebFrameTest extends HttpUnitTest {
     	WebForm form = bottomFrame.getFormWithName("submit_to_parent");
     	form.setParameter("name","aa");
     	form.setParameter("password","xx");
-    	boolean oldDebug=	HttpUnitUtils.EXCEPTION_DEBUG;
-  		HttpUnitUtils.EXCEPTION_DEBUG=false;
-  		HttpUnitUtils.EXCEPTION_DEBUG=true;
+    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(true);
     	try  {
     		WebResponse submitResponse = form.submit(); // This response contains the same page, does not log the user in. Load the same //page
     	} catch (ScriptException se) {
@@ -502,7 +500,7 @@ public class WebFrameTest extends HttpUnitTest {
     		System.err.println(msg);
     		throw se;
     	}
-    	HttpUnitUtils.EXCEPTION_DEBUG=oldDebug;
+    	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
     }
 
     /**

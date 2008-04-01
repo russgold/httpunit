@@ -1096,7 +1096,7 @@ public class WebForm extends WebRequestSource {
         }
 
 
-        void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+        protected void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
             processor.addParameter( _name, _value, characterSet );
         }
 

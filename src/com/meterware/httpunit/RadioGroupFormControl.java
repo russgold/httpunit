@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.meterware.httpunit.controls.IllegalParameterValueException;
 import com.meterware.httpunit.protocol.ParameterProcessor;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
@@ -75,7 +76,7 @@ public class RadioGroupFormControl extends FormControl {
   /**
    * Returns the options displayed for this radio button group.
    */
-  String[] getDisplayedOptions() {
+  protected String[] getDisplayedOptions() {
       ArrayList valueList = new ArrayList();
       FormControl[] buttons = getButtons();
       for (int i = 0; i < buttons.length; i++) {
@@ -94,7 +95,7 @@ public class RadioGroupFormControl extends FormControl {
   }
 
 
-  void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+  protected void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
       for (int i = 0; i < getButtons().length; i++) getButtons()[i].addValues( processor, characterSet );
   }
 
@@ -109,7 +110,7 @@ public class RadioGroupFormControl extends FormControl {
   }
 
 
-  void claimUniqueValue( List values ) {
+  protected void claimUniqueValue( List values ) {
       int matchingButtonIndex = -1;
       for (int i = 0; i < getButtons().length && matchingButtonIndex < 0; i++) {
           if (!getButtons()[i].isReadOnly() && values.contains( getButtons()[i].getQueryValue() )) matchingButtonIndex = i;
@@ -125,7 +126,7 @@ public class RadioGroupFormControl extends FormControl {
   }
 
 
-  void reset() {
+  protected void reset() {
       for (int i = 0; i < getButtons().length; i++) getButtons()[i].reset();
   }
 

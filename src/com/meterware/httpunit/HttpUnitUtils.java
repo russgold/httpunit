@@ -45,7 +45,7 @@ public class HttpUnitUtils {
     /**
      * set to true to debug Exception handling
      */
-    public static boolean EXCEPTION_DEBUG=true;
+    private static boolean EXCEPTION_DEBUG=true;
 
     /**
      * handle Exceptions and thowables
@@ -434,4 +434,21 @@ public class HttpUnitUtils {
             }
         }
     }
+
+
+		/**
+		 * @return the eXCEPTION_DEBUG
+		 */
+		protected static boolean isEXCEPTION_DEBUG() {
+			return EXCEPTION_DEBUG;
+		}
+
+		/**
+		 * @param exception_debug the eXCEPTION_DEBUG to set
+		 */
+		public static boolean setEXCEPTION_DEBUG(boolean exception_debug) {
+			boolean oldExceptionDebug=exception_debug;
+			EXCEPTION_DEBUG = exception_debug;
+			return oldExceptionDebug;
+		}
 }

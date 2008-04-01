@@ -19,6 +19,7 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.controls.SelectionFormControl;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
@@ -333,10 +334,13 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "Reverted value", "female", form.getParameterValue( "sex" ) );
     }
 
-
+    /**
+     * test Select HTML Element 
+     * @throws Exception
+     */
     public void testSelect() throws Exception {
         defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
-                                  "<Select name=color><Option>blue<Option selected>red \n" +
+                                  "<Select id='select1' name=color><Option>blue<Option selected>red \n" +
                                   "<Option>green</select>" +
                                   "<TextArea name=\"text\">Sample text</TextArea>" +
                                   "<Input type=submit></form>" );
@@ -359,6 +363,7 @@ public class WebFormTest extends HttpUnitTest {
             form.setParameter( "color", new String[] { "green", "red" } );
             fail( "Should have rejected set with multiple values" );
         } catch (IllegalRequestParameterException e) {
+        	assertEquals("exception should read ","Attempted to assign to parameter 'color' the extraneous value 'red'.",e.getMessage());
         }
 
         form.setParameter( "color", "green" );
@@ -366,6 +371,7 @@ public class WebFormTest extends HttpUnitTest {
         form.reset();
         assertEquals( "Reverted color", "red", form.getParameterValue( "color" ) );
     }
+    
 
 
     public void testSizedSelect() throws Exception {

@@ -111,12 +111,12 @@ public class Button extends FormControl {
 //-------------------------------------------------- FormControl methods -----------------------------------------------
 
 
-    String[] getValues() {
+    protected String[] getValues() {
         return new String[ 0 ];
     }
 
 
-    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+    protected void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
     }
 
 

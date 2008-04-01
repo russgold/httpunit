@@ -142,7 +142,7 @@ public class SubmitButton extends Button {
      * Returns the current value(s) associated with this control. These values will be transmitted to the server
      * if the control is 'successful'.
      **/
-    String[] getValues() {
+    protected String[] getValues() {
         return (isDisabled() || !_pressed) ? NO_VALUE : toArray( getValue() );
     }
 
@@ -199,7 +199,7 @@ public class SubmitButton extends Button {
      * @characterSet - the active character set
      * @throws IOException if addValues fails
      */
-    void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
+    protected void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
       if (_pressed && !isDisabled()) {
         String buttonName = getName();
         if (buttonName != null && buttonName.length() > 0 && getValue().length() > 0) {

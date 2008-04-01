@@ -34,7 +34,7 @@ import com.meterware.httpunit.parsing.HTMLParserFactory;
 /**
  * Some common utilities for manipulating DOM nodes.
  **/
-class NodeUtils {
+public class NodeUtils {
 
   /**
    * get the attribute with the given name from the given node as an int value
@@ -107,7 +107,7 @@ class NodeUtils {
      * @param attributeName - the attribute name to check
      * @return true if the attribute is present
      */
-    static boolean isNodeAttributePresent( Node node, final String attributeName ) {
+    public static boolean isNodeAttributePresent( Node node, final String attributeName ) {
         return node.getAttributes().getNamedItem( attributeName ) != null;
     }
 

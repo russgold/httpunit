@@ -20,6 +20,7 @@ package com.meterware.httpunit.javascript;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
+import com.meterware.httpunit.controls.SelectionFormControl;
 import com.meterware.httpunit.protocol.UploadFileSpec;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
@@ -1091,7 +1092,42 @@ public class FormScriptingTest extends HttpUnitTest {
         response.getLinks()[0].mouseOver();
         assertEquals( "after change message", "selected #0", wc.popNextAlert() );
     }
-
+    /**
+     * test that in case of an Index out of bounds problem an exception is thrown
+     * with a meaningful message (not nullpointer exception)
+     * Bug report [ 1124057 ] Out of Bounds Exception should be avoided
+     * by Wolfgang Fahl of 2005-02-16 17:25
+     *
+     */
+    public void testSelectIndexOutOfBoundsCatching() throws Exception {
+      defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
+          "function viewSelect( choices ) { \n" +
+          " // try accessing out of bounds\n"+
+          "  alert( choices.options[5].value )\n;" +
+          "}\n" +
+          "</script></head>" +
+          "<body onLoad='viewSelect( document.the_form.choices )'>" +
+          "<form name='the_form'>" +
+          "  <select name='choices'>" +
+          "    <option value='1'>red" +
+          "    <option value='3' selected>blue" +
+          "  </select>" +
+          "</form>" +
+          "<a href='#' onMouseOver=\"alert( 'selected #' + document.the_form.choices.selectedIndex );\">which</a>" +
+          "</body></html>" );
+      WebConversation wc = new WebConversation();
+    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
+      try {
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      	fail("There should be a runtime exeption here");
+      	// java.lang.RuntimeException: Event 'viewSelect( document.the_form.choices )' failed: java.lang.RuntimeException: invalid index 5 for Options redblue,
+      } catch (java.lang.RuntimeException rte) {
+      	assertTrue(rte.getMessage().indexOf("invalid index 5 for Options red,blue")>0);
+      } finally {
+      	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
+      }	
+    }
+    
 
     public void testFormSelectDefaults() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><script language='JavaScript'>" +
