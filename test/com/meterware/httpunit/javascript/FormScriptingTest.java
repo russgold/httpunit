@@ -110,8 +110,9 @@ public class FormScriptingTest extends HttpUnitTest {
       		links[ i ].click();
       	}
       	String expected[]={
-      			"#FFFCC","#E0000","#000E0","#00080","#40000"
+      	 "#FFFFCC","#E00000","#0000E0","#000080","#000000"
       	};
+
       	for (int i=0;i<links.length;i++) {
       		assertEquals( "Message for link  "+i, expected[i], wc.popNextAlert() );
       	}	
