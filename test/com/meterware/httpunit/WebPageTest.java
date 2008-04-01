@@ -98,6 +98,8 @@ public class WebPageTest extends HttpUnitTest {
 
         WebResponse structuredPage = wc.getResponse( getHostPath() + "/StructuredPage.html" );
         assertEquals( "XHTML Title", "A Structured Page", structuredPage.getReceivedPage().getTitle() );
+        Document root=structuredPage.getDOM();
+        assertTrue("document root should be available",root!=null);
 
         WebResponse xhtmlPage = wc.getResponse( getHostPath() + "/XHTMLPage.html" );
         assertEquals( "XHTML Title", "An XHTML Page", xhtmlPage.getReceivedPage().getTitle() );

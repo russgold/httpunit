@@ -453,6 +453,10 @@ public class FormScriptingTest extends HttpUnitTest {
       assertEquals( "field one equals field two", form.getParameterValue("one"), form.getParameterValue( "two" ) );
     }
 
+    /**
+     * test disabling a submit button via script
+     * @throws Exception
+     */
     public void testEnablingDisabledSubmitButtonViaScript() throws Exception {
         defineResource( "DoIt?color=green&change=success", "You made it!" );
         defineResource( "OnCommand.html", "<html><head></head>" +
@@ -568,6 +572,12 @@ public class FormScriptingTest extends HttpUnitTest {
         assertFalse( "Button should have been enabled or NOT-Disabled", form.getButtonWithID( buttonID ).isDisabled() );
     }
 
+    /**
+     * click submit button to prove that it is enabled
+     * @param form
+     * @throws IOException
+     * @throws SAXException
+     */
     private void clickSubmitButtonToProveThatItIsEnabled( WebForm form ) throws IOException, SAXException {
         WebResponse response = form.submit();
         assertNotNull( response );
@@ -577,6 +587,14 @@ public class FormScriptingTest extends HttpUnitTest {
         form.getButtonWithID( buttonID ).click();
     }
 
+    /**
+     * change the enable State of  Button via Javascript
+     * @param form
+     * @param wc
+     * @return
+     * @throws IOException
+     * @throws SAXException
+     */
     private WebForm runJavaScriptToToggleEnabledStateOfButton( WebForm form, WebConversation wc ) throws IOException, SAXException {
         Button enableChange = form.getButtonWithID( "enableChange" );
         enableChange.click();
@@ -590,7 +608,8 @@ public class FormScriptingTest extends HttpUnitTest {
             SubmitButton button = form.getSubmitButton( "change" );
             form.submit( button );
         } catch (Exception e) {
-            assertTrue( e.toString().indexOf( "The specified button (name='change' value='success' is disabled and may not be used to submit this form" ) > -1 );
+        	String msg=e.getMessage();
+          assertTrue(msg.indexOf( "The specified button (name='change' value='success' is disabled and may not be used to submit this form" ) > -1 );
         }
     }
 

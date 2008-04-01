@@ -427,6 +427,10 @@ public class FormParametersTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test disabled controls
+     * @throws Exception
+     */
     public void testDisabledControls() throws Exception {
         defineWebPage( "Default", "<form method=GET action = '/ask'>" +
                                        "<Input disabled type=checkbox name=color value=red checked>" +

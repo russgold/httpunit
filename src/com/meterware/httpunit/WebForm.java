@@ -90,7 +90,8 @@ public class WebForm extends WebRequestSource {
      * inhibits the submission, will return the updated contents of the frame containing this form.
      **/
     public WebResponse submit( SubmitButton button ) throws IOException, SAXException {
-        return (button == null || button.doOnClickEvent()) ? doFormSubmit( button ) : getCurrentFrameContents();
+    	WebResponse result=submit(button,0,0);
+      return result;
     }
 
 
@@ -102,7 +103,13 @@ public class WebForm extends WebRequestSource {
      * @since 1.6
      **/
     public WebResponse submit( SubmitButton button, int x, int y ) throws IOException, SAXException {
-        return button.doOnClickEvent() ? doFormSubmit( button, x, y ) : getCurrentFrameContents();
+    	WebResponse result=null;
+      if (button==null || button.doOnClickSequence(x, y)) {
+      	result= doFormSubmit( button, x, y );
+      } else {
+      	result=getCurrentFrameContents();
+      }
+      return result;
     }
 
 
@@ -300,9 +307,13 @@ public class WebForm extends WebRequestSource {
     /**
      * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
      * If the button is null, simulates the pressing of the default button.
+     * @param button - the submitbutton to be pressed - may be null
+     * @param - x the x position
+     * @param - y the y position
      **/
     public WebRequest getRequest( SubmitButton button, int x, int y ) {
-        if (button == null) button = getDefaultButton();
+        if (button == null) 
+        	button = getDefaultButton();
 
         if (HttpUnitOptions.getParameterValuesValidated()) {
             if (button == null) {
@@ -311,8 +322,11 @@ public class WebForm extends WebRequestSource {
                 // bypass checks
             } else if (!getSubmitButtonVector().contains( button )) {
                 throw new IllegalSubmitButtonException( button );
-            } else if (button.isDisabled()) {
-                throw new DisabledSubmitButtonException( button );
+            } else if (!button.wasEnabled()) {            	
+            	// this is too late for the check of isDisabled()
+            	// onclick has already been done ...
+            	// [ 1289151 ] Order of events in button.click() is wrong
+              button.throwDisabledException();
             }
         }
 
@@ -841,7 +855,11 @@ public class WebForm extends WebRequestSource {
             FormControl[] controls = getFormControls();
             for (int i = 0; i < controls.length; i++) {
                 FormControl control = controls[ i ];
-                if (control instanceof SubmitButton) _buttonVector.add( control );
+                if (control instanceof SubmitButton) {
+                	SubmitButton sb=(SubmitButton)control;
+                	sb.rememberEnableState();
+                	_buttonVector.add( sb );
+                }
             }
 
             /**
@@ -1011,28 +1029,6 @@ public class WebForm extends WebRequestSource {
 //============================= exception class IllegalUnnamedSubmitButtonException ======================================
 
 
-    /**
-     * This exception is thrown on an attempt to define a form request with a button not defined on that form.
-     **/
-    class DisabledSubmitButtonException extends IllegalStateException {
-
-
-        DisabledSubmitButtonException( SubmitButton button ) {
-            _name  = button.getName();
-            _value = button.getValue();
-        }
-
-
-        public String getMessage() {
-            return "The specified button (name='" + _name + "' value='" + _value
-                   + "' is disabled and may not be used to submit this form.";
-        }
-
-
-        private String _name;
-        private String _value;
-
-    }
 
 }
 

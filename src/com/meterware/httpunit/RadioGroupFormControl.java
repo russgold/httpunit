@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id: FormControl.java 786 2007-11-23 18:36:23Z wolfgang_fahl $
 *
-* Copyright (c) 2001-2007, Russell Gold
+* Copyright (c) 2001-2007,2008 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -29,6 +29,9 @@ import com.meterware.httpunit.controls.IllegalParameterValueException;
 import com.meterware.httpunit.protocol.ParameterProcessor;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 
+/**
+ * Radio button control
+ */
 public class RadioGroupFormControl extends FormControl {
 
   private List _buttonList = new ArrayList();
@@ -40,11 +43,19 @@ public class RadioGroupFormControl extends FormControl {
       return UNDEFINED_TYPE;
   }
 
+  /**
+   * construct Radiobuttons for a form
+   * @param form
+   */
   public RadioGroupFormControl( WebForm form ) {
       super( form );
   }
 
 
+  /**
+   * add a radio button 
+   * @param control
+   */
   void addRadioButton( RadioButtonFormControl control ) {
       _buttonList.add( control );
       _buttons = null;
@@ -52,6 +63,10 @@ public class RadioGroupFormControl extends FormControl {
   }
 
 
+  /**
+   * get the values for the buttons
+   * @return an array of String values
+   */
   public String[] getValues() {
       for (int i = 0; i < getButtons().length; i++) {
           if (getButtons()[i].isChecked()) return getButtons()[i].getValues();

@@ -41,6 +41,8 @@ public class Button extends FormControl {
     static final public HTMLElementPredicate WITH_LABEL;
     
     private WebResponse _baseResponse;
+    // remember the last verifyEnabled result
+    private boolean _wasEnabled=true;
 
 
     public String getType() {
@@ -78,22 +80,86 @@ public class Button extends FormControl {
                                 : ((HTMLButtonElementImpl) getNode()).getValue() );
     }
 
-
+    /**
+     * the onClickSequence for this button
+     * @return
+     */
+    protected boolean doOnClickSequence(int x,int y) throws IOException, SAXException {
+      verifyButtonEnabled();
+      boolean result=doOnClickEvent();
+      if (result) { 
+      	doButtonAction(x,y);  
+      }	
+      this.rememberEnableState();
+      return result;
+    }
+    
     /**
      * Performs the action associated with clicking this button after running any 'onClick' script.
      * For a submit button this typically submits the form.
      */
     public void click() throws IOException, SAXException {
-        verifyButtonEnabled();
-        if (doOnClickEvent()) doButtonAction();
+      doOnClickSequence(0,0);      
     }
 
+    /**
+     * return the last result of verifyButtonEnabled or the 
+     * intial enabled state derived from !isDisabled as originally setDisabled
+     * needed to fix bug report [ 1289151 ] Order of events in button.click() is wrong
+     * @return
+     */
+    public boolean wasEnabled() {
+    	return _wasEnabled;
+    }
 
+    /**
+     * remember wether the button was enabled
+     */
+    public void rememberEnableState() {
+    	_wasEnabled=!isDisabled();    	
+    }
+
+    /**
+     * verifyButtonEnabled
+     */
     protected void verifyButtonEnabled() {
-        if (isDisabled()) throw new IllegalStateException( "Button" + (getName().length() == 0 ? "" : " '" + getName() + "'") + " is disabled and may not be clicked." );
+    	rememberEnableState();
+      if (isDisabled()) 
+      	throwDisabledException();
+    }
+    
+    /**
+     * throw an exception that I'm disbled
+     *
+     */
+    public void throwDisabledException() {
+     	throw new DisabledButtonException(this);    	
+    }
+    
+    /**
+     * This exception is thrown on an attempt to click on a button disabled button
+     **/
+    class DisabledButtonException extends IllegalStateException {
+
+
+        DisabledButtonException( Button button ) {
+            _name  = button.getName();
+            _value = button.getValue();
+        }
+
+
+        public String getMessage() {
+        	String msg="Button" + (getName().length() == 0 ? "" : " '" + getName() + "'") + " is disabled and may not be clicked.";
+        	return msg;
+        }
+        
+
+        protected String _name;
+        protected String _value;
+
     }
 
-
+    
     /**
      * Returns true if this button is disabled, meaning that it cannot be clicked.
      **/
@@ -104,8 +170,24 @@ public class Button extends FormControl {
   
     /**
      * Perform the normal action of this button.
+     * @param x - the x coordinate
+     * @param y - the y coordinate
+     * @throws IOException
+     * @throws SAXException
      */
-    protected void doButtonAction() throws IOException, SAXException {}
+    protected void doButtonAction(int x,int y) throws IOException, SAXException {
+    	// pseudo - abstract
+    }
+    
+    /**
+     * Perform the normal action of this button.
+     * delegate to the x-y version
+     * @throws IOException
+     * @throws SAXException
+     */
+    protected void doButtonAction() throws IOException, SAXException {
+    	doButtonAction(0,0);
+    }
 
 
 //-------------------------------------------------- FormControl methods -----------------------------------------------

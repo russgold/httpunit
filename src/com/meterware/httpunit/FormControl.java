@@ -299,8 +299,6 @@ public abstract class FormControl extends HTMLElementBase {
     	return handleEvent("onclick");
     }
     
-
-
     /**
      * Performs the 'onMouseUp' event defined for this control.
     * @deprecated since 1.7 use doOnMouseUpEvent instead

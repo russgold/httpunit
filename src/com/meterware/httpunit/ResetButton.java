@@ -38,7 +38,10 @@ public class ResetButton extends Button {
     }
 
 
-    protected void doButtonAction() {
+    /**
+     * overridden button action
+     */
+    protected void doButtonAction(int x,int y) {
         getForm().reset();
     }
 }

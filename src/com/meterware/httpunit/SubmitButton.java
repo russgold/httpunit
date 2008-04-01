@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, 2007, Russell Gold
+* Copyright (c) 2000-2004, 2007, 2008 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -31,7 +31,7 @@ import com.meterware.httpunit.protocol.ParameterProcessor;
 public class SubmitButton extends Button {
 
     private boolean _fake;
-
+    
 
     public String getType() {
         return (isImageButton()?IMAGE_BUTTON_TYPE:SUBMIT_BUTTON_TYPE);
@@ -52,21 +52,22 @@ public class SubmitButton extends Button {
      * @since 1.6
      */
     public void click( int x, int y ) throws IOException, SAXException {
-        if (!isImageButton()) throw new IllegalStateException( "May only specify positions for an image button" );
-        verifyButtonEnabled();
-        if (doOnClickEvent()) getForm().doFormSubmit( this, x, y );
+        if (!isImageButton()) 
+        	throw new IllegalStateException( "May only specify positions for an image button" );
+        doOnClickSequence(x,y);
     }
 
 
 //--------------------------------- Button methods ----------------------------------------------
 
-
     /**
-     * Perform the normal action of this button.
+     * do the button Action 
+     * @param x - x coordinate
+     * @param y - y coordinate
      */
-    protected void doButtonAction() throws IOException, SAXException {
-        getForm().doFormSubmit( this );
-    }
+    protected void doButtonAction(int x,int y) throws IOException, SAXException {
+      getForm().doFormSubmit( this ,x,y);
+    }  
 
 
 //------------------------------------ Object methods ----------------------------------------
@@ -124,6 +125,10 @@ public class SubmitButton extends Button {
     }
 
 
+    /**
+     * flag that the button was pressed
+     * @param pressed
+     */
     void setPressed( boolean pressed ) {
         _pressed = pressed;
     }
@@ -233,5 +238,28 @@ public class SubmitButton extends Button {
         return getName().equals( button.getName() ) &&
                   (getName().length() == 0 || getValue().equals( button.getValue() ));
     }
+    
+    public void throwDisabledException() {
+    	throw new DisabledSubmitButtonException( this );
+    }	
+    
+    /**
+     * This exception is thrown on an attempt to define a form request with a button not defined on that form.
+     **/
+    class DisabledSubmitButtonException extends DisabledButtonException {
+
+
+        DisabledSubmitButtonException( SubmitButton button ) {
+        		super(button);
+        }
+
+
+        public String getMessage() {
+            return "The specified button (name='" + _name + "' value='" + _value
+                   + "' is disabled and may not be used to submit this form.";
+        }
+
+    }
+
 }
 
