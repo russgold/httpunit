@@ -1102,7 +1102,10 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
             if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
             if (tag.getName().equalsIgnoreCase( "noscript") && HttpUnitOptions.isScriptingEnabled()) {
-                do { tag = parser.getNextTag(); } while (tag.getName().equalsIgnoreCase( "/noscript") );
+                do { 
+                	tag = parser.getNextTag(); 
+                } 
+                while (tag.getName().equalsIgnoreCase( "/noscript") );
             }
             tag = parser.getNextTag();
         }
@@ -1115,6 +1118,10 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    /**
+     * process MetaTags based on the tag
+     * @param tag
+     */
     private void processMetaTag( ByteTag tag ) {
         if (isHttpEquivMetaTag( tag, "content-type" )) {
             inferContentType( tag.getAttribute( "content" ) );
@@ -1124,23 +1131,43 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    /**
+     * check whether the given tag is a http equiv meta tag
+     * @param tag
+     * @param headerName
+     * @return
+     */
     private boolean isHttpEquivMetaTag( ByteTag tag, String headerName )
     {
-        return headerName.equalsIgnoreCase( tag.getAttribute( "http_equiv" ) ) ||
-               headerName.equalsIgnoreCase( tag.getAttribute( "http-equiv" ) );
+    	String equiv1=tag.getAttribute( "http_equiv" );
+    	String equiv2=tag.getAttribute( "http-equiv" );
+    	boolean result=
+    		headerName.equalsIgnoreCase( equiv1 ) ||
+        headerName.equalsIgnoreCase( equiv2  );
+    	return result;
     }
 
 
+    /**
+     * infer the refresh Header
+     * @param refreshHeader
+     */
     private void inferRefreshHeader( String refreshHeader ) {
         String originalHeader = getHeaderField( "Refresh" );
+        // System.err.println("original='"+originalHeader+"'\nrefreshHeader='"+refreshHeader+"'");
         if (originalHeader == null) {
             _refreshHeader = refreshHeader;
         }
     }
 
 
+    /**
+     * read the Refresh Request
+     *
+     */
     private void readRefreshRequest() {
-        if (_refreshDelay >= 0) return;
+        if (_refreshDelay >= 0) 
+        	return;
         _refreshDelay = 0;
         String refreshHeader = _refreshHeader != null ? _refreshHeader : getHeaderField( "Refresh" );
         if (refreshHeader == null) return;

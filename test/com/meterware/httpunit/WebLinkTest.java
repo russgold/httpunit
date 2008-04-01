@@ -147,10 +147,10 @@ public class WebLinkTest extends HttpUnitTest {
         WebResponse response = wc.getResponse( getHostPath() + "/Initial.html" );
         String endbreak=response.getLinkWithID( "endbreak" ).getRequest().getURL().toExternalForm() ;
         assertEquals( "URL with break at end", endbreak,"http://localhost/somewhere");
-        //System.err.println(endbreak+"='"+endbreak+"'");
+        //System.err.println("endbreak='"+endbreak+"'");
         String midbreak=response.getLinkWithID( "midbreak" ).getRequest().getURL().toExternalForm() ;
-        //System.err.println(midbreak+"='"+midbreak+"'");
-        assertEquals( "URL across linebreak", midbreak,"http://localhost/somewhere");
+        //System.err.println("midbreak='"+midbreak+"'");
+        assertEquals( "URL across linebreak", midbreak,"http://loc\nalhost/somewhere");
     }
 
 

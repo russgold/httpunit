@@ -975,6 +975,10 @@ public class ScriptingTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test the trick for detecting java script enabled
+     * @throws Exception
+     */
     public void testJavascriptDetectionTrick() throws Exception {
         defineResource( "NoScript.html", "No javascript here" );
         defineResource( "HasScript.html", "Javascript is enabled!" );
@@ -988,11 +992,12 @@ public class ScriptingTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         wc.getClientProperties().setAutoRefresh( true );
         WebResponse response = wc.getResponse( getHostPath() + "/Start.html" );
-        assertEquals( "Result page", "Javascript is enabled!", response.getText() );
-
+        String result=response.getText();
+        assertEquals( "Result page ", "Javascript is enabled!", result);
         HttpUnitOptions.setScriptingEnabled( false );
         response = wc.getResponse( getHostPath() + "/Start.html" );
-        assertEquals( "Result page", "No javascript here", response.getText() );
+        result=response.getText();
+        assertEquals( "Result page", "No javascript here", result );
     }
 
     /**

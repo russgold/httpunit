@@ -420,6 +420,10 @@ public abstract class HttpUnitOptions {
     }
 
 
+    /**
+     * change the scriptingEnabled flag
+     * @param scriptingEnabled
+     */
     public static void setScriptingEnabled( boolean scriptingEnabled ) {
         if (scriptingEnabled != _scriptingEnabled) {
             _scriptingEngine = scriptingEnabled ? null : NULL_SCRIPTING_ENGINE_FACTORY;

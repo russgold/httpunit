@@ -109,7 +109,11 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
         assertNull( "VBScript link found", wr.getLinkWith( "VBScript" ) );
     }
 
-
+    
+    /**
+     * test no script sections
+     * @throws Exception
+     */
     public void testNoScriptSections() throws Exception {
         defineResource(  "OnCommand.html",  "<html><head><title>something</title></head>" +
                                             "<body>" +

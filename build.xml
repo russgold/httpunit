@@ -107,7 +107,7 @@
 	          < dependency group="rhino"      artifact="rhino" version="1.5R4.1" website="http://www.mozilla.org/rhino/download.html"  />
 	          -->
             <dependency group="junit"      version="3.8.1" />
-            <dependency group="nekohtml"   version="0.9.1" unless="use.jtidy"/>
+            <dependency group="nekohtml"   version="1.9.6" unless="use.jtidy"/>
             <dependency group="servletapi" version="2.4" />
             <dependency group="jtidy"      version="4aug2000r7-dev"/>
             <dependency group="xerces"     version="2.6.1" artifact="xercesImpl"/>

@@ -351,15 +351,16 @@ class ParsedHTML {
     	  // proposed patch 1152036
     	  // not enabled by wf@bitplan.com since it would brake
     	  // com.meterware.httpunit.javascript.NekoEnhancedScriptingTest - testNoScriptSections
-    		// if (!HttpUnitOptions.isScriptingEnabled()) {
+    		//if (!HttpUnitOptions.isScriptingEnabled()) {
     		// 	return;
-    		/// }
+    		//}
         String script = getScript( element );
         if (script != null) {
             try {
                 _updateElements = false;
                 String language = NodeUtils.getNodeAttribute( element, "language", null );
-                if (!getResponse().getScriptingHandler().supportsScriptLanguage( language )) _enableNoScriptNodes = true;
+                if (!getResponse().getScriptingHandler().supportsScriptLanguage( language )) 
+                	_enableNoScriptNodes = true;
                 getResponse().getScriptingHandler().runScript( language, script );
             } finally {
                 clearCaches();
@@ -400,7 +401,10 @@ class ParsedHTML {
      * If noscript node content is enabled, returns null - otherwise returns a concealing element.
      */
     private HTMLElement toNoscriptElement( Element element ) {
-        return _enableNoScriptNodes ? null : new NoScriptElement( element );
+    	HTMLElement result=null;
+    	if (!_enableNoScriptNodes)
+        result=new NoScriptElement( element );
+    	return result;
     }
 
 
@@ -1148,6 +1152,9 @@ class ParsedHTML {
     }
 
 
+    /**
+     * NoScript Element
+     */
     class NoScriptElement extends HTMLElementBase implements ContentConcealer {
 
         public NoScriptElement( Node node ) {

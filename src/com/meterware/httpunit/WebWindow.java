@@ -191,7 +191,9 @@ public class WebWindow {
     WebResponse updateWindow( String requestTarget, WebResponse response, RequestContext requestContext ) throws IOException, SAXException {
         _client.updateClient( response );
         if (getClient().getClientProperties().isAutoRefresh() && response.getRefreshRequest() != null) {
-            return getResponse( response.getRefreshRequest() );
+        	WebRequest request=response.getRefreshRequest();
+        	WebResponse result=getResponse( request );
+          return result; 
         } else if (shouldFollowRedirect( response )) {
             delay( HttpUnitOptions.getRedirectDelay() );
             return getResponse( new RedirectWebRequest( response ) );
@@ -331,17 +333,20 @@ public class WebWindow {
         }
     }
 
-
     /**
      * check whether redirect is configured
      * @param response
      * @return
      */
     private boolean redirectConfigured( WebResponse response ) {
-        return getClient().getClientProperties().isAutoRedirect()
-            && response.getResponseCode() >= HttpURLConnection.HTTP_MOVED_PERM
-            && response.getResponseCode() <= HttpURLConnection.HTTP_MOVED_TEMP
-            && response.getHeaderField( "Location" ) != null;
+    	boolean isAutoredirect=getClient().getClientProperties().isAutoRedirect();
+    	boolean hasLocation=response.getHeaderField( "Location" ) != null;
+    	int responseCode=response.getResponseCode();
+    	boolean result=isAutoredirect
+      	&& responseCode >= HttpURLConnection.HTTP_MOVED_PERM
+      	&& responseCode <= HttpURLConnection.HTTP_MOVED_TEMP
+      	&& hasLocation;
+      return result;
     }
 
     /**
