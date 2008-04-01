@@ -164,6 +164,15 @@ public class ScriptingTest extends HttpUnitTest {
    }
    
    /**
+    * test for bug report [ 1153066 ] Eternal loop while processing javascript
+    * by Serguei Khramtchenko 2005-02-27
+    * @throws Exception
+    */
+   public void testAvoidEndlessLoop() throws Exception {
+  	 WebConversation wc=doTestJavaScript("document.location='#node_selected';");  			
+   }			 
+   
+   /**
     * test for cloneNode feature (asked for by Mark Childeson on 2008-04-01)
     * @throws Exception
     */    
