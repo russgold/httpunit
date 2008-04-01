@@ -608,10 +608,13 @@ public class WebClient {
 
     /**
      * Examines the headers in the response and throws an exception if appropriate.
+     * @parm response - the response to validate
      **/
     private void validateHeaders( WebResponse response ) throws HttpException {
-        if (!getExceptionsThrownOnErrorStatus()) return;
-
+        if (!getExceptionsThrownOnErrorStatus()) 
+        	return;
+        // see feature request [ 914314 ] Add HttpException.getResponse for better reporting
+        // for possible improvements here
         if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
             throw new HttpInternalErrorException( response.getURL() );
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {

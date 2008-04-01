@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2001, Russell Gold
+* Copyright (c) 2000-2001, 2008 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,11 +30,22 @@ import java.net.URL;
 public class HttpException extends RuntimeException {
 
 
+	  /**
+	   * throw a http Exception with the given responseCode
+	   * @param responseCode
+	   */
     protected HttpException( int responseCode ) {
         _responseCode = responseCode;
+        System.err.println(responseCode);
     }
 
 
+    /**
+     * throw a http Exception with the given responseCode and Message
+     * @param responseCode
+     * @param responseMessage
+     * @param baseURL
+     */
     protected HttpException( int responseCode, String responseMessage, URL baseURL ) {
         _responseMessage = responseMessage;
         _responseCode = responseCode;
@@ -42,6 +53,10 @@ public class HttpException extends RuntimeException {
     }
 
 
+    /**
+     * get the Message for the http Exception
+     * @return - the message of the Exception
+     */
     public String getMessage() {
         StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE).append( "Error on HTTP request: " );
         sb.append( _responseCode );
@@ -59,19 +74,27 @@ public class HttpException extends RuntimeException {
     }
 
 
+    /**
+     * get the response Code of this http Exception
+     * @return - the response Code code 4xx or 5xx
+     */
     public int getResponseCode() {
         return _responseCode;
     }
 
 
+    /**
+     * get the response Message of this http Exception
+     * @return
+     */
     public String getResponseMessage() {
         return _responseMessage;
     }
 
 
+    // private local copies of variables 
     private int _responseCode;
     private URL _url;
-
     private String _responseMessage;
 
 }

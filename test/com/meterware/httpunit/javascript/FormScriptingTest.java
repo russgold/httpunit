@@ -386,7 +386,29 @@ public class FormScriptingTest extends HttpUnitTest {
       	fail("There should be no "+rte.getMessage()+" Runtime exception here");
       }
     }
-
+    
+    /**
+     * test indirect invocation 
+     * feature request 
+     * [ 796961 ] Support indirect invocation of JavaScript events on elements
+     * by David D. Kilzer 
+     * @throws Exception
+     */
+    public void testIndirectEventInvocation() throws Exception {
+      defineResource( "OnCommand.html",  "<html><head></head><body>" +
+                                         "<form name=\"testForm\">" +
+                                         "<input type=\"text\" name=\"one\" value=\"default value\" onchange=\"this.form.two.value = this.form.one.value;\">" +
+                                         "<input type=\"text\" name=\"two\" value=\"not the same value\">" +
+                                         "</form>" +
+                                         "<script language=\"javascript\" type=\"text/javascript\">\n" +
+                                         "document.forms[\"testForm\"].elements[\"one\"].onchange();\n" +
+                                         "</script>" +
+                                         "</body></html>" );
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      WebForm form = response.getFormWithName( "testForm" );
+      assertEquals( "field one equals field two", form.getParameterValue("one"), form.getParameterValue( "two" ) );
+    }
 
     public void testEnablingDisabledSubmitButtonViaScript() throws Exception {
         defineResource( "DoIt?color=green&change=success", "You made it!" );
