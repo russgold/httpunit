@@ -112,52 +112,108 @@ public class ScriptingTest extends HttpUnitTest {
         response.getLinks()[0].click();
         assertEquals( "New page", "You made it!", wc.getCurrentPage().getText() );
     }
+    // set to true to get the static HTML Code on System.err
+    public static boolean debugHTML=false;
 
     /**
-     * test the given javaScript function
-     * @param script
+     * test the given javaScript code by putting it into a function and calling it
+     * as a prerequisite make the html code snippet available in the body of the page 
+     * @param script - some javascript code to be called in a function
+     * @param html - a html code snippet
+     * @return
+     * @throws Exception
      */
-    public WebConversation doTestJavaScript(String script) throws Exception {
+    public WebConversation doTestJavaScript(String script,String html) throws Exception {
       defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>\n" +
       		"function javaScriptFunction() {\n"+
       		script+
       		"}\n"+
           "</script></head>" +
           "<body>" +
+          html+"\n"+
           "<a href=\"javascript:javaScriptFunction()\">go</a>" +
           "</body></html>" );
       WebConversation wc = new WebConversation();
       WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      if (debugHTML) {
+      	System.err.println(response.getText()+"\n");
+      }	
       response.getLinkWith( "go" ).click();
       return wc;    	
     }
     
-    /**
-     * test for bug report [ 1508516 ] Javascript method: "undefined" is not supported
-     * @throws Exception
-     */
-    public void testUndefined() throws Exception {
-    	WebConversation wc=doTestJavaScript("if (typeof(xyzDefinitelyNotDefined) == 'undefined') {\n"+
+   /**
+    * test the given javaScript code by putting it into a function
+    * and calling it
+    * @param script
+    */
+   public WebConversation doTestJavaScript(String script) throws Exception {
+  	 return doTestJavaScript(script,"");
+   }	 
+    
+   /**
+    * test for bug report [ 1508516 ] Javascript method: "undefined" is not supported
+    * @throws Exception
+    */
+   public void testUndefined() throws Exception {
+  	 WebConversation wc=doTestJavaScript("if (typeof(xyzDefinitelyNotDefined) == 'undefined') {\n"+
     			"alert ('blabla');\n"+
     			"return;\n"+
     			"}");
-      assertEquals( "Alert message", "blabla", wc.popNextAlert() );
-    	
-    }
+  	 assertEquals( "Alert message", "blabla", wc.popNextAlert() );    	
+   }
+   
+   /**
+    * test for cloneNode feature (asked for by Mark Childeson on 2008-04-01)
+    * @throws Exception
+    */    
+   public void testCloneNode() throws Exception {
+   	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+  		return;
+  	}	  	 
+  	 WebConversation wc=doTestJavaScript(
+  		"dolly1=document.getElementById('Dolly');\n"+
+    	"dolly2=dolly1.cloneNode(true);\n"+
+    	"dolly1.firstChild.nodeValue += dolly2.firstChild.nodeValue;\n"+
+    	"alert(dolly1.firsthChild.nodeValue);\n",
+    	"<div id='Dolly'>Dolly </div>");
+   }
 
-    public void testJavaScriptURLWithIncludedFunction() throws Exception {
-        defineResource( "saycheese.js", "function sayCheese() { alert( \"Cheese!\" ); }" );
-        defineResource( "OnCommand.html", "<html><head><script language='JavaScript' src='saycheese.js'>" +
+   /**
+    * test javascript call to an included function
+    * @throws Exception
+    */
+   public void testJavaScriptURLWithIncludedFunction() throws Exception { 	 
+     defineResource( "saycheese.js", "function sayCheese() { alert( \"Cheese!\" ); }" );
+     defineResource( "OnCommand.html", "<html><head><script language='JavaScript' src='saycheese.js'>" +
                                           "</script></head>" +
                                           "<body>" +
                                           "<a href=\"javascript:sayCheese()\">go</a>" +
                                           "</body></html>" );
-        WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-        response.getLinkWith( "go" ).click();
-        assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
-    }
+     WebConversation wc = new WebConversation();
+     WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+     response.getLinkWith( "go" ).click();
+     assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
+   }
 
+   /**
+    * test javascript call to an included function
+    * @throws Exception
+    */
+   public void testJavaScriptURLWithIncludedFunction2() throws Exception { 	 
+     defineResource( "saycheese.js",  "function sayCheese() { alert( \"Cheese!\" ); }" );
+     defineResource( "callcheese.js", "function callCheese() { sayCheese(); }" );
+     defineResource( "OnCommand.html", "<html><head>\n"+
+    		 "<script language='JavaScript' src='saycheese.js'></script>\n"+
+    		 "<script language='JavaScript' src='callcheese.js'></script>\n"+
+    		 "</head><body>" +
+         "	<a href=\"javascript:callCheese()\">go</a>" +
+         "</body></html>" );
+     WebConversation wc = new WebConversation();
+     WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+     response.getLinkWith( "go" ).click();
+     assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
+   }  
 
     public void testJavaScriptURLInNewWindow() throws Exception {
         defineWebPage( "OnCommand", "<input type='button' id='nowindow' onClick='alert(\"hi\")'></input>\n" +

@@ -22,6 +22,8 @@ package com.meterware.httpunit;
 import com.meterware.httpunit.scripting.ScriptingEventHandler;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
+
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
@@ -30,6 +32,9 @@ import org.w3c.dom.Node;
  * @since 1.5.2
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
+// TODO activate the extends Element as
+// in http://www.w3.org/TR/REC-DOM-Level-1/java-language-binding.html
+//public interface HTMLElement extends Element,ScriptingEventHandler {
 public interface HTMLElement extends ScriptingEventHandler {
 
     /**
