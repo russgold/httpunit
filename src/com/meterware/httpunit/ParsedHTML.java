@@ -225,13 +225,19 @@ class ParsedHTML {
 
     /**
      * Returns the HTML elements with an attribute with the specified name and value.
+     * @param name - the name of the attribute to check
+     * @param value - the value of the attribute to check
      */
     public HTMLElement[] getElementsWithAttribute( String name, String value ) {
         loadElements();
         ArrayList elements = new ArrayList();
         for (Iterator i = _registry.iterator(); i.hasNext();) {
             HTMLElement element = (HTMLElement) i.next();
-            if (value.equals( element.getAttribute( name ))) elements.add( element );
+            String aValue=element.getAttribute( name );
+            if (value.equals(aValue )) {
+               //System.err.println(element.getTagName()+"("+name+")="+aValue);
+             	 elements.add( element );
+            }	
         }
         return (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
     }
@@ -246,6 +252,12 @@ class ParsedHTML {
     }
 
 
+    /**
+     * get the elements with the given tagname
+     * @param dom - the node to start from
+     * @param name - the name of the attribute to look for
+     * @return
+     */
     HTMLElement[] getElementsByTagName( Node dom, String name ) {
         loadElements();
         if (dom instanceof Element) {

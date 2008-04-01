@@ -332,6 +332,17 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     public HTMLElement getElementWithID( String id ) throws SAXException {
         return getReceivedPage().getElementWithID( id );
     }
+    
+    /**
+     * return the HTMLElements with the specified tag name
+     * @param tagName e.g. "div" or "table"
+     * @return a list of all HTMLElements with that tag name
+     * @throws SAXException
+     * @since 1.7
+     */
+    public HTMLElement[] getElementsByTagName(String tagName) throws SAXException {
+    	return getReceivedPage().getElementsByTagName(getDOM(),tagName);
+    }
 
 
     /**

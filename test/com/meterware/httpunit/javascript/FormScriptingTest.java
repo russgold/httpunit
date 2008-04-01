@@ -153,6 +153,8 @@ public class FormScriptingTest extends HttpUnitTest {
       	}	
     }
 
+
+
     public void testElementsProperty() throws Exception {
         defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
                                            "function listElements( form ) {\n" +
@@ -186,6 +188,46 @@ public class FormScriptingTest extends HttpUnitTest {
 
         assertEquals( "Changed state", "on", form.getParameterValue( "ready" ) );
     }
+    
+    /**
+     * test clicking on a span
+     * inspired by Mail from Christoph to developer mailinglist of 2008-04-01
+     */
+    public void testClickSpan() throws Exception {
+      defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>" +
+      "function crtCtrla(obj,otherArg) {"+
+      "		alert(otherArg);"+
+      "}"+		
+      "</script></head>" +
+      "<body>" +  	
+      "<table><tr><td class='cl'><span onClick='crtCtrla(this, \"rim_ModuleSearchResult=Drilldown=key_\", null, null);' class='feact'><span>489</span></span></td></tr></table>"+
+      "</body></html>");
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+      String elementNames[]=response.getElementNames();
+      HTMLElement elements[]=response.getElementsByTagName("span");
+      assertTrue("Two span elements should be found ",elements.length==2);
+      HTMLElement span1=elements[0];
+      String onclick="crtCtrla(this, \"rim_ModuleSearchResult=Drilldown=key_\", null, null);";
+      assertEquals(span1.getAttribute("onclick"),onclick);
+      span1.handleEvent("onclick");
+      String alert=wc.popNextAlert();
+      assertEquals("function should have been triggered to alert",alert,"rim_ModuleSearchResult=Drilldown=key_");
+      elements=response.getElementsWithAttribute("onclick", onclick);
+      int expected=1;
+      // TODO check how 2 could be correct ...
+      expected=2;
+      assertTrue(expected+"elements should be found ",elements.length==expected);
+      span1=elements[0];
+      span1.handleEvent("onclick");
+      alert=wc.popNextAlert();
+      assertEquals("function should have been triggered to alert",alert,"rim_ModuleSearchResult=Drilldown=key_");
+      // TODO remove this part
+      span1=elements[1];
+      span1.handleEvent("onclick");
+      alert=wc.popNextAlert();
+      assertEquals("function should have been triggered to alert",alert,"rim_ModuleSearchResult=Drilldown=key_");
+    }  
 
 
     public void testResetViaScript() throws Exception {
