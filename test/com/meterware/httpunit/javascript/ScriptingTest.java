@@ -1065,6 +1065,48 @@ public class ScriptingTest extends HttpUnitTest {
        WebResponse response = wc.getResponse( getHostPath() + "/Script.html" );
        // com.meterware.httpunit.ScriptException: Event 'testFunction()' failed: org.mozilla.javascript.EcmaError: ReferenceError: "someFunction" is not defined. (httpunit#1)
        String alert1=wc.popNextAlert();
-       assertEquals("somefunction called",alert1);
+       assertEquals("somefunction called",alert1);              
     }   
+    
+    /**
+     * test for bug report [ 1396877 ] Javascript:properties parentNode,firstChild, .. returns null
+     * by gklopp 2006-01-04 15:15
+     * @throws Exception
+     */
+    public void testDOM() throws Exception {
+     	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    		return;
+    	}	  	 
+      defineResource( "testSelect.html", "<html><head><script type='text/javascript'>\n" +        		        	
+			                           "<!--\n" +
+			                           "function testDOM() {\n" +				    
+			                           "  var sel = document.getElementById('the_select');\n" +
+			                           "  var p = sel.parentNode;\n" +
+			                           "  var child = p.firstChild;\n" +
+			                           "  alert('Parent : ' + p.nodeName);\n" +
+			                           "  alert('First child : ' + child.nodeName);\n" + 
+			                           "}\n" +
+			                           "-->\n" +        		        		
+                                         "</script></head>" +
+                                         "<body>" +										   
+                                         "<form name='the_form'>" +
+									   "   <table>" +
+									   "    <tr>" +
+									   "      <td>Selection :</td>" +
+									   "       <td>" +
+									   "          <select name='the_select'>" +
+									   "              <option value='option1Value'>option1</option>" +
+									   "          </select>" +
+									   "       </td>" +
+									   "     </tr>" +
+									   "   </table>" +
+									   "</form>" +				
+									   "<script type='text/javascript'>testDOM();</script>" +										   
+                                         "</body></html>");
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/testSelect.html" );
+      assertEquals( "Message 1", "TD", wc.popNextAlert().toUpperCase() );
+      assertEquals( "Message 2", "SELECT", wc.popNextAlert().toUpperCase() );        
+  }
+
 }

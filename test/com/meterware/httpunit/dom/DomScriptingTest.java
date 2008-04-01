@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2006-2007, Russell Gold
+ * Copyright (c) 2006-2007,2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -25,6 +25,10 @@ import org.w3c.dom.html.HTMLBodyElement;
 import org.w3c.dom.html.HTMLAnchorElement;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Context;
+
+import com.meterware.httpunit.WebConversation;
+import com.meterware.httpunit.WebResponse;
+
 import junit.framework.TestSuite;
 
 import java.net.URL;
@@ -134,6 +138,7 @@ public class DomScriptingTest extends AbstractHTMLElementTest {
 
         assertEquals( "red link href", "http://localhost/red.html", evaluateExpression( _htmlDocument, "links.red.href" ) );
     }
+
 
 
     private void appendLink( HTMLBodyElement body, String id, String href ) {
