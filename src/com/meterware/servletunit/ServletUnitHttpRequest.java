@@ -45,6 +45,8 @@ import javax.servlet.ServletException;
 class ServletUnitHttpRequest implements HttpServletRequest {
 
     private ServletInputStreamImpl _inputStream;
+    // TODO remove when test case for [ 1509117 ] getContentType()
+    // gets available
     private String                 _contentType;
     private Vector                 _locales;
     private boolean                _secure;
@@ -82,7 +84,12 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         }
         if (_headers.get( "Content-Length") == null) _headers.put( "Content-Length", Integer.toString( messageBody.length ) );
 
-        if (_messageBody != null && (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 )) {
+        boolean setBody=
+        // pre [ 1509117 ] getContentType()
+        // _messageBody != null && (_contentType == null || _contentType.indexOf( "x-www-form-urlencoded" ) >= 0 );
+        // patch version:
+        	_messageBody != null && (contentTypeHeader == null ||	contentTypeHeader.indexOf( "x-www-form-urlencoded" ) >= 0 );
+        if (setBody) {
             _requestContext.setMessageBody( _messageBody );
         }
     }
@@ -390,7 +397,15 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * of the CGI variable CONTENT_TYPE.
      **/
     public String getContentType() {
-        return _contentType;
+    	String result;
+    	result=_contentType;
+    	/**
+    	 * suggested fix by bug report 
+    	 * [ 1509117 ] getContentType()
+    	 * by Tom Parker     
+    	 */
+    	result=this.getHeader( "Content-Type" );
+      return result;
     }
 
 
