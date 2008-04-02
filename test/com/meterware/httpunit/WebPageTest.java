@@ -29,6 +29,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import org.w3c.dom.html.HTMLDocument;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 
 
@@ -79,6 +80,13 @@ public class WebPageTest extends HttpUnitTest {
         }
     }
 
+    /**
+     * check the valid contentTypes
+     * modified for bug report
+     * [ 1281655 ] [patch] allow text/xml to be parsed as html
+     * by fabrizio giustina
+     * @throws Exception
+     */
 
     public void testHtmlRequirement() throws Exception {
         defineResource( "TextPage.txt", "Just text", "text/plain" );
@@ -87,6 +95,8 @@ public class WebPageTest extends HttpUnitTest {
                                                "<html><head><title>A Structured Page</title></head><body>Something here</body></html>", "text/xhtml" );
         defineResource( "XHTMLPage.html", "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML Basic 1.0//EN' 'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd'>" +
                                                "<html><head><title>An XHTML Page</title></head><body>Something here</body></html>", "application/xhtml+xml" );
+        // see http://www.xmlrpc.com/spec
+        defineResource( "XMLRPC.html","<?xml version=\"1.0\"?><methodCall><methodName>stock.getQuote</methodName><params><param><value>JAVA</value></param></params></methodCall>","text/xml");
         WebConversation wc = new WebConversation();
         try {
             wc.getResponse( getHostPath() + "/TextPage.txt" ).getReceivedPage().getTitle();
@@ -99,10 +109,17 @@ public class WebPageTest extends HttpUnitTest {
         WebResponse structuredPage = wc.getResponse( getHostPath() + "/StructuredPage.html" );
         assertEquals( "XHTML Title", "A Structured Page", structuredPage.getReceivedPage().getTitle() );
         Document root=structuredPage.getDOM();
-        assertTrue("document root should be available",root!=null);
+        assertTrue("document root of structured  Page should be available",root!=null);
 
         WebResponse xhtmlPage = wc.getResponse( getHostPath() + "/XHTMLPage.html" );
         assertEquals( "XHTML Title", "An XHTML Page", xhtmlPage.getReceivedPage().getTitle() );
+
+        WebResponse xmlrpcPage = wc.getResponse( getHostPath() + "/XMLRPC.html" );
+        root=xmlrpcPage.getDOM();
+        assertTrue("document root of xml RPC page should be available",root!=null);
+        NodeList elements=root.getElementsByTagName("methodCall");
+        assertTrue("there should be one methodCall node",elements.getLength()==1);
+        
     }
 
 

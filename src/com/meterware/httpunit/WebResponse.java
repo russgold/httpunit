@@ -52,6 +52,7 @@ import org.mozilla.javascript.Scriptable;
  * @author <a href="mailto:DREW.VARNER@oracle.com">Drew Varner</a>
  * @author <a href="mailto:dglo@ssec.wisc.edu">Dave Glowacki</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
+ * @author Wolfgang Fahl
  **/
 abstract
 public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
@@ -59,7 +60,15 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     private static final String HTML_CONTENT  = "text/html";
     private static final String XHTML_CONTENT = "application/xhtml+xml";
     private static final String FAUX_XHTML_CONTENT = "text/xhtml";
-
+    // [ 1281655 ] [patch] allow text/xml to be parsed as html
+    // calls for adding this put would break testTraversal
+    private static final String XML_CONTENT  = "text/xml";
+    // the list of valid content Types
+    private static String[] validContentTypes={
+    	HTML_CONTENT, XHTML_CONTENT, FAUX_XHTML_CONTENT
+    };
+    
+    
     private static final int UNINITIALIZED_INT = -2;
     private static final int UNKNOWN_LENGTH_TIMEOUT = 500;
     private static final int UNKNOWN_LENGTH_RETRY_INTERVAL = 10;
@@ -83,11 +92,17 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Returns true if the response is HTML.
+     * @return true if the contenType fits 
      **/
     public boolean isHTML() {
-        return getContentType().equalsIgnoreCase( HTML_CONTENT ) ||
-               getContentType().equalsIgnoreCase( FAUX_XHTML_CONTENT ) ||
-               getContentType().equalsIgnoreCase( XHTML_CONTENT );
+    	boolean result=false;
+    	// check the different content types
+    	for (int i=0;i<validContentTypes.length;i++) {
+    		result=getContentType().equalsIgnoreCase(validContentTypes[i]);
+    		if (result)
+    			break;
+    	} // for
+    	return result;
     }
 
 
@@ -1428,6 +1443,27 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
         private byte[] _buffer;
     }
+
+
+		/**
+		 * allow access to the valid content Types
+		 * @since 1.7
+		 * @return the validContentTypes
+		 */
+		public static String[] getValidContentTypes() {
+			return validContentTypes;
+		}
+
+
+		/**
+		 * allow modification of the valid content Types
+		 * use with care 
+		 * @since 1.7
+		 * @param validContentTypes the validContentTypes to set
+		 */
+		protected static void setValidContentTypes(String[] validContentTypes) {
+			WebResponse.validContentTypes = validContentTypes;
+		}
 
 
 }
