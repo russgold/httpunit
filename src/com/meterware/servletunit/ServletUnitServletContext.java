@@ -40,7 +40,7 @@ import javax.servlet.ServletException;
 /**
  * This class is a private implementation of the ServletContext class.
  **/
-class ServletUnitServletContext implements ServletContext {
+public class ServletUnitServletContext implements ServletContext {
 
     private PrintStream _logStream = System.out;
 
