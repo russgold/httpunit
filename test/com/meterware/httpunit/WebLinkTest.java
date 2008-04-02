@@ -460,6 +460,28 @@ public class WebLinkTest extends HttpUnitTest {
         assertNotNull( "Did not find the guide area", guide );
         assertEquals( "Relative URL", "guide.html", guide.getURLString() );
     }
-
+    /**
+     * test for bug report [ 1035949 ] NullPointerException on Weblink.click
+     * by Ute Platzer
+     * @throws Exception
+     */   
+    public void testLinkBug() throws Exception {
+      WebConversation wc = new WebConversation();
+      String html="\"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html40/strict.dtd\">\n"+
+    	"<html><body>\n"+
+    	"	<a target=\"_parent\" class=\"core_button_normal\"  href=\"/test2.html\">test link</a>"+
+    	"</body></html>";
+      defineWebPage( "test3",html);
+      defineWebPage( "test2","test page2");
+      HttpUnitOptions.setLoggingHttpHeaders(false);
+      HttpUnitOptions.setScriptingEnabled( false );
+      WebResponse mapPage = wc.getResponse( getHostPath() + "/test3.html" );
+      WebLink link =wc.getCurrentPage().getLinkWith("test link");
+      link.click();
+      
+      String html2=(wc.getCurrentPage().getText());
+      assertTrue("click should lead to page 2",html2.indexOf("test page2")>0);
+    }
+    
     private WebResponse _simplePage;
 }
