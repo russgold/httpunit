@@ -243,7 +243,7 @@ public class WebFormTest extends HttpUnitTest {
         form.reset();
         assertEquals( "Reset text area value", "Something", form.getParameterValue( "name" ) );
     }
-
+    
 
     public void testFormRequest() throws Exception {
         WebForm form = _wc.getResponse( getHostPath() + "/OneForm.html" ).getForms()[0];
@@ -282,8 +282,10 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
-    // XXX turn this back on when the parser handles it properly
-    public void notestNullTextValues() throws Exception {
+    /**
+     * test Null textValues
+     */ 
+    public void testNullTextValues() throws Exception {
         defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
                                   "<Input name=\"secret\" type=\"hidden\" value=>" +
                                   "<br><Input name=typeless value=>" +

@@ -234,7 +234,8 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     final
     protected void loadDestinationParameters() {
         StringTokenizer st = new StringTokenizer( getParametersString(), PARAM_DELIM );
-        while (st.hasMoreTokens()) stripOneParameter( st.nextToken() );
+        while (st.hasMoreTokens()) 
+        	stripOneParameter( st.nextToken() );
     }
 
 
@@ -384,6 +385,14 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
 //----------------------------- private members -----------------------------------------------
 
 
+    /**
+     * parameter Delimiter for URL parameters
+     * bug report
+     * [ 1052037 ] Semicolon not supported as URL param delimiter
+     * asks for this to be extended to &;
+     * @see http://www.w3.org/TR/html4/appendix/notes.html#h-B.2 section B2.2
+     * 
+     */
     private static final String PARAM_DELIM = "&";
 
     /** The web response containing this request source. **/
