@@ -117,7 +117,9 @@ public class CookieTest extends TestCase {
         checkAcceptance( 6, false, "www.meterware.com/servlets/special", ".com", null );
         checkAcceptance( 7, false, "www.meterware.com/servlets/special", ".httpunit.org", null );
         checkAcceptance( 8, false, "www.some.meterware.com/servlets/special", ".meterware.com", null );
-        checkAcceptance( 9, false, "www.meterware.com/servlets/special", "www.meterware.com", null );
+        // modified expected result according to [ 1476380 ] Cookies incorrectly rejected despite valid domain
+        checkAcceptance( 9, true,  "www.meterware.com/servlets/special", "www.meterware.com", null );
+        checkAcceptance(10, false, "www.evilyahoo.com","yahoo.com",null);
     }
 
     /**
@@ -250,8 +252,8 @@ public class CookieTest extends TestCase {
      * @throws Exception
      */
     public void xtestCookiesRejection1533762() throws Exception {
-      checkAcceptance( 1, true, "admin.automation.testing.com.ru", ".testing.com.ru", null );
-      checkAcceptance( 2, true, "admin.automation.testing.com.ru", ".admin.automation.testing.com.ru",null);
+      checkAcceptance( 1, true, "admin.automation.testing.com.ru", ".admin.automation.testing.com.ru",null);
+      checkAcceptance( 2, true, "admin.automation.testing.com.ru", ".testing.com.ru", null );
     }
     
 

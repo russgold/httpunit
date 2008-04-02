@@ -479,24 +479,29 @@ public class CookieJar {
 
         /**
          * get the domainAttribute Status for the given domainAttribute with the given sourceHost
+         * @see http://wp.netscape.com/newsref/std/cookie_spec.html
          * @param domainAttribute
          * @param sourceHost
          * @return
          */
         private int getDomainAttributeStatus( String domainAttribute, String sourceHost ) {
-            if (!domainAttribute.startsWith(".")) 
-            	domainAttribute = '.' + domainAttribute;
+        	// patch according to [ 1476380 ] Cookies incorrectly rejected despite valid domain
+        	if (domainAttribute.equals(sourceHost)) {
+        		return CookieListener.ACCEPTED;
+        	}        	
+          if (!domainAttribute.startsWith(".")) 
+          	domainAttribute = '.' + domainAttribute;
 
-            if (domainAttribute.lastIndexOf('.') == 0) {
-                return CookieListener.DOMAIN_ONE_DOT;
-            } else if (!sourceHost.endsWith( domainAttribute )) {
-                return CookieListener.DOMAIN_NOT_SOURCE_SUFFIX;
-            } else if (CookieProperties.isDomainMatchingStrict() &&
-                       sourceHost.lastIndexOf( domainAttribute ) > sourceHost.indexOf( '.' )) {
-                return CookieListener.DOMAIN_TOO_MANY_LEVELS;
-            } else {
-                return CookieListener.ACCEPTED;
-            }
+          if (domainAttribute.lastIndexOf('.') == 0) {
+            return CookieListener.DOMAIN_ONE_DOT;
+          } else if (!sourceHost.endsWith( domainAttribute )) {
+              return CookieListener.DOMAIN_NOT_SOURCE_SUFFIX;
+          } else if (CookieProperties.isDomainMatchingStrict() &&
+              sourceHost.lastIndexOf( domainAttribute ) > sourceHost.indexOf( '.' )) {
+              return CookieListener.DOMAIN_TOO_MANY_LEVELS;
+          } else {
+              return CookieListener.ACCEPTED;
+          }
         }
         
         private boolean reportCookieRejected( int reason, String attribute, String source ) {
