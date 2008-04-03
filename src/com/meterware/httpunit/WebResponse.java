@@ -61,11 +61,11 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     private static final String XHTML_CONTENT = "application/xhtml+xml";
     private static final String FAUX_XHTML_CONTENT = "text/xhtml";
     // [ 1281655 ] [patch] allow text/xml to be parsed as html
-    // calls for adding this put would break testTraversal
+    // testTraversal test changed after positive reply by Russell
     private static final String XML_CONTENT  = "text/xml";
     // the list of valid content Types
     private static String[] validContentTypes={
-    	HTML_CONTENT, XHTML_CONTENT, FAUX_XHTML_CONTENT
+    	HTML_CONTENT, XHTML_CONTENT, FAUX_XHTML_CONTENT, XML_CONTENT
     };
     
     
