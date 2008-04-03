@@ -21,6 +21,7 @@ package com.meterware.servletunit;
 *******************************************************************************************************************/
 import java.util.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -506,14 +507,39 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
+    /**
+     * verify the secure property and scheme http/https 
+     * extended test for bug report [ 1165454 ] ServletUnitHttpRequest.getScheme() returns "http" for secure
+     * by Jeff Mills
+     * @throws Exception
+     */
     public void testSecureProperty() throws Exception {
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple");
         ServletUnitHttpRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
         assertFalse( "Incorrectly noted request as secure", request.isSecure() );
+        assertEquals("http",request.getScheme(),"http");
 
         WebRequest secureReq = new GetMethodWebRequest( "https://localhost/simple");
         request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, secureReq, _context, new Hashtable(), NO_MESSAGE_BODY );
         assertTrue( "Request not marked as secure", request.isSecure() );
+        assertEquals("https",request.getScheme(),"https");
+        
+        wr = new GetMethodWebRequest( "ftp://localhost/simple");
+        request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
+        assertFalse( "Incorrectly noted request as secure", request.isSecure() );
+        assertEquals("ftp",request.getScheme(),"ftp");
+        
+        secureReq = new GetMethodWebRequest( "ftps://localhost/simple");
+        try {
+        	request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, secureReq, _context, new Hashtable(), NO_MESSAGE_BODY );
+          assertTrue( "Request not marked as secure", request.isSecure() );
+          assertEquals("ftps",request.getScheme(),"ftps");
+        } catch (java.net.MalformedURLException mue) {
+        	// as of 2008-03 this happends - I'm not sure whether that should be expected WF
+        	String msg=mue.getMessage();
+        	// System.err.println(msg);
+          assertTrue("ftps is not a known protocol",msg.indexOf("unknown protocol: ftps")>=0);
+    		} 
     }
 
 

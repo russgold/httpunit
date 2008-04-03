@@ -49,6 +49,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     // gets available
     private String                 _contentType;
     private Vector                 _locales;
+    private String                 _protocol;
     private boolean                _secure;
     private RequestContext         _requestContext;
     private String                 _charset;
@@ -72,7 +73,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _headers.addEntries( request.getHeaders() );
         setCookiesFromHeader( _headers );
         _messageBody = messageBody;
-        _secure = request.getURL().getProtocol().equalsIgnoreCase( "https" );
+        _protocol=request.getURL().getProtocol().toLowerCase();
+        _secure = _protocol.endsWith("s" );
 
         _requestContext = new RequestContext( request.getURL() );
         String contentTypeHeader = (String) _headers.get( "Content-Type" );
@@ -451,7 +453,9 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * as noted in RFC 1738.
      **/
     public String getScheme() {
-        return "http";
+    	String result= isSecure() ? "https" : "http";
+    	result=_protocol;
+    	return result;
     }
 
 

@@ -110,7 +110,8 @@ public class RequestContextTest extends HttpUnitTest {
         assertMatchingSet( "param values", new String[] { "red", "blue" }, rc.getParameterValues( "param" ) );
         assertEquals( "param1 value", hebrewValue, ((String[]) rc.getParameterMap().get( "param1"))[0] );
     }
-
+    
+  
 
     class DummyHttpServletRequest implements HttpServletRequest {
 
