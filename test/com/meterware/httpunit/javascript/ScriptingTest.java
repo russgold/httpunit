@@ -28,8 +28,8 @@ import java.util.ArrayList;
 
 
 /**
- *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
+ * @author Wolfgang Fahl - for compiling patches from the Source Forge web site 2008-03
  **/
 public class ScriptingTest extends HttpUnitTest {
 
@@ -246,6 +246,35 @@ public class ScriptingTest extends HttpUnitTest {
         assertNotNull( "No alert detected", wc.getNextAlert() );
         assertEquals( "Alert message", "Ouch!", wc.popNextAlert() );
         assertNull( "Alert should have been removed", wc.getNextAlert() );
+    }
+    
+    /**
+     * test for bug report [ 1161922 ] setting window.onload has no effect
+	   * by Kent Tong
+     * @throws Exception
+     */
+    public void testWindowOnload() throws Exception {
+    	String html="<html>\n"+
+    	"<body>\n"+
+    	"<script language='JavaScript'><!--\n"+
+    	"function foo(text) {\n"+
+    	"alert(text);\n"+
+    	"}\n"+
+    	"window.onload = foo('windowload');\n"+
+    	"// --></script>\n"+
+    	"<form>\n"+
+    	"<input type='Submit' name='OK' value='OK'/>\n"+
+    	"<a href=\"JavaScript:foo('click')\">go</a>" +
+    	"</form>\n"+
+    	"</body>\n"+
+    	"</html>\n";
+      defineResource(  "OnCommand.html", html);
+      WebConversation wc = new WebConversation();
+      WebResponse response=wc.getResponse( getHostPath() + "/OnCommand.html" );
+      assertNotNull( "No alert detected", wc.getNextAlert() );
+      assertEquals( "Alert message", "windowload", wc.popNextAlert() );
+      response.getLinks()[0].click();
+      assertEquals( "Alert message", "click", wc.popNextAlert() );
     }
 
     /**
