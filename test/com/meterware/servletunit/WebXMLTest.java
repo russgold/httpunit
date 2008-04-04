@@ -100,6 +100,9 @@ public class WebXMLTest extends TestCase {
 
         assertRealPath( "path with no context", new ServletRunner( webXml ), new File( "something.txt" ), "/something.txt" );
         assertRealPath( "path with context", new ServletRunner( webXml, "/testing" ), new File( "build/base/something.txt" ), "/something.txt" );
+        // attempt for an assertion a long the line of bug report [ 1113728 ] getRealPath throws IndexOutOfBoundsException on empty string
+        // TODO check what was meant by Adrian Baker
+        // assertRealPath( "empty path with context", new ServletRunner( webXml, "/testing" ), new File( "" ), "/testing" );
         assertRealPath( "path with no context, no slash", new ServletRunner( webXml ), new File( "something.txt" ), "something.txt" );
         assertRealPath( "path with context, no slash", new ServletRunner( webXml, "/testing" ), new File( "build/base/something.txt" ), "something.txt" );
     }
