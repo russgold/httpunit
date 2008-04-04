@@ -941,12 +941,26 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
             throw new IllegalStateException( "Must be called before response text is defined." );
         }
 
+        // please note bug report [ 1119205 ] EOFExceptions while using a Proxy
+        // and patch proposal below
+        // by Ralf Bust
+        /* original 1.6.2 code
         if (encodedUsingGZIP()) {
             byte[] compressedData = readFromStream( inputStream, getContentLength() );
             _inputStream = new GZIPInputStream( new ByteArrayInputStream( compressedData ) );
         } else {
             _inputStream = inputStream;
-        }
+        }*/
+        
+        if (encodedUsingGZIP()) {
+        	try {
+        		_inputStream = new GZIPInputStream( inputStream );
+        	} catch (EOFException eof) {
+        		_inputStream = inputStream;
+        	} 
+        }  else  {
+        	_inputStream = inputStream;
+       	}
     }
 
 
