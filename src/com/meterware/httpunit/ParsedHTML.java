@@ -369,6 +369,11 @@ class ParsedHTML {
     }
 
 
+    /**
+     * get the script for the given node
+     * @param scriptNode
+     * @return the script
+     */
     private String getScript( Node scriptNode ) {
         String scriptLocation = NodeUtils.getNodeAttribute( scriptNode, "src", null );
         if (scriptLocation == null) {
