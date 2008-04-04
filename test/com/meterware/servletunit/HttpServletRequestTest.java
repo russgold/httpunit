@@ -381,6 +381,48 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals( FIRST_COOKIE_VALUE, firstActualCookie.getValue() );
         assertEquals( SECOND_COOKIE_VALUE, secondActualCookie.getValue() );
     }
+    
+    private static final String TEST_SERVLET_URL = "http://localhost:8080/testServlet";
+
+    /**
+     * test case for [ 1151277 ] httpunit 1.6 breaks Cookie handling for ServletUnitClient
+     * by Michael Corum
+     * @throws Exception
+     */
+    public void testGetCookies_httpunit16() throws  Exception {
+	    CookieProperties.setDomainMatchingStrict(false);
+	    CookieProperties.setPathMatchingStrict(false);
+	    ServletRunner sr = new ServletRunner();
+      sr.registerServlet( "testServlet", "ServletName" );
+      ServletUnitClient m_sc = sr.newClient();	    
+	    String FIRST_COOKIE = "RANDOM_COOKIE";
+	    String SECOND_COOKIE = "ANOTHER_COOKIE";
+	    String FIRST_COOKIE_VALUE = "cookie1";
+	    String SECOND_COOKIE_VALUE = "cookie2";
+	    //    ToDo: Use putCookie() for httpunit v1.6 later
+	    //m_sc.addCookie(FIRST_COOKIE,    FIRST_COOKIE_VALUE);
+	    m_sc.putCookie(FIRST_COOKIE,    FIRST_COOKIE_VALUE);
+	    //m_sc.addCookie(SECOND_COOKIE,    SECOND_COOKIE_VALUE);
+	    m_sc.putCookie(SECOND_COOKIE, SECOND_COOKIE_VALUE);
+	
+	    InvocationContext invocation = m_sc.newInvocation(TEST_SERVLET_URL);
+	    HttpServletRequest requ = invocation.getRequest();
+	
+	    Cookie[] cookies = requ.getCookies();
+	    assertEquals(2, cookies.length);
+	    Cookie firstActualCookie = cookies[0];
+	    Cookie secondActualCookie = cookies[1];
+	
+	    assertEquals(FIRST_COOKIE, firstActualCookie.
+	    getName());
+	    assertEquals(SECOND_COOKIE,
+	    secondActualCookie.getName());
+	
+	    assertEquals(FIRST_COOKIE_VALUE,
+	    firstActualCookie.getValue());
+	    assertEquals(SECOND_COOKIE_VALUE,
+	    secondActualCookie.getValue());
+    }
 
 
     /**
