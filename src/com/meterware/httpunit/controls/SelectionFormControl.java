@@ -369,14 +369,27 @@ public class SelectionFormControl extends FormControl {
         }
 
 
+        /**
+        * Modified by gklopp - 12/19/2005
+        * [ 1396835 ] Javascript : length of a select element cannot be increased
+        * Bug corrected : The length can be greater than the original length
+        */
         public void setLength( int length ) {
-            if (length < 0 || length >= _options.length) return;
-            Option[] newArray = new Option[ length ];
-            System.arraycopy( _options, 0, newArray, 0, length );
-            _options = newArray;
+        	if (length < 0) return;
+        	Option[] newArray = new Option[length ];
+        	if (length <= _options.length) {
+        			System.arraycopy( _options, 0,
+        			newArray, 0, length );
+        	} else {
+        		System.arraycopy( _options, 0, newArray, 0, _options.length );
+        		for (int i = _options.length; i <	length; i++) {
+        			newArray[i] = new Option();
+        			newArray[i].setIndex(this, i);
+        		}
+        	}
+        	_options = newArray;
         }
-
-
+        
         public void put( int i, SelectionOption option ) {
             if (i < 0) return;
 

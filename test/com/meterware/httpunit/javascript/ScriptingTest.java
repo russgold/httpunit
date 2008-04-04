@@ -1186,5 +1186,44 @@ public class ScriptingTest extends HttpUnitTest {
       assertEquals( "Message 1", "TD", wc.popNextAlert().toUpperCase() );
       assertEquals( "Message 2", "SELECT", wc.popNextAlert().toUpperCase() );        
   }
+    
+  /**
+   * test for bug report [ 1396835 ] Javascript : length of a select element cannot be increased
+   * by gklopp
+	 * used to  throw java.lang.RuntimeException: Script 'fillSelect();' failed: java.lang.RuntimeException: invalid index 1 for Options option1
+   *	at com.meterware.httpunit.javascript.ScriptingEngineImpl.handleScriptException(ScriptingEngineImpl.java:61)
+   * 
+   * @throws Exception
+   */
+    public void testFillSelect() throws Exception {
+      defineResource( "testSelect.html", "<html><head><script type='text/javascript'>\n" +        		        	
+			                           "<!--\n" +
+			                           "function fillSelect() {\n" +				    
+			                           "   document.the_form.the_select.options.length = 2;\n" +
+			                           "   document.the_form.the_select.options[1].text = 'option2';\n " +				
+			                           "   document.the_form.the_select.options[1].value = 'option2Value';\n " +
+			                           "}\n" +
+			                           "-->\n" +        		        		
+                                         "</script></head>" +
+                                         "<body>" +										   
+                                         "<form name='the_form'>" +
+									   "   <table>" +
+									   "    <tr>" +
+									   "      <td>Selection :</td>" +
+									   "       <td>" +
+									   "          <select name='the_select'>" +
+									   "              <option value='option1Value'>option1</option>" +
+									   "          </select>" +
+									   "       </td>" +
+									   "     </tr>" +
+									   "   </table>" +
+									   "</form>" +				
+									   "<script type='text/javascript'>fillSelect();</script>" +										   
+                                         "</body></html>");
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/testSelect.html" );
+      final WebForm form = response.getFormWithName( "the_form" );
+  }
+
 
 }
