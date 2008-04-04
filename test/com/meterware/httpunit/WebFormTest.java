@@ -408,6 +408,12 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+    /**
+     * testMultiSelect
+     * should fit to bug report [ 1060291 ] setting multiple values in selection list
+     * by Vladimir
+     * @throws Exception
+     */
     public void testMultiSelect() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
                                   "<Select multiple size=4 name=colors>" +
