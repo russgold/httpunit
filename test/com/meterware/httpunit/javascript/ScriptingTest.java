@@ -296,6 +296,42 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Number of script failures logged", 1, HttpUnitOptions.getScriptErrorMessages().length );
     }
 
+    /**
+     * test for bug[ 1055450 ] Error loading included script aborts entire request
+     * by Renaud Waldura  
+     */
+    public void testIncludeErrorBypass() throws Exception {
+    	// purposely we don't have it here
+      // defineResource( "saycheese.js", "function sayCheese() { alert( \"Cheese!\" ); }" );
+      defineResource( "OnCommand.html", "<html><head><script language='JavaScript' src='saycheese.js'>" +
+                                           "</script></head>" +
+                                           "<body>" +
+                                           "<a href=\"javascript:sayCheese()\">go</a>" +
+                                           "</body></html>" );
+      HttpUnitOptions.setExceptionsThrownOnScriptError( true);
+      HttpUnitOptions.clearScriptErrorMessages();
+      WebConversation wc = new WebConversation();
+      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
+      try {
+      	response.getLinkWith( "go" ).click();
+      	fail("there should have been an exception");
+      } catch (Throwable th) { 
+        // java.lang.RuntimeException: Error clicking link: com.meterware.httpunit.ScriptException: URL 'javascript:sayCheese()' failed: org.mozilla.javascript.EcmaError: ReferenceError: "sayCheese" is not defined.
+      	assertTrue("is not defined should be found in message",th.getMessage().indexOf("not defined")>0);
+      } finally {
+      	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
+      }
+      
+      HttpUnitOptions.setExceptionsThrownOnScriptError( false);
+      HttpUnitOptions.clearScriptErrorMessages();      
+    	response.getLinkWith( "go" ).click();
+    	String messages[]=HttpUnitOptions.getScriptErrorMessages();
+    	assertTrue("there should be one message",messages.length==1);
+    	String message=messages[0];
+    	assertTrue("is not defined should be found",message.indexOf("is not defined")>0);
+    }
+
 
     public void testConfirmationDialog() throws Exception {
         defineWebPage( "OnCommand", "<a href='NextPage' id='go' onClick='return confirm( \"go on?\" );'>" );
