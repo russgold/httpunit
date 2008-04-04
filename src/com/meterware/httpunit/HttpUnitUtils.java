@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.util.StringTokenizer;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -430,6 +431,11 @@ public class HttpUnitUtils {
             try {
                 return new InputSource( getClass().getClassLoader().getResourceAsStream( localName ) );
             } catch (Exception e) {
+                // proposed patch for bug report 
+                // [ 1264706 ] [patch] replace ClasspathEntityResolver
+                // by fabrizio giustina
+            	  // even to return this in all cases!
+                // return new InputSource( new ByteArrayInputStream( new byte[0] ) );
                 return null;
             }
         }
