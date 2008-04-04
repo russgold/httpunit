@@ -72,7 +72,6 @@ public class HTMLSelectElementImpl extends HTMLControl implements HTMLSelectElem
         return (getMultiple() && getSize() > 1);
     }
 
-
     public int getLength() {
         return getOptions().getLength();
     }

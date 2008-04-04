@@ -1224,6 +1224,57 @@ public class ScriptingTest extends HttpUnitTest {
       WebResponse response = wc.getResponse( getHostPath() + "/testSelect.html" );
       final WebForm form = response.getFormWithName( "the_form" );
   }
+    
+  /**
+   * test for bug report [ 1396896 ] Javascript: length property of a select element not writable
+   * by gklopp
+   * used to throw
+   * java.lang.RuntimeException: Script 'modifySelectLength();' failed: java.lang.RuntimeException: No such property: length
+   * @throws Exception
+   */    
+    public void testModifySelectLength() throws Exception {
+      defineResource( "testModifySelectLength.html",
+      		                           "<html><head><script type='text/javascript'>\n" +        		        	
+			                           "<!--\n" +
+			                           "function modifySelectLength() {\n" +				    
+			                           "   document.the_form.the_select.length = 2;\n" +
+			                           "   document.the_form.the_select.options[1].text = 'option2';\n " +				
+			                           "   document.the_form.the_select.options[1].value = 'option2Value';\n " +
+			                           "}\n" +
+			                           "-->\n" +        		        		
+                                         "</script></head>" +
+                                         "<body>" +										   
+                                         "<form name='the_form'>" +
+									   "   <table>" +
+									   "    <tr>" +
+									   "      <td>Selection :</td>" +
+									   "       <td>" +
+									   "          <select name='the_select'>" +
+									   "              <option value='option1Value'>option1</option>" +
+									   "          </select>" +
+									   "       </td>" +
+									   "     </tr>" +
+									   "   </table>" +
+									   "</form>" +				
+									   "<script type='text/javascript'>modifySelectLength();</script>" +										   
+                                         "</body></html>");
+    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
+      WebConversation wc = new WebConversation();
+      try {
+      	WebResponse response = wc.getResponse( getHostPath() + "/testModifySelectLength.html" );
+      } catch (Exception ex ) {
+       	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+      		 // TODO change this expected result if fixed
+       		 assertTrue(ex instanceof java.lang.RuntimeException);
+       		 assertTrue(ex.getMessage().indexOf("Not implemented yet")>=0);
+       	} else {
+       		throw ex;
+       	}
+      } finally {
+      	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
+      }
+      
+  }
 
 
 }

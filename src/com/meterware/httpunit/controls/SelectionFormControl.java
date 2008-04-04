@@ -143,6 +143,10 @@ public class SelectionFormControl extends FormControl {
             } else if (propertyName.equalsIgnoreCase( "selectedIndex" )) {
                 if (!(value instanceof Number)) throw new RuntimeException( "selectedIndex must be set to an integer" );
                 _selectionOptions.setSelectedIndex( ((Number) value).intValue() );
+            } else if (propertyName.equalsIgnoreCase( "length" )) {
+            	// [ 1396896 ] Javascript: length property of a select element not writable
+            	// what now?
+            	throw new RuntimeException( "Options.setLength Not implemented yet" );
             } else {
                 super.set( propertyName, value );
             }
