@@ -162,6 +162,22 @@ public class FormSubmitTest extends HttpUnitTest {
 
 
     /**
+     * test for bug report [ 1629836 ] Anchor only form actions are not properly handled
+     * by Claude Brisson 
+     * @throws Exception
+     */
+    public void testAnchor() throws Exception {
+      defineWebPage( "page", "<form method=GET action = \"#myanchor\">" +
+          "<Input type=submit id=doit>" +
+          "</form>" );
+      WebResponse page = _wc.getResponse( getHostPath() + "/page.html" );
+      WebForm form = page.getForms()[0];
+      Button button=form.getButtonWithID("doit");
+      button.click();
+      String url=_wc.getCurrentPage().getURL().toExternalForm();
+      assertTrue(url.endsWith("page.html"));          	
+    }
+    /**
      * check that a fake submit button will be added and marked as such
      * test for [ 1159887 ] patch for RFE 1159884
      * by Rafal Krzewski 
