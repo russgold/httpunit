@@ -92,10 +92,13 @@ class FormParameter {
         ArrayList list = new ArrayList( values.length );
         list.addAll( Arrays.asList( values ) );
         FormControl[] controls = getControls();
-        for (int i = 0; i < controls.length; i++) controls[i].claimRequiredValues( list );
-        for (int i = 0; i < controls.length; i++) controls[i].claimUniqueValue( list );
-        for (int i = 0; i < controls.length; i++) controls[i].claimValue( list );
-        if (!list.isEmpty()) throw 
+        for (int i = 0; i < controls.length; i++) 
+        	controls[i].claimRequiredValues( list );
+        for (int i = 0; i < controls.length; i++) 
+        	controls[i].claimUniqueValue( list );
+        for (int i = 0; i < controls.length; i++) 
+        	controls[i].claimValue( list );
+        if (!list.isEmpty()) throw 	
         	new UnusedParameterValueException( _name, (String) list.get(0) );
     }
 
