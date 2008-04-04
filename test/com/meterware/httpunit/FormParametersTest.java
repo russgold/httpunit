@@ -24,6 +24,7 @@ import junit.framework.TestSuite;
 
 import java.io.File;
 
+import com.meterware.httpunit.controls.IllegalParameterValueException;
 import com.meterware.httpunit.protocol.UploadFileSpec;
 
 
@@ -89,26 +90,62 @@ public class FormParametersTest extends HttpUnitTest {
 
 
     public void testChoiceParameterValidation() throws Exception {
-        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
-                                       "<Select name=colors><Option>blue<Option>red</Select>" +
-                                       "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
-                                       "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                       "<Input type=submit></form>" );
+      defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
+          "<Select name=colors><Option>blue<Option>red</Select>" +
+          "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
+          "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
+          "<Input type=submit></form>" );
+			WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+			WebRequest request = page.getForms()[0].getRequest();
+			validateSetParameterRejected( request, "noSuchControl", "green", "setting of non-existent control" );
+			validateSetParameterRejected( request, "colors", "green", "setting of undefined value" );
+			validateSetParameterRejected( request, "fish", "snapper", "setting of display value" );
+			validateSetParameterRejected( request, "media", "CDRom", "setting list to illegal value" );
+			validateSetParameterRejected( request, "colors", new String[] { "blue", "red" }, "setting multiple values on choice" );
+			validateSetParameterRejected( request, "media", new String[] { "TV", "CDRom" }, "setting one bad value in a group" );
+			
+			request.setParameter( "colors", "blue" );
+			request.setParameter( "fish", "red" );
+			request.setParameter( "media", "TV" );
+			request.setParameter( "colors", new String[] { "blue" } );
+			request.setParameter( "fish", new String[] { "red" } );
+			request.setParameter( "media", new String[] { "TV", "Radio" } );   
+    }
+    
+    /**
+     * test for bug [ 1215734 ] another <select> problem
+     * by alex
+     * @throws Exception
+     */
+    public void testChoiceParameterBug1215734() throws Exception {
+     	String formFromBugReport=
+    		"<form id='form1' class='form' method='post'\n"+
+    		"action='/SanityJSFWebApp/faces/Page1.jsp;jsessionid=5210f4ac722ad98199c2498\n"+
+    		"69de0'\n"+
+    		"enctype='application/x-www-form-urlencoded'>\n"+
+    		"<select id='form1:dropdown1' name='form1:dropdown1'\n"+
+    		"size='1' style='left: 264px; top: 168px; position:\n"+
+    		"absolute'> <option value='Able, Tony'>Able, Tony</option>\n"+
+    		"<option value='Black, John'>Black, John</option>\n"+
+    		"<option value='Kent, Richard'>Kent, Richard</option>\n"+
+    		"<option value='Chen, Larry'>Chen, Larry</option>\n"+
+    		"<option value='Donaldson, Sue'>Donaldson, Sue</option>\n"+
+    		"</select><input id='form1:button1' type='submit'\n"+
+    		"name='form1:button1' value='Go' style='left: 168px;\n"+
+    		"top: 168px; position: absolute' />\n"+
+    		"<input id='form1_hidden' name='form1_hidden'\n"+
+    		"value='form1_hidden' type='hidden' />\n"+
+    		"</form>";
+        defineWebPage( "Default", formFromBugReport);
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebRequest request = page.getForms()[0].getRequest();
-        validateSetParameterRejected( request, "noSuchControl", "green", "setting of non-existent control" );
-        validateSetParameterRejected( request, "colors", "green", "setting of undefined value" );
-        validateSetParameterRejected( request, "fish", "snapper", "setting of display value" );
-        validateSetParameterRejected( request, "media", "CDRom", "setting list to illegal value" );
-        validateSetParameterRejected( request, "colors", new String[] { "blue", "red" }, "setting multiple values on choice" );
-        validateSetParameterRejected( request, "media", new String[] { "TV", "CDRom" }, "setting one bad value in a group" );
-
-        request.setParameter( "colors", "blue" );
-        request.setParameter( "fish", "red" );
-        request.setParameter( "media", "TV" );
-        request.setParameter( "colors", new String[] { "blue" } );
-        request.setParameter( "fish", new String[] { "red" } );
-        request.setParameter( "media", new String[] { "TV", "Radio" } );
+        try {
+        	request.setParameter("form1:dropdown1","Kent,\tRichard");
+        	fail("a tab is not a space ... or?");
+        } catch (IllegalParameterValueException ipve) {
+        	// fine
+        }
+        request.setParameter("form1:dropdown1","Kent, Richard");
     }
 
 

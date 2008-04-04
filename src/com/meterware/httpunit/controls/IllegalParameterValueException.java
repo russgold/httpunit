@@ -45,7 +45,7 @@ public class IllegalParameterValueException extends IllegalRequestParameterExcep
         sb.append( _badValue ).append( "'. Value must be one of: { " );
         for (int i = 0; i < _allowedValues.length; i++) {
             if (i != 0) sb.append( ", " );
-            sb.append( _allowedValues[i] );
+            sb.append( "'"+ _allowedValues[i] +"'" );
         }
         sb.append( " }" );
         return sb.toString();
