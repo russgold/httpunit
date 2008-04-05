@@ -19,6 +19,9 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.servletunit.ServletRunner;
+import com.meterware.servletunit.FormTableTest.FormTableServlet;
+
 import junit.framework.TestSuite;
 
 
@@ -250,6 +253,42 @@ public class HtmlTablesTest extends HttpUnitTest {
         assertEquals( "Colors", table.getCellAsText( 0, 1 ) );
         assertEquals( "Names",  table.getCellAsText( 0, 2 ) );
         assertSame( table.getTableCell( 0, 0 ), table.getTableCell( 0, 1 ) );
+    }
+
+    public static String htmlForBug1043368="<HTML>\n"+
+      "<head>\n"+
+      "<title>FormTable Servlet GET</title>\n"+
+      "</head>\n<body>\n"+
+      "<FORM METHOD=\"POST\" ACTION=\"/some/action\">\n"+
+      "<TABLE>\n"+
+      "<TR><TD colspan=\"4\">Test Form:</TD></TR>\n\n"+
+      "<TR>\n"+
+      "<TD>*Contact Name:</TD>\n"+
+      "<TD>"+
+      "<input type=\"text\" size=\"21\" " +
+               "name=\"CONTACT_NAME\" value=\"TIMOTHY O'LEARY\">"+
+      "</TD>\n"+
+      "<TD>Building Number:</TD>\n"+
+      "<TD>"+
+      "<input type=\"text\" size=\"7\" " +
+               "name=\"BUILDING_NUMBER\" value=\"355\">"+
+      "</TD>\n"+
+      "</TR>\n"+
+      "</TABLE>\n"+
+      "</FORM>";
+
+    /**
+     * test for bug report [ 1043368 ] WebTable has wrong number of columns
+     * by AutoTest
+     */
+    public void testColumnNumberInTable() throws Exception {
+      defineWebPage( "Default",htmlForBug1043368);
+      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+      WebTable table = page.getTables()[0];
+      assertNotNull( "didn't find table", table );
+      // System.out.println( table.toString() );        
+      assertFalse( "wrong table",table.getCellAsText( 1, 0 ).indexOf("Contact Name") == -1 );
+      assertEquals( "wrong column count", 4, table.getColumnCount());        
     }
 
 
