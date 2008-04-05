@@ -58,6 +58,12 @@ public class JavaScript {
             InvocationTargetException, ClassDefinitionException, NotAFunctionException,
             PropertyException, SAXException, JavaScriptException {
         Context context = Context.enter();
+        // suggest bug fix for large java scripts see
+        // bug report [ 1216567 ] Exception for large javascripts
+        // by Grzegorz Lukasik
+        // and
+        
+        context.setOptimizationLevel(HttpUnitOptions.getJavaScriptOptimizationLevel());
         Scriptable scope = context.initStandardObjects( null );
         initHTMLObjects( scope );
 

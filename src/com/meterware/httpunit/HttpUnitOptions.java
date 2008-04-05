@@ -63,6 +63,7 @@ public abstract class HttpUnitOptions {
         _postIncludesCharset = false;
         _exceptionsThrownOnScriptError = true;
         _customAttributes = null;
+        _javaScriptOptimizationLevel = -1; 
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
     }
@@ -546,10 +547,37 @@ public abstract class HttpUnitOptions {
     private static boolean _scriptingEnabled = true;
 
     private static boolean _exceptionsThrownOnScriptError = true;
+    
+    private static int _javaScriptOptimizationLevel = -1; 
 
 
     static {
         reset();
 
     }
+
+
+		/**
+		 * getter for Java Script optimization level
+		 * @return the javaScriptOptimizationLevel to be use for running
+		 * scripts
+		 */
+		public static int getJavaScriptOptimizationLevel() {
+			return _javaScriptOptimizationLevel;
+		}
+
+
+		/**
+		 * setter for Java Script optimization level
+		 * @param scriptOptimizationLevel the _javaScriptOptimizationLevel to set
+		 * see rhino documentation for valid values: 
+  	 *    -2: with continuation
+  	 *    -1: interpret
+     * 0: compile to Java bytecode, don't optimize
+     * 1..9: compile to Java bytecode, optimize 		 * 
+		 */
+		public static void setJavaScriptOptimizationLevel(
+				int scriptOptimizationLevel) {
+			_javaScriptOptimizationLevel = scriptOptimizationLevel;
+		}
 }
