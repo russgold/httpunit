@@ -270,7 +270,6 @@ public class JavaScript {
             result.initialize( elements );
             return result;
         }
-
     }
 
 
@@ -429,6 +428,9 @@ public class JavaScript {
     }
 
 
+    /**
+     * Document script handling
+     */
     static public class Document extends JavaScriptEngine {
 
         private ElementArray _forms;
@@ -496,7 +498,6 @@ public class JavaScript {
             if (urlString.startsWith( "color" )) return;
             getWindow().setLocation( urlString );
         }
-
 
         public String jsGet_cookie() {
             return getDelegate().getCookie();

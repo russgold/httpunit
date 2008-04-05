@@ -178,6 +178,7 @@ public class ScriptingTest extends HttpUnitTest {
     */    
    public void testCloneNode() throws Exception {
    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+  		warnDisabled("testCloneNode","not fixed for old javascript engine");
   		return;
   	}	  	 
   	 WebConversation wc=doTestJavaScript(
@@ -871,7 +872,7 @@ public class ScriptingTest extends HttpUnitTest {
       */    		
     	// will only work with Dom based scripting engine before patch
     	// needs addCustomAttribute for old scriptin engine
-    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {    		
     		HttpUnitOptions.addCustomAttribute("myattr");
     	}	
 	    	defineResource( "start.html",
@@ -1070,7 +1071,7 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Result page ", "Javascript is enabled!", response.getText() );
         boolean nekoHtmlBugFixed = false; // waiting for response to http://sourceforge.net/tracker/index.php?func=detail&aid=1932445&group_id=195122&atid=952178
         if (!nekoHtmlBugFixed) {
-            System.err.println( "*** Test testJavascriptDetectionTrick() disabled, waiting for nekoHtml bug #1932445" );
+        	this.warnDisabled("testJavascriptDetectionTrick", "waiting for nekoHtml bug #1932445" );
         } else {
             HttpUnitOptions.setScriptingEnabled( false );
             response = wc.getResponse( getHostPath() + "/Start.html" );
@@ -1153,6 +1154,7 @@ public class ScriptingTest extends HttpUnitTest {
      */
     public void testDOM() throws Exception {
      	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+    		warnDisabled("testDOM","not fixed for old javascript engine");
     		return;
     	}	  	 
       defineResource( "testSelect.html", "<html><head><script type='text/javascript'>\n" +        		        	
@@ -1265,6 +1267,7 @@ public class ScriptingTest extends HttpUnitTest {
       } catch (Exception ex ) {
        	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
       		 // TODO change this expected result if fixed
+      		 warnDisabled("testModifySelectLength","not fixed for old javascript engine");
        		 assertTrue(ex instanceof java.lang.RuntimeException);
        		 assertTrue(ex.getMessage().indexOf("Not implemented yet")>=0);
        	} else {

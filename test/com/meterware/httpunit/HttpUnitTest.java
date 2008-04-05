@@ -64,6 +64,16 @@ public class HttpUnitTest extends HttpUserAgentTest {
         }
     }
 
+    public static boolean WARN_DISABLED=true;
+    /**
+     * show a warning for disabled Tests
+     * @param testName
+     * @param comment
+     */
+    public void warnDisabled(String testName,String comment) {
+    	if (WARN_DISABLED)
+    		System.err.println("*** Test "+testName+" disabled: "+comment);
+    }
 
     static {
         new WebConversation();

@@ -318,17 +318,31 @@ public class DocumentScriptingTest extends HttpUnitTest {
     /**
      * test jsFunction_createElement() 
      * @author Mark Childerson
+     * also for bug report [ 1430378 ] createElement not found in JavaScript
+     * by Saliya Jinadasa 
      * @since 2008-03-26
      * @throws Exception
-     * TODO activate by renaming to testCreateElement
      */
-    public void xtestCreateElement() throws Exception {
+    public void testCreateElement() throws Exception {
     	defineResource("OnCommand.html", 
 		                   "<html><head><title>Amazing!</title></head>"+
 		                   "<body onLoad='var elem=document.createElement(\"input\");elem.id=\"hellothere\";alert(elem.id);'></body>");
 			WebConversation wc = new WebConversation();
-			wc.getResponse( getHostPath() + "/OnCommand.html" );
-			assertEquals( "Alert message", "hellothere", wc.popNextAlert() );
+    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
+			try {
+				wc.getResponse( getHostPath() + "/OnCommand.html" );
+				// 	used to throw:
+				// 	com.meterware.httpunit.ScriptException: Event 'var elem=document.createElement("input");elem.id="hellothere";alert(elem.id);' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot find function createElement.
+				assertEquals( "Alert message", "hellothere", wc.popNextAlert() );
+			} catch (ScriptException se) {
+       	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+       		this.warnDisabled("testCreateElement", "not fixed for old scripting engine");
+       	} else {
+       		throw se;
+       	}				
+			} finally {
+	    	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
+			}
     }
 
 

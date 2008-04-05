@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
  * test for bug report [ 1043368 ] WebTable has wrong number of columns
  * by AutoTest
  */
-public class FormTableTest extends TestCase {
+public class FormTableTest extends HttpUnitTest {
 
     public static void main( String args[] ) {
         junit.textui.TestRunner.run( suite() );
@@ -74,7 +74,7 @@ public class FormTableTest extends TestCase {
         
         boolean bug1043368Open=true;
         if (bug1043368Open) {
-        	System.err.println("*** Test testFormTable() for open bug 1043368 disabled ");
+        	this.warnDisabled("testFormTable", "for open bug 1043368");
         } else {
         	System.out.println( table.toString() );        
         	assertFalse( "wrong table", 
