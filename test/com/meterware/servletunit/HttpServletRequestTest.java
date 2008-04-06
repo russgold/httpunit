@@ -157,8 +157,26 @@ public class HttpServletRequestTest extends ServletUnitTest {
     /**
      * test for bug report [ 1143757 ] encoding of Special charcters broken with 1.6
      * by Klaus Halfmann
+     * test for bug report [ 1159810 ] URL encoding problem with ServletUnit
+     * by Sven Helmberger 
      */
-    public void testParameterWithSpaces() throws Exception {
+    public void testParameterWithSpacesAndAt() throws Exception {
+      WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+      String pValueWithSpaces="This Input is to long";
+      String pValueWithAt="@user@example.org";
+      wr.setParameter("age" ,pValueWithSpaces);
+      String result=wr.getParameter("age");
+      // according to Klaus Halfman as of 2005-02-18 / version 1.6 results in "This+Input+is+to+long"
+      // System.err.println(result);
+      assertEquals("spaces should survive",pValueWithSpaces,result);
+      wr.setParameter("age" ,pValueWithAt);
+      result=wr.getParameter("age");
+      assertEquals("@ should survive",pValueWithAt,result);
+    }   
+
+    /**
+     */
+    public void testParameterWithAt() throws Exception {
       WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
       String pValueWithSpaces="This Input is to long";
       wr.setParameter("age" ,pValueWithSpaces);
@@ -167,7 +185,6 @@ public class HttpServletRequestTest extends ServletUnitTest {
       // System.err.println(result);
       assertEquals("spaces should survive",pValueWithSpaces,result);
     }   
-
 
     public void testParameterMap() throws Exception {
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
