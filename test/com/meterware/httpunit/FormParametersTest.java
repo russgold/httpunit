@@ -148,6 +148,46 @@ public class FormParametersTest extends HttpUnitTest {
         request.setParameter("form1:dropdown1","Kent, Richard");
     }
 
+    /**
+     * test for bug Report [ 1122186 ] Duplicate select with same name cause error
+     * by Serge Knystautas
+     */
+    public void testDuplicateSelect() throws Exception {
+    	String html="  </head>\n"+
+    	"  <body>\n"+
+    	"  <form name='form1' action='test.php' onsubmit='showpost()'>\n"+
+    	"		<select id='select1' name='selects'>\n"+
+    	"		<option value=''>Pick one</option>\n"+
+    	"		<option value='123'>Foobar</option>\n"+
+    	"		<option value='345'>bar</option>\n"+
+    	"		</select>\n"+
+    	"		\n"+
+    	"		<select id='select2' name='selects'>\n"+
+    	"		<option value=''>Pick one</option>\n"+
+    	"		<option value='123'>Foobar</option>\n"+
+    	"		<option value='345'>bar</option>\n"+
+    	"		</select>\n"+
+    	"		\n"+
+    	"		<select id='select3' name='selects'>\n"+
+    	"		<option value=''>Pick one</option>\n"+
+    	"		<option value='123'>Foobar</option>\n"+
+    	"		<option value='345'>bar</option>\n"+
+    	"		</select>\n"+
+    	"		<br/>\n"+
+    	"		<input type='submit' name='go' value='go'>\n"+
+    	"  </form>\n"+
+    	"  </body>\n"+
+    	"</html>\n";
+      defineWebPage( "Default", html);
+      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+      WebForm webform=page.getForms()[0];
+      try {
+      	webform.setParameter("selects", "123");
+      } catch (IllegalParameterValueException ipve) {
+      	//com.meterware.httpunit.controls.IllegalParameterValueException: May not set parameter 'selects' to 'unknown bad value'. Value must be one of: { '', '123', '345' }
+      	assertTrue("unknown bad value expected",ipve.getMessage().indexOf("unknown bad value")>=0);
+      }
+    }
 
     public void testTextParameterValidationBypass() throws Exception {
         defineWebPage( "Default", "<form method=GET action = \"/ask\">" +

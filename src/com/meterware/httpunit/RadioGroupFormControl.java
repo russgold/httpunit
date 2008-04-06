@@ -130,7 +130,7 @@ public class RadioGroupFormControl extends FormControl {
       for (int i = 0; i < getButtons().length && matchingButtonIndex < 0; i++) {
           if (!getButtons()[i].isReadOnly() && values.contains( getButtons()[i].getQueryValue() )) matchingButtonIndex = i;
       }
-      if (matchingButtonIndex <0) throw new IllegalParameterValueException( getButtons()[0].getName(), (String) values.get(0), getAllowedValues() );
+      if (matchingButtonIndex <0) throw new IllegalParameterValueException( getButtons()[0].getName(), values, getAllowedValues() );
 
       boolean wasChecked = getButtons()[ matchingButtonIndex ].isChecked();
       for (int i = 0; i < getButtons().length; i++) {

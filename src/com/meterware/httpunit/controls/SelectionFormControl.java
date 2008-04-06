@@ -293,8 +293,13 @@ public class SelectionFormControl extends FormControl {
         }
 
 
+        /**
+         * claim unique values from the given list of values
+         * @param values - the list of values
+         * @return
+         */
         boolean claimUniqueValues( List values ) {
-            return claimUniqueValues( values, _options );
+          return claimUniqueValues( values, _options );
         }
 
 
@@ -308,8 +313,9 @@ public class SelectionFormControl extends FormControl {
          * @param values
          */
         final protected void reportNoMatches( List values ) {
-            if (!_listBox) 
-            	throw new IllegalParameterValueException( getName(), (String) values.get(0), getOptionValues() );
+            if (!_listBox) {
+            	throw new IllegalParameterValueException( getName(), values, getOptionValues() );
+            }	
         }
 
 

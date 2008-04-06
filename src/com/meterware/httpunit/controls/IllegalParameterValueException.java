@@ -20,6 +20,8 @@ package com.meterware.httpunit.controls;
 *
 *******************************************************************************************************************/
 
+import java.util.List;
+
 import com.meterware.httpunit.HttpUnitUtils;
 import com.meterware.httpunit.IllegalRequestParameterException;
 
@@ -32,12 +34,41 @@ import com.meterware.httpunit.IllegalRequestParameterException;
 public class IllegalParameterValueException extends IllegalRequestParameterException {
 
 
-    public IllegalParameterValueException( String parameterName, String badValue, String[] allowed ) {
-        _parameterName = parameterName;
-        _badValue      = badValue;
-        _allowedValues = allowed;
-    }
+  /**
+   * construct an IllegalParameterValueException
+   * @param parameterName - the name of the parameter
+   * @param badValue - the bad value that is not allowed
+   * @param allowed - the list of allowed values
+   */
+  public IllegalParameterValueException( String parameterName, String badValue, String[] allowed ) {
+      _parameterName = parameterName;        
+      _badValue      = badValue;
+      _allowedValues = allowed;
+  }
+  
+  /**
+   * get the bad value from a list of Values
+   * @param values
+   * @return
+   */
+  protected static String getBadValue(List values) {
+  	String result="unknown bad value";
+  	if (values.size()>0) {
+  		result=(String) values.get(0);
+  	}	
+  	return result;
+  }	
 
+  /**
+   * 
+   * @param parameterName
+   * @param values
+   * @param allowed
+   */
+  public IllegalParameterValueException( String parameterName, List values, String[] allowed ) {
+  	this(parameterName,getBadValue(values),allowed);
+  }	
+    
 
     public String getMessage() {
         StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
