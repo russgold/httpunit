@@ -54,7 +54,8 @@ public class IllegalParameterValueException extends IllegalRequestParameterExcep
   protected static String getBadValue(List values) {
   	String result="unknown bad value";
   	if (values.size()>0) {
-  		result=(String) values.get(0);
+  		Object badValue=values.get(0);
+  		result=badValue.toString(); 
   	}	
   	return result;
   }	
