@@ -153,6 +153,20 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertMatchingSet( "color parameter", new String[] { "red", "blue" }, request.getParameterValues( "color" ) );
         assertNull( "unset parameter should be null", request.getParameterValues( "unset" ) );
     }
+    
+    /**
+     * test for bug report [ 1143757 ] encoding of Special charcters broken with 1.6
+     * by Klaus Halfmann
+     */
+    public void testParameterWithSpaces() throws Exception {
+      WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+      String pValueWithSpaces="This Input is to long";
+      wr.setParameter("age" ,pValueWithSpaces);
+      String result=wr.getParameter("age");
+      // according to Klaus Halfman as of 2005-02-18 / version 1.6 results in "This+Input+is+to+long"
+      // System.err.println(result);
+      assertEquals("spaces should survive",pValueWithSpaces,result);
+    }   
 
 
     public void testParameterMap() throws Exception {
