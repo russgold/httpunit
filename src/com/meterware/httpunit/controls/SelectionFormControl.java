@@ -185,7 +185,7 @@ public class SelectionFormControl extends FormControl {
 
     public static class Option extends ScriptableDelegate implements SelectionOption {
 
-        private String  _text;
+        private String  _text ="";
         private String  _value;
         private boolean _defaultSelected;
         private boolean _selected;
@@ -385,20 +385,15 @@ public class SelectionFormControl extends FormControl {
         * Bug corrected : The length can be greater than the original length
         */
         public void setLength( int length ) {
-        	if (length < 0) return;
-        	Option[] newArray = new Option[length ];
-        	if (length <= _options.length) {
-        			System.arraycopy( _options, 0,
-        			newArray, 0, length );
-        	} else {
-        		System.arraycopy( _options, 0, newArray, 0, _options.length );
-        		for (int i = _options.length; i <	length; i++) {
-        			newArray[i] = new Option();
-        			newArray[i].setIndex(this, i);
-        		}
-        	}
-        	_options = newArray;
+            if (length < 0) return;
+            Option[] newArray = new Option[ length ];
+            System.arraycopy( _options, 0, newArray, 0, Math.min( length, _options.length ) );
+            for (int i = _options.length; i < length; i++) {
+                newArray[i]  = new Option();
+            }
+            _options = newArray;
         }
+        
         
         public void put( int i, SelectionOption option ) {
             if (i < 0) return;

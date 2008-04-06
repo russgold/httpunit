@@ -1154,6 +1154,8 @@ public class FormScriptingTest extends HttpUnitTest {
         response.getLinks()[0].mouseOver();
         assertEquals( "after change message", "selected #0", wc.popNextAlert() );
     }
+
+
     /**
      * test that in case of an Index out of bounds problem an exception is thrown
      * with a meaningful message (not nullpointer exception)
@@ -1599,6 +1601,43 @@ public class FormScriptingTest extends HttpUnitTest {
         wc.getResponse( getHostPath() + "/Default.html" );
         assertMatchingSet("Length of form", expectedPrompts, collector.confirmPromptsSeen.toArray());
     }
+
+    /**
+     * Verifies that it is possible to increase the size of a select control.
+     * @throws Exception on any unexpected error
+     */
+    public void testIncreaseSelectLength() throws Exception {
+        defineWebPage("Default", "<script language=JavaScript>\n" +
+                                 "function extend()\n"+
+	                             "{\n"+
+                                    "document.myForm.jobRoleID.options.length=2;\n" +
+                                    "document.myForm.jobRoleID.options[1].text='here';" +
+                                    "return true;\n" +
+		                        "}\n" +
+                                "function viewSelect( choice ) {\n" +
+                                "    alert ('select has ' + choice.options.length + ' options' );\n" +
+                                "    alert ('last option is ' + choice.options[choice.options.length-1].text );\n" +
+                                "}\n" +
+                                "</script>" +
+                                  "<form name=myForm method=POST>" +
+                                  "  <select name=\"jobRoleID\">" +
+                                  "    <option value=\"0\" selected=\"selected\">Select Job Role</option>" +
+                                  "  </select>" +
+                                  "  <input type=\"text\" name=\"last_name\" value=\"Bloggs\">" +
+                                  "</form>" +
+                                  "<a href='#' onClick='viewSelect(document.myForm.jobRoleID); return false;'>a</href>\n" +
+                                  "<a href='#' onClick='extend(); return false;'>a</href>\n");
+        WebConversation wc = new WebConversation();
+        WebResponse wr = wc.getResponse( getHostPath() + "/Default.html" );
+        wr.getLinks()[ 0 ].click();
+        assertEquals( "1st message", "select has 1 options", wc.popNextAlert() );
+        assertEquals( "2nd message", "last option is Select Job Role", wc.popNextAlert() );
+        wr.getLinks()[ 1 ].click();
+        wr.getLinks()[ 0 ].click();
+        assertEquals( "3rd message", "select has 2 options", wc.popNextAlert() );
+        assertEquals( "4th message", "last option is here", wc.popNextAlert() );
+    }
+
 
     /**
      * Test that the JavaScript 'value' and 'defaultValue' properties of a text input are distinct.

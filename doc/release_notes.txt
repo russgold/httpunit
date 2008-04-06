@@ -15,6 +15,8 @@ Limitations:
 
 Revision History:
 =================
+06-Apr-2008 bugfix 1110071: cannot increase length of a select control
+
 for a full subversion log you  might want to issue the subversion command:
 	svn log https://httpunit.svn.sourceforge.net/svnroot/httpunit
 02-Apr-2008:	
