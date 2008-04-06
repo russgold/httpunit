@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2007, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -38,7 +38,7 @@ import com.meterware.httpunit.dom.HTMLControl;
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author <a href="mailto:bx@bigfoot.com">Benoit Xhenseval</a>
  **/
-class ParsedHTML {
+public class ParsedHTML {
 
     final static private HTMLElement[] NO_ELEMENTS = new HTMLElement[0];
 
@@ -789,13 +789,36 @@ class ParsedHTML {
     }
 
 
+    /**
+     * convert the given child to a link anchor
+     * @param child
+     * @return
+     */
     private WebLink toLinkAnchor( Element child ) {
         return (!isWebLink( child )) ? null : new WebLink( _response, _baseURL, child, _frame, _baseTarget, _characterSet );
     }
 
 
-    private boolean isWebLink( Node node ) {
-        return (node.getAttributes().getNamedItem( "href" ) != null);
+    /**
+     * check whether the given node is a Web link by checking that 
+     * the node is of type "A"
+     * @param node - the node to check
+     * @return
+     */
+    public static boolean isWebLink( Node node ) {
+    	/*
+       * Bug report [ 1156972 ] isWebLink doesn't recognize all anchor tags
+       * by fregienj claims this be changed to check whether the case-insensitive node name is "A"
+       */
+    	boolean result=false;
+      String tagName = ((Element) node).getTagName();    	
+      if (!tagName.equalsIgnoreCase( "area" ) && !tagName.equalsIgnoreCase( "a")) {
+      } else {
+      	// pre 1.7 code
+      	result=(node.getAttributes().getNamedItem( "href" ) != null);    
+      	// result=true;
+      }
+      return result;
     }
 
 

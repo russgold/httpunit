@@ -71,6 +71,26 @@ public class WebLinkTest extends HttpUnitTest {
     }
     
     /**
+     * test for bug report [ 1156972 ] isWebLink doesn't recognize all anchor tags
+     * by fregienj
+     * @throws Exception
+     */
+    public void testFindNonHrefLinks() throws Exception {
+      defineResource( "NonHref.html", "<html><head><title>NonHref Links</title></head><body>\n"+
+      "<a onclick='javascript:followlink()'>I am a clickable link after all</a>\n"+
+      "</body></html>" );
+      WebConversation wc = new WebConversation();
+      WebResponse response=wc.getResponse( getHostPath() + "/NonHref.html" );
+      WebLink[] links = response.getLinks();
+      assertNotNull( links );
+      this.warnDisabled("testFindNonHrefLinks()","pending decision for bug report [ 1156972 ] -> does an <a> node to have href to be considered a link?");
+      boolean decided=false;
+      if (decided) {
+      	assertEquals( 1, links.length );
+      }	
+    }
+    
+    /**
      * test for Bug report 1908117 by firebird74
      * http://www.w3.org/Addressing/URL/url-spec.html
 		 * says
@@ -240,6 +260,11 @@ public class WebLinkTest extends HttpUnitTest {
     }
 
 
+    /**
+     * @see [ 1156972 ] isWebLink doesn't recognize all anchor tags
+     * for different opinion on weblink count.
+     * @throws Exception
+     */
     public void testLinkFollowing() throws Exception {
         WebConversation wc = new WebConversation();
         defineWebPage( "Initial", "Go to <a href=\"Next.html\">the next page.</a> <a name=\"bottom\">Bottom</a>" );

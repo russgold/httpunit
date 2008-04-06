@@ -24,6 +24,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.meterware.httpunit.ParsedHTML;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -40,15 +42,18 @@ class HTMLContainerDelegate {
     }
 
 
+    /**
+     * get Links for a given Node
+     * @param rootNode
+     * @return
+     */
     HTMLCollection getLinks( NodeImpl rootNode ) {
         ArrayList elements = new ArrayList();
         for (Iterator each = rootNode.preOrderIteratorAfterNode( _iteratorMask ); each.hasNext();) {
             Node node = (Node) each.next();
             if (node.getNodeType() != Node.ELEMENT_NODE) continue;
 
-            String tagName = ((Element) node).getTagName();
-            if (!tagName.equalsIgnoreCase( "area" ) && !tagName.equalsIgnoreCase( "a")) continue;
-            if (node.getAttributes().getNamedItem( "href" ) != null) {
+            if (ParsedHTML.isWebLink(node)) {
                 elements.add( node );
             }
         }
