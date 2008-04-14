@@ -282,10 +282,10 @@ public class PseudoServerTest extends HttpUserAgentTest {
         conn.startChunkedResponse( "POST", "/chunkedServlet" );
         conn.sendChunk( "This " );
         conn.sendChunk( "is " );
-        conn.sendChunk( "also " );
+        conn.sendChunk( "also (and with a greater size) " );
         conn.sendChunk( "chunked.");
         SocketConnection.SocketResponse response2 = conn.getResponse();
-        assertEquals( "retrieved body", "This is also chunked.", new String( response2.getBody() ) );
+        assertEquals( "retrieved body", "This is also (and with a greater size) chunked.", new String( response2.getBody() ) );
     }
 
 

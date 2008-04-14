@@ -42,9 +42,12 @@ public abstract class HttpUnitOptions {
     public static final String ORIGINAL_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";
     private static final String NEW_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.dom.DomBasedScriptingEngineFactory";
 
-    // comment out the scripting engine not to be used
+    // comment out the scripting engine not to be used by allowing the appropriate number of asterisks in the comment on the next line (1 or 2)
+    /**/
     final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = ORIGINAL_SCRIPTING_ENGINE_FACTORY;
-    //final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = NEW_SCRIPTING_ENGINE_FACTORY;
+    /*/
+    final static public String DEFAULT_SCRIPT_ENGINE_FACTORY = NEW_SCRIPTING_ENGINE_FACTORY;
+    /*/
 
 
     /**

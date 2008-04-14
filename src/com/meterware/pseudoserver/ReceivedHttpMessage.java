@@ -133,7 +133,7 @@ abstract class ReceivedHttpMessage {
 
     private int getNextChunkLength( InputStream inputStream ) throws IOException {
         try {
-            return Integer.parseInt( readHeaderLine( inputStream ) );
+            return Integer.parseInt( readHeaderLine( inputStream ), 16 );
         } catch (NumberFormatException e) {
             throw new IOException( "Unabled to read chunk length: " + e );
         }
