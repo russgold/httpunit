@@ -32,6 +32,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.FrameSelector;
 
 import org.w3c.dom.Document;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -105,7 +106,23 @@ public class ServletRunner {
         _application = new WebApplication( HttpUnitUtils.newParser().parse( webXml ), webXml.getParentFile().getParentFile(), contextPath );
         completeInitialization( contextPath );
     }
-
+    
+    /**
+     * constructor with entity Resolver
+     * as asked for in Bug report 1222269 by jim - jafergus 
+     * @param webXMLFileSpec
+     * @param resolver
+     * @throws IOException
+     * @throws SAXException
+     * @since 1.7
+     */
+    public ServletRunner( String webXMLFileSpec,EntityResolver resolver )	throws IOException, SAXException	{
+  		DocumentBuilder parser = HttpUnitUtils.newParser();
+  		parser.setEntityResolver(resolver);
+  		_application = new WebApplication( parser.parse(
+  		webXMLFileSpec ) );
+  		completeInitialization( null );
+ 		}
 
     /**
      * Constructor which expects an input stream containing the web.xml for the application.
