@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2003, 2007, Russell Gold
+ * Copyright (c) 2002-2003, 2007-2008 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -105,7 +105,7 @@ final class UncheckedParameterHolder extends ParameterHolder implements Paramete
             String name = (String) e.nextElement();
             Object[] values = (Object[]) _parameters.get( name );
             for (int i = 0; i < values.length; i++) {
-                if (values[i] instanceof String) {
+           	  if (values[i] instanceof String || values[i] == null) {
                     processor.addParameter( name, (String) values[i], _characterSet );
                 } else if (values[i] instanceof UploadFileSpec) {
                     processor.addFile( name, (UploadFileSpec) values[i] );

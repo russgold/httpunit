@@ -209,6 +209,34 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
+    /**
+     * test Bug report 1212204
+     * by Brian Bonner
+     * @throws Exception
+     */
+    public void testBug1212204() throws Exception {
+    	WebRequest request = new
+    	GetMethodWebRequest("http://localhost/pathinfo?queryString");
+    	//assertEquals("queryString", request.getQueryString());
+    	request = new
+    	GetMethodWebRequest("http://localhost/pathinfo?queryString");
+    	request.setParameter("queryString","");
+    	assertEquals("queryString=", request.getQueryString());
+    	request = new
+    	GetMethodWebRequest("http://localhost/pathinfo?queryString");
+    	request.setParameter("queryString",(String)null);
+    	assertEquals("queryString", request.getQueryString());
+    	WebRequest wr = new
+    		GetMethodWebRequest("http://localhost?wsdl");
+    			wr.setParameter("abc","def");		
+    			wr.setParameter("def","");
+    			wr.setParameter("test",(String)null);
+    			wr.setParameter("wsdl", (String)null);		
+    	
+    			assertEquals("wsdl&abc=def&def=&test",wr.getQueryString());
+    }	
+
+
     public void testInlineSingleValuedParameter() throws Exception {
         WebRequest wr = new GetMethodWebRequest( "http://localhost/simple?color=red&color=blue&age=12" );
         HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
