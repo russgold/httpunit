@@ -243,7 +243,8 @@ public class ServletUnitServletContext implements ServletContext {
     public String getRealPath( String path ) {
         return _application.getResourceFile( path ).getAbsolutePath();
     }
-
+    
+    public static final String DEFAULT_SERVER_INFO="ServletUnit test framework";
 
     /**
      * Returns the name and version of the servlet container on which the servlet is running.
@@ -255,7 +256,7 @@ public class ServletUnitServletContext implements ServletContext {
      * Dev Kit/1.0 (JDK 1.1.6; Windows NT 4.0 x86).
      **/
     public String getServerInfo() {
-        return "ServletUnit test framework";
+        return DEFAULT_SERVER_INFO;
     }
 
 
