@@ -571,6 +571,35 @@ public class FormParametersTest extends HttpUnitTest {
         assertEquals( "File from unvalidated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
     }
     
+    	
+
+    /**
+     * test for BugReport 1937946 (different result on Mac than on other platforms
+     * @throws Exception
+     * to activate test download 
+     * https://sourceforge.net/tracker/download.php?group_id=6550&atid=106550&file_id=274135&aid=1937946
+     * and copy as index.html (or whatever - change url if necessary) to local host
+     * tested with real browser so deactivated for HttpUnitSuite
+     */
+  	public void xtestBugReport1937946Mac() throws Exception {
+    	String url = "http://localhost/index.html";
+  		WebConversation conversation = new WebConversation();
+  		WebRequest      request = new GetMethodWebRequest( url );
+  		WebResponse 	response = conversation.getResponse( request );
+  		
+  		HttpUnitOptions.setExceptionsThrownOnScriptError( false );
+  		
+  		assertNotNull( "Kein Response von URL '" + url + "'.", response );
+  	        System.out.println( "\nResponse von URL '" + url + "'." );
+  	    
+  	        WebForm form = response.getFormWithID( "suchen" );
+  	        String param[] = form.getParameterNames();
+  	  
+  	  for (int i = 0; i < param.length; i++) {
+  			System.err.println(param[i]);
+  		}
+      assertTrue("expecting 5 params but found "+param.length,param.length==5);
+  	}
   
 
 //---------------------------------------------- private members ------------------------------------------------
