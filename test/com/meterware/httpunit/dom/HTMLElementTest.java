@@ -68,6 +68,10 @@ public class HTMLElementTest extends AbstractHTMLElementTest {
     }
 
 
+    /**
+     * test base element attributes
+     * @throws Exception
+     */
     public void testBaseElementAttributes() throws Exception {
         Element element = createElement( "code", new String[][] { { "class", "special" }, { "dir", "rtl" }, { "id", "sample" }, { "lang", "hb" }, { "title", "psalm 83"} } );
         assertTrue( "node should be an HTMLElement but is " + element.getClass(), element instanceof HTMLElement );
