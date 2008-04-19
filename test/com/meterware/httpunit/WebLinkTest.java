@@ -70,6 +70,7 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( 0, links.length );
     }
     
+    
     /**
      * test for bug report [ 1156972 ] isWebLink doesn't recognize all anchor tags
      * by fregienj
@@ -282,6 +283,26 @@ public class WebLinkTest extends HttpUnitTest {
         link.click();
         assertEquals( "Title of next page", "Initial", wc.getFrameContents( link.getTarget() ).getTitle() );
     }
+    
+    /**
+     * test for bug report
+     * [ 1232591 ] getTarget() gives "_top" even if target is not present
+     * by Rifi
+     */
+    public void testGetTarget_top() throws Exception {
+      WebConversation wc = new WebConversation();
+      defineWebPage( "target", "<a href=\"a.html\">" );
+      WebResponse targetPage = wc.getResponse( getHostPath() + "/target.html" );
+      assertEquals( "Num links in initial page", 1,targetPage.getLinks().length );
+      WebLink link = targetPage.getLinks()[0];
+      String target=link.getTarget();
+      // the bug report _top is NOT what we expect
+      // but for the time being this is how httpunit behaves ...
+      String expected="_top";
+      //System.err.println(target);
+      assertTrue(target.equals(expected));    	
+    }
+
 
 
     public void testLinksWithFragmentsAndParameters() throws Exception {
