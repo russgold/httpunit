@@ -254,6 +254,90 @@ public class WebFrameTest extends HttpUnitTest {
         WebResponse response = _wc.getResponse( getHostPath() + "/Frames.html" );
         assertEquals( "red subframe", _wc.getFrameContents( "red" ), response.getSubframeContents( "red" ) );
     }
+    
+    /**
+     * test for bug report
+     * [ 1535018 ] Sub frame recognition - getSubframeContents
+     * by Oliver GL
+     * this is how it does not work ...
+     */
+    public void xtestSubFrameRecognitionOriginal() throws Exception {
+    	defineWebPage("frame1","frame1Content");
+    	defineWebPage("frame2","frame2Content");
+    	defineWebPage("frame3","frame3Content");
+	    String html="<html>\n"+
+	    "<head>\n"+
+	    "</head>\n"+
+	    "<frameset name=\"topset\" rows=\"65,*\">\n"+
+	    "  <frame src=\"frame1.html\" name=\"Banner\" frameborder=\"0\" noresize scrolling=\"no\">\n"+
+	    "  <frameset name=\"subset\" cols=\"180,*\">\n"+
+	    "     <frame src=\"frame2.html\" name=\"Menu\"   frameborder=\"0\" noresize scrolling=\"yes\">\n"+
+	    "     <frame src=\"frame3.html\" name=\"Action\" frameborder=\"0\" noresize scrolling=\"auto\">\n"+
+	    "  </frameset>\n"+
+	    "</frameset>\n"+
+	    "</html>";
+	    // for checking the resulting frame page in real browser ...
+	    // System.out.println(html);
+	    defineResource("frames.html",html);
+      WebResponse topResponse = _wc.getResponse( getHostPath() + "/frames.html" );
+      String[] frameNames=topResponse.getFrameNames();
+      // System.out.println("found "+frameNames.length+" frames");
+      assertTrue(frameNames.length==3);
+      String[]expectedNames={"Banner","Menu","Action"};
+      for (int i=0;i<frameNames.length;i++) {
+      	// System.out.println("frame #"+i+" is '"+frameNames[i]+"'");
+      	assertTrue("frame #"+i+" should be '"+expectedNames[i]+"'",frameNames[i].equals(expectedNames[i]));
+      }
+      WebResponse bannerFrame=_wc.getFrameContents("Banner");
+      for (int i=0;i<frameNames.length;i++) {
+      	WebResponse subFrame =bannerFrame.getSubframeContents(frameNames[i]);
+      	assertNotNull(subFrame);
+      }	
+    }
+    
+    /**
+     * test for bug report
+     * [ 1535018 ] Sub frame recognition - getSubframeContents
+     * by Oliver GL
+     * and this is how it works
+     */
+    public void testSubFrameRecognition() throws Exception {
+    	String frame1Content=
+	    "  <frameset name=\"subset\" cols=\"180,*\">\n"+
+	    "     <frame src=\"frame2.html\" name=\"Menu\"   frameborder=\"0\" noresize scrolling=\"yes\">\n"+
+	    "     <frame src=\"frame3.html\" name=\"Action\" frameborder=\"0\" noresize scrolling=\"auto\">\n"+
+	    "  </frameset>";
+
+    	defineWebPage("frame1",frame1Content);
+    	defineWebPage("frame2","frame2Content");
+    	defineWebPage("frame3","frame3Content");
+	    String html="<html>\n"+
+	    "<head>\n"+
+	    "</head>\n"+
+	    "<frameset name=\"topset\" rows=\"65,*\">\n"+
+	    "  <frame src=\"frame1.html\" name=\"Banner\" frameborder=\"0\" noresize scrolling=\"no\">\n"+
+	    "</frameset>\n"+
+	    "</html>";
+	    // for checking the resulting frame page in real browser ...
+	    // System.out.println(html);
+	    defineResource("frames.html",html);
+      WebResponse topResponse = _wc.getResponse( getHostPath() + "/frames.html" );
+      String[] frameNames=topResponse.getFrameNames();
+      // System.out.println("found "+frameNames.length+" frames");
+      String[]expectedTopNames={"Banner"};
+      assertTrue(frameNames.length==expectedTopNames.length);
+      for (int i=0;i<frameNames.length;i++) {
+      	// System.out.println("frame #"+i+" is '"+frameNames[i]+"'");
+      	assertTrue("frame #"+i+" should be '"+expectedTopNames[i]+"'",frameNames[i].equals(expectedTopNames[i]));
+      }
+      WebResponse bannerFrame=_wc.getFrameContents("Banner");
+      String[] subFrameNames=bannerFrame.getFrameNames();
+      String[] expectedSubNames={"Menu","Action"};
+      for (int i=1;i<subFrameNames.length;i++) {
+      	WebResponse subFrame =bannerFrame.getSubframeContents(subFrameNames[i]);
+      	assertNotNull(subFrame);
+      }	
+    }
 
 
     public void testNestedSubFrames() throws Exception {
