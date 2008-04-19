@@ -1355,13 +1355,13 @@ public class ScriptingTest extends HttpUnitTest {
 	    		// alert(var25500);}' failed: java.lang.IllegalArgumentException: out of range index
 	    		// for 50000 lines and opt level 0	   
 	    		if ((optimizationLevel>=0) && (lines>=50000)) {
-	    			System.err.println("*** Test testLargeJavaScript() fails with runtime Exception for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
+	    			this.warnDisabled("testLargeJavaScript","fails with runtime Exception for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
 	    		} else {
 	    			throw re;
 	    		}
 	    	} catch (java.lang.OutOfMemoryError ome) {
 	    		if (lines>=expectMemoryExceededForLinesOver) {
-	    			System.err.println("*** Test testLargeJavaScript() fails with out of memory error for "+lines+" lines at optimizationLevel "+optimizationLevel+" we expect this for more than "+expectMemoryExceededForLinesOver+" lines");
+	    			this.warnDisabled("testLargeJavaScript","fails with out of memory error for "+lines+" lines at optimizationLevel "+optimizationLevel+" we expect this for more than "+expectMemoryExceededForLinesOver+" lines");
 	    			break;
 	    		} else {
 	    			throw ome;
@@ -1369,7 +1369,7 @@ public class ScriptingTest extends HttpUnitTest {
 	    	} catch (java.lang.ClassFormatError cfe) {
 	    		// java.lang.ClassFormatError: Invalid method Code length 223990 in class file org/mozilla/javascript/gen/c1
 	    		if (optimizationLevel>=0)
-	    			System.err.println("*** Test testLargeJavaScript() fails with class format error for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
+	    			this.warnDisabled("testLargeJavaScript","fails with class format error for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
 	    		else
 	    			throw cfe;	    	
 	    	} // try

@@ -72,9 +72,9 @@ public class FormTableTest extends HttpUnitTest {
 
         assertNotNull( "didn't find table", table );
         
-        boolean bug1043368Open=true;
-        if (bug1043368Open) {
-        	this.warnDisabled("testFormTable", "for open bug 1043368");
+        boolean bug1043368Pending=true;
+        if (bug1043368Pending) {
+        	this.warnDisabled("testFormTable", "for pending bug 1043368");
         } else {
         	System.out.println( table.toString() );        
         	assertFalse( "wrong table", 
