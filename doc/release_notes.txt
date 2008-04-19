@@ -15,433 +15,142 @@ Limitations:
 
 Revision History:
 =================
-14-Apr-2008 PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal
 
+
+14-Apr-2008 PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal
 06-Apr-2008 bugfix 1110071: cannot increase length of a select control
 
-for a full subversion log you  might want to issue the subversion command:
-	svn log https://httpunit.svn.sourceforge.net/svnroot/httpunit
-02-Apr-2008:	
-------------------------------------------------------------------------
-r879 | wolfgang_fahl | 2008-04-02 09:08:48 +0200 (Mi, 02 Apr 2008) | 3 lines
-
-[ 1281655 ] [patch] allow text/xml to be parsed as html
-by fabrizio giustina 
-made available static accessor for validContentTypes in WebResponse
-------------------------------------------------------------------------
-r878 | wolfgang_fahl | 2008-04-02 08:39:21 +0200 (Mi, 02 Apr 2008) | 1 line
-
-comments for patch 1509117
-------------------------------------------------------------------------
-r877 | wolfgang_fahl | 2008-04-02 01:41:53 +0200 (Mi, 02 Apr 2008) | 2 lines
-
-test for bug report [ 1295782 ] Method purgeEmptyCells Truncates Table by ahansen 2005-09-19 22:47
-no fix necessary anymore - already patched
-------------------------------------------------------------------------
-r876 | wolfgang_fahl | 2008-04-02 01:31:38 +0200 (Mi, 02 Apr 2008) | 2 lines
-
-test for bug report [ 1153066 ] Eternal loop while processing javascript by Serguei Khramtchenko 2005-02-27
-
-------------------------------------------------------------------------
-r875 | wolfgang_fahl | 2008-04-02 01:08:51 +0200 (Mi, 02 Apr 2008) | 2 lines
-
-test for [ 1396877 ] Javascript:properties parentNode,firstChild, .. returns null
-by gklopp 2006-01-04 15:15
-------------------------------------------------------------------------
-r874 | wolfgang_fahl | 2008-04-01 19:08:32 +0200 (Di, 01 Apr 2008) | 2 lines
-
-new NekoHtml 1.9.6 parser - please note one test failing:
-testJavascriptDetectionTrick
-------------------------------------------------------------------------
-r873 | wolfgang_fahl | 2008-04-01 17:31:27 +0200 (Di, 01 Apr 2008) | 1 line
-
-fixed after comment from Mark
-------------------------------------------------------------------------
-r872 | wolfgang_fahl | 2008-04-01 17:13:17 +0200 (Di, 01 Apr 2008) | 1 line
-
-patch from bug report [ 1264704 ] [patch] add parent exception to HttpException by fabrizio giustina
-------------------------------------------------------------------------
-r871 | wolfgang_fahl | 2008-04-01 17:02:41 +0200 (Di, 01 Apr 2008) | 1 line
-
-bug fix for bug [ 1289151 ] Order of events in button.click() is wrong
-------------------------------------------------------------------------
-r870 | wolfgang_fahl | 2008-04-01 14:54:23 +0200 (Di, 01 Apr 2008) | 2 lines
-
-inspired by e-mail Execute Javascript of span element
-of 2008-04-01 by Christoph
-------------------------------------------------------------------------
-r869 | wolfgang_fahl | 2008-04-01 14:05:57 +0200 (Di, 01 Apr 2008) | 2 lines
-
-Test for bug report [ 1124024 ] Formcontrol and isDisabled should be public
-by Wolfgang Fahl 2005-02-16 16:39
-------------------------------------------------------------------------
-r868 | wolfgang_fahl | 2008-04-01 13:54:31 +0200 (Di, 01 Apr 2008) | 2 lines
-
-Bug report [ 1124057 ] Out of Bounds Exception should be avoided
-by Wolfgang Fahl of 2005-02-16 17:25
-------------------------------------------------------------------------
-r867 | wolfgang_fahl | 2008-04-01 10:07:02 +0200 (Di, 01 Apr 2008) | 3 lines
-
-feature request [ 796961 ] Support indirect invocation of JavaScript events on elements
-by David D Kilzer
-test added - works with no change to code
-------------------------------------------------------------------------
-r866 | wolfgang_fahl | 2008-04-01 09:04:28 +0200 (Di, 01 Apr 2008) | 2 lines
-
-test and analysis for javaScript cloneNode feature asked for by Mark Childerson according to
-http://www.w3.org/TR/REC-DOM-Level-1/java-language-binding.html
-------------------------------------------------------------------------
-r865 | wolfgang_fahl | 2008-03-31 20:44:32 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-test case for [ 1508516 ] Javascript method: "undefined" is not supported
-- works !
-------------------------------------------------------------------------
-r864 | wolfgang_fahl | 2008-03-31 20:24:56 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-test for bug report [ 1533762 ] Valid cookies are rejected
-by Alexey Bulat  but unfortunately patch does not work
-------------------------------------------------------------------------
-r863 | wolfgang_fahl | 2008-03-31 19:54:34 +0200 (Mo, 31 Mrz 2008) | 1 line
-
-[ 1672385 ] HttpOnly cookie looses all cookie info
-------------------------------------------------------------------------
-r862 | wolfgang_fahl | 2008-03-31 19:37:20 +0200 (Mo, 31 Mrz 2008) | 1 line
-
-comment modified
-------------------------------------------------------------------------
-r861 | wolfgang_fahl | 2008-03-31 18:22:40 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-bug report [ 1895501 ] Handling no codebase attribute in APPLET tag
-change default from "/" to "." meaning from root directory to current directory
-------------------------------------------------------------------------
-r860 | wolfgang_fahl | 2008-03-31 12:59:29 +0200 (Mo, 31 Mrz 2008) | 1 line
-
-tests and start of implementation for [ 1870946 ] getAttribute function support in HTMLElement (not fixed yet so switched off for old scripting engine)
-------------------------------------------------------------------------
-r859 | wolfgang_fahl | 2008-03-31 12:17:30 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-[ 1488617 ] alternate patch for cookie bug #1371204
-by Richard Lee 
-------------------------------------------------------------------------
-r858 | wolfgang_fahl | 2008-03-31 11:58:35 +0200 (Mo, 31 Mrz 2008) | 1 line
-
-patch [ 1323053 ] Patch for 1323031 by Hugh Winkler
-------------------------------------------------------------------------
-r857 | wolfgang_fahl | 2008-03-31 11:30:10 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-[ 1246438 ] For issue 1221537; ServletUnitHttpRequest.getReader not impl
-by Tim
-------------------------------------------------------------------------
-r856 | wolfgang_fahl | 2008-03-31 11:09:12 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-patch [ 1235132 ] Getter support for javascript form.name
-by Peter Phillips + make it work for DOM engine
-------------------------------------------------------------------------
-r855 | wolfgang_fahl | 2008-03-31 10:54:13 +0200 (Mo, 31 Mrz 2008) | 2 lines
-
-[ 1176688 ] Allow configuration of neko parser properties
-but feature switched off since the test cases don't work then
-------------------------------------------------------------------------
-r854 | wolfgang_fahl | 2008-03-30 18:54:19 +0200 (So, 30 Mrz 2008) | 1 line
-
-comments fixed
-------------------------------------------------------------------------
-r853 | wolfgang_fahl | 2008-03-30 18:53:49 +0200 (So, 30 Mrz 2008) | 1 line
-
-tried to change the url encoding for spaces - did not succeed
-------------------------------------------------------------------------
-r852 | wolfgang_fahl | 2008-03-30 17:14:31 +0200 (So, 30 Mrz 2008) | 1 line
-
-test for https://sourceforge.net/forum/message.php?msg_id=3485431
-------------------------------------------------------------------------
-r851 | wolfgang_fahl | 2008-03-30 16:42:37 +0200 (So, 30 Mrz 2008) | 2 lines
-
-testcase for https://sourceforge.net/forum/message.php?msg_id=4482660
-by kauffmann81
-------------------------------------------------------------------------
-r850 | wolfgang_fahl | 2008-03-30 15:54:48 +0200 (So, 30 Mrz 2008) | 1 line
-
-Copyright year changed
-------------------------------------------------------------------------
-r849 | wolfgang_fahl | 2008-03-30 15:54:16 +0200 (So, 30 Mrz 2008) | 1 line
-
-[ 1159887 ] patch for RFE 1159884 by Rafal Krzewski
-------------------------------------------------------------------------
-r848 | wolfgang_fahl | 2008-03-30 15:36:54 +0200 (So, 30 Mrz 2008) | 3 lines
-
-bug [ 1159844 ] allow parsing intercepted pages into HTMLSegment objects
-with patch [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)
-by Rafal Krzewski
-------------------------------------------------------------------------
-r847 | wolfgang_fahl | 2008-03-30 15:24:17 +0200 (So, 30 Mrz 2008) | 1 line
-
-patch [ 1155415 ] Handle redirect instructions which can lead to a loop by james abley
-------------------------------------------------------------------------
-r846 | wolfgang_fahl | 2008-03-30 15:21:11 +0200 (So, 30 Mrz 2008) | 1 line
-
-patch [ 1155415 ] Handle redirect instructions which can lead to a loop by james abley
-------------------------------------------------------------------------
-r845 | wolfgang_fahl | 2008-03-30 14:25:35 +0200 (So, 30 Mrz 2008) | 1 line
-
-copyright year changed
-------------------------------------------------------------------------
-r844 | wolfgang_fahl | 2008-03-30 14:23:00 +0200 (So, 30 Mrz 2008) | 1 line
-
-patch [ 1211154 ] NekoDOMParser default to lowercase by Dan Allen
-------------------------------------------------------------------------
-r843 | wolfgang_fahl | 2008-03-30 14:02:11 +0200 (So, 30 Mrz 2008) | 2 lines
-
-patch [ 1117822 ] Patch for purgeEmptyCells() problem
-by Glen Stampoultzis 
-------------------------------------------------------------------------
-r842 | wolfgang_fahl | 2008-03-30 13:31:47 +0200 (So, 30 Mrz 2008) | 1 line
-
-new interface
-------------------------------------------------------------------------
-r841 | wolfgang_fahl | 2008-03-30 13:20:44 +0200 (So, 30 Mrz 2008) | 1 line
-
-inspired by Ville Skytt?\195?\164's patch[ 1065881 ] Fix servlettest classpath
-------------------------------------------------------------------------
-r840 | wolfgang_fahl | 2008-03-30 00:53:21 +0100 (So, 30 Mrz 2008) | 1 line
-
-patch 1030851  by Jord Sonneveld - jsonneve
-------------------------------------------------------------------------
-r839 | wolfgang_fahl | 2008-03-30 00:30:13 +0100 (So, 30 Mrz 2008) | 1 line
-
-patch  884146 + refactoring around handling events
-------------------------------------------------------------------------
-r838 | wolfgang_fahl | 2008-03-29 19:22:38 +0100 (Sa, 29 Mrz 2008) | 1 line
-
-patch 1415415 added (mime types for tiff and pdf)
-------------------------------------------------------------------------
-r837 | wolfgang_fahl | 2008-03-29 18:43:35 +0100 (Sa, 29 Mrz 2008) | 1 line
-
-event and onchange parts of patch 1653410
-------------------------------------------------------------------------
-r836 | wolfgang_fahl | 2008-03-29 16:53:36 +0100 (Sa, 29 Mrz 2008) | 1 line
-
-patch 1653410 added
-------------------------------------------------------------------------
-r835 | wolfgang_fahl | 2008-03-29 10:20:17 +0100 (Sa, 29 Mrz 2008) | 1 line
-
-comment added
-------------------------------------------------------------------------
-r834 | wolfgang_fahl | 2008-03-29 09:07:21 +0100 (Sa, 29 Mrz 2008) | 1 line
-
-1864072 patch by Matt
-------------------------------------------------------------------------
-r833 | wolfgang_fahl | 2008-03-28 13:24:08 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-Scriptable interface
-------------------------------------------------------------------------
-r832 | wolfgang_fahl | 2008-03-28 12:39:44 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-null handling for openNewWindow
-------------------------------------------------------------------------
-r831 | wolfgang_fahl | 2008-03-28 11:48:28 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-comment
-------------------------------------------------------------------------
-r830 | wolfgang_fahl | 2008-03-28 11:47:18 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-setProxy fix
-------------------------------------------------------------------------
-r829 | wolfgang_fahl | 2008-03-28 11:17:35 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-javadoc and error handling
-------------------------------------------------------------------------
-r828 | wolfgang_fahl | 2008-03-28 10:49:25 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-error handling improved
-------------------------------------------------------------------------
-r827 | wolfgang_fahl | 2008-03-28 10:09:12 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-isEclipse added
-------------------------------------------------------------------------
-r826 | russgold | 2008-03-28 01:30:12 +0100 (Fr, 28 Mrz 2008) | 1 line
-
-PseudoServer enhancements: better debug messages, handle request timeout
-------------------------------------------------------------------------
-r825 | wolfgang_fahl | 2008-03-27 20:54:12 +0100 (Do, 27 Mrz 2008) | 3 lines
-
-improvements by Mark Childerson as mailed in
-Message-ID: <E1JevCG-0000Pm-Jr@mail.sourceforge.net>
-
-------------------------------------------------------------------------
-r824 | wolfgang_fahl | 2008-03-27 20:34:55 +0100 (Do, 27 Mrz 2008) | 1 line
-
-debug of java.net.MalformedURLException problems
-------------------------------------------------------------------------
-r823 | wolfgang_fahl | 2008-03-27 08:14:54 +0100 (Do, 27 Mrz 2008) | 1 line
-
-added stub for testCreateElement
-------------------------------------------------------------------------
-r822 | wolfgang_fahl | 2008-03-26 19:36:27 +0100 (Mi, 26 Mrz 2008) | 1 line
-
-some refactoring
-------------------------------------------------------------------------
-r821 | wolfgang_fahl | 2008-03-26 09:19:24 +0100 (Mi, 26 Mrz 2008) | 1 line
-
-added test for iFrame problem
-------------------------------------------------------------------------
-r820 | wolfgang_fahl | 2008-01-10 12:36:06 +0100 (Do, 10 Jan 2008) | 1 line
-
-test proposal for Patch 1653410
-------------------------------------------------------------------------
-r819 | russgold | 2008-01-03 14:35:21 +0100 (Do, 03 Jan 2008) | 1 line
-
-fix Wolfgang's email address
-------------------------------------------------------------------------
-r818 | russgold | 2008-01-02 18:23:57 +0100 (Mi, 02 Jan 2008) | 1 line
-
-update website definition to point to subversion repository, list Wolfgang as committer
-------------------------------------------------------------------------
-r817 | wolfgang_fahl | 2007-12-31 17:06:45 +0100 (Mo, 31 Dez 2007) | 2 lines
-
-[ 1333390 ] patch for bug 1277797
-
-------------------------------------------------------------------------
-r816 | wolfgang_fahl | 2007-12-31 15:09:41 +0100 (Mo, 31 Dez 2007) | 1 line
-
-patch 1443333  and some improved javadoc
-------------------------------------------------------------------------
-r815 | wolfgang_fahl | 2007-12-31 12:43:52 +0100 (Mo, 31 Dez 2007) | 1 line
-
-1518901
-------------------------------------------------------------------------
-r814 | wolfgang_fahl | 2007-12-30 18:49:24 +0100 (So, 30 Dez 2007) | 1 line
-
-Patch 1531005.
-------------------------------------------------------------------------
-r813 | wolfgang_fahl | 2007-12-30 18:33:18 +0100 (So, 30 Dez 2007) | 1 line
-
-test for Patch  1838699.
-------------------------------------------------------------------------
-r812 | wolfgang_fahl | 2007-12-30 13:58:45 +0100 (So, 30 Dez 2007) | 1 line
-
-SR 1288796
-------------------------------------------------------------------------
-r811 | wolfgang_fahl | 2007-12-30 13:41:38 +0100 (So, 30 Dez 2007) | 1 line
-
-885326 checked but no go
-------------------------------------------------------------------------
-r810 | wolfgang_fahl | 2007-12-30 13:29:18 +0100 (So, 30 Dez 2007) | 1 line
-
-svn
-------------------------------------------------------------------------
-r809 | wolfgang_fahl | 2007-12-30 12:53:42 +0100 (So, 30 Dez 2007) | 1 line
-
-deactivated test and deprecated function for  Patch [ 1838699 ]
-------------------------------------------------------------------------
-r808 | wolfgang_fahl | 2007-12-30 12:07:01 +0100 (So, 30 Dez 2007) | 1 line
-
-pending patch 1155792
-------------------------------------------------------------------------
-r807 | wolfgang_fahl | 2007-12-30 11:13:55 +0100 (So, 30 Dez 2007) | 1 line
-
-patch 18386699
-------------------------------------------------------------------------
-r806 | wolfgang_fahl | 2007-12-30 10:38:33 +0100 (So, 30 Dez 2007) | 1 line
-
-1.6.3. prep
-------------------------------------------------------------------------
-r805 | wolfgang_fahl | 2007-12-30 10:34:54 +0100 (So, 30 Dez 2007) | 1 line
-
-javadoc
-------------------------------------------------------------------------
-r804 | wolfgang_fahl | 2007-12-30 10:30:39 +0100 (So, 30 Dez 2007) | 1 line
-
-BR 1843978
-------------------------------------------------------------------------
-r803 | wolfgang_fahl | 2007-12-30 09:11:21 +0100 (So, 30 Dez 2007) | 1 line
-
-new tests
-------------------------------------------------------------------------
-r802 | wolfgang_fahl | 2007-12-28 17:32:11 +0100 (Fr, 28 Dez 2007) | 1 line
-
-extended TestSuite
-------------------------------------------------------------------------
-r801 | wolfgang_fahl | 2007-12-28 17:24:44 +0100 (Fr, 28 Dez 2007) | 1 line
-
-new package plus tests
-------------------------------------------------------------------------
-r800 | wolfgang_fahl | 2007-12-28 16:59:12 +0100 (Fr, 28 Dez 2007) | 2 lines
-
-[ 1371208 ] Patch for Cookie bug #1371204
-
-------------------------------------------------------------------------
-r799 | wolfgang_fahl | 2007-12-28 16:50:28 +0100 (Fr, 28 Dez 2007) | 2 lines
-
-[ 1520925 ] SSL patch
-
-------------------------------------------------------------------------
-r798 | wolfgang_fahl | 2007-12-28 16:35:45 +0100 (Fr, 28 Dez 2007) | 1 line
-
-IBM Websphere https protocol support 
-------------------------------------------------------------------------
-r797 | wolfgang_fahl | 2007-12-28 16:16:07 +0100 (Fr, 28 Dez 2007) | 1 line
-
- [ 844084 ] Block HTTP referer added
-------------------------------------------------------------------------
-r796 | wolfgang_fahl | 2007-12-28 15:39:07 +0100 (Fr, 28 Dez 2007) | 1 line
-
-fixed for abstract setProxy
-------------------------------------------------------------------------
-r795 | wolfgang_fahl | 2007-12-28 15:10:41 +0100 (Fr, 28 Dez 2007) | 1 line
-
-comments for some suggestions
-------------------------------------------------------------------------
-r794 | wolfgang_fahl | 2007-12-28 14:49:11 +0100 (Fr, 28 Dez 2007) | 1 line
-
-proposed patch 1152036 - not enabled
-------------------------------------------------------------------------
-r793 | wolfgang_fahl | 2007-12-28 14:15:50 +0100 (Fr, 28 Dez 2007) | 1 line
-
-new tests and some comments
-------------------------------------------------------------------------
-r792 | wolfgang_fahl | 2007-12-24 09:07:36 +0100 (Mo, 24 Dez 2007) | 1 line
-
-Fix for 1705925
-------------------------------------------------------------------------
-r791 | wolfgang_fahl | 2007-12-21 14:24:12 +0100 (Fr, 21 Dez 2007) | 3 lines
-
-ServletUnitHttpRequest.getDateHeader() always "returns -1"?
-Date sent:	Wed, 19 Dec 2007 11:17:36 -0700
-by Yu Chen
-------------------------------------------------------------------------
-r790 | wolfgang_fahl | 2007-12-21 14:23:51 +0100 (Fr, 21 Dez 2007) | 1 line
-
-CVS headers don't work in Subversion
-------------------------------------------------------------------------
-r789 | wolfgang_fahl | 2007-12-21 14:21:45 +0100 (Fr, 21 Dez 2007) | 1 line
-
-Header added
-------------------------------------------------------------------------
-r788 | wolfgang_fahl | 2007-12-21 14:21:10 +0100 (Fr, 21 Dez 2007) | 3 lines
-
-ServletUnitHttpRequest.getDateHeader() always "returns -1"?
-Date sent:	Wed, 19 Dec 2007 11:17:36 -0700
-by Yu Chen
-------------------------------------------------------------------------
-r787 | wolfgang_fahl | 2007-12-06 20:14:14 +0100 (Do, 06 Dez 2007) | 1 line
-
-made some controls public
-------------------------------------------------------------------------
-r786 | wolfgang_fahl | 2007-11-23 19:36:23 +0100 (Fr, 23 Nov 2007) | 1 line
-
-improved index out of bounds handling for options
-
-30-Dec-2007:
-	1853311  	[PATCH] setExceptionsThrownOnScriptError not working    	   2007-12-18 17:53  	 5  	Closed  	wolfgang_fahl  	gwrba
-	1853073 	[PATCH] getElementByID support 	  2007-12-18 15:29 	5 	Closed 	wolfgang_fahl 	gcc
-	1853071 	[PATCH] Comment DOM support 	  2007-12-18 15:28 	5 	Closed 	wolfgang_fahl 	gcc
-	1853053 	[PATCH] ServletContext requires getContextPath() 	  2007-12-18 14:38 	5 	Closed 	wolfgang_fahl 	gcc
-	1843978 	Accessing Options in a form is in lower case 	  2007-12-04 11:35 	5 	Closed 	wolfgang_fahl 	mkempa
-	1791608 	failed: TypeError: undefined is not a function. 	* 2007-09-10 16:20 	5 	Closed 	wolfgang_fahl 	thisisananth
-	1705925 	Bug in URL-decoding of GET-Request-Parameters 	* 2007-04-23 16:30 	5 	Closed 	wolfgang_fahl 	sthuebner
-	1516007 	Default SSL provider not being used 	* 2006-07-02 23:05 	5 	Closed 	wolfgang_fahl 	trajanoAccepting Donations
-	1449658 	Problems setting value of a select-box in a XHTML document 	* 2006-03-14 16:25 	5 	Closed 	wolfgang_fahl 	bkuser
-	1243721 	SSL doesn't work with IBM JDK 	* 2005-07-23 23:21 	5 	Closed 	wolfgang_fahl 	jherbst
+1.7 Bug fixes and patches from 2007-12 to 2008-04:	for a full subversion log you  might want to issue the subversion command:
+			svn log https://httpunit.svn.sourceforge.net/svnroot/httpunit
+		The following list of changes has been extracted from this subversion log automatically. You might want to look at
+			http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=920
+		inserting the revision number mentioned below to see the full details of each change. E.g. the details for
+		(r788) can be found at
+		 			http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=788
+		 			
+		 			
+         1.  improved index out of bounds handling for options (r786)
+         2.  made some controls public (r787)
+         3.  ServletUnitHttpRequest.getDateHeader() always "returns -1"?Date sent:	Wed, 19 Dec 2007 11:17:36 -0700by Yu Chen (r788)
+         4.  ServletUnitHttpRequest.getDateHeader() always "returns -1"?Date sent:	Wed, 19 Dec 2007 11:17:36 -0700by Yu Chen (r791)
+         5.  Fix for 1705925 (r792)
+         6.  new tests and some comments (r793)
+         7.  proposed patch 1152036 - not enabled (r794)
+         8.  comments for some suggestions (r795)
+         9.  fixed for abstract setProxy (r796)
+         10.   [ 844084 ] Block HTTP referer added (r797)
+         11.  IBM Websphere https protocol support  (r798)
+         12.  [ 1520925 ] SSL patch (r799)
+         13.  [ 1371208 ] Patch for Cookie bug #1371204 (r800)
+         14.  new package plus tests (r801)
+         15.  extended TestSuite (r802)
+         16.  new tests (r803)
+         17.  BR 1843978 (r804)
+         18.  javadoc (r805)
+         19.  1.6.3. prep (r806)
+         20.  patch 18386699 (r807)
+         21.  pending patch 1155792 (r808)
+         22.  deactivated test and deprecated function for  Patch [ 1838699 ] (r809)
+         23.  svn (r810)
+         24.  885326 checked but no go (r811)
+         25.  SR 1288796 (r812)
+         26.  test for Patch  1838699. (r813)
+         27.  Patch 1531005. (r814)
+         28.  1518901 (r815)
+         29.  patch 1443333  and some improved javadoc (r816)
+         30.  [ 1333390 ] patch for bug 1277797 (r817)
+         31.  update website definition to point to subversion repository, list Wolfgang as committer (r818)
+         32.  fix Wolfgang's email address (r819)
+         33.  test proposal for Patch 1653410 (r820)
+         34.  added test for iFrame problem (r821)
+         35.  some refactoring (r822)
+         36.  added stub for testCreateElement (r823)
+         37.  debug of java.net.MalformedURLException problems (r824)
+         38.  improvements by Mark Childerson as mailed inMessage-ID: <E1JevCG-0000Pm-Jr@mail.sourceforge.net> (r825)
+         39.  PseudoServer enhancements: better debug messages, handle request timeout (r826)
+         40.  isEclipse added (r827)
+         41.  error handling improved (r828)
+         42.  javadoc and error handling (r829)
+         43.  setProxy fix (r830)
+         44.  comment (r831)
+         45.  null handling for openNewWindow (r832)
+         46.  Scriptable interface (r833)
+         47.  1864072 patch by Matt (r834)
+         48.  patch 1653410 added (r836)
+         49.  event and onchange parts of patch 1653410 (r837)
+         50.  patch 1415415 added (mime types for tiff and pdf) (r838)
+         51.  patch  884146 + refactoring around handling events (r839)
+         52.  patch 1030851  by Jord Sonneveld - jsonneve (r840)
+         53.  inspired by Ville Skytt?\195?\164's patch[ 1065881 ] Fix servlettest classpath (r841)
+         54.  new interface (r842)
+         55.  patch [ 1117822 ] Patch for purgeEmptyCells() problemby Glen Stampoultzis  (r843)
+         56.  patch [ 1211154 ] NekoDOMParser default to lowercase by Dan Allen (r844)
+         57.  patch [ 1155415 ] Handle redirect instructions which can lead to a loop by james abley (r846)
+         58.  patch [ 1155415 ] Handle redirect instructions which can lead to a loop by james abley (r847)
+         59.  bug [ 1159844 ] allow parsing intercepted pages into HTMLSegment objectswith patch [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)by Rafal Krzewski (r848)
+         60.  [ 1159887 ] patch for RFE 1159884 by Rafal Krzewski (r849)
+         61.  testcase for https://sourceforge.net/forum/message.php?msg_id=4482660by kauffmann81 (r851)
+         62.  test for https://sourceforge.net/forum/message.php?msg_id=3485431 (r852)
+         63.  tried to change the url encoding for spaces - did not succeed (r853)
+         64.  [ 1176688 ] Allow configuration of neko parser propertiesbut feature switched off since the test cases don't work then (r855)
+         65.  patch [ 1235132 ] Getter support for javascript form.nameby Peter Phillips + make it work for DOM engine (r856)
+         66.  [ 1246438 ] For issue 1221537; ServletUnitHttpRequest.getReader not implby Tim (r857)
+         67.  patch [ 1323053 ] Patch for 1323031 by Hugh Winkler (r858)
+         68.  [ 1488617 ] alternate patch for cookie bug #1371204by Richard Lee  (r859)
+         69.  tests and start of implementation for [ 1870946 ] getAttribute function support in HTMLElement (not fixed yet so switched off for old scripting engine) (r860)
+         70.  bug report [ 1895501 ] Handling no codebase attribute in APPLET tagchange default from "/" to "." meaning from root directory to current directory (r861)
+         71.  comment modified (r862)
+         72.  [ 1672385 ] HttpOnly cookie looses all cookie info (r863)
+         73.  test for bug report [ 1533762 ] Valid cookies are rejectedby Alexey Bulat  but unfortunately patch does not work (r864)
+         74.  test case for [ 1508516 ] Javascript method: "undefined" is not supported- works ! (r865)
+         75.  test and analysis for javaScript cloneNode feature asked for by Mark Childerson according tohttp://www.w3.org/TR/REC-DOM-Level-1/java-language-binding.html (r866)
+         76.  feature request [ 796961 ] Support indirect invocation of JavaScript events on elementsby David D Kilzertest added - works with no change to code (r867)
+         77.  Bug report [ 1124057 ] Out of Bounds Exception should be avoidedby Wolfgang Fahl of 2005-02-16 17:25 (r868)
+         78.  Test for bug report [ 1124024 ] Formcontrol and isDisabled should be publicby Wolfgang Fahl 2005-02-16 16:39 (r869)
+         79.  inspired by e-mail Execute Javascript of span elementof 2008-04-01 by Christoph (r870)
+         80.  bug fix for bug [ 1289151 ] Order of events in button.click() is wrong (r871)
+         81.  patch from bug report [ 1264704 ] [patch] add parent exception to HttpException by fabrizio giustina (r872)
+         82.  fixed after comment from Mark (r873)
+         83.  new NekoHtml 1.9.6 parser - please note one test failing:testJavascriptDetectionTrick (r874)
+         84.  test for [ 1396877 ] Javascript:properties parentNode,firstChild, .. returns nullby gklopp 2006-01-04 15:15 (r875)
+         85.  test for bug report [ 1153066 ] Eternal loop while processing javascript by Serguei Khramtchenko 2005-02-27 (r876)
+         86.  test for bug report [ 1295782 ] Method purgeEmptyCells Truncates Table by ahansen 2005-09-19 22:47no fix necessary anymore - already patched (r877)
+         87.  comments for patch 1509117 (r878)
+         88.  [ 1281655 ] [patch] allow text/xml to be parsed as htmlby fabrizio giustina made available static accessor for validContentTypes in WebResponse (r879)
+         89.  developers and release notes (r880)
+         90.  Bug report by Adam Hardy via developer Mailinglistof 2008-04-02 to avoid java.lang.IllegalAccessException: Class org.apache.tiles.access.TilesAccess can not access a member of class com.meterware.servletunit.ServletUnitServletContext with modifiers "public"when working with Tiles (r881)
+         91.  partially disabled noscript detection trick test, pending nekoHTML bugfix (r882)
+         92.  [ 1035949 ] NullPointerException on Weblink.clickby Ute Platzerhistoric (r883)
+         93.  patch for [ 1476380 ] Cookies incorrectly rejected despite valid domainby Garrick Toubassi (r884)
+         94.  [ 1052037 ] Semicolon not supported as URL param delimiterby Lucano fix yet only comments (r885)
+         95.  test for bug report [ 1161922 ] setting window.onload has no effectby Kent Tong - no fix necessary (r886)
+         96.  fix for bug report [ 1165454 ] ServletUnitHttpRequest.getScheme() returns "http" for secureby Jeff Mills getScheme now returns _protocol (in lowercase) gotten from the URL of the request. Test will throw java.net.MalFormedURLException / unknown protcol for "ftps" which is considered expected at this time (r887)
+         97.  [ 1281655 ] [patch] activated by chaning testTraversal (r888)
+         98.  [ 1629836 ] Anchor only form actions are not properly handledby Claude Brisson can not reproduce - testcase runs (r889)
+         99.  [ 1055450 ] Error loading included script aborts entire requestby Renaud Walduraworks already with 1.6.2 (r890)
+         100.  comment for bug report [ 1060291 ] setting multiple values in selection list by Vladimirthat the existing testMultiSelect seems to fit (r892)
+         101.  test case for bug report [ 1151277 ] httpunit 1.6 breaks Cookie handling for ServletUnitClientby Michael Corumruns without change (r896)
+         102.  trying to check [ 1113728 ] getRealPath throws IndexOutOfBoundsException on empty stringby Adrian Bakerhad to comment out again (r898)
+         103.  bug report [ 1396835 ] Javascript : length of a select element cannot be increasedby gklopp + patch (r899)
+         104.  bug report [ 1119205 ] EOFExceptions while using a Proxypatch by Ralf Bustset to pending in tracker - the patch does not break any testbut there is no unit test for the difference of the two implementations yet (r901)
+         105.  test for [ 1396896 ] Javascript: length property of a select element not writableby gklopp modified impl to throw "Not implemented exception"Modal test case for new Dom Scripting Engine (r902)
+         106.  patch for bug report [ 1264706 ] [patch] replace ClasspathEntityResolverput into comment (r903)
+         107.  test for bug report [ 1215734 ] another <select> problemby alexpatched the IllegalParameterValueException to but options in quotes to better show the "Kent, Richard" culpritshowed that tab and space could also lead to a problem (r904)
+         108.  test for the bug reports [ 1216567 ] Exception for large javascriptsby Grzegorz Lukasik and bug report [ 1572117 ] ClassFormatErrorby Walter Meierset quicktest to false to run the test for scripts froma thousand to a million lines for optimization levels from -2 to 9 (will take approx 30 secs)patch: new function:HttpUnitOptions.setJavaScriptOptimizationLevel(optimizationLevel);with default optimization level of -1 (interpret) (r905)
+         109.  test for open bug report [ 1043368 ] WebTable has wrong number of columnsby AutoTestadded and disabled (warning only) (r906)
+         110.  Formtable test added and added warnDisabled generalization for some tests (r907)
+         111.  Id keyword property set where missing (r908)
+         112.  Bug report [ 1122186 ] Duplicate select with same name cause errorfixed by changing constructor for IllegalParameterValueException and getting bad value in a separate function - may later also be used to fix the ClasscastException problem when a double is in the list of values (r909)
+         113.  should fix class cast exception for which we are waiting for junit test (r910)
+         114.  test for bug report [ 1143757 ] encoding of Special charcters broken with 1.6by Klaus Halfmannworks with no change (r911)
+         115.  bug report [ 1156972 ] isWebLink doesn't recognize all anchor tagsby fregienjnot patched yet and used warnDisabled until decision whether all <area> and <a> nodes are to be considered WebLinks no matter whether they have hrefs or not (r912)
+         116.  test for bug report [ 1159810 ] URL encoding problem with ServletUnitby Sven Helmberger  addedis a duplicate of the other encoding bug and works (r913)
+         117.  bug #1110071: javascript cannot increase length of a select control (r914)
+         118.  Parse chunk lengths as hex (r915)
+         119.  test for Bug Report 1937946 added (but disabled for HttpUnitSuite since it needs index.html on localhostconvenience addition to be able to test this bug report on a Mac (r916)
+         120.  bug report (actually a feature request) 1942454 Make ServerInfo a constantby Philip Helger (r917)
+         121.  fix for Bug report 1212204 by Brian Bonner (r918)
+         122.  [ 1222269 ] Cannot setEntityResolver on ServletRunnerjim - jafergusadd another constructor for ServletRunner as requested (r919)
 	  
  5-Jul-2007:
     Notes: The PostMethodWebRequest.setMimeEncoded method has been removed. Mime encoding, if desired, should now be
