@@ -1435,13 +1435,22 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
 
         ByteTag getNextTag() throws UnsupportedEncodingException {
-            ByteTag byteTag;
+            ByteTag byteTag=null;
             do {
-                int start = _end + 1;
-                while (start < _buffer.length && _buffer[ start ] != '<') start++;
-                for (_end =start +1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
-                if (_end >= _buffer.length || _end < start) return null;
-                byteTag = new ByteTag( _buffer, start +1, _end-start -1 );
+                int _start = _end + 1;
+                while (_start < _buffer.length && _buffer[ _start ] != '<') _start++;
+                // proposed patch for bug report 
+                // [ 1376739 ] iframe tag not recognized if Javascript code contains '<'
+                // by Nathan Jakubiak
+                // uncommented since it doesn't seem to fix the test in WebFrameTest.java
+                // if (_scriptDepth > 0 && _start+1 < _buffer.length &&
+                //		_buffer[ _start+1 ] != '/') {
+                //		_end = _start+1;
+                //		continue;
+                //}
+                for (_end =_start +1; _end < _buffer.length && _buffer[ _end ] != '>'; _end++);
+                if (_end >= _buffer.length || _end < _start) return null;
+                byteTag = new ByteTag( _buffer, _start +1, _end-_start -1 );
                 if (byteTag.getName().equalsIgnoreCase("script")) {
                     _scriptDepth++;
                     return byteTag;

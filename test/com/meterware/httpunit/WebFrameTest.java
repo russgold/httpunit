@@ -427,6 +427,26 @@ public class WebFrameTest extends HttpUnitTest {
         assertNotNull( "Contents not found", contents );
         assertEquals( "Number of links in iframe", 1, _wc.getFrameContents( "center" ).getLinks().length );
     }
+    
+    /**
+     * test bug report [ 1376739 ] iframe tag not recognized if Javascript code contains '<'
+     * by Nathan Jakubiak
+     * @throws Exception
+     */
+    public void testIFrameBug() throws Exception {
+    	String html="\"<SCRIPT LANGUAGE=\"JavaScript\">\n"+
+    	"var b = 0 < 1;\n"+
+    	"</SCRIPT>\n"+
+    	"<iframe name=\"iframe_after_lessthan_in_javascript\"\n"+
+    	"src=\"c.html\"></iframe>";
+      defineWebPage( "iframe",  html);
+      try {
+      	WebResponse response = _wc.getFrameContents("iframe_after_lessthan_in_javascript");
+      	assertTrue(response!=null);
+      } catch (Throwable th) {
+        this.warnDisabled("testIFrameBug", "patch needed for '"+th.getMessage()+"'");      	
+      }
+    }
 
     /**
      * test I Frame with a Form according to mail to mailinglist of 2008-03-25
