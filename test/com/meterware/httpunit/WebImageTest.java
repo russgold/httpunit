@@ -62,6 +62,42 @@ public class WebImageTest extends HttpUnitTest {
         assertEquals( "Selected image source", "onemore.gif", image.getSource() );
     }
 
+    /**
+     * test for bug report [ 1432236 ] Downloading gif images uses up sockets
+     * by Sir Runcible Spoon
+     * @throws Exception
+     */
+    public void testGetImageManyTimes() throws Exception {
+    	// try this for different numbers of images
+    	int testCounts[]={10,100
+    			//,1000    // approx 2.5 secs
+    			//,2000    // approx 15  secs
+    			//,3000    // approx 47 secs
+    			//,4000    // approx 90 secs
+    			//,5000    // approx 126 secs
+    			// ,10000   // approx 426 secs
+    			//,100000  // let us know if you get this running ...
+    			};
+    	// try
+    	for (int testIndex=0;testIndex<testCounts.length;testIndex++) {
+    		int MANY_IMAGES_COUNT=testCounts[testIndex];    	
+    		// System.out.println(""+(testIndex+1)+". test many images with "+MANY_IMAGES_COUNT+" image links");
+      	String html="<html><head><title>A page with many images</title></head>\n" +
+      	"<body>\n";
+	    	for (int i=0;i<MANY_IMAGES_COUNT;i++) {
+	    		html+="<img src='image"+i+".gif' alt='image#"+i+"'>\n";
+	    	}
+	    	html+="</body></html>\n";
+	    	defineResource("manyImages"+testIndex+".html",html);
+	      WebConversation wc = new WebConversation();
+	      WebRequest request = new GetMethodWebRequest( getHostPath() + "/manyImages"+testIndex+".html");
+	      WebResponse manyImagesPage = wc.getResponse( request );
+	      assertEquals( "Number of images", MANY_IMAGES_COUNT, manyImagesPage.getImages().length );
+	    	for (int i=0;i<MANY_IMAGES_COUNT;i++) {
+	        assertEquals( "image source #"+i, "image"+i+".gif", manyImagesPage.getImages()[i].getSource() );    		
+	    	} // for
+    	} // for	
+    }
 
     public void testFindImageAndLink() throws Exception {
         defineResource( "SimplePage.html",
