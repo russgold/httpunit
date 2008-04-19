@@ -406,7 +406,31 @@ might want to issue the subversion command:<br />
   </li>
   <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1376739&group_id=6550&atid=306550">1376739</a> ] iframe tag not recognized if Javascript code contains '&lt;'<br />by Nathan Jakubiak added<br />The supplied patch unfortunately does not work and is therefore only added as a comment
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=929">r929</a>)
-  </li>    
+  </li>
+  <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1390695&group_id=6550&atid=106550">1390695</a> ] bad error message<br />by Martin Olsson<br />added and fixed to FormParameter now to throw a NoSuchParameterException instead of an UnusedUploadFileException:
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=932">r932</a>)
+  </li>
+  <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1390695&group_id=6550&atid=106550">1390695</a> ] bad error message<br />by Martin Olsson<br />added and fixed to FormParameter now to throw a NoSuchParameterException instead of an UnusedUploadFileException:
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=933">r933</a>)
+  </li>
+  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1393144&group_id=6550&atid=306550">1393144</a> ] URL args in form action are sent for GET forms by Nathan Jakubiak<br />added and disabled while bug is pending and waiting for patch
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=934">r934</a>)
+  </li>
+  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1432236&group_id=6550&atid=106550">1432236</a> ] Downloading gif images uses up sockets by Sir Runcible Spoon - with many images httpunit<br />might run out of resources. In the test environment up<br />to 10.000 image accesses where possible (taking some 7 minutes) with no problem - the test for 10 and 100 images is active
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=935">r935</a>)
+  </li>
+  <li>Test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1510495&group_id=6550&atid=106550">1510495</a> ] getParameterValue on a submit button fails by Julien HENRY added<br />if submit is done before getting the form parameter everything is fine
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=936">r936</a>)
+  </li>
+  <li>added test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1510582&group_id=6550&atid=106550">1510582</a> ] setParameter fails with &lt;input type="file"&gt; by Julien Henry <br />and changed the behaviour of setparameter that a more<br />developer friendly exception with a hopefully better understandable message is thrown to point out that file parameters need a parameter of type java.io.File when being set
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=937">r937</a>)
+  </li>
+  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1534234&group_id=6550&atid=306550">1534234</a> ] HttpServletResponse.isCommitted() always false? (+ p a t c h)<br />by Olaf Klischat added. Unfortunately p a t c h does <br />break other tests - asking for improved test case and patch
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=938">r938</a>)
+  </li>
+  <li>test case for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1535018&group_id=6550&atid=106550">1535018</a> ] Sub frame recognition - getSubframeContents by Oliver GL<br />there is the almost original version of the testCase xtestSubFrameRecognition and a working version<br />testSubFrameRecognition the difference between the two and the link in the response of today shows that people have a hard time understanding how the getFrameContents and getSubframeContents functions work. 
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=939">r939</a>)
+  </li>      
 </ol>
 <pre>	  
  5-Jul-2007:
