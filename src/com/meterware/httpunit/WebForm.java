@@ -638,8 +638,9 @@ public class WebForm extends WebRequestSource {
      **/
     public void setParameter( String name, UploadFileSpec[] files ) {
         FormParameter parameter = getParameter( name );
-        if (parameter == null) throw new NoSuchParameterException( name );
-        parameter.setFiles( files );
+        if ((parameter == null) || (!parameter.isFileParameter()))
+        	throw new NoSuchParameterException( name );
+       	parameter.setFiles( files );
     }
 
 

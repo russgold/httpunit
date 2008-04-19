@@ -281,6 +281,12 @@ class FormParameter {
     class UnusedUploadFileException extends IllegalRequestParameterException {
 
 
+    	/**
+    	 * construct a new UnusedUploadFileException exception base on the parameter Name the number of files expected and supplied
+    	 * @param parameterName
+    	 * @param numFilesExpected
+    	 * @param numFilesSupplied
+    	 */
         UnusedUploadFileException( String parameterName, int numFilesExpected, int numFilesSupplied ) {
             _parameterName = parameterName;
             _numExpected   = numFilesExpected;
@@ -288,6 +294,9 @@ class FormParameter {
         }
 
 
+        /**
+         * get the message for this exception
+         */
         public String getMessage() {
             StringBuffer sb = new StringBuffer( HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE );
             sb.append( "Attempted to upload " ).append( _numSupplied ).append( " files using parameter '" ).append( _parameterName );

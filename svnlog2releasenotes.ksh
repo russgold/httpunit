@@ -89,8 +89,9 @@ END {
   print "<ol>"
   repositorylink="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision="
   baselink="http://sourceforge.net/tracker/index.php?func=detail"
-  buglink  ="&group_id=6550&atid=106550"
-  patchlink="&group_id=6550&atid=306550"
+  buglink    ="&group_id=6550&atid=106550"
+  supportlink="&group_id=6550&atid=206550"
+  patchlink  ="&group_id=6550&atid=306550"
 	for (rev in text) {
 	  current=text[rev]
 	  # look for bug report or patch number - must have 6 digits +
@@ -102,10 +103,12 @@ END {
 	  	# patch or bug?
 		  if (match(current,"[p|P]atch")) {
 		    postfix=patchlink
-		    # replace number with link to sourceforge tracker
+		  } else if (match(current,"SR")) {
+		    postfix=supportlink
 		  } else {
 		  	postfix=buglink
 		  }
+	    # replace number with link to sourceforge tracker
 			link=sprintf("<a href=%s%s&aid=%s%s%s>%s</a>",quote,baselink,linkno,postfix,quote,linkno);
 			current=substr(current,1,rs-1) link substr(current,rs+rl,length(current))
 	  }

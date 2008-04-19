@@ -24,6 +24,8 @@ import junit.framework.TestSuite;
 
 import java.io.File;
 
+import com.meterware.httpunit.FormParameter.UnusedUploadFileException;
+import com.meterware.httpunit.WebForm.NoSuchParameterException;
 import com.meterware.httpunit.controls.IllegalParameterValueException;
 import com.meterware.httpunit.protocol.UploadFileSpec;
 
@@ -571,6 +573,33 @@ public class FormParametersTest extends HttpUnitTest {
         assertEquals( "File from unvalidated request", file.getAbsolutePath(), wr.getParameterValues( "File" )[0] );
     }
     
+    /**
+     * test for bug report [ 1390695 ] bad error message
+     * by Martin Olsson 
+     */
+    public void testUnusedUploadFileException() throws Exception {
+  	 defineWebPage( "Default", "<form method=POST action='/ask'>" +
+         "<Input type=file name=correct_field_name>" +
+         "<Input type=submit value=Upload></form>" );
+  	 	WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );    	 	
+  	 	WebForm form = page.getForms()[0];
+  	 	try { 
+  	 	  // purposely try to set a non existing file name
+  	 	 form.setParameter("wrong_field_name", new File("exists.txt"));
+  	 	 fail("There should have been an exception");
+  	 	} catch (NoSuchParameterException npe) {
+  	 		String msg=npe.getMessage();
+  	 		String expected="No parameter named 'wrong_field_name' is defined in the form";
+  	 		assertTrue(msg.equals(expected));
+  	 	} catch (UnusedUploadFileException ufe) {
+  	 		String msg=ufe.getMessage();
+  	 		// this is the pre 1.7 behaviour
+  	 		String expected="Attempted to upload 1 files using parameter 'null' which is not a file parameter.";
+  	 		assertTrue(msg.equals(expected));
+  	 		System.err.println(msg);
+  	 		fail("in 1.7 bug 1390695 should be fixed");
+  	 	}
+    }
     	
 
     /**
