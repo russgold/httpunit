@@ -32,6 +32,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.meterware.httpunit.*;
+import com.meterware.servletunit.StatelessTest.SimpleGetServlet;
 
 /**
  * Tests the ServletUnitHttpResponse class.
@@ -183,12 +184,52 @@ public class HttpServletResponseTest extends ServletUnitTest {
     }
 
 
+    /**
+     * test isComitted flag after flushing buffer
+     * @throws Exception
+     */
     public void testUpdateAfterFlushBuffer() throws Exception {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         servletResponse.getWriter();
         assertFalse( "Should not be committed yet", servletResponse.isCommitted() );
         servletResponse.flushBuffer();
         assertTrue( "Should be committed now", servletResponse.isCommitted() );
+    }
+ 
+    /**
+     * helper Servlet for bug report 1534234
+     */
+    public static class CheckIsCommittedServlet extends HttpServlet {
+    	public static boolean isCommitted;
+	      protected void doGet( HttpServletRequest req, 
+	                            HttpServletResponse resp ) 
+	          throws ServletException, IOException  {
+	          resp.setContentType( "text/html" );
+	
+	          PrintWriter pw = resp.getWriter();
+	          pw.println("anything");
+	          pw.flush();
+	          pw.close();	
+	          isCommitted=resp.isCommitted();
+	     }
+    }
+		    
+    /**
+     * test bug report [ 1534234 ] HttpServletResponse.isCommitted() always false? (+patch)
+     * by Olaf Klischat?
+     * 
+     */
+    public void testIsCommitted() throws Exception {
+      ServletRunner sr = new ServletRunner();
+
+      WebRequest request = new GetMethodWebRequest( "http://localhost/servlet/" + SimpleGetServlet.class.getName() );
+      WebResponse response = sr.getResponse( request );
+      boolean isPending=true;
+      if (isPending) {
+      	HttpUnitTest.warnDisabled("testIsCommitted", "bug report 1534234 is pending - waiting for testcase/improved patch");
+      } else {
+      	assertTrue("The response should be committed",CheckIsCommittedServlet.isCommitted);
+      }	
     }
 
 

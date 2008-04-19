@@ -90,7 +90,7 @@ public class HttpUnitTest extends HttpUserAgentTest {
      * @param testName
      * @param comment
      */
-    public void warnDisabled(String testName,String comment) {
+    public static void warnDisabled(String testName,String comment) {
     	if (WARN_DISABLED) {
     		disabledIndex++;
     		System.err.println("*** "+disabledIndex+". Test "+testName+" disabled: "+comment);
