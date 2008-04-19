@@ -610,15 +610,17 @@ public class WebForm extends WebRequestSource {
      * Removes a parameter name from this collection.
      **/
     public void removeParameter( String name ) {
-        setParameter( name, NO_VALUES );
+    	setParameter( name, NO_VALUES );
     }
 
 
     /**
      * Sets the value of a parameter in this form.
+     * @param name - the name of the parameter
+     * @param value - the value of the parameter
      **/
     public void setParameter( String name, String value ) {
-        setParameter( name, new String[] { value } );
+    	setParameter( name, new String[] { value } );
     }
 
 
@@ -627,8 +629,11 @@ public class WebForm extends WebRequestSource {
      * controls with the same name in the form.
      */
     public void setParameter( String name, final String[] values ) {
-        FormParameter parameter = getParameter( name );
+        FormParameter parameter = getParameter( name );        
         if (parameter == UNKNOWN_PARAMETER) throw new NoSuchParameterException( name );
+        if (parameter.isFileParameter()) {
+        	throw new InvalidFileParameterException(name,values);
+        }        	
         parameter.setValues( values );
     }
 
@@ -954,6 +959,41 @@ public class WebForm extends WebRequestSource {
 
 //===========================---===== exception class NoSuchParameterException =========================================
 
+    /**
+     * This exception is thrown on an attempt to set a file parameter to a non file type
+     **/
+    class InvalidFileParameterException extends IllegalRequestParameterException {
+
+
+    		/**
+    		 * construct a new InvalidFileParameterException for the given parameter name and value list
+    		 * @param parameterName
+    		 * @param values
+    		 */
+        InvalidFileParameterException( String parameterName, String[] values ) {
+            _parameterName = parameterName;
+            _values=values;
+        }
+
+
+        /**
+         * get the message for this exception
+         */
+        public String getMessage() {
+        	String valueList="";
+        	String delim="";
+        	for (int i=0;i<_values.length;i++) {
+        		valueList+=delim+"'"+_values[i]+"'";
+        		delim=", ";
+        	}
+        	String msg="The file parameter with the name '"+_parameterName+"' must have type File but the string values "+valueList+" where supplied";
+        	return msg;
+        }
+
+
+        private String _parameterName;
+        private String[] _values;
+    }
 
     /**
      * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.

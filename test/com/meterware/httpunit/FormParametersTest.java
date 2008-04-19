@@ -24,7 +24,9 @@ import junit.framework.TestSuite;
 
 import java.io.File;
 
+import com.meterware.httpunit.FormParameter.UnusedParameterValueException;
 import com.meterware.httpunit.FormParameter.UnusedUploadFileException;
+import com.meterware.httpunit.WebForm.InvalidFileParameterException;
 import com.meterware.httpunit.WebForm.NoSuchParameterException;
 import com.meterware.httpunit.controls.IllegalParameterValueException;
 import com.meterware.httpunit.protocol.UploadFileSpec;
@@ -623,7 +625,39 @@ public class FormParametersTest extends HttpUnitTest {
     		 assertTrue(foundURL.equals(expected));
     	 }	 
     }
-    
+    /**
+     * test for bug report
+     * [ 1510582 ] setParameter fails with <input type="file">
+     * by Julien HENRY
+     */
+    public void testUnusedParameterExceptionForFileParamWithStringValue() throws Exception {
+   	 	defineWebPage( "Default", "<form method=POST action='/ask'>" +
+         "<Input type=file name=\"file1\">" +
+         "<Input type=file name=\"file2\">" +
+         "<Input type=submit value=Upload></form>" );
+  	 	WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );    	 	
+  	 	WebForm form = page.getForms()[0];
+  	 	try { 
+  	 		// this works with no exception
+  	 		form.setParameter("file1", new File("/tmp/test.txt"));
+  	 		// this doesn't 
+  	 		form.setParameter("file2", "/tmp/test.txt");
+  	 		fail("There should have been an exception");
+  	 	} catch (UnusedParameterValueException upe) {
+  	 		String msg=upe.getMessage();
+  	 		// this is the pre 1.7 behaviour
+  	 		String expected="Attempted to assign to parameter 'file2' the extraneous value '/tmp/test.txt'.";
+  	 		System.err.println(msg);
+  	 		assertTrue("exception message is not as expected",msg.equals(expected));
+  	 		fail("in 1.7 bug 1510582 should be fixed");
+  	 	} catch (InvalidFileParameterException ipe) {
+  	 		String msg=ipe.getMessage();
+  	 		String expected="The file parameter with the name 'file2' must have type File but the string values '/tmp/test.txt' where supplied";
+  	 		// System.err.println(msg);
+  	 		assertTrue("InvalidFileParameterException message is not as expected",msg.equals(expected));
+  	 	}
+    	
+    }
     /**
      * test for bug report [ 1390695 ] bad error message
      * by Martin Olsson 

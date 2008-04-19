@@ -250,15 +250,25 @@ class FormParameter {
     /**
      * This exception is thrown on an attempt to set a parameter to a value not permitted to it by the form.
      **/
-    class UnusedParameterValueException extends IllegalRequestParameterException {
+    public class UnusedParameterValueException extends IllegalRequestParameterException {
 
-
+    	
+    	/**
+    	 * construct an exception for an unused parameter with the given name 
+    	 * and the value that is bad
+    	 * @param parameterName
+    	 * @param badValue
+    	 */
         UnusedParameterValueException( String parameterName, String badValue ) {
             _parameterName = parameterName;
             _badValue      = badValue;
         }
 
-
+        
+        /**
+         * get the message for this exception
+         * @return the message
+         */
         public String getMessage() {
             StringBuffer sb = new StringBuffer(HttpUnitUtils.DEFAULT_TEXT_BUFFER_SIZE);
             sb.append( "Attempted to assign to parameter '" ).append( _parameterName );

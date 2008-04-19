@@ -891,8 +891,15 @@ class TextAreaFormControl extends TextFormControl {
 }
 
 
+/**
+ * a control for File submit
+ */
 class FileSubmitFormControl extends FormControl {
 
+	  /**
+	   * accessor for the type
+	   * @return the constant FILE_TYPE
+	   */
     public String getType() {
         return FILE_TYPE;
     }
