@@ -574,6 +574,24 @@ public class FormParametersTest extends HttpUnitTest {
     }
     
     /**
+     * test for bug report [ 1510495 ] getParameterValue on a submit button fails
+     * by Julien HENRY
+     * @throws Exception
+     */
+    public void testSubmitButtonParameterValue() throws Exception {
+    	defineResource("/someaction?submitButton=buttonLabel","submitted");
+    	String html="<form name='checkit' method=GET action='someaction'>"+
+    							"<input type='submit' name='submitButton' value='buttonLabel' />"+
+    	            "</form>";
+    	defineWebPage("checkit",html);
+   	 	WebResponse resp= _wc.getResponse( getHostPath() + "/checkit.html" );    
+   	  WebForm form = resp.getFormWithName("checkit");
+   	  form.submit();
+   	  String paramValue=form.getParameterValue("submitButton");
+   	  assertTrue("the parameter value should be buttonLabel",paramValue.equals("buttonLabel"));
+    }
+    
+    /**
      * test for bug report [ 1393144 ] URL args in form action are sent for GET forms
      * by Nathan Jakubiak
      */
