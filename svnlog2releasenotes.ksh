@@ -46,6 +46,7 @@ BEGIN {
 	ignores[i++]="copyright year"
 	ignores[i++]="source formatting"
 	ignores[i++]="source code layout"
+	ignores[i++]="not for release notes"
 }  
 /^------------------------------------------------------------------------/{
 	svnindex++; next  
