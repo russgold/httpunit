@@ -69,8 +69,6 @@
 </path>
 
 
-
-
 <!--  ===================================================================  -->
 <!--  Prepares the build directory                                         -->
 <!--  ===================================================================  -->
@@ -260,7 +258,13 @@ Build-Date: ${TODAY}
 Build-Time: ${TSTAMP}
 Revision: ${revision}
 </echo>
+	<!-- compressed default jar file -->
     <jar jarfile="${lib.dir}/${name}.jar" manifest="${build.dir}/info.txt">
+        <fileset dir="${build.classes}" includes="com/**"/>
+        <fileset dir="META-INF" includes="*.dtd"/>
+    </jar>
+	<!-- non compressed default jar file -->
+    <jar jarfile="${lib.dir}/${name}_uncompressed.jar" manifest="${build.dir}/info.txt" compress="false" >
         <fileset dir="${build.classes}" includes="com/**"/>
         <fileset dir="META-INF" includes="*.dtd"/>
     </jar>
