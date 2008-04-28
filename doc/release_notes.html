@@ -1,45 +1,87 @@
 <html>
 <head><title>httpunit 1.7 release notes</title></head>
 <body>
-<pre>
-HttpUnit release notes
+<h1>HttpUnit release notes</h1>
 
-Known problems:
-    1. The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
-       This behavior matches that currently used by IE and Navigator.
-    2. Defining a form parameter with the same name or ID as a JavaScript Form function will cause that function not to
-       be callable.
-
-Limitations:
-    1. JDK 1.4.2 or higher is required
-    2. JavaScript support does not include some DOM properties
-    3. The JavaScript assignment Document.cookie= does not restrict the cookie by path and domain
-    4. Only table cells and explicit paragraphs are recognized as text blocks
-
-
-Revision History:
-=================
-
-
-14-Apr-2008 PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal
-06-Apr-2008 bugfix 1110071: cannot increase length of a select control
-</pre>
-<h3>1.7 2008-04-19</h3>
-Bug fixes and patches from 2007-12 to 2008-04-19:	for a full subversion log you  
-might want to issue the subversion command:<br />
-			<code>  svn log https://httpunit.svn.sourceforge.net/svnroot/httpunit</code><br />
-		The following list of changes has been extracted from this subversion log with patch
-		and subversion repository links being inserted.
-		 
+<h3>Known problems:</h3>
 <ol>
-  <li>made some controls public
+    <li>The "accept-charset" attribute for forms is ignored; the page content character set is used to encode any response.
+       This behavior matches that currently used by IE and Navigator.</li>
+    <li>Defining a form parameter with the same name or ID as a JavaScript Form function will cause that function not to
+       be callable.</li>
+</ol>
+<h3>Limitations:</h3>
+<ol>
+	<li>JDK 1.4.2 or higher is required</li>
+	<li>JavaScript support does not include some DOM properties</li>
+  <li>The JavaScript assignment Document.cookie= does not restrict the cookie by path and domain</li>
+  <li>Only table cells and explicit paragraphs are recognized as text blocks</li>
+</ol>
+
+<h2>Revision History:</h2>
+
+<h3>Version 1.7 Released 2008-04-27</h3>
+<h4>Notes:</h4>
+<ol>
+	<li>Upgraded NekoHTML to 1.9.6</li>
+	<li>Upgraded Xerces to 2.6.1</li>
+	<li>Upgraded Rhino to 1.6R5</li>
+ 	<li>5-Jul-2007:
+   	The PostMethodWebRequest.setMimeEncoded method has been removed. Mime encoding, if desired, should now be
+    specified when constructing the object.</li>
+	<li>28-Jun-2007:
+    WebLink.click() now only returns the contents of the frame containing the link. Previously, if there was no
+    event involved and the link included a frame reference, it would return the contents of the referenced frame.
+  </li>  
+	<li>26-Nov-2006:
+    HttpUnit configuration management has been moved from CVS to subversion at http://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit
+  </li>
+	<li>28-Mar-2006:
+	The build now uses the ant-dependencies task (see http://www.httpunit.org/doc/dependencies.html) rather than
+           keeping the dependent jars in cvs.</li>
+  <li>made some controls (RadioButton,RadioGroupForm) public to support Radiobutton testing better
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=787">r787</a>)
   </li>
-  <li>ServletUnitHttpRequest.getDateHeader() always "returns -1"?<br />Date sent:	Wed, 19 Dec 2007 11:17:36 -0700<br />by Yu Chen
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=788">r788</a>)
+  <li>some refactoring: HttpUnitUtils.handleException is now called where a simple printStackTrace was
+    found in the past. The boolean flag HttpUnitUtil.EXCEPTION_DEBUG now controls whether this happens
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=822">r822</a>)
   </li>
-  <li>ServletUnitHttpRequest.getDateHeader() always "returns -1"?<br />Date sent:	Wed, 19 Dec 2007 11:17:36 -0700<br />by Yu Chen
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=791">r791</a>)
+  <li>The doScript method has been refactored - it is now deprecated and renamed to doScriptEvent to make clear 
+  	that this method expects a full script to work on. A click will now also fire the mousedown and mouseup events.
+  	handleEvent is now the method to call for handling events by name  e.g. onchange, onmousedown, onclick, onmouseup, onblur, onfocus
+  	(<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=839">r839</a>)
+  </li>
+</ol>    
+<h4>Additions:</h4>
+<h5> Content and Parsing:</h5>
+<ol>
+	<li>Basic authentication now can support authorization only after challenge and different passwords for
+              different realms.</li>
+  <li>Added support for rudimentary (RFC 2109) digest authentication.</li>
+	<li>Added "overrideContextType" property to ClientProperties to permit handling of files served with the
+               wrong content type.</li>
+	<li>27-Mar-2006 Created a custom HttpUnit DOM</li>
+</ol>               
+<h5>Pseudoserver:</h5>
+<ol>
+	<li>
+31-Mar-2006: Added WebResource.suppressAutomaticContentTypeHeader to permit generation of responses without the
+               Content-Type header.</li>           
+</ol>
+<h4>Acknowledgements</h4>
+Thanks to the very many people that have supplied bugfixed and patches from 2005 to 2008 - please follow
+the links to the sourceforge.net tracker items in the list of problems fixed below to find out the details about each contributor.
+<h4>Problems corrected:</h4>
+Bug fixes and patches from 2007-12 to 2008-04-19:	for a full subversion log you  
+might want to issue the subversion command:<br />
+
+		<br /><code>&nbsp;&nbsp;svn log https://httpunit.svn.sourceforge.net/svnroot/httpunit</code><br /><br />
+		The following list of changes has been extracted from this subversion log with patch
+		and subversion repository links being inserted.
+<ol>		
+  <li>ServletUnitHttpRequest.getDateHeader() always "returns -1"? by Yu Chen
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=788">r788</a>,
+    <a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=791">r791</a>)
   </li>
   <li>Fix for <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550">1705925</a>
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=792">r792</a>)
@@ -130,9 +172,6 @@ might want to issue the subversion command:<br />
   </li>
   <li>added test for iFrame problem
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=821">r821</a>)
-  </li>
-  <li>some refactoring
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=822">r822</a>)
   </li>
   <li>added stub for testCreateElement
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=823">r823</a>)
@@ -377,7 +416,7 @@ might want to issue the subversion command:<br />
   <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1110071&group_id=6550&atid=106550">1110071</a>: javascript cannot increase length of a select control
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=914">r914</a>)
   </li>
-  <li>Parse chunk lengths as hex
+  <li>14-Apr-2008 PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=915">r915</a>)
   </li>
   <li>test for Bug Report <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1937946&group_id=6550&atid=106550">1937946</a> added (but disabled for HttpUnitSuite since it needs index.html on localhost<br />convenience addition to be able to test this bug report on a Mac
@@ -432,47 +471,9 @@ might want to issue the subversion command:<br />
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=939">r939</a>)
   </li>      
 </ol>
-<pre>	  
- 5-Jul-2007:
-    Notes: The PostMethodWebRequest.setMimeEncoded method has been removed. Mime encoding, if desired, should now be
-    specified when constructing the object.
-
-28-Jun-2007:
-    Notes: WebLink.click() now only returns the contents of the frame containing the link. Previously, if there was no
-    event involved and the link included a frame reference, it would return the contents of the referenced frame.
     
-26-Dec-2006:
-    Additions:
-       Content and Parsing:
-           1. Basic authentication now can support authorization only after challenge and different passwords for
-              different realms.
-           2. Added support for rudimentary (RFC 2109) digest authentication.
-
- 1-Dec-2006:
-    Additions:
-        Content and Parsing:
-            1. Added "overrideContextType" property to ClientProperties to permit handling of files served with the
-               wrong content type.
-26-Nov-2006:
-    Notes: HttpUnit has been moved to subversion at http://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit
-
-31-Mar-2006:
-    Additions:
-        PseudoServer:
-            1. Added WebResource.suppressAutomaticContentTypeHeader to permit generation of responses without the
-               Content-Type header.
-               
-28-Mar-2006:
-    Notes:
-        1. The build now uses the ant-dependencies task (see http://www.httpunit.org/doc/dependencies.html) rather than
-           keeping the dependent jars in cvs.
-           
-27-Mar-2006
-    Additions:
-        Content and Parsing:
-            1. Created a custom HttpUnit DOM
-
-27-Mar-2006 1.6.2:
+<h3>Version 1.6.2 released 2006-03-27:</h3>
+<pre>	  
     Acknowledgements:
         Thanks for Fabrizio Giustina for suggesting a way to make the TableRow object publically accessible.
 
@@ -485,8 +486,9 @@ might want to issue the subversion command:<br />
         2. Added support for Servlet API 2.4
         3. Implemented ServletContext.getServletContextName
         4. (PseudoServer) made HttpRequest class public
-
- 6-Mar-2005 1.6.1
+</pre>
+ <h3>Version 1.6.1 released 2005-03-06 </h3>
+<pre> 
     Acknowledgements:
         Thanks to Hanson Char for identifying a JDK 1.5 incompatibility.
         Thanks to Satish Kolli for fixing bug #1040770
@@ -523,9 +525,9 @@ might want to issue the subversion command:<br />
             
         PseudoServer
             16. Made all WebResource constructors public
-
-
-3-Oct-2004 1.6
+</pre>
+<h3>Version 1.6 released 2004-10-03</h3>
+<pre>
 Acknowledgements:
     Thanks to Chris Hane for making it easier to add support for javascript properties and for providing support for
         getAttribute() to handle any property defined in the underlying Node.
@@ -673,9 +675,9 @@ Problems fixed:
         1. Upgraded NekoHTML to 0.9.1
         2. Upgraded Xerces to 2.4.0
         3. Upgraded Rhino to 1.5R4.1
-
-
-21-Aug-2003 1.5.4
+</pre>
+<h3>Version 1.5.4 released 2003-08-21</h3>
+<pre>
 Acknowledgements:
     Thanks to David D. Kilzer for:
          creating thorough tests for URLs containing navigation and showing a way to handle them, and
@@ -721,9 +723,10 @@ Problems fixed:
         9. bug #734133: javascript: URLs were ignored if "javascript:" is not all lower case.
    ServletUnit
        10. bug #744214: ServletUnit does not recognize subframes
-
- 4-Apr-2003 1.5.3
-Acknowledgements:
+</pre>
+ <h3>Version 1.5.3 released 2004-04-04</h3>
+ <pre>
+ Acknowledgements:
     Thanks to Andrew Bickerton for:
           correcting the handling of document.open for non-HTML pages and new pages with base tags,
           correcting the document.write append problem,
@@ -787,9 +790,9 @@ Notes:
        to ClientProperties, permitting them to be set per WebClient rather than just globally. The old properties
        have been deprecated, and now access the defaults for ClientProperties. Tests which set the HttpUnitOptions
        properties before creating their WebClients will be unaffected.
-
-
-  3-Mar-2003 1.5.2
+</pre>
+<h3>Version 1.5.2 released 2003-03-03</h3>
+<pre>
 Acknowledgements:
     Thanks to John Sinclair for noting the lack of line breaks in manifest.mf and proposing a fix
     Thanks to Bernhard Wagner for simplifying some string comparison code in ParsedHTML and WebTable
@@ -871,10 +874,9 @@ Additions:
 Notes:
     1. Upgraded NekoHTML to 0.7.2 which no longer generates superfluous &lt;form&gt; tags.
     2. Removed a number of deprecated methods
-
-
-18-Dec-2002 1.5.1
-
+</pre>
+<h3>Version 1.5.1 released 2002-12-18</h3>
+<pre>
 Acknowledgements:
     Thanks to Geert Bevin for fixing a problem with comparing cookies
     Thanks to Troy Waldrep for pointing out the non-standard Refresh header definition accepted in popular browsers
@@ -924,9 +926,9 @@ Additions:
 
 Notes:
     1. Upgraded NekoHTML to 0.7.1
-
-
- 3-Nov-2002 1.5
+</pre>
+<h3>Version 1.5. released 2002-11-03</h3>
+<pre>
 Acknowledgements:
     Thanks to Ken Corbin for adding tests for disabled and read-only parameters.
     Thanks to Geert Bevin for fixing a problem with generation of cookie headers that affects some servers.
@@ -1023,8 +1025,9 @@ Additions:
        20. RFE #585495 ServletUnit now supports HttpServletResponse.setContentLength.
        21. ServletUnit now implements HttpServletRequest.getLocale() and getLocales()
 
-
- 2-Oct-2002 1.4.6
+</pre>
+ <h3>Version 1.4.6 released 2002-10-02</h3>
+<pre>
 Acknowledgements:
     Thanks to Ville Skyttï¿½ for removing the test dependency on xerces.
     Thanks to Donald Ball for pointing out the problem with the behavior of Select.selectedIndex.
@@ -1061,8 +1064,9 @@ Additions:
        9. Link.href is now read-write.
       10. The Navigator object is now supported.
 
-
-30-Aug-2002 1.4.5
+</pre>
+<h3>Version 1.4.5 released 2002-08-30</h3>
+<pre>
 Acknowledgements:
     Thanks to Steve Heath for an example on how to make JSPs work with ServletUnit.
     Thanks to Rajan Narasimhan for fixing the relative URL computation problem.
@@ -1136,8 +1140,9 @@ Additions:
 Notes:
    1. The class com.meterware.httpunit.ScriptableObject has been renamed as com.meterware.httpunit.scripting.ScriptableDelegate
 
-
-20-Jun-2002 1.4.1
+</pre>
+<h3>Version 1.4.1 released 2002-06-20</h3>
+<pre>
 Acknowledgements:
     Thanks to Stefan Renz for finding the file control value bug and providing a fix.
     Thanks to Frank Carver for extending base 64 encoding to handle character values &gt; 127.
@@ -1186,8 +1191,9 @@ Notes:
     2. The version of JTidy included with this release is 4-Aug-2000-r7, which seems to have fewer problems with classloading;
        however, it is also described as a "less stable" pre-release.
 
-
- 6-Mar-2002 1.4
+</pre>
+ <h3>Version 1.4. released 2002-03-06</h3>
+ <pre>
 Acknowledgements:
     Thanks to Didier Besset for correcting the WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
     Thanks to Stefan G. Renz for identifying the infinite loop bug in frame handling
@@ -1258,15 +1264,15 @@ Notes:
        This property is initialized from the HttpUnitOptions property of the same name when the WebClient object is
        created. This allows finer control over this behavior. Tests which depend on this setting should no longer
        interfere with one another.
-
-
-28-Nov-2001 1.3.0
+</pre>
+<h3>Version 1.3.0 released 2001-11-28</h3>
+<pre>
 Acknowledgements:
     Thanks to Oliver Imbusch for finding and fixing problems with parsing of encoded link parameter names and values and
         of link URLs with parameters and fragments.
     Thanks to Paul Frantz and Dave Glowacki for finding and fixing problems with parsing of link parameter names without values.
     Thanks to Didier Besset for new WebForm methods: hasParameterNamed and hasParameterStartingWithPrefix
-    Thanks to Peter Roï¿½bach for catching some typos in the tutorial.
+    Thanks to Peter Roßbach for catching some typos in the tutorial.
     Thanks to Benoit Xhenseval for adding a mechanism to handle HTML parser errors.
     Thanks to Benoit Xhenseval for optimizing the use of DOMs and StringBuffers.
     Thanks to Bradley Smith for implementing getParameterNames in ServletUnit.
@@ -1309,9 +1315,9 @@ Additions:
      10. HttpUnit now pre-allocates StringBuffer instances to their most likely size
      11. DOMs are no longer copied when passed internally'
      12. ByteTag objects no longer allocate Hashtable unless required
-
-
-25-Oct-2001 1.2.7
+</pre>
+<h3>Version 1.2.7 released 2001-10-25 </h3>
+<pre>
 
 Acknowledgements:
     Thanks to Chris Stevenson for identifying a problem with forms lacking an action
@@ -1375,8 +1381,9 @@ Additions:
        19. Now recognizes a Charset header if no charset is specified in the Content-type header. There are some servers
            which send this non-standard header.
 
-
- 6-Jul-2001 1.2.6
+</pre>
+ <h3>Version 1.2.6 released 2001-07-06</h3>
+ <pre>
 Acknowledgements:
     Thanks to Marcos Tarruella for adding a test case for the Base64 class
 
@@ -1393,9 +1400,9 @@ Additions:
 Problems corrected:
     1. The cookbook was missing parentheses for its constructors
     2. Updated the NearWords example to accomodate changes to the Merriam-Webster site
-
-
-18-Jun-2001 1.2.5
+</pre>
+<h3>Version 1.2.5 released 2001-06-18</h3>
+<pre>
 Acknowledgements:
     Thanks to Rolf Schmidiger for corrected behavior when failing to find a site
     Thanks to Tom Watkins, Deepa Dihr, Marcos Tarruella for their implementation of
@@ -1429,9 +1436,9 @@ Configuration changes:
     1. The build.xml file has been changed to use a specified directory of dependant jars
        rather than the system classpath. This requires at least ant 1.3. It is no longer
        necessary to specify the classpath parameter when running the unit tests.
-
-
- 5-May-01 1.2.4
+</pre>
+<h3>Version 1.2.4 released 2001-05-05</h3>
+<pre>
 Acknowledgements:
     Thanks to Jim Kimball for finding and fixing the redirection of subframes
 
@@ -1452,8 +1459,9 @@ Additions:
     3. Added getID to WebForm
     4. Added getFormWithID to HTMLSegment interface
 
-
-2-Apr-01 1.2.3
+</pre>
+<h3>Version 1.2.3 released 2001-04-02 </h3>
+<pre>
 Acknowledgements:
     Thanks to Silvio Samadelli for improved cookie-recognition logic
 
@@ -1467,8 +1475,9 @@ Problems corrected:
 
 Additions:
     1. The Referer header is now sent for requests derived from links and forms.
-
-08-Jan-01 1.2.2
+</pre>
+<h3>Version 1.2.2 released 2001-01-08 </h3>
+<pre>
 Acknowledgements:
     Thanks to Rocky Rhodes for finding the multiple cookie bug
     Thanks to Scott Croco for correcting the response code problem
@@ -1483,8 +1492,9 @@ Problems corrected:
        or a file not found exception.
     3. Creating a request from a form with an empty &lt;select&gt; tag was generating a SingleValuedParameterException.
     4. Corrected IllegalArgumentException: sun.io.CharToByteUTF-8 that happened in JDK 1.1.x
-
-01-Jan-01 1.2.1
+</pre>
+<h3>Version 1.2.1 released 2001-01-01</h3>
+<pre>
 Acknowledgements:
     Thanks to Toyoshi Ushio for helping with the handling of non-English scripts and for translating the home page and cookbook into Japanese.
 
@@ -1500,8 +1510,9 @@ Additions:
     4. WebConversation now has a new public base class: WebClient
     5. Any message header may now be defined, using: WebClient.setHeaderField and will be sent on all subsequent requests
     6. Forms may now be retrieved by their name attributes, using WebResponse.getFormWithName()
-
-16-Nov-00 1.2
+</pre>
+<h3>Version 1.2 released 2000-11-16</h3>
+<pre>
 Acknowledgements:
     Thanks to Robert Krueger for providing an interface to the xerces parser for XML web responses.
     Thanks to Marco Tamanti and Gabriele Antonelli for suggesting ways to support file URLs
@@ -1517,8 +1528,9 @@ Additions:
     3. XML parsing is now supported. If WebResponse.getDOM is called for a non-HTML response (content type is not "text/html"),
        the xerces parser will be invoked to treat the response as XML.
     4. File URLs (file:xxx) are now supported
-
-17-Oct-00 1.1
+</pre>
+<h3>Version 1.1 released 2000-10-17</h3>
+<pre>
 Acknowledgements:
     Thanks to Seth Ladd for specific exceptions from WebConversation.getResponse
     Thanks to Dave Glowacki for suggestions on convenience methods in WebResponse and WebLink,
@@ -1553,10 +1565,9 @@ Additions:
    10. WebConversation now supports getCookieNames and getCookieValue to return the current cookies
    11. The WebResponse now can return the response code associated with it (2xx)
    12. Non-breaking spaces are converted to spaces on any conversion to text
-
-
-1-Sep-00 1.0
-
+</pre>
+<h3>Version 1.0 released 2000-09-01</h3>
+<pre>
 Acknowledgements:
 Thanks to Jan Ohrstrom for his additions to WebConversation
 
@@ -1573,9 +1584,9 @@ Additions:
     6. WebConversation now throws AuthorizationRequiredException when the web server rejects a request
        because of authorization problems.
     7. WebConversation now supports basic authentication via the setAuthorization method.
-
-
-4-Aug-00 0.9.5
+</pre>
+<h3>Version 0.9.5 released 2000-08-04</h3>
+<pre>
 General:
     1. Nested tables are now supported (examples to follow) by using WebTable.getTableCell
     2. table columns and rows used only for formatting may now be ignored using WebTable.purgeEmptyCells
@@ -1590,35 +1601,37 @@ Additions:
     4. Added WebTable.purgeEmptyCells to eliminate meaningless spacing information
     5. Added copyright notices to most source files
     6. Added support for checkboxes, radio buttons, text areas, and selects
-
-
-29-Jun-00 0.9.1
+</pre>
+<h3>Version 0.9.1 released 2000-06-29</h3>
+<pre>
 Additions:
     1. The PostMethodWebRequest class is now public.
     2. Row and column spans are now handled
     3. Formatting inside table cells is ignored in computing the text value of a cell
-
-19-Jun-00 0.9
+</pre>
+<h3>Version 0.9 released 2000-06-19</h3>
+<pre>
 Additions:
     1. The parser may be tested during the build by issuing the command: 'ant test -Dclasspath="%classpath%"'
 
     2. WebResponse now can return an array of the top-level tables in the HTML response.
        Each table may now be asked for its size and the contents of each of its cells.
-
-
-5-Jun-00   0.8.2
-Additions:
+</pre>
+<h3>Version 0.8.2 released 2000-06-05</h3>
+<pre>Additions:
     WebResponse now has a getDOM method which permits examination of the DOM equivalent of the response.
-
-1-Jun-00   0.8.1
+</pre>
+<h3>Version 0.8.1 released 2000-06-01</h3>
+<pre>
 Problems corrected:
     Default parameter values are ignored
     Parameter values without explicit types were being ignored, rather than defaulting to TEXT
 Additions:
     ExampleTest now demonstrates the use of httpunit and JUnit to test servlets
     NearWords demonstrates the use of httpunit to access web site functionality
-
-03-May-00  0.8
+</pre>
+<h3>Version 0.8 released 2000-05-03</h3>
+<pre>
 Initial public release
 </pre>
 </body>
