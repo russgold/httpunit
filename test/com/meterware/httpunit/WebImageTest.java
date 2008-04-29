@@ -98,6 +98,62 @@ public class WebImageTest extends HttpUnitTest {
 	    	} // for
     	} // for	
     }
+  	
+    public static final int MAX_GIFTESTCOUNT=15000;
+    
+    
+    /**
+     * test for bug report [ 1432236 ] Downloading gif images uses up sockets
+     * by Sir Runcible Spoon and rlindsjo     
+     * as responded in the sourceforge tracker by himself
+     * */
+    public void dotestGetImageManyTimes(WebConversation wc,String url) throws Exception {
+    	String delim="";
+    	boolean withDebug=true;
+    	int i=1;
+      for (;i<=MAX_GIFTESTCOUNT;i++) {
+      	if (withDebug) {
+	      	if (i%500==0)  {
+	          System.out.print(delim+i);
+	          delim=", ";
+	          System.out.flush();
+	          if (i%10000==0) {
+	          	System.out.println();
+	          }
+	      	}  
+      	}	
+      	try {
+      		WebResponse resp =	wc.getResponse(url);
+          // Enable line below to not get too many open files / sockets
+          // resp.getInputStream().close();
+      	} catch (java.net.BindException jnbe) {
+      		String msg="There should be no exception for "+url+" but there is as BindException '"+jnbe.getMessage()+"' after "+i+" gif image accesses";
+      		// System.out.println(msg);
+      		assertTrue(msg,false);
+      	}
+      } // for
+      assertTrue("the test loop should have been performed "+MAX_GIFTESTCOUNT+" times",i>=MAX_GIFTESTCOUNT);
+    }
+    
+    /**
+     * test for bug report [ 1432236 ] Downloading gif images uses up sockets
+     * by Sir Runcible Spoon     
+     * as responded by himself and rlindsjo
+     * @throws Exception
+     */
+    public void xtestGetImageManyTimes2() throws Exception {
+    	WebConversation wc = new WebConversation();
+    	byte[] gif1x1={0x47,0x49,0x46,0x38,0x39,0x61,0x01,0x00,0x01,0x00, //  GIF89a...
+    								 (byte)0xF0,0x00,0x00,0x15,0x15,0x15,0x00,0x00,0x00,0x21,
+    								 (byte)0xF9,0x04,0x01,0x00,0x00,0x00,0x00,0x2C,0x00,0x00,
+    								 0x00,0x00,0x01,0x00,0x01,0x00,0x00,0x02,0x02,0x44,
+    								 0x01,0x00,0x3B};
+      defineResource( "image", gif1x1, "image/gif");
+      // slow version of test with internal image definition
+    	// dotestGetImageManyTimes(wc,getHostPath() + "/image");
+    	// faster version of test with an image on the local webserver
+    	dotestGetImageManyTimes(wc,"http://localhost/1x1.gif");
+    }
 
     public void testFindImageAndLink() throws Exception {
         defineResource( "SimplePage.html",
