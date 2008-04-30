@@ -738,6 +738,31 @@ public class WebClientTest extends HttpUnitTest {
       }
   }
 
+	/**
+	 * test for bug report [ 1283878 ] FileNotFoundException using Sun JDK 1.5 on empty error pages
+	 * by Roger Lindsjö  
+	 * @throws Exception
+	 */
+	public void testEmptyErrorPage() throws Exception {
+    boolean originalState =
+  		HttpUnitOptions.getExceptionsThrownOnErrorStatus();
+    HttpUnitOptions.setExceptionsThrownOnErrorStatus( false );       
+  		 
+    try {
+      WebConversation wc = new WebConversation();
+      defineResource( "emptyError", "", 404);
+      WebRequest request = new GetMethodWebRequest( getHostPath() +"/emptyError" );
+      WebResponse response = wc.getResponse( request );
+      assertEquals( 404, response.getResponseCode() );
+      assertEquals( 0, response.getContentLength() );
+    } catch (java.io.FileNotFoundException fnfe) {
+    	fnfe.printStackTrace();
+    	assertTrue("There should be not file not found exception '"+fnfe.getMessage()+"'",false);
+    } finally {
+      // Restore exceptions state
+    	HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState );
+  	}
+  }
 
   /**
    * test GZIP begin disabled

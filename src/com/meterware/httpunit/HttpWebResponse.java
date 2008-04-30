@@ -20,6 +20,7 @@ package com.meterware.httpunit;
 *
 *******************************************************************************************************************/
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -70,15 +71,53 @@ class HttpWebResponse extends WebResponse {
 
 
 
+    /**
+     * get the input stream for the given connection 
+     * @param connection
+     * @return
+     * @throws IOException
+     */
     private InputStream getInputStream( URLConnection connection ) throws IOException {
-        return isResponseOnErrorStream( connection )
-                               ? ((HttpURLConnection) connection).getErrorStream()
-                               : connection.getInputStream();
+    	InputStream result=null;
+    	// check whether there is an error stream
+    	if (isResponseOnErrorStream( connection )) {
+        result=((HttpURLConnection) connection).getErrorStream();
+    	} else  {     		
+    		// if there is no error stream it depends on the response code
+    		try {
+    			result=connection.getInputStream();
+    		} catch (java.io.FileNotFoundException fnfe) {
+    			// as of JDK 1.5 a null inputstream might have been returned here
+    			// see bug report [ 1283878 ] FileNotFoundException using Sun JDK 1.5 on empty error pages
+    			// by Roger Lindsjö
+    			if (isErrorResponse(connection)) {
+    				// fake an empty error stream
+    				result=new ByteArrayInputStream(new byte[0]);
+    			} else {
+    				throw fnfe;
+    			}
+    		}
+    	}
+    	return result;
     }
 
 
+    /**
+     * check whether a response code >=400 was received
+     * @param connection
+     * @return
+     */
+    private boolean isErrorResponse(URLConnection connection ) {
+    	return _responseCode >= HttpURLConnection.HTTP_BAD_REQUEST;
+    }
+    
+    /**
+     * check whether the response is on the error stream
+     * @param connection
+     * @return
+     */
     private boolean isResponseOnErrorStream( URLConnection connection ) {
-        return _responseCode >= HttpURLConnection.HTTP_BAD_REQUEST && ((HttpURLConnection) connection).getErrorStream() != null;
+      return isErrorResponse(connection) && ((HttpURLConnection) connection).getErrorStream() != null;
     }
 
 
