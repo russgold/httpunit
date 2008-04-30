@@ -83,12 +83,15 @@ public class WebLinkTest extends HttpUnitTest {
       WebConversation wc = new WebConversation();
       WebResponse response=wc.getResponse( getHostPath() + "/NonHref.html" );
       WebLink[] links = response.getLinks();
+      // TODO implement and test this
+      // WebLink[] links = response.getAnchors();
       assertNotNull( links );
-      this.warnDisabled("testFindNonHrefLinks()","pending decision for bug report [ 1156972 ] -> does an <a> node to have href to be considered a link?");
-      boolean decided=false;
+      boolean decided=true;
       if (decided) {
-      	assertEquals( 1, links.length );
-      }	
+      	assertEquals( 0, links.length );
+      } else {
+        this.warnDisabled("testFindNonHrefLinks()","pending decision for bug report [ 1156972 ] -> does an <a> node to have href to be considered a link?");
+      }
     }
     
     /**

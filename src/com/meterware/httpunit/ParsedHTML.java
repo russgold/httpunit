@@ -809,13 +809,15 @@ public class ParsedHTML {
     	/*
        * Bug report [ 1156972 ] isWebLink doesn't recognize all anchor tags
        * by fregienj claims this be changed to check whether the case-insensitive node name is "A"
+       * -> should be isAnchor method and getAnchor
        */
     	boolean result=false;
       String tagName = ((Element) node).getTagName();    	
       if (!tagName.equalsIgnoreCase( "area" ) && !tagName.equalsIgnoreCase( "a")) {
       } else {
-      	// pre 1.7 code
-      	result=(node.getAttributes().getNamedItem( "href" ) != null);    
+      	// pre 1.7 code - still active
+      	result=(node.getAttributes().getNamedItem( "href" ) != null);
+      	// proposed patch - not activated
       	// result=true;
       }
       return result;
