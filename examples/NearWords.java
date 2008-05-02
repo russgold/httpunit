@@ -17,7 +17,11 @@ public class NearWords {
         try {
             if (params.length < 1) {
                 System.out.println( "Usage: java NearWords [pattern]" );
-                System.out.println( "where [pattern] may contain '?' to match any character" ); 
+                System.out.println( "where [pattern] may contain '?' to match any character" );
+                System.out.println( "");
+                System.out.println( "will demonstrate usage with the pattern 'test' now ...");
+                String[] defaultParams={"test"};
+                params=defaultParams;
             }
             WordSeeker seeker = new WordSeeker();
             
@@ -35,12 +39,19 @@ public class NearWords {
 
 }
 
-
+/**
+ * subclass to seek words from the Merriam-Webster Online search
+ * as of 2008-05-02
+ *
+ */
 class WordSeeker {
 
     public WordSeeker() {
         try {
-            WebRequest request = new GetMethodWebRequest( "http://www.m-w.com/" );
+        	HttpUnitOptions.setScriptingEnabled(false);
+        	String url="http://www.m-w.com/";
+        	System.out.println("visiting "+url);
+            WebRequest request = new GetMethodWebRequest( url );
             response = conversation.getResponse( request );
         } catch (Exception e) {
             throw new RuntimeException( "Error retrieving form: " + e );
@@ -49,33 +60,18 @@ class WordSeeker {
 
 
     public String[] getWordsMatching( String pattern ) throws SAXException, IOException, java.net.MalformedURLException {
-        WebForm lookupForm = getFormWithName( "dict" );
-        WebRequest request = lookupForm.getRequest();
-        request.setParameter( "va", pattern );
-        request.setParameter( "book", "Dictionary" );
-        response = conversation.getResponse( request );
-
-        return getOptionsFromResponse();
+    	System.out.println("getting Words matching '"+pattern+"'");
+      WebForm lookupForm = response.getFormWithID("search_form"); 
+      WebRequest request = lookupForm.getRequest();
+      request.setParameter( "va", pattern );
+      request.setParameter( "book", "Dictionary" );
+      response = conversation.getResponse( request );
+      return getOptionsFromResponse();
     }
-
 
     private WebConversation conversation = new WebConversation();
 
     private WebResponse     response;
-
-    private WebForm getFormWithName( String name ) throws SAXException {
-        WebForm[] forms = response.getForms();
-        for (int i=0; i < forms.length; i++) {
-            Node formNode = forms[i].getDOMSubtree();
-            NamedNodeMap nnm = formNode.getAttributes();
-            Node nameNode = nnm.getNamedItem( "name" );
-            if (nameNode == null) continue;
-            if (nameNode.getNodeValue().equalsIgnoreCase( name )) {
-                return forms[i];
-            }
-        }
-        return null;
-    }
 
 
     private String[] getOptionsFromResponse() throws SAXException {
