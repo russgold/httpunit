@@ -138,7 +138,7 @@ public class WebWindow {
     /**
      * Submits a web request and returns a response, using all state developed so far as stored in
      * cookies as requested by the server.
-     * @see patch [ 1155415 ] Handle redirect instructions which can lead to a loop
+     * see patch [ 1155415 ] Handle redirect instructions which can lead to a loop
      * @exception SAXException thrown if there is an error parsing the retrieved page
      * @return the WebResponse or null
      **/

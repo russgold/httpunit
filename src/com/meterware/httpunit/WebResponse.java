@@ -726,7 +726,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     /**
      * open a a new Window with the given name and relative URL
      * @param name - the name of the window
-     * @param relativeURL - the relative URL to be used
+     * @param relativeUrl - the relative URL to be used
      * @return the WebResponse as a DomWindowProxy
      */
     public DomWindowProxy openNewWindow( String name, String relativeUrl ) throws IOException, SAXException {
@@ -906,7 +906,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Constructs a response object.
-     * @see [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)
+     * see [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)
      * @param frame the frame to hold the response
      * @param url the url from which the response was received
      * 

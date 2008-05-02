@@ -82,7 +82,9 @@ public class Button extends FormControl {
 
     /**
      * the onClickSequence for this button
-     * @return
+     * @param x - the x position
+     * @param y - the y position
+     * @return if the onClickSequence was handled
      */
     protected boolean doOnClickSequence(int x,int y) throws IOException, SAXException {
       verifyButtonEnabled();
@@ -104,9 +106,9 @@ public class Button extends FormControl {
 
     /**
      * return the last result of verifyButtonEnabled or the 
-     * intial enabled state derived from !isDisabled as originally setDisabled
+     * initial enabled state derived from !isDisabled as originally setDisabled
      * needed to fix bug report [ 1289151 ] Order of events in button.click() is wrong
-     * @return
+     * @return whether the button was originally enabled 
      */
     public boolean wasEnabled() {
     	return _wasEnabled;

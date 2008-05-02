@@ -167,7 +167,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     /**
      * get the relative URL for a weblink
      * change spaces to %20
-     * @return
+     * @return the relative URL as a string
      */
     protected String getRelativeURL() {
         String result = HttpUnitUtils.encodeSpaces( HttpUnitUtils.trimFragment( getDestination() ) );
@@ -243,7 +243,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
      * submit the given event for the given request
      * @param event
      * @param request
-     * @return
+     * @return the response for the submitted Request
      * @throws IOException
      * @throws SAXException
      */
@@ -267,8 +267,8 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     
     /**
      * optional do the event if it's defined
-     * @param event
-     * @return
+     * @param eventScript - the script to handle
+     * @return whether the script was handled
      */
     public boolean doEventScript(String eventScript) {
     	return this.getScriptingHandler().doEventScript(eventScript);
@@ -278,7 +278,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
      * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
      * execute the script if it's assigned by calling doEvent for the script
      * @param eventName
-     * @return
+     * @return whether the event with the given name was handled
      */
     public boolean handleEvent(String eventName) {
     	return this.getScriptingHandler().handleEvent(eventName);

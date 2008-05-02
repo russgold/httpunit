@@ -60,7 +60,7 @@ public class HttpUnitUtils {
     
     /**
      * are we running in the Eclipse IDE?
-     * @return
+     * @return whether we are running in the Eclipse environment
      */
     public static boolean isEclipse() {
     	StackTraceElement[] ste = new Throwable().getStackTrace();
@@ -185,7 +185,7 @@ public class HttpUnitUtils {
     /**
      * parse an InputStream to a string (for debugging)
      * @param is
-     * @return
+     * @return the string gotten from the inputString
      */
     public static String parseISToString(java.io.InputStream is){
     	java.io.DataInputStream din = new java.io.DataInputStream(is);
@@ -196,6 +196,7 @@ public class HttpUnitUtils {
     			sb.append(line+"\n");
     		}
     	}catch(Exception ex){
+    		// TODO handle exception properly here
     		ex.getMessage();
     	}finally{
     		try{

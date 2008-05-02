@@ -803,7 +803,7 @@ public class ParsedHTML {
      * check whether the given node is a Web link by checking that 
      * the node is of type "A"
      * @param node - the node to check
-     * @return
+     * @return whether the given node represents a web link
      */
     public static boolean isWebLink( Node node ) {
     	/*

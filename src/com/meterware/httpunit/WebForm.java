@@ -308,8 +308,8 @@ public class WebForm extends WebRequestSource {
      * Creates and returns a web request which will simulate the submission of this form by pressing the specified button.
      * If the button is null, simulates the pressing of the default button.
      * @param button - the submitbutton to be pressed - may be null
-     * @param - x the x position
-     * @param - y the y position
+     * @param x - the x position
+     * @param y - the y position
      **/
     public WebRequest getRequest( SubmitButton button, int x, int y ) {
         if (button == null) 

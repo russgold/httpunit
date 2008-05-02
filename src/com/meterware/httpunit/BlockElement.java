@@ -127,8 +127,8 @@ abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HT
     
     /**
      * optional do the event if it's defined
-     * @param event
-     * @return
+     * @param eventScript - the script to work on
+     * @return true if the event script was handled
      */
     public boolean doEventScript(String eventScript) {
     	return this.getScriptingHandler().doEventScript(eventScript);
@@ -138,7 +138,7 @@ abstract public class BlockElement extends ParsedHTML implements HTMLSegment, HT
      * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
      * execute the script if it's assigned by calling doEvent for the script
      * @param eventName
-     * @return
+     * @return true if the event with the given name was handled
      */
     public boolean handleEvent(String eventName) {
     	return this.getScriptingHandler().handleEvent(eventName);

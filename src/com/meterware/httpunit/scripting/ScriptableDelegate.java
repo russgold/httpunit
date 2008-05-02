@@ -63,7 +63,7 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
 
     /**
      * Executes the specified scripted event.
-     * @parm eventScript - the eventScript to execute
+     * @param eventScript - the eventScript to execute
      **/
     public boolean doEventScript( String eventScript ) {
         if (eventScript.length() == 0) return true;
@@ -74,7 +74,7 @@ abstract public class ScriptableDelegate implements ScriptingHandler {
      * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
      * execute the script if it's assigned by calling doEvent for the script
      * @param eventName
-     * @return
+     * @return whether the event with the given name was handled
      */
     public boolean handleEvent(String eventName) {
     	String eventScript=(String)get(eventName);

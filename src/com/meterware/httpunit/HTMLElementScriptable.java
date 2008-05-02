@@ -63,7 +63,7 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
     /**
      * get the content of the given attribute
      * @param attributeName
-     * @return
+     * @return the attribute as a string
      */
     public String getAttribute(String attributeName) {
     	return _element.getAttribute(attributeName);
@@ -90,7 +90,7 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
      * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
      * execute the script if it's assigned by calling doEvent for the script
      * @param eventName
-     * @return
+     * @return whether the event with the givne name was handled
      */
     public boolean handleEvent(String eventName) {
     	// check whether onclick is activated

@@ -185,7 +185,7 @@ public class CookieJar {
 
     /**
      * Returns the value of the specified cookie.
-     * @name - the name of the cookie to get the value for
+     * @param name - the name of the cookie to get the value for
      * @return the value of the cookie
      **/
     public String getCookieValue( String name ) {

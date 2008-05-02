@@ -107,7 +107,7 @@ public class HttpException extends RuntimeException {
 
     /**
      * get the response Message of this http Exception
-     * @return
+     * @return the response message
      */
     public String getResponseMessage() {
         return _responseMessage;

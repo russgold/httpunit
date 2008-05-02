@@ -201,7 +201,7 @@ public class SubmitButton extends Button {
     /**
      * addValues if not disabled and pressed
      * @param processor - the ParameterProcessor used
-     * @characterSet - the active character set
+     * @param characterSet - the active character set
      * @throws IOException if addValues fails
      */
     protected void addValues( ParameterProcessor processor, String characterSet ) throws IOException {
