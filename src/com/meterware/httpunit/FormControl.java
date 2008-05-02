@@ -162,7 +162,7 @@ public abstract class FormControl extends HTMLElementBase {
     /**
      * Returns true if this control is hidden.
      **/
-    boolean isHidden() {
+    public boolean isHidden() {
         return false;
     }
 
@@ -365,6 +365,12 @@ public abstract class FormControl extends HTMLElementBase {
     }
 
 
+    /**
+     * return the FormControl for the given parameter node in a form
+     * @param form - the form in which the parameter is defined
+     * @param node - the node in which the parameter is defined
+     * @return the form control
+     */
     static FormControl newFormParameter( WebForm form, Node node ) {
         if (node.getNodeType() != Node.ELEMENT_NODE) {
             return null;
@@ -834,6 +840,9 @@ class PasswordFieldFormControl extends TextFieldFormControl {
     }
 }
 
+/**
+ * a hidden text field
+ */
 class HiddenFieldFormControl extends TextFieldFormControl {
 
     public String getType() {
@@ -854,7 +863,7 @@ class HiddenFieldFormControl extends TextFieldFormControl {
     }
 
 
-    boolean isHidden() {
+    public boolean isHidden() {
         return true;
     }
 }

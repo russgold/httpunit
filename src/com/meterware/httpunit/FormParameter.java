@@ -33,7 +33,7 @@ import java.util.Arrays;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-class FormParameter {
+public class FormParameter {
 
 
     private FormControl[] _controls;
@@ -54,9 +54,26 @@ class FormParameter {
     }
 
 
-    private FormControl[] getControls() {
+    /**
+     * get the controls for this form Parameter
+     * @return
+     */
+    public FormControl[] getControls() {
         if (_controls == null) _controls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
         return _controls;
+    }
+    
+    /**
+     * get the control for this form Parameter (assuming it 
+     * has only one as for a text control
+     * @return
+     */
+    public FormControl getControl()  {
+    	FormControl[] controls=getControls();
+    	if (controls.length!=1) {
+    		throw new RuntimeException("getControl can only be called if the number of controls is 1 but it is "+controls.length+" you might want to use getControls instead");
+    	}
+    	return controls[0];
     }
 
 
@@ -225,7 +242,7 @@ class FormParameter {
         return true;
     }
 
-
+    
     public boolean isHiddenParameter() {
         FormControl[] controls = getControls();
         for (int i = 0; i < controls.length; i++) {

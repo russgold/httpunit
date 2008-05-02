@@ -916,7 +916,12 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    private FormParameter getParameter( String name ) {
+    /**
+     * get the form parameter with the given name
+     * @param name
+     * @return the form parameter with this name
+     */
+    public FormParameter getParameter( String name ) {
         final FormParameter parameter = ((FormParameter) getFormParameters().get( name ));
         return parameter != null ? parameter : UNKNOWN_PARAMETER;
     }
