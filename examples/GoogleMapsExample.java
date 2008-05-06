@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.Writer;
+import java.text.NumberFormat;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -55,7 +56,7 @@ public class GoogleMapsExample {
 	 * @param destPoint
 	 */
 	public void getRouteAsGPX(String startPoint,String destPoint, String filename,boolean withDisplay)  throws Exception {
-		String kml=getRouteFromGoogleMaps(startPoint,destPoint,withDisplay);
+		String kml=getRouteFromGoogleMaps(startPoint,destPoint,withDisplay,false);
 		if (DEBUG) {
 			System.out.println(kml);
 		}
@@ -174,30 +175,51 @@ public class GoogleMapsExample {
   	}
     return gpxdoc;
 	}
+	/**
+	 * the url to use
+	 */
+  public static String url="http://maps.google.com/maps";
+  /**
+   * the directions string to look for
+   */
+  public static String directions="directions";
+ 
+  /**
+    This is how to use the example in germany:
+    
+  	GoogleMapsExample.url="http://maps.google.de/maps";
+  	GoogleMapsExample.directions="Route berechnen";
+  */	
+
 
 	/**
 	 * get a route from google maps with the given start and destination points
 	 * @param startPoint
 	 * @param destPoint
 	 * @param withDisplay
+	 * @param asKML
 	 */
-	public String getRouteFromGoogleMaps(String startPoint,String destPoint, boolean withDisplay) throws Exception {
-    // direct call first
-    String url="http://maps.google.com/maps";
+	public String getRouteFromGoogleMaps(String startPoint,String destPoint, boolean withDisplay, boolean asKML) throws Exception {
     // and now indirectly
     // create the conversation object which will maintain state for us
     WebConversation wc = new WebConversation();
 
     // Obtain the main page on the meterware web site
-    WebRequest request = new GetMethodWebRequest( url);
+    WebRequest request = new GetMethodWebRequest(url);
     request.setParameter("output", "html");
     WebResponse response = wc.getResponse( request );
     if (withDisplay && DEBUG)
     	BrowserDisplayer.showResponseInBrowser(response);
     
-    // find the link which contains the string "HttpUnit" and click it
-    WebLink httpunitLink = response.getFirstMatchingLink( WebLink.MATCH_CONTAINED_TEXT, "directions" );
-    response = httpunitLink.click();
+    // find the link which contains the string for directions and click it
+    WebLink directionsLink = response.getFirstMatchingLink( WebLink.MATCH_CONTAINED_TEXT, directions);
+    if (directionsLink==null) {
+    	System.err.println("could not find "+directions+" in response");
+      if (DEBUG)
+      	BrowserDisplayer.showResponseInBrowser(response);
+    	System.exit(1);
+    }
+    response = directionsLink.click();
     if (withDisplay && DEBUG)
     	BrowserDisplayer.showResponseInBrowser(response);  
     WebForm lookupForm = response.getFormWithID("d_form"); 
@@ -207,14 +229,43 @@ public class GoogleMapsExample {
     response = wc.getResponse( request );
     if (withDisplay)
     	BrowserDisplayer.showResponseInBrowser(response);
-  	// request.setParameter("output", "kml");
-    FormParameter parameter = lookupForm.getParameter( "output" );
-    FormControl outputControl=parameter.getControl();
-    outputControl.setAttribute("value", "kml");
-   	response = wc.getResponse( request );
-    if (withDisplay && DEBUG)
-    	BrowserDisplayer.showResponseInBrowser(response); 
+    if (asKML) {
+	  	// request.setParameter("output", "kml");
+	    FormParameter parameter = lookupForm.getParameter( "output" );
+	    FormControl outputControl=parameter.getControl();
+	    outputControl.setAttribute("value", "kml");
+	   	response = wc.getResponse( request );
+	    if (withDisplay && DEBUG)
+	    	BrowserDisplayer.showResponseInBrowser(response);
+    }  
     return (response.getText());
+	}
+	
+	/**
+	 * get the distance between to given Zip codes
+	 * @param 
+	 */
+	public String getDistance(String startPoint, String endPoint, boolean withDisplay) throws Exception {
+		String route=getRouteFromGoogleMaps(startPoint,endPoint,withDisplay,false);
+		String [] driveLocale={"Drive:","Fahrt:"};
+		String [] unitLocale ={"mi","km"};
+		for (int i=0;i<driveLocale.length;i++) {
+			int drivePos=route.indexOf(driveLocale[i]);
+			if (drivePos>0) {
+				String driveString=route.substring(drivePos);
+				int unitPos=driveString.indexOf(unitLocale[i]);
+				if (unitPos>0) {
+					String distanceString=driveString.substring(1, unitPos+unitLocale[i].length());
+					int divPos;
+					while ((divPos=distanceString.indexOf("<div>"))>0) {
+						distanceString=distanceString.substring(divPos+5);
+					}
+					distanceString=distanceString.replace("&#160;"," ");
+					return distanceString;
+				}
+			}
+		}	
+		return "?";
 	}
 	
   /**
@@ -225,9 +276,13 @@ public class GoogleMapsExample {
   public static void main( String[] params ) {
     try {
         if (params.length < 3) {
-            System.out.println( "Usage: java RouteAsGPX [from] [to] [filename] [nodisplay]" );
-            System.out.println( "");
-            String[] defaultParams={"sfo","94526","sfoexample.gpx"};
+            System.out.println( "Usage: java RouteAsGPX [from] [to] ([filename]|'distance') [nodisplay]" );
+            System.out.println( "      e.g. java RouteAsGPX sfo 94526 sfoexample.gpx");
+            System.out.println( "         to get the route as a Garmin compatible GPX file");
+            System.out.println( "      e.g. java RouteAsGPX sfo 94526 distance");
+            System.out.println( "         to calculate the distance");
+            String[] defaultParams={"sfo","94526","distance"};
+            // defaultParams={"sfo","94526","sfoexample.gpx"};
             params=defaultParams;
             System.out.println( "will demonstrate usage with the route "+defaultParams[0]+" - "+defaultParams[1]+" and store to "+defaultParams[2]);
         }
@@ -235,8 +290,16 @@ public class GoogleMapsExample {
         boolean withDisplay=true;
         if (params.length>=4)
         	withDisplay=false;
-        routeAsGPX.getRouteAsGPX(params[0], params[1], params[2],withDisplay);
-        
+        String startPoint=params[0];
+        String endPoint  =params[1];
+        String filename  =params[2];
+        if (filename.equals("distance")) {
+        	String distanceS=routeAsGPX.getDistance(startPoint, endPoint, withDisplay);
+        	// String distanceS=NumberFormat.getInstance().format(distance);
+        	System.out.println("The distance between "+startPoint+" and "+endPoint+" is "+distanceS);
+        } else {
+        	routeAsGPX.getRouteAsGPX(startPoint, endPoint, filename,withDisplay);
+        }	        
     } catch (Exception e) {
       System.err.println( "Exception: " + e );
       e.printStackTrace();
