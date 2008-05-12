@@ -25,7 +25,12 @@
 Thanks to Stefan Hübner for supplying a patch for URL-decoding of parameters in ServletUnit
 Thanks to Archimedes Trajano for supplying code to support non-JSSE SSL providers
 Thanks to Bobby Abraham for adding the capability of deleting a cookie manually
-Thanks for Rafal Krzewski for adding special handling for form actions containing a parameter named "action."
+Thanks to Rafal Krzewski for adding special handling for form actions containing a parameter named "action."
+Thanks to Michael Rudolf for adding support for connection and read timeouts.
+Thanks to Richard Lee for supporting xy parameter submission for unnamed image buttons.
+Thanks to Laurent Wozniak for address the handling of expired cookies
+Thanks to Matthew O. Smith for adding more sophisticated logging to ServletUnit
+Thanks to Mattias Jiderhamn for adding Javascript support for arbitrary attributes
 
 <h4>Notes:</h4>
 <ol>
@@ -64,7 +69,9 @@ Thanks for Rafal Krzewski for adding special handling for form actions containin
     <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550">1705925</a> URL-encoded parameter values were not decoded properly if HttpUnitOptions.setDefaultCharacterSet() is set to something different than ISO-8859-1</li>
     <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1371204&group_id=6550&atid=106550">1371204</a> there was no way to change or delete a server-supplied cookie from a test</li>
     <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1843978&group_id=6550&atid=106550">1843978</a> the value of a SELECT control could not be set if the web page defined a namespace URI</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1277797&group_id=6550&atid=106550">1277797</a> expired cookies are now removed from the client session</li>
     <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155792&group_id=6550&atid=306550">1155792</a> could not set the action for a form if its original action had a parameter named "action" </li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a> unnamed image buttons now submit positions as "x" and "y"</li>
 </ol>
 <h4>Additions:</h4>
 <h5> Content and Parsing:</h5>
@@ -78,18 +85,25 @@ Thanks for Rafal Krzewski for adding special handling for form actions containin
                by a firewall or proxy server</li>
     <li>Added <a href="api/com/meterware/httpunit/HttpsProtocolSupport.html#useProvider(java.lang.String,%20java.lang.String)">HttpsProtocolSupport.useProvider</a> to override the default selection of the JSSE for SSL support</li>
     <li>Added <a href="api/com/meterware/httpunit/HttpsProtocolSupport.html#useIBM()">HttpsProtocolSupport.useIBM</a> to select the SSL support provided by IBM WebSphere (which must be in the classpath)</li>
-    <li></li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1531005&group_id=6550&atid=306550">1531005</a> getElementsWithAttribute should now work with most attribute names</li>
     <li>27-Mar-2006 Created a custom HttpUnit DOM</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1518901&group_id=6550&atid=306550">1518901</a> added methods to control connection and read timeouts.</li>
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1415415&group_id=6550&atid=306550">1415415</a> added (mime types for tiff and pdf)</li>
+</ol>
+<h5>Javascript support</h5>
+<ol>
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> added support for arbitrary element attributes</li>
+    
 </ol>
 <h5>ServletUnit</h5>
 <ol>
     <li>ServletUnitHttpRequest.getDateHeader() has been implemented; previously it always returned -1</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1864072&group_id=6550&atid=106550">1864072</a> now log to a user-specified output stream</li> 
 </ol>
 <h5>Pseudoserver:</h5>
 <ol>
-	<li>
-31-Mar-2006: Added WebResource.suppressAutomaticContentTypeHeader to permit generation of responses without the
-               Content-Type header.</li>           
+    <li>Added WebResource.suppressAutomaticContentTypeHeader to permit generation of responses without the Content-Type header.</li>
+    <li>Improved debugging messages and handle response timeouts.</li>           
 </ol>
 <h4>Acknowledgements</h4>
 Thanks to the very many people that have supplied bugfixed and patches from 2005 to 2008 - please follow
@@ -102,81 +116,6 @@ might want to issue the subversion command:<br />
 		The following list of changes has been extracted from this subversion log with patch
 		and subversion repository links being inserted.
 <ol>		
-  <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=885326&group_id=6550&atid=206550">885326</a> checked but no go
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=811">r811</a>)
-  </li>
-  <li>SR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1288796&group_id=6550&atid=206550">1288796</a>
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=812">r812</a>)
-  </li>
-  <li>test for Patch  <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1838699&group_id=6550&atid=306550">1838699</a>.
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=813">r813</a>)
-  </li>
-  <li>Patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1531005&group_id=6550&atid=306550">1531005</a>.
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=814">r814</a>)
-  </li>
-  <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1518901&group_id=6550&atid=306550">patch 1518901</a>
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=815">r815</a>)
-  </li>
-  <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a>  and some improved javadoc
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=816">r816</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1333390&group_id=6550&atid=306550">1333390</a> ] patch for bug 1277797
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=817">r817</a>)
-  </li>
-  <li>update website definition to point to subversion repository, list Wolfgang as committer
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=818">r818</a>)
-  </li>
-  <li>fix Wolfgang's email address
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=819">r819</a>)
-  </li>
-  <li>test proposal for Patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a>
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=820">r820</a>)
-  </li>
-  <li>added test for iFrame problem
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=821">r821</a>)
-  </li>
-  <li>added stub for testCreateElement
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=823">r823</a>)
-  </li>
-  <li>debug of java.net.MalformedURLException problems
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=824">r824</a>)
-  </li>
-  <li>improvements by Mark Childerson as mailed in<br />Message-ID: &lt;E1JevCG-0000Pm-Jr@mail.sourceforge.net&gt;
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=825">r825</a>)
-  </li>
-  <li>PseudoServer enhancements: better debug messages, handle request timeout
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=826">r826</a>)
-  </li>
-  <li>isEclipse added
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=827">r827</a>)
-  </li>
-  <li>error handling improved
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=828">r828</a>)
-  </li>
-  <li>javadoc and error handling
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=829">r829</a>)
-  </li>
-  <li>setProxy fix
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=830">r830</a>)
-  </li>
-  <li>null handling for openNewWindow
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=832">r832</a>)
-  </li>
-  <li>Scriptable interface
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=833">r833</a>)
-  </li>
-  <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1864072&group_id=6550&atid=106550">1864072</a> patch by Matt
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=834">r834</a>)
-  </li>
-  <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> added
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=836">r836</a>)
-  </li>
-  <li>event and onchange parts of patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a>
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=837">r837</a>)
-  </li>
-  <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1415415&group_id=6550&atid=306550">1415415</a> added (mime types for tiff and pdf)
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=838">r838</a>)
-  </li>
   <li>patch  <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> + refactoring around handling events
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=839">r839</a>)
   </li>
