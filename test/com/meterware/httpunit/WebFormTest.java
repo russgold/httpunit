@@ -302,6 +302,35 @@ public class WebFormTest extends HttpUnitTest {
         assertEquals( "", request.getParameter( "typeless" ) );
     }
 
+    /**
+     * [ httpunit-Bugs-1954311 ] Set the value of a text area. Currently fails
+     * if the textarea is empty to begin with.  
+     * by m0smith
+     * 
+     * @throws Exception on failure
+     */
+    public void testTextArea() throws Exception {
+        String fieldName = "comments";
+        String comment = "My what a lovely dress that is";
+        // Setting defaultValue to something other than an empty string makes
+        // this test case pass.
+        String defaultValue = "";
+
+        defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" + "<textarea name='" + fieldName
+                + "' row='10' cols='20'>" + defaultValue + "</textarea>" +
+                	"<br><Input type=submit value = \"Submit\">"
+                + "</form>");
+
+        WebResponse page = _wc.getResponse(getHostPath() +"/Default.html");
+        WebForm form = page.getForms()[0];
+        form.setParameter(fieldName, comment);  // THIS LINE FAILS
+
+        assertEquals(1, form.getParameterNames().length);
+
+        WebRequest request = form.getRequest();
+        assertEquals(comment, request.getParameter(fieldName));
+
+    }
 
     public void testTableForm() throws Exception {
         defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +

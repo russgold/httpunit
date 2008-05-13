@@ -760,7 +760,10 @@ abstract class TextFormControl extends FormControl {
             setValue( (String) values.get(0) );
             values.remove(0);
         }
-        if (!(oldValue.equals( getValue() ))) sendOnChangeEvent();
+        boolean same=oldValue==null && getValue()==null;
+        if (oldValue!=null)
+        	 same=oldValue.equals( getValue());
+        if (!same) sendOnChangeEvent();
     }
 
 
