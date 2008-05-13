@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/ 
-public abstract class HeaderOnlyWebRequest extends WebRequest {
+public class HeaderOnlyWebRequest extends WebRequest {
 
 
     /**
