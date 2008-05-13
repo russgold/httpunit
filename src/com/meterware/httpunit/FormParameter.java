@@ -56,7 +56,7 @@ public class FormParameter {
 
     /**
      * get the controls for this form Parameter
-     * @return
+     * @return the controls
      */
     public FormControl[] getControls() {
         if (_controls == null) _controls = (FormControl[]) _controlList.toArray( new FormControl[ _controlList.size() ] );
@@ -66,7 +66,7 @@ public class FormParameter {
     /**
      * get the control for this form Parameter (assuming it 
      * has only one as for a text control
-     * @return
+     * @return the controls
      */
     public FormControl getControl()  {
     	FormControl[] controls=getControls();

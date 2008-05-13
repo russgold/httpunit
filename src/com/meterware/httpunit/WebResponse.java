@@ -1061,6 +1061,14 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     private final URL    _pageURL;
 
     private final WebClient _client;
+    /**
+     * getter for the WebClient
+     * @since 1.7
+     * @return the web client for this WebResponse (if any)
+     */
+    public WebClient getClient() {
+    	return _client;
+    }
 
     private ScriptingHandler _scriptingHandler;
 
