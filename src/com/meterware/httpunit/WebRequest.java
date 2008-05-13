@@ -184,10 +184,17 @@ public class WebRequest {
 
 
     /**
-     * Returns the HTTP method defined for this request.
-     **/
-    abstract
-    public String getMethod();
+     * the HTTP method defined for this request e.g. DELETE,OPTIONS,HEAD
+     */
+    protected String method;
+
+		
+		/**
+		 * @return the method
+		 */
+		public String getMethod() {
+			return method;
+		}
 
 
     /**
@@ -569,6 +576,7 @@ public class WebRequest {
         }
         return null;
     }
+
 }
 
 //======================================== class JavaScriptURLStreamHandler ============================================

@@ -48,6 +48,13 @@ public abstract class HeaderOnlyWebRequest extends WebRequest {
             throw new RuntimeException( "Programming error: " + e );   // should never happen
         }
     }
+    
+    /**
+		 * @param method the method to set
+		 */
+		public void setMethod(String method) {
+			this.method = method;
+		}
 
 
 //-------------------------------- protected members ---------------------------

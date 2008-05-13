@@ -5,7 +5,7 @@ import java.net.URL;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002, Russell Gold
+ * Copyright (c) 2002-2008, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -37,6 +37,7 @@ public class HeadMethodWebRequest extends HeaderOnlyWebRequest {
      */
     public HeadMethodWebRequest( String urlString ) {
         super( urlString );
+        this.setMethod("HEAD");
     }
 
 
@@ -47,10 +48,7 @@ public class HeadMethodWebRequest extends HeaderOnlyWebRequest {
      */
     public HeadMethodWebRequest( URL urlBase, String urlString ) {
         super( urlBase, urlString );
+        this.setMethod("HEAD");
     }
 
-
-    public String getMethod() {
-        return "HEAD";
-    }
 }
