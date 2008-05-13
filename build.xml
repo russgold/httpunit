@@ -213,6 +213,11 @@
         <exclude name="**/javascript/*" unless="rhino.present" />
         <exclude name="**/JUnitServletTest.java" unless="junit.present" />
     </javac>
+		<copy todir="${test.classes}">          
+			<fileset dir="${tstsrc.dir}">       
+				<include name="**/*.html"/>     
+			</fileset>                          
+		</copy>
 </target>
 
 

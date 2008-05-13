@@ -21,10 +21,18 @@ package com.meterware.httpunit.javascript;
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
+import junit.framework.Assert;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 
 
 /**
@@ -1386,6 +1394,76 @@ public class ScriptingTest extends HttpUnitTest {
 	  	HttpUnitOptions.reset();
   	}	// for optimizationLevel
   }
-
+  /**
+   * bug report [ 1286018 ] EcmaError in seemingly valid function
+   * by Stephane Mikaty
+   * @throws Exception
+   */
+  public void testArgumentsProperty() throws Exception {  
+   	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
+  		warnDisabled("testArgumentsProperty","not fixed for old javascript engine");
+  		return;
+  	}	  	 
+ 		new ScriptingTestHelper("../html/testArgumentsProperty.html").run();
+  }                                                                                                    
+	                                                                                                     
+	/**                                                                                                  
+	 * Helper class to define a whole scripting test in a single html file.                              
+	 * This avoids the need to create a large Java escaped string, which                                 
+	 * obfuscates the purpose of the test.                                                               
+	 *                                                                                                   
+	 * The test if given the name of an HTML resource at construction time.                              
+	 * The resource is expected to be in the same package as {@link ScriptingTest}.                      
+	 * Inside the HTML resource, two div elements are required:                                          
+	 * <ol>                                                                                              
+	 * <li>a div with id "expected"                                                                      
+	 * <li>a div with id "actual"                                                                        
+	 * <ol>                                                                                              
+	 * The test is expected to have run by the time the document is loaded, and                          
+	 * passes if the actual div and the expected div have the same content.                              
+	 *                                                                                                   
+	 * The simplest to achieve this is to ensure that the HTML resource contains                         
+	 * an onload instruction that exercises the functionality under test.                                
+	 */                                                                                                  
+	public class ScriptingTestHelper extends Assert {                                                    
+		                                                                                                    
+		/**                                                                                                 
+		 * Name of the HTML resource containing the test in this package.                                   
+		 */                                                                                                 
+		private final String htmlResource;                                                                  
+		                  
+		/**
+		 * constructor for this helper test
+		 * @param anHtmlResource
+		 */
+		ScriptingTestHelper(String anHtmlResource) {                                                        
+			this.htmlResource = anHtmlResource;                                                               
+		}                                                                                                   
+		   
+		/**
+		 * run this Assertion
+		 * @throws Exception
+		 */
+		void run() throws Exception {                                                                       
+			URL url = getClass().getResource(htmlResource);                                                   
+			URLConnection conn = url.openConnection();                                                        
+			String contentType = conn.getContentType();  		                                                  
+			byte[] data = new byte[conn.getContentLength()];                                                  
+			conn.getInputStream().read(data);                                                                 
+			defineResource( "OnCommand.html", data, contentType );                                              
+			WebConversation wc = new WebConversation();                                                         
+			WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );  
+			Document doc=response.getDOM();
+			Node expected=doc.getElementById("expected").getFirstChild();
+			Node actual  =doc.getElementById("actual").getFirstChild();
+			assertNotNull("node expected should not be null",expected);
+			assertNotNull("node actual should not be null",actual);
+			String expectedText = expected.getNodeValue();  
+			String actualText   = actual.getNodeValue();      
+			assertEquals(expectedText, actualText);                                                             
+		}                                                                                                   
+	                                                                                                     
+	}                                                                                                    
+  	                                                                                                     
 
 }
