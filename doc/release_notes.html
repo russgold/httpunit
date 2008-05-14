@@ -22,62 +22,75 @@
 
 <h3>Version 1.7 Released 2008-04-27</h3>
 <h4>Acknowledgements:</h4>
-Thanks to Stefan Hübner for supplying a patch for URL-decoding of parameters in ServletUnit
-Thanks to Archimedes Trajano for supplying code to support non-JSSE SSL providers
-Thanks to Bobby Abraham for adding the capability of deleting a cookie manually
-Thanks to Rafal Krzewski for adding special handling for form actions containing a parameter named "action."
-Thanks to Michael Rudolf for adding support for connection and read timeouts.
-Thanks to Richard Lee for supporting xy parameter submission for unnamed image buttons.
-Thanks to Laurent Wozniak for address the handling of expired cookies
-Thanks to Matthew O. Smith for adding more sophisticated logging to ServletUnit
-Thanks to Mattias Jiderhamn for adding Javascript support for arbitrary attributes
-Thanks to Björn Beskow for adding Javascript support for 'onMouseUp' and 'onMouseDown' events
-Thanks to Jord Sonneveld for adding support for onBlur and onFocus events
+Thanks to <ul>
+    <li>Stefan Hübner for supplying a patch for URL-decoding of parameters in ServletUnit</li>
+    <li>Archimedes Trajano for supplying code to support non-JSSE SSL providers</li>
+    <li>Bobby Abraham for adding the capability of deleting a cookie manually</li>
+    <li>Rafal Krzewski for adding special handling for form actions containing a parameter named "action."</li>
+    <li>Michael Rudolf for adding support for connection and read timeouts.</li>
+    <li>Richard Lee for supporting xy parameter submission for unnamed image buttons.</li>
+    <li>Laurent Wozniak for address the handling of expired cookies</li>
+    <li>Matthew O. Smith for adding more sophisticated logging to ServletUnit</li>
+    <li>Mattias Jiderhamn for adding Javascript support for arbitrary attributes</li>
+    <li>Björn Beskow for adding Javascript support for 'onMouseUp' and 'onMouseDown' events</li>
+    <li>Jord Sonneveld for adding support for onBlur and onFocus events</li>
+    <li>Hugh Winkler for fixing getPathInfo decoding</li>
+    <li>David D. Kilzer for supporting direct invocation ot javascript events</li>
+</ul>
 
 <h4>Notes:</h4>
 <ol>
-	<li>Upgraded NekoHTML to 1.9.6</li>
-	<li>Upgraded Xerces to 2.6.1</li>
-	<li>Upgraded Rhino to 1.6R5</li>
- 	<li>5-Jul-2007:
-   	The PostMethodWebRequest.setMimeEncoded method has been removed. Mime encoding, if desired, should now be
-    specified when constructing the object.</li>
-	<li>28-Jun-2007:
-    WebLink.click() now only returns the contents of the frame containing the link. Previously, if there was no
-    event involved and the link included a frame reference, it would return the contents of the referenced frame.
-  </li>  
-	<li>26-Nov-2006:
-    HttpUnit configuration management has been moved from CVS to subversion at http://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit
-  </li>
-	<li>28-Mar-2006:
-	The build now uses the ant-dependencies task (see http://www.httpunit.org/doc/dependencies.html) rather than
-           keeping the dependent jars in cvs.</li>
-  <li>made some controls (RadioButton,RadioGroupForm) public to support Radiobutton testing better
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=787">r787</a>)
-  </li>
-  <li>some refactoring: HttpUnitUtils.handleException is now called where a simple printStackTrace was
-    found in the past. The boolean flag HttpUnitUtil.EXCEPTION_DEBUG now controls whether this happens
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=822">r822</a>)
-  </li>
-  <li>The doScript method has been refactored - it is now deprecated and renamed to doScriptEvent to make clear 
-  	that this method expects a full script to work on. A click will now also fire the mousedown and mouseup events.
-  	handleEvent is now the method to call for handling events by name  e.g. onchange, onmousedown, onclick, onmouseup, onblur, onfocus
-  	(<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=839">r839</a>)
-  </li>
+    <li>Upgraded NekoHTML to 1.9.6</li>
+    <li>Upgraded Xerces to 2.6.1</li>
+    <li>Upgraded Rhino to 1.6R5</li>
+    <li>The PostMethodWebRequest.setMimeEncoded method has been removed. Mime encoding, if desired, should now be
+        specified when constructing the object.
+    </li>
+    <li>WebLink.click() now only returns the contents of the frame containing the link. Previously, if there was no
+        event involved and the link included a frame reference, it would return the contents of the referenced frame.
+    </li>
+    <li> HttpUnit configuration management has been moved from CVS to subversion at
+        http://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit
+    </li>
+    <li>The build now uses the ant-dependencies task (see http://www.httpunit.org/doc/dependencies.html) rather than
+        keeping the dependent jars in cvs.
+    </li>
+    <li>made some controls (RadioButton,RadioGroupForm) public to support Radiobutton testing better
+    </li>
+    <li>HttpUnitUtils.handleException is now called where a simple printStackTrace was
+        found in the past. The boolean flag HttpUnitUtil.EXCEPTION_DEBUG now controls whether this happens
+    </li>
+    <li>The doScript method has been refactored - it is now deprecated and renamed to doScriptEvent to make clear
+        that this method expects a full script to work on. A click will now also fire the mousedown and mouseup events.
+        handleEvent is now the method to call for handling events by name e.g. onchange, onmousedown, onclick,
+        onmouseup, onblur, onfocus
+    </li>
+    <li>When using the nekoHtml parser, tag and attribute names now default to lower case, rather than upper case as
+        before
+    </li>
 </ol>
 <h4>Problems fixed:</h4>
 <h5>Content and Parsing:</h5>
 <ol>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550">1705925</a> URL-encoded parameter values were not decoded properly if HttpUnitOptions.setDefaultCharacterSet() is set to something different than ISO-8859-1</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1371204&group_id=6550&atid=106550">1371204</a> there was no way to change or delete a server-supplied cookie from a test</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1843978&group_id=6550&atid=106550">1843978</a> the value of a SELECT control could not be set if the web page defined a namespace URI</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1277797&group_id=6550&atid=106550">1277797</a> expired cookies are now removed from the client session</li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155792&group_id=6550&atid=306550">1155792</a> could not set the action for a form if its original action had a parameter named "action" </li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a> unnamed image buttons now submit positions as "x" and "y"</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550">1705925</a> - URL-encoded parameter values were not decoded properly if HttpUnitOptions.setDefaultCharacterSet() is set to something different than ISO-8859-1</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1371204&group_id=6550&atid=106550">1371204</a> - there was no way to change or delete a server-supplied cookie from a test</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1843978&group_id=6550&atid=106550">1843978</a> - the value of a SELECT control could not be set if the web page defined a namespace URI</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1277797&group_id=6550&atid=106550">1277797</a> - expired cookies are now removed from the client session</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1895501&group_id=6550&atid=106550">1895501</a> - the applet codebase was defaulting to the root directory, rather than the current directory</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1672385&group_id=6550&atid=106550">1672385</a> - specifying <code>HttpOnly</code> on a cookie header was causing any specified cookies to be lost</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1954311&group_id=6550&atid=106550">1954311</a> - WebForm.setParameter no longer throws NullPointerException when the control is a TextArea</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1124057&group_id=6550&atid=106550">1124047</a> - selecting a select option by index should now throw RuntimeException rather than IndexOutOfBounds if the index is bad</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155792&group_id=6550&atid=306550">1155792</a> - could not set the action for a form if its original action had a parameter named "action" </li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a> - unnamed image buttons now submit positions as "x" and "y"</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155415&group_id=6550&atid=306550">1155415</a> - in some cases, automatic redirects could result in an infinite loop</li>
 </ol>
 <h5>PseudoServer</h5>
 <ol>
     <li>PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal</li>
+</ol>
+<h5>ServletUnit</h5>
+<ol>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1323031&group_id=6550&atid=106550">1323031</a> - HttpServletRequest.getPathInfo was not properly decoding spaces in URLs</li>
 </ol>
 <h4>Additions:</h4>
 <h5> Content and Parsing:</h5>
@@ -98,14 +111,16 @@ Thanks to Jord Sonneveld for adding support for onBlur and onFocus events
 </ol>
 <h5>Javascript support</h5>
 <ol>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> added support for arbitrary element attributes</li>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> added support for the 'onMouseDown" and 'onMouseUp' events</li>    
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1030851&group_id=6550&atid=306550">1030851</a> added support for 'onBlur' and 'onFocus' events</li>
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> - added support for arbitrary element attributes</li>
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> - added support for the 'onMouseDown" and 'onMouseUp' events</li>
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1030851&group_id=6550&atid=306550">1030851</a> - added support for 'onBlur' and 'onFocus' events</li>
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=796961&group_id=6550&atid=356550">796961</a> - javascript events can now be directly invoked on elements</li>
 </ol>
 <h5>ServletUnit</h5>
 <ol>
-    <li>ServletUnitHttpRequest.getDateHeader() has been implemented; previously it always returned -1</li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1864072&group_id=6550&atid=106550">1864072</a> now log to a user-specified output stream</li> 
+    <li>HttpRequest.getDateHeader() has been implemented; previously it always returned -1</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1246438&group_id=6550&atid=106550">1246438</a> - HttpRequest.getReader is now implemented</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1864072&group_id=6550&atid=106550">1864072</a> - now log to a user-specified output stream</li>
 </ol>
 <h5>Pseudoserver:</h5>
 <ol>
@@ -123,69 +138,6 @@ might want to issue the subversion command:<br />
 		The following list of changes has been extracted from this subversion log with patch
 		and subversion repository links being inserted.
 <ol>		
-  <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1954311&group_id=6550&atid=106550">1954311</a> ] WebForm.setParameter throws NullPointerException on textarea by Matthew O. Smith fixed
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=956">r956</a>)
-  </li>
-  <li>new interface
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=842">r842</a>)
-  </li>
-  <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1117822&group_id=6550&atid=306550">1117822</a> ] Patch for purgeEmptyCells() problem<br />by Glen Stampoultzis 
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=843">r843</a>)
-  </li>
-  <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1211154&group_id=6550&atid=306550">1211154</a> ] NekoDOMParser default to lowercase by Dan Allen
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=844">r844</a>)
-  </li>
-  <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155415&group_id=6550&atid=306550">1155415</a> ] Handle redirect instructions which can lead to a loop by james abley
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=846">r846</a>)
-  </li>
-  <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155415&group_id=6550&atid=306550">1155415</a> ] Handle redirect instructions which can lead to a loop by james abley
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=847">r847</a>)
-  </li>
-  <li>bug [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1159858&group_id=6550&atid=306550">1159858</a> ] allow parsing intercepted pages into HTMLSegment objects<br />with patch [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)<br />by Rafal Krzewski
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=848">r848</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1159887&group_id=6550&atid=306550">1159887</a> ] patch for RFE 1159884 by Rafal Krzewski
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=849">r849</a>)
-  </li>
-  <li>testcase for https://sourceforge.net/forum/message.php?msg_id=<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=4482660&group_id=6550&atid=106550">4482660</a><br />by kauffmann81
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=851">r851</a>)
-  </li>
-  <li>test for https://sourceforge.net/forum/message.php?msg_id=<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3485431&group_id=6550&atid=106550">3485431</a>
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=852">r852</a>)
-  </li>
-  <li>tried to change the url encoding for spaces - did not succeed
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=853">r853</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1176688&group_id=6550&atid=106550">1176688</a> ] Allow configuration of neko parser properties<br />but feature switched off since the test cases don't work then
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=855">r855</a>)
-  </li>
-  <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1235132&group_id=6550&atid=306550">1235132</a> ] Getter support for javascript form.name<br />by Peter Phillips + make it work for DOM engine
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=856">r856</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1246438&group_id=6550&atid=106550">1246438</a> ] For issue 1221537; ServletUnitHttpRequest.getReader not impl<br />by Tim
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=857">r857</a>)
-  </li>
-  <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1323053&group_id=6550&atid=306550">1323053</a> ] Patch for 1323031 by Hugh Winkler
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=858">r858</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1488617&group_id=6550&atid=306550">1488617</a> ] alternate patch for cookie bug #1371204<br />by Richard Lee 
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=859">r859</a>)
-  </li>
-  <li>tests and start of implementation for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1870946&group_id=6550&atid=106550">1870946</a> ] getAttribute function support in HTMLElement (not fixed yet so switched off for old scripting engine)
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=860">r860</a>)
-  </li>
-  <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1895501&group_id=6550&atid=106550">1895501</a> ] Handling no codebase attribute in APPLET tag<br />change default from "/" to "." meaning from root directory to current directory
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=861">r861</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1672385&group_id=6550&atid=106550">1672385</a> ] HttpOnly cookie looses all cookie info
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=863">r863</a>)
-  </li>
-  <li>feature request [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=796961&group_id=6550&atid=106550">796961</a> ] Support indirect invocation of JavaScript events on elements<br />by David D Kilzer<br />test added - works with no change to code
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=867">r867</a>)
-  </li>
-  <li>Bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1124057&group_id=6550&atid=106550">1124057</a> ] Out of Bounds Exception should be avoided<br />by Wolfgang Fahl of 2005-02-16 17:25
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=868">r868</a>)
-  </li>
   <li>inspired by e-mail Execute Javascript of span element<br />of 2008-04-01 by Christoph
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=870">r870</a>)
   </li>
@@ -197,15 +149,6 @@ might want to issue the subversion command:<br />
   </li>
   <li>fixed after comment from Mark
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=873">r873</a>)
-  </li>
-  <li>test for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1396877&group_id=6550&atid=106550">1396877</a> ] Javascript:properties parentNode,firstChild, .. returns null<br />by gklopp 2006-01-04 15:15
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=875">r875</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1153066&group_id=6550&atid=106550">1153066</a> ] Eternal loop while processing javascript by Serguei Khramtchenko 2005-02-27
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=876">r876</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1295782&group_id=6550&atid=306550">1295782</a> ] Method purgeEmptyCells Truncates Table by ahansen 2005-09-19 22:47<br />no fix necessary anymore - already patched
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=877">r877</a>)
   </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1281655&group_id=6550&atid=306550">1281655</a> ] [patch] allow text/xml to be parsed as html<br />by fabrizio giustina <br />made available static accessor for validContentTypes in WebResponse
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=879">r879</a>)
@@ -227,18 +170,6 @@ might want to issue the subversion command:<br />
   </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1281655&group_id=6550&atid=306550">1281655</a> ] [patch] activated by chaning testTraversal
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=888">r888</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1629836&group_id=6550&atid=106550">1629836</a> ] Anchor only form actions are not properly handled<br />by Claude Brisson <br />can not reproduce - testcase runs
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=889">r889</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1055450&group_id=6550&atid=106550">1055450</a> ] Error loading included script aborts entire request<br />by Renaud Waldura<br />works already with 1.6.2
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=890">r890</a>)
-  </li>
-  <li>comment for <br />bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1060291&group_id=6550&atid=106550">1060291</a> ] setting multiple values in selection <br />list <br />by Vladimir<br />that the existing testMultiSelect seems to fit
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=892">r892</a>)
-  </li>
-  <li>trying to check <br />[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1113728&group_id=6550&atid=106550">1113728</a> ] getRealPath throws IndexOutOfBoundsException on empty string<br />by Adrian Baker<br />had to comment out again
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=898">r898</a>)
   </li>
   <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1396835&group_id=6550&atid=306550">1396835</a> ] Javascript : length of a select element cannot be increased<br />by gklopp + patch
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=899">r899</a>)
