@@ -20,7 +20,7 @@
 
 <h2>Revision History:</h2>
 
-<h3>Version 1.7 Released 2008-04-27</h3>
+<h3>Version 1.7 Released 2008-05-14</h3>
 <h4>Acknowledgements:</h4>
 Thanks to <ul>
     <li>Stefan Hübner for supplying a patch for URL-decoding of parameters in ServletUnit</li>
@@ -36,6 +36,8 @@ Thanks to <ul>
     <li>Jord Sonneveld for adding support for onBlur and onFocus events</li>
     <li>Hugh Winkler for fixing getPathInfo decoding</li>
     <li>David D. Kilzer for supporting direct invocation ot javascript events</li>
+    <li>Fabrizio Giustina for enabling html parsing of xml responses</li>
+    <li>Roger Lindsjö for adding handling of empty error pages under JDK 1.5</li>
 </ul>
 
 <h4>Notes:</h4>
@@ -55,34 +57,30 @@ Thanks to <ul>
     <li>The build now uses the ant-dependencies task (see http://www.httpunit.org/doc/dependencies.html) rather than
         keeping the dependent jars in cvs.
     </li>
-    <li>made some controls (RadioButton,RadioGroupForm) public to support Radiobutton testing better
-    </li>
-    <li>HttpUnitUtils.handleException is now called where a simple printStackTrace was
-        found in the past. The boolean flag HttpUnitUtil.EXCEPTION_DEBUG now controls whether this happens
-    </li>
-    <li>The doScript method has been refactored - it is now deprecated and renamed to doScriptEvent to make clear
-        that this method expects a full script to work on. A click will now also fire the mousedown and mouseup events.
-        handleEvent is now the method to call for handling events by name e.g. onchange, onmousedown, onclick,
-        onmouseup, onblur, onfocus
-    </li>
-    <li>When using the nekoHtml parser, tag and attribute names now default to lower case, rather than upper case as
-        before
-    </li>
+    <li>When using the nekoHtml parser, tag and attribute names now default to lower case, rather than upper case as before</li>
 </ol>
 <h4>Problems fixed:</h4>
 <h5>Content and Parsing:</h5>
 <ol>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550">1705925</a> - URL-encoded parameter values were not decoded properly if HttpUnitOptions.setDefaultCharacterSet() is set to something different than ISO-8859-1</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1371204&group_id=6550&atid=106550">1371204</a> - there was no way to change or delete a server-supplied cookie from a test</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1843978&group_id=6550&atid=106550">1843978</a> - the value of a SELECT control could not be set if the web page defined a namespace URI</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1277797&group_id=6550&atid=106550">1277797</a> - expired cookies are now removed from the client session</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1895501&group_id=6550&atid=106550">1895501</a> - the applet codebase was defaulting to the root directory, rather than the current directory</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1672385&group_id=6550&atid=106550">1672385</a> - specifying <code>HttpOnly</code> on a cookie header was causing any specified cookies to be lost</li>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1954311&group_id=6550&atid=106550">1954311</a> - WebForm.setParameter no longer throws NullPointerException when the control is a TextArea</li>
     <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1124057&group_id=6550&atid=106550">1124047</a> - selecting a select option by index should now throw RuntimeException rather than IndexOutOfBounds if the index is bad</li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155792&group_id=6550&atid=306550">1155792</a> - could not set the action for a form if its original action had a parameter named "action" </li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a> - unnamed image buttons now submit positions as "x" and "y"</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1212204&group_id=6550&atid=106550">1212204</a> - WebRquest.getQueryString was ignoring parameters without values</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1277797&group_id=6550&atid=106550">1277797</a> - expired cookies are now removed from the client session</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1283878&group_id=6550&atid=106550">1283878</a> - in JDK 1.5, empty error pages were causing FileNotFoundException to be thrown</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1371204&group_id=6550&atid=106550">1371204</a> - there was no way to change or delete a server-supplied cookie from a test</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1672385&group_id=6550&atid=106550">1672385</a> - specifying <code>HttpOnly</code> on a cookie header was causing any specified cookies to be lost</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1705925&group_id=6550&atid=106550">1705925</a> - URL-encoded parameter values were not decoded properly if HttpUnitOptions.setDefaultCharacterSet() is set to something different than ISO-8859-1</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1843978&group_id=6550&atid=106550">1843978</a> - the value of a SELECT control could not be set if the web page defined a namespace URI</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1895501&group_id=6550&atid=106550">1895501</a> - the applet codebase was defaulting to the root directory, rather than the current directory</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1954311&group_id=6550&atid=106550">1954311</a> - WebForm.setParameter no longer throws NullPointerException when the control is a TextArea</li>
     <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155415&group_id=6550&atid=306550">1155415</a> - in some cases, automatic redirects could result in an infinite loop</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155792&group_id=6550&atid=306550">1155792</a> - could not set the action for a form if its original action had a parameter named "action" </li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1281655&group_id=6550&atid=306550">1281655</a> - attempts to parse xml as html were being rejected</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a> - unnamed image buttons now submit positions as "x" and "y"</li>
+</ol>
+<h5>Javascript</h5>
+<ol>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1289151&group_id=6550&atid=106550">1289151</a> - clicking a button was firing the 'onClick' event for disabled buttons</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=&group_id=6550&atid=106550">1396835</a> - increading the length of a select control was throwing an exception</li>
 </ol>
 <h5>PseudoServer</h5>
 <ol>
@@ -90,31 +88,33 @@ Thanks to <ul>
 </ol>
 <h5>ServletUnit</h5>
 <ol>
+    <li>The implementation of ServletContext is now public, allowing it to be instantiated via reflection as needed</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1165454&group_id=6550&atid=106550">1165454</a> - HttpServletRequest.getScheme() now returns "https" for secure requests</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1242640&group_id=6550&atid=106550">1242640</a> - Causes of 500 errors are not included in the stack trace</li>
     <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1323031&group_id=6550&atid=106550">1323031</a> - HttpServletRequest.getPathInfo was not properly decoding spaces in URLs</li>
 </ol>
 <h4>Additions:</h4>
 <h5> Content and Parsing:</h5>
 <ol>
-	<li>Basic authentication now can support authorization only after challenge and different passwords for
-              different realms.</li>
+    <li>Created a custom HttpUnit DOM</li>
+	<li>Basic authentication now can support authorization only after challenge and different passwords for different realms.</li>
     <li>Added support for rudimentary (RFC 2109) digest authentication.</li>
-	<li>Added "overrideContextType" property to ClientProperties to permit handling of files served with the
-               wrong content type.</li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=844084&group_id=6550&atid=306550">844084</a> added "sendReferer" property to ClientProperties to permit testing of sites when the referer header is blocked
-               by a firewall or proxy server</li>
+	<li>Added "overrideContextType" property to ClientProperties to permit handling of files served with the wrong content type.</li>
     <li>Added <a href="api/com/meterware/httpunit/HttpsProtocolSupport.html#useProvider(java.lang.String,%20java.lang.String)">HttpsProtocolSupport.useProvider</a> to override the default selection of the JSSE for SSL support</li>
     <li>Added <a href="api/com/meterware/httpunit/HttpsProtocolSupport.html#useIBM()">HttpsProtocolSupport.useIBM</a> to select the SSL support provided by IBM WebSphere (which must be in the classpath)</li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1531005&group_id=6550&atid=306550">1531005</a> getElementsWithAttribute should now work with most attribute names</li>
-    <li>27-Mar-2006 Created a custom HttpUnit DOM</li>
-    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1518901&group_id=6550&atid=306550">1518901</a> added methods to control connection and read timeouts.</li>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1415415&group_id=6550&atid=306550">1415415</a> added (mime types for tiff and pdf)</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=844084&group_id=6550&atid=306550">844084</a> - added "sendReferer" property to ClientProperties to permit testing of sites when the referer header is blocked
+               by a firewall or proxy server</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1518901&group_id=6550&atid=306550">1518901</a> - added methods to control connection and read timeouts.</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1415415&group_id=6550&atid=306550">1415415</a> - added (mime types for tiff and pdf)</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1531005&group_id=6550&atid=306550">1531005</a> - getElementsWithAttribute should now work with most attribute names</li>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1476380&group_id=6550&atid=106550">1476380</a> - cookies are now accepted even if their domain matches exactly</li>
 </ol>
 <h5>Javascript support</h5>
 <ol>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> - added support for arbitrary element attributes</li>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> - added support for the 'onMouseDown" and 'onMouseUp' events</li>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1030851&group_id=6550&atid=306550">1030851</a> - added support for 'onBlur' and 'onFocus' events</li>
-    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=796961&group_id=6550&atid=356550">796961</a> - javascript events can now be directly invoked on elements</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=796961&group_id=6550&atid=356550">796961</a> - javascript events can now be directly invoked on elements</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> - added support for the 'onMouseDown" and 'onMouseUp' events</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1030851&group_id=6550&atid=306550">1030851</a> - added support for 'onBlur' and 'onFocus' events</li>
+    <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> - added support for arbitrary element attributes</li>
 </ol>
 <h5>ServletUnit</h5>
 <ol>
@@ -126,102 +126,6 @@ Thanks to <ul>
 <ol>
     <li>Added WebResource.suppressAutomaticContentTypeHeader to permit generation of responses without the Content-Type header.</li>
     <li>Improved debugging messages and handle response timeouts.</li>           
-</ol>
-<h4>Acknowledgements</h4>
-Thanks to the very many people that have supplied bugfixed and patches from 2005 to 2008 - please follow
-the links to the sourceforge.net tracker items in the list of problems fixed below to find out the details about each contributor.
-<h4>Problems corrected:</h4>
-Bug fixes and patches from 2007-12 to 2008-04-19:	for a full subversion log you  
-might want to issue the subversion command:<br />
-
-		<br /><code>&nbsp;&nbsp;svn log https://httpunit.svn.sourceforge.net/svnroot/httpunit</code><br /><br />
-		The following list of changes has been extracted from this subversion log with patch
-		and subversion repository links being inserted.
-<ol>		
-  <li>inspired by e-mail Execute Javascript of span element<br />of 2008-04-01 by Christoph
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=870">r870</a>)
-  </li>
-  <li>bug fix for bug [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1289151&group_id=6550&atid=106550">1289151</a> ] Order of events in button.click() is wrong
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=871">r871</a>)
-  </li>
-  <li>patch from bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1264704&group_id=6550&atid=306550">1264704</a> ] [patch] add parent exception to HttpException by fabrizio giustina
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=872">r872</a>)
-  </li>
-  <li>fixed after comment from Mark
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=873">r873</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1281655&group_id=6550&atid=306550">1281655</a> ] [patch] allow text/xml to be parsed as html<br />by fabrizio giustina <br />made available static accessor for validContentTypes in WebResponse
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=879">r879</a>)
-  </li>
-  <li>Bug report by Adam Hardy via developer Mailinglist<br />of 2008-04-02 to avoid java.lang.IllegalAccessException: Class org.apache.tiles.access.TilesAccess can <br />not access a member of class com.meterware.servletunit.ServletUnitServletContext <br />with modifiers "public"<br />when working with Tiles
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=881">r881</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1035949&group_id=6550&atid=106550">1035949</a> ] NullPointerException on Weblink.click<br />by Ute Platzer<br />historic
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=883">r883</a>)
-  </li>
-  <li>patch for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1476380&group_id=6550&atid=306550">1476380</a> ] Cookies incorrectly rejected despite valid domain<br />by Garrick Toubassi
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=884">r884</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1052037&group_id=6550&atid=106550">1052037</a> ] Semicolon not supported as URL param delimiter<br />by Luca<br />no fix yet only comments
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=885">r885</a>)
-  </li>
-  <li>fix for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1165454&group_id=6550&atid=106550">1165454</a> ] ServletUnitHttpRequest.getScheme() returns "http" for secure<br />by Jeff Mills getScheme now returns _protocol (in lowercase) gotten from the URL of the request. Test will throw java.net.MalFormedURLException / unknown protcol for "ftps" which is considered expected at this time
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=887">r887</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1281655&group_id=6550&atid=306550">1281655</a> ] [patch] activated by chaning testTraversal
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=888">r888</a>)
-  </li>
-  <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1396835&group_id=6550&atid=306550">1396835</a> ] Javascript : length of a select element cannot be increased<br />by gklopp + patch
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=899">r899</a>)
-  </li>
-  <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1119205&group_id=6550&atid=306550">1119205</a> ] EOFExceptions while using a Proxy<br />patch by Ralf Bust<br />set to pending in tracker - the patch does not break any test<br />but there is no unit test for the difference of the two implementations yet
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=901">r901</a>)
-  </li>
-  <li>patch for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1264706&group_id=6550&atid=306550">1264706</a> ] [patch] replace ClasspathEntityResolver<br />put into comment
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=903">r903</a>)
-  </li>
-  <li>Id keyword property set where missing
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=908">r908</a>)
-  </li>
-  <li>Bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1122186&group_id=6550&atid=106550">1122186</a> ] Duplicate select with same name cause error<br />fixed by changing constructor for IllegalParameterValueException and getting bad value in a separate function - may later also be used to fix the ClasscastException problem when a double is in the list of values
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=909">r909</a>)
-  </li>
-  <li>should fix class cast exception for which we are waiting for junit test
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=910">r910</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1143757&group_id=6550&atid=106550">1143757</a> ] encoding of Special charcters broken with 1.6<br />by Klaus Halfmann<br />works with no change
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=911">r911</a>)
-  </li>
-  <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1156972&group_id=6550&atid=306550">1156972</a> ] isWebLink doesn't recognize all anchor tags<br />by fregienj<br />not patched yet and used warnDisabled until decision whether all &lt;area&gt; and &lt;a&gt; nodes are to be considered WebLinks no matter whether they have hrefs or not
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=912">r912</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1159810&group_id=6550&atid=106550">1159810</a> ] URL encoding problem with ServletUnit<br />by Sven Helmberger  added<br />is a duplicate of the other encoding bug and works
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=913">r913</a>)
-  </li>
-  <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1110071&group_id=6550&atid=106550">1110071</a>: javascript cannot increase length of a select control
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=914">r914</a>)
-  </li>
-  <li>test for Bug Report <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1937946&group_id=6550&atid=106550">1937946</a> added (but disabled for HttpUnitSuite since it needs index.html on localhost<br />convenience addition to be able to test this bug report on a Mac
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=916">r916</a>)
-  </li>
-  <li>bug report (actually a feature request) <br /><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1942454&group_id=6550&atid=106550">1942454</a> Make ServerInfo a constant<br />by Philip Helger
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=917">r917</a>)
-  </li>
-  <li>fix for Bug report <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1212204&group_id=6550&atid=106550">1212204</a> by Brian Bonner
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=918">r918</a>)
-  </li>
-  <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1222269&group_id=6550&atid=106550">1222269</a> ] Cannot setEntityResolver on ServletRunner<br />jim - jafergus<br />add another constructor for ServletRunner as requested
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=919">r919</a>)
-  </li>
-  <li>formatted extraction of subversion log with links
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=922">r922</a>)
-  </li>
-  <li>PATCH proposal [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1592532&group_id=6550&atid=106550">1592532</a> ] Invalid ServletUnitServletContext#getResource(String path)<br />by Timo Westkämper<br />add as comment while waiting for a JUnit testcase to be supplied
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=927">r927</a>)
-  </li>
-    <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1283878&group_id=6550&atid=106550">1283878</a> ] FileNotFoundException using Sun JDK 1.5 on empty error pages by Roger Lindsjö checked with his
-    test case and fixed with his patch proposal  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=946">r946</a>)
-  </li>      
 </ol>
     
 <h3>Version 1.6.2 released 2006-03-27:</h3>
