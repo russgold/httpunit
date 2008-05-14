@@ -31,6 +31,8 @@ Thanks to Richard Lee for supporting xy parameter submission for unnamed image b
 Thanks to Laurent Wozniak for address the handling of expired cookies
 Thanks to Matthew O. Smith for adding more sophisticated logging to ServletUnit
 Thanks to Mattias Jiderhamn for adding Javascript support for arbitrary attributes
+Thanks to Björn Beskow for adding Javascript support for 'onMouseUp' and 'onMouseDown' events
+Thanks to Jord Sonneveld for adding support for onBlur and onFocus events
 
 <h4>Notes:</h4>
 <ol>
@@ -73,6 +75,10 @@ Thanks to Mattias Jiderhamn for adding Javascript support for arbitrary attribut
     <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155792&group_id=6550&atid=306550">1155792</a> could not set the action for a form if its original action had a parameter named "action" </li>
     <li>patch #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1443333&group_id=6550&atid=306550">1443333</a> unnamed image buttons now submit positions as "x" and "y"</li>
 </ol>
+<h5>PseudoServer</h5>
+<ol>
+    <li>PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal</li>
+</ol>
 <h4>Additions:</h4>
 <h5> Content and Parsing:</h5>
 <ol>
@@ -93,7 +99,8 @@ Thanks to Mattias Jiderhamn for adding Javascript support for arbitrary attribut
 <h5>Javascript support</h5>
 <ol>
     <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1653410&group_id=6550&atid=306550">1653410</a> added support for arbitrary element attributes</li>
-    
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> added support for the 'onMouseDown" and 'onMouseUp' events</li>    
+    <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1030851&group_id=6550&atid=306550">1030851</a> added support for 'onBlur' and 'onFocus' events</li>
 </ol>
 <h5>ServletUnit</h5>
 <ol>
@@ -119,15 +126,6 @@ might want to issue the subversion command:<br />
   <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1954311&group_id=6550&atid=106550">1954311</a> ] WebForm.setParameter throws NullPointerException on textarea by Matthew O. Smith fixed
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=956">r956</a>)
   </li>
-  <li>patch  <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=884146&group_id=6550&atid=306550">884146</a> + refactoring around handling events
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=839">r839</a>)
-  </li>
-  <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1030851&group_id=6550&atid=306550">1030851</a>  by Jord Sonneveld - jsonneve
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=840">r840</a>)
-  </li>
-  <li>inspired by Ville Skytt?\195?\164's patch[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1065881&group_id=6550&atid=306550">1065881</a> ] Fix servlettest classpath
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=841">r841</a>)
-  </li>
   <li>new interface
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=842">r842</a>)
   </li>
@@ -143,7 +141,7 @@ might want to issue the subversion command:<br />
   <li>patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1155415&group_id=6550&atid=306550">1155415</a> ] Handle redirect instructions which can lead to a loop by james abley
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=847">r847</a>)
   </li>
-  <li>bug [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1159858&group_id=6550&atid=306550>1159858</a> ] allow parsing intercepted pages into HTMLSegment objects<br />with patch [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)<br />by Rafal Krzewski
+  <li>bug [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1159858&group_id=6550&atid=306550">1159858</a> ] allow parsing intercepted pages into HTMLSegment objects<br />with patch [ 1159858 ] patch for RFE 1159844 (parsing intercepted pages)<br />by Rafal Krzewski
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=848">r848</a>)
   </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1159887&group_id=6550&atid=306550">1159887</a> ] patch for RFE 1159884 by Rafal Krzewski
@@ -179,29 +177,14 @@ might want to issue the subversion command:<br />
   <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1895501&group_id=6550&atid=106550">1895501</a> ] Handling no codebase attribute in APPLET tag<br />change default from "/" to "." meaning from root directory to current directory
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=861">r861</a>)
   </li>
-  <li>comment modified
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=862">r862</a>)
-  </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1672385&group_id=6550&atid=106550">1672385</a> ] HttpOnly cookie looses all cookie info
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=863">r863</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1533762&group_id=6550&atid=306550">1533762</a> ] Valid cookies are rejected<br />by Alexey Bulat  but unfortunately patch does not work
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=864">r864</a>)
-  </li>
-  <li>test case for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1508516&group_id=6550&atid=106550">1508516</a> ] Javascript method: "undefined" is not supported<br />- works !
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=865">r865</a>)
-  </li>
-  <li>test and analysis for javaScript cloneNode feature asked for by Mark Childerson according to<br />http://www.w3.org/TR/REC-DOM-Level-1/java-language-binding.html
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=866">r866</a>)
   </li>
   <li>feature request [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=796961&group_id=6550&atid=106550">796961</a> ] Support indirect invocation of JavaScript events on elements<br />by David D Kilzer<br />test added - works with no change to code
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=867">r867</a>)
   </li>
   <li>Bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1124057&group_id=6550&atid=106550">1124057</a> ] Out of Bounds Exception should be avoided<br />by Wolfgang Fahl of 2005-02-16 17:25
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=868">r868</a>)
-  </li>
-  <li>Test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1124024&group_id=6550&atid=106550">1124024</a> ] Formcontrol and isDisabled should be public<br />by Wolfgang Fahl 2005-02-16 16:39
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=869">r869</a>)
   </li>
   <li>inspired by e-mail Execute Javascript of span element<br />of 2008-04-01 by Christoph
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=870">r870</a>)
@@ -215,9 +198,6 @@ might want to issue the subversion command:<br />
   <li>fixed after comment from Mark
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=873">r873</a>)
   </li>
-  <li>new NekoHtml 1.9.6 parser - please note one test failing:<br />testJavascriptDetectionTrick
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=874">r874</a>)
-  </li>
   <li>test for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1396877&group_id=6550&atid=106550">1396877</a> ] Javascript:properties parentNode,firstChild, .. returns null<br />by gklopp 2006-01-04 15:15
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=875">r875</a>)
   </li>
@@ -227,20 +207,11 @@ might want to issue the subversion command:<br />
   <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1295782&group_id=6550&atid=306550">1295782</a> ] Method purgeEmptyCells Truncates Table by ahansen 2005-09-19 22:47<br />no fix necessary anymore - already patched
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=877">r877</a>)
   </li>
-  <li>comments for patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1509117&group_id=6550&atid=306550">1509117</a>
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=878">r878</a>)
-  </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1281655&group_id=6550&atid=306550">1281655</a> ] [patch] allow text/xml to be parsed as html<br />by fabrizio giustina <br />made available static accessor for validContentTypes in WebResponse
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=879">r879</a>)
   </li>
-  <li>developers and release notes
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=880">r880</a>)
-  </li>
   <li>Bug report by Adam Hardy via developer Mailinglist<br />of 2008-04-02 to avoid java.lang.IllegalAccessException: Class org.apache.tiles.access.TilesAccess can <br />not access a member of class com.meterware.servletunit.ServletUnitServletContext <br />with modifiers "public"<br />when working with Tiles
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=881">r881</a>)
-  </li>
-  <li>partially disabled noscript detection trick test, pending nekoHTML bugfix
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=882">r882</a>)
   </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1035949&group_id=6550&atid=106550">1035949</a> ] NullPointerException on Weblink.click<br />by Ute Platzer<br />historic
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=883">r883</a>)
@@ -250,9 +221,6 @@ might want to issue the subversion command:<br />
   </li>
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1052037&group_id=6550&atid=106550">1052037</a> ] Semicolon not supported as URL param delimiter<br />by Luca<br />no fix yet only comments
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=885">r885</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1161922&group_id=6550&atid=106550">1161922</a> ] setting window.onload has no effect<br />by Kent Tong - no fix necessary
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=886">r886</a>)
   </li>
   <li>fix for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1165454&group_id=6550&atid=106550">1165454</a> ] ServletUnitHttpRequest.getScheme() returns "http" for secure<br />by Jeff Mills getScheme now returns _protocol (in lowercase) gotten from the URL of the request. Test will throw java.net.MalFormedURLException / unknown protcol for "ftps" which is considered expected at this time
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=887">r887</a>)
@@ -269,9 +237,6 @@ might want to issue the subversion command:<br />
   <li>comment for <br />bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1060291&group_id=6550&atid=106550">1060291</a> ] setting multiple values in selection <br />list <br />by Vladimir<br />that the existing testMultiSelect seems to fit
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=892">r892</a>)
   </li>
-  <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1151277&group_id=6550&atid=106550">1151277</a> ] httpunit 1.6 breaks Cookie handling for ServletUnitClient<br />by Michael Corum<br />runs without change
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=896">r896</a>)
-  </li>
   <li>trying to check <br />[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1113728&group_id=6550&atid=106550">1113728</a> ] getRealPath throws IndexOutOfBoundsException on empty string<br />by Adrian Baker<br />had to comment out again
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=898">r898</a>)
   </li>
@@ -281,23 +246,8 @@ might want to issue the subversion command:<br />
   <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1119205&group_id=6550&atid=306550">1119205</a> ] EOFExceptions while using a Proxy<br />patch by Ralf Bust<br />set to pending in tracker - the patch does not break any test<br />but there is no unit test for the difference of the two implementations yet
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=901">r901</a>)
   </li>
-  <li>test for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1396896&group_id=6550&atid=106550">1396896</a> ] Javascript: length property of a select element not writable<br />by gklopp <br />modified impl to throw "Not implemented exception"<br />Modal test case for new Dom Scripting Engine
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=902">r902</a>)
-  </li>
   <li>patch for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1264706&group_id=6550&atid=306550">1264706</a> ] [patch] replace ClasspathEntityResolver<br />put into comment
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=903">r903</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1215734&group_id=6550&atid=306550">1215734</a> ] another &lt;select&gt; problem<br />by alex<br />patched the IllegalParameterValueException to but options in quotes to better show the "Kent, Richard" culprit<br />showed that tab and space could also lead to a problem
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=904">r904</a>)
-  </li>
-  <li>test for the bug reports <br />[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1216567&group_id=6550&atid=306550">1216567</a> ] Exception for large javascripts<br />by Grzegorz Lukasik <br />and bug report [ 1572117 ] ClassFormatError<br />by Walter Meier<br />set quicktest to false to run the test for scripts from<br />a thousand to a million lines for optimization levels from -2 to 9 (will take approx 30 secs)<br />patch: new function:<br />HttpUnitOptions.setJavaScriptOptimizationLevel(optimizationLevel);<br />with default optimization level of -1 (interpret)
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=905">r905</a>)
-  </li>
-  <li>test for open bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1043368&group_id=6550&atid=106550">1043368</a> ] WebTable has wrong number of columns<br />by AutoTest<br />added and disabled (warning only)
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=906">r906</a>)
-  </li>
-  <li>Formtable test added and added warnDisabled generalization for some tests
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=907">r907</a>)
   </li>
   <li>Id keyword property set where missing
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=908">r908</a>)
@@ -320,9 +270,6 @@ might want to issue the subversion command:<br />
   <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1110071&group_id=6550&atid=106550">1110071</a>: javascript cannot increase length of a select control
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=914">r914</a>)
   </li>
-  <li>14-Apr-2008 PseudoServer was incorrectly parsing chunk lengths as decimal rather than hexadecimal
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=915">r915</a>)
-  </li>
   <li>test for Bug Report <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1937946&group_id=6550&atid=106550">1937946</a> added (but disabled for HttpUnitSuite since it needs index.html on localhost<br />convenience addition to be able to test this bug report on a Mac
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=916">r916</a>)
   </li>
@@ -335,46 +282,13 @@ might want to issue the subversion command:<br />
   <li>[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1222269&group_id=6550&atid=106550">1222269</a> ] Cannot setEntityResolver on ServletRunner<br />jim - jafergus<br />add another constructor for ServletRunner as requested
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=919">r919</a>)
   </li>
-  <li>improved
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=921">r921</a>)
-  </li>
   <li>formatted extraction of subversion log with links
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=922">r922</a>)
   </li>
   <li>PATCH proposal [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1592532&group_id=6550&atid=106550">1592532</a> ] Invalid ServletUnitServletContext#getResource(String path)<br />by Timo Westkämper<br />add as comment while waiting for a JUnit testcase to be supplied
     (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=927">r927</a>)
   </li>
-  <li>test for bug report<br />[ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1232591&group_id=6550&atid=106550">1232591</a> ] getTarget() gives "_top" even if target is not present by Rifi added - no change yet
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=928">r928</a>)
-  </li>
-  <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1376739&group_id=6550&atid=306550">1376739</a> ] iframe tag not recognized if Javascript code contains '&lt;'<br />by Nathan Jakubiak added<br />The supplied patch unfortunately does not work and is therefore only added as a comment
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=929">r929</a>)
-  </li>
-  <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1390695&group_id=6550&atid=106550">1390695</a> ] bad error message<br />by Martin Olsson<br />added and fixed to FormParameter now to throw a NoSuchParameterException instead of an UnusedUploadFileException:
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=932">r932</a>)
-  </li>
-  <li>test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1390695&group_id=6550&atid=106550">1390695</a> ] bad error message<br />by Martin Olsson<br />added and fixed to FormParameter now to throw a NoSuchParameterException instead of an UnusedUploadFileException:
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=933">r933</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1393144&group_id=6550&atid=306550">1393144</a> ] URL args in form action are sent for GET forms by Nathan Jakubiak<br />added and disabled while bug is pending and waiting for patch
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=934">r934</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1432236&group_id=6550&atid=106550">1432236</a> ] Downloading gif images uses up sockets by Sir Runcible Spoon - with many images httpunit<br />might run out of resources. In the test environment up<br />to 10.000 image accesses where possible (taking some 7 minutes) with no problem - the test for 10 and 100 images is active
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=935">r935</a>)
-  </li>
-  <li>Test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1510495&group_id=6550&atid=106550">1510495</a> ] getParameterValue on a submit button fails by Julien HENRY added<br />if submit is done before getting the form parameter everything is fine
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=936">r936</a>)
-  </li>
-  <li>added test case for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1510582&group_id=6550&atid=106550">1510582</a> ] setParameter fails with &lt;input type="file"&gt; by Julien Henry <br />and changed the behaviour of setparameter that a more<br />developer friendly exception with a hopefully better understandable message is thrown to point out that file parameters need a parameter of type java.io.File when being set
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=937">r937</a>)
-  </li>
-  <li>test for bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1534234&group_id=6550&atid=306550">1534234</a> ] HttpServletResponse.isCommitted() always false? (+ p a t c h)<br />by Olaf Klischat added. Unfortunately p a t c h does <br />break other tests - asking for improved test case and patch
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=938">r938</a>)
-  </li>
-  <li>test case for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1535018&group_id=6550&atid=106550">1535018</a> ] Sub frame recognition - getSubframeContents by Oliver GL<br />there is the almost original version of the testCase xtestSubFrameRecognition and a working version<br />testSubFrameRecognition the difference between the two and the link in the response of today shows that people have a hard time understanding how the getFrameContents and getSubframeContents functions work. 
-    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=939">r939</a>)
-  </li>
-    <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1283878&group_id=6550&atid=106550">1283878</a> ] FileNotFoundException using Sun JDK 1.5 on empty error pages by Roger Lindsjö checked with his 
+    <li>bug report [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1283878&group_id=6550&atid=106550">1283878</a> ] FileNotFoundException using Sun JDK 1.5 on empty error pages by Roger Lindsjö checked with his
     test case and fixed with his patch proposal  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=946">r946</a>)
   </li>      
 </ol>
