@@ -336,7 +336,7 @@ public class DocumentScriptingTest extends HttpUnitTest {
 				assertEquals( "Alert message", "hellothere", wc.popNextAlert() );
 			} catch (ScriptException se) {
        	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-       		this.warnDisabled("testCreateElement", "not fixed for old scripting engine");
+       		this.warnDisabled("testCreateElement","B",3, "not fixed for old scripting engine");
        	} else {
        		throw se;
        	}				

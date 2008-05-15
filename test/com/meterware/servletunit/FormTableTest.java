@@ -74,7 +74,7 @@ public class FormTableTest extends HttpUnitTest {
         
         boolean bug1043368Pending=true;
         if (bug1043368Pending) {
-        	this.warnDisabled("testFormTable", "for pending bug 1043368");
+        	this.warnDisabled("testFormTable","A",2, "for pending bug 1043368");
         } else {
         	System.out.println( table.toString() );        
         	assertFalse( "wrong table", 

@@ -186,7 +186,7 @@ public class ScriptingTest extends HttpUnitTest {
     */    
    public void testCloneNode() throws Exception {
    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-  		warnDisabled("testCloneNode","not fixed for old javascript engine");
+  		warnDisabled("testCloneNode","B",3,"not fixed for old javascript engine");
   		return;
   	}	  	 
   	 WebConversation wc=doTestJavaScript(
@@ -1079,7 +1079,7 @@ public class ScriptingTest extends HttpUnitTest {
         assertEquals( "Result page ", "Javascript is enabled!", response.getText() );
         boolean nekoHtmlBugFixed = false; // waiting for response to http://sourceforge.net/tracker/index.php?func=detail&aid=1932445&group_id=195122&atid=952178
         if (!nekoHtmlBugFixed) {
-        	this.warnDisabled("testJavascriptDetectionTrick", "waiting for nekoHtml bug #1932445" );
+        	this.warnDisabled("testJavascriptDetectionTrick","A",2,"waiting for nekoHtml bug #1932445" );
         } else {
             HttpUnitOptions.setScriptingEnabled( false );
             response = wc.getResponse( getHostPath() + "/Start.html" );
@@ -1162,7 +1162,7 @@ public class ScriptingTest extends HttpUnitTest {
      */
     public void testDOM() throws Exception {
      	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-    		warnDisabled("testDOM","not fixed for old javascript engine");
+    		warnDisabled("testDOM","B",3,"not fixed for old javascript engine");
     		return;
     	}	  	 
       defineResource( "testSelect.html", "<html><head><script type='text/javascript'>\n" +        		        	
@@ -1275,7 +1275,7 @@ public class ScriptingTest extends HttpUnitTest {
       } catch (Exception ex ) {
        	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
       		 // TODO change this expected result if fixed
-      		 warnDisabled("testModifySelectLength","not fixed for old javascript engine");
+      		 warnDisabled("testModifySelectLength","B",3,"not fixed for old javascript engine");
        		 assertTrue(ex instanceof java.lang.RuntimeException);
        		 assertTrue(ex.getMessage().indexOf("Not implemented yet")>=0);
        	} else {
@@ -1363,13 +1363,13 @@ public class ScriptingTest extends HttpUnitTest {
 	    		// alert(var25500);}' failed: java.lang.IllegalArgumentException: out of range index
 	    		// for 50000 lines and opt level 0	   
 	    		if ((optimizationLevel>=0) && (lines>=50000)) {
-	    			this.warnDisabled("testLargeJavaScript","fails with runtime Exception for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
+	    			this.warnDisabled("testLargeJavaScript","C",2,"fails with runtime Exception for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
 	    		} else {
 	    			throw re;
 	    		}
 	    	} catch (java.lang.OutOfMemoryError ome) {
 	    		if (lines>=expectMemoryExceededForLinesOver) {
-	    			this.warnDisabled("testLargeJavaScript","fails with out of memory error for "+lines+" lines at optimizationLevel "+optimizationLevel+" we expect this for more than "+expectMemoryExceededForLinesOver+" lines");
+	    			this.warnDisabled("testLargeJavaScript","C",3,"fails with out of memory error for "+lines+" lines at optimizationLevel "+optimizationLevel+" we expect this for more than "+expectMemoryExceededForLinesOver+" lines");
 	    			break;
 	    		} else {
 	    			throw ome;
@@ -1377,7 +1377,7 @@ public class ScriptingTest extends HttpUnitTest {
 	    	} catch (java.lang.ClassFormatError cfe) {
 	    		// java.lang.ClassFormatError: Invalid method Code length 223990 in class file org/mozilla/javascript/gen/c1
 	    		if (optimizationLevel>=0)
-	    			this.warnDisabled("testLargeJavaScript","fails with class format error for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
+	    			this.warnDisabled("testLargeJavaScript","C",2,"fails with class format error for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
 	    		else
 	    			throw cfe;	    	
 	    	} // try
@@ -1401,7 +1401,7 @@ public class ScriptingTest extends HttpUnitTest {
    */
   public void testArgumentsProperty() throws Exception {  
    	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-  		warnDisabled("testArgumentsProperty","not fixed for old javascript engine");
+  		warnDisabled("testArgumentsProperty","B",3,"not fixed for old javascript engine");
   		return;
   	}	  	 
  		new ScriptingTestHelper("../html/testArgumentsProperty.html").run();

@@ -27,6 +27,9 @@ import com.meterware.httpunit.parsing.ParsingTestSuite;
 import com.meterware.httpunit.ssl.HttpsProtocolSupportTest;
 import com.meterware.httpunit.dom.DomTestSuite;
 
+import junit.framework.AssertionFailedError;
+import junit.framework.TestListener;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.framework.Test;
 
@@ -35,14 +38,15 @@ import junit.framework.Test;
  * Tests for the httpunit package.
  **/
 public class HttpUnitSuite extends ConditionalTestSuite {
-
+	
 	  /**
 	   * entry point to run suite from command line
 	   * @param args - command line arguments
 	   */
     public static void main( String[] args ) {
         try {
-            junit.textui.TestRunner.run( suite() );
+        	HttpUnitTest.warnDelim="\n";
+  	  		TestResult result=junit.textui.TestRunner.run(suite());
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use Options | File Templates.
         }

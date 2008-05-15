@@ -102,23 +102,28 @@ public class HttpUnitTest extends HttpUserAgentTest {
     	}
     	return result;    	
     }
+		public static String warnDelim="";
+		
+		
     /**
      * show a warning for disabled Tests
      * @param testName
      * @param comment
      */
-    public static void warnDisabled(String testName,String comment) {
+    public static void warnDisabled(String testName,String priority,int urgency,String comment) {
     	if (WARN_DISABLED) {
-    		String delim="";
-    		//delim="\n";
     		if (firstWarn) {
     			firstWarn=false;
-    			System.err.println("\n The following tests are not active:");
-    			System.err.println(" #  |        testname               | reason  ");
-    			System.err.println("----+-------------------------------+--------------------------------------------");
+    			System.err.println("\n The following tests are not active - the features tested are not part of the current release:");
+    			System.err.println(" #  |        testname               | priority | urgency | reason  ");
+    			System.err.println("----+-------------------------------+----------+---------+----------------------------------------");
     		}
     		disabledIndex++;
-    		System.err.println(delim+padLeft(""+disabledIndex,3)+" | "+padLeft(testName,29)+" | "+comment);
+    		System.err.println(warnDelim+padLeft(""+disabledIndex,3)+
+    				" | "+padLeft(testName,29)+
+    				" | "+padLeft(priority, 8)+
+    				" | "+padLeft(""+urgency, 7)+
+    				" | "+comment);
     	}	
     }
 

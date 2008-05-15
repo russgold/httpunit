@@ -226,7 +226,7 @@ public class HttpServletResponseTest extends ServletUnitTest {
       WebResponse response = sr.getResponse( request );
       boolean isPending=true;
       if (isPending) {
-      	HttpUnitTest.warnDisabled("testIsCommitted", "bug report 1534234 is pending - waiting for testcase/improved patch");
+      	HttpUnitTest.warnDisabled("testIsCommitted","B",2,"bug report 1534234 is pending - waiting for testcase/improved patch");
       } else {
       	assertTrue("The response should be committed",CheckIsCommittedServlet.isCommitted);
       }	

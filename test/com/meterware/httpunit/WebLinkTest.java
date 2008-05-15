@@ -90,7 +90,7 @@ public class WebLinkTest extends HttpUnitTest {
       if (decided) {
       	assertEquals( 0, links.length );
       } else {
-        this.warnDisabled("testFindNonHrefLinks()","pending decision for bug report [ 1156972 ] -> does an <a> node to have href to be considered a link?");
+        this.warnDisabled("testFindNonHrefLinks()","C",2,"pending decision for bug report [ 1156972 ] -> does an <a> node to have href to be considered a link?");
       }
     }
     

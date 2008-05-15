@@ -528,7 +528,7 @@ public class WebFrameTest extends HttpUnitTest {
       	WebResponse response = _wc.getFrameContents("iframe_after_lessthan_in_javascript");
       	assertTrue(response!=null);
       } catch (Throwable th) {
-        this.warnDisabled("testIFrameBug", "patch needed for '"+th.getMessage()+"'");      	
+        this.warnDisabled("testIFrameBug", "B",2,"patch needed for '"+th.getMessage()+"'");      	
       }
     }
 

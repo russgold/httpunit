@@ -619,7 +619,7 @@ public class FormParametersTest extends HttpUnitTest {
     	 String foundURL=resp.getURL().toString();
     	 boolean disabled=true;
     	 if (disabled) {
-    		 this.warnDisabled("testParamReplacement", "bug 1393144 pending - waiting for patch");
+    		 this.warnDisabled("testParamReplacement","A",2, "bug 1393144 pending - waiting for patch");
     	 } else {	 
     		 // System.out.println("url: " + foundURL);
     		 assertTrue(foundURL.equals(expected));
