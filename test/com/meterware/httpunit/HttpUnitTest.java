@@ -84,7 +84,24 @@ public class HttpUnitTest extends HttpUserAgentTest {
      */
     public static boolean WARN_DISABLED=true;
     public static int disabledIndex=0;
+    public static boolean firstWarn=true;
     
+    /**
+     * return a left padded string
+     * @param s
+     * @param pad
+     * @return
+     */
+    private static String padLeft(String s, int pad) {
+    	String result=s;
+    	String space="                                                         ";
+    	if (result.length()>pad) {
+    		result=result.substring(0,pad);
+    	} else if (result.length()<pad) {
+    		result=space.substring(0,pad-result.length())+result;
+    	}
+    	return result;    	
+    }
     /**
      * show a warning for disabled Tests
      * @param testName
@@ -92,8 +109,16 @@ public class HttpUnitTest extends HttpUserAgentTest {
      */
     public static void warnDisabled(String testName,String comment) {
     	if (WARN_DISABLED) {
+    		String delim="";
+    		//delim="\n";
+    		if (firstWarn) {
+    			firstWarn=false;
+    			System.err.println("\n The following tests are not active:");
+    			System.err.println(" #  |        testname               | reason  ");
+    			System.err.println("----+-------------------------------+--------------------------------------------");
+    		}
     		disabledIndex++;
-    		System.err.println("*** "+disabledIndex+". Test "+testName+" disabled: "+comment);
+    		System.err.println(delim+padLeft(""+disabledIndex,3)+" | "+padLeft(testName,29)+" | "+comment);
     	}	
     }
 
