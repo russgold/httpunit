@@ -19,6 +19,13 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.HttpUnitTest;
+import com.meterware.httpunit.WebClient;
+import com.meterware.httpunit.WebConversation;
+import com.meterware.httpunit.WebForm;
+import com.meterware.httpunit.WebLink;
+import com.meterware.httpunit.WebResponse;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 

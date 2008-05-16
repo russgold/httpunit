@@ -20,6 +20,8 @@ package com.meterware.httpunit.javascript;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
+import com.meterware.httpunit.javascript.AbstractJavaScriptTest;
+
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 

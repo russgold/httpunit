@@ -22,6 +22,8 @@ package com.meterware.httpunit.javascript;
 
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.HttpUnitOptions;
+import com.meterware.httpunit.javascript.AbstractJavaScriptTest;
+
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
 
@@ -152,14 +154,14 @@ public class NewScriptingTests extends AbstractJavaScriptTest {
                     // alert(var25500);}' failed: java.lang.IllegalArgumentException: out of range index
                     // for 50000 lines and opt level 0
                     if ((optimizationLevel >= 0) && (lines >= 50000)) {
-                        this.warnDisabled( "testLargeJavaScript",
+                        this.warnDisabled( "testLargeJavaScript","C",2,
                                 "fails with runtime Exception for " + lines + " lines at optimizationLevel " + optimizationLevel + " the default is level -1 so we only warn" );
                     } else {
                         throw re;
                     }
                 } catch (java.lang.OutOfMemoryError ome) {
                     if (lines >= expectMemoryExceededForLinesOver) {
-                        this.warnDisabled( "testLargeJavaScript",
+                        this.warnDisabled( "testLargeJavaScript","C",2,
                                 "fails with out of memory error for " + lines + " lines at optimizationLevel " + optimizationLevel + " we expect this for more than " + expectMemoryExceededForLinesOver + " lines" );
                         break;
                     } else {
@@ -168,7 +170,7 @@ public class NewScriptingTests extends AbstractJavaScriptTest {
                 } catch (java.lang.ClassFormatError cfe) {
                     // java.lang.ClassFormatError: Invalid method Code length 223990 in class file org/mozilla/javascript/gen/c1
                     if (optimizationLevel >= 0)
-                        this.warnDisabled( "testLargeJavaScript",
+                        this.warnDisabled( "testLargeJavaScript","C",2,
                                 "fails with class format error for " + lines + " lines at optimizationLevel " + optimizationLevel + " the default is level -1 so we only warn" );
                     else
                         throw cfe;
