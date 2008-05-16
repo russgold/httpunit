@@ -336,23 +336,29 @@ public class WebTable extends HTMLElementBase {
 
 
     static {
-        MATCH_FIRST_NONBLANK_CELL = new HTMLElementPredicate() {    // XXX find a way to do this w/o purging the table cells
+        MATCH_FIRST_NONBLANK_CELL = new HTMLElementPredicate() {
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 WebTable table = ((WebTable) htmlElement);
-                table.purgeEmptyCells();
-                return table.getRowCount() > 0 &&
-                       HttpUnitUtils.matches( table.getCellAsText(0,0).trim(), (String) criteria );
-            };
+                for (int row = 0; row < table.getRowCount(); row++) {
+                    for (int col = 0; col < table.getColumnCount(); col++) {
+                        if (HttpUnitUtils.matches( table.getCellAsText( row, col ).trim(), (String) criteria)) return true;
+                    }
+                }
+                return false;
+            }
         };
 
 
         MATCH_FIRST_NONBLANK_CELL_PREFIX = new HTMLElementPredicate() {   // XXX find a way to do this w/o purging the table cells
             public boolean matchesCriteria( Object htmlElement, Object criteria ) {
                 WebTable table = ((WebTable) htmlElement);
-                table.purgeEmptyCells();
-                return table.getRowCount() > 0 &&
-                       HttpUnitUtils.hasPrefix( table.getCellAsText(0,0).toUpperCase().trim(), (String) criteria );
-            };
+                for (int row = 0; row < table.getRowCount(); row++) {
+                    for (int col = 0; col < table.getColumnCount(); col++) {
+                        if (HttpUnitUtils.hasPrefix( table.getCellAsText( row, col ).trim(), (String) criteria)) return true;
+                    }
+                }
+                return false;
+            }
         };
 
 

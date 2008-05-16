@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  * @author Wolfgang Fahl - for compiling patches from the Source Forge web site 2008-03
  **/
-public class ScriptingTest extends HttpUnitTest {
+public class ScriptingTest extends AbstractJavaScriptTest {
 
     public static void main( String args[] ) {
         TestRunner.run( suite() );
@@ -120,46 +120,9 @@ public class ScriptingTest extends HttpUnitTest {
         response.getLinks()[0].click();
         assertEquals( "New page", "You made it!", wc.getCurrentPage().getText() );
     }
-    // set to true to get the static HTML Code on System.err
-    public static boolean debugHTML=false;
+
 
     /**
-     * test the given javaScript code by putting it into a function and calling it
-     * as a prerequisite make the html code snippet available in the body of the page 
-     * @param script - some javascript code to be called in a function
-     * @param html - a html code snippet
-     * @return
-     * @throws Exception
-     */
-    public WebConversation doTestJavaScript(String script,String html) throws Exception {
-      defineResource( "OnCommand.html", "<html><head><script language='JavaScript'>\n" +
-      		"function javaScriptFunction() {\n"+
-      		script+
-      		"}\n"+
-          "</script></head>" +
-          "<body>" +
-          html+"\n"+
-          "<a href=\"javascript:javaScriptFunction()\">go</a>" +
-          "</body></html>" );
-      WebConversation wc = new WebConversation();
-      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-      if (debugHTML) {
-      	System.err.println(response.getText()+"\n");
-      }	
-      response.getLinkWith( "go" ).click();
-      return wc;    	
-    }
-    
-   /**
-    * test the given javaScript code by putting it into a function
-    * and calling it
-    * @param script
-    */
-   public WebConversation doTestJavaScript(String script) throws Exception {
-  	 return doTestJavaScript(script,"");
-   }	 
-    
-   /**
     * test for bug report [ 1508516 ] Javascript method: "undefined" is not supported
     * @throws Exception
     */
@@ -180,23 +143,6 @@ public class ScriptingTest extends HttpUnitTest {
   	 WebConversation wc=doTestJavaScript("document.location='#node_selected';");  			
    }			 
    
-   /**
-    * test for cloneNode feature (asked for by Mark Childeson on 2008-04-01)
-    * @throws Exception
-    */    
-   public void testCloneNode() throws Exception {
-   	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-  		warnDisabled("testCloneNode","B",3,"not fixed for old javascript engine");
-  		return;
-  	}	  	 
-  	 WebConversation wc=doTestJavaScript(
-  		"dolly1=document.getElementById('Dolly');\n"+
-    	"dolly2=dolly1.cloneNode(true);\n"+
-    	"dolly1.firstChild.nodeValue += dolly2.firstChild.nodeValue;\n"+
-    	"alert(dolly1.firsthChild.nodeValue);\n",
-    	"<div id='Dolly'>Dolly </div>");
-   }
-
    /**
     * test javascript call to an included function
     * @throws Exception
@@ -1066,9 +1012,9 @@ public class ScriptingTest extends HttpUnitTest {
         defineResource( "NoScript.html", "No javascript here" );
         defineResource( "HasScript.html", "Javascript is enabled!" );
         defineResource( "Start.html",  "<html><head>" +
-//                                       "  <noscript>" +
-//                                       "      <meta http-equiv='refresh' content='0;url=NoScript.html'>" +
-//                                       "  </noscript>" +
+                                       "  <noscript>" +
+                                       "      <meta http-equiv='refresh' content='0;url=NoScript.html'>" +
+                                       "  </noscript>" +
                                        "</head>" +
                                        "<body onload='document.form.submit()'>" +
                                        "<form name='form' action='HasScript.html'></form>" +
@@ -1077,59 +1023,54 @@ public class ScriptingTest extends HttpUnitTest {
         wc.getClientProperties().setAutoRefresh( true );
         WebResponse response = wc.getResponse( getHostPath() + "/Start.html" );
         assertEquals( "Result page ", "Javascript is enabled!", response.getText() );
-        boolean nekoHtmlBugFixed = false; // waiting for response to http://sourceforge.net/tracker/index.php?func=detail&aid=1932445&group_id=195122&atid=952178
-        if (!nekoHtmlBugFixed) {
-        	this.warnDisabled("testJavascriptDetectionTrick","A",2,"waiting for nekoHtml bug #1932445" );
-        } else {
-            HttpUnitOptions.setScriptingEnabled( false );
-            response = wc.getResponse( getHostPath() + "/Start.html" );
-            assertEquals( "Result page", "No javascript here", response.getText() );
-        }
+        HttpUnitOptions.setScriptingEnabled( false );
+        response = wc.getResponse( getHostPath() + "/Start.html" );
+        assertEquals( "Result page", "No javascript here", response.getText() );
     }
 
     /**
-     * @see https://sourceforge.net/forum/forum.php?thread_id=1808696&forum_id=20294
+     * https://sourceforge.net/forum/forum.php?thread_id=1808696&forum_id=20294
      * by kauffman81
      */
     public void testJavaScriptConfirmPopUp() throws Exception {
-    	String target="<html><body>After click we want to see this!</body></html>";
-      defineResource( "Target.html",  target);    	
-      defineResource( "Popup.html","<html><head><script language='JavaScript'>"+      	 
-       "// 	This is the javascript that handles the onclick event\n"+       	 
-       "function verify_onBorrar(form){\n"+ 
-       "  alert(form.id);\n"+       
-       /* TODO check this javascript code
-        * if uncommented it will throw
-          com.meterware.httpunit.ScriptException: Event 'verify_onBorrar(this.form)' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot read property "0" from undefined (httpunit#3)
-       "	for(var i = 0;i<form.selection[i].length;i++){\n"+ 
-       "		if(form.selection[i].checked){\n"+ 
-       "			if(confirm('blablabla')){\n"+ 
-       "				form.action = 'Target.html';\n"+  
-       "				form.submit(); \n"+
-       "			} // if\n"+    	
-       "		} // if\n"+    	
-       "	} // for\n"+    	
-       */
-       "} // verify_onBorrar\n"+    	
-       "</script></head>\n"+    	
-       "<body>\n"+
-       "	<form id='someform' name='someform'>"+
-       "		<input type='button' id='button1' class='button' value='say hi' onclick=\"alert('hi')\"/>"+
-       "		<input type='button' id='delete' class='button' value='delete' onclick='verify_onBorrar(this.form)'/></form>\n"+
-       "	</form>\n"+
-       "</body></html>");
-      WebConversation wc = new WebConversation();
-      WebResponse response = wc.getResponse( getHostPath() + "/Popup.html" );
-      Button button1 = (Button) response.getElementWithID( "button1" );
-      button1.click();
-      String alert1=wc.popNextAlert();
-      assertEquals("hi",alert1);
-      Button button2 = (Button) response.getElementWithID( "delete" );
-      button2.click();
-      String alert2=wc.popNextAlert();
-      // TODO activate this check
-      // System.err.println("alert 2 is "+alert2);
-      // assertEquals("someform",alert2);
+        String target = "<html><body>After click we want to see this!</body></html>";
+        defineResource( "Target.html", target );
+        defineResource( "Popup.html", "<html><head><script language='JavaScript'>" +
+                "// 	This is the javascript that handles the onclick event\n" +
+                "function verify_onBorrar(form){\n" +
+                "  alert(form.id);\n" +
+                /* TODO check this javascript code
+                 * if uncommented it will throw
+                   com.meterware.httpunit.ScriptException: Event 'verify_onBorrar(this.form)' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot read property "0" from undefined (httpunit#3)
+                "	for(var i = 0;i<form.selection[i].length;i++){\n"+
+                "		if(form.selection[i].checked){\n"+
+                "			if(confirm('blablabla')){\n"+
+                "				form.action = 'Target.html';\n"+
+                "				form.submit(); \n"+
+                "			} // if\n"+
+                "		} // if\n"+
+                "	} // for\n"+
+                */
+                "} // verify_onBorrar\n" +
+                "</script></head>\n" +
+                "<body>\n" +
+                "	<form id='someform' name='someform'>" +
+                "		<input type='button' id='button1' class='button' value='say hi' onclick=\"alert('hi')\"/>" +
+                "		<input type='button' id='delete' class='button' value='delete' onclick='verify_onBorrar(this.form)'/></form>\n" +
+                "	</form>\n" +
+                "</body></html>" );
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse( getHostPath() + "/Popup.html" );
+        Button button1 = (Button) response.getElementWithID( "button1" );
+        button1.click();
+        String alert1 = wc.popNextAlert();
+        assertEquals( "hi", alert1 );
+        Button button2 = (Button) response.getElementWithID( "delete" );
+        button2.click();
+        String alert2 = wc.popNextAlert();
+        // TODO activate this check
+        // System.err.println("alert 2 is "+alert2);
+        // assertEquals("someform",alert2);
     }
     
     /**
@@ -1154,49 +1095,6 @@ public class ScriptingTest extends HttpUnitTest {
        String alert1=wc.popNextAlert();
        assertEquals("somefunction called",alert1);              
     }   
-    
-    /**
-     * test for bug report [ 1396877 ] Javascript:properties parentNode,firstChild, .. returns null
-     * by gklopp 2006-01-04 15:15
-     * @throws Exception
-     */
-    public void testDOM() throws Exception {
-     	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-    		warnDisabled("testDOM","B",3,"not fixed for old javascript engine");
-    		return;
-    	}	  	 
-      defineResource( "testSelect.html", "<html><head><script type='text/javascript'>\n" +        		        	
-			                           "<!--\n" +
-			                           "function testDOM() {\n" +				    
-			                           "  var sel = document.getElementById('the_select');\n" +
-			                           "  var p = sel.parentNode;\n" +
-			                           "  var child = p.firstChild;\n" +
-			                           "  alert('Parent : ' + p.nodeName);\n" +
-			                           "  alert('First child : ' + child.nodeName);\n" + 
-			                           "}\n" +
-			                           "-->\n" +        		        		
-                                         "</script></head>" +
-                                         "<body>" +										   
-                                         "<form name='the_form'>" +
-									   "   <table>" +
-									   "    <tr>" +
-									   "      <td>Selection :</td>" +
-									   "       <td>" +
-									   "          <select name='the_select'>" +
-									   "              <option value='option1Value'>option1</option>" +
-									   "          </select>" +
-									   "       </td>" +
-									   "     </tr>" +
-									   "   </table>" +
-									   "</form>" +				
-									   "<script type='text/javascript'>testDOM();</script>" +										   
-                                         "</body></html>");
-      WebConversation wc = new WebConversation();
-      WebResponse response = wc.getResponse( getHostPath() + "/testSelect.html" );
-      assertEquals( "Message 1", "TD", wc.popNextAlert().toUpperCase() );
-      assertEquals( "Message 2", "SELECT", wc.popNextAlert().toUpperCase() );        
-  }
-    
   /**
    * test for bug report [ 1396835 ] Javascript : length of a select element cannot be increased
    * by gklopp
@@ -1234,6 +1132,7 @@ public class ScriptingTest extends HttpUnitTest {
       WebResponse response = wc.getResponse( getHostPath() + "/testSelect.html" );
       final WebForm form = response.getFormWithName( "the_form" );
   }
+
     
   /**
    * test for bug report [ 1396896 ] Javascript: length property of a select element not writable
@@ -1268,202 +1167,9 @@ public class ScriptingTest extends HttpUnitTest {
 									   "</form>" +				
 									   "<script type='text/javascript'>modifySelectLength();</script>" +										   
                                          "</body></html>");
-    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
       WebConversation wc = new WebConversation();
-      try {
-      	WebResponse response = wc.getResponse( getHostPath() + "/testModifySelectLength.html" );
-      } catch (Exception ex ) {
-       	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-      		 // TODO change this expected result if fixed
-      		 warnDisabled("testModifySelectLength","B",3,"not fixed for old javascript engine");
-       		 assertTrue(ex instanceof java.lang.RuntimeException);
-       		 assertTrue(ex.getMessage().indexOf("Not implemented yet")>=0);
-       	} else {
-       		throw ex;
-       	}
-      } finally {
-      	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
-      }
-      
+      wc.getResponse( getHostPath() + "/testModifySelectLength.html" );
+
   }
     
-  /**
-   * test for bug report [ 1216567 ] Exception for large javascripts
-   * by Grzegorz Lukasik 
-   * and bug report [ 1572117 ] ClassFormatError
-   * by Walter Meier
-   * @author Wolfgang Fahl 2008-04-05
-   */  
-  public void testLargeJavaScript() throws Exception {
-  	// create at least 64 KByte worth of Java script of the form
-  	// var1000=1000;
-  	// let's check the length;
-  	//          1
-  	// 12345678901234
-  	// var1000=1000+1;
-  	// so that is 14 chars avg per line - we'll do that many times for good measure ...
-  	// you might want to adjust the numbers to your environment
-  	// we do tests with 1000,10000,100000,1000000 lines in a logarithmic manner
-  	// we do the optimization levels according to rhino docs:
-  	// 
-  	//    -2: with continuation
-  	//    -1: interpret
-    // 0: compile to Java bytecode, don't optimize
-    // 1..9: compile to Java bytecode, optimize
-  	// 
-  	// set quicktest to false to get the full extent of the test
-  	// the quick version only runs 1000 and 1000 lines for the levels -2 to 1
-  	boolean quicktest=true;
-  	boolean showProgress=false;
-  	int linesToTest[]={1000,10000,100000,1000000};
-  	int numTests=linesToTest.length;
-  	int minOptLevel=-2;
-  	int maxOptLevel=9;
-  	// when to expect a memory error
-  	int expectMemoryExceededForLinesOver=100000;
-  	if (quicktest) {
-  		numTests=2; 
-  		minOptLevel=-1;
-  		maxOptLevel=1;
-  		showProgress=false;
-  	} else {
-  		showProgress=true;
-  	}
-  	for (int optimizationLevel=minOptLevel;optimizationLevel<=maxOptLevel;optimizationLevel++) {
-    	HttpUnitOptions.setJavaScriptOptimizationLevel(optimizationLevel);
-  		// allow for different number of lines
-	  	for (int i=1;i<numTests;i++) {  		
-	  		int fromj=1;
-	  		int toj  =linesToTest[i]+1;
-	  		int lines=toj-fromj;
-	  		String testDesc="test "+i+" for "+lines+" Lines ("+fromj+"-"+toj+") at optlevel "+optimizationLevel;
-	  		if (showProgress)
-	  			System.out.println(testDesc);
-	  		int midj =(fromj+toj)/2;
-	    	WebConversation wc=null;
-	    	StringBuffer prepareScript=new StringBuffer();
-	    	try {
-	    		// prepare code lines like
-	    		// var1000=1000+1;
-	    		// with the var<j>=<j>+1;\n pattern ...
-	    		// should be fun for the optimizer to remove all that unused code :-)
-	    		// we'll only use one variable later ...
-		  		for (int j=fromj;j<toj;j++) {
-		  			prepareScript.append("var");
-		  			prepareScript.append(j);
-		  			prepareScript.append("=");
-		  			prepareScript.append(j);
-		  			prepareScript.append("+1;\n");
-		  		}
-		    	prepareScript.append("alert(var"+midj+");");
-		    	// off we go ... see what happens ...
-	    		wc=  	this.doTestJavaScript(prepareScript.toString());
-	    	} catch (RuntimeException re) {
-	    		// currently we get:
-	    		// alert(var25500);}' failed: java.lang.IllegalArgumentException: out of range index
-	    		// for 50000 lines and opt level 0	   
-	    		if ((optimizationLevel>=0) && (lines>=50000)) {
-	    			this.warnDisabled("testLargeJavaScript","C",2,"fails with runtime Exception for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
-	    		} else {
-	    			throw re;
-	    		}
-	    	} catch (java.lang.OutOfMemoryError ome) {
-	    		if (lines>=expectMemoryExceededForLinesOver) {
-	    			this.warnDisabled("testLargeJavaScript","C",3,"fails with out of memory error for "+lines+" lines at optimizationLevel "+optimizationLevel+" we expect this for more than "+expectMemoryExceededForLinesOver+" lines");
-	    			break;
-	    		} else {
-	    			throw ome;
-	    		}
-	    	} catch (java.lang.ClassFormatError cfe) {
-	    		// java.lang.ClassFormatError: Invalid method Code length 223990 in class file org/mozilla/javascript/gen/c1
-	    		if (optimizationLevel>=0)
-	    			this.warnDisabled("testLargeJavaScript","C",2,"fails with class format error for "+lines+" lines at optimizationLevel "+optimizationLevel+" the default is level -1 so we only warn");
-	    		else
-	    			throw cfe;	    	
-	    	} // try
-	    	
-	    	if (wc!=null) {
-		    	String expected=""+(midj+1);
-		    	expected=expected.trim();
-		    	// if we get here the big javascript was actually executed
-		    	// e.g. interpreted and compiled and the alert message at it's end 
-		    	// was fired to show the content of a variable in the far middle of the script
-		    	assertEquals(testDesc, expected, wc.popNextAlert() );
-	    	}	
-	  	} // for
-	  	HttpUnitOptions.reset();
-  	}	// for optimizationLevel
-  }
-  /**
-   * bug report [ 1286018 ] EcmaError in seemingly valid function
-   * by Stephane Mikaty
-   * @throws Exception
-   */
-  public void testArgumentsProperty() throws Exception {  
-   	if (HttpUnitOptions.DEFAULT_SCRIPT_ENGINE_FACTORY.equals(HttpUnitOptions.ORIGINAL_SCRIPTING_ENGINE_FACTORY)) {
-  		warnDisabled("testArgumentsProperty","B",3,"not fixed for old javascript engine");
-  		return;
-  	}	  	 
- 		new ScriptingTestHelper("../html/testArgumentsProperty.html").run();
-  }                                                                                                    
-	                                                                                                     
-	/**                                                                                                  
-	 * Helper class to define a whole scripting test in a single html file.                              
-	 * This avoids the need to create a large Java escaped string, which                                 
-	 * obfuscates the purpose of the test.                                                               
-	 *                                                                                                   
-	 * The test if given the name of an HTML resource at construction time.                              
-	 * The resource is expected to be in the same package as {@link ScriptingTest}.                      
-	 * Inside the HTML resource, two div elements are required:                                          
-	 * <ol>                                                                                              
-	 * <li>a div with id "expected"                                                                      
-	 * <li>a div with id "actual"                                                                        
-	 * <ol>                                                                                              
-	 * The test is expected to have run by the time the document is loaded, and                          
-	 * passes if the actual div and the expected div have the same content.                              
-	 *                                                                                                   
-	 * The simplest to achieve this is to ensure that the HTML resource contains                         
-	 * an onload instruction that exercises the functionality under test.                                
-	 */                                                                                                  
-	public class ScriptingTestHelper extends Assert {                                                    
-		                                                                                                    
-		/**                                                                                                 
-		 * Name of the HTML resource containing the test in this package.                                   
-		 */                                                                                                 
-		private final String htmlResource;                                                                  
-		                  
-		/**
-		 * constructor for this helper test
-		 * @param anHtmlResource
-		 */
-		ScriptingTestHelper(String anHtmlResource) {                                                        
-			this.htmlResource = anHtmlResource;                                                               
-		}                                                                                                   
-		   
-		/**
-		 * run this Assertion
-		 * @throws Exception
-		 */
-		void run() throws Exception {                                                                       
-			URL url = getClass().getResource(htmlResource);                                                   
-			URLConnection conn = url.openConnection();                                                        
-			String contentType = conn.getContentType();  		                                                  
-			byte[] data = new byte[conn.getContentLength()];                                                  
-			conn.getInputStream().read(data);                                                                 
-			defineResource( "OnCommand.html", data, contentType );                                              
-			WebConversation wc = new WebConversation();                                                         
-			WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );  
-			Document doc=response.getDOM();
-			Node expected=doc.getElementById("expected").getFirstChild();
-			Node actual  =doc.getElementById("actual").getFirstChild();
-			assertNotNull("node expected should not be null",expected);
-			assertNotNull("node actual should not be null",actual);
-			String expectedText = expected.getNodeValue();  
-			String actualText   = actual.getNodeValue();      
-			assertEquals(expectedText, actualText);                                                             
-		}                                                                                                   
-	                                                                                                     
-	}                                                                                                    
-  	                                                                                                     
-
 }

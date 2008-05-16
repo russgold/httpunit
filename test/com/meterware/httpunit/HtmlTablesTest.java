@@ -19,9 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.servletunit.ServletRunner;
-import com.meterware.servletunit.FormTableTest.FormTableServlet;
-
 import junit.framework.TestSuite;
 
 
@@ -261,19 +258,13 @@ public class HtmlTablesTest extends HttpUnitTest {
       "</head>\n<body>\n"+
       "<FORM METHOD=\"POST\" ACTION=\"/some/action\">\n"+
       "<TABLE>\n"+
-      "<TR><TD colspan=\"4\">Test Form:</TD></TR>\n\n"+
-      "<TR>\n"+
-      "<TD>*Contact Name:</TD>\n"+
-      "<TD>"+
-      "<input type=\"text\" size=\"21\" " +
-               "name=\"CONTACT_NAME\" value=\"TIMOTHY O'LEARY\">"+
-      "</TD>\n"+
-      "<TD>Building Number:</TD>\n"+
-      "<TD>"+
-      "<input type=\"text\" size=\"7\" " +
-               "name=\"BUILDING_NUMBER\" value=\"355\">"+
-      "</TD>\n"+
-      "</TR>\n"+
+      "   <TR><TD colspan=\"4\">Test Form:</TD></TR>\n\n"+
+      "   <TR>\n"+
+      "       <TD>*Contact Name:</TD>\n"+
+      "       <TD><input type=\"text\" size=\"21\" name=\"CONTACT_NAME\" value=\"TIMOTHY O'LEARY\"></TD>\n"+
+      "       <TD>Building Number:</TD>\n"+
+      "       <TD><input type=\"text\" size=\"7\" name=\"BUILDING_NUMBER\" value=\"355\"></TD>\n"+
+      "   </TR>\n"+
       "</TABLE>\n"+
       "</FORM>";
 
@@ -282,13 +273,13 @@ public class HtmlTablesTest extends HttpUnitTest {
      * by AutoTest
      */
     public void testColumnNumberInTable() throws Exception {
-      defineWebPage( "Default",htmlForBug1043368);
-      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
-      WebTable table = page.getTables()[0];
-      assertNotNull( "didn't find table", table );
-      // System.out.println( table.toString() );        
-      assertFalse( "wrong table",table.getCellAsText( 1, 0 ).indexOf("Contact Name") == -1 );
-      assertEquals( "wrong column count", 4, table.getColumnCount());        
+        defineWebPage( "Default", htmlForBug1043368 );
+        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebTable table = page.getTableStartingWithPrefix( "Test Form" );
+        assertNotNull( "didn't find table", table );
+        // System.out.println( table.toString() );
+        assertFalse( "wrong table", table.getCellAsText( 1, 0 ).indexOf( "Contact Name" ) == -1 );
+        assertEquals( "wrong column count", 4, table.getColumnCount() );
     }
 
 
@@ -341,6 +332,7 @@ public class HtmlTablesTest extends HttpUnitTest {
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
         WebTable wt = page.getTableStartingWith( "Red" );
         assertNotNull( "Did not find table starting with 'Red'", wt );
+        wt.purgeEmptyCells();
         String[][] cells = wt.asText();
         assertEquals( "Non-blank rows",    2, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
@@ -378,7 +370,9 @@ public class HtmlTablesTest extends HttpUnitTest {
                                   "</table>" );
 
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
-        String[][] cells = page.getTableStartingWith( "Title" ).asText();
+        WebTable table = page.getTableStartingWith( "Title" );
+        table.purgeEmptyCells();
+        String[][] cells = table.asText();
         assertEquals( "Non-blank rows",    3, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,1",       "Value", cells[1][1] );
@@ -394,7 +388,9 @@ public class HtmlTablesTest extends HttpUnitTest {
                                   "</table>" );
 
         WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
-        String[][] cells = page.getTableStartingWith( "Title" ).asText();
+        WebTable table = page.getTableStartingWith( "Title" );
+        table.purgeEmptyCells();
+        String[][] cells = table.asText();
         assertEquals( "Non-blank rows",    3, cells.length );
         assertEquals( "Non-blank columns", 2, cells[0].length );
         assertEquals( "cell at 1,1",       "Value", cells[1][1] );

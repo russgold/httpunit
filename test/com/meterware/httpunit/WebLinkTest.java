@@ -72,29 +72,6 @@ public class WebLinkTest extends HttpUnitTest {
     
     
     /**
-     * test for bug report [ 1156972 ] isWebLink doesn't recognize all anchor tags
-     * by fregienj
-     * @throws Exception
-     */
-    public void testFindNonHrefLinks() throws Exception {
-      defineResource( "NonHref.html", "<html><head><title>NonHref Links</title></head><body>\n"+
-      "<a onclick='javascript:followlink()'>I am a clickable link after all</a>\n"+
-      "</body></html>" );
-      WebConversation wc = new WebConversation();
-      WebResponse response=wc.getResponse( getHostPath() + "/NonHref.html" );
-      WebLink[] links = response.getLinks();
-      // TODO implement and test this
-      // WebLink[] links = response.getAnchors();
-      assertNotNull( links );
-      boolean decided=true;
-      if (decided) {
-      	assertEquals( 0, links.length );
-      } else {
-        this.warnDisabled("testFindNonHrefLinks()","C",2,"pending decision for bug report [ 1156972 ] -> does an <a> node to have href to be considered a link?");
-      }
-    }
-    
-    /**
      * test for Bug report 1908117 by firebird74
      * http://www.w3.org/Addressing/URL/url-spec.html
 		 * says
@@ -156,25 +133,6 @@ public class WebLinkTest extends HttpUnitTest {
         WebRequest request = link.getRequest();
         assertTrue( "Should be a get request", request instanceof GetMethodWebRequest );
         assertEquals( getHostPath() + "/other.html", request.getURL().toExternalForm() );
-    }
-
-
-    /**
-     * test a link that has a line break included
-     * @throws Exception
-     */
-    public void testLinkUrlAcrossLineBreaks() throws Exception {
-        WebConversation wc = new WebConversation();
-        defineWebPage( "Initial", "<a id='midbreak' href='http://loc\nalhost/somewhere'</a>" +
-                                  "<a id='endbreak' href='http://localhost/somewhere\n'</a>" );
-
-        WebResponse response = wc.getResponse( getHostPath() + "/Initial.html" );
-        String endbreak=response.getLinkWithID( "endbreak" ).getRequest().getURL().toExternalForm() ;
-        assertEquals( "URL with break at end", endbreak,"http://localhost/somewhere");
-        //System.err.println("endbreak='"+endbreak+"'");
-        String midbreak=response.getLinkWithID( "midbreak" ).getRequest().getURL().toExternalForm() ;
-        //System.err.println("midbreak='"+midbreak+"'");
-        assertEquals( "URL across linebreak", midbreak,"http://loc\nalhost/somewhere");
     }
 
 

@@ -592,39 +592,8 @@ public class FormParametersTest extends HttpUnitTest {
    	  String paramValue=form.getParameterValue("submitButton");
    	  assertTrue("the parameter value should be buttonLabel",paramValue.equals("buttonLabel"));
     }
+
     
-    /**
-     * test for bug report [ 1393144 ] URL args in form action are sent for GET forms
-     * by Nathan Jakubiak
-     */
-    public void testParamReplacement() throws Exception {
-    	String expected="/cgi-bin/bar?foo=a";
-    	String nogood  ="/cgi-bin/bar?arg=replaced&foo=a";
-      defineResource( nogood  , "not good"  );    	
-      defineResource( expected, "excellent" );    	
-    	String html=
-    	"<FORM NAME=Bethsheba METHOD=GET ACTION=/cgi-bin/bar?arg=replaced>"+
-    	"<INPUT TYPE=TEXT NAME=foo>"+
-    	"<INPUT TYPE=SUBMIT>"+
-    	"</FORM>"+
-    	"<br>"+
-    	"<!--JavaScript submit:"+
-    	"<a	href=\"javascript:document.Bethsheba.submit()\">go</a>"+
-    	"-->";
-    	 defineWebPage( "test", html);
-    	 WebResponse resp= _wc.getResponse( getHostPath() + "/test.html" );    
-    	 WebForm form = resp.getFormWithName("Bethsheba");
-    	 form.setParameter("foo", "a");
-    	 resp = form.submit();
-    	 String foundURL=resp.getURL().toString();
-    	 boolean disabled=true;
-    	 if (disabled) {
-    		 this.warnDisabled("testParamReplacement","A",2, "bug 1393144 pending - waiting for patch");
-    	 } else {	 
-    		 // System.out.println("url: " + foundURL);
-    		 assertTrue(foundURL.equals(expected));
-    	 }	 
-    }
     /**
      * test for bug report
      * [ 1510582 ] setParameter fails with <input type="file">
