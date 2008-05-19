@@ -24,7 +24,7 @@
 <!--  ======================================================================= -->
 <!--  httpunit build file                                                     -->
 <!--  ======================================================================= -->
-<project name="httpunit" default="jar" basedir=".">
+<project name="httpunit" default="jar" basedir="." xmlns:artifact="urn:maven-artifact-ant">
     <property name="name" value="httpunit" />
     <property name="Name" value="HttpUnit" />
     <property name="version" value="development" />
@@ -92,25 +92,18 @@
         </path>
     </target>
 
-		<!-- use ant-dependencies special ant-task to optionally download missing parts from maven repository -->
+		<!-- use maven ant-task to optionally download missing parts from maven repository -->
     <target name="prepare_repository_classpath" depends="check_jars_dir" unless="have.local.jars">
         <echo message="using repository classpath"/>
-    	  <!-- Russell's proxy -->
-        <setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80"/>
-        <typedef classpath="${jars.dir}/ant-dependencies.jar" resource="dependencies.properties" />
-        <dependencies pathId="base.classpath" fileSetId="distributed.jars">
-        	  <!-- get from http://www.ibiblio.org/maven/rhino/jars/ -->
-            <dependency group="rhino"      artifact="js" version="1.6R5" website="http://www.mozilla.org/rhino/download.html"  />
-	      	  <!-- older version
-	          < dependency group="rhino"      artifact="rhino" version="1.5R4.1" website="http://www.mozilla.org/rhino/download.html"  />
-	          -->
-            <dependency group="junit"      version="3.8.1" />
-            <dependency group="nekohtml"   version="0.9.5" unless="use.jtidy"/>
-            <dependency group="servletapi" version="2.4" />
-            <dependency group="jtidy"      version="4aug2000r7-dev"/>
-            <dependency group="xerces"     version="2.6.1" artifact="xercesImpl"/>
-            <dependency group="xerces"     version="2.6.1" artifact="xmlParserAPIs"/>
-        </dependencies>
+
+        <typedef classpath="${jars.dir}/maven-ant-tasks-2.0.9.jar" resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" />
+        <artifact:dependencies pathId="base.classpath" fileSetId="distributed.jars">
+            <dependency groupId="rhino"         artifactId="js"            version="1.6R5"  />
+            <dependency groupId="junit"         artifactId="junit"         version="3.8.1" />
+            <dependency groupId="nekohtml"      artifactId="nekohtml"      version="0.9.5"/>
+            <dependency groupId="javax.servlet" artifactId="servlet-api"   version="2.4" />
+            <dependency groupId="jtidy"         artifactId="jtidy"         version="4aug2000r7-dev"/>
+        </artifact:dependencies>
     </target>
 
 <target name="prepare" depends="prepare_local_classpath,prepare_repository_classpath">
