@@ -96,7 +96,7 @@
     <target name="prepare_repository_classpath" depends="check_jars_dir" unless="have.local.jars">
         <echo message="using repository classpath"/>
     	  <!-- Russell's proxy -->
-        <!--<setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80"/>-->
+        <setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80"/>
         <typedef classpath="${jars.dir}/ant-dependencies.jar" resource="dependencies.properties" />
         <dependencies pathId="base.classpath" fileSetId="distributed.jars">
         	  <!-- get from http://www.ibiblio.org/maven/rhino/jars/ -->
@@ -122,7 +122,7 @@
 <!-- =================================================================== -->
 <!-- Check to see what optional dependencies are available               -->
 <!-- =================================================================== -->
-<target name="check_for_optional_packages">
+<target name="check_for_optional_packages" depends="prepare">
     <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet"
                                            classpathref="base.classpath" />
     <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"
@@ -137,15 +137,16 @@
                                            classpathref="base.classpath" />
     <available property="junit.present"    classname="junit.framework.Test"
                                            classpathref="base.classpath" />
-    <available property="dom3.present"     classname="org.w3c.dom.TypeInfo"
-                                           classpathref="base.classpath" />
+    <condition property="dom3.absent">
+        <contains string="${java.version}" substring="1.4"/>
+    </condition>
 </target>
 
 
 <!--  ===================================================================  -->
 <!--  Compiles the source code                                             -->
 <!--  ===================================================================  -->
-<target name="compile-for-java2" depends="prepare,check_for_optional_packages" unless="dom3.present">
+<target name="compile-for-java2" depends="prepare,check_for_optional_packages" if="dom3.absent">
     <mkdir dir="${build.classes}" />
     <javac srcdir="src-1.4" destdir="${build.classes}"/>
 </target>
