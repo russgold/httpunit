@@ -97,12 +97,9 @@
         <echo message="using repository classpath"/>
 
         <typedef classpath="${jars.dir}/maven-ant-tasks-2.0.9.jar" resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" />
+        <artifact:pom file="pom.xml" id="maven.project"/>
         <artifact:dependencies pathId="base.classpath" fileSetId="distributed.jars">
-            <dependency groupId="rhino"         artifactId="js"            version="1.6R5"  />
-            <dependency groupId="junit"         artifactId="junit"         version="3.8.1" />
-            <dependency groupId="nekohtml"      artifactId="nekohtml"      version="0.9.5"/>
-            <dependency groupId="javax.servlet" artifactId="servlet-api"   version="2.4" />
-            <dependency groupId="jtidy"         artifactId="jtidy"         version="4aug2000r7-dev"/>
+            <pom refid="maven.project"/>
         </artifact:dependencies>
     </target>
 
