@@ -1,25 +1,26 @@
 <?xml version="1.0" ?>
-<!--
- * http://sourceforge.net/projects/httpunit/
- * Copyright (c) 2002-2008 Russell Gold
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
- * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
- * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions
- * of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
- * THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
-	$Header$
-	$Id$                                    
-  $Log$
--->
+<!-- ****************************************************************************************************************
+*
+* $Id$
+*
+* http://httpunit.org/
+* Copyright (c) 2002-2008 Russell Gold
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+* documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+* the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+* to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions
+* of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+* THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+* CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+*
+**************************************************************************************************************** -->
 
 <!--  ======================================================================= -->
 <!--  httpunit build file                                                     -->
@@ -58,17 +59,6 @@
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
     <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />
 
-<!-- =================================================================== -->
-<!-- Defines the classpath used for testing.                             -->
-<!-- =================================================================== -->
-<path id="test.classpath">
-    <fileset dir="${jars.dir}">
-        <include name="activation.jar"/>
-        <include name="mailapi.jar" />
-    </fileset>
-</path>
-
-
 <!--  ===================================================================  -->
 <!--  Prepares the build directory                                         -->
 <!--  ===================================================================  -->
@@ -97,9 +87,8 @@
         <echo message="using repository classpath"/>
 
         <typedef classpath="${jars.dir}/maven-ant-tasks-2.0.9.jar" resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" />
-        <artifact:pom file="pom.xml" id="maven.project"/>
         <artifact:dependencies pathId="base.classpath" fileSetId="distributed.jars">
-            <pom refid="maven.project"/>
+            <pom file="pom.xml"/>
         </artifact:dependencies>
     </target>
 
@@ -116,7 +105,7 @@
     <available property="jsdk.present"     classname="javax.servlet.http.HttpServlet"
                                            classpathref="base.classpath" />
     <available property="javamail.present" classname="javax.mail.internet.MimeMultipart"
-                                           classpathref="test.classpath" />
+                                           classpathref="base.classpath" />
     <available property="jaxp.present"     classname="javax.xml.parsers.DocumentBuilderFactory"
                                            classpathref="base.classpath" />
     <available property="rhino.present"    classname="org.mozilla.javascript.Context"
@@ -195,7 +184,6 @@
            debug="on" deprecation="off" optimize="off">
         <classpath>
             <path refid="base.classpath" />
-            <path refid="test.classpath" />
             <pathelement location="${build.classes}" />
         </classpath>
         <exclude name="**/servletunit/*" unless="jsdk.present" />
@@ -219,7 +207,6 @@
     <java classname="${test.class}" fork="yes" >
          <classpath>
              <path refid="base.classpath" />
-             <path refid="test.classpath" />
              <pathelement location="${build.classes}" />
              <pathelement location="META-INF" />
              <pathelement location="${test.classes}" />

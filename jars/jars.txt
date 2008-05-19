@@ -1,5 +1,0 @@
-Jars used:
-
-(for testing HttpUnit only)
-mail        (javamail 1.2)
-activation  (jaf 1.0.1)
