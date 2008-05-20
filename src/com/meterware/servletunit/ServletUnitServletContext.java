@@ -359,6 +359,13 @@ public class ServletUnitServletContext implements ServletContext {
         return _application.getDisplayName();
     }
 
+//-------------------------------------- servlet-api 2.5 additions -----------------------------------------------
+
+    public String getContextPath() {
+        return null;
+    }
+
+
 //------------------------------------------- package members ----------------------------------------------------
 
 

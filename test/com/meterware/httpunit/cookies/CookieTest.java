@@ -172,36 +172,37 @@ public class CookieTest extends TestCase {
      * test cookie age and expiration handling
      * see also Friday Fun: I Hate Cookies 
      * http://www.mnot.net/blog/2006/10/27/cookie_fun
-     * @throws Exception
+     * @throws Exception when an unexpected error occurs
      */
     public void testCookieAge() throws Exception {
-      String ages[]= {"max-age=5000",
-      								"Max-Age=3000",
-      		            "expires=Tue, 29-Mar-2005 19:30:42 GMT; Max-Age=2592000",
-      		            "Max-Age=2592000;expires=Tue, 29-Mar-2005 19:30:42 GMT",
-      		            "expires=Tue, 29-Mar-2005 19:30:42 GMT",
-      		            "Expires=Wednesday, 01-Jan-1970 0:0:00 GMT"
-                     };
-      long expectedMilliSeconds[]={System.currentTimeMillis()+5000*1000,
-      		                         System.currentTimeMillis()+3000*1000,
-      		                         1112124642000l,    		                         
-      		                         1112124642000l, 
-      		                         1112124642000l,
-      		                         0};
-     	for (int i=0;i<ages.length;i++) {
-     		String index=""+i;
-     		String cookieName="cookie"+index.trim();
-     		String header=cookieName+"=cookievalue;"+ages[i];
-     		TestSource source=new TestSource(new URL("http://www.somedomain.com/somepath/"),header);
-       	CookieJar jar = new CookieJar(source);
-      	Cookie cookie=jar.getCookie(cookieName);
-      	assertTrue(cookieName+" not null",cookie!=null);
-      	if (cookie!=null) {
-      		long expiredTime=cookie.getExpiredTime();
-      		assertEquals(cookieName+" expiration",expiredTime,expectedMilliSeconds[i]);
-      	}	
-     	}	
+        String ages[] = {"max-age=5000",
+                         "Max-Age=3000",
+                         "expires=Tue, 29-Mar-2005 19:30:42 GMT; Max-Age=2592000",
+                         "Max-Age=2592000;expires=Tue, 29-Mar-2005 19:30:42 GMT",
+                         "expires=Tue, 29-Mar-2005 19:30:42 GMT",
+                         "Expires=Wednesday, 01-Jan-1970 0:0:00 GMT"
+                         };
+        long expectedMilliSeconds[] = {System.currentTimeMillis() + 5000 * 1000,
+                                       System.currentTimeMillis() + 3000 * 1000,
+                                       1112124642000l,
+                                       1112124642000l,
+                                       1112124642000l,
+                                       0};
+
+        for (int i = 0; i < ages.length; i++) {
+            String index = "" + i;
+            String cookieName = "cookie" + index.trim();
+            String header = cookieName + "=cookievalue;" + ages[i];
+            TestSource source = new TestSource( new URL( "http://www.somedomain.com/somepath/" ), header );
+            CookieJar jar = new CookieJar( source );
+            Cookie cookie = jar.getCookie( cookieName );
+            assertNotNull( cookieName + " not null", cookie );
+
+            long expiredTime = cookie.getExpiredTime();
+            assertEquals( cookieName + " expiration", expiredTime, expectedMilliSeconds[i] );
+        }
     }
+
 
     public void testHeaderGeneration() throws Exception {
         CookieJar jar = new CookieJar();

@@ -44,14 +44,16 @@ public class Cookie {
     private String _domain;
     
     private long _expiredTime;
-    
-		/**
-		 * @return the _expiredTime in milliseconds
-		 */
-		public long getExpiredTime() {
-			return _expiredTime;
-		}
-    
+
+
+    /**
+     * @return the _expiredTime in milliseconds
+     */
+    public long getExpiredTime() {
+        return _expiredTime;
+    }
+
+
     /**
      * DateFormat to be used to format original Netscape cookies
      */
