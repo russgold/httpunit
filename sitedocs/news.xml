@@ -1,6 +1,6 @@
 <?xml version='1.0' ?>
 <news>
-    <item date="20-May-2008">HttpUnit 1.7 released</item>
+    <item date="20-May-2008" url="doc/release_notes.html">HttpUnit 1.7 released</item>
     <item date="02-Apr-2008">Open Tracker items patches/bug incorporated</item>
     <item date="26-Nov-2006">Switched to subversion repository</item>
     <item date="27-Mar-2006">HttpUnit 1.6.2 released</item>

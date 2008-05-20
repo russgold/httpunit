@@ -274,12 +274,7 @@ public class WebRequestSource extends ParameterHolder implements HTMLElement {
     	return this.getScriptingHandler().doEventScript(eventScript);
     }
     
-    /**
-     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
-     * execute the script if it's assigned by calling doEvent for the script
-     * @param eventName
-     * @return whether the event with the given name was handled
-     */
+
     public boolean handleEvent(String eventName) {
     	return this.getScriptingHandler().handleEvent(eventName);
     }

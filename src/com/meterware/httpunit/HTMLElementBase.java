@@ -84,19 +84,12 @@ class HTMLElementBase implements HTMLElement {
     
     /**
      * optional do the event if it's defined
-     * @param eventScript
-     * @return true if the event script was run
      */
     public boolean doEventScript(String eventScript) {
     	return this.getScriptingHandler().doEventScript(eventScript);
     }
     
-    /**
-     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
-     * execute the script if it's assigned by calling doEvent for the script
-     * @param eventName
-     * @return whether the event was handled
-     */
+
     public boolean handleEvent(String eventName) {
     	return this.getScriptingHandler().handleEvent(eventName);
     }

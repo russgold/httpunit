@@ -86,23 +86,17 @@ class HTMLElementScriptable extends ScriptableDelegate implements DocumentElemen
     	_element.removeAttribute( attributeName );
     }    
     
-    /**
-     * get the event Handler script for the event e.g. onchange, onmousedown, onclick, onmouseup
-     * execute the script if it's assigned by calling doEvent for the script
-     * @param eventName
-     * @return whether the event with the givne name was handled
-     */
     public boolean handleEvent(String eventName) {
-    	// check whether onclick is activated
-    	if (eventName.toLowerCase().equals("onclick")) {
-    		handleEvent("onmousedown");
-    	}
-      String eventScript = getAttribute( eventName );
-      boolean result=doEventScript(eventScript);
-      if (eventName.toLowerCase().equals("onclick")) {
-    		handleEvent("onmouseup");
-    	}
-      return result;
+        // check whether onclick is activated
+        if (eventName.toLowerCase().equals( "onclick" )) {
+            handleEvent( "onmousedown" );
+        }
+        String eventScript = getAttribute( eventName );
+        boolean result = doEventScript( eventScript );
+        if (eventName.toLowerCase().equals( "onclick" )) {
+            handleEvent( "onmouseup" );
+        }
+        return result;
     }
 
     /**
