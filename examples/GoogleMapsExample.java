@@ -204,7 +204,7 @@ public class GoogleMapsExample {
     // create the conversation object which will maintain state for us
     WebConversation wc = new WebConversation();
 
-    // Obtain the main page on the meterware web site
+    // Obtain the main page on the google maps web site
     WebRequest request = new GetMethodWebRequest(url);
     request.setParameter("output", "html");
     WebResponse response = wc.getResponse( request );
