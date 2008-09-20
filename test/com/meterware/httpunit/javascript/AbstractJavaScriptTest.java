@@ -9,9 +9,11 @@ import com.meterware.httpunit.WebResponse;
  * User: russgold
  * Date: May 16, 2008
  * Time: 3:20:40 PM
- * To change this template use File | Settings | File Templates.
+ * abstract base class for JavaScript tests of the httpunit framework
+ * supplies doTestJavaScript as a default operation for starting tests
  */
-public class AbstractJavaScriptTest extends HttpUnitTest {// set to true to get the static HTML Code on System.err
+public abstract class AbstractJavaScriptTest extends HttpUnitTest {
+// set to true to get the static HTML Code on System.err
 public static boolean debugHTML=false;
 
 
