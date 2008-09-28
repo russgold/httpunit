@@ -104,7 +104,7 @@ public class WebForm extends WebRequestSource {
      **/
     public WebResponse submit( SubmitButton button, int x, int y ) throws IOException, SAXException {
     	WebResponse result=null;
-      if (button==null || button.doOnClickSequence(x, y)) {
+      if (button==null || !button.doOnClickSequence(x, y)) {
       	result= doFormSubmit( button, x, y );
       } else {
       	result=getCurrentFrameContents();

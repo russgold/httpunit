@@ -60,9 +60,19 @@ public class UploadFileSpec {
     }
 
 
+    /**
+     * get the Inputstream - even if it has been closed previously
+     * @return the inputstream for the current file
+     * @throws IOException
+     */
     public InputStream getInputStream() throws IOException {
         if (_inputStream == null) {
             _inputStream = new FileInputStream( _file );
+        }
+        try {
+        	_inputStream.available();
+        } catch (IOException ex) {
+        	_inputStream = new FileInputStream( _file );
         }
         return _inputStream;
     }
