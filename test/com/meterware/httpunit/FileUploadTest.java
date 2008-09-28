@@ -25,6 +25,7 @@ import com.meterware.httpunit.protocol.UploadFileSpec;
 
 import java.io.*;
 import java.util.StringTokenizer;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.activation.DataSource;
@@ -325,6 +326,37 @@ public class FileUploadTest extends HttpUnitTest {
       File file = createFile( "temp.new" , new byte[] { 1, 2, 3, 4, 0x7f, 0x23 });
       doTestFileContentType(file,"x-application/new","x-application/new:message.name=temp.new&message.lines=1");
     }
+
+    /**
+     * test submitting a file by
+     * Martin Burchell, Aptivate for BR 2034998
+     * @throws Exception
+     */
+    public void testSubmitFile() throws Exception
+    {
+    		defineResource( "ListParams", new MimeEcho() );
+        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +
+                "<Input type=file name=message>" +
+                "</form>" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );
+        WebResponse simplePage = wc.getResponse( request );
+    	
+        WebForm form = simplePage.getForms()[0];
+        assertNotNull(form);
+
+        File file = new File( "temp.txt" );
+        FileWriter fw = new FileWriter( file );
+        PrintWriter pw = new PrintWriter( fw );
+        pw.println( "Not much text" );
+        pw.println( "But two lines" );
+        pw.close();
+		
+        form.setParameter("message",new UploadFileSpec[] { new UploadFileSpec( file )} );
+        form.submit();
+
+        file.delete();
+    }
 }
 
 
@@ -448,4 +480,7 @@ class MimeEcho extends PseudoServlet {
             return value;
         }
     }
+    
 }
+
+ 	  	 
