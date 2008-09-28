@@ -242,7 +242,7 @@ public class WebClient {
 
     /**
      * Sets a username and password for a basic authentication scheme.
-     * @deprecated as of 1.7. Use #setAuthentication for more accurate emulation of browser behavior.
+     * Use #setAuthentication for more accurate emulation of browser behavior.
      **/
     public void setAuthorization( String userName, String password ) {
         _fixedAuthorizationString = "Basic " + Base64.encode( userName + ':' + password );
