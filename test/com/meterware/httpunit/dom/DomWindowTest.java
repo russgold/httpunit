@@ -156,6 +156,7 @@ public class DomWindowTest extends AbstractHTMLElementTest {
         window.setTimeout( 40 );
         window.focus();
         window.moveTo( 10, 20 );
+        window.scrollTo(10,20);
     }
 
 

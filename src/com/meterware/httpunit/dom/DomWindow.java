@@ -155,7 +155,9 @@ public class DomWindow extends AbstractDomComponent implements Scriptable {
 
     public void moveTo( int x, int y ) {
     }
-
+    
+    public void scrollTo( int x, int y ) {
+    }
 
     protected String getDocumentWriteBuffer() {
         return _document.getWriteBuffer().toString();

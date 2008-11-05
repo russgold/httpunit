@@ -273,6 +273,10 @@ public class JavaScript {
     }
 
 
+    /**
+     * Window functions 
+     *
+     */
     static public class Window extends JavaScriptEngine {
 
         private Document     _document;
@@ -384,6 +388,9 @@ public class JavaScript {
 
 
         public void jsFunction_moveTo( int x, int y ) {
+        }
+        
+        public void jsFunction_scrollTo( int x, int y ) {
         }
 
 
