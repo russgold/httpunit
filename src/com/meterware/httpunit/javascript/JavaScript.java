@@ -897,6 +897,10 @@ public class JavaScript {
     }
 
 
+    /**
+     * Form functions 
+     *
+     */
     static public class Form extends HTMLElement {
 
         private ElementArray _controls;
@@ -907,6 +911,15 @@ public class JavaScript {
         
         public String jsGet_name() {
           return getDelegate().getName();
+        }
+        
+        /**
+         * @since FR [ 2163079 ] make form.name property mutable
+         * by Peter De Bruycker 
+         * @param name
+         */
+        public void jsSet_name( String name ) {
+        	getDelegate().set( "name", name );
         }
 
         public String jsGet_action() {

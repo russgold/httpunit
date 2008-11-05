@@ -67,12 +67,37 @@ public class FormScriptingTest extends HttpUnitTest {
                                          "<form id='the_form_with_id'/>" +
                                          "<script type='JavaScript'>" +
                                          "  alert( document.forms[1].name );" +
+                                         "</script>" +
+                                         "<form id='the_form_with_id2' name='the_form_with_name2'/>" +
+                                         "<script type='JavaScript'>" +
+                                         "  alert( document.forms[2].name );" +
                                          "</script>" );
            WebConversation wc = new WebConversation();
             wc.getResponse( getHostPath() + "/OnCommand.html" );
             assertEquals( "Message 1", "the_form_with_name", wc.popNextAlert() );
             assertEquals( "Message 2", "the_form_with_id", wc.popNextAlert() );
+            assertEquals( "Message 3", "the_form_with_name2", wc.popNextAlert() );
     }
+    
+    /**
+  	 * FR [ 2163079 ] make form.name property mutable by Peter De Bruycker
+  	 * 
+  	 * @throws Exception
+  	 */
+  	public void testModifyingFormNameProperty() throws Exception {
+  		WebConversation wc = new WebConversation();
+  		defineWebPage(
+  				"Default",
+  				"<form id = 'the_form' name = 'form_name'/>"
+  						+ "<a href='#' name='doTell' onClick='document.forms[0].name=\"new_form_name\";'>tell</a>"
+  						+ "<a href='#' name='doShow' onClick='alert( document.forms[0].name );'>show</a>");
+  		WebResponse page = wc.getResponse(getHostPath() + "/Default.html");
+  		page.getLinkWithName("doShow").click();
+  		assertEquals("Initial name", "form_name", wc.popNextAlert());
+  		page.getLinkWithName("doTell").click();
+  		page.getLinkWithName("doShow").click();
+  		assertEquals("Current name", "new_form_name", wc.popNextAlert());
+  	}
     
     /**
      * test to access attributes from java script

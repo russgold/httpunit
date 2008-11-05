@@ -19,6 +19,7 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.scripting.IdentifiedDelegate;
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.FormScriptable;
@@ -719,7 +720,12 @@ public class WebForm extends WebRequestSource {
     }
 
 
-    public class Scriptable extends HTMLElementScriptable implements NamedDelegate, FormScriptable {
+    /**
+     * 
+     * Scriptable implementation for the WebForm
+     *
+     */
+    public class Scriptable extends HTMLElementScriptable implements NamedDelegate, IdentifiedDelegate, FormScriptable {
         public String getAction() { return WebForm.this.getAction(); }
         public void setAction( String newAction ) { setDestination( newAction ); _presetParameters = null; }
 
@@ -734,8 +740,20 @@ public class WebForm extends WebRequestSource {
         }
 
 
+        /**
+         * return the name of the WebForm
+         * @return the name
+         */
         public String getName() {
-            return WebForm.this.getID().length() != 0 ? WebForm.this.getID() : WebForm.this.getName();
+        		return WebForm.this.getName().length() != 0 ? WebForm.this.getName() : WebForm.this.getID();
+        }
+        
+        /**
+         * return the id of the WebForm
+         * @return the id
+         */
+        public String getID() {
+        	return WebForm.this.getID();
         }
 
 
@@ -771,6 +789,8 @@ public class WebForm extends WebRequestSource {
               setTargetAttribute( value.toString() );
             } else if (propertyName.equals( "action" )) {
               setAction( value.toString() );
+            } else if (propertyName.equals( "name" )) {
+            	getElement().setAttribute( "name", value.toString() );            
             } else if (value instanceof String) {
                 setParameterValue( propertyName, (String) value );
             } else if (value instanceof Number) {
