@@ -68,10 +68,9 @@ public class WebConversation extends WebClient {
             }
             URLConnection connection = openConnection( getRequestURL( request ) );
             // [ 1518901 ] enable http connect and read timeouts (needs JDK 1.5)
-            // XXX enable for 1.7 release in 2008
-            // comment out if you need this and have JDK 1.5
-            // if (_connectTimeout>=0) connection.setConnectTimeout( _connectTimeout );
-            // if (_readTimeout>=0)    connection.setReadTimeout( _readTimeout );            
+            // comment the next two line if you do not need this and have JDK <1.5
+            if (_connectTimeout>=0) connection.setConnectTimeout( _connectTimeout );
+            if (_readTimeout>=0)    connection.setReadTimeout( _readTimeout );            
             if (HttpUnitOptions.isLoggingHttpHeaders()) {
                 String urlString = request.getURLString();
                 System.out.println( "\nConnecting to " + request.getURL().getHost() );
