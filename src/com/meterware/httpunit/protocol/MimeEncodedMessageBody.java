@@ -94,6 +94,12 @@ class MimeEncodedMessageBody extends MessageBody {
         }
 
 
+        /**
+         * add the parameter with the given name value and characterSet
+         * @param name - the name
+         * @param value - the value to set
+         * @param characterSet - the name of the characterSet to use
+         */
         public void addParameter( String name, String value, String characterSet ) throws IOException {
             if (name == null || name.length() == 0) return;
 
