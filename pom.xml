@@ -168,7 +168,28 @@ export MAVEN_OPTS=-Xmx384M
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
 			<scope>test</scope>
+			<!--- Jetty libraries needed for Testing BR [ 2264431 ] form.submit() sends multiple HTTP POSTS
 		</dependency>
+		  <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>6.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty-naming</artifactId>
+      <version>6.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty-plus</artifactId>
+      <version>6.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>6.1.4</version>
+    </dependency> -->		
 	</dependencies>
 
 	<pluginRepositories>
