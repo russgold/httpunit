@@ -17,5 +17,11 @@
 	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/activation/activation/1.1/activation-1.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry kind="lib" path="jars/maven-ant-tasks-2.0.9.jar"/>
+	<!-- Libaries needed to test [ 2264431 ] form.submit() sends multiple HTTP POSTS
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/org/mortbay/jetty/jetty/6.1.4/jetty-6.1.4.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/org/mortbay/jetty/jetty-naming/6.1.4/jetty-naming-6.1.4.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/org/mortbay/jetty/jetty-plus/6.1.4/jetty-plus-6.1.4.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY/org/mortbay/jetty/jetty-util/6.1.4/jetty-util-6.1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
+	-->
 </classpath>
