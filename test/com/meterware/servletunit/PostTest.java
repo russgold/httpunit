@@ -1,7 +1,7 @@
 package com.meterware.servletunit;
 
 /********************************************************************************************************************
- * $Id: StatefulTest.java 665 2004-09-09 00:16:40Z russgold $
+ * $Id$
  *
  * Copyright (c) 2008, Russell Gold
  *
