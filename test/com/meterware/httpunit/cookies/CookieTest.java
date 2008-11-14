@@ -254,6 +254,18 @@ public class CookieTest extends TestCase {
     }
     
     /**
+     *  test for bug report [ 2076028 ] Cookies are handeled incorrectly
+     */
+    public void testHttpOnlyCookiePath() throws Exception {
+      CookieJar jar = new CookieJar(
+              new TestSource( new URL( "http://www.meterware.com" ),
+                              new String[] { "myStuff=1234; path=/; HttpOnly"} ) );
+      Cookie cookie=jar.getCookie("myStuff");
+      String expected="/";
+      assertEquals("The cookie should have the path '"+expected+"' but has "+cookie.getPath(),cookie.getPath(),expected);
+    }
+    
+    /**
      * test for bug report [ 1533762 ] Valid cookies are rejected
      * by Alexey Bulat 
      * TODO enable when working patch is available

@@ -375,6 +375,7 @@ public class CookieJar {
      */
     class CookiePress {
 
+    	  // the current value
         private StringBuffer _value = new StringBuffer();
         private HashMap _attributes = new HashMap();
         private URL     _sourceURL;
@@ -389,12 +390,20 @@ public class CookieJar {
         }
 
 
+        /**
+         * clear the attributes and the cookie value
+         */
         void clear() {
             _value.setLength(0);
             _attributes.clear();
         }
 
 
+        /**
+         * add the token content
+         * @param token
+         * @param lastChar
+         */
         void addToken( String token, char lastChar ) {
             _value.insert( 0, token );
             if (lastChar != '=') _value.insert( 0, ',' );
@@ -408,13 +417,14 @@ public class CookieJar {
          * @param equalsIndex - the position of the equal sign
          */
         void addTokenWithEqualsSign( CookieRecipe recipe, String token, int equalsIndex ) {
-            String name = token.substring( 0, equalsIndex  ).trim();
-            String value= token.substring( equalsIndex + 1 ).trim();
+            final String name = token.substring( 0, equalsIndex  ).trim();
+            final String value= token.substring( equalsIndex + 1 ).trim();
             _value.insert( 0, value );
+            final String fvalue=_value.toString();
             if (recipe.isCookieAttribute( name.toLowerCase() )) {
-                _attributes.put( name.toLowerCase(), _value.toString() );
+                _attributes.put( name.toLowerCase(), value );
             } else {
-                addCookieIfValid( new Cookie( name, _value.toString(), _attributes ) );
+                addCookieIfValid( new Cookie( name, fvalue, _attributes ) );
                 _attributes.clear();
             }
             _value.setLength(0);
