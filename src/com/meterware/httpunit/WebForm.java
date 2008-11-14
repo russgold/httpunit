@@ -50,8 +50,6 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
 public class WebForm extends WebRequestSource {
-    private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
-
     private final static String[] NO_VALUES = new String[0];
 
     private Button[] _buttons;
@@ -631,7 +629,7 @@ public class WebForm extends WebRequestSource {
      */
     public void setParameter( String name, final String[] values ) {
         FormParameter parameter = getParameter( name );        
-        if (parameter == UNKNOWN_PARAMETER) throw new NoSuchParameterException( name );
+        if (parameter.isUnknown()) throw new NoSuchParameterException( name );
         if (parameter.isFileParameter()) {
         	throw new InvalidFileParameterException(name,values);
         }        	
@@ -771,7 +769,7 @@ public class WebForm extends WebRequestSource {
                 return new Integer(getFormControls().length);
             } else {
                 final FormParameter parameter = getParameter( propertyName );
-                if (parameter != UNKNOWN_PARAMETER) return parameter.getScriptableObject();
+                if (!parameter.isUnknown()) return parameter.getScriptableObject();
                 FormControl control = getControlWithID( propertyName );
                 return control == null ? super.get( propertyName ) : control.getScriptingHandler();
             }
@@ -943,7 +941,7 @@ public class WebForm extends WebRequestSource {
      */
     public FormParameter getParameter( String name ) {
         final FormParameter parameter = ((FormParameter) getFormParameters().get( name ));
-        return parameter != null ? parameter : UNKNOWN_PARAMETER;
+        return parameter != null ? parameter : FormParameter.getUNKNOWN_PARAMETER();
     }
 
 

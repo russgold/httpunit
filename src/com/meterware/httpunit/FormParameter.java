@@ -35,13 +35,32 @@ import java.util.Arrays;
  **/
 public class FormParameter {
 
+  private static final FormParameter UNKNOWN_PARAMETER = new FormParameter();
 
     private FormControl[] _controls;
     private ArrayList _controlList = new ArrayList();
     private RadioGroupFormControl _group;
     private String _name;
 
+		/**
+		 * @return the uNKNOWN_PARAMETER
+		 */
+		public static FormParameter getUNKNOWN_PARAMETER() {
+			return UNKNOWN_PARAMETER;
+		}
 
+		/**
+     * return whether I am the unknown parameter
+     * @return
+     */
+    public boolean isUnknown() {
+    	return this==UNKNOWN_PARAMETER;
+    }
+    
+    /**
+     * add the given form control
+     * @param control
+     */
     void addControl( FormControl control ) {
         _controls = null;
         if (_name == null) _name = control.getName();
@@ -225,30 +244,42 @@ public class FormParameter {
     }
 
 
+    /**
+     * is this a disabled parameter
+     * @return false if one of the controls is not disabled or this is the unknown parameter
+     */
     boolean isDisabledParameter() {
         FormControl[] controls = getControls();
         for (int i = 0; i < controls.length; i++) {
             if (!controls[i].isDisabled()) return false;
         }
-        return true;
+        return (!this.isUnknown());
     }
 
 
+    /**
+     * is this a read only parameter
+     * @return false if one of the controls is not read only or this is the unknown parameter 
+     */
     boolean isReadOnlyParameter() {
         FormControl[] controls = getControls();
         for (int i = 0; i < controls.length; i++) {
             if (!controls[i].isReadOnly()) return false;
         }
-        return true;
+        return (!this.isUnknown());
     }
 
     
+    /**
+     * is this a hidden parameter?
+     * @return false if one of the controls is not hidden or this is the unknown parameter
+     */
     public boolean isHiddenParameter() {
         FormControl[] controls = getControls();
         for (int i = 0; i < controls.length; i++) {
             if (!controls[i].isHidden()) return false;
         }
-        return true;
+        return (!this.isUnknown());
     }
 
 
@@ -368,6 +399,8 @@ public class FormParameter {
         private String   _parameterName;
         private String   _methodName;
     }
+
+
 
 
 
