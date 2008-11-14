@@ -94,6 +94,13 @@ public class MessageBodyRequestTest extends HttpUnitTest {
         byte[] download = getDownload( response );
         assertEquals( "Body response", binaryData, download );
     }
+    
+    /**
+     * test for BR [ 1964665 ] HeaderOnlyRequest cannot be constructed
+     */
+    public void testHeaderOnlyWebRequest() throws Exception  {
+    	HeaderOnlyWebRequest r = new HeaderOnlyWebRequest("http://www.google.com");
+    }
 
 
     private byte[] getDownload( WebResponse response ) throws IOException {
