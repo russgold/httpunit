@@ -199,7 +199,14 @@ public class CookieTest extends TestCase {
             assertNotNull( cookieName + " not null", cookie );
 
             long expiredTime = cookie.getExpiredTime();
-            assertEquals( cookieName + " expiration", expiredTime, expectedMilliSeconds[i] );
+            int grace = 3000;
+            assertTrue( cookieName + " expiration expect on or after" +
+            expectedMilliSeconds[i] + " but was " + expiredTime,
+            expectedMilliSeconds[i] <= expiredTime );
+            assertTrue( cookieName + " expiration expect before " +
+            (expectedMilliSeconds[i] + grace) + " but was " + expiredTime,
+            (expectedMilliSeconds[i]) + grace > expiredTime );
+            //  assertEquals( cookieName + " expiration", expiredTime, expectedMilliSeconds[i] );
         }
     }
 
