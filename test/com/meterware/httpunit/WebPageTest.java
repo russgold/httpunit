@@ -503,6 +503,32 @@ public class WebPageTest extends HttpUnitTest {
         final WebResponse targetResponse = wc.getOpenWindow(targetWindow).getCurrentPage();
         assertEquals("Base URL of link in target document", targetBaseURL, targetResponse.getLinkWith("relative link").getBaseURL());
     }
+    
+    /**
+     * test case for BR [ 2100376 ] Unable to implement an XPath Predicate (which used to work)
+     * by Stephane Mikaty
+     * @throws Exception
+     */
+    public void testGetFirstMatchingForm() throws Exception {
+      defineResource( "SimplePage.html", "<html><title>Hello</title>"
+      + " <body><form action='blah' method='GET'><button type='Submit' value='Blah'>Blah</button></form>"
+      + " <form action='new' method='GET'>"
+      + " <p>Some Junk</p><button type='Submit' value='Save'>Save</button></form>"
+      + "</html>" );
+      defineResource( "new", "<html><body><p>Success.</p></body></html>" );
+      defineResource( "blah", "<html><body><p>Failure.</p></body></html>" );
+
+      WebConversation wc = new WebConversation();
+      WebResponse resp = wc.getResponse( getHostPath() + "/SimplePage.html" );
+
+      //find our desired Save form and submit it
+      WebForm form = resp.getFirstMatchingForm(new XPathPredicate( "//BUTTON[@value='Save']/ancestor::FORM" ),null );
+      assertNotNull("The form found should not be null",form);
+      resp = wc.sendRequest( form.getRequest() );
+
+      //check the response
+      assertTrue( resp.getText().indexOf( "Success" ) >= 0 );
+    }
 
     /**
      * Create a fragment of HTML defining JavaScript that writes a document into a different window.
