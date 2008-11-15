@@ -413,6 +413,10 @@ public class JavaScript {
             return delegate == null ? null : (Window) toScriptable( delegate );
         }
 
+        /** The global "event" object is not supported, so return null (instead of causing '"event" is not defined') */ 
+        public Location jsGet_event() {
+           return null;
+        }
 
         public void clearCaches() {
             if (_document != null) _document.clearCaches();
