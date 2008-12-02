@@ -257,12 +257,44 @@ public class FormSubmitTest extends HttpUnitTest {
         } catch (IllegalStateException e) {}
     }
     
+    /**
+     * test for bug report [2264431] double submit problem
+     * version 1.7 would have problem with double submits 
+     */
+    public void testDoubleSubmitProblem() throws Exception {
+    	boolean states[]={false,true};
+    	String expected[]={"","1"};
+    	for (int i=0;i<states.length;i++) {
+	    	// countMySelf Tipp from http://www.tipstrs.com/tip/1084/Static-variables-in-Javascript
+	    	defineWebPage( "Default", "<form method=GET action = \"Default.html\" onsubmit=\"javascript:countMyself();\">" +
+	          "<script type='JavaScript'>\n" +
+	          "function countMyself() {\n"+
+	          "  // Check to see if the counter has been initialized\n"+
+	          "  if ( typeof countMyself.counter == 'undefined' ) {\n"+
+	          "      // It has not... perform the initilization\n"+
+	          "      countMyself.counter = 0;\n"+
+	          "  }\n"+
+	          "\n"+
+	          "  // Do something stupid to indicate the value\n"+
+	          "  alert(++countMyself.counter);\n"+
+	        	"}\n"+          
+	    	   	"</script>" +    			
+	          "<Input type=submit name='update' onclick='return "+states[i]+";'></form>" +
+	          "</form>" );
+				WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+				WebForm form = page.getForms()[0];
+				form.submit();
+				String alert=_wc.popNextAlert();
+	      assertEquals( "There should be "+expected[i]+" submits for onclick state '"+states[i]+"' but there are "+alert,alert,expected[i]);
+    	} 
+    }
+    
     /** 
      * test self disabling submit Buttons
      * test for bug report [ 1289151 ] Order of events in button.click() is wrong
      */
     public void testSelfDisablingSubmitButton() throws Exception {
-      defineWebPage( "Default", "<form method=GET action = \"Default.html\">" +
+    	defineWebPage( "Default", "<form method=GET action = \"Default.html\">" +
           "<Input type=submit name='update' onclick='javascript:this.disabled=true;'></form>" +
           "</form>" );
 				WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
