@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2002, Russell Gold
+* Copyright (c) 2000-2008, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -55,6 +55,24 @@ public class XMLPageTest extends HttpUnitTest {
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.xml" );
         WebResponse simplePage = wc.getResponse( request );
         simplePage.getDOM();
+    }
+    
+    /**
+     * test case for BR [2373755] by Frank Waldheim
+     * deactivated since it is the opposite of 1281655
+     * @throws Exception
+     */
+    public void xtestXMLisHTML() throws Exception {
+    	String originalXml = "<?xml version=\"1.0\" ?><main><title>See me now</title></main>";
+    	defineResource("SimplePage.xml", originalXml, "text/xml");
+    	WebConversation wc = new WebConversation();
+    	WebRequest request = new GetMethodWebRequest(getHostPath()+"/SimplePage.xml");
+    	WebResponse simplePage = wc.getResponse(request);
+    	// we do not have an html result
+    	assertFalse("xml result is not HTML",simplePage.isHTML());
+    	// get the main element as root
+    	assertNotNull("we do have an root-element",simplePage.getDOM().getDocumentElement()); 
+    	assertEquals("the actual root must be the root of our test-xml",simplePage.getDOM().getDocumentElement().getTagName(),"main");
     }
 
 
