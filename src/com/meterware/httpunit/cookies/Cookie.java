@@ -236,6 +236,12 @@ public class Cookie {
     }
 
 
+    /**
+     * accept path for the given hostpath
+     * @param pathPattern
+     * @param hostPath
+     * @return true - either if PathMatching is not strict or the hostpath starts with the given path pattern
+     */
     private boolean acceptPath( String pathPattern, String hostPath ) {
         return !CookieProperties.isPathMatchingStrict() || hostPath.startsWith( pathPattern );
     }
