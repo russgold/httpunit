@@ -303,6 +303,8 @@ public class CookieTest extends TestCase {
         checkAcceptance( 1, true, "www.some.meterware.com/servlets/special", ".meterware.com", null );
         checkAcceptance( 2, false, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
         checkAcceptance( 3, true, "www.meterware.com/servlets/special", "www.meterware.com", null );
+        // missing leading dot case (yahoo cookies seem to behave like this - seems to be non RFC 2109 compliant ...)
+        checkAcceptance( 4, true, "www.meterware.com/servlets/special", "meterware.com", null );
 
         CookieProperties.setPathMatchingStrict( false );
         checkAcceptance( 11, true, "www.meterware.com/servlets/special", ".meterware.com", "/servlets/ordinary" );
