@@ -330,6 +330,10 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    /**
+     * test on demand Basic Authentication
+     * @throws Exception
+     */
     public void testOnDemandBasicAuthentication() throws Exception {
         defineResource( "getAuthorization", new PseudoServlet() {
             public WebResource getGetResponse() {
