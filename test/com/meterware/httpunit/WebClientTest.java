@@ -384,6 +384,30 @@ public class WebClientTest extends HttpUnitTest {
             assertEquals( "bogusrealm", e.getAuthenticationParameter( "realm" ) );
         }
     }
+    
+    /**
+     * test the Negotiate Header does not spoil authentication
+     * @throws Exception
+     */
+    public void testAuthenticationNegotiateRequest() throws Exception {
+        defineResource( "getAuthorization", new PseudoServlet() {
+            public WebResource getGetResponse() {
+                String header = getHeader( "Authorization" );
+                if (header == null) {
+                    WebResource webResource = new WebResource( "unauthorized" );
+                    webResource.addHeader( "WWW-Authenticate: Negotiate");
+                    return webResource;
+                } else {
+                    return new WebResource( header, "text/plain" );
+                }
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        wc.setAuthentication( "testrealm", "user", "password" );
+        WebResponse wr = wc.getResponse( getHostPath() + "/getAuthorization" );
+        assertEquals( "authorization", "unauthorized", wr.getText() );
+	}
 
 
     public void suspendtestProxyServerAccessWithAuthentication() throws Exception {

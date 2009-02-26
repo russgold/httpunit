@@ -28,15 +28,26 @@ public class HttpHeader {
 
     private String _label;
     private Map    _properties;
+    protected String _headerString;
 
 
+    /**
+     * construct a HttpHeader from the given headerString
+     * @param headerString
+     */
     public HttpHeader( String headerString ) {
         this( headerString, null );
     }
 
 
+    /**
+     * construct a HttpHeader from the given headerString and label
+     * @param headerString
+     * @param defaultLabel
+     */
     public HttpHeader( String headerString, String defaultLabel ) {
         if (headerString != null) {
+        	_headerString=headerString;
             final int index = headerString.indexOf( ' ' );
             if (index < 0) {  // non-conforming header
                 _label      = defaultLabel;

@@ -261,8 +261,20 @@ public class WebClient {
     }
 
 
+    /**
+     * get the credentials for the given realm
+     * @param realm
+     * @return
+     */
     PasswordAuthentication getCredentialsForRealm( String realm ) {
-        return ((PasswordAuthentication) _credentials.get( realm ));
+    	if (_credentials==null) {
+    		throw new Error("null _credentials while calling getCredentialsForRealm");
+    	}
+    	if (realm==null) {
+    		throw new Error("null realm while calling getCredentialsForRealm");
+    	}
+    	PasswordAuthentication result=((PasswordAuthentication) _credentials.get( realm ));
+        return result;
     }
 
     /**

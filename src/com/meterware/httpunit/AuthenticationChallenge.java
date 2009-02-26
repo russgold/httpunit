@@ -23,6 +23,8 @@ import java.net.PasswordAuthentication;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.io.UnsupportedEncodingException;
 
 
@@ -49,18 +51,24 @@ class AuthenticationChallenge extends HttpHeader {
         _request = request;
     }
 
-
+    /**
+     * check whether authentication is needed
+     * @return
+     */
     boolean needToAuthenticate() {
         if (getAuthenticationType() == null) return false;
         if (getCredentialsForRealm() != null) return true;
-        if (!_client.getExceptionsThrownOnErrorStatus()) return false;
-
+        if (!_client.getExceptionsThrownOnErrorStatus()) return false;;
+        
         throw createAuthorizationRequiredException();
     }
 
 
     private String getAuthenticationType() {
-        return getLabel();
+    	String result=getLabel();
+    	if (_headerString!=null && _headerString.equals("Negotiate"))
+    		result=null;
+        return result;
     }
 
 
@@ -82,8 +90,16 @@ class AuthenticationChallenge extends HttpHeader {
     }
 
 
+    /**
+     * get the credentials for the realm property
+     * @return
+     */
     private PasswordAuthentication getCredentialsForRealm() {
-        return _client.getCredentialsForRealm( getProperty( "realm" ) );
+    	String realm=getProperty( "realm" );
+    	PasswordAuthentication result=null;
+    	if (realm!=null)
+    		result=_client.getCredentialsForRealm( realm );
+        return result;
     }
 
     private String getMethod() {
