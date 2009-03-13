@@ -190,8 +190,7 @@ public class CookieTest extends TestCase {
                                        0};
 
         for (int i = 0; i < ages.length; i++) {
-            String index = "" + i;
-            String cookieName = "cookie" + index.trim();
+            String cookieName = "cookie" + i;
             String header = cookieName + "=cookievalue;" + ages[i];
             TestSource source = new TestSource( new URL( "http://www.somedomain.com/somepath/" ), header );
             CookieJar jar = new CookieJar( source );
@@ -227,6 +226,44 @@ public class CookieTest extends TestCase {
                                              new String[] { "zero", "zero", "first", "second", "fourth", "gone" },
                                              jar.getCookieNames() );
     }
+    
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testDrupalCookieInteraction() throws Exception {
+      CookieJar jar = new CookieJar();
+      jar.putSingleUseCookie("SESS1234","1234",".drupalsite.org","/");
+      Cookie cookie=jar.getCookie("SESS1234");
+      assertTrue(cookie!=null);
+      assertEquals(cookie.getDomain(),".drupalsite.org");
+      assertEquals(cookie.getValue(),"1234");
+      assertEquals(cookie.getPath(),"/");
+      assertEquals(1, jar.getCookies().size());
+
+      CookieJar jar1 = new CookieJar();
+      jar1.putSingleUseCookie("SESS1234", "deleted", "www.drupalsite.org","/");
+      jar.updateCookies( jar1 );
+
+      cookie=jar.getCookie("SESS1234");
+      assertTrue(cookie!=null);
+      assertEquals(cookie.getDomain(),"www.drupalsite.org");
+      assertEquals(cookie.getValue(),"deleted");
+      assertEquals(cookie.getPath(),"/");
+      assertEquals(1, jar.getCookies().size());
+
+      CookieJar jar2 = new CookieJar();
+      jar2.putSingleUseCookie("SESS1234", "4321", ".drupalsite.org","/");
+      jar.updateCookies( jar2 );
+
+      cookie=jar.getCookie("SESS1234");
+      assertTrue(cookie!=null);
+      assertEquals(cookie.getDomain(),".drupalsite.org");
+      assertEquals(cookie.getValue(),"4321");
+      assertEquals(cookie.getPath(),"/");
+      assertEquals(1, jar.getCookies().size());
+
+  }
     
     /**
      * test for [ 1488617 ] alternate patch for cookie bug #1371204

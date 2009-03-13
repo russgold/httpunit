@@ -251,15 +251,43 @@ public class CookieJar {
      * Add the cookie to this jar, replacing any previous matching cookie.
      */
     void addUniqueCookie( Cookie cookie ) {
-        _cookies.remove( cookie );
+       _cookies.remove( cookie );
+		   for (Iterator i = _cookies.iterator(); i.hasNext();) {
+					Cookie c = (Cookie) i.next();
+					if (c.getName().equals(cookie.getName())) {
+						if (compareDomain(c.getDomain(), cookie.getDomain())) {
+							if (c.getPath() != null && cookie.getPath() != null
+									&& c.getPath().equals(cookie.getPath())) {
+								i.remove();
+							}
+						}
+					}
+				}      
         _cookies.add( cookie );
     }
 
+    /**
+		 * compare the two domains given for "cookie-equality"
+		 * 
+		 * @param domain
+		 * @param newDomain
+		 * @return
+		 */
+		private boolean compareDomain(String domain, String newDomain) {
+			if (domain.charAt(0) == '.' && newDomain.endsWith(domain)) {
+				return true;
+			}
+			if (newDomain.charAt(0) == '.' && domain.endsWith(newDomain)) {
+				return true;
+			}
+	
+			return domain.equals(newDomain);
+		}
 
     /**
-     * base class for the cookie recipies - there are two different implementations
-     * of this
-     */
+		 * base class for the cookie recipies - there are two different
+		 * implementations of this
+		 */
     abstract class CookieRecipe {
 
         /**
