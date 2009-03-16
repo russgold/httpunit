@@ -159,6 +159,21 @@ public class ScriptingTest extends AbstractJavaScriptTest {
      response.getLinkWith( "go" ).click();
      assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
    }
+   
+   /**
+    * test javascript call to built-in functions
+    * e.g. toLowerCase
+    */
+   public void testJavaScriptWitBuiltInFunctions() throws Exception { 	 
+     defineResource( "OnCommand.html", "<html>" +
+                                          "<body>" +
+                                          "<a href=\"javascript:alert(toLowerCase('Cheese!'))\">go</a>" +
+                                          "</body></html>" );
+     WebConversation wc = new WebConversation();
+     WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+     response.getLinkWith( "go" ).click();
+     assertEquals( "Alert message", "cheese!", wc.popNextAlert() );
+   }
 
    /**
     * test javascript call to an included function

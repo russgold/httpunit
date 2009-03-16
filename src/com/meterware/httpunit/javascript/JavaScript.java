@@ -375,6 +375,14 @@ public class JavaScript {
         public void jsFunction_alert( String message ) {
             getDelegate().alertUser( message );
         }
+        
+        /**
+         * javascript built in function "toLowerCase"
+         * @param s
+         */
+        public String jsFunction_toLowerCase(String s) {
+        	return s.toLowerCase();
+        }
 
 
         public boolean jsFunction_confirm( String message ) {
