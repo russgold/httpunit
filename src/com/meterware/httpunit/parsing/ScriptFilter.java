@@ -19,19 +19,15 @@ package com.meterware.httpunit.parsing;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import java.io.IOException;
-import java.io.StringReader;
 
-import org.apache.xerces.xni.Augmentations;
-import org.apache.xerces.xni.QName;
-import org.apache.xerces.xni.XMLAttributes;
-import org.apache.xerces.xni.XMLLocator;
-import org.apache.xerces.xni.XMLString;
-import org.apache.xerces.xni.XNIException;
+import com.meterware.httpunit.HttpUnitOptions;
+import org.apache.xerces.xni.*;
 import org.apache.xerces.xni.parser.XMLInputSource;
-
 import org.cyberneko.html.HTMLConfiguration;
 import org.cyberneko.html.filters.DefaultFilter;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * A filter to interpret JavaScript script blocks, based on the sample Scripts program provided by NekoHTML.
@@ -97,7 +93,7 @@ class ScriptFilter extends DefaultFilter {
     private boolean isSupportedScript( QName element, XMLAttributes attrs ) {
         if (!element.rawname.equalsIgnoreCase( "script" ) || attrs == null) return false;
         String value = getScriptLanguage( attrs );
-        return _scriptHandler.supportsScriptLanguage( value );
+        return HttpUnitOptions.isScriptingEnabled() && _scriptHandler.supportsScriptLanguage( value );
     }
 
 

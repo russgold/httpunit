@@ -175,7 +175,7 @@ public class WebConversation extends WebClient {
      * @param headers
      */
     private void sendHeaders( URLConnection connection, Dictionary headers ) {
-    		boolean sendReferer = getClientProperties().isSendReferer();
+        boolean sendReferer = getClientProperties().isSendReferer();
         for (Enumeration e = headers.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             if ( sendReferer || !"referer".equalsIgnoreCase( key ) ) {
