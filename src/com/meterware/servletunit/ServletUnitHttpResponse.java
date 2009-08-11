@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 class ServletUnitHttpResponse implements HttpServletResponse {
 
     // rfc1123-date is "Sun, 06 Nov 1994 08:49:37 GMT"
-    private static final String RFC1123_DATE_SPEC = "EEE, dd MMM yyyy hh:mm:ss z";
+    private static final String RFC1123_DATE_SPEC = "EEE, dd MMM yyyy HH:mm:ss z";
     private boolean _committed;
     private Locale _locale = Locale.getDefault();
 
