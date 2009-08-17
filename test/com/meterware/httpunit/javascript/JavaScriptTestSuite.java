@@ -1,8 +1,8 @@
 package com.meterware.httpunit.javascript;
 /********************************************************************************************************************
  * $Id$
- *
- * Copyright (c) 2002-2003, Russell Gold
+ * $URL$
+ * Copyright (c) 2002-2009, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -30,11 +30,19 @@ import junit.framework.TestSuite;
  **/
 public class JavaScriptTestSuite {
 
+	/**
+	 * start the JUnit tests from here
+	 * @param args
+	 */
     public static void main( String[] args ) {
         junit.textui.TestRunner.run( suite() );
     }
 
 
+    /**
+     * collect the test suite for the java script tests 
+     * @return
+     */
     public static Test suite() {
         TestSuite result = new TestSuite();
         result.addTest( ScriptingTest.suite() );
