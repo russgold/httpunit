@@ -1,6 +1,6 @@
 package com.meterware.httpunit.scripting;
 /********************************************************************************************************************
- * $Id: ScriptingHandler.java 778 2007-05-16 19:07:49Z russgold $
+ * $Id$
  *
  * Copyright (c) 2006-2007, Russell Gold
  *

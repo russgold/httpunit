@@ -1,6 +1,6 @@
 package com.meterware.httpunit.dom;
 /********************************************************************************************************************
- * $Id: HTMLSelectElementImpl.java 767 2006-07-06 04:02:07Z russgold $
+ * $Id$
  *
  * Copyright (c) 2007, Russell Gold
  *

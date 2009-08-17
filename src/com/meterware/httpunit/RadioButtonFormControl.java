@@ -1,6 +1,6 @@
 package com.meterware.httpunit;
 /********************************************************************************************************************
-* $Id: FormControl.java 786 2007-11-23 18:36:23Z wolfgang_fahl $
+* $Id$
 *
 * Copyright (c) 2001-2007, Russell Gold
 *
