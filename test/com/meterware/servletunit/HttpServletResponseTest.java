@@ -1,6 +1,7 @@
 package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
+* $URL$
 *
 * Copyright (c) 2000-2004, Russell Gold
 *
@@ -213,8 +214,9 @@ public class HttpServletResponseTest extends ServletUnitTest {
         headerValue = servletResponse.getHeaderField( "three" );
         assertEquals( "int header is wrong", "3", headerValue );
 
-        SimpleDateFormat df = new SimpleDateFormat( "MM/dd/yyyy z" );
-        Date d = df.parse( "12/9/1969 GMT" );
+        // use RFC1123_DATE_SPEC formatter
+        SimpleDateFormat df = new SimpleDateFormat( "MM/dd/yyyy HH:mm:ss z" );
+        Date d = df.parse( "12/9/1969 12:00:00 GMT" );
         servletResponse.setDateHeader( "date", d.getTime() );
         headerValue = servletResponse.getHeaderField( "date" );
         assertEquals( "date header is wrong", "Tue, 09 Dec 1969 12:00:00 GMT", headerValue );
@@ -225,8 +227,9 @@ public class HttpServletResponseTest extends ServletUnitTest {
         ServletUnitHttpResponse servletResponse = new ServletUnitHttpResponse();
         servletResponse.setContentType( "text/html" );
 
-        SimpleDateFormat df = new SimpleDateFormat( "MM/dd/yyyy z" );
-        Date date = df.parse( "12/9/1969 GMT" );
+        // RFC1123_DATE_SPEC format
+        SimpleDateFormat df = new SimpleDateFormat( "MM/dd/yyyy HH:mm:ss z" );
+        Date date = df.parse( "12/9/1969 12:00:00 GMT" );
 
         servletResponse.addHeader( "list", "over-rideme" );
         servletResponse.setHeader( "list", "foo" );
