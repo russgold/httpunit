@@ -180,17 +180,18 @@ public class CookieTest extends TestCase {
                          "expires=Tue, 29-Mar-2005 19:30:42 GMT; Max-Age=2592000",
                          "Max-Age=2592000;expires=Tue, 29-Mar-2005 19:30:42 GMT",
                          "expires=Tue, 29-Mar-2005 19:30:42 GMT",
-                         "Expires=Wednesday, 01-Jan-1970 0:0:00 GMT"
+                         "Expires=Wednesday, 01-Jan-1970 00:00:00 GMT"
                          };
-        long expectedMilliSeconds[] = {System.currentTimeMillis() + 5000 * 1000,
-                                       System.currentTimeMillis() + 3000 * 1000,
-                                       1112124642000l,
-                                       1112124642000l,
+        long now=System.currentTimeMillis();
+        long expectedMilliSeconds[] = {now + 5000 * 1000,
+                                       now + 3000 * 1000,
+                                       now + 2592000 * 1000,
+                                       now + 2592000 * 1000,
                                        1112124642000l,
                                        0};
 
         for (int i = 0; i < ages.length; i++) {
-            String cookieName = "cookie" + i;
+            String cookieName = "cookie" + i ;
             String header = cookieName + "=cookievalue;" + ages[i];
             TestSource source = new TestSource( new URL( "http://www.somedomain.com/somepath/" ), header );
             CookieJar jar = new CookieJar( source );
@@ -199,10 +200,10 @@ public class CookieTest extends TestCase {
 
             long expiredTime = cookie.getExpiredTime();
             int grace = 3000;
-            assertTrue( cookieName + " expiration expect on or after" +
+            assertTrue( cookieName + " '"+ages[i]+"' expiration expect on or after" +
             expectedMilliSeconds[i] + " but was " + expiredTime,
             expectedMilliSeconds[i] <= expiredTime );
-            assertTrue( cookieName + " expiration expect before " +
+            assertTrue( cookieName + " '"+ages[i]+"' expiration expect before " +
             (expectedMilliSeconds[i] + grace) + " but was " + expiredTime,
             (expectedMilliSeconds[i]) + grace > expiredTime );
             //  assertEquals( cookieName + " expiration", expiredTime, expectedMilliSeconds[i] );
