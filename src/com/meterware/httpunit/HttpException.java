@@ -128,5 +128,24 @@ public class HttpException extends RuntimeException {
     	 
      
     private Throwable _cause;
+    
+    // see feature request [ 914314 ] Add HttpException.getResponse for better reporting
+    private WebResponse response;
+
+    /**
+     * return the WebResponse associated with this Exception (if any)
+     * @return
+     */
+    public WebResponse getResponse() {
+		return response;
+	}
+
+	/**
+     * add the given response to this exception
+     * @param response
+     */
+	public void setResponse(WebResponse response) {
+		this.response=response;		
+	}
     	 
 }

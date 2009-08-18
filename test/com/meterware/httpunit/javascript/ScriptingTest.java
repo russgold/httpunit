@@ -193,7 +193,58 @@ public class ScriptingTest extends AbstractJavaScriptTest {
      WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
      response.getLinkWith( "go" ).click();
      assertEquals( "Alert message", "Cheese!", wc.popNextAlert() );
-   }  
+   }
+
+   /**
+    * test Detection of Javascript files that can not be found
+    * behaviour pointed out by Dan Lipofsky
+    * @throws Exception
+    */
+   public void testBadJavascriptFile() throws Exception {
+	   // define xyz.js to create a 404 error
+	   // we don't do this - it should be a default behaviour of the Pseudo Server!
+	   // defineResource( "xyz.js", "File does not exist: xyz.js", 404);
+	   defineResource("OnCommand.html",
+	     "<html><head>" +
+	     "<script language='JavaScript' src='xyz.js'></script></head>" +
+	     "<body>Hello</body></html>" );
+	   boolean originalState =
+	  		HttpUnitOptions.getExceptionsThrownOnErrorStatus();
+	   boolean originalScriptState=
+		   HttpUnitOptions.getExceptionsThrownOnScriptError();   
+	   boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
+
+	   // make sure exceptions are thrown
+	   HttpUnitOptions.setExceptionsThrownOnErrorStatus(false);
+	   for (int i=0;i<2;i++) {
+		   boolean throwScriptException=i==0;
+		   HttpUnitOptions.setExceptionsThrownOnScriptError(throwScriptException);
+		   HttpUnitOptions.clearScriptErrorMessages();
+		   WebConversation wc = new WebConversation();
+		   try {
+		     WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+		     // WebResponse response = wc.getResponse( getHostPath() + "/xyz.js" );
+		     // assertEquals( 404, response.getResponseCode() );
+		     if (throwScriptException) {
+		    	 fail("there should have been an exception");
+		     } else {
+			   String[] errMsgs = HttpUnitOptions.getScriptErrorMessages();
+			   assertTrue("There should be an error Message",errMsgs.length==1);
+			   String errMsg=errMsgs[0];
+			   assertEquals(errMsg,"? failed: com.meterware.httpunit.ScriptException: unable to find /xyz.js");
+		     }  
+		   } catch (ScriptException se) {
+			   assertTrue(throwScriptException);
+		   } catch (Exception e) {
+			   fail("there should be no exception when throwScriptException is "+throwScriptException);
+		   }		   
+	   }
+	   // Restore exceptions state
+	   HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState );
+	   HttpUnitOptions.setExceptionsThrownOnScriptError(originalScriptState);  		   
+	   HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
+   }
+
 
     public void testJavaScriptURLInNewWindow() throws Exception {
         defineWebPage( "OnCommand", "<input type='button' id='nowindow' onClick='alert(\"hi\")'></input>\n" +
@@ -279,17 +330,20 @@ public class ScriptingTest extends AbstractJavaScriptTest {
                                            "<body>" +
                                            "<a href=\"javascript:sayCheese()\">go</a>" +
                                            "</body></html>" );
-      HttpUnitOptions.setExceptionsThrownOnScriptError( true);
-      HttpUnitOptions.clearScriptErrorMessages();
       WebConversation wc = new WebConversation();
+      boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
+      HttpUnitOptions.setExceptionsThrownOnScriptError( false);
       WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
-    	boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
       try {
+        HttpUnitOptions.setExceptionsThrownOnScriptError( true);
+        HttpUnitOptions.clearScriptErrorMessages();
       	response.getLinkWith( "go" ).click();
       	fail("there should have been an exception");
-      } catch (Throwable th) { 
+      } catch (ScriptException se) {
+    	  fail("Runtime exception is appropriate in this test case since we ignored the loading error");
+      } catch (RuntimeException rte) { 
         // java.lang.RuntimeException: Error clicking link: com.meterware.httpunit.ScriptException: URL 'javascript:sayCheese()' failed: org.mozilla.javascript.EcmaError: ReferenceError: "sayCheese" is not defined.
-      	assertTrue("is not defined should be found in message",th.getMessage().indexOf("not defined")>0);
+      	assertTrue("is not defined should be found in message",rte.getMessage().indexOf("not defined")>0);
       } finally {
       	HttpUnitUtils.setEXCEPTION_DEBUG(oldDebug);
       }

@@ -100,6 +100,10 @@ public class PseudoServer {
     }
 
 
+    /**
+     * create a PseudoServer with the given socketTimeout
+     * @param socketTimeout - the time out to use
+     */
     public PseudoServer( int socketTimeout ) {
         _socketTimeout = socketTimeout;
         _serverNum = ++_numServers;
@@ -197,9 +201,16 @@ public class PseudoServer {
 
     /**
      * Defines a resource which will result in an error message.
-     **/
-    public void setErrorResource( String name, int errorCode, String errorMessage ) {
-        _resources.put( asResourceName( name ), new WebResource( errorMessage, errorCode ) );
+     * return it for further use
+     * @param name
+     * @param errorCode
+     * @param errorMessage
+     * @return the resource
+     */
+    public WebResource setErrorResource( String name, int errorCode, String errorMessage ) {
+    	WebResource resource = new WebResource( errorMessage, errorCode );
+        _resources.put( asResourceName( name ), resource );
+        return resource;
     }
 
 
@@ -314,7 +325,9 @@ public class PseudoServer {
                 boolean keepAlive = respondToRequest( request, outputStream );
                 if (!keepAlive) break;
                 while (_active && 0 == inputStream.available()) {
-                    try { Thread.sleep( INPUT_POLL_INTERVAL ); } catch (InterruptedException e) {}
+                    try { 
+                    	Thread.sleep( INPUT_POLL_INTERVAL ); 
+                    } catch (InterruptedException e) {}
                 }
             }
         } catch (IOException e) {
@@ -329,6 +342,12 @@ public class PseudoServer {
     }
 
 
+    /**
+     * respond to the given request
+     * @param request - the request
+     * @param response - the response stream
+     * @return
+     */
     private boolean respondToRequest( HttpRequest request, HttpResponseStream response ) {
         debug( "Server thread handling request: " + request );
         boolean keepAlive = isKeepAlive( request );
@@ -338,17 +357,27 @@ public class PseudoServer {
             response.setProtocol( getResponseProtocol( request ) );
             resource = getResource( request );
             if (resource == null) {
-                response.setResponse( HttpURLConnection.HTTP_NOT_FOUND, "unable to find " + request.getURI() );
+            	// what resource could not be find?
+            	String uri=request.getURI();
+            	// 404 - Not Found error code
+            	int errorCode=HttpURLConnection.HTTP_NOT_FOUND;
+            	// typical 404 error Message 
+            	String errorMessage="unable to find " + uri;
+            	// make sure there is a resource and
+            	// next time we'll take it from the resource Cache
+            	resource=setErrorResource(uri, errorCode, errorMessage);
+            	// set the errorCode for this response
+                response.setResponse(errorCode , errorMessage );
             } else {
-                if (resource.closesConnection()) keepAlive = false;
                 if (resource.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     response.setResponse( resource.getResponseCode(), "" );
-                }
-                String[] headers = resource.getHeaders();
-                for (int i = 0; i < headers.length; i++) {
-                    debug( "Server thread sending header: " + headers[i] );
-                    response.addHeader( headers[i] );
-                }
+                }            	
+            }
+            if (resource.closesConnection()) keepAlive = false;
+            String[] headers = resource.getHeaders();
+            for (int i = 0; i < headers.length; i++) {
+                debug( "Server thread sending header: " + headers[i] );
+                response.addHeader( headers[i] );
             }
         } catch (UnknownMethodException e) {
             response.setResponse( HttpURLConnection.HTTP_BAD_METHOD, "unsupported method: " + e.getMethod() );
@@ -356,7 +385,11 @@ public class PseudoServer {
             t.printStackTrace();
             response.setResponse( HttpURLConnection.HTTP_INTERNAL_ERROR, t.toString() );
         }
-        try { response.write( resource ); } catch (IOException e) { System.out.println( "*** Failed to send reply: " + e ); }
+        try { 
+        	response.write( resource ); 
+        } catch (IOException e) { 
+        	System.out.println( "*** Failed to send reply: " + e ); 
+        }
         return keepAlive;
     }
 
@@ -470,6 +503,11 @@ class HttpResponseStream {
     }
 
 
+    /**
+     * set the response to the given response Code
+     * @param responseCode
+     * @param responseText
+     */
     void setResponse( int responseCode, String responseText ) {
         _responseCode = responseCode;
         _responseText = responseText;

@@ -44,6 +44,10 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
     }
 
 
+    /**
+     * access to the list of error Messages that were collected 
+     * @return the array with error Messages
+     */
     static public String[] getErrorMessages() {
         return (String[]) _errorMessages.toArray( new String[ _errorMessages.size() ] );
     }
@@ -56,11 +60,15 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
      */
     static public void handleScriptException( Exception e, String badScript ) {
         final String errorMessage = badScript + " failed: " + e;
-        if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException)) {
+        
+        if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException) && !(e instanceof ScriptException)) {
           HttpUnitUtils.handleException(e);
             throw new RuntimeException( errorMessage );
         } else if (JavaScript.isThrowExceptionsOnError()) {
           HttpUnitUtils.handleException(e);
+          if (e instanceof ScriptException)
+          	throw (ScriptException)e;
+          else
             throw new ScriptException( errorMessage );
         } else {
             _errorMessages.add( errorMessage );

@@ -623,17 +623,25 @@ public class WebClient {
      * @parm response - the response to validate
      **/
     private void validateHeaders( WebResponse response ) throws HttpException {
-        if (!getExceptionsThrownOnErrorStatus()) 
-        	return;
-        // see feature request [ 914314 ] Add HttpException.getResponse for better reporting
-        // for possible improvements here
+    	HttpException exception=null;
         if (response.getResponseCode() == HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            throw new HttpInternalErrorException( response.getURL() );
+            exception=new HttpInternalErrorException( response.getURL() );
         } else if (response.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new HttpNotFoundException( response.getResponseMessage(), response.getURL() );
+            exception= new HttpNotFoundException( response.getResponseMessage(), response.getURL() );
         } else if (response.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
-            throw new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
+            exception= new HttpException( response.getResponseCode(), response.getResponseMessage(), response.getURL() );
         }
+        // is there an exception?
+        if (exception!=null) {
+            // see feature request [ 914314 ] Add HttpException.getResponse for better reporting
+            exception.setResponse(response);
+        	// 	shall we ignore errors?
+        	if (!getExceptionsThrownOnErrorStatus()) { 
+        		return;
+        	} else {
+                throw exception;
+        	}        		
+        }	
     }
 
 

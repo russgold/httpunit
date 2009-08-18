@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2004, Russell Gold
+* Copyright (c) 2000-2009, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -58,8 +58,12 @@ class HttpWebResponse extends WebResponse {
 
         /** make sure that any IO exception for HTML received page happens here, not later. **/
         if (_responseCode < HttpURLConnection.HTTP_BAD_REQUEST || !throwExceptionOnError) {
-            defineRawInputStream( new BufferedInputStream( getInputStream( connection ) ) );
-            if (getContentType().startsWith( "text" )) loadResponseText();
+        	InputStream inputStream = getInputStream( connection );
+            defineRawInputStream( new BufferedInputStream( inputStream ) );
+            String contentType = getContentType();
+            if (contentType.startsWith( "text" ))	{
+            	loadResponseText();
+            }
         }
     }
 
@@ -81,7 +85,7 @@ class HttpWebResponse extends WebResponse {
     	InputStream result=null;
     	// check whether there is an error stream
     	if (isResponseOnErrorStream( connection )) {
-        result=((HttpURLConnection) connection).getErrorStream();
+    		result=((HttpURLConnection) connection).getErrorStream();
     	} else  {     		
     		// if there is no error stream it depends on the response code
     		try {
@@ -190,30 +194,40 @@ class HttpWebResponse extends WebResponse {
 
 
     private int       _responseCode    = HttpURLConnection.HTTP_OK;
-    private String    _responseMessage = "OK";
+	private String    _responseMessage = "OK";
+    
+	/**
+	 * set the responseCode to the given code and message
+	 * @param code
+	 * @param message
+	 */
+    private  void setResponseCode(int code, String message) {
+		_responseCode = code;
+		_responseMessage=message;
+	}
 
     private Hashtable _headers = new Hashtable();
 
-
-
+    /**
+     * read the response Header for the given connection and set the response code and
+     * message accordingly
+     * @param connection
+     * @throws IOException
+     */
     private void readResponseHeader( HttpURLConnection connection ) throws IOException {
         if (!needStatusWorkaround()) {
-            _responseCode = connection.getResponseCode();
-            _responseMessage = connection.getResponseMessage();
+            setResponseCode(connection.getResponseCode(),connection.getResponseMessage());
         } else {
              if (connection.getHeaderField(0) == null) throw new UnknownHostException( connection.getURL().toExternalForm() );
 
             StringTokenizer st = new StringTokenizer( connection.getHeaderField(0) );
             st.nextToken();
             if (!st.hasMoreTokens()) {
-                _responseCode = HttpURLConnection.HTTP_OK;
-                _responseMessage = "OK";
+                setResponseCode(HttpURLConnection.HTTP_OK,"OK");
             } else try {
-                _responseCode = Integer.parseInt( st.nextToken() );
-                _responseMessage = getRemainingTokens( st );
+                setResponseCode(Integer.parseInt( st.nextToken()) ,getRemainingTokens( st ));
             } catch (NumberFormatException e) {
-                _responseCode = HttpURLConnection.HTTP_INTERNAL_ERROR;
-                _responseMessage = "Cannot parse response header";
+                setResponseCode (HttpURLConnection.HTTP_INTERNAL_ERROR,"Cannot parse response header");
             }
         }
     }
@@ -238,8 +252,7 @@ class HttpWebResponse extends WebResponse {
         if (connection instanceof HttpURLConnection) {
             readResponseHeader( (HttpURLConnection) connection );
         } else {
-            _responseCode = HttpURLConnection.HTTP_OK;
-            _responseMessage = "OK";
+            setResponseCode (HttpURLConnection.HTTP_OK, "OK");
             if (connection.getContentType().startsWith( "text" )) {
                 setContentTypeHeader( connection.getContentType() + "; charset=" + FILE_ENCODING );
             }

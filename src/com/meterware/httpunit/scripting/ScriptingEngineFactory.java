@@ -64,6 +64,13 @@ public interface ScriptingEngineFactory {
      * Clears the accumulated script error messages.
      */
     public void clearErrorMessages();
+    
+    /**
+     * handle Exceptions 
+     * @param e - the exception to handle
+     * @param badScript - the script that caused the problem
+     */
+    public void handleScriptException( Exception e, String badScript );
 
 
     ScriptingHandler createHandler( HTMLElement elementBase );

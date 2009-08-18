@@ -505,6 +505,9 @@ public abstract class HttpUnitOptions {
         public void clearErrorMessages() {}
         public ScriptingHandler createHandler( HTMLElement element ) { return ScriptableDelegate.NULL_SCRIPT_ENGINE; }
         public ScriptingHandler createHandler( WebResponse response ) { return ScriptableDelegate.NULL_SCRIPT_ENGINE; }
+		public void handleScriptException(Exception e, String badScript) {
+			// happily ignore and exception
+		}
     };
 
 

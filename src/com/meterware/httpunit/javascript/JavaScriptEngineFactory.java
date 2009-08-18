@@ -82,6 +82,13 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
     public String[] getErrorMessages() {
         return ScriptingEngineImpl.getErrorMessages();
     }
+    
+    /**
+     * delegate the handling for Script exceptions
+     */
+	public void handleScriptException(Exception e, String badScript) {
+		ScriptingEngineImpl.handleScriptException(e, badScript);		
+	}
 
 
     public void clearErrorMessages() {
@@ -99,4 +106,6 @@ public class JavaScriptEngineFactory implements ScriptingEngineFactory {
     public ScriptingHandler createHandler( WebResponse response ) {
         return response.createJavascriptScriptingHandler();
     }
+
+
 }

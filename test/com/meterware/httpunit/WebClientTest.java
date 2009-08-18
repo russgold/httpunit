@@ -72,6 +72,10 @@ public class WebClientTest extends HttpUnitTest {
     }
 
 
+    /**
+     * check access to resources that are not defined
+     * @throws Exception
+     */
     public void testNotFound() throws Exception {
         WebConversation wc = new WebConversation();
         WebRequest request = new GetMethodWebRequest( getHostPath() + "/nothing.htm" );
@@ -81,8 +85,50 @@ public class WebClientTest extends HttpUnitTest {
         } catch (HttpNotFoundException e) {
             assertEquals( "Response code", HttpURLConnection.HTTP_NOT_FOUND, e.getResponseCode() );
             assertEquals( "Response message", "unable to find /nothing.htm", e.getResponseMessage() );
+            assertEquals( "Response text","",e.getResponse().getText());
         }
     }
+    
+	/**
+	 * check access to undefined resources
+	 * @throws IOException 
+	 */
+	public void testUndefinedResource() throws IOException {
+		boolean originalState = HttpUnitOptions
+				.getExceptionsThrownOnErrorStatus();
+		// try two cases for throwException true on i==0, false on i==1
+		for (int i = 0; i <2; i++) {
+			boolean throwException = i == 0;
+			HttpUnitOptions.setExceptionsThrownOnErrorStatus(throwException);
+			WebResponse response = null;
+			try {
+				WebConversation wc = new WebConversation();
+				WebRequest request = new GetMethodWebRequest(getHostPath()
+						+ "/undefined");
+				response = wc.getResponse(request);
+				if (throwException) {
+					fail("there should have been an exception here");
+				}
+			} catch (HttpNotFoundException hnfe) {
+				assertTrue(throwException);
+				response=hnfe.getResponse();
+			} catch (Exception e) {
+				fail("there should be no exception here");
+			}
+			assertTrue(response != null);
+			assertEquals(HttpURLConnection.HTTP_NOT_FOUND, response
+					.getResponseCode());
+			if (throwException) {
+				assertEquals("with throwException="+throwException,"", response.getText());
+				assertEquals("with throwException="+throwException,"unable to find /undefined",response.getResponseMessage());
+			} else {
+				// FIXME what do we expect here and how do we get it!
+				assertEquals("with throwException="+throwException,"unable to find /undefined", response.getText());
+				assertNull(response.getResponseMessage());				
+			}
+		}
+		HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState);
+	}
 
 
     public void testNotModifiedResponse() throws Exception {
@@ -769,39 +815,6 @@ public class WebClientTest extends HttpUnitTest {
       }
   }
   
-	/**
-	 * check access to undefined resources
-	 */
-	public void testUndefinedResource() {
-		boolean originalState = HttpUnitOptions
-				.getExceptionsThrownOnErrorStatus();
-		for (int i = 0; i < 1; i++) {
-			boolean throwException = i == 0;
-			HttpUnitOptions.setExceptionsThrownOnErrorStatus(throwException);
-			WebResponse response = null;
-			try {
-				WebConversation wc = new WebConversation();
-				WebRequest request = new GetMethodWebRequest(getHostPath()
-						+ "/undefined");
-				response = wc.getResponse(request);
-				if (throwException) {
-					fail("there should have been an exception here");
-				}
-				assertTrue(response != null);
-				assertEquals(HttpURLConnection.HTTP_NOT_FOUND, response
-						.getResponseCode());
-				assertEquals(0, response.getContentLength());
-			} catch (Exception e) {
-				if (throwException) {
-					assertTrue(e instanceof HttpNotFoundException);
-				} else {
-					fail("there should be no exception here");
-				}
-			}
-		}
-		HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState);
-	}
-
 	/**
 	 * test for bug report [ 1283878 ] FileNotFoundException using Sun JDK 1.5 on empty error pages
 	 * by Roger Lindsjö  

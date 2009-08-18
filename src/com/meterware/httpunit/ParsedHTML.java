@@ -25,6 +25,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.html.*;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.io.IOException;
@@ -380,7 +381,7 @@ public class ParsedHTML {
         } else {
             try {
                 return getIncludedScript( scriptLocation );
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException( "Error loading included script: " + e );
             }
         }
@@ -391,13 +392,30 @@ public class ParsedHTML {
      * Returns the contents of an included script, given its src attribute.
      * @param srcAttribute the location of the script.
      * @return the contents of the script.
-     * @throws java.io.IOException if there is a problem retrieving the script
+     * @throws IOException if there is a problem retrieving the script
      */
     String getIncludedScript( String srcAttribute ) throws IOException {
         WebRequest req = new GetMethodWebRequest( getBaseURL(), srcAttribute );
         WebWindow window = getResponse().getWindow();
-        if (window == null) throw new IllegalStateException( "Unable to retrieve script included by this response, since it was loaded by getResource(). Use getResponse() instead.");
-        return window.getResource( req ).getText();
+        if (window == null) 
+        	throw new IllegalStateException( "Unable to retrieve script included by this response, since it was loaded by getResource(). Use getResponse() instead.");
+        WebResponse response = window.getResource( req );
+        // check whether the Source is available
+        int code = response.getResponseCode();
+        // if everything is o.k.
+        if (code<=HttpURLConnection.HTTP_BAD_REQUEST) {
+        	// return the text
+            String result =response.getText();
+            return result;        	
+        } else {
+        	// in this case the text would be an error message
+        	// we do not return it but set the 
+        	ScriptException se=new ScriptException(response.getText());
+        	String badScript="?";
+        	// let scripting engine decide what to do with this exception (throw it or remember it ...)
+        	HttpUnitOptions.getScriptingEngine().handleScriptException(se, badScript);
+        	return "";
+        }
     }
 
 

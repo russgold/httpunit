@@ -26,6 +26,7 @@ import com.meterware.httpunit.scripting.ScriptingEngineFactory;
 import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.scripting.ScriptingEngine;
 import com.meterware.httpunit.HttpUnitUtils;
+import com.meterware.httpunit.ScriptException;
 import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.HTMLElement;
 
@@ -38,6 +39,7 @@ import org.w3c.dom.html.HTMLBodyElement;
 import org.xml.sax.SAXException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -143,4 +145,14 @@ public class DomBasedScriptingEngineFactory implements ScriptingEngineFactory {
     public ScriptingHandler createHandler( WebResponse response ) {
         return response.createDomScriptingHandler();
     }
+
+
+	 /**
+     * handle Exceptions 
+     * @param e - the exception to handle
+     * @param badScript - the script that caused the problem
+     */
+    public void handleScriptException( Exception e, String badScript ) {
+    	ScriptingEngineImpl.handleScriptException(e, badScript);
+    }		
 }

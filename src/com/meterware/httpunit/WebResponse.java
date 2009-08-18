@@ -282,16 +282,17 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
      * which may be used to represent internal state of this object.
      **/
     public String getText() throws IOException {
-        if (_responseText == null) loadResponseText();
+        if (_responseText == null) 
+        	loadResponseText();
         return _responseText;
     }
-
 
     /**
      * Returns a buffered input stream for reading the contents of this reply.
      **/
     public InputStream getInputStream() throws IOException {
-        if (_inputStream == null) _inputStream = new ByteArrayInputStream( getText().getBytes() );
+        if (_inputStream == null) 
+        	_inputStream = new ByteArrayInputStream( getText().getBytes() );
         return _inputStream;
     }
 
@@ -1056,7 +1057,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     private String _responseText;
 
-    private InputStream _inputStream;
+	private InputStream _inputStream;
 
     private final URL    _pageURL;
 
