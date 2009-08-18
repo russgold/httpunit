@@ -33,6 +33,8 @@ import java.net.*;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
+import org.xml.sax.SAXException;
+
 //import HTTPClient.HTTPConnection;
 //import HTTPClient.HTTPResponse;
 
@@ -766,6 +768,39 @@ public class WebClientTest extends HttpUnitTest {
           }
       }
   }
+  
+	/**
+	 * check access to undefined resources
+	 */
+	public void testUndefinedResource() {
+		boolean originalState = HttpUnitOptions
+				.getExceptionsThrownOnErrorStatus();
+		for (int i = 0; i < 1; i++) {
+			boolean throwException = i == 0;
+			HttpUnitOptions.setExceptionsThrownOnErrorStatus(throwException);
+			WebResponse response = null;
+			try {
+				WebConversation wc = new WebConversation();
+				WebRequest request = new GetMethodWebRequest(getHostPath()
+						+ "/undefined");
+				response = wc.getResponse(request);
+				if (throwException) {
+					fail("there should have been an exception here");
+				}
+				assertTrue(response != null);
+				assertEquals(HttpURLConnection.HTTP_NOT_FOUND, response
+						.getResponseCode());
+				assertEquals(0, response.getContentLength());
+			} catch (Exception e) {
+				if (throwException) {
+					assertTrue(e instanceof HttpNotFoundException);
+				} else {
+					fail("there should be no exception here");
+				}
+			}
+		}
+		HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState);
+	}
 
 	/**
 	 * test for bug report [ 1283878 ] FileNotFoundException using Sun JDK 1.5 on empty error pages
@@ -782,11 +817,11 @@ public class WebClientTest extends HttpUnitTest {
       defineResource( "emptyError", "", 404);
       WebRequest request = new GetMethodWebRequest( getHostPath() +"/emptyError" );
       WebResponse response = wc.getResponse( request );
-      assertEquals( 404, response.getResponseCode() );
+      assertEquals( HttpURLConnection.HTTP_NOT_FOUND, response.getResponseCode() );
       assertEquals( 0, response.getContentLength() );
     } catch (java.io.FileNotFoundException fnfe) {
     	fnfe.printStackTrace();
-    	assertTrue("There should be not file not found exception '"+fnfe.getMessage()+"'",false);
+    	assertTrue("There should be no file not found exception '"+fnfe.getMessage()+"'",false);
     } finally {
       // Restore exceptions state
     	HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState );
