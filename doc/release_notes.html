@@ -20,6 +20,28 @@
 
 <h2>Revision History:</h2>
 
+<h3>Version 1.7.x to be Released some time in the future</h3>
+<h4>Acknowledgements:</h4>
+<ul>
+	<li>Marc Guillemot for his change request to add the response to a HttpException</li>
+    <li>Robert Wadura for showing that trying to load included scripts that do not exist might abort entire requests - was already fixed in 1.7 but not mentioned in the release notes</li>
+    <li>Dan Lipofsky for pointing out some problems with JavaScript handling</li>
+</ul>
+<h4>Problems fixed:</h4>
+    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1055450&group_id=6550&atid=106550">1055450</a> - Error loading included script aborts entire request</li>
+<h4>Additions:</h4>
+<h5>Debugging</h5>
+Whenever some code was changed it was made more debug and test-friendly. 
+<ul>
+    <li>One-lines have been modified to multiple lines  to be able to inspect variables that hold temporary results</li>
+    <li>accessing private variables is sometimes done via getters and setters just to be able to better debug when the variable is set</li>
+</ul>    
+<h5>Error handling</h5>
+<ol>
+    <li>change request #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=914314&group_id=6550&atid=356550">914314</a>Add HttpException.getResponse for better reporting</li>
+</ol>    
+
+
 <h3>Version 1.7 Released 2008-05-20</h3>
 <h4>Acknowledgements:</h4>
 This project would almost certainly have remained dormant without the extraordinary contributions of our new committer, Wolfgang Fahl. 
