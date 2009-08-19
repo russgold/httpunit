@@ -63,19 +63,23 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
      */
     static public void handleScriptException( Exception e, String badScript ) {
     	String errorMessage=badScript==null? e.getMessage():badScript + " failed: " + e; 
-        
-        if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException) && !(e instanceof ScriptException)) {
-          HttpUnitUtils.handleException(e);
-            throw new RuntimeException( errorMessage );
-        } else if (JavaScript.isThrowExceptionsOnError()) {
-          HttpUnitUtils.handleException(e);
-          if (e instanceof ScriptException)
-          	throw (ScriptException)e;
-          else
-            throw new ScriptException( errorMessage );
-        } else {
-            _errorMessages.add( errorMessage );
-        }
+    	if (e instanceof EcmaError ||
+    			e instanceof EvaluatorException ||
+    			e instanceof ScriptException ||
+    			e instanceof JavaScriptException)	{
+   			if (JavaScript.isThrowExceptionsOnError())	{
+   				HttpUnitUtils.handleException(e);
+   				if (e instanceof ScriptException)
+   					throw (ScriptException)e;
+   				else
+   					throw new ScriptException( errorMessage );
+   			} else	{
+    				_errorMessages.add( errorMessage );
+    		}
+   		} else	{
+    		HttpUnitUtils.handleException(e);
+    		throw new RuntimeException( errorMessage );
+    	}
     }
 
 //--------------------------------------- ScriptingEngine methods ------------------------------------------------------
