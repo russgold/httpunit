@@ -23,6 +23,8 @@ package com.meterware.httpunit.javascript;
 import com.meterware.httpunit.*;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+import junit.framework.ComparisonFailure;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
@@ -200,7 +202,7 @@ public class ScriptingTest extends AbstractJavaScriptTest {
     * behaviour pointed out by Dan Lipofsky
     * @throws Exception
     */
-   public void testBadJavascriptFile() throws Exception {
+   public void testBadJavascriptFile()  {
 	   // define xyz.js to create a 404 error
 	   // we don't do this - it should be a default behaviour of the Pseudo Server!
 	   // defineResource( "xyz.js", "File does not exist: xyz.js", 404);
@@ -212,12 +214,16 @@ public class ScriptingTest extends AbstractJavaScriptTest {
 	  		HttpUnitOptions.getExceptionsThrownOnErrorStatus();
 	   boolean originalScriptState=
 		   HttpUnitOptions.getExceptionsThrownOnScriptError();   
+	   // make sure stackTraces are not printed on Exceptions
+	   // uncomment this if you'd actually like to debug the following code
 	   boolean oldDebug=	HttpUnitUtils.setEXCEPTION_DEBUG(false);
-
-	   // make sure exceptions are thrown
-	   HttpUnitOptions.setExceptionsThrownOnErrorStatus(false);
-	   for (int i=0;i<2;i++) {
-		   boolean throwScriptException=i==0;
+	   AssertionFailedError failure=null;
+	   // check 4 combinations of Exception and ScriptError status flags
+	   for (int i=0;i<4;i++) {
+		   boolean throwScriptException=(i%2)==0; // true on case 0 and 2
+		   boolean throwException=((i/2)%2)==0;   // true on case 0 and 1
+		   String testDescription=("case "+i+" throwScriptException="+throwScriptException+" throwException="+throwException);
+		   HttpUnitOptions.setExceptionsThrownOnErrorStatus(throwException);
 		   HttpUnitOptions.setExceptionsThrownOnScriptError(throwScriptException);
 		   HttpUnitOptions.clearScriptErrorMessages();
 		   WebConversation wc = new WebConversation();
@@ -231,14 +237,19 @@ public class ScriptingTest extends AbstractJavaScriptTest {
 			   String[] errMsgs = HttpUnitOptions.getScriptErrorMessages();
 			   assertTrue("There should be an error Message",errMsgs.length==1);
 			   String errMsg=errMsgs[0];
-			   assertEquals(errMsg,"? failed: com.meterware.httpunit.ScriptException: unable to find /xyz.js");
+			   assertEquals(testDescription,"reponseCode 404 on getIncludedScript for src='xyz.js'",errMsg);
 		     }  
 		   } catch (ScriptException se) {
 			   assertTrue(throwScriptException);
 		   } catch (Exception e) {
 			   fail("there should be no exception when throwScriptException is "+throwScriptException);
-		   }		   
+		   } catch (AssertionFailedError afe) {
+			   // continue looping on failed tests
+			   failure=afe;
+		   }
 	   }
+	   if (failure!=null)
+		   	throw(failure);
 	   // Restore exceptions state
 	   HttpUnitOptions.setExceptionsThrownOnErrorStatus(originalState );
 	   HttpUnitOptions.setExceptionsThrownOnScriptError(originalScriptState);  		   

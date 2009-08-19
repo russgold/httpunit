@@ -410,8 +410,8 @@ public class ParsedHTML {
         } else {
         	// in this case the text would be an error message
         	// we do not return it but set the 
-        	ScriptException se=new ScriptException(response.getText());
-        	String badScript="?";
+        	ScriptException se=new ScriptException("reponseCode "+code+" on getIncludedScript for src='"+srcAttribute+"'");
+        	String badScript=null;
         	// let scripting engine decide what to do with this exception (throw it or remember it ...)
         	HttpUnitOptions.getScriptingEngine().handleScriptException(se, badScript);
         	return "";

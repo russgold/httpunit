@@ -39,6 +39,9 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
     private static ArrayList _errorMessages = new ArrayList();
 
 
+    /**
+     * clear the list of error Messages
+     */
     static public void clearErrorMessages() {
         _errorMessages.clear();
     }
@@ -59,7 +62,7 @@ public abstract class ScriptingEngineImpl extends ScriptableObject implements Sc
      * @param badScript - the script that caused the problem
      */
     static public void handleScriptException( Exception e, String badScript ) {
-        final String errorMessage = badScript + " failed: " + e;
+    	String errorMessage=badScript==null? e.getMessage():badScript + " failed: " + e; 
         
         if (!(e instanceof EcmaError) && !(e instanceof EvaluatorException) && !(e instanceof ScriptException)) {
           HttpUnitUtils.handleException(e);
