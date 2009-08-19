@@ -50,11 +50,11 @@ public class HeaderOnlyWebRequest extends WebRequest {
     }
     
     /**
-		 * @param method the method to set
-		 */
-		public void setMethod(String method) {
-			this.method = method;
-		}
+     * @param method the method to set
+     */
+    public void setMethod(String method) {
+    	this.method = method;
+    }
 
 
 //-------------------------------- protected members ---------------------------

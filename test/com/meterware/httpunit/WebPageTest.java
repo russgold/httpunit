@@ -153,6 +153,27 @@ public class WebPageTest extends HttpUnitTest {
         assertNotNull( "No DOM created for document", dom );
         assertTrue( "returned dom does not implement HTMLDocument, but is " + dom.getClass().getName(), dom instanceof HTMLDocument );
     }
+    
+    /**
+     * add test for HeadMethodWebRequest 
+     * @author Dan Lipofsky 2009-08-19
+     * @throws Exception
+     */
+    public void testHeadMethodWebRequest() throws Exception {
+        defineResource( "SimplePage.html",
+            "<html><head><title>A Sample Page</title></head>\n" +
+            "<body>Hello</body></html>\n" );
+        HttpUnitOptions.setExceptionsThrownOnErrorStatus(true);
+        WebConversation wc = new WebConversation();
+        // create a HeadMethodWebRequest
+        // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html for definition
+        WebRequest request = new HeadMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        String text=simplePage.getText();
+        // no body should be returned
+        assertEquals("",text);
+      }
+
 
 
     public void testTitle() throws Exception {

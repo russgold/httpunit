@@ -404,11 +404,21 @@ public class PseudoServer {
     }
 
 
+    /**
+     * get the resource for the given request by first trying to look it up in the cache
+     * then depending on the type of request PseudoServlet and the method / command e.g. GET/HEAD
+     * finally the extension of the uri ".zip" ".class" and ".jar" are handled
+     * @param request
+     * @return the WebResource or null if non of the recipes above will lead to a valid resource
+     * @throws IOException
+     */
     private WebResource getResource( HttpRequest request ) throws IOException {
         Object resource = _resources.get( request.getURI() );
         if (resource == null) resource = _resources.get( withoutParameters( request.getURI() ) );
 
-        if (request.getCommand().equals( "GET" ) && resource instanceof WebResource) {
+        // check the method of the request
+        String command=request.getCommand();
+        if ((command.equals( "GET" ) || command.equals("HEAD")) && resource instanceof WebResource) {
             return (WebResource) resource;
         } else if (resource instanceof PseudoServlet) {
             return getResource( (PseudoServlet) resource, request );

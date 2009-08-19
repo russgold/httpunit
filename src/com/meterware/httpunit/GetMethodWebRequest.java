@@ -24,16 +24,52 @@ import org.w3c.dom.Element;
 import java.net.URL;
 
 /**
- * An HTTP request using the GET method.
+ * An HTTP request using the GET method. 
+ * RFC 2616 http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html defines: 
+ * 
+ * 9.3 GET
+ * 
+ * The GET method means retrieve whatever information (in the form of an entity)
+ * is identified by the Request-URI. If the Request-URI refers to a
+ * data-producing process, it is the produced data which shall be returned as
+ * the entity in the response and not the source text of the process, unless
+ * that text happens to be the output of the process.
+ * 
+ * The semantics of the GET method change to a "conditional GET" if the request
+ * message includes an If-Modified-Since, If-Unmodified-Since, If-Match,
+ * If-None-Match, or If-Range header field. A conditional GET method requests
+ * that the entity be transferred only under the circumstances described by the
+ * conditional header field(s). The conditional GET method is intended to reduce
+ * unnecessary network usage by allowing cached entities to be refreshed without
+ * requiring multiple requests or transferring data already held by the client.
+ * 
+ * The semantics of the GET method change to a "partial GET" if the request
+ * message includes a Range header field. A partial GET requests that only part
+ * of the entity be transferred, as described in section 14.35. The partial GET
+ * method is intended to reduce unnecessary network usage by allowing
+ * partially-retrieved entities to be completed without transferring data
+ * already held by the client.
+ * 
+ * The response to a GET request is cacheable if and only if it meets the
+ * requirements for HTTP caching described in section 13.
+ * 
+ * See section 15.1.3 for security considerations when used for forms.
  **/
 public class GetMethodWebRequest extends HeaderOnlyWebRequest {
 
+	/**
+	 * initialize me - set method to GET
+	 */
+	private void init() {
+		super.setMethod("GET");
+	}
 
     /**
      * Constructs a web request using a specific absolute url string.
      **/
     public GetMethodWebRequest( String urlString ) {
         super( urlString );
+        init();
     }
 
 
@@ -42,6 +78,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     public GetMethodWebRequest( URL urlBase, String urlString ) {
         super( urlBase, urlString );
+        init();
     }
 
 
@@ -50,14 +87,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     public GetMethodWebRequest( URL urlBase, String urlString, String target ) {
         super( urlBase, urlString, target );
-    }
-
-
-    /**
-     * Returns the HTTP method defined for this request.
-     **/
-    public String getMethod() {
-        return "GET";
+        init();
     }
 
 
@@ -69,6 +99,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( WebForm sourceForm ) {
         super( sourceForm );
+        init();
     }
 
 
@@ -77,6 +108,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( FixedURLWebRequestSource source ) {
         super( source );
+        init();
     }
 
 
@@ -85,6 +117,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( WebResponse referer, Element sourceElement, URL urlBase, String urlString, String target ) {
         super( referer, sourceElement, urlBase, urlString, target );
+        init();
     }
 
 
@@ -93,6 +126,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( URL urlBase, String urlString, FrameSelector frame ) {
         super( urlBase, urlString, frame );
+        init();
     }
 
 
@@ -101,6 +135,7 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( URL urlBase, String urlString, FrameSelector frame, String target ) {
         super( urlBase, urlString, frame, target );
+        init();
     }
 
 
@@ -109,11 +144,8 @@ public class GetMethodWebRequest extends HeaderOnlyWebRequest {
      **/
     GetMethodWebRequest( WebForm sourceForm, ParameterHolder parameterHolder, SubmitButton button, int x, int y ) {
         super( sourceForm, parameterHolder, button, x, y );
+        init();
     }
 
 
 }
-
-
-
-

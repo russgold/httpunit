@@ -189,12 +189,12 @@ public class WebRequest {
     protected String method;
 
 		
-		/**
-		 * @return the method
-		 */
-		public String getMethod() {
-			return method;
-		}
+    /**
+     * @return the method
+     */
+    public String getMethod() {
+    	return method;
+    }
 
 
     /**
