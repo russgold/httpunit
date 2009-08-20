@@ -97,6 +97,7 @@ public class ParsedHTML {
      * @return an array of objects representing the forms in the page or portion of a page.
      **/
     public WebForm[] getForms() {
+    	loadElements();
         HTMLCollection forms = ((HTMLContainerElement) _rootNode).getForms();
         WebForm[] result = new WebForm[ forms.getLength() ];
         for (int i = 0; i < result.length; i++) {
@@ -116,6 +117,7 @@ public class ParsedHTML {
      * Returns the links found in the page in the order in which they appear.
      **/
     public WebLink[] getLinks() {
+    	loadElements();
         HTMLCollection links = ((HTMLContainerElement) _rootNode).getLinks();
         WebLink[] result = new WebLink[ links.getLength() ];
         for (int i = 0; i < result.length; i++) {
@@ -133,6 +135,7 @@ public class ParsedHTML {
      * Returns a proxy for each applet found embedded in this page.
      */
     public WebApplet[] getApplets() {
+    	loadElements();
         HTMLCollection applets = ((HTMLContainerElement) _rootNode).getApplets();
         WebApplet[] result = new WebApplet[ applets.getLength() ];
         for (int i = 0; i < result.length; i++) {
@@ -150,6 +153,7 @@ public class ParsedHTML {
      * Returns the images found in the page in the order in which they appear.
      */
     public WebImage[] getImages() {
+    	loadElements();
         HTMLCollection images = ((HTMLContainerElement) _rootNode).getImages();
         WebImage[] result = new WebImage[ images.getLength() ];
         for (int i = 0; i < result.length; i++) {
@@ -167,6 +171,7 @@ public class ParsedHTML {
      * Returns the top-level block elements found in the page in the order in which they appear.
      */
     public TextBlock[] getTextBlocks() {
+    	loadElements();
         if (_blocks == null) {
             loadElements();
             _blocks = (TextBlock[]) _blocksList.toArray( new TextBlock[ _blocksList.size() ] );
@@ -179,6 +184,7 @@ public class ParsedHTML {
      * Returns the first text block found in the page which matches the specified predicate and value.
      */
     public TextBlock getFirstMatchingTextBlock( HTMLElementPredicate predicate, Object criteria ) {
+    	loadElements();
         TextBlock[] blocks = getTextBlocks();
         for (int i = 0; i < blocks.length; i++) {
             if (predicate.matchesCriteria( blocks[i], criteria )) return blocks[i];
@@ -187,7 +193,13 @@ public class ParsedHTML {
     }
 
 
+    /**
+     * get the next text block based on the given block
+     * @param block
+     * @return - the next text block
+     */
     public TextBlock getNextTextBlock( TextBlock block ) {
+    	loadElements();
         int index = _blocksList.indexOf( block );
         if (index < 0 || index == _blocksList.size() - 1) return null;
         return (TextBlock) _blocksList.get( index+1 );
@@ -196,8 +208,10 @@ public class ParsedHTML {
 
     /**
      * Returns the top-level tables found in the page in the order in which they appear.
+     * @return an array of tables
      **/
     public WebTable[] getTables() {
+    	loadElements();
         if (_tables == null) {
             loadElements();
             _tables = (WebTable[]) _tableList.toArray( new WebTable[ _tableList.size() ] );

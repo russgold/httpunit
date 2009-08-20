@@ -450,10 +450,13 @@ public abstract class HttpUnitOptions {
 
     /**
      * Determines whether script errors result in exceptions or warning messages.
+     * @return the current state
      */
-    public static void setExceptionsThrownOnScriptError( boolean throwExceptions ) {
+    public static boolean setExceptionsThrownOnScriptError( boolean throwExceptions ) {
+    	boolean current=_exceptionsThrownOnScriptError;
         _exceptionsThrownOnScriptError = throwExceptions;
         getScriptingEngine().setThrowExceptionsOnError( throwExceptions );
+        return current;
     }
 
 

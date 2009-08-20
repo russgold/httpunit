@@ -65,6 +65,38 @@ public class WebFormTest extends HttpUnitTest {
                                   "</form>" );
     }
 
+    /**
+     * placeholder for test for BR 2407470 by redsonic with comment and patch by Adam Heath
+     * 
+     */
+    public void testGetFormWithID() throws Exception {
+        defineWebPage(  "OnCommand",
+        		"<html>\n"+
+        		"  <head>\n"+
+                "     <script type='JavaScript'>\n" +
+                "         function function1() {\n"+
+                "  		    alert( document.forms[0].name );\n" +
+                "         }\n"+
+                "     </script>\n" +
+                "  </head>\n" +
+                "  <body>\n"+
+                "    <form id='form1' name='form1name'/>\n" +
+                "    <form id='form2' name='form2name'/>\n" + 
+                "    <form id='form3' name='form3name'/>\n" +
+                "  <body>\n"+
+                "</html>\n");
+        boolean oldstate = HttpUnitOptions.setExceptionsThrownOnScriptError(false);
+        try {
+        	WebConversation wc = new WebConversation();
+        	WebResponse wr=wc.getResponse( getHostPath() + "/OnCommand.html" );    	
+        	WebForm form = wr.getFormWithID( "form3" );
+        	assertTrue(form!=null);
+        } catch (Exception ex) {
+        	throw ex;
+        } finally {
+        	HttpUnitOptions.setExceptionsThrownOnScriptError(oldstate);
+        }
+    }
 
     public void testSubmitFromForm() throws Exception {
         defineWebPage( "Form", "<form method=GET id=main action = 'tryMe'>" +
