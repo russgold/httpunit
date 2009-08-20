@@ -20,15 +20,64 @@
 
 <h2>Revision History:</h2>
 
-<h3>Version 1.7.x to be Released some time in the future</h3>
+<h3>Version 1.7.x to be Released some time in the future after 2009-08-20</h3>
 <h4>Acknowledgements:</h4>
 <ul>
 	<li>Marc Guillemot for his change request to add the response to a HttpException</li>
     <li>Robert Wadura for showing that trying to load included scripts that do not exist might abort entire requests - was already fixed in 1.7 but not mentioned in the release notes</li>
     <li>Dan Lipofsky for pointing out some problems with JavaScript handling</li>
+    <li>James Abley for making the Abstract base class of the TestCases abstract</li>
+    <li>Tiago Luchini for a fix to avoid that forms are submitted twice</li>
+    <li>Martin Burchell for supplying a testCase for the forms are submitted twice problem</li>
+    <li>Hugh Winkler for pointing out that setAuthorization(user, password should not be deprecated</li>
+    <li>Peter De Bruycker for asking to make form.name property mutable</li>
+    <li>Dawn Lambeth for helping to fix a NullPointerException in MimeEncodedMessageBody</li>
+    <li>Matthew O. Smith for finding a but that BlockElement is not checking null</li>
+    <li>Markus Gaisbauer for correcting an issue with Cookie handling </li>
+    <li>Malcolm Robbins for helping to fix isHiddenParameter which return true for non existing parameters</li>
+    <li>Stephen Cresswell for suggesting to modify CookieTest</li>
+    <li>Stephen Mikaty for an addition to so that the XPath Predicate handling may work again</li>
+    <li>Mattias Jiderhamn for helping to avoid 'event is not defined' problems</li>
+    <li>Brendan Boesen for revisiting BR 2264431</li>
+    <li>James Courtney for proposing a new test case and providing a fix</li>
+    <li>Serge Maslyukov for a path to solve issue with drupal's cookie</li>
+    <li>Chris Wilson for supplying a fix for Rhino JavaScript errors to show up when ScriptError handling is switched off</li>
+    <li>redsonic and Adam Heath for proposing a patch to solve problems with getFormWithId()</li>
+    <li>Oliver Wahlen for asking for a solution to get the bytes for a download result - WebResponse.getBytes() is now available for this purpose</li>
 </ul>
 <h4>Problems fixed:</h4>
-    <li>bug #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1055450&group_id=6550&atid=106550">1055450</a> - Error loading included script aborts entire request</li>
+    <li>BR [<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1055450&group_id=6550&atid=106550">1055450</a> ] Error loading included script aborts entire request</li>
+	<li>BR [<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2034998&group_id=6550&atid=106550">2034998</a> ] by Tiago Luchini + fix of another bug    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=991">r991</a>)  </li>
+	<li>BR [<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2212706&group_id=6550&atid=106550">2212706</a> ] NullPointerException in MimeEncodedMessageBody by Dawn Lambeth (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=997">r997</a>)</li>
+	<li>BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1963211&group_id=6550&atid=106550">1963211</a> ] FindBug: BlockElement not checking null by Matthew O. Smith  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1008">r1008</a>)  </li>
+	<li>BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2076028&group_id=6550&atid=106550">2076028</a> ] Cookies are handeled incorrectly by Markus Gaisbauer (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1006">r1006</a>) </li>
+	<li>BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2099277&group_id=6550&atid=106550">2099277</a> ] isHiddenParameter() returns true when non existent by Malcolm Robbins  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1007">r1007</a>)
+	<li>BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2100376&group_id=6550&atid=106550">2100376</a> ] Unable to implement an XPath Predicate (which used to work) by Stephane Mikaty  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1010">r1010</a>) </li>
+  	<li>BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2100376&group_id=6550&atid=106550">2100376</a> ] Unable to implement an XPath Predicate (which used to work) by Stephane Mikaty (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1012">r1012</a>)  </li>
+	<li>Patch [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1968504&group_id=6550&atid=306550">1968504</a> ] Avoid '"event" is not defined'  by Mattias Jiderhamn (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1013">r1013</a>)  </li>
+  	<li>BR[<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2264431&group_id=6550&atid=106550">2264431</a>] Revisited by Brendan Boesen (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1014">r1014</a>)</li>
+	<li>fix by James Courtney (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1033">r1033</a>) </li>
+<h5>Other modifications</h5>
+<ol>
+  <li>made abstract on recommendation of James Abley   (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=990">r990</a>)</li>
+  <li>test case for BR<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2034998&group_id=6550&atid=106550">2034998</a> by Martin Burchell, Aptivate (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=992">r992</a>)</li>
+  <li>removed deprecated as asked for in BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2034206&group_id=6550&atid=106550">2034206</a> by Hugh Winkler (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=993">r993</a>) </li>
+  <li>FR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2163079&group_id=6550&atid=106550">2163079</a> ] make form.name property mutable by Peter De Bruycker (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=995">r995</a>)</li>
+  <li>follow up on BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1518901&group_id=6550&atid=106550">1518901</a> ] (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=998">r998</a>) </li>
+  <li>Test for [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2264431&group_id=6550&atid=106550">2264431</a> ] form.submit() sends multiple HTTP POSTS (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=999">r999</a>) </li>
+  <li>modified according to suggestion by Stephen Cresswell (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1005">r1005</a>)</li>
+  <li>added test case for discussing <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2373755&group_id=6550&atid=106550">2373755</a>(<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1015">r1015</a>)</li>
+  <li>new testcase according to discussion with James Courtney (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1017">r1017</a>)</li>
+  <li>Negotiate Header should not spoil Authentication -- null pointer problem removed (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1019">r1019</a>)</li>
+  <li>patch by Serge Maslyukov to solve issue with drupal's cookie (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1020">r1020</a>) </li>
+  <li>fix problems in german locale (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1032">r1032</a>) </li>
+  <li>check behaviour of undefined resources (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1035">r1035</a>) </li>
+  <li>modify message on failure of getIncludes Scripts via src attributes<br />to make sure the message is the same on all setting of Exception and ScriptError status flags  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1039">r1039</a>)  </li>
+  <li>add test for HeadMethodWebRequest by Dan Lipofsky and fix the PseudoServer accordingly. Make sure GetMethodWebRequest sets the method attribute in the superClass. (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1040">r1040</a>)  </li>
+  <li>fixed BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2637824&group_id=6550&atid=106550">2637824</a> by Chris Wilson <br />JavaScriptException still fatal with script exceptions off (Rhino)(<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1041">r1041</a>)  </li>
+  <li>proposed fix for BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2407470&group_id=6550&atid=306550">2407470</a> Regression in httpUnit-1.7 by redsonic with Patch from Adam Heath (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1042">r1042</a>) </li>
+</ol>
+	
 <h4>Additions:</h4>
 <h5>Debugging</h5>
 Whenever some code was changed it was made more debug and test-friendly. 
@@ -38,8 +87,29 @@ Whenever some code was changed it was made more debug and test-friendly.
 </ul>    
 <h5>Error handling</h5>
 <ol>
-    <li>change request #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=914314&group_id=6550&atid=356550">914314</a>Add HttpException.getResponse for better reporting</li>
+    <li>change request #<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=914314&group_id=6550&atid=356550">914314</a>Add HttpException.getResponse for better reporting - comment added only</li>
+    <li>implemented CR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=914314&group_id=6550&atid=106550">914314</a> ] to add getResponse to HttpException<br />improved handling of undefined resources in PseudoServer<br />getIncludedScript now handles 404 errors according to the HttpUnit Options settings for script error and exception handling (thanks to Dan Lipofsky for pointing this out) (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1036">r1036</a>)  </li>
+</ol>
+<h5>Content and Parsing</h5>    
+<ol>
+  <li>Test added for BR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1964665&group_id=6550&atid=106550">1964665</a> ] HeaderOnlyRequest cannot be constructed (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1009">r1009</a>)  </li>
+  <li>getBytes added to WebResponse according to a CR by Oliver Wahlen<br />getDownload helper function is superfluous now  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1043">r1043</a>) </li>
 </ol>    
+<h5>Java Script</h5>
+<ol>
+  <li>FR [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2025598&group_id=6550&atid=106550">2025598</a> ] support javascript window.scrollTo() (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=994">r994</a>) </li>
+  <li>toLowerCase built in function added (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1021">r1021</a>)  </li>
+  <li>patch <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1152036&group_id=6550&atid=306550">1152036</a>: don't request javascript when not enabled  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1022">r1022</a>) </li>
+</ol>
+<h5>IDE Support</h5>
+<ol>
+  <li>updated for new maven2 repository (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=987">r987</a>)</li>
+  <li>Eclipse settings added (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=988">r988</a>) </li>
+  <li>Eclipse setting modified for lesser warnings  (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1023">r1023</a>) </li>
+  <li>more settings changed (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1024">r1024</a>)</li>
+</ol>    
+<h4>Improvements</h4>
+<h5>Javadoc</h5>
 
 
 <h3>Version 1.7 Released 2008-05-20</h3>
