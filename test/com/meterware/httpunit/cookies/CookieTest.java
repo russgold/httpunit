@@ -22,6 +22,7 @@ package com.meterware.httpunit.cookies;
  *******************************************************************************************************************/
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
@@ -75,6 +76,20 @@ public class CookieTest extends TestCase {
         assertEquals( "cookie 'p30waco_sso' value", "3.0,en,us,AMERICA,Drew", jar.getCookieValue( "p30waco_sso" ) );
         assertEquals( "cookie 'PORTAL30_SSO_TEST' value", "X", jar.getCookieValue( "PORTAL30_SSO_TEST" ) );
         assertEquals( "cookie 'SESSION_ID' value", "17585,Dzm5LzbRPnb95QkUyIX+7w5RDT7p6OLuOVZ91AMl4hsDATyZ1ej+FA==", jar.getCookieValue( "SESSION_ID" ) );
+    }
+    
+    /***
+     * test for double quoted cookies suggested by Mario V
+     * disabled since it indeed fails - FIXME - we need a patch here
+     * @throws Exception
+     */
+    public void xtestDoubleQuoteCookies() throws Exception {
+        CookieJar jar = new CookieJar(
+                new TestSource( new URL( "http://www.meterware.com" ),
+                                new String[] { "NewUniversalCookie=\"mmmmmmmmmmmmmmm==mmmmmmm mmmmmmm\"; Path=/"} ) );
+        Collection cookies = jar.getCookies();        
+        assertTrue("There should only be one cookie but there are "+cookies.size(),cookies.size()==1);
+        assertEquals( "cookie 'NewUniversalCookie' value", "mmmmmmmmmmmmmmm==mmmmmmm mmmmmmm", jar.getCookieValue( "NewUniversalCookie" ) );
     }
 
 
