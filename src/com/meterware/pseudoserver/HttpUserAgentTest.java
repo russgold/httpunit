@@ -255,9 +255,7 @@ public class HttpUserAgentTest extends TestCase {
 
 
     protected void assertEquals( String comment, byte[] expected, byte[] actual ) {
-        if (!equals( expected, actual )) {
-            fail( comment + " expected:\n" + toString( expected ) + ", but was:\n" + toString( actual ) );
-        }
+    	assertEquals(comment,toString(expected),toString(actual));
     }
 
 

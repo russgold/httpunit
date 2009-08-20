@@ -276,10 +276,21 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     abstract
     public String getHeaderField( String fieldName );
 
-
+    /**
+     * Returns the actual byte stream of the response e.g. for download results
+     * @return the byte array read for this response
+     * @throws IOException
+     */
+    public byte[] getBytes() throws IOException {
+        if (_responseText == null) 
+        	loadResponseText();
+        return _bytes;
+    } 
+    
     /**
      * Returns the text of the response (excluding headers) as a string. Use this method in preference to 'toString'
      * which may be used to represent internal state of this object.
+     * @return the response text
      **/
     public String getText() throws IOException {
         if (_responseText == null) 
@@ -1055,7 +1066,15 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     private int _refreshDelay = -1;  // initialized to invalid value
 
+    /**
+     * the response as a String
+     */
     private String _responseText;
+    
+    /**
+     * the response as a byte array
+     */
+    private byte[] _bytes;
 
 	private InputStream _inputStream;
 
@@ -1082,15 +1101,15 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
         try {
             final int contentLength = this.encodedUsingGZIP() ? -1 : getContentLength();
             int bytesRemaining = contentLength < 0 ? Integer.MAX_VALUE : contentLength;
-            byte[] bytes = readFromStream( inputStream, bytesRemaining );
+            _bytes = readFromStream( inputStream, bytesRemaining );
 
-            readTags( bytes );
-            _responseText = new String( bytes, getCharacterSet() );
-            _inputStream  = new ByteArrayInputStream( bytes );
+            readTags( _bytes );
+            _responseText = new String( _bytes, getCharacterSet() );
+            _inputStream  = new ByteArrayInputStream( _bytes );
 
-            if (HttpUnitOptions.isCheckContentLength() && contentLength >= 0 && bytes.length != contentLength) {
+            if (HttpUnitOptions.isCheckContentLength() && contentLength >= 0 && _bytes.length != contentLength) {
                 throw new IOException("Truncated message. Expected length: " + contentLength +
-                                                       ", Actual length: " + bytes.length);
+                                                       ", Actual length: " + _bytes.length);
             }
         } finally {
             inputStream.close();
