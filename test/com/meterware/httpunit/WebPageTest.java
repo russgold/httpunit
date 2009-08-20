@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2007, Russell Gold
+* Copyright (c) 2000-2009, Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -457,6 +457,26 @@ public class WebPageTest extends HttpUnitTest {
         assertImplement( "elements with id 'link1'", simplePage.getElementsWithAttribute( "id", "link1" ), WebLink.class );
         assertImplement( "elements with src '/images/arrow.gif'", simplePage.getElementsWithAttribute( "src", "/images/arrow.gif" ), WebImage.class );
     }
+
+    /**
+     * test for getElementsWithClassName supplied by Rick Huff
+     * @throws Exception
+     */
+    public void testGetElementsWithClassName() throws Exception {
+        defineResource( "SimplePage.html",
+                        "<html><head><title>A Sample Page</title></head>\n" +
+                        "<body><form class='first colorsample' name='aForm'><input name=color></form>" +
+                        "have <a id='link1' href='/other.html'>an <b>active</b> link</A>\n" +
+                        "<img id='23' src='/images/arrow.gif' ALT='Next -->' WIDTH=1 HEIGHT=4>\n" +
+                        "</body></html>\n" );
+        WebConversation wc = new WebConversation();
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/SimplePage.html" );
+        WebResponse simplePage = wc.getResponse( request );
+        assertImplement( "elements with class attribute 'first colorsample'", simplePage.getElementsWithAttribute( "class", "first colorsample" ), WebForm.class );
+        assertImplement( "elements with class 'first'", simplePage.getElementsWithClassName( "first" ), WebForm.class );
+        assertImplement( "elements with class 'colorsample'", simplePage.getElementsWithClassName( "colorsample" ), WebForm.class );
+    }
+
 
     /**
      * Test the {@link WebResponse.ByteTagParser} to ensure that embedded JavaScript is skipped.

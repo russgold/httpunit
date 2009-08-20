@@ -387,7 +387,13 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
         return getReceivedPage().getElementsWithName( name );
     }
 
-
+    /**
+     * Returns the HTMLElements found in this segment with the specified class.
+     */
+    public HTMLElement[] getElementsWithClassName( String className ) throws SAXException {
+        return getReceivedPage().getElementsWithClassName( className );
+    }
+    
     /**
      * Returns the HTMLElements found with the specified attribute value.
      * @since 1.6

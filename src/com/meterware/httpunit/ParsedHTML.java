@@ -66,6 +66,9 @@ public class ParsedHTML {
 
     /** map of element names to lists of elements. **/
     private HashMap      _elementsByName = new HashMap();
+    
+    /** map of element class to elements. **/
+    private HashMap      _elementsByClass = new HashMap();
 
     /** map of DOM elements to HTML elements **/
     private ElementRegistry _registry = new ElementRegistry();
@@ -234,6 +237,15 @@ public class ParsedHTML {
     public HTMLElement[] getElementsWithName( String name ) {
         loadElements();
         ArrayList elements = (ArrayList) _elementsByName.get( name );
+        return elements == null ? NO_ELEMENTS : (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
+    }
+
+    /**
+     * Returns the HTML elements with the specified class.
+     */
+    public HTMLElement[] getElementsWithClassName( String className ) {
+        loadElements();
+        ArrayList elements = (ArrayList) _elementsByClass.get( className );
         return elements == null ? NO_ELEMENTS : (HTMLElement[]) elements.toArray( new HTMLElement[ elements.size() ] );
     }
 
@@ -889,6 +901,22 @@ public class ParsedHTML {
         _registry.registerElement( node, htmlElement );
         if (htmlElement.getID() != null) _elementsByID.put( htmlElement.getID(), htmlElement );
         if (htmlElement.getName() != null) addNamedElement( htmlElement.getName(), htmlElement );
+        if (htmlElement.getClassName() != null) {
+            StringTokenizer tokenizer = new StringTokenizer(htmlElement.getClassName());
+            String token;
+            
+            while(tokenizer.hasMoreElements()) {
+            	token = tokenizer.nextToken();
+       		
+            	if ( _elementsByClass.containsKey( token )) {
+                	((ArrayList) _elementsByClass.get( token )).add( htmlElement );
+            	} else {
+                	ArrayList arrayList = new ArrayList();
+                	arrayList.add(htmlElement);
+                    _elementsByClass.put( token, arrayList );
+            	}
+            }
+        }
     }
 
 
