@@ -2,7 +2,7 @@ package com.meterware.servletunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2000-2008 by Russell Gold
+* Copyright (c) 2000-2009 by Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -714,10 +714,9 @@ public class HttpServletRequestTest extends ServletUnitTest {
   /**
    * test the reader with a Specific Character set (here UTF-8)
    * @throws Exception
-   * TODO make work an switch back on
+   * FIXME make work an switch back on
    */
   public void xtestGetReaderSpecificCharset() throws Exception {
-      //String body = "東京";
       String body = "\u05d0\u05d1\u05d2\u05d3";
       InputStream stream = new ByteArrayInputStream( body.getBytes( "UTF-8" ) );
       WebRequest wr = new PostMethodWebRequest( "http://localhost/simple", stream, "text/plain; charset=UTF-8" );
@@ -769,6 +768,39 @@ public class HttpServletRequestTest extends ServletUnitTest {
         request.setCharacterEncoding( "ISO-8859-8" );
         assertEquals( "param1 value", "red", request.getParameter( "param1") );
         assertEquals( "param2 value", hebrewValue, request.getParameter( "param2") );
+    }
+
+    /**
+     * test for getServerPort and getServerName by Antoine Vernois
+     * @throws Exception
+     */
+    public void testDefaultHttpServerPort() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://localhost/simple" );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
+        int serverPort = request.getServerPort();
+        assertEquals( "default http server port", serverPort, 80 );
+    }
+
+    /**
+     * test for getServerPort and getServerName by Antoine Vernois
+     * @throws Exception
+     */
+    public void testSuppliedHttpServerPort() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://localhost:8080/simple" );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
+        int serverPort = request.getServerPort();
+        assertEquals( "supplied http server port", serverPort, 8080 );
+    }
+
+    /**
+     * test for getServerPort and getServerName by Antoine Vernois
+     * @throws Exception
+     */
+    public void testServerName() throws Exception {
+        WebRequest wr = new GetMethodWebRequest( "http://myhost:8080/simple" );
+        HttpServletRequest request = new ServletUnitHttpRequest( NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), NO_MESSAGE_BODY );
+        String serverName = request.getServerName();
+        assertEquals( "server name", serverName, "myhost" );
     }
 
 

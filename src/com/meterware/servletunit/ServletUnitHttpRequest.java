@@ -56,7 +56,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
     private boolean                _gotReader;
     private boolean                _gotInputStream;
     private BufferedReader         _reader;
-    
+    private int 		           _serverPort;
+    private String		           _serverName;   
 
 
     /**
@@ -75,6 +76,11 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         _messageBody = messageBody;
         _protocol=request.getURL().getProtocol().toLowerCase();
         _secure = _protocol.endsWith("s" );
+        _serverName = request.getURL().getHost();
+        _serverPort = request.getURL().getPort();
+        if ( _serverPort == -1 ) {
+            _serverPort = request.getURL().getDefaultPort();
+        }
 
         _requestContext = new RequestContext( request.getURL() );
         String contentTypeHeader = (String) _headers.get( "Content-Type" );
@@ -472,7 +478,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns the host name of the server that received the request.
      **/
     public String getServerName() {
-        return "localhost";
+    	return _serverName;
     }
 
 
@@ -480,7 +486,7 @@ class ServletUnitHttpRequest implements HttpServletRequest {
      * Returns the port number on which this request was received.
      **/
     public int getServerPort() {
-        return 0;
+    	return _serverPort;
     }
 
 
