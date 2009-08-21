@@ -159,10 +159,10 @@ public class WebLinkTest extends HttpUnitTest {
     	assertTrue(elements[0] instanceof TableCell);
     	TableCell aCell=(TableCell)elements[0];
     	WebLink[] cellLinks = aCell.getLinks();
-    	for (int i=0;i<cellLinks.length;i++) {
+    	/*for (int i=0;i<cellLinks.length;i++) {
     		WebLink link=cellLinks[i];
     		System.out.println("link "+i+"="+link.getName());
-    	}
+    	}*/
     	assertEquals(1,cellLinks.length);
     	assertEquals("acelllink",cellLinks[0].getName());
     }
