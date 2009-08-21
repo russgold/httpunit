@@ -50,6 +50,7 @@ public class JavaScriptTestSuite {
         result.addTest( FormScriptingTest.suite() );
         result.addTest( FrameScriptingTest.suite() );
         result.addTest( HTMLElementTest.suite() );
+        result.addTest( EventHandlingTest.suite());
         return result;
     }
 }

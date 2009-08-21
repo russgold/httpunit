@@ -21,11 +21,17 @@ package com.meterware.httpunit.javascript;
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
 
+import com.meterware.httpunit.javascript.events.EventException;
+import com.meterware.httpunit.javascript.events.EventTarget;
 import com.meterware.httpunit.scripting.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.mozilla.javascript.*;
 import org.xml.sax.SAXException;
@@ -104,10 +110,12 @@ public class JavaScript {
     /**
      * abstract Engine for JavaScript
      */
-    abstract static class JavaScriptEngine extends ScriptingEngineImpl {
+    abstract static class JavaScriptEngine extends ScriptingEngineImpl implements EventTarget {
 
         protected ScriptableDelegate _scriptable;
         protected JavaScriptEngine   _parent;
+        protected Map _eventListeners = new HashMap(); // Map<String,Set<EventListener>>
+        protected Map _eventCaptureListeners = new HashMap(); // Map<String,Set<EventListener>>
 
         /**
          * initialize JavaScript for the given ScriptEngine
@@ -270,6 +278,57 @@ public class JavaScript {
             result.initialize( elements );
             return result;
         }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void jsFunction_addEventListener(String type, Scriptable listener, boolean useCapture) {
+            if(useCapture) {
+                Set set = (Set)_eventCaptureListeners.get(type); //Set<Scriptable>
+                if(set == null) {
+                    set = new HashSet();
+                    _eventCaptureListeners.put(type, set);
+                }
+                set.add(listener);
+            } else {
+                Set set = (Set)_eventListeners.get(type); //Set<Scriptable>
+                if(set == null) {
+                    set = new HashSet();
+                    _eventListeners.put(type, set);
+                }
+                set.add(listener);
+            }
+            //System.out.println(getClassName()+".addEventListener("+type+")");
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean jsFunction_dispatchEvent(Scriptable evt) throws EventException  {
+            // TODO implement event dispatching & listener invocation
+            //System.out.println(getClassName()+".dispatchEvent("+evt.get("type",evt)+")");
+            return true;
+        }
+
+
+        /**
+         * {@inheritDoc}
+         */
+        public void jsFunction_removeEventListener(String type, Scriptable listener, boolean useCapture) {
+            if(useCapture) {
+                Set set = (Set)_eventCaptureListeners.get(type); //Set<EventListener>
+                if(set != null) {
+                    set.remove(listener);
+                }
+            } else {
+                Set set = (Set)_eventListeners.get(type); //Set<EventListener>
+                if(set != null) {
+                    set.remove(listener);
+                }
+            }
+            //System.out.println(getClassName()+".removeEventListener("+type+")");
+        }
     }
 
 
@@ -413,6 +472,7 @@ public class JavaScript {
         public void jsFunction_close() {
             getDelegate().closeWindow();
         }
+
 
 
         public Window jsFunction_open( Object url, String name, String features, boolean replace )
@@ -575,6 +635,27 @@ public class JavaScript {
         private HTMLPage.Scriptable getDelegate() {
             return (HTMLPage.Scriptable) _scriptable;
         }
+
+
+		public void jsFunction_addEventListener(String type,
+				Scriptable listener, boolean useCapture) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+		public boolean jsFunction_dispatchEvent(Scriptable evt)
+				throws EventException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+
+		public void jsFunction_removeEventListener(String type,
+				Scriptable listener, boolean useCapture) {
+			// TODO Auto-generated method stub
+			
+		}
 
     }
 
