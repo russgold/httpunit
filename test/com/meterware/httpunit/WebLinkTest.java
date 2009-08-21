@@ -19,6 +19,8 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import org.xml.sax.SAXException;
+
 import junit.framework.TestSuite;
 
 
@@ -52,6 +54,7 @@ public class WebLinkTest extends HttpUnitTest {
                         "<body>This has no forms but it does\n" +
                         "have <a href='/other.html#middle' id='activeID'>an <b>active</b> link</A>\n" +
                         " and <a name=here>an anchor</a>\n" +
+                        "<table><tr><td name='acell'><a href='basic.html' name='acelllink'>a link in a cell</a></td></tr></table>"+
                         "<a href='basic.html' name=\"nextLink\"><IMG SRC=\"/images/arrow.gif\" ALT=\"Next -->\" WIDTH=1 HEIGHT=4></a>\n" +
                         "<a href='another.html' name='myLink'>some text</a>\n" +
                         "</body></html>\n" );
@@ -107,11 +110,14 @@ public class WebLinkTest extends HttpUnitTest {
     	assertTrue("the blank %20 in the link2 should not be converted but we got '"+link2.getURLString()+"'",link2.getURLString().equals(blankLink2));    	
     }
 
-
+    /**
+     * check the number of links in the sample page
+     * @throws Exception
+     */
     public void testLinks() throws Exception {
         WebLink[] links = _simplePage.getLinks();
         assertNotNull( "Found no links", links );
-        assertEquals( "number of links in page", 3, links.length );
+        assertEquals( "number of links in page", 4, links.length );
     }
 
 
@@ -141,6 +147,25 @@ public class WebLinkTest extends HttpUnitTest {
         assertEquals( "URLString", "/other.html", link.getURLString() );
     }
 
+    
+    /**
+     * test for BR 2534057 
+     * getLinks() for a Cell return all page links
+     * @throws SAXException 
+     */
+    public void testGetLinksForCell() throws SAXException {
+    	HTMLElement[] elements = _simplePage.getElementsWithName("acell");
+    	assertTrue(elements.length==1);
+    	assertTrue(elements[0] instanceof TableCell);
+    	TableCell aCell=(TableCell)elements[0];
+    	WebLink[] cellLinks = aCell.getLinks();
+    	for (int i=0;i<cellLinks.length;i++) {
+    		WebLink link=cellLinks[i];
+    		System.out.println("link "+i+"="+link.getName());
+    	}
+    	assertEquals(1,cellLinks.length);
+    	assertEquals("acelllink",cellLinks[0].getName());
+    }
 
     public void testGetLinkByText() throws Exception {
         WebLink link = _simplePage.getLinkWith( "no link" );

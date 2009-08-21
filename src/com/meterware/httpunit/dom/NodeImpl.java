@@ -352,6 +352,22 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
         return new PreOrderIterator( PreOrderIterator.nextNode( this ) );
     }
 
+    /**
+     * 
+     * @return
+     */
+    public Iterator preOrderIteratorWithinNode() {
+        PreOrderIterator result = new PreOrderIterator( PreOrderIterator.nextNode( this ) );
+        result.setDoNotLeaveNode(this);
+        return result;
+    }
+    
+	public Iterator preOrderIteratorWithinNode(IteratorMask mask) {
+        PreOrderIterator result = new PreOrderIterator( PreOrderIterator.nextNode( this ),mask );
+        result.setDoNotLeaveNode(this);
+        return result;
+	}
+
 
     public Iterator preOrderIteratorAfterNode( IteratorMask mask ) {
         return new PreOrderIterator( PreOrderIterator.nextNode( this ), mask );
@@ -367,36 +383,105 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
     }
 
 
+    /**
+     * allow masking of the iteration
+     */
     interface IteratorMask {
+    	// skip a given subtree
         boolean skipSubtree( Node subtreeRoot );
     }
 
-
+    /**
+     * iterator for Nodetrees that can be influenced with an Iterator mask to skip
+     * specific parts 
+     */
     static class PreOrderIterator implements Iterator {
         private NodeImpl _nextNode;
+        private NodeImpl _startNode;
         private IteratorMask _mask;
+        private NodeImpl _doNotLeaveNode=null;
 
+        /**
+         * get the limit node
+         * @return
+         */
+        public NodeImpl getDoNotLeaveNode() {
+			return _doNotLeaveNode;
+		}
 
+        /**
+         * limit the PreOrderIterator not to leave the given node
+         * @param doNotLeaveNode
+         */
+		public void setDoNotLeaveNode(NodeImpl doNotLeaveNode) {
+			_doNotLeaveNode = doNotLeaveNode;
+		}
+		
+		/**
+		 * check whether the node is a child of the doNotLeaveNode (if one is set)
+		 * @param node
+		 * @return
+		 */
+		private boolean isChild(Node node) {
+			if (node==null) {
+				return false;
+			} if (_doNotLeaveNode==null) {
+				return true;
+			}	else {
+				Node parent = node.getParentNode();
+				if (parent==null) {
+					return false;
+				} else { 
+					if (parent.isSameNode(_doNotLeaveNode)) {
+						return true;
+					} else {
+						return isChild(parent);
+					}					
+				}
+			}				
+		}
+
+		/**
+         * create a PreOrderIterator starting at a given currentNode
+         * @param currentNode
+         */
         PreOrderIterator( NodeImpl currentNode ) {
             _nextNode = currentNode;
+            _startNode= currentNode;
         }
 
 
+        /**
+         * create a PreOrderIterator starting at a given currentNode and setting
+         * the iterator mask to the given mask
+         * @param currentNode
+         * @param mask
+         */
         PreOrderIterator( NodeImpl currentNode, IteratorMask mask ) {
             this( currentNode );
             _mask = mask;
         }
 
 
+        /**
+         * is there still a next node?
+         */
         public boolean hasNext() {
             return null != _nextNode;
         }
 
 
+        /**
+         * move one step in the tree
+         */
         public Object next() {
             NodeImpl currentNode = _nextNode;
             _nextNode = nextNode( _nextNode );
-            while (_mask != null && _nextNode != null && _mask.skipSubtree( _nextNode )) _nextNode = nextSubtree( _nextNode );
+            while (_mask != null && _nextNode != null && _mask.skipSubtree( _nextNode ))
+            	_nextNode = nextSubtree( _nextNode );
+            // check that we fit the doNotLeaveNode condition in case there is one
+            if (!isChild(_nextNode))
+            	_nextNode=null;
             return currentNode;
         }
 
@@ -421,4 +506,5 @@ abstract public class NodeImpl extends AbstractDomComponent implements Node {
             return null;
         }
     }
+
 }

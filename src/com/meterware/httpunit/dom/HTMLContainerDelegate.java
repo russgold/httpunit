@@ -44,12 +44,12 @@ class HTMLContainerDelegate {
 
     /**
      * get Links for a given Node
-     * @param rootNode
+     * @param rootNode - an array of forms
      * @return
      */
     HTMLCollection getLinks( NodeImpl rootNode ) {
         ArrayList elements = new ArrayList();
-        for (Iterator each = rootNode.preOrderIteratorAfterNode( _iteratorMask ); each.hasNext();) {
+        for (Iterator each = rootNode.preOrderIteratorWithinNode( _iteratorMask ); each.hasNext();) {
             Node node = (Node) each.next();
             if (node.getNodeType() != Node.ELEMENT_NODE) continue;
 
@@ -61,9 +61,14 @@ class HTMLContainerDelegate {
     }
 
 
+    /**
+     * get forms for a given Node
+     * @param rootNode - the node to start from
+     * @return - an array of forms
+     */
     HTMLCollection getForms( NodeImpl rootNode ) {
         ArrayList elements = new ArrayList();
-        for (Iterator each = rootNode.preOrderIteratorAfterNode( _iteratorMask ); each.hasNext();) {
+        for (Iterator each = rootNode.preOrderIteratorWithinNode( _iteratorMask ); each.hasNext();) {
             Node node = (Node) each.next();
             if (node.getNodeType() != Node.ELEMENT_NODE) continue;
 

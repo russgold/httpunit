@@ -372,6 +372,19 @@ public class NodeTest extends TestCase {
         assertFalse( "Iterator should have terminated after " + expectedNodes.length + " nodes", each.hasNext() );
     }
 
+    /**
+     * Verifies that we can iterate through nodes in order, starting after a specific node.
+     */
+    public void testPreOrderIteratorWithinNode() throws Exception {
+        Iterator each = ((NodeImpl)_foo1).preOrderIteratorWithinNode();
+        Node[] expectedNodes = { _bar1, _text, _foo2};
+        for (int i = 0; i < expectedNodes.length; i++) {
+            assertTrue( "Iterator prematurely terminated after " + i + " nodes", each.hasNext() );
+            Object node = each.next();
+            assertSame( "Node " + (1 + i) + ":", expectedNodes[i], node );
+        }
+        assertFalse( "Iterator should have terminated after " + expectedNodes.length + " nodes", each.hasNext() );
+    }
 
     /**
      * Verifies that we can iterate through nodes in order skipping a specified subtree.
