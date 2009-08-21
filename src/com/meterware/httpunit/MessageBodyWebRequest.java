@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
 * $Id$
 *
-* Copyright (c) 2001-2004,2007 Russell Gold
+* Copyright (c) 2001-2009 Russell Gold
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -157,8 +157,14 @@ public class MessageBodyWebRequest extends WebRequest {
 
         /**
          * Transmits the body of this request as a sequence of bytes.
-         **/
+         * @param outputStream
+         * @param parameters
+         * @throws IOException if the tranmission fails
+         */
         public void writeTo( OutputStream outputStream, ParameterCollection parameters ) throws IOException {
+            if (_source.markSupported()) {
+                mark();
+            }
             byte[] buffer = new byte[8 * 1024];
             int count = 0;
             do {
@@ -166,10 +172,27 @@ public class MessageBodyWebRequest extends WebRequest {
                 count = _source.read( buffer, 0, buffer.length );
             } while (count != -1);
 
-            _source.close();
+            written = true;
         }
 
+        /**
+         * 
+         * @throws IOException
+         */
+        public void mark() throws IOException {
+            if (written) {
+                _source.reset();
+            } else {
+            	// amount of bytes to be read after mark gets invalid
+            	int readlimit=1024*1024; // ! MByte
+            	// Marks the current position in this input stream. 
+            	// A subsequent call to the reset method repositions 
+            	// this stream at the last marked position so that subsequent reads re-read the same bytes. 
+                _source.mark(readlimit);
+            }
+        }
 
+        private boolean     written = false;
         private InputStream _source;
         private String      _contentType;
     }

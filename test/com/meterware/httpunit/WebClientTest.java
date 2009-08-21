@@ -26,8 +26,10 @@ import com.meterware.pseudoserver.WebResource;
 
 import junit.framework.TestSuite;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.*;
 import java.util.*;
@@ -403,6 +405,38 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "authorization", "Basic dXNlcjpwYXNzd29yZA==", wr.getText() );
     }
 
+	/**
+	 * test on demand Basic Authentication with InputStream
+	 * 
+	 * @throws Exception
+	 */
+	public void testOnDemandBasicAuthenticationInputStream() throws Exception {
+		defineResource("postRequiringAuthentication", new PseudoServlet() {
+			public WebResource getPostResponse() {
+				String header = getHeader("Authorization");
+				if (header == null) {
+					WebResource webResource = new WebResource("unauthorized");
+					webResource
+							.addHeader("WWW-Authenticate: Basic realm=\"testrealm\"");
+					return webResource;
+				} else {
+					return new WebResource(getBody(), "text/plain");
+				}
+			}
+		});
+
+		String body = "something";
+		InputStream bodyStream = new ByteArrayInputStream(body.getBytes("UTF-8"));
+		PostMethodWebRequest request = new PostMethodWebRequest(getHostPath()
+				+ "/postRequiringAuthentication", bodyStream, "text/plain");
+
+		WebConversation wc = new WebConversation();
+		wc.setAuthentication("testrealm", "user", "password");
+
+		WebResponse wr = wc.getResponse(request);
+		assertEquals(body, wr.getText());
+		bodyStream.close();
+	}
 
     /**
      * Verifies that even though we have specified username and password for a realm,
