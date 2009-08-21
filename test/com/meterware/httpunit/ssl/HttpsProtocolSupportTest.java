@@ -22,6 +22,8 @@ package com.meterware.httpunit.ssl;
 import java.security.Provider;
 import java.security.Security;
 
+import javax.net.ssl.SSLSocketFactory;
+
 import com.meterware.httpunit.HttpsProtocolSupport;
 
 import junit.framework.Test;
@@ -76,5 +78,14 @@ public class HttpsProtocolSupportTest extends TestCase {
 			if (sslProviders.length>0)
 				expected= sslProviders[0].getClass().getName();
 			assertEquals( "provider",expected, provider.getName() );				
+    }
+    
+    /**
+     * test the socket Factory convenience method as proposed by Florian Weimar
+     * @throws Exception
+     */
+    public void testSocketFactory() throws Exception {
+    	SSLSocketFactory factory = HttpsProtocolSupport.getSocketFactory();
+    	assertTrue(factory!=null);
     }
   }

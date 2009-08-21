@@ -22,6 +22,12 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import java.security.Provider;
 import java.security.Security;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 
 
 /**
@@ -154,6 +160,34 @@ public abstract class HttpsProtocolSupport {
         }
         return false;
     }
+    
+    /**
+     * convenience function: create a socket factory which
+     * uses an anything-goes trust manager.
+     * proposed by Florian Weimar
+     */
+    public static SSLSocketFactory getSocketFactory() throws Exception {
+    	final SSLContext context = SSLContext.getInstance("TLS");
+    	context.init(null, new X509TrustManager[] {
+    		new X509TrustManager() {
+    		    //@Override
+    		    public void checkClientTrusted(X509Certificate[] arg0,
+    			    String arg1) throws CertificateException {
+    		    }
+
+    		    //@Override
+    		    public void checkServerTrusted(X509Certificate[] arg0,
+    			    String arg1) throws CertificateException {
+    		    }
+
+    		    //@Override
+    		    public X509Certificate[] getAcceptedIssuers() {
+    			return null;
+    		    }
+
+    		}}, null);
+    	return context.getSocketFactory();
+        }
 
 
     /**
