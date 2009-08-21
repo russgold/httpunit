@@ -70,6 +70,7 @@ class HttpWebResponse extends WebResponse {
 
     HttpWebResponse( WebConversation client, FrameSelector frame, WebRequest request, URLConnection connection, boolean throwExceptionOnError ) throws IOException {
         this( client, frame, request.getURL(), connection, throwExceptionOnError );
+        super.setWithParse(!request.getMethod().equals("HEAD"));
         _referer = request.getReferer();
     }
 

@@ -74,12 +74,29 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     private static final int UNKNOWN_LENGTH_RETRY_INTERVAL = 10;
 
     private FrameSelector _frame;
-
+    // allow to switch off parsing e.g. for method="HEAD"
+    private boolean _withParse=true;
     private String  _baseTarget;
     private String  _refreshHeader;
     private URL     _baseURL;
     private boolean _parsingPage;
 
+    /**
+     * is parsing on?
+     * @return
+     */
+    public boolean isWithParse() {
+    	return _withParse;
+    }
+    
+    /**
+     * set the parsing switch
+     * @param doparse
+     * @return
+     */
+    public void setWithParse(boolean doParse) {
+    	_withParse=doParse;
+    }
 
     /**
      * Returns a web response built from a URL connection. Provided to allow
@@ -832,7 +849,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
 
         public void load() throws SAXException {
-            if (isHTML()) {
+            if (isHTML() && isWithParse()) {
                 getReceivedPage().getForms();         // TODO be more explicit here - don't care about forms, after all
                 doEventScript( getReceivedPage().getOnLoadEvent() );
             }
@@ -1308,8 +1325,10 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
 
     private WebFrame[] getFrames() throws SAXException {
-        return getReceivedPage().getFrames();
-
+    	if (isWithParse())
+    		return getReceivedPage().getFrames();
+    	else
+    		return new WebFrame[0];
     }
 
 
@@ -1324,10 +1343,11 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
                 _parsingPage = true;
                 if (!isHTML()) throw new NotHTMLException( getContentType() );
                 _page = new HTMLPage( this, _frame, _baseURL, _baseTarget, getCharacterSet() );
-                _page.parse( getText(), _pageURL );
-                if (_page == null) throw new IllegalStateException( "replaceText called in the middle of getReceivedPage()" );
-
-                ((HTMLDocumentImpl) _page.getRootNode()).getWindow().setProxy( this );
+                if (_withParse) {
+                	_page.parse( getText(), _pageURL );
+                	if (_page == null) throw new IllegalStateException( "replaceText called in the middle of getReceivedPage()" );
+                	((HTMLDocumentImpl) _page.getRootNode()).getWindow().setProxy( this );
+                }	
             } catch (IOException e) {
             	HttpUnitUtils.handleException(e);
                throw new RuntimeException( e.toString() );
