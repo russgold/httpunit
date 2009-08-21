@@ -47,6 +47,11 @@ public class ProxySample extends TestCase {
     }
 
 
+    /**
+     * test the proxy access
+     * - set the proxy server to one that you may use at your location for quicker response time
+     * @throws Exception
+     */
     public void testProxyAccess() throws Exception {
         WebConversation wc = new WebConversation();
         wc.setProxyServer( "www-proxy.us.oracle.com", 80 );

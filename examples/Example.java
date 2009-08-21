@@ -5,6 +5,10 @@ import com.meterware.httpunit.*;
 public class Example {
 
 
+  /**
+   * starting point of this Example
+   * @param params
+   */
   public static void main( String[] params ) {
     try {
       // create the conversation object which will maintain state for us
@@ -24,6 +28,7 @@ public class Example {
 
     } catch (Exception e) {
        System.err.println( "Exception: " + e );
+       e.printStackTrace();
     }
   }
 }
