@@ -1,6 +1,6 @@
 /********************************************************************************************************************
- * $Id: FormScriptingTest.java 1031 2009-08-17 12:15:24Z wolfgang_fahl $
- * $URL: https://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit/test/com/meterware/httpunit/javascript/FormScriptingTest.java $
+ * $Id$
+ * $URL$
  *
  * Copyright (c) 2005, Caltha - Gajda, Krzewski, Mach, Potempski Sp.J., 
  * Copyright (c) 2009, Wolfgang Fahl
