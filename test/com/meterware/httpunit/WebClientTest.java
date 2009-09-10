@@ -1121,4 +1121,28 @@ public class WebClientTest extends HttpUnitTest {
         assertEquals( "Submitted cookie header", "found cookies: type=short", wr.getText() );
     }
 
+
+    /**
+     * test for Delete Response patch by Matthew M. Boedicker"
+     * @throws Exception
+     */
+    public void testDelete() throws Exception {
+    	String resourceName = "something/to/delete";
+    	final String responseBody = "deleted";
+    	final String contentType = "text/plain";
+
+        defineResource( resourceName, new PseudoServlet() {
+            public WebResource getDeleteResponse() {
+                return new WebResource( responseBody, contentType );
+            }
+        } );
+
+        WebConversation wc = new WebConversation();
+        WebRequest request = new DeleteMethodWebRequest( getHostPath() + '/' + resourceName );
+        WebResponse response = wc.getResponse( request );
+
+        assertEquals( "requested resource", responseBody, response.getText().trim() );
+        assertEquals( "content type", contentType, response.getContentType() );
+    }
+
  }

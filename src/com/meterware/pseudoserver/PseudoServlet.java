@@ -42,6 +42,8 @@ public class PseudoServlet {
             return getPutResponse();
         } else if (methodType.equalsIgnoreCase( "POST" )) {
             return getPostResponse();
+        } else if (methodType.equalsIgnoreCase( "DELETE" )) {
+            return getDeleteResponse();
         } else {
             throw new UnknownMethodException( methodType );
         }
@@ -69,6 +71,14 @@ public class PseudoServlet {
      **/ 
     public WebResource getPutResponse() throws IOException {
         throw new UnknownMethodException( "PUT" );
+    }
+
+
+    /*
+     * Returns a resource object as a result of a delete request. 
+     **/ 
+    public WebResource getDeleteResponse() throws IOException {
+        throw new UnknownMethodException( "DELETE" );
     }
 
 
