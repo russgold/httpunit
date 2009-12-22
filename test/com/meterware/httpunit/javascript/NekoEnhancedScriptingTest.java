@@ -49,7 +49,7 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
 
 
     public void testEmbeddedDocumentWrite() throws Exception {
-        defineResource(  "OnCommand.html",  "<html><head><title>something</title></head>" +
+        defineResource(  "OnCommandWrite.html",  "<html><head><title>something</title></head>" +
                                             "<body>" +
                                             "<script language='JavaScript'>" +
                                             "document.write( '<a id=here href=about:blank>' );" +
@@ -58,7 +58,7 @@ public class NekoEnhancedScriptingTest extends HttpUnitTest {
                                             "</script>" +
                                             "</body></html>" );
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebResponse response = wc.getResponse( getHostPath() + "/OnCommandWrite.html" );
         WebLink link = response.getLinkWithID( "here" );
         assertNotNull( "The link was not found", link );
         assertEquals( "Link contents", "something", link.getText() );

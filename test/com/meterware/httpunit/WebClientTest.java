@@ -643,7 +643,7 @@ public class WebClientTest extends HttpUnitTest {
      * @throws Exception
      */
     public void dotestRefererHeader(boolean refererEnabled) throws Exception {
-        String resourceName = "tellMe";
+        String resourceName = "tellMe"+refererEnabled;
         String linkSource = "fromLink";
         String formSource = "fromForm";
 
@@ -651,8 +651,8 @@ public class WebClientTest extends HttpUnitTest {
         String page1 = getHostPath() + '/' + linkSource;
         String page2 = getHostPath() + '/' + formSource;
 
-        defineResource( linkSource, "<html><head></head><body><a href=\"tellMe\">Go</a></body></html>" );
-        defineResource( formSource, "<html><body><form action=\"tellMe\"><input type=submit></form></body></html>" );
+        defineResource( linkSource, "<html><head></head><body><a href=\""+resourceName+"\">Go</a></body></html>" );
+        defineResource( formSource, "<html><body><form action=\""+resourceName+"\"><input type=submit></form></body></html>" );
         defineResource( resourceName, new PseudoServlet() {
             public WebResource getGetResponse() {
                 String referer = getHeader( "Referer" );

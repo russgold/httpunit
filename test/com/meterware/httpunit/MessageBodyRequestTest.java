@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -51,20 +52,48 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 	public void setUp() throws Exception {
 		super.setUp();
 	}
-
-	public void testGenericPostRequest() throws Exception {
-		defineResource("ReportData", new BodyEcho());
-		String sourceData = "This is an interesting test\nWith two lines";
+	
+	/**
+	 * make a Request from the given parameters
+	 * @param resourceName
+	 * @param sourceData
+	 * @param contentType
+	 * @return the new WebRequest
+	 * @throws UnsupportedEncodingException
+	 */
+	public WebRequest makeRequest(String resourceName,String sourceData, String contentType) throws UnsupportedEncodingException{
+		defineResource(resourceName, new BodyEcho());
 		InputStream source = new ByteArrayInputStream(sourceData
 				.getBytes("iso-8859-1"));
+		WebRequest wr = new PostMethodWebRequest(getHostPath() + "/"+resourceName,
+				source, contentType);
+		return wr;
+	}
 
+	/**
+	 * test a generic Post request
+	 * @throws Exception
+	 */
+	public void testGenericPostRequest() throws Exception {
 		WebConversation wc = new WebConversation();
-		WebRequest wr = new PostMethodWebRequest(getHostPath() + "/ReportData",
-				source, "text/sample");
+		String sourceData="This is an interesting test\nWith two lines";
+		WebRequest wr = makeRequest("ReportData",sourceData, "text/sample");
 		WebResponse response = wc.getResponse(wr);
 		assertEquals("Body response", "\nPOST\n" + sourceData, response
 				.getText());
 		assertEquals("Content-type", "text/sample", response.getContentType());
+	}
+	
+	/**
+	 * test for Patch by Serge Maslyukov for empty content Types
+	 * @throws Exception
+	 */
+	public void testEmptyContentType() throws Exception {
+		WebConversation wc = new WebConversation();
+		String emptyContentType=""; // this is an emptyContentType
+		WebRequest wr = makeRequest("something","some data",emptyContentType);
+		WebResponse response = wc.getResponse(wr);
+		assertEquals("Content-type", "",wr.getContentType());
 	}
 
 	public void testPutRequest() throws Exception {

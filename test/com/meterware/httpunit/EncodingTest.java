@@ -62,12 +62,14 @@ public class EncodingTest extends HttpUnitTest {
      */
     public void testParseContentHeader() throws Exception {
     	String headers[]={
+    		"",
     		"text/plain",
     		"text/html; charset=Cp1252",
     		"text/html; charset=iso-8859-8",
     		"text/html; charset=EUC-JP"
     	};
     	String expected[][]={
+    			{"text/plain",null},
     			{"text/plain",null},
     			{"text/html","Cp1252"},
     			{"text/html","iso-8859-8"},
