@@ -298,6 +298,7 @@ public class CookieTest extends TestCase {
 
     /**
      * test for bug report [ 1672385 ] HttpOnly cookie looses all cookie info
+     * extended according to comment of 2010-04-22
      * @throws Exception
      */
     public void testHttpOnlyCookies() throws Exception {
@@ -305,6 +306,9 @@ public class CookieTest extends TestCase {
               new TestSource( new URL( "http://www.meterware.com" ),
                               new String[] { "myStuff=1234; path=/foo; HttpOnly"} ) );
       assertEquals( "cookie 'myStuff' value", "1234", jar.getCookieValue( "myStuff" ) );
+      // comment of 2010-04-22
+      String path=jar.getCookie("myStuff").getPath();
+      assertEquals("cookie 'myStuff' path","/foo",path);
     }
     
     /**
