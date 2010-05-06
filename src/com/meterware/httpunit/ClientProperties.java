@@ -209,23 +209,40 @@ public class ClientProperties {
         _iframeSupported = iframeSupported;
     }
 
-
     /**
-     * Returns the context type (if any) to use instead of the one specified by the server. Defaults to null.
-     * @return the overriding context type, or null if none is specified.
+     * @deprecated since 1.8 see BR 2595566 - name of getter is a typo
+     * @see getOverrideContentType
+     * @return the overriding content type
      */
     public String getOverrideContextType() {
-        return _overrideContextType;
+    	return getOverrideContentType();
+    }
+    
+    /**
+     * @deprecated since 1.8 see BR 2595566 - name of setter is a typo
+     * @param overrideContentType the content type 
+     * @see setOverrideContentType
+    */
+    public void setOverrideContextType( String overrideContentType ) {
+    	setOverrideContentType(overrideContentType);
+    }
+
+    /**
+     * Returns the content type (if any) to use instead of the one specified by the server. Defaults to null.
+     * @return the overriding content type, or null if none is specified.
+     */
+    public String getOverrideContentType() {
+        return _overrideContentType;
     }
 
 
     /**
      * All responses to this client will use the specified content type rather than the one specified by the server.
      * Setting this to "text/html" will force all reponses to be interpreted as HTML.
-     * @param overrideContextType the new override to apply to context types.
+     * @param overrideContentType the new override to apply to context types.
      */
-    public void setOverrideContextType( String overrideContextType ) {
-        _overrideContextType = overrideContextType;
+    public void setOverrideContentType( String overrideContentType ) {
+        _overrideContentType = overrideContentType;
     }
 
 
@@ -274,7 +291,7 @@ public class ClientProperties {
     private String _applicationVersion  = "1.5";
     private String _userAgent;
     private String _platform            = "Java";
-    private String _overrideContextType = null;
+    private String _overrideContentType = null;
     private int    _availWidth          = 800;
     private int    _availHeight         = 600;
 
@@ -309,7 +326,7 @@ public class ClientProperties {
         _applicationVersion  = source._applicationVersion;
         _userAgent           = source._userAgent;
         _platform            = source._platform;
-        _overrideContextType = source._overrideContextType;
+        _overrideContentType = source._overrideContentType;
         _iframeSupported     = source._iframeSupported;
         _acceptCookies       = source._acceptCookies;
         _acceptGzip          = source._acceptGzip;
