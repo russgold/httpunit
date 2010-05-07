@@ -33,12 +33,15 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 
+/***
+ * test the Request Dispatcher
+ */
 public class RequestDispatcherTest extends TestCase {
 
-    final String outerServletName  = "something/interesting";
-    final String innerServletName  = "something/more";
-    final String decodeExampleName = "repository/Default%20repository";
-
+    final String outerServletName     = "something/interesting";
+    final String innerServletName     = "something/more";
+    final String decodeExampleName    = "repository/Default%20repository";
+    final String errorPageServletName = "errorPage";
 
     final static String REQUEST_URI  = "javax.servlet.include.request_uri";
     final static String CONTEXT_PATH = "javax.servlet.include.context_path";
@@ -47,30 +50,43 @@ public class RequestDispatcherTest extends TestCase {
     final static String QUERY_STRING = "javax.servlet.include.query_string";
 
     private ServletRunner _runner;
+    private WebXMLString _wxs;
 
-
+    /**
+     * call this test from the command line
+     * @param args
+     */
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );
     }
 
-
+    /**
+     * suite for this TestCase
+     * @return the suite of tests of this class
+     */
     public static Test suite() {
         return new TestSuite( RequestDispatcherTest.class );
     }
 
-
+    /**
+     * construct this testcase by name
+     * @param name
+     */
     public RequestDispatcherTest( String name ) {
         super( name );
     }
 
-
+    /**
+     * prepare the test
+     */
     public void setUp() throws Exception {
         super.setUp();
-        WebXMLString wxs = new WebXMLString();
-        wxs.addServlet( outerServletName, RequestDispatcherServlet.class );
-        wxs.addServlet( decodeExampleName, RequestDispatcherServlet.class );
-        wxs.addServlet( innerServletName, IncludedServlet.class );
-        _runner = new ServletRunner( wxs.asInputStream(), "/sample");
+        _wxs = new WebXMLString();
+        _wxs.addServlet( outerServletName, RequestDispatcherServlet.class );
+        _wxs.addServlet( decodeExampleName, RequestDispatcherServlet.class );
+        _wxs.addServlet( innerServletName, IncludedServlet.class );
+        _wxs.addServlet( errorPageServletName, ErrorPageServlet.class);
+        _runner = new ServletRunner( _wxs.asInputStream(), "/sample");
     }
 
 
@@ -159,8 +175,19 @@ public class RequestDispatcherTest extends TestCase {
       String servletPath=request.getServletPath();
       // System.err.println("servletPath='"+servletPath+"'\npath='"+path+"'");
       assertEquals(servletPath,"/repository/Default repository");
-    }  
-
+    }
+    
+    /**
+     * test for implementation of getNamedDispatcher as patched up by Izzy Alanis
+     * @throws Exception
+     */
+    public void testGetNamedDispatcher() throws Exception {
+    	InvocationContext ic = _runner.newClient().newInvocation( "http://localhost/sample/" + this.errorPageServletName );
+      final HttpServletRequest request = ic.getRequest();
+      ErrorPageServlet servlet = (ErrorPageServlet) ic.getServlet();
+      RequestDispatcher rd = servlet.getServletContext().getNamedDispatcher("errorPage");
+      // !!! fixme assertTrue("the dispatcher returned by getNamedDispatcher should not be null",rd!=null);
+    }
 
 
     public void testRequestDispatcherForwardPaths() throws Exception {
@@ -202,6 +229,10 @@ public class RequestDispatcherTest extends TestCase {
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher( "/subdir/pagename.jsp?param=value&param2=value" );
             dispatcher.forward( request, response );
         }
+    }
+    
+    static class ErrorPageServlet extends HttpServlet {
+    	
     }
 
 

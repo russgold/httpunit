@@ -49,7 +49,18 @@ abstract class WebResourceConfiguration {
 
 
     WebResourceConfiguration( Element resourceElement, String resourceNodeName ) throws SAXException {
-        this( XMLUtils.getChildNodeValue( resourceElement, resourceNodeName ) );
+    	this( resourceElement, resourceNodeName, XMLUtils.getChildNodeValue( resourceElement, resourceNodeName ) );
+    } 	
+    
+    /**
+     * construct a WebResourceConfiguration from the given parameters
+     * @param resourceElement
+     * @param resourceNodeName
+     * @param className
+     * @throws SAXException
+     */
+    public WebResourceConfiguration(Element resourceElement, String resourceNodeName,				String className) throws SAXException {
+    	this(className);
         final NodeList initParams = resourceElement.getElementsByTagName( "init-param" );
         for (int i = initParams.getLength() - 1; i >= 0; i--) {
             _initParams.put( XMLUtils.getChildNodeValue( (Element) initParams.item( i ), "param-name" ),
@@ -57,8 +68,7 @@ abstract class WebResourceConfiguration {
         }
     }
 
-
-    abstract void destroyResource();
+		abstract void destroyResource();
 
 
     String getClassName() {

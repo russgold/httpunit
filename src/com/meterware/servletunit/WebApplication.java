@@ -56,6 +56,13 @@ class WebApplication implements SessionListenerDispatcher {
 
     /** A mapping of resource names to servlet configurations. **/
     private WebResourceMap _servletMapping = new WebResourceMap();
+    
+    
+    /** A mapping of filter names to FilterConfigurations */
+    private Hashtable _filters = new Hashtable();
+    
+    /** A mapping of servlet names to ServletConfigurations */
+    private Hashtable _servlets = new Hashtable();
 
     /** A mapping of resource names to filter configurations. **/
     private FilterUrlMap _filterUrlMapping = new FilterUrlMap();
@@ -415,8 +422,10 @@ class WebApplication implements SessionListenerDispatcher {
         Hashtable nameToClass = new Hashtable();
         NodeList nl = document.getElementsByTagName( "filter" );
         for (int i = 0; i < nl.getLength(); i++) registerFilterClass( nameToClass, (Element) nl.item( i ) );
-        nl = document.getElementsByTagName( "filter-mapping" );
-        for (int i = 0; i < nl.getLength(); i++) registerFilter( nameToClass, (Element) nl.item( i ) );
+        	nl = document.getElementsByTagName( "filter-mapping" );
+        for (int i = 0; i < nl.getLength(); i++) 
+        	registerFilter( nameToClass, (Element) nl.item( i ) );
+        this._filters=nameToClass;
     }
 
 
@@ -477,7 +486,9 @@ class WebApplication implements SessionListenerDispatcher {
         NodeList nl = document.getElementsByTagName( "servlet" );
         for (int i = 0; i < nl.getLength(); i++) registerServletClass( nameToClass, (Element) nl.item( i ) );
         nl = document.getElementsByTagName( "servlet-mapping" );
-        for (int i = 0; i < nl.getLength(); i++) registerServlet( nameToClass, (Element) nl.item( i ) );
+        for (int i = 0; i < nl.getLength(); i++) 
+        	registerServlet( nameToClass, (Element) nl.item( i ) );
+        this._servlets=nameToClass;
     }
 
 
@@ -552,6 +563,7 @@ class WebApplication implements SessionListenerDispatcher {
 
         private Servlet _servlet;
         private String _servletName;
+        private String _jspFile;
         private int _loadOrder = DONT_AUTOLOAD;
 
         ServletConfiguration( String className ) {
@@ -565,8 +577,10 @@ class WebApplication implements SessionListenerDispatcher {
 
 
         ServletConfiguration( Element servletElement ) throws SAXException {
-            super( servletElement, "servlet-class" );
+            super( servletElement, "servlet-class" , XMLUtils.getChildNodeValue( servletElement, "servlet-class", "org.apache.jasper.servlet.JspServlet" ));
             _servletName = XMLUtils.getChildNodeValue( servletElement, "servlet-name" );
+            _jspFile = XMLUtils.getChildNodeValue( servletElement, "jsp-file", "");
+            if("".equals(_jspFile)) _jspFile = null;
             final NodeList loadOrder = servletElement.getElementsByTagName( "load-on-startup" );
             for (int i = 0; i < loadOrder.getLength(); i++) {
                 String order = XMLUtils.getTextValue( loadOrder.item(i) );
@@ -609,6 +623,11 @@ class WebApplication implements SessionListenerDispatcher {
         public int getLoadOrder() {
             return _loadOrder;
         }
+
+
+				public Object getJspFile() {
+					return this._jspFile;
+				}
     }
 
 
@@ -1073,6 +1092,16 @@ class WebApplication implements SessionListenerDispatcher {
         }
 
     }
+
+
+    /**
+     * return the given ServletConfiguration for the given servlet name
+     * @param servletName
+     * @return the corresponding ServletConfiguration
+     */
+		public ServletConfiguration getServletByName(String servletName) {
+			return (ServletConfiguration) _servlets.get(servletName);
+		}
 
 }
 
