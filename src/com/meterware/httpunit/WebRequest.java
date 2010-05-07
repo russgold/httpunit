@@ -142,7 +142,7 @@ public class WebRequest {
 
     private String getNormalizedPath( String path ) {
         if (path.lastIndexOf( "//" ) > path.lastIndexOf( "://" ) + 1) return getNormalizedPath( stripDoubleSlashes( path ) );
-        if (path.indexOf( "/.." ) > 0) return getNormalizedPath( stripUpNavigation( path ) );
+        if (path.indexOf( "/../" )>0 || path.endsWith("/..")) return getNormalizedPath( stripUpNavigation( path ) );
         if (path.indexOf( "/./" ) > 0) return getNormalizedPath( stripInPlaceNavigation( path ) );
         return path;
     }

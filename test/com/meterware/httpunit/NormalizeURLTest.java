@@ -238,6 +238,15 @@ public class NormalizeURLTest extends HttpUnitTest {
         WebRequest request = new GetMethodWebRequest( "http://host.name/directory1/directory2/../../file.html" );
         assertEquals( "URL", request.getURL().toExternalForm(), "http://host.name/file.html" );
     }
+    
+    /**
+     * patch by Serge Maslyukov
+     * @throws Exception
+     */
+    public void testTripleDottedPath() throws Exception {
+       WebRequest request = new GetMethodWebRequest( "http://en.wikipedia.org/wiki/...And_Found" );
+       assertEquals( "URL", request.getURL().toExternalForm(), "http://en.wikipedia.org/wiki/...And_Found" );
+    }
 
 
     /*
