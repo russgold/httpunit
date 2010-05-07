@@ -71,12 +71,12 @@ public class HttpUnitUtils {
      * Returns the content type and encoding as a pair of strings.
      * If no character set is specified, the second entry will be null.
      * @param header the header to parse
-     * @return a string array with the content type and the content charset
+     * @return a string array with the content type and the content char set
      **/
     public static String[] parseContentTypeHeader( String header ) {
         String[] result = new String[] { "text/plain", null };
         if (header.trim().length()>0){
-	        StringTokenizer st = new StringTokenizer( header, ";=" );
+	        StringTokenizer st = new StringTokenizer( header, ";= " );
 	        result[0] = st.nextToken();
 	        while (st.hasMoreTokens()) {
 	            String parameter = st.nextToken();

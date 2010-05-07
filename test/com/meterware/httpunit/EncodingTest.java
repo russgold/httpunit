@@ -66,22 +66,30 @@ public class EncodingTest extends HttpUnitTest {
     		"text/plain",
     		"text/html; charset=Cp1252",
     		"text/html; charset=iso-8859-8",
-    		"text/html; charset=EUC-JP"
+    		"text/html; charset=EUC-JP",
+    		"text/html charset=windows-1251",
+    		"text/html; charset=utf-8",
+    		"text/html; charset = utf-8",
+    		"text/html; charset=\"iso-8859-8\""
     	};
     	String expected[][]={
     			{"text/plain",null},
     			{"text/plain",null},
     			{"text/html","Cp1252"},
     			{"text/html","iso-8859-8"},
-    			{"text/html","EUC-JP"}
+    			{"text/html","EUC-JP"},
+    			{"text/html","windows-1251"},
+    			{"text/html","utf-8"},
+    			{"text/html","utf-8"},
+    			{"text/html","iso-8859-8"}
     	};
     	for (int i=0;i<headers.length;i++) {
     		String result[]=HttpUnitUtils.parseContentTypeHeader(headers[i]);
+    		assertEquals(2, result.length);
         assertEquals( "header "+i , expected[i][0] , result[0]);
         assertEquals( "header "+i , expected[i][1] , result[1]);
     	} // for	
     }
-
 
     public void testSpecifiedEncoding() throws Exception {
         String hebrewTitle = "\u05d0\u05d1\u05d2\u05d3";
