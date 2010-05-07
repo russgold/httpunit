@@ -80,9 +80,9 @@ class WebXMLString {
     }
     
     /**
-     * return me as a Text/String containing the XML descriptor accoding
+     * return me as a Text/String containing the XML descriptor according
      * to the Sun Microsystems's specification
-     * if running on Eclipse shorten the DOCTYPE spec as a work-around for a
+     * if running on Eclipse shorten the DOCTYPE specification as a work-around for a
      * bogus java.net.MalformedURLException (that is in fact caused by a null-pointer exception in handling the dtd part)
      * @return
      */
