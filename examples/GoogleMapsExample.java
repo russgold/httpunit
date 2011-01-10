@@ -17,8 +17,10 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.StringReader;
 import java.io.Writer;
@@ -43,6 +45,13 @@ import com.meterware.httpunit.*;
  * get a Route from Google Maps and convert it as a GPX file useable by Garmin
  * tracking devices - can be imported in MapSource software then ...
  * 
+ * As of 2011-01 the old example did not work properly any more. Tricks for
+ * accessing Google Maps via HTML / Javascript can be found at:
+ * http://www.codeproject.com/KB/scripting/Use_of_Google_Map.aspx
+ * 
+ * this example was modified to use the Google Directions API now 
+ * @see http://code.google.com/intl/de-DE/apis/maps/documentation/directions/
+ * 
  */
 public class GoogleMapsExample {
 
@@ -50,6 +59,26 @@ public class GoogleMapsExample {
 	 * shall we show debug information?
 	 */
 	private boolean DEBUG = true;
+	
+	 /** 
+	  * @param filePath the name of the file to open. Not sure if it can accept URLs or just filenames. Path handling could be better, and buffer sizes are hardcoded
+	  */ 
+   private static String readFileAsString(String filePath)
+   throws java.io.IOException{
+       StringBuffer fileData = new StringBuffer(1000);
+       BufferedReader reader = new BufferedReader(
+               new FileReader(filePath));
+       char[] buf = new char[1024];
+       int numRead=0;
+       while((numRead=reader.read(buf)) != -1){
+           String readData = String.valueOf(buf, 0, numRead);
+           fileData.append(readData);
+           buf = new char[1024];
+       }
+       reader.close();
+       return fileData.toString();
+   }
+
 
 	/**
 	 * get a Route description as a Garmin compatible GPX file
@@ -69,7 +98,17 @@ public class GoogleMapsExample {
 		// http://www.fish-track.com/?page_id=3
 		Document gpxdoc = convertKMLtoGPX(kml);
 		// output the result
+		boolean tostdout=filename==null;
+		if (tostdout){
+			File f = File.createTempFile("httpUnit", ".xml");
+			f.deleteOnExit();
+			filename=f.getAbsolutePath();
+		}	
 		xmlSerialize(gpxdoc, filename);
+		if (tostdout){
+			String xmltext=this.readFileAsString(filename);
+			System.out.println(xmltext);
+		}
 	}
 
 	/**
@@ -79,8 +118,7 @@ public class GoogleMapsExample {
 	 * @param filename
 	 * @throws Exception
 	 */
-	public void xmlSerialize(Document document, String filename)
-			throws Exception {
+	public void xmlSerialize(Document document, String filename) throws Exception {
 		OutputFormat outputOptions = new OutputFormat();
 		// outputOptions.setOmitXMLDeclaration(true);
 		outputOptions.setIndent(4);
@@ -106,8 +144,8 @@ public class GoogleMapsExample {
 		if (subNodes.getLength() != 1) {
 			if (throwException)
 				throw new RuntimeException("getSubNode failed for " + parent
-						+ " expected 1 child with tag name '" + tagName
-						+ "' but got " + subNodes.getLength());
+						+ " expected 1 child with tag name '" + tagName + "' but got "
+						+ subNodes.getLength());
 			else
 				return null;
 		}
@@ -115,41 +153,16 @@ public class GoogleMapsExample {
 	}
 
 	/**
-	 * get the latitude and longitude from a route point
+	 * convert the given Google Map Direction API file to gpx format
 	 * 
-	 * @param kmlRoutePoint
+	 * @param xml
+	 *          - the xml version of the file
 	 * @return
 	 */
-	public String[] extractCoordinates(Element kmlRoutePoint) {
-		String[] result = new String[2];
-		Element point = getSubNode(kmlRoutePoint, "Point", false);
-		if (point == null)
-			return null;
-		Element coordNode = getSubNode(point, "coordinates", true);
-		String coords = coordNode.getTextContent();
-		StringTokenizer coordSplitter = new StringTokenizer(coords, ",", false);
-		if (coordSplitter.countTokens() <= 2) {
-			throw new RuntimeException("extract coordinates failed for "
-					+ kmlRoutePoint
-					+ " expected at least two coordinates but got "
-					+ coordSplitter.countTokens() + " '" + coords + "'");
-		}
-		result[0] = coordSplitter.nextToken();
-		result[1] = coordSplitter.nextToken();
-		return result;
-	}
-
-	/**
-	 * convert the given kml file to gpx format
-	 * 
-	 * @param kml
-	 *            - the kml version of the file
-	 * @return
-	 */
-	public Document convertKMLtoGPX(String kml) throws Exception {
+	public Document convertKMLtoGPX(String googlexml) throws Exception {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document kmldoc = builder.parse(new InputSource(new StringReader(kml)));
+		Document kmldoc = builder.parse(new InputSource(new StringReader(googlexml)));
 		Document gpxdoc = builder.newDocument();
 		String comment = "Converted by httpunit GoogleMapsExample";
 		gpxdoc.appendChild(gpxdoc.createComment(comment));
@@ -157,7 +170,7 @@ public class GoogleMapsExample {
 		org.w3c.dom.Element root = gpxdoc.createElement("gpx");
 		root.setAttribute("xmlns", "http://www.topografix.com/GPX/1/1");
 		root.setAttribute("creator", "KML2GPX Example by BITPlan");
-		root.setAttribute("version", "1.1");
+		root.setAttribute("version", "1.2");
 		gpxdoc.appendChild(root);
 
 		org.w3c.dom.Element metadata = gpxdoc.createElement("metadata");
@@ -171,22 +184,22 @@ public class GoogleMapsExample {
 
 		org.w3c.dom.Element route = gpxdoc.createElement("rte");
 		root.appendChild(route);
-		NodeList routePoints = kmldoc.getElementsByTagName("Placemark");
+		NodeList routePoints = kmldoc.getElementsByTagName("step");
 		for (int i = 0; i < routePoints.getLength(); i++) {
-			Element kmlRoutePoint = (Element) routePoints.item(i);
-			String name = getSubNode(kmlRoutePoint, "name", true)
-					.getTextContent();
+			Element stepNode = (Element) routePoints.item(i);
+			String instructions = getSubNode(stepNode, "html_instructions", true).getTextContent();
 			if (DEBUG)
-				System.out.println("found route point " + i + ": " + name);
+				System.out.println("found route point " + i + ": " + instructions);
 
-			String coords[] = extractCoordinates(kmlRoutePoint);
-			if (coords != null) {
+			Element endNode=getSubNode(stepNode,"end_location",true);
+			Element latNode=getSubNode(endNode, "lat",true);
+			Element lonNode=getSubNode(endNode,"lng",true);
+			if (latNode != null && lonNode!=null) {
 				org.w3c.dom.Element routePoint = gpxdoc.createElement("rtept");
-				routePoint.setAttribute("lon", coords[0]);
-				routePoint.setAttribute("lat", coords[1]);
-				org.w3c.dom.Element routePointName = gpxdoc
-						.createElement("name");
-				routePointName.setTextContent(name);
+				routePoint.setAttribute("lon", lonNode.getTextContent());
+				routePoint.setAttribute("lat", latNode.getTextContent());
+				org.w3c.dom.Element routePointName = gpxdoc.createElement("name");
+				routePointName.setTextContent("step"+i);
 				routePoint.appendChild(routePointName);
 				route.appendChild(routePoint);
 			}
@@ -197,11 +210,20 @@ public class GoogleMapsExample {
 	/**
 	 * the url to use
 	 */
-	public static String url = "http://maps.google.com/maps";
+	public static String url = "http://maps.google.com/maps/api/directions/xml";
+
+
 	/**
-	 * the directions string to look for
+	 * error handling in case the Google Maps WebPage has changed
+	 * 
+	 * @throws Exception
 	 */
-	public static String directions = "directions";
+	public void notifyGoogleMapsHasChanged(String msg) throws Exception {
+		throw new Exception(
+				"GoogleMaps lookupForm at "
+						+ msg
+						+ "\n has changed - please notify the author of this example via the httpunit-develop mailing list");
+	}
 
 	/**
 	 * get a route from google maps with the given start and destination points
@@ -219,57 +241,41 @@ public class GoogleMapsExample {
 
 		// Obtain the main page on the google maps web site
 		WebRequest request = new GetMethodWebRequest(url);
-		request.setParameter("output", "html");
-		WebResponse response = wc.getResponse(request);
-		if (withDisplay && DEBUG)
-			BrowserDisplayer.showResponseInBrowser(response);
-
-		// find the link which contains the string for directions and click it
-		WebLink directionsLink = response.getFirstMatchingLink(
-				WebLink.MATCH_CONTAINED_TEXT, directions);
-		if (directionsLink == null) {
-			System.err.println("could not find " + directions + " in response");
-			if (DEBUG)
-				BrowserDisplayer.showResponseInBrowser(response);
-			System.exit(1);
-		}
-		response = directionsLink.click();
-		if (withDisplay && DEBUG)
-			BrowserDisplayer.showResponseInBrowser(response);
-		WebForm lookupForm = response.getFormWithID("q_form");
-		if (lookupForm == null) {
-			throw new Exception(
-					"GoogleMaps lookupForm at "
-							+ request.toString()
-							+ "\n has changed - please notify the author if this example via the httpunit-develop mailing list");
-		}
-		request = lookupForm.getRequest();
-		request.setParameter("saddr", startPoint);
-		request.setParameter("daddr", destPoint);
-		response = wc.getResponse(request);
-		if (withDisplay)
-			BrowserDisplayer.showResponseInBrowser(response);
-		if (asKML) {
-			// request.setParameter("output", "kml");
-			FormParameter parameter = lookupForm.getParameter("output");
-			FormControl outputControl = parameter.getControl();
-			outputControl.setAttribute("value", "kml");
+		request.setParameter("origin", startPoint);
+		request.setParameter("destination", destPoint);
+		request.setParameter("sensor", "false");
+		if (DEBUG)
+			System.out.println("requesting "+url+"?"+request.getQueryString());
+		WebResponse response=null;
+		try {
 			response = wc.getResponse(request);
-			if (withDisplay && DEBUG)
-				BrowserDisplayer.showResponseInBrowser(response);
+		} catch (Throwable th) {
+			String[] paramnames = request.getRequestParameterNames();
+			System.err.print("valid parameter names are: ");
+			String delim = "";
+			for (int i = 0; i < paramnames.length; i++) {
+				System.err.print(delim + i + ":" + paramnames[i]);
+				delim = ",";
+			}
+			System.err.println();
+			this.notifyGoogleMapsHasChanged(request.toString() + ":"
+					+ th.getMessage());
 		}
+		//if (withDisplay)
+		//	BrowserDisplayer.showResponseInBrowser(response);
 		return (response.getText());
 	}
 
 	/**
-	 * get the distance between two given locations
+	 * get the distance between two given locations from the Google Maps API xml
+	 * file
 	 * 
 	 * @param
 	 */
 	public String getDistance(String startPoint, String endPoint,
 			boolean withDisplay) throws Exception {
-		String route = getRouteFromGoogleMaps(startPoint, endPoint,
-				withDisplay, false);
+		String route = getRouteFromGoogleMaps(startPoint, endPoint, withDisplay,
+				false);
 		String[] driveLocale = { "Driving directions", "Route" };
 		String[] unitLocale = { "mi", "km" };
 		for (int i = 0; i < driveLocale.length; i++) {
@@ -303,20 +309,18 @@ public class GoogleMapsExample {
 		try {
 			if (params.length < 3) {
 				System.out
-						.println("Usage: java RouteAsGPX [from] [to] ([filename]|'distance') [nodisplay]");
+						.println("Usage: java RouteAsGPX [from] [to] [filename] [nodisplay]");
 				System.out
 						.println("      e.g. java RouteAsGPX sfo CA-94526 sfoexample.gpx");
 				System.out
 						.println("         to get the route as a Garmin compatible GPX file");
-				System.out
-						.println("      e.g. java RouteAsGPX sfo CA-94526 distance");
-				System.out.println("         to calculate the distance");
-				String[] defaultParams = { "sfo", "CA-94526", "distance" };
+				System.out.println("      e.g. java RouteAsGPX sfo CA-94526");
+				System.out.println("         to output to stdout/screen");
+				String[] defaultParams = { "sfo", "CA-94526", };
 				// defaultParams={"sfo","CA-94526","sfoexample.gpx"};
 				params = defaultParams;
 				System.out.println("will demonstrate usage with the route "
-						+ defaultParams[0] + " - " + defaultParams[1]
-						+ " and store to " + defaultParams[2]);
+						+ defaultParams[0] + " - " + defaultParams[1] + " to stdout ");
 			}
 			/**
 			 * This is how to use the example in germany:
@@ -331,17 +335,10 @@ public class GoogleMapsExample {
 				withDisplay = false;
 			String startPoint = params[0];
 			String endPoint = params[1];
-			String filename = params[2];
-			if (filename.equals("distance")) {
-				String distanceS = routeAsGPX.getDistance(startPoint, endPoint,
-						withDisplay);
-				// String distanceS=NumberFormat.getInstance().format(distance);
-				System.out.println("The distance between " + startPoint
-						+ " and " + endPoint + " is " + distanceS);
-			} else {
-				routeAsGPX.getRouteAsGPX(startPoint, endPoint, filename,
-						withDisplay);
-			}
+			String filename = null;
+			if (params.length>2)
+			  filename=params[2];
+	  	routeAsGPX.getRouteAsGPX(startPoint, endPoint, filename, withDisplay);
 		} catch (Exception e) {
 			System.err.println("Exception: " + e);
 			e.printStackTrace();
