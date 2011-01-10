@@ -33,7 +33,9 @@ public class BrowserDisplayer {
 		File f = File.createTempFile("httpUnit", ".html");
 		f.deleteOnExit();
 		PrintWriter fod = new PrintWriter(new FileOutputStream(f));
-		fod.print("<head><base href=\"'http://localhost'/\"> </head>");
+		if (!text.startsWith("<?xml")) {
+			fod.print("<head><base href=\"'http://localhost'/\"> </head>");
+		}
 		fod.print(text);
 		fod.close();
 		URL url = f.toURL();
