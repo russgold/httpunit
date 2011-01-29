@@ -30,6 +30,8 @@ import java.net.URL;
 import java.util.*;
 import java.io.IOException;
 
+import javax.management.RuntimeErrorException;
+
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.dom.HTMLContainerElement;
 import com.meterware.httpunit.dom.HTMLDocumentImpl;
@@ -215,16 +217,16 @@ public class ParsedHTML {
      **/
     public WebTable[] getTables() {
     	loadElements();
-        if (_tables == null) {
-            loadElements();
-            _tables = (WebTable[]) _tableList.toArray( new WebTable[ _tableList.size() ] );
-        }
-        return _tables;
+      if (_tables == null) {
+      	_tables = (WebTable[]) _tableList.toArray( new WebTable[ _tableList.size() ] );
+      }
+      return _tables;
     }
-
 
     /**
      * Returns the HTMLElement with the specified ID.
+     * @param id - the id of the element to return
+     * @return the element looked for
      */
     public HTMLElement getElementWithID( String id ) {
         return (HTMLElement) getElementWithID( id, HTMLElement.class );
