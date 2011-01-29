@@ -126,6 +126,23 @@ public class PostTest extends TestCase {
 		}
 	}
 
+	public void testMultiPartPost() throws Exception {
+		TestServlet.location="http://localhost/";
+	
+		ServletRunner sr = new ServletRunner();
+		sr.registerServlet(resourceName, TestServlet.class.getName());
+
+		WebRequest request = new GetMethodWebRequest(TestServlet.location+resourceName);
+		WebResponse response = sr.getResponse(request);
+
+		WebForm form = response.getFormWithID("multipart-bug");
+		response = form.submit();
+		
+		assertEquals(true, response.getText().contains("name=\"empty\""));
+		assertEquals(true, response.getText().contains("name=\"empty_textarea\""));
+		//check(response);
+	}
+	
 	/**
 	 * a Servlet that counts the posts being done
 	 */
@@ -139,7 +156,19 @@ public class PostTest extends TestCase {
 			response
 					.getWriter()
 					.println(
-							"<html><body><form action='"+location+resourceName+"' method='post' id='bug'><input name='handle'/><input name='brainz'/></form></body></html>");
+							"<html>" +
+							"<body>" +
+							"<form action='"+location+resourceName+"' method='post' id='bug'>" +
+							"<input name='handle'/>" +
+							"<input name='brainz'/>" +
+							"</form>" +
+							"<form id='multipart-bug' method='post' action='"+location+resourceName+"' enctype='multipart/form-data'>" +
+							"<input name='empty' value=''>" +
+							"<input name='notempty' value='1'>" +
+							"<textarea name='empty_textarea'></textarea>" +
+							"</form>" +
+							"</body>" +
+							"</html>");
 			/*
 			if (request instanceof Request)
 				((Request) request).setHandled(true);
@@ -149,6 +178,13 @@ public class PostTest extends TestCase {
 		protected void doPost(HttpServletRequest request,
 				HttpServletResponse response) throws IOException, ServletException {
 			postCount++;
+			InputStream is = request.getInputStream();
+			OutputStream os = response.getOutputStream();
+			byte [] buffer = new byte [4096];
+			for (int length = is.read(buffer); length > 0; length = is.read(buffer))
+			{
+				os.write(buffer, 0, length);
+			}
 		}
 	}
 }

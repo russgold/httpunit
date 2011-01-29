@@ -64,7 +64,17 @@ public class HTMLTextAreaElementImpl extends HTMLControl implements HTMLTextArea
 
     public String getDefaultValue() {
         Node node = getFirstChild();
-        if (node == null || node.getNodeType() != Node.TEXT_NODE) return null;
+        
+        if (node == null)
+    	{
+        	return "";
+    	}
+        
+        if (node.getNodeType() != Node.TEXT_NODE)
+    	{
+        	return null;
+    	}
+        
         return node.getNodeValue();
     }
 
