@@ -17,5 +17,6 @@
 	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/activation/activation/1.1/activation-1.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry kind="lib" path="jars/maven-ant-tasks-2.0.9.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPOSITORY"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

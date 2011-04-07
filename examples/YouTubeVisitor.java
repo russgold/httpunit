@@ -12,7 +12,7 @@ import javax.swing.text.BadLocationException;
 
 import org.xml.sax.SAXException;
 
-import sun.tools.tree.ThisExpression;
+
 
 /**
  * an example that shows how to automate visits you tube
