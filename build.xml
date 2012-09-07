@@ -35,26 +35,26 @@
     <property name="deprecation" value="off" />
     <property name="optimize" value="off" />
 
-    <property name="src.dir" value="src" />
-    <property name="tstsrc.dir" value="test" />
+    <property name="src.dir" value="src/main/java" />
+    <property name="tstsrc.dir" value="test/main/java" />
     <property name="examples.dir" value="examples" />
     <property name="website.dir" value="site" />
     <property name="quicksite.dir" value="../quicksite/src" />
     <property name="lib.dir" value="lib" />
     <property name="jars.dir" value="jars" />
 
-    <property name="docs.dir" value="doc" />
-    <property name="build.dir" value="build" />
+    <property name="docs.dir" value="target/doc" />
+    <property name="build.dir" value="target" />
     <property name="build.classes" value="${build.dir}/classes" />
     <property name="test.classes" value="${build.dir}/testclasses" />
     <property name="website.classes" value="${build.dir}/siteclasses" />
     <property name="example.classes" value="${build.dir}/examples" />
     <property name="javadoc.dir" value="${docs.dir}/api" />
 
-    <property name="dist.dir" value="dist" />
+    <property name="dist.dir" value="target/dist" />
     <property name="archive.dir" value="${dist.dir}/${name}-${version}" />
     <property name="classpath" value="" />
-    <property name="web.dir" value="web" />
+    <property name="web.dir" value="target/web" />
     <property name="packages" value="com.meterware.httpunit,com.meterware.servletunit,com.meterware.pseudoserver,com.meterware.httpunit.cookies,com.meterware.httpunit.scripting,com.meterware.httpunit.parsing" />
     <property name="test.class" value="com.meterware.httpunit.HttpUnitSuite" />
     <property name="servlet.test.class" value="com.meterware.servletunit.ServletUnitSuite" />

@@ -266,7 +266,7 @@ public class PseudoServer {
 
     private boolean _active = true;
 
-    private boolean _debug=true;
+    private boolean _debug=false;
 
 
     private String asResourceName( String rawName ) {

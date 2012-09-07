@@ -29,8 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 import junit.runner.BaseTestRunner;
-import junit.runner.TestSuiteLoader;
-import junit.runner.StandardTestSuiteLoader;
 import junit.framework.Test;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestResult;
@@ -145,15 +143,6 @@ public class JUnitServlet extends HttpServlet {
 
 
         public void testFailed( int i, Test test, Throwable throwable ) {
-        }
-
-
-        /**
-         * Always use the StandardTestSuiteLoader. Overridden from
-         * BaseTestRunner.
-         */
-        public TestSuiteLoader getLoader() {
-            return new StandardTestSuiteLoader();
         }
 
     }

@@ -98,6 +98,7 @@ public class WebPageTest extends HttpUnitTest {
         // see http://www.xmlrpc.com/spec
         defineResource( "XMLRPC.html","<?xml version=\"1.0\"?><methodCall><methodName>stock.getQuote</methodName><params><param><value>JAVA</value></param></params></methodCall>","text/xml");
         WebConversation wc = new WebConversation();
+        HttpUnitOptions.setCheckHtmlContentType(true);
         try {
             wc.getResponse( getHostPath() + "/TextPage.txt" ).getReceivedPage().getTitle();
             fail( "Should have rejected attempt to get a title from a text page" );
@@ -128,6 +129,7 @@ public class WebPageTest extends HttpUnitTest {
      * @throws Exception if an unexpected exception occurs during the test.
      */
     public void testForceAsHtml() throws Exception {
+        HttpUnitOptions.setCheckHtmlContentType(true);
         defineResource( "SimplePage.html", "<html><head><title>A Sample Page</title></head><body>Something here</body></html>", "text" );
         WebConversation wc = new WebConversation();
         try {

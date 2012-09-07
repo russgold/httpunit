@@ -91,7 +91,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     
     /**
      * set the parsing switch
-     * @param doparse
+     * @param doParse
      * @return
      */
     public void setWithParse(boolean doParse) {
@@ -1341,7 +1341,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
         if (_page == null) {
             try {
                 _parsingPage = true;
-                if (!isHTML()) throw new NotHTMLException( getContentType() );
+                if (HttpUnitOptions.isCheckHtmlContentType() && !isHTML()) throw new NotHTMLException( getContentType() );
                 _page = new HTMLPage( this, _frame, _baseURL, _baseTarget, getCharacterSet() );
                 if (_withParse) {
                 	_page.parse( getText(), _pageURL );

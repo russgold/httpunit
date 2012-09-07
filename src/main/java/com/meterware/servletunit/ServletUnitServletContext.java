@@ -125,7 +125,7 @@ public class ServletUnitServletContext implements ServletContext {
 			File resourceFile = _application.getResourceFile(path);
 			// PATCH proposal [ 1592532 ] Invalid
 			// ServletUnitServletContext#getResource(String path)
-			// by Timo Westkämper
+			// by Timo Westkemper
 			// return !resourceFile.exists() ? null : resourceFile.toURL();
 			return resourceFile == null ? null : resourceFile.toURL();
 		} catch (MalformedURLException e) {

@@ -808,7 +808,7 @@ public class FormScriptingTest extends HttpUnitTest {
 
     /**
      * test for onMouseDownEvent support patch 884146 
-     * by Björn Beskow - bbeskow
+     * by Bjoern Beskow - bbeskow
      * @throws Exception
      */
     public void testCheckboxOnMouseDownEvent() throws Exception {

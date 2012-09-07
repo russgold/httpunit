@@ -28,12 +28,12 @@ import java.util.ArrayList;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-class EventAwareTestCase extends TestCase {
+class EventAwareTestBase extends TestCase {
 
     private static ArrayList _events;
 
 
-    public EventAwareTestCase( String name ) {
+    public EventAwareTestBase(String name) {
         super( name );
     }
 
@@ -76,7 +76,7 @@ class EventAwareTestCase extends TestCase {
 class EventData {
     private String _eventName;
     private Class _listenerClass;
-    private EventAwareTestCase.EventVerifier _verifier;
+    private EventAwareTestBase.EventVerifier _verifier;
 
     static String toEventString( String eventName, Class listenerClass ) {
         return eventName + " from " + listenerClass.getName();
@@ -88,7 +88,7 @@ class EventData {
     }
 
 
-    EventData( String eventName, Class listenerClass, EventAwareTestCase.EventVerifier verifier ) {
+    EventData( String eventName, Class listenerClass, EventAwareTestBase.EventVerifier verifier ) {
         _eventName = eventName;
         _listenerClass = listenerClass;
         _verifier = verifier;

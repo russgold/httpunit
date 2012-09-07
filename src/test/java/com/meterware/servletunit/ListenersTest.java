@@ -29,7 +29,7 @@ import javax.servlet.http.*;
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class ListenersTest extends EventAwareTestCase {
+public class ListenersTest extends EventAwareTestBase {
 
     public static void main(String args[]) {
         junit.textui.TestRunner.run( suite() );

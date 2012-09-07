@@ -72,7 +72,8 @@ public abstract class HttpUnitOptions {
         _postIncludesCharset = false;
         _exceptionsThrownOnScriptError = true;
         _customAttributes = null;
-        _javaScriptOptimizationLevel = -1; 
+        _javaScriptOptimizationLevel = -1;
+        _checkHtmlContentType = false;
         setScriptEngineClassName( DEFAULT_SCRIPT_ENGINE_FACTORY );
         setScriptingEnabled( true );
     }
@@ -310,6 +311,22 @@ public abstract class HttpUnitOptions {
         _loggingHttpHeaders = enabled;
     }
 
+
+    /**
+     * Returns true if HttpUnit throws an exception when attempting to parse as HTML a response whose content type
+     * is not HTML. The default is false (content type is ignored).
+     **/
+    public static boolean isCheckHtmlContentType() {
+        return _checkHtmlContentType;
+    }
+
+    /**
+     * If true, HttpUnit throws an exception when attempting to parse as HTML a response whose content type
+     * is not HTML. The default is false (content type is ignored).
+     **/
+    public static void setCheckHtmlContentType(boolean checkHtmlContentType) {
+        _checkHtmlContentType = checkHtmlContentType;
+    }
 
     /**
      * Returns true if HttpUnit should automatically follow page redirect requests (status 3xx).
@@ -563,7 +580,9 @@ public abstract class HttpUnitOptions {
 
     private static boolean _exceptionsThrownOnScriptError = true;
     
-    private static int _javaScriptOptimizationLevel = -1; 
+    private static int _javaScriptOptimizationLevel = -1;
+
+    private static boolean _checkHtmlContentType = false;
 
 
     static {
