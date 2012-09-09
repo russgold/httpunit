@@ -22,7 +22,6 @@ package com.meterware.httpunit.javascript;
 
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.HttpUnitOptions;
-import com.meterware.httpunit.javascript.AbstractJavaScriptTest;
 
 import junit.textui.TestRunner;
 import junit.framework.TestSuite;
@@ -68,9 +67,9 @@ public class NewScriptingTests extends AbstractJavaScriptTest {
                 "<body onload=\"dumpargs('a','b')\">                            " +
                 "</body></html>                                                 ";
 
-        defineResource( "OnCommand.html", html );
+        pseudoServerTestSupport.defineResource("OnCommand.html", html);
         WebConversation wc = new WebConversation();
-        wc.getResponse( getHostPath() + "/OnCommand.html" );
+        wc.getResponse(pseudoServerTestSupport.getHostPath() + "/OnCommand.html" );
         assertEquals( "alert message 1", "2 arguments", wc.popNextAlert() );
         assertEquals( "alert message 2", "0: a", wc.popNextAlert() );
         assertEquals( "alert message 3", "1: b", wc.popNextAlert() );

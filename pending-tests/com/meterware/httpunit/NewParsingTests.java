@@ -19,12 +19,6 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.HttpUnitTest;
-import com.meterware.httpunit.WebClient;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebForm;
-import com.meterware.httpunit.WebLink;
-import com.meterware.httpunit.WebResponse;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -62,10 +56,10 @@ public class NewParsingTests extends HttpUnitTest {
      */
     public void testLinkUrlAcrossLineBreaks() throws Exception {
         WebConversation wc = new WebConversation();
-        defineWebPage( "Initial", "<a id='midbreak' href='http://loc\nalhost/somewhere'</a>" +
-                                  "<a id='endbreak' href='http://localhost/somewhere\n'</a>" );
+        pseudoServerTestSupport.defineWebPage("Initial", "<a id='midbreak' href='http://loc\nalhost/somewhere'</a>" +
+                "<a id='endbreak' href='http://localhost/somewhere\n'</a>");
 
-        WebResponse response = wc.getResponse( getHostPath() + "/Initial.html" );
+        WebResponse response = wc.getResponse(pseudoServerTestSupport.getHostPath() + "/Initial.html" );
         String endbreak=response.getLinkWithID( "endbreak" ).getRequest().getURL().toExternalForm() ;
         assertEquals( "URL with break at end", endbreak,"http://localhost/somewhere");
         //System.err.println("endbreak='"+endbreak+"'");
@@ -83,8 +77,8 @@ public class NewParsingTests extends HttpUnitTest {
     public void testParamReplacement() throws Exception {
         String expected = "/cgi-bin/bar?foo=a";
         String nogood = "/cgi-bin/bar?arg=replaced&foo=a";
-        defineResource( nogood, "not good" );
-        defineResource( expected, "excellent" );
+        pseudoServerTestSupport.defineResource(nogood, "not good");
+        pseudoServerTestSupport.defineResource(expected, "excellent");
         String html =
                 "<FORM NAME=Bethsheba METHOD=GET ACTION=/cgi-bin/bar?arg=replaced>" +
                         "<INPUT TYPE=TEXT NAME=foo>" +
@@ -94,8 +88,8 @@ public class NewParsingTests extends HttpUnitTest {
                         "<!--JavaScript submit:" +
                         "<a	href=\"javascript:document.Bethsheba.submit()\">go</a>" +
                         "-->";
-        defineWebPage( "test", html );
-        WebResponse resp = _wc.getResponse( getHostPath() + "/test.html" );
+        pseudoServerTestSupport.defineWebPage("test", html);
+        WebResponse resp = _wc.getResponse(pseudoServerTestSupport.getHostPath() + "/test.html" );
         WebForm form = resp.getFormWithName( "Bethsheba" );
         form.setParameter( "foo", "a" );
         resp = form.submit();
@@ -115,7 +109,7 @@ public class NewParsingTests extends HttpUnitTest {
                 "</SCRIPT>\n" +
                 "<iframe name=\"iframe_after_lessthan_in_javascript\"\n" +
                 "src=\"c.html\"></iframe>";
-        defineWebPage( "iframe", html );
+        pseudoServerTestSupport.defineWebPage("iframe", html);
         WebResponse response = _wc.getFrameContents( "iframe_after_lessthan_in_javascript" );
         assertNotNull( "Iframe was not recognized", response );
     }
@@ -127,11 +121,11 @@ public class NewParsingTests extends HttpUnitTest {
      * @throws Exception on anuncaught error
      */
     public void testFindNonHrefLinks() throws Exception {
-        defineResource( "NonHref.html", "<html><head><title>NonHref Links</title></head><body>\n" +
+        pseudoServerTestSupport.defineResource("NonHref.html", "<html><head><title>NonHref Links</title></head><body>\n" +
                 "<a onclick='javascript:followlink()'>I am a clickable link after all</a>\n" +
-                "</body></html>" );
+                "</body></html>");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/NonHref.html" );
+        WebResponse response = wc.getResponse(pseudoServerTestSupport.getHostPath() + "/NonHref.html" );
         WebLink[] links = response.getLinks();
         assertNotNull( links );
         assertEquals( "number of non-href anchor tags", 1, links.length );

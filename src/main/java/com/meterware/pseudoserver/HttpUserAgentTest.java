@@ -24,68 +24,66 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.io.IOException;
 
-import junit.framework.TestCase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 
 /**
  * A base class for test cases that use the pseudo server.
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-public class HttpUserAgentTest extends TestCase {
+public class HttpUserAgentTest {
 
-    private String _hostPath;
-    private PseudoServer _server;
+    private static final PseudoServerTestSupport testSupport = new PseudoServerTestSupport();
 
 
-    public HttpUserAgentTest( String name ) {
-        super( name );
+    @BeforeClass
+    static public void setUpHttpUserAgentTest() throws Exception {
+        testSupport.setUpServer();
     }
 
 
-    public void setUp() throws Exception {
-        _server = new PseudoServer();
-        _hostPath = "http://localhost:" + _server.getConnectedPort();
-    }
-
-
-    public void tearDown() throws Exception {
-        if (_server != null) _server.shutDown();
+    @AfterClass
+    static public void tearDownHttpUserAgentTest() throws Exception {
+        testSupport.tearDownServer();
     }
 
 
     protected void defineResource( String resourceName, PseudoServlet servlet ) {
-        _server.setResource( resourceName, servlet );
+        testSupport.defineResource(resourceName, servlet);
     }
 
 
     protected void defineResource( String resourceName, String value ) {
-        _server.setResource( resourceName, value );
+        testSupport.defineResource(resourceName, value);
     }
 
 
     protected void defineResource( String resourceName, byte[] value, String contentType ) {
-        _server.setResource( resourceName, value, contentType );
+        testSupport.defineResource(resourceName, value, contentType);
     }
 
 
     protected void defineResource( String resourceName, String value, int statusCode ) {
-        _server.setErrorResource( resourceName, statusCode, value );
+        testSupport.defineResource(resourceName, value, statusCode);
     }
 
 
     protected void defineResource( String resourceName, String value, String contentType ) {
-        _server.setResource( resourceName, value, contentType );
+        testSupport.defineResource(resourceName, value, contentType);
     }
 
 
     protected void addResourceHeader( String resourceName, String header ) {
-        _server.addResourceHeader( resourceName, header );
+        testSupport.addResourceHeader(resourceName, header);
     }
 
 
     protected void setResourceCharSet( String resourceName, String setName, boolean reportCharSet ) {
-        _server.setCharacterSet( resourceName, setName );
-        _server.setSendCharacterSet( resourceName, reportCharSet );
+        testSupport.setResourceCharSet(resourceName, setName, reportCharSet);
     }
 
     /**
@@ -96,17 +94,8 @@ public class HttpUserAgentTest extends TestCase {
      * @param body
      */
     protected void defineWebPage( String xmlns,String pageName, String body ) {
-    	String preamble="";
-    	if (xmlns==null)
-    		xmlns="";
-    	else {
-    		preamble ="<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-      	preamble+="<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
-    		xmlns=" xmlns=\""+xmlns+"\"";
-    	}	
-      defineResource( pageName + ".html", preamble+"<html"+xmlns+">\n<head><title>" + pageName + "</title></head>\n" +
-                                          "<body>\n" + body + "\n</body>\n</html>" );
-  }
+        testSupport.defineWebPage(xmlns, pageName, body);
+    }
 
     /**
      * define a Web Page with the given page name and boy adding the html and body tags with pageName as the title of the page
@@ -114,54 +103,37 @@ public class HttpUserAgentTest extends TestCase {
      * @param body
      */
     protected void defineWebPage( String pageName, String body ) {
-    	defineWebPage(null,pageName,body);
+        testSupport.defineWebPage(pageName, body);
     }
 
 
     protected void mapToClasspath( String directory ) {
-        _server.mapToClasspath( directory );
+        testSupport.mapToClasspath(directory);
     }
 
 
     protected PseudoServer getServer() {
-        return _server;
+        return testSupport.getServer();
     }
 
 
     protected void setServerDebug( boolean enabled ) {
-        _server.setDebug( enabled );
+        testSupport.setServerDebug(enabled);
     }
 
 
     protected String getHostPath() {
-        return _hostPath;
+        return testSupport.getHostPath();
     }
 
 
     protected int getHostPort() throws IOException {
-        return _server.getConnectedPort();
+        return testSupport.getHostPort();
     }
 
 
     protected void assertEqualQueries( String query1, String query2 ) {
         assertEquals( new QuerySpec( query1 ), new QuerySpec( query2 ) );
-    }
-
-
-
-    protected void assertEquals( String comment, Object[] expected, Object[] found ) {
-        if (!equals( expected, found )) {
-            fail( comment + " expected: " + asText( expected ) + " but found " + asText( found ) );
-        }
-    }
-
-
-    private boolean equals( Object[] first, Object[] second ) {
-        if (first.length != second.length) return false;
-        for (int i = 0; i < first.length; i++) {
-            if (!first[ i ].equals( second[ i ] )) return false;
-        }
-        return true;
     }
 
 
@@ -251,11 +223,6 @@ public class HttpUserAgentTest extends TestCase {
             sb.append( Integer.toHexString( chars[i] ) ).append( " " );
         }
         return sb.toString();
-    }
-
-
-    protected void assertEquals( String comment, byte[] expected, byte[] actual ) {
-    	assertEquals(comment,toString(expected),toString(actual));
     }
 
 

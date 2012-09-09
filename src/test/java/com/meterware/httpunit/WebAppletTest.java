@@ -19,10 +19,8 @@ package com.meterware.httpunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import com.meterware.httpunit.HttpUnitTest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.httpunit.WebApplet;
+
+import org.junit.Test;
 
 import java.applet.Applet;
 import java.util.Enumeration;
@@ -32,185 +30,179 @@ import java.lang.reflect.Method;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
-import junit.textui.TestRunner;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
 
 /**
- *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- **/ 
+ */
 public class WebAppletTest extends HttpUnitTest {
 
-    public static void main( String args[] ) {
-        TestRunner.run( suite() );
-    }
-
-
-    public static TestSuite suite() {
-        return new TestSuite( WebAppletTest.class );
-    }
-
-
-    public WebAppletTest( String name ) {
-        super( name );
-    }
-
+    @Test
     public void testDeleteMe() {
         new WebConversation();
     }
 
 
+    @Test
     public void testFindApplets() throws Exception {
-        defineWebPage( "start", "<applet code='FirstApplet.class' width=150 height=100></applet>" +
-                                "<applet code='SecondApplet.class' width=150 height=100></applet>" );
+        defineWebPage("start", "<applet code='FirstApplet.class' width=150 height=100></applet>" +
+                "<applet code='SecondApplet.class' width=150 height=100></applet>");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         WebApplet[] applets = response.getApplets();
-        assertNotNull( "No applet found", applets );
-        assertEquals( "number of applets in page", 2, applets.length );
+        assertNotNull("No applet found", applets);
+        assertEquals("number of applets in page", 2, applets.length);
     }
 
 
+    @Test
     public void testAppletProperties() throws Exception {
-        defineWebPage( "start", "<applet code='FirstApplet.class' name=first codebase='/classes' width=150 height=100></applet>" +
-                                "<applet code='SecondApplet.class' name=second width=150 height=100></applet>" );
+        defineWebPage("start", "<applet code='FirstApplet.class' name=first codebase='/classes' width=150 height=100></applet>" +
+                "<applet code='SecondApplet.class' name=second width=150 height=100></applet>");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         WebApplet applet1 = response.getApplets()[0];
         WebApplet applet2 = response.getApplets()[1];
-        assertEquals( "Applet 1 codebase", getHostPath() + "/classes/", applet1.getCodeBaseURL().toExternalForm() );
-        assertEquals( "Applet 2 codebase", getHostPath() + "/", applet2.getCodeBaseURL().toExternalForm() );
+        assertEquals("Applet 1 codebase", getHostPath() + "/classes/", applet1.getCodeBaseURL().toExternalForm());
+        assertEquals("Applet 2 codebase", getHostPath() + "/", applet2.getCodeBaseURL().toExternalForm());
 
-        assertEquals( "Applet 1 name", "first", applet1.getName() );
-        assertEquals( "Applet 1 width", 150, applet1.getWidth() );
-        assertEquals( "Applet 1 height", 100, applet1.getHeight() );
+        assertEquals("Applet 1 name", "first", applet1.getName());
+        assertEquals("Applet 1 width", 150, applet1.getWidth());
+        assertEquals("Applet 1 height", 100, applet1.getHeight());
     }
 
 
+    @Test
     public void testReadAppletParameters() throws Exception {
-        defineWebPage( "start", "<applet code='DoIt'>" +
-                                "  <param name='color' value='ffff00'>" +
-                                "  <param name='age' value='12'>" +
-                                "</applet>" );
+        defineWebPage("start", "<applet code='DoIt'>" +
+                "  <param name='color' value='ffff00'>" +
+                "  <param name='age' value='12'>" +
+                "</applet>");
 
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         WebApplet applet = response.getApplets()[0];
-        assertNotNull( "Parameter names return null", applet.getParameterNames() );
-        assertEquals( "Number of parameters", 2, applet.getParameterNames().length );
-        assertMatchingSet( "Parameter names", new String[]{"color", "age"}, applet.getParameterNames() );
+        assertNotNull("Parameter names return null", applet.getParameterNames());
+        assertEquals("Number of parameters", 2, applet.getParameterNames().length);
+        assertMatchingSet("Parameter names", new String[]{"color", "age"}, applet.getParameterNames());
     }
 
 
+    @Test
     public void testAppletClassName() throws Exception {
-        defineWebPage( "start", "<applet code='com/something/FirstApplet.class' width=150 height=100></applet>" +
-                                "<applet code='org\\nothing\\SecondApplet' width=150 height=100></applet>" +
-                                "<applet code='net.ThirdApplet.class' width=150 height=100></applet>" );
+        defineWebPage("start", "<applet code='com/something/FirstApplet.class' width=150 height=100></applet>" +
+                "<applet code='org\\nothing\\SecondApplet' width=150 height=100></applet>" +
+                "<applet code='net.ThirdApplet.class' width=150 height=100></applet>");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
-        assertEquals( "Applet 1 classname", "com.something.FirstApplet", response.getApplets()[0].getMainClassName() );
-        assertEquals( "Applet 2 classname", "org.nothing.SecondApplet", response.getApplets()[1].getMainClassName() );
-        assertEquals( "Applet 3 classname", "net.ThirdApplet", response.getApplets()[2].getMainClassName() );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
+        assertEquals("Applet 1 classname", "com.something.FirstApplet", response.getApplets()[0].getMainClassName());
+        assertEquals("Applet 2 classname", "org.nothing.SecondApplet", response.getApplets()[1].getMainClassName());
+        assertEquals("Applet 3 classname", "net.ThirdApplet", response.getApplets()[2].getMainClassName());
     }
 
 
+    @Test
     public void testAppletLoading() throws Exception {
-        defineWebPage( "start", "<applet code='" + SimpleApplet.class.getName() +
-                                ".class' codebase=/classes width=100 height=100></applet>");
-        mapToClasspath( "/classes" );
+        defineWebPage("start", "<applet code='" + SimpleApplet.class.getName() +
+                ".class' codebase=/classes width=100 height=100></applet>");
+        mapToClasspath("/classes");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         WebApplet wa = response.getApplets()[0];
         Applet applet = wa.getApplet();
-        assertNotNull( "Applet was not loaded", applet );
-        assertEquals( "Applet class", SimpleApplet.class.getName(), applet.getClass().getName() );
+        assertNotNull("Applet was not loaded", applet);
+        assertEquals("Applet class", SimpleApplet.class.getName(), applet.getClass().getName());
     }
 
 
     public void notestAppletArchive() throws Exception {
-        defineWebPage( "start", "<applet archive='/lib/xercesImpl.jar,/lib/xmlParserAPIs.jar'" +
-                                " code='" + XMLApplet.class.getName() + ".class'" +
-                                " codebase=/classes width=100 height=100></applet>");
-        mapToClasspath( "/classes" );
-        mapToClasspath( "/lib" );
+        defineWebPage("start", "<applet archive='/lib/xercesImpl.jar,/lib/xmlParserAPIs.jar'" +
+                " code='" + XMLApplet.class.getName() + ".class'" +
+                " codebase=/classes width=100 height=100></applet>");
+        mapToClasspath("/classes");
+        mapToClasspath("/lib");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         Applet applet = response.getApplets()[0].getApplet();
-        Method testMethod = applet.getClass().getMethod( "getDocumentBuilder", new Class[0] );
-        Object result = testMethod.invoke( applet, new Object[0] );
-        assertEquals( "Superclass name", DocumentBuilder.class.getName(), result.getClass().getSuperclass().getName() );
+        Method testMethod = applet.getClass().getMethod("getDocumentBuilder", new Class[0]);
+        Object result = testMethod.invoke(applet, new Object[0]);
+        assertEquals("Superclass name", DocumentBuilder.class.getName(), result.getClass().getSuperclass().getName());
     }
 
 
+    @Test
     public void testAppletParameterAccess() throws Exception {
-        defineWebPage( "start", "<applet code='" + SimpleApplet.class.getName() +
-                                ".class' codebase=/classes width=100 height=100>" +
-                                "  <param name='color' value='ffff00'>" +
-                                "  <param name='age' value='12'>" +
-                                "</applet>");
-        mapToClasspath( "/classes" );
+        defineWebPage("start", "<applet code='" + SimpleApplet.class.getName() +
+                ".class' codebase=/classes width=100 height=100>" +
+                "  <param name='color' value='ffff00'>" +
+                "  <param name='age' value='12'>" +
+                "</applet>");
+        mapToClasspath("/classes");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         Applet applet = response.getApplets()[0].getApplet();
-        assertNull( "Applet parameter 'hue' should be null", applet.getParameter( "hue" ) );
-        assertEquals( "Applet parameter 'color'", "ffff00", applet.getParameter( "color" ) );
-        assertEquals( "Applet parameter 'age'", "12", applet.getParameter( "age" ) );
+        assertNull("Applet parameter 'hue' should be null", applet.getParameter("hue"));
+        assertEquals("Applet parameter 'color'", "ffff00", applet.getParameter("color"));
+        assertEquals("Applet parameter 'age'", "12", applet.getParameter("age"));
     }
 
 
+    @Test
     public void testAppletFindFromApplet() throws Exception {
-        defineWebPage( "start", "<applet name=first code='" + SimpleApplet.class.getName() +
-                                ".class' codebase=/classes width=100 height=100></applet>" +
-                                "<applet name=second code='" + SecondApplet.class.getName() +
-                                ".class' codebase=/classes width=100 height=100></applet>");
-        mapToClasspath( "/classes" );
+        defineWebPage("start", "<applet name=first code='" + SimpleApplet.class.getName() +
+                ".class' codebase=/classes width=100 height=100></applet>" +
+                "<applet name=second code='" + SecondApplet.class.getName() +
+                ".class' codebase=/classes width=100 height=100></applet>");
+        mapToClasspath("/classes");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         Applet applet = response.getApplets()[0].getApplet();
-        Applet applet2 = applet.getAppletContext().getApplet( "second" );
-        assertNotNull( "Applet was not loaded", applet2 );
-        assertEquals( "Applet class", SecondApplet.class.getName(), applet2.getClass().getName() );
+        Applet applet2 = applet.getAppletContext().getApplet("second");
+        assertNotNull("Applet was not loaded", applet2);
+        assertEquals("Applet class", SecondApplet.class.getName(), applet2.getClass().getName());
 
         Enumeration applets = applet2.getAppletContext().getApplets();
-        assertNotNull( "No applet enumeration returned", applets );
-        assertTrue( "No applets in enumeration", applets.hasMoreElements() );
-        assertTrue( "First is not an applet", applets.nextElement() instanceof Applet );
-        assertTrue( "Only one applet in enumeration", applets.hasMoreElements() );
-        assertTrue( "Second is not an applet", applets.nextElement() instanceof Applet );
-        assertFalse( "More than two applets enumerated", applets.hasMoreElements() );
+        assertNotNull("No applet enumeration returned", applets);
+        assertTrue("No applets in enumeration", applets.hasMoreElements());
+        assertTrue("First is not an applet", applets.nextElement() instanceof Applet);
+        assertTrue("Only one applet in enumeration", applets.hasMoreElements());
+        assertTrue("Second is not an applet", applets.nextElement() instanceof Applet);
+        assertFalse("More than two applets enumerated", applets.hasMoreElements());
     }
 
 
+    @Test
     public void testShowDocument() throws Exception {
-        defineResource( "next.html", "You made it!" );
-        defineWebPage( "start", "<applet code='" + SimpleApplet.class.getName() +
-                                ".class' codebase=/classes width=100 height=100></applet>");
-        mapToClasspath( "/classes" );
+        defineResource("next.html", "You made it!");
+        defineWebPage("start", "<applet code='" + SimpleApplet.class.getName() +
+                ".class' codebase=/classes width=100 height=100></applet>");
+        mapToClasspath("/classes");
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/start.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/start.html");
         WebApplet wa = response.getApplets()[0];
         Applet applet = wa.getApplet();
-        applet.getAppletContext().showDocument( new URL( getHostPath() + "/next.html" ) );
-        assertEquals( "current page URL", getHostPath() + "/next.html", wc.getCurrentPage().getURL().toExternalForm() );
+        applet.getAppletContext().showDocument(new URL(getHostPath() + "/next.html"));
+        assertEquals("current page URL", getHostPath() + "/next.html", wc.getCurrentPage().getURL().toExternalForm());
     }
-    
+
     /**
      * test for bug report [ 1895501 ] Handling no codebase attribute in APPLET tag
      * by lacton
+     *
      * @throws Exception
      */
+    @Test
     public void testAppletWithinADirectory() throws Exception {
-      defineWebPage( "directory/start", "<applet code='"+SimpleApplet.class.getName()+"'></applet>" );
-      mapToClasspath( "/directory" );
-      WebConversation wc = new WebConversation();
-      WebResponse response = wc.getResponse( getHostPath() + "/directory/start.html" );
-      WebApplet wa = response.getApplets()[0];
-      assertEquals( "Applet codebase", getHostPath() + "/directory/", wa.getCodeBaseURL().toExternalForm() );
-      Applet applet = wa.getApplet();
-      assertNotNull( "Applet was not loaded", applet );
-      assertEquals( "Applet class", SimpleApplet.class.getName(), applet.getClass().getName() );
+        defineWebPage("directory/start", "<applet code='" + SimpleApplet.class.getName() + "'></applet>");
+        mapToClasspath("/directory");
+        WebConversation wc = new WebConversation();
+        WebResponse response = wc.getResponse(getHostPath() + "/directory/start.html");
+        WebApplet wa = response.getApplets()[0];
+        assertEquals("Applet codebase", getHostPath() + "/directory/", wa.getCodeBaseURL().toExternalForm());
+        Applet applet = wa.getApplet();
+        assertNotNull("Applet was not loaded", applet);
+        assertEquals("Applet class", SimpleApplet.class.getName(), applet.getClass().getName());
     }
-
 
 
     public static class SimpleApplet extends Applet {

@@ -19,107 +19,95 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+
 import com.meterware.httpunit.HttpUnitTest;
+import org.junit.Test;
 
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Locale;
-import java.security.Principal;
-import java.io.UnsupportedEncodingException;
-import java.io.IOException;
-import java.io.BufferedReader;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-import javax.servlet.ServletInputStream;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.security.Principal;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
 
 
 /**
- * 
  * @author <a href="russgold@httpunit.org">Russell Gold</a>
- **/
+ */
 
 public class RequestContextTest extends HttpUnitTest {
-
-    public static void main( String args[] ) {
-        junit.textui.TestRunner.run( suite() );
-    }
-
-
-    public static TestSuite suite() {
-        return new TestSuite( RequestContextTest.class );
-    }
-
-
-    public RequestContextTest( String testName ) {
-        super( testName );
-    }
-
 
     /**
      * Verify parsing of a query string.
      */
+    @Test
     public void testQueryStringParsing() throws Exception {
-        RequestContext rc = new RequestContext( new URL( "http://localhost/basic?param=red&param1=old&param=blue" ));
-        assertMatchingSet( "parameter names", new String[] { "param", "param1" }, rc.getParameterNames() );
-        assertMatchingSet( "param values", new String[] { "red", "blue" }, rc.getParameterValues( "param" ) );
-        assertEquals( "param1 value", "old", ((String[]) rc.getParameterMap().get( "param1"))[0] );
+        RequestContext rc = new RequestContext(new URL("http://localhost/basic?param=red&param1=old&param=blue"));
+        assertMatchingSet("parameter names", new String[]{"param", "param1"}, rc.getParameterNames());
+        assertMatchingSet("param values", new String[]{"red", "blue"}, rc.getParameterValues("param"));
+        assertEquals("param1 value", "old", ((String[]) rc.getParameterMap().get("param1"))[0]);
     }
 
 
     /**
      * Verify override of parent request parameters.
      */
+    @Test
     public void testParameterOverride() throws Exception {
-        HttpServletRequest request = new DummyHttpServletRequest( new URL( "http://localhost/basic?param=red&param1=old&param=blue" ) );
-        RequestContext context = new RequestContext( new URL( "http://localhost/second?param=yellow&param2=fast" ));
-        context.setParentRequest( request );
-        assertMatchingSet( "parameter names", new String[] { "param", "param1", "param2" }, context.getParameterNames() );
-        assertMatchingSet( "param values", new String[] { "yellow" }, context.getParameterValues( "param" ) );
-        assertEquals( "param1 value", "old", ((String[]) context.getParameterMap().get( "param1"))[0] );
+        HttpServletRequest request = new DummyHttpServletRequest(new URL("http://localhost/basic?param=red&param1=old&param=blue"));
+        RequestContext context = new RequestContext(new URL("http://localhost/second?param=yellow&param2=fast"));
+        context.setParentRequest(request);
+        assertMatchingSet("parameter names", new String[]{"param", "param1", "param2"}, context.getParameterNames());
+        assertMatchingSet("param values", new String[]{"yellow"}, context.getParameterValues("param"));
+        assertEquals("param1 value", "old", ((String[]) context.getParameterMap().get("param1"))[0]);
     }
 
 
     /**
      * Verify parsing of message body parameters.
      */
+    @Test
     public void testPostParameterParsing() throws Exception {
-        RequestContext rc = new RequestContext( new URL( "http://localhost/basic" ));
-        rc.setMessageBody( "param=red&param1=old&param=blue".getBytes() );
-        assertMatchingSet( "parameter names", new String[] { "param", "param1" }, rc.getParameterNames() );
-        assertMatchingSet( "param values", new String[] { "red", "blue" }, rc.getParameterValues( "param" ) );
-        assertEquals( "param1 value", "old", ((String[]) rc.getParameterMap().get( "param1"))[0] );
+        RequestContext rc = new RequestContext(new URL("http://localhost/basic"));
+        rc.setMessageBody("param=red&param1=old&param=blue".getBytes());
+        assertMatchingSet("parameter names", new String[]{"param", "param1"}, rc.getParameterNames());
+        assertMatchingSet("param values", new String[]{"red", "blue"}, rc.getParameterValues("param"));
+        assertEquals("param1 value", "old", ((String[]) rc.getParameterMap().get("param1"))[0]);
     }
 
 
     /**
      * Verify parsing of message body parameters using a specified character encoding.
      */
+    @Test
     public void testEncodedParameterParsing() throws Exception {
-        RequestContext rc = new RequestContext( new URL( "http://localhost/basic" ));
+        RequestContext rc = new RequestContext(new URL("http://localhost/basic"));
         String hebrewValue = "\u05d0\u05d1\u05d2\u05d3";
         String paramString = "param=red&param1=%E0%E1%E2%E3&param=blue";
-        rc.setMessageBody( paramString.getBytes( "iso-8859-1" ) );
-        rc.setMessageEncoding( "iso-8859-8" );
-        assertMatchingSet( "parameter names", new String[] { "param", "param1" }, rc.getParameterNames() );
-        assertMatchingSet( "param values", new String[] { "red", "blue" }, rc.getParameterValues( "param" ) );
-        assertEquals( "param1 value", hebrewValue, ((String[]) rc.getParameterMap().get( "param1"))[0] );
+        rc.setMessageBody(paramString.getBytes("iso-8859-1"));
+        rc.setMessageEncoding("iso-8859-8");
+        assertMatchingSet("parameter names", new String[]{"param", "param1"}, rc.getParameterNames());
+        assertMatchingSet("param values", new String[]{"red", "blue"}, rc.getParameterValues("param"));
+        assertEquals("param1 value", hebrewValue, ((String[]) rc.getParameterMap().get("param1"))[0]);
     }
-    
-  
+
 
     class DummyHttpServletRequest implements HttpServletRequest {
 
         private RequestContext _requestContext;
 
 
-        public DummyHttpServletRequest( URL requestURL ) {
-            _requestContext = new RequestContext( requestURL );
+        public DummyHttpServletRequest(URL requestURL) {
+            _requestContext = new RequestContext(requestURL);
         }
 
 
@@ -133,17 +121,17 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public long getDateHeader( String s ) {
+        public long getDateHeader(String s) {
             return 0;
         }
 
 
-        public String getHeader( String s ) {
+        public String getHeader(String s) {
             return null;
         }
 
 
-        public Enumeration getHeaders( String s ) {
+        public Enumeration getHeaders(String s) {
             return null;
         }
 
@@ -153,7 +141,7 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public int getIntHeader( String s ) {
+        public int getIntHeader(String s) {
             return 0;
         }
 
@@ -188,7 +176,7 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public boolean isUserInRole( String s ) {
+        public boolean isUserInRole(String s) {
             return false;
         }
 
@@ -218,7 +206,7 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public HttpSession getSession( boolean b ) {
+        public HttpSession getSession(boolean b) {
             return null;
         }
 
@@ -248,7 +236,7 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public Object getAttribute( String s ) {
+        public Object getAttribute(String s) {
             return null;
         }
 
@@ -263,7 +251,7 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public void setCharacterEncoding( String s ) throws UnsupportedEncodingException {
+        public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
         }
 
 
@@ -282,8 +270,8 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public String getParameter( String s ) {
-            return _requestContext.getParameter( s );
+        public String getParameter(String s) {
+            return _requestContext.getParameter(s);
         }
 
 
@@ -292,8 +280,8 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public String[] getParameterValues( String s ) {
-            return _requestContext.getParameterValues( s );
+        public String[] getParameterValues(String s) {
+            return _requestContext.getParameterValues(s);
         }
 
 
@@ -337,11 +325,11 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public void setAttribute( String s, Object o ) {
+        public void setAttribute(String s, Object o) {
         }
 
 
-        public void removeAttribute( String s ) {
+        public void removeAttribute(String s) {
         }
 
 
@@ -360,12 +348,12 @@ public class RequestContextTest extends HttpUnitTest {
         }
 
 
-        public RequestDispatcher getRequestDispatcher( String s ) {
+        public RequestDispatcher getRequestDispatcher(String s) {
             return null;
         }
 
 
-        public String getRealPath( String s ) {
+        public String getRealPath(String s) {
             return null;
         }
 

@@ -21,30 +21,27 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 
-import java.util.*;
-
 import junit.framework.TestCase;
 
 
 /**
- *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
- **/
+ */
 public class FailingTests extends TestCase {
 
-    public FailingTests( String s ) {
-        super( s );
+    public FailingTests(String s) {
+        super(s);
     }
 
     public void testAddition() {
-        assertEquals( 3, 1+1 );
+        assertEquals(3, 1 + 1);
     }
 
     public void testSubtraction() {
-        assertEquals( 3, 5-4 );
+        assertEquals(3, 5 - 4);
     }
 
     public void testMultiplication() {
-        assertEquals( 4, 2*2 );
+        assertEquals(4, 2 * 2);
     }
 }

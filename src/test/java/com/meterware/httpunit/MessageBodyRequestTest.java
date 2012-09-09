@@ -22,6 +22,7 @@ package com.meterware.httpunit;
  *******************************************************************************************************************/
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,30 +30,14 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * A unit test to verify miscellaneous requests with message bodies.
  **/
 public class MessageBodyRequestTest extends HttpUnitTest {
 
-	public static void main(String args[]) {
-		junit.textui.TestRunner.run(suite());
-	}
-
-	public static Test suite() {
-		return new TestSuite(MessageBodyRequestTest.class);
-	}
-
-	public MessageBodyRequestTest(String name) {
-		super(name);
-	}
-
-	public void setUp() throws Exception {
-		super.setUp();
-	}
-	
 	/**
 	 * make a Request from the given parameters
 	 * @param resourceName
@@ -62,7 +47,7 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 	 * @throws UnsupportedEncodingException
 	 */
 	public WebRequest makeRequest(String resourceName,String sourceData, String contentType) throws UnsupportedEncodingException{
-		defineResource(resourceName, new BodyEcho());
+        defineResource(resourceName, new BodyEcho());
 		InputStream source = new ByteArrayInputStream(sourceData
 				.getBytes("iso-8859-1"));
 		WebRequest wr = new PostMethodWebRequest(getHostPath() + "/"+resourceName,
@@ -74,13 +59,13 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 	 * test a generic Post request
 	 * @throws Exception
 	 */
-	public void testGenericPostRequest() throws Exception {
+    @Test
+    public void testGenericPostRequest() throws Exception {
 		WebConversation wc = new WebConversation();
 		String sourceData="This is an interesting test\nWith two lines";
 		WebRequest wr = makeRequest("ReportData",sourceData, "text/sample");
 		WebResponse response = wc.getResponse(wr);
-		assertEquals("Body response", "\nPOST\n" + sourceData, response
-				.getText());
+		assertEquals("Body response", "\nPOST\n" + sourceData, response.getText());
 		assertEquals("Content-type", "text/sample", response.getContentType());
 	}
 	
@@ -88,7 +73,8 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 	 * test for Patch by Serge Maslyukov for empty content Types
 	 * @throws Exception
 	 */
-	public void testEmptyContentType() throws Exception {
+    @Test
+    public void testEmptyContentType() throws Exception {
 		WebConversation wc = new WebConversation();
 		String emptyContentType=""; // this is an emptyContentType
 		WebRequest wr = makeRequest("something","some data",emptyContentType);
@@ -96,8 +82,9 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 		assertEquals("Content-type", "",wr.getContentType());
 	}
 
-	public void testPutRequest() throws Exception {
-		defineResource("ReportData", new BodyEcho());
+    @Test
+    public void testPutRequest() throws Exception {
+        defineResource("ReportData", new BodyEcho());
 		String sourceData = "This is an interesting test\nWith two lines";
 		InputStream source = new ByteArrayInputStream(sourceData
 				.getBytes("iso-8859-1"));
@@ -113,8 +100,9 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 	/**
 	 * test for download problem described by Oliver Wahlen	 
 	 */
-	public void testDownloadRequestUsingGetText() throws Exception {
-    	defineResource( "ReportData", new BodyEcho() );
+    @Test
+    public void testDownloadRequestUsingGetText() throws Exception {
+        defineResource("ReportData", new BodyEcho());
     	byte[] binaryData = new byte[256];
     	for(int i=0;i<=255;i++) {
     		binaryData[i] = (byte)i;
@@ -123,7 +111,7 @@ public class MessageBodyRequestTest extends HttpUnitTest {
     	InputStream source = new ByteArrayInputStream( binaryData );
 
     	WebConversation wc = new WebConversation();
-    	WebRequest wr = new PutMethodWebRequest( getHostPath() + "/ReportData", source, "application/random" );
+    	WebRequest wr = new PutMethodWebRequest(getHostPath() + "/ReportData", source, "application/random" );
     	WebResponse response = wc.getResponse( wr );
     	// currently the following line does not work:
     	byte[] download = response.getText().getBytes();
@@ -131,11 +119,12 @@ public class MessageBodyRequestTest extends HttpUnitTest {
     	// byte[] download = getDownload( response );
     	// and this one is now available ...
     	download=response.getBytes();
-		assertEquals("Body response", binaryData, download);
+		assertArrayEquals("Body response", binaryData, download);
 	}
 	
-	public void testDownloadRequest() throws Exception {
-		defineResource("ReportData", new BodyEcho());
+    @Test
+    public void testDownloadRequest() throws Exception {
+        defineResource("ReportData", new BodyEcho());
 		byte[] binaryData = new byte[] { 0x01, 0x05, 0x0d, 0x0a, 0x02 };
 
 		InputStream source = new ByteArrayInputStream(binaryData);
@@ -145,19 +134,20 @@ public class MessageBodyRequestTest extends HttpUnitTest {
 				source, "application/random");
 		WebResponse response = wc.getResponse(wr);
 		byte[] download = response.getBytes();
-		assertEquals("Body response", binaryData, download);
+		assertArrayEquals("Body response", binaryData, download);
 
 		download = getDownload(response);
-		assertEquals("Body response", binaryData, download);
+		assertArrayEquals("Body response", binaryData, download);
 		
 		download = response.getBytes();
-		assertEquals("Body response", binaryData, download);
+		assertArrayEquals("Body response", binaryData, download);
 	}
 
 	/**
 	 * test for BR [ 1964665 ] HeaderOnlyRequest cannot be constructed
 	 */
-	public void testHeaderOnlyWebRequest() throws Exception {
+    @Test
+    public void testHeaderOnlyWebRequest() throws Exception {
 		HeaderOnlyWebRequest r = new HeaderOnlyWebRequest(
 				"http://www.google.com");
 	}

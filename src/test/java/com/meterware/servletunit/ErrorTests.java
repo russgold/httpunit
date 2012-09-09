@@ -21,26 +21,26 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 
-import java.util.*;
-
 import junit.framework.TestCase;
+import org.junit.Test;
 
 
 /**
+ * This test is run by the junit servlet only.
  *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
- **/
+ */
 public class ErrorTests extends TestCase {
 
-    public ErrorTests( String s ) {
-        super( s );
+    public ErrorTests(String s) {
+        super(s);
     }
 
     public void testAddition() {
-        throw new RuntimeException( "Got a problem?" );
+        throw new RuntimeException("Got a problem?");
     }
 
     public void testMultiplication() {
-        assertEquals( 4, 2*2 );
+        assertEquals(4, 2 * 2);
     }
 }

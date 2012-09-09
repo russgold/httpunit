@@ -19,8 +19,13 @@ package com.meterware.httpunit.dom;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import junit.framework.TestSuite;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mozilla.javascript.Context;
+
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -31,21 +36,16 @@ public class DomEventScriptingTest extends AbstractHTMLElementTest {
     private static final Object[] NO_ARGS = new Object[0];
 
 
-    public static TestSuite suite() {
-        return new TestSuite( DomEventScriptingTest.class );
-    }
-
-
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         _context = Context.enter();
-        _context.initStandardObjects( null );
+        _context.initStandardObjects(null);
     }
 
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         Context.exit();
-        super.tearDown();
     }
 
 
@@ -53,9 +53,10 @@ public class DomEventScriptingTest extends AbstractHTMLElementTest {
      * Verifies that the 'onload' event for a body element is initially undefined if no corresponding attribute
      * is defined.
      */
+    @Test
     public void testNoOnloadEvent() throws Exception {
-        HTMLBodyElementImpl body = (HTMLBodyElementImpl) createElement( "body" );
-        assertNull( "Found a default definition for 'onLoad' event", body.getOnloadEvent() );
+        HTMLBodyElementImpl body = (HTMLBodyElementImpl) createElement("body");
+        assertNull("Found a default definition for 'onLoad' event", body.getOnloadEvent());
     }
 
 
@@ -63,11 +64,12 @@ public class DomEventScriptingTest extends AbstractHTMLElementTest {
      * Verifies that the 'onload' event for a body element is initially defined if a corresponding attribute
      * is defined.
      */
+    @Test
     public void testInlineOnloadEvent() throws Exception {
-        HTMLBodyElementImpl body = (HTMLBodyElementImpl) createElement( "body", new Object[][] { {"onload", "title='here'" } } );
-        assertNotNull( "Found no definition for 'onLoad' event", body.getOnloadEvent() );
-        body.getOnloadEvent().call( _context, body, body, NO_ARGS );
-        assertEquals( "Updated title", "here", body.getTitle() );
+        HTMLBodyElementImpl body = (HTMLBodyElementImpl) createElement("body", new Object[][]{{"onload", "title='here'"}});
+        assertNotNull("Found no definition for 'onLoad' event", body.getOnloadEvent());
+        body.getOnloadEvent().call(_context, body, body, NO_ARGS);
+        assertEquals("Updated title", "here", body.getTitle());
     }
 
 }

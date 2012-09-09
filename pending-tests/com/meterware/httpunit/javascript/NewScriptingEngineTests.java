@@ -20,7 +20,6 @@ package com.meterware.httpunit.javascript;
  *
  *******************************************************************************************************************/
 import com.meterware.httpunit.*;
-import com.meterware.httpunit.javascript.AbstractJavaScriptTest;
 
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
@@ -52,13 +51,13 @@ public class NewScriptingEngineTests extends AbstractJavaScriptTest {
      * @throws Exception on uncaught problem
      */
     public void testCreateElement() throws Exception {
-        defineResource( "OnCommand.html",
+        pseudoServerTestSupport.defineResource("OnCommand.html",
                 "<html><head><title>Amazing!</title></head>" +
-                        "<body onLoad='var elem=document.createElement(\"input\");elem.id=\"hellothere\";alert(elem.id);'></body>" );
+                        "<body onLoad='var elem=document.createElement(\"input\");elem.id=\"hellothere\";alert(elem.id);'></body>");
         WebConversation wc = new WebConversation();
         boolean oldDebug = HttpUnitUtils.setEXCEPTION_DEBUG( false );
         try {
-            wc.getResponse( getHostPath() + "/OnCommand.html" );
+            wc.getResponse(pseudoServerTestSupport.getHostPath() + "/OnCommand.html" );
             // 	used to throw:
             // 	com.meterware.httpunit.ScriptException: Event 'var elem=document.createElement("input");elem.id="hellothere";alert(elem.id);' failed: org.mozilla.javascript.EcmaError: TypeError: Cannot find function createElement.
             assertEquals( "Alert message", "hellothere", wc.popNextAlert() );
@@ -87,7 +86,7 @@ public class NewScriptingEngineTests extends AbstractJavaScriptTest {
      * @throws Exception on any uncaught problem
      */
     public void testDOM() throws Exception {
-        defineResource( "testSelect.html", "<html><head><script type='text/javascript'>\n" +
+        pseudoServerTestSupport.defineResource("testSelect.html", "<html><head><script type='text/javascript'>\n" +
                 "<!--\n" +
                 "function testDOM() {\n" +
                 "  var sel = document.getElementById('the_select');\n" +
@@ -112,9 +111,9 @@ public class NewScriptingEngineTests extends AbstractJavaScriptTest {
                 "   </table>" +
                 "</form>" +
                 "<script type='text/javascript'>testDOM();</script>" +
-                "</body></html>" );
+                "</body></html>");
         WebConversation wc = new WebConversation();
-        wc.getResponse( getHostPath() + "/testSelect.html" );
+        wc.getResponse(pseudoServerTestSupport.getHostPath() + "/testSelect.html" );
         assertEquals( "Message 1", "TD", wc.popNextAlert().toUpperCase() );
         assertEquals( "Message 2", "SELECT", wc.popNextAlert().toUpperCase() );
     }

@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2004, Russell Gold
+ * Copyright (c) 2004, 2012, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -19,31 +19,30 @@ package com.meterware.httpunit.dom;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-
-import junit.framework.TestCase;
-
 import java.beans.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.junit.Before;
 import org.w3c.dom.html.HTMLElement;
 import org.w3c.dom.html.HTMLOptionElement;
 import org.w3c.dom.Element;
+
+import static org.junit.Assert.*;
 
 /**
  *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  **/
-abstract public class AbstractHTMLElementTest extends TestCase implements DomListener {
+abstract public class AbstractHTMLElementTest implements DomListener {
 
     protected HTMLDocumentImpl _htmlDocument;
     private List _eventsReceived = new ArrayList();
 
-
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUpAbstractHTMLElementTest() throws Exception {
         _htmlDocument = new HTMLDocumentImpl();
     }
 

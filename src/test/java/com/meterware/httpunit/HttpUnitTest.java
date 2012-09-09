@@ -21,6 +21,7 @@ package com.meterware.httpunit;
 *******************************************************************************************************************/
 import com.meterware.pseudoserver.HttpUserAgentTest;
 import com.meterware.httpunit.parsing.HTMLParserFactory;
+import org.junit.Before;
 
 /**
  * a base class for HttpUnit regression tests.
@@ -30,54 +31,15 @@ import com.meterware.httpunit.parsing.HTMLParserFactory;
 abstract
 public class HttpUnitTest extends HttpUserAgentTest {
 
-    private boolean _showTestName;
-    private long _startTime;
-
-
-    /**
-     * construct a test with the given name
-     * @param name
-     */
-    public HttpUnitTest( String name ) {
-        super( name );
-    }
-
-    /**
-     * construct a test with the given name and show it depending on the flag showTestName
-     * @param name
-     * @param showTestName
-     */
-    public HttpUnitTest( String name, boolean showTestName ) {
-        super( name );
-        _showTestName = showTestName;
-    }
-
-
+    @Before
     /**
      * setup the test by resetting the environment for Http Unit tests
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    public void setUpHttpUnitTest() throws Exception {
         HttpUnitOptions.reset();
         HTMLParserFactory.reset();
-        if (_showTestName) {
-            System.out.println( "----------------------- " + getName() + " ------------------------");
-            _startTime = System.currentTimeMillis();
-        }
     }
 
-
-    /**
-     * tear down the test and if the name should be shown do so with the duration of the test
-     * in millisecs
-     */
-    public void tearDown() throws Exception {
-        super.tearDown();
-        if (_showTestName) {
-            long duration = System.currentTimeMillis() - _startTime;
-            System.out.println( "... took " + duration + " msec");
-        }
-    }
 
     /**
      * handling of tests that are temporarily disabled

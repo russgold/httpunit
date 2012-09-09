@@ -19,17 +19,16 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.controls.SelectionFormControl;
 import com.meterware.pseudoserver.PseudoServlet;
 import com.meterware.pseudoserver.WebResource;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.IOException;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.xml.sax.SAXException;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -37,60 +36,47 @@ import org.xml.sax.SAXException;
  **/
 public class WebFormTest extends HttpUnitTest {
 
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run( suite() );
-    }
 
-
-    public static Test suite() {
-        return new TestSuite( WebFormTest.class );
-    }
-
-
-    public WebFormTest( String name ) {
-        super( name );
-    }
-
-
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         _wc = new WebConversation();
 
-        defineWebPage( "OneForm", "<h2>Login required</h2>" +
-                                  "<form method=POST action = \"/servlet/Login\"><B>" +
-                                  "Enter the name 'master': <Input type=TEXT Name=name></B>" +
-                                  "<input type=\"checkbox\" name=first>Disabled" +
-                                  "<input type=\"checkbox\" name=second checked>Enabled" +
-                                  "<br><Input type=submit value = \"Log in\">" +
-                                  "</form>" );
+        defineWebPage("OneForm", "<h2>Login required</h2>" +
+                "<form method=POST action = \"/servlet/Login\"><B>" +
+                "Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                "<input type=\"checkbox\" name=first>Disabled" +
+                "<input type=\"checkbox\" name=second checked>Enabled" +
+                "<br><Input type=submit value = \"Log in\">" +
+                "</form>");
     }
 
     /**
      * placeholder for test for BR 2407470 by redsonic with comment and patch by Adam Heath
      * 
      */
+       @Test
     public void testGetFormWithID() throws Exception {
-        defineWebPage(  "OnCommand",
-        		"<html>\n"+
-        		"  <head>\n"+
-                "     <script type='JavaScript'>\n" +
-                "         function function1() {\n"+
-                "  		    alert( document.forms[0].name );\n" +
-                "         }\n"+
-                "     </script>\n" +
-                "  </head>\n" +
-                "  <body>\n"+
-                "    <form id='form1' name='form1name'/>\n" +
-                "    <form id='form2' name='form2name'/>\n" + 
-                "    <form id='form3' name='form3name'/>\n" +
-                "  <body>\n"+
-                "</html>\n");
+           defineWebPage("OnCommand",
+                   "<html>\n" +
+                           "  <head>\n" +
+                           "     <script type='JavaScript'>\n" +
+                           "         function function1() {\n" +
+                           "  		    alert( document.forms[0].name );\n" +
+                           "         }\n" +
+                           "     </script>\n" +
+                           "  </head>\n" +
+                           "  <body>\n" +
+                           "    <form id='form1' name='form1name'/>\n" +
+                           "    <form id='form2' name='form2name'/>\n" +
+                           "    <form id='form3' name='form3name'/>\n" +
+                           "  <body>\n" +
+                           "</html>\n");
         boolean oldstate = HttpUnitOptions.setExceptionsThrownOnScriptError(false);
         try {
         	WebConversation wc = new WebConversation();
-        	WebResponse wr=wc.getResponse( getHostPath() + "/OnCommand.html" );    	
+        	WebResponse wr=wc.getResponse(getHostPath() + "/OnCommand.html" );
         	WebForm form = wr.getFormWithID( "form3" );
-        	assertTrue(form!=null);
+        	assertNotNull(form);
         } catch (Exception ex) {
         	throw ex;
         } finally {
@@ -98,13 +84,14 @@ public class WebFormTest extends HttpUnitTest {
         }
     }
 
+       @Test
     public void testSubmitFromForm() throws Exception {
-        defineWebPage( "Form", "<form method=GET id=main action = 'tryMe'>" +
-                              "<Input type=text Name=name>" +
-                              "<input type=\"checkbox\" name=second checked>Enabled" +
-                              "</form>" );
-        defineResource( "/tryMe?name=master&second=on", "You made it!" );
-        WebResponse wr = _wc.getResponse( getHostPath() + "/Form.html" );
+           defineWebPage("Form", "<form method=GET id=main action = 'tryMe'>" +
+                   "<Input type=text Name=name>" +
+                   "<input type=\"checkbox\" name=second checked>Enabled" +
+                   "</form>");
+           defineResource("/tryMe?name=master&second=on", "You made it!");
+        WebResponse wr = _wc.getResponse(getHostPath() + "/Form.html" );
         WebForm form = wr.getFormWithID( "main" );
         form.setParameter( "name", "master" );
         form.submit();
@@ -112,14 +99,15 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testAmbiguousSubmitFromForm() throws Exception {
-        defineWebPage( "Form", "<form method=GET id=main action = 'tryMe'>" +
-                              "<Input type=text Name=name>" +
-                              "<input type=\"checkbox\" name=second checked>Enabled" +
-                              "<input type='submit' name='left'><input type='submit' name='right'>" +
-                              "</form>" );
-        defineResource( "/tryMe?name=master&second=on", "You made it!" );
-        WebResponse wr = _wc.getResponse( getHostPath() + "/Form.html" );
+           defineWebPage("Form", "<form method=GET id=main action = 'tryMe'>" +
+                   "<Input type=text Name=name>" +
+                   "<input type=\"checkbox\" name=second checked>Enabled" +
+                   "<input type='submit' name='left'><input type='submit' name='right'>" +
+                   "</form>");
+           defineResource("/tryMe?name=master&second=on", "You made it!");
+        WebResponse wr = _wc.getResponse(getHostPath() + "/Form.html" );
         WebForm form = wr.getFormWithID( "main" );
         form.setParameter( "name", "master" );
         try {
@@ -132,15 +120,16 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testSubmitFromButton() throws Exception {
-        defineWebPage( "Form", "<form method=GET id=main action = 'tryMe'>" +
-                              "<Input type=text Name=name>" +
-                              "<input type=\"checkbox\" name=second checked>Enabled" +
-                              "<input type=submit name=save value=none>" +
-                              "<input type=submit name=save value=all>" +
-                              "</form>" );
-        defineResource( "/tryMe?name=master&second=on&save=all", "You made it!" );
-        WebResponse wr = _wc.getResponse( getHostPath() + "/Form.html" );
+           defineWebPage("Form", "<form method=GET id=main action = 'tryMe'>" +
+                   "<Input type=text Name=name>" +
+                   "<input type=\"checkbox\" name=second checked>Enabled" +
+                   "<input type=submit name=save value=none>" +
+                   "<input type=submit name=save value=all>" +
+                   "</form>");
+           defineResource("/tryMe?name=master&second=on&save=all", "You made it!");
+        WebResponse wr = _wc.getResponse(getHostPath() + "/Form.html" );
         WebForm form = wr.getFormWithID( "main" );
         form.setParameter( "name", "master" );
         SubmitButton button = form.getSubmitButton( "save", "all" );
@@ -153,13 +142,14 @@ public class WebFormTest extends HttpUnitTest {
      * test clicking on a Positional Button with a given name "update"
      * @throws Exception
      */
-    public void testSubmitFromPositionalButton() throws Exception {    	
-        defineResource( "ask?age=12&update=name&update.x=5&update.y=15", "You made it!", "text/plain" );
-        defineWebPage( "Default", "<form id='form' method=GET action = \"/ask\">" +
-                                  "<Input type=text name=age value=12>" +
-                                  "<Input type=image name=update value=name src=\"\">" +
-                                  "</form>" );
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+       @Test
+    public void testSubmitFromPositionalButton() throws Exception {
+           defineResource("ask?age=12&update=name&update.x=5&update.y=15", "You made it!", "text/plain");
+           defineWebPage("Default", "<form id='form' method=GET action = \"/ask\">" +
+                   "<Input type=text name=age value=12>" +
+                   "<Input type=image name=update value=name src=\"\">" +
+                   "</form>");
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
         SubmitButton button = page.getFormWithID( "form" ).getSubmitButton( "update" );
         assertEquals("x param name",button.positionParameterName("x"),"update.x");
         assertEquals("y param name",button.positionParameterName("y"),"update.y");
@@ -173,16 +163,17 @@ public class WebFormTest extends HttpUnitTest {
      * see also FormSubmitTest.testUnnamedImageButtonDefaultSubmit
      * @throws Exception
      */
+       @Test
     public void testSubmitFromUnnamedImageButton() throws Exception {
     	boolean oldAllowUnnamedImageButton=SubmitButton.isAllowUnnamedImageButton();
     	SubmitButton.setAllowUnnamedImageButton(true);
-      defineResource( "ask?age=12", "Unnamed Image Button ignored!", "text/plain" );
-      defineResource( "ask?age=12&x=5&y=15", "You made it!", "text/plain" );
-      defineWebPage( "Default", "<form id='form' method=GET action = \"/ask\">" +
-                                "<Input type=text name=age value=12>" +
-                                "<Input type=image id=imageid value=name src=\"\">" +
-                                "</form>" );    
-      WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+           defineResource("ask?age=12", "Unnamed Image Button ignored!", "text/plain");
+           defineResource("ask?age=12&x=5&y=15", "You made it!", "text/plain");
+           defineWebPage("Default", "<form id='form' method=GET action = \"/ask\">" +
+                   "<Input type=text name=age value=12>" +
+                   "<Input type=image id=imageid value=name src=\"\">" +
+                   "</form>");
+      WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
       SubmitButton button = page.getFormWithID( "form" ).getSubmitButtonWithID( "imageid" );
       assertEquals("empty button name",button.getName(),"");
       assertEquals("x param name",button.positionParameterName("x"),"x");
@@ -197,63 +188,68 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testFindNoForm() throws Exception {
-        defineWebPage( "NoForms", "This has no forms but it does" +
-                                  "have <a href=\"/other.html\">an active link</A>" +
-                                  " and <a name=here>an anchor</a>" );
+           defineWebPage("NoForms", "This has no forms but it does" +
+                   "have <a href=\"/other.html\">an active link</A>" +
+                   " and <a name=here>an anchor</a>");
 
-        WebForm[] forms = _wc.getResponse( getHostPath() + "/NoForms.html" ).getForms();
+        WebForm[] forms = _wc.getResponse(getHostPath() + "/NoForms.html" ).getForms();
         assertNotNull( forms );
         assertEquals( 0, forms.length );
     }
 
 
+       @Test
     public void testFindOneForm() throws Exception {
-        WebForm[] forms = _wc.getResponse( getHostPath() + "/OneForm.html" ).getForms();
+        WebForm[] forms = _wc.getResponse(getHostPath() + "/OneForm.html" ).getForms();
         assertNotNull( forms );
         assertEquals( 1, forms.length );
     }
 
 
+       @Test
     public void testFindFormByName() throws Exception {
-        defineWebPage( "Default", "<form name=oneForm method=POST action = \"/servlet/Login\">" +
-                                  "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
-                                  "<br><Input name=typeless value=nothing>" +
-                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
-                                  "<br><Input type=submit value = \"Log in\">" +
-                                  "</form>" );
+           defineWebPage("Default", "<form name=oneForm method=POST action = \"/servlet/Login\">" +
+                   "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
+                   "<br><Input name=typeless value=nothing>" +
+                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                   "<br><Input type=submit value = \"Log in\">" +
+                   "</form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
         assertNull( "Found nonexistent form", page.getFormWithName( "nobody" ) );
         assertNotNull( "Did not find named form", page.getFormWithName( "oneform" ) );
     }
 
 
+       @Test
     public void testFindFormByID() throws Exception {
-        defineWebPage( "Default", "<form id=oneForm method=POST action = \"/servlet/Login\">" +
-                                  "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
-                                  "<br><Input name=typeless value=nothing>" +
-                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
-                                  "<br><Input type=submit value = \"Log in\">" +
-                                  "</form>" );
+           defineWebPage("Default", "<form id=oneForm method=POST action = \"/servlet/Login\">" +
+                   "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
+                   "<br><Input name=typeless value=nothing>" +
+                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                   "<br><Input type=submit value = \"Log in\">" +
+                   "</form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
         assertNull( "Found nonexistent form", page.getFormWithID( "nobody" ) );
         assertNotNull( "Did not find specified form", page.getFormWithID( "oneForm" ) );
     }
 
 
+       @Test
     public void testFormParameters() throws Exception {
-        defineWebPage( "AForm", "<h2>Login required</h2>" +
-                                  "<form method=POST action = \"/servlet/Login\"><B>" +
-                                  "Enter the name 'master': <textarea Name=name>Something</textarea></B>" +
-                                  "<input type=\"checkbox\" name=first>Disabled" +
-                                  "<input type=\"checkbox\" name=second checked>Enabled" +
-                                  "<input type=textbox name=third value=something>" +
-                                  "<br><Input type=submit value = \"Log in\">" +
-                                  "</form>" );
+           defineWebPage("AForm", "<h2>Login required</h2>" +
+                   "<form method=POST action = \"/servlet/Login\"><B>" +
+                   "Enter the name 'master': <textarea Name=name>Something</textarea></B>" +
+                   "<input type=\"checkbox\" name=first>Disabled" +
+                   "<input type=\"checkbox\" name=second checked>Enabled" +
+                   "<input type=textbox name=third value=something>" +
+                   "<br><Input type=submit value = \"Log in\">" +
+                   "</form>");
 
-        WebForm form = _wc.getResponse( getHostPath() + "/AForm.html" ).getForms()[0];
+        WebForm form = _wc.getResponse(getHostPath() + "/AForm.html" ).getForms()[0];
         String[] parameters = form.getParameterNames();
         assertNotNull( parameters );
         assertMatchingSet( "form parameter names", new String[] { "first", "name", "second", "third" }, parameters );
@@ -277,24 +273,26 @@ public class WebFormTest extends HttpUnitTest {
     }
     
 
+       @Test
     public void testFormRequest() throws Exception {
-        WebForm form = _wc.getResponse( getHostPath() + "/OneForm.html" ).getForms()[0];
+        WebForm form = _wc.getResponse(getHostPath() + "/OneForm.html" ).getForms()[0];
         WebRequest request = form.getRequest();
         request.setParameter( "name", "master" );
         assertTrue( "Should be a post request", !(request instanceof GetMethodWebRequest) );
-        assertEquals( getHostPath() + "/servlet/Login", request.getURL().toExternalForm() );
+        assertEquals(getHostPath() + "/servlet/Login", request.getURL().toExternalForm() );
     }
 
 
+       @Test
     public void testHiddenParameters() throws Exception {
-        defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
-                                  "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
-                                  "<br><Input name=typeless value=nothing>" +
-                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
-                                  "<br><Input type=submit value = \"Log in\">" +
-                                  "</form>" );
+           defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" +
+                   "<Input name=\"secret\" type=\"hidden\" value=\"surprise\">" +
+                   "<br><Input name=typeless value=nothing>" +
+                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                   "<br><Input type=submit value = \"Log in\">" +
+                   "</form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         assertEquals( 3, form.getParameterNames().length );
 
@@ -317,15 +315,16 @@ public class WebFormTest extends HttpUnitTest {
     /**
      * test Null textValues
      */ 
+       @Test
     public void testNullTextValues() throws Exception {
-        defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
-                                  "<Input name=\"secret\" type=\"hidden\" value=>" +
-                                  "<br><Input name=typeless value=>" +
-                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
-                                  "<br><Input type=submit value = \"Log in\">" +
-                                  "</form>" );
+           defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" +
+                   "<Input name=\"secret\" type=\"hidden\" value=>" +
+                   "<br><Input name=typeless value=>" +
+                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                   "<br><Input type=submit value = \"Log in\">" +
+                   "</form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         assertEquals( 3, form.getParameterNames().length );
 
@@ -341,6 +340,7 @@ public class WebFormTest extends HttpUnitTest {
      * 
      * @throws Exception on failure
      */
+       @Test
     public void testTextArea() throws Exception {
         String fieldName = "comments";
         String comment = "My what a lovely dress that is";
@@ -348,10 +348,10 @@ public class WebFormTest extends HttpUnitTest {
         // this test case pass.
         String defaultValue = "";
 
-        defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" + "<textarea name='" + fieldName
-                + "' row='10' cols='20'>" + defaultValue + "</textarea>" +
-                	"<br><Input type=submit value = \"Submit\">"
-                + "</form>");
+           defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" + "<textarea name='" + fieldName
+                   + "' row='10' cols='20'>" + defaultValue + "</textarea>" +
+                   "<br><Input type=submit value = \"Submit\">"
+                   + "</form>");
 
         WebResponse page = _wc.getResponse(getHostPath() +"/Default.html");
         WebForm form = page.getForms()[0];
@@ -364,17 +364,18 @@ public class WebFormTest extends HttpUnitTest {
 
     }
 
+       @Test
     public void testTableForm() throws Exception {
-        defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
-                                  "<table summary=\"\"><tr><td>" +
-                                  "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
-                                  "</td><td><Input type=Radio name=sex value=male>Masculine" +
-                                  "</td><td><Input type=Radio name=sex value=female checked>Feminine" +
-                                  "</td><td><Input type=Radio name=sex value=neuter>Neither" +
-                                  "<Input type=submit value = \"Log in\"></tr></table>" +
-                                  "</form>" );
+           defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" +
+                   "<table summary=\"\"><tr><td>" +
+                   "<B>Enter the name 'master': <Input type=TEXT Name=name></B>" +
+                   "</td><td><Input type=Radio name=sex value=male>Masculine" +
+                   "</td><td><Input type=Radio name=sex value=female checked>Feminine" +
+                   "</td><td><Input type=Radio name=sex value=neuter>Neither" +
+                   "<Input type=submit value = \"Log in\"></tr></table>" +
+                   "</form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
 
         WebForm form = page.getForms()[0];
         String[] parameterNames = form.getParameterNames();
@@ -401,14 +402,15 @@ public class WebFormTest extends HttpUnitTest {
      * test Select HTML Element 
      * @throws Exception
      */
+       @Test
     public void testSelect() throws Exception {
-        defineWebPage( "Default", "<form method=POST action = \"/servlet/Login\">" +
-                                  "<Select id='select1' name=color><Option>blue<Option selected>red \n" +
-                                  "<Option>green</select>" +
-                                  "<TextArea name=\"text\">Sample text</TextArea>" +
-                                  "<Input type=submit></form>" );
+           defineWebPage("Default", "<form method=POST action = \"/servlet/Login\">" +
+                   "<Select id='select1' name=color><Option>blue<Option selected>red \n" +
+                   "<Option>green</select>" +
+                   "<TextArea name=\"text\">Sample text</TextArea>" +
+                   "<Input type=submit></form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
 
         WebForm form = page.getForms()[0];
         String[] parameterNames = form.getParameterNames();
@@ -437,13 +439,14 @@ public class WebFormTest extends HttpUnitTest {
     
 
 
+       @Test
     public void testSizedSelect() throws Exception {
-        defineWebPage( "Default", "<form method=POST action = '/servlet/Login'>" +
-                                  "<Select name=poems><Option>limerick<Option>haiku</select>" +
-                                  "<Select name=songs size=2><Option>aria<Option>folk</select>" +
-                                  "<Input type=submit></form>" );
+           defineWebPage("Default", "<form method=POST action = '/servlet/Login'>" +
+                   "<Select name=poems><Option>limerick<Option>haiku</select>" +
+                   "<Select name=songs size=2><Option>aria<Option>folk</select>" +
+                   "<Input type=submit></form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
 
         WebForm form = page.getForms()[0];
         assertEquals( "Default poem", "limerick", form.getParameterValue( "poems" ) );
@@ -451,6 +454,7 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testSingleSelectParameterOrdering() throws Exception {
         StringBuffer sb = new StringBuffer( "<form action='sendIt' id='theform'>" );
         for (int i= 0; i < 4; i++) {
@@ -458,10 +462,10 @@ public class WebFormTest extends HttpUnitTest {
         }
         sb.append( "</form>" );
 
-        defineWebPage( "OnCommand", sb.toString() );
+           defineWebPage("OnCommand", sb.toString());
 
         WebConversation wc = new WebConversation();
-        WebResponse response = wc.getResponse( getHostPath() + "/OnCommand.html" );
+        WebResponse response = wc.getResponse(getHostPath() + "/OnCommand.html" );
         WebForm form = response.getFormWithID( "theform" );
         form.setParameter( "enabled", new String[] { "true", "false", "false", "true" } );
         WebRequest request = form.getRequest();
@@ -475,14 +479,15 @@ public class WebFormTest extends HttpUnitTest {
      * by Vladimir
      * @throws Exception
      */
+       @Test
     public void testMultiSelect() throws Exception {
-        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
-                                  "<Select multiple size=4 name=colors>" +
-                                  "<Option>blue<Option selected>red \n" +
-                                  "<Option>green<Option value=\"pink\" selected>salmon</select>" +
-                                  "<Input type=submit></form>" );
+           defineWebPage("Default", "<form method=GET action = \"/ask\">" +
+                   "<Select multiple size=4 name=colors>" +
+                   "<Option>blue<Option selected>red \n" +
+                   "<Option>green<Option value=\"pink\" selected>salmon</select>" +
+                   "<Input type=submit></form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
         WebForm form = page.getForms()[0];
         String[] parameterNames = form.getParameterNames();
         assertEquals( "num parameters", 1, parameterNames.length );
@@ -490,16 +495,16 @@ public class WebFormTest extends HttpUnitTest {
         assertTrue( "Found extraneous values for unknown parameter 'magic'", form.getParameterValues( "magic" ).length == 0 );
         assertMatchingSet( "Select defaults", new String[] { "red", "pink" }, form.getParameterValues( "colors" ) );
         assertMatchingSet( "Select options", new String[] { "blue", "red", "green", "salmon" }, form.getOptions( "colors" ) );
-        assertEquals( "Select values", new String[] { "blue", "red", "green", "pink" }, form.getOptionValues( "colors" ) );
+        assertArrayEquals("Select values", new String[]{"blue", "red", "green", "pink"}, form.getOptionValues("colors"));
         WebRequest request = form.getRequest();
         assertMatchingSet( "Request defaults", new String[] { "red", "pink" }, request.getParameterValues( "colors" ) );
         assertEquals( "URL", getHostPath() + "/ask?colors=red&colors=pink", request.getURL().toExternalForm() );
 
 
         form.setParameter( "colors", "green" );
-        assertEquals( "New select value", new String[] { "green" }, form.getParameterValues( "colors" ) );
+        assertArrayEquals("New select value", new String[]{"green"}, form.getParameterValues("colors"));
         form.setParameter( "colors", new String[] { "blue", "pink" } );
-        assertEquals( "New select value", new String[] { "blue", "pink" }, form.getParameterValues( "colors" ) );
+        assertArrayEquals("New select value", new String[]{"blue", "pink"}, form.getParameterValues("colors"));
 
         try {
             form.setParameter( "colors", new String[] { "red", "colors" } );
@@ -512,14 +517,15 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testUnspecifiedDefaults() throws Exception {
-        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
-                                  "<Select name=colors><Option>blue<Option>red</Select>" +
-                                  "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
-                                  "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
-                                  "<Input type=submit></form>" );
+           defineWebPage("Default", "<form method=GET action = \"/ask\">" +
+                   "<Select name=colors><Option>blue<Option>red</Select>" +
+                   "<Select name=fish><Option value=red>snapper<Option value=pink>salmon</select>" +
+                   "<Select name=media multiple size=2><Option>TV<Option>Radio</select>" +
+                   "<Input type=submit></form>");
 
-        WebResponse page = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse page = _wc.getResponse(getHostPath() + "/Default.html" );
 
         WebForm form = page.getForms()[0];
          assertEquals( "inferred color default", "blue", form.getParameterValue( "colors" ) );
@@ -533,16 +539,17 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testCheckboxControls() throws Exception {
-        defineWebPage( "Default", "<form method=GET action = \"/ask\">" +
-                                  "<Input type=checkbox name=ready value=yes checked>" +
-                                  "<Input type=checkbox name=color value=red checked>" +
-                                  "<Input type=checkbox name=color value=blue checked>" +
-                                  "<Input type=checkbox name=gender value=male checked>" +
-                                  "<Input type=checkbox name=gender value=female>" +
-                                  "<Input type=submit></form>" );
+           defineWebPage("Default", "<form method=GET action = \"/ask\">" +
+                   "<Input type=checkbox name=ready value=yes checked>" +
+                   "<Input type=checkbox name=color value=red checked>" +
+                   "<Input type=checkbox name=color value=blue checked>" +
+                   "<Input type=checkbox name=gender value=male checked>" +
+                   "<Input type=checkbox name=gender value=female>" +
+                   "<Input type=submit></form>");
 
-        WebResponse response = _wc.getResponse( getHostPath() + "/Default.html" );
+        WebResponse response = _wc.getResponse(getHostPath() + "/Default.html" );
         assertNotNull( response.getForms() );
         assertEquals( "Num forms in page", 1, response.getForms().length );
         WebForm form = response.getForms()[0];
@@ -563,21 +570,22 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testGetWithQueryString() throws Exception {
-        defineResource( "QueryForm.html",
-                        "<html><head></head>" +
-                        "<form method=GET action=\"SayHello?speed=fast\">" +
-                        "<input type=text name=name><input type=submit></form></body></html>" );
-        defineResource( "SayHello?speed=fast&name=me", new PseudoServlet() {
-            public WebResource getGetResponse() {
-                WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
-                                                      "</td></tr></table></body></html>" );
-                return result;
-            }
-        } );
+           defineResource("QueryForm.html",
+                   "<html><head></head>" +
+                           "<form method=GET action=\"SayHello?speed=fast\">" +
+                           "<input type=text name=name><input type=submit></form></body></html>");
+           defineResource("SayHello?speed=fast&name=me", new PseudoServlet() {
+               public WebResource getGetResponse() {
+                   WebResource result = new WebResource("<html><body><table><tr><td>Hello, there" +
+                           "</td></tr></table></body></html>");
+                   return result;
+               }
+           });
 
         WebConversation wc = new WebConversation();
-        WebResponse formPage = wc.getResponse( getHostPath() + "/QueryForm.html" );
+        WebResponse formPage = wc.getResponse(getHostPath() + "/QueryForm.html" );
         WebForm form = formPage.getForms()[0];
         form.setParameter( "name", "me" );
         WebRequest request = form.getRequest();
@@ -590,21 +598,22 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testPostWithQueryString() throws Exception {
-        defineResource( "QueryForm.html",
-                        "<html><head></head>" +
-                        "<form method=POST action=\"SayHello?speed=fast\">" +
-                        "<input type=text name=name><input type=submit></form></body></html>" );
-        defineResource( "SayHello?speed=fast", new PseudoServlet() {
-            public WebResource getPostResponse() {
-                WebResource result = new WebResource( "<html><body><table><tr><td>Hello, there" +
-                                                      "</td></tr></table></body></html>" );
-                return result;
-            }
-        } );
+           defineResource("QueryForm.html",
+                   "<html><head></head>" +
+                           "<form method=POST action=\"SayHello?speed=fast\">" +
+                           "<input type=text name=name><input type=submit></form></body></html>");
+           defineResource("SayHello?speed=fast", new PseudoServlet() {
+               public WebResource getPostResponse() {
+                   WebResource result = new WebResource("<html><body><table><tr><td>Hello, there" +
+                           "</td></tr></table></body></html>");
+                   return result;
+               }
+           });
 
         WebConversation wc = new WebConversation();
-        WebResponse formPage = wc.getResponse( getHostPath() + "/QueryForm.html" );
+        WebResponse formPage = wc.getResponse(getHostPath() + "/QueryForm.html" );
         WebForm form = formPage.getForms()[0];
         WebRequest request = form.getRequest();
         request.setParameter( "name", "Charlie" );
@@ -617,22 +626,23 @@ public class WebFormTest extends HttpUnitTest {
     }
 
 
+       @Test
     public void testPostWithEmbeddedSpace() throws Exception {
         String sessionID = "/ID=03.019c010101010001.00000001.a202000000000019. 0d09";
-        defineResource( "login", "redirectoring", HttpURLConnection.HTTP_MOVED_PERM );
+           defineResource("login", "redirectoring", HttpURLConnection.HTTP_MOVED_PERM);
         super.addResourceHeader( "login", "Location: " + getHostPath() + sessionID + "/login" );
-        defineResource( sessionID + "/login",
-                        "<html><head></head>" +
-                        "<form method=POST action='SayHello'>" +
-                        "<input type=text name=name><input type=submit></form></body></html>" );
-        defineResource( sessionID + "/SayHello", new PseudoServlet() {
-            public WebResource getPostResponse() {
-                return new WebResource( "<html><body><table><tr><td>Hello, there</td></tr></table></body></html>" );
-            }
-        } );
+           defineResource(sessionID + "/login",
+                   "<html><head></head>" +
+                           "<form method=POST action='SayHello'>" +
+                           "<input type=text name=name><input type=submit></form></body></html>");
+           defineResource(sessionID + "/SayHello", new PseudoServlet() {
+               public WebResource getPostResponse() {
+                   return new WebResource("<html><body><table><tr><td>Hello, there</td></tr></table></body></html>");
+               }
+           });
 
         WebConversation wc = new WebConversation();
-        WebResponse formPage = wc.getResponse( getHostPath() + "/login" );
+        WebResponse formPage = wc.getResponse(getHostPath() + "/login" );
         WebForm form = formPage.getForms()[0];
         WebRequest request = form.getRequest();
         request.setParameter( "name", "Charlie" );

@@ -19,7 +19,7 @@ package com.meterware.httpunit.dom;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import java.util.Stack;
 import java.net.URL;

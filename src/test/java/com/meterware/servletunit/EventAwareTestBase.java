@@ -19,43 +19,36 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import junit.framework.TestCase;
-import junit.framework.Assert;
-
 import java.util.ArrayList;
 
+import static org.junit.Assert.*;
+
 /**
- *
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- **/
-class EventAwareTestBase extends TestCase {
+ */
+class EventAwareTestBase {
 
     private static ArrayList _events;
 
 
-    public EventAwareTestBase(String name) {
-        super( name );
+    protected static void expectEvent(String eventName, Class listenerClass) {
+        _events.add(new EventData(eventName, listenerClass));
     }
 
 
-    protected static void expectEvent( String eventName, Class listenerClass ) {
-        _events.add( new EventData( eventName, listenerClass ) );
+    protected static void expectEvent(String eventName, Class listenerClass, EventVerifier verifier) {
+        _events.add(new EventData(eventName, listenerClass, verifier));
     }
 
 
-    protected static void expectEvent( String eventName, Class listenerClass, EventVerifier verifier ) {
-        _events.add( new EventData( eventName, listenerClass, verifier ) );
-    }
-
-
-    protected static void sendEvent( String eventName, Object listener, Object eventObject ) {
-        assertFalse( "Unexpected event: " + EventData.toEventString( eventName, listener.getClass() ), _events.isEmpty() );
-        ((EventData) _events.remove( 0 )).verifyEvent( eventName, listener, eventObject );
+    protected static void sendEvent(String eventName, Object listener, Object eventObject) {
+        assertFalse("Unexpected event: " + EventData.toEventString(eventName, listener.getClass()), _events.isEmpty());
+        ((EventData) _events.remove(0)).verifyEvent(eventName, listener, eventObject);
     }
 
 
     protected static void verifyEvents() {
-        if (!_events.isEmpty()) fail( "Did not receive event " + _events.get(0) );
+        if (!_events.isEmpty()) fail("Did not receive event " + _events.get(0));
     }
 
 
@@ -65,12 +58,10 @@ class EventAwareTestBase extends TestCase {
 
 
     interface EventVerifier {
-        public void verifyEvent( String eventLabel, Object eventObject );
+        public void verifyEvent(String eventLabel, Object eventObject);
     }
 
 }
-
-
 
 
 class EventData {
@@ -78,31 +69,31 @@ class EventData {
     private Class _listenerClass;
     private EventAwareTestBase.EventVerifier _verifier;
 
-    static String toEventString( String eventName, Class listenerClass ) {
+    static String toEventString(String eventName, Class listenerClass) {
         return eventName + " from " + listenerClass.getName();
     }
 
 
-    EventData( String eventName, Class listenerClass ) {
-        this( eventName, listenerClass, null );
+    EventData(String eventName, Class listenerClass) {
+        this(eventName, listenerClass, null);
     }
 
 
-    EventData( String eventName, Class listenerClass, EventAwareTestBase.EventVerifier verifier ) {
+    EventData(String eventName, Class listenerClass, EventAwareTestBase.EventVerifier verifier) {
         _eventName = eventName;
         _listenerClass = listenerClass;
         _verifier = verifier;
     }
 
 
-    void verifyEvent( String eventName, Object listener, Object event ) {
-        Assert.assertEquals( "Event", toString(),  toEventString( eventName, listener.getClass() ) );
-        if (_verifier != null) _verifier.verifyEvent( toString(), event );
+    void verifyEvent(String eventName, Object listener, Object event) {
+        assertEquals("Event", toString(), toEventString(eventName, listener.getClass()));
+        if (_verifier != null) _verifier.verifyEvent(toString(), event);
     }
 
 
     public String toString() {
-        return toEventString( _eventName, _listenerClass );
+        return toEventString(_eventName, _listenerClass);
     }
 
 }

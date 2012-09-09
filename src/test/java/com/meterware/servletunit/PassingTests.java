@@ -20,22 +20,22 @@ package com.meterware.servletunit;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
+
 import junit.framework.TestCase;
 
 
 /**
- *
  * @author <a href="mailto:russgold@acm.org">Russell Gold</a>
- **/
+ */
 public class PassingTests extends TestCase {
 
-    public PassingTests( String s ) {
-        super( s );
+    public PassingTests(String s) {
+        super(s);
     }
 
 
     public void testAddition() {
-        assertEquals( 2, 1 + 1 );
+        assertEquals(2, 1 + 1);
     }
 }
 

@@ -19,11 +19,15 @@ package com.meterware.httpunit.dom;
  * DEALINGS IN THE SOFTWARE.
  *
  *******************************************************************************************************************/
-import junit.textui.TestRunner;
-import junit.framework.TestSuite;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.w3c.dom.html.*;
 
 import java.net.URL;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
@@ -32,174 +36,171 @@ public class HTMLFormSubmitTest extends AbstractHTMLElementTest {
 
     private HTMLFormElement _form;
 
+    @Before
+    public void setUp() throws Exception {
+        TestWindowProxy windowProxy = new TestWindowProxy(_htmlDocument);
+        windowProxy.setUrl(new URL("http://localhost/aux.html"));
 
-    public static void main( String[] args ) {
-        TestRunner.run( suite() );
-    }
+        _htmlDocument.getWindow().setProxy(windowProxy);
+        HTMLBodyElement body = (HTMLBodyElement) _htmlDocument.createElement("body");
+        _htmlDocument.appendChild(body);
 
-
-    public static TestSuite suite() {
-        return new TestSuite( HTMLFormSubmitTest.class );
-    }
-
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        TestWindowProxy windowProxy = new TestWindowProxy( _htmlDocument );
-        windowProxy.setUrl( new URL( "http://localhost/aux.html" ) );
-
-        _htmlDocument.getWindow().setProxy( windowProxy );
-        HTMLBodyElement body = (HTMLBodyElement) _htmlDocument.createElement( "body" );
-        _htmlDocument.appendChild( body );
-        
-        _form = (HTMLFormElement) createElement( "form", new String[][] { { "action", "go_here" } } );
-        body.appendChild( _form );
-        _form.setMethod( "GET" );
-        _form.setAction( "tryMe" );
+        _form = (HTMLFormElement) createElement("form", new String[][]{{"action", "go_here"}});
+        body.appendChild(_form);
+        _form.setMethod("GET");
+        _form.setAction("tryMe");
     }
 
 
     /**
      * Verifies that submitting a simple form works.
      */
+    @Test
     public void testSubmitFromForm() throws Exception {
-        addInput( "text", "name" ).setValue( "master" );
-        addInput( "checkbox", "second" ).setChecked( true );
+        addInput("text", "name").setValue("master");
+        addInput("checkbox", "second").setChecked(true);
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?name=master&second=on, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?name=master&second=on, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that submitting a simple form from a button selects that button only.
      */
+    @Test
     public void testSubmitFromButton() throws Exception {
-        addInput( "text", "name", "master" );
-        addInput( "checkbox", "second" ).setChecked( true );
-        addInput( "submit", "save", "none" );
-        HTMLInputElementImpl button = (HTMLInputElementImpl) addInput( "submit", "save", "all" );
+        addInput("text", "name", "master");
+        addInput("checkbox", "second").setChecked(true);
+        addInput("submit", "save", "none");
+        HTMLInputElementImpl button = (HTMLInputElementImpl) addInput("submit", "save", "all");
         button.doClickAction();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?name=master&second=on&save=all, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?name=master&second=on&save=all, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that characters in parameter names will be appropriately encoded.
      */
+    @Test
     public void testEmbeddedEquals() throws Exception {
-        addInput( "text", "age=x", "12" );
+        addInput("text", "age=x", "12");
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?age%3Dx=12, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?age%3Dx=12, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that an empty "select" element does not transmit any parameter values.
      */
+    @Test
     public void testEmptyChoiceSubmit() throws Exception {
-        addInput( "text", "age", "12" );
-        addSelect( "empty" );
+        addInput("text", "age", "12");
+        addSelect("empty");
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?age=12, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?age=12, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that a select will send a value taken from the "value" attribute.
      */
+    @Test
     public void testSubmitUsingSelectOptionAttributes() throws Exception {
-        addInput( "text", "age", "12" );
-        HTMLSelectElement select = addSelect( "color" );
-        addOption( select, "red", null );
-        addOption( select, "blue", "azure" ).setSelected( true );
-        addOption( select, "green", null );
+        addInput("text", "age", "12");
+        HTMLSelectElement select = addSelect("color");
+        addOption(select, "red", null);
+        addOption(select, "blue", "azure").setSelected(true);
+        addOption(select, "green", null);
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?age=12&color=blue, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?age=12&color=blue, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that a select will send a value taken from the text nodes following the option tags.
      */
+    @Test
     public void testSubmitUsingSelectOptionLabels() throws Exception {
-        addInput( "text", "age", "12" );
-        HTMLSelectElement select = addSelect( "color" );
-        select.setMultiple( true );
-        select.setSize( 2 );
-        addOption( select, null, "red" );
-        addOption( select, null, "blue" ).setSelected( true );
-        addOption( select, null, "green" ).setSelected( true );
+        addInput("text", "age", "12");
+        HTMLSelectElement select = addSelect("color");
+        select.setMultiple(true);
+        select.setSize(2);
+        addOption(select, null, "red");
+        addOption(select, null, "blue").setSelected(true);
+        addOption(select, null, "green").setSelected(true);
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?age=12&color=blue&color=green, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?age=12&color=blue&color=green, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that a radio button will send its value on submit.
      */
+    @Test
     public void testSubmitRadioButtons() throws Exception {
-        addInput( "radio", "color", "red" ).setChecked( true );
-        addInput( "radio", "color", "blue" ).setChecked( true );
-        addInput( "radio", "color", "green" );
+        addInput("radio", "color", "red").setChecked(true);
+        addInput("radio", "color", "blue").setChecked(true);
+        addInput("radio", "color", "green");
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?color=blue, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?color=blue, null, null )", TestWindowProxy.popProxyCall());
     }
 
 
     /**
      * Verifies that checkboxes will send their values on submit.
      */
+    @Test
     public void testSubmitCheckboxes() throws Exception {
-        addInput( "checkbox", "color", "red" ).setChecked( true );
-        addInput( "checkbox", "color", "blue" ).setChecked( true );
-        addInput( "checkbox", "color", "green" );
+        addInput("checkbox", "color", "red").setChecked(true);
+        addInput("checkbox", "color", "blue").setChecked(true);
+        addInput("checkbox", "color", "green");
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( GET, http://localhost/tryMe?color=red&color=blue, null, null )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( GET, http://localhost/tryMe?color=red&color=blue, null, null )", TestWindowProxy.popProxyCall());
     }
-
 
     /**
      * Verifies that forms with the POST method send their data in the message body.
      */
-    public void ntestSubmitUsingPost() throws Exception {
-        _form.setMethod( "POST" );
-        addInput( "checkbox", "color", "red" ).setChecked( true );
-        addInput( "checkbox", "color", "blue" ).setChecked( true );
-        addInput( "checkbox", "color", "green" );
+    @Test @Ignore
+    public void submitUsingPost() throws Exception {
+        _form.setMethod("POST");
+        addInput("checkbox", "color", "red").setChecked(true);
+        addInput("checkbox", "color", "blue").setChecked(true);
+        addInput("checkbox", "color", "green");
         _form.submit();
-        assertEquals( "Expected response", "submitRequest( POST, http://localhost/tryMe, null, color=red&color=blue )", TestWindowProxy.popProxyCall() );
+        assertEquals("Expected response", "submitRequest( POST, http://localhost/tryMe, null, color=red&color=blue )", TestWindowProxy.popProxyCall());
     }
 
 
-    private HTMLSelectElement addSelect( String name ) {
-        HTMLSelectElement select = (HTMLSelectElement) _htmlDocument.createElement( "select" );
-        _form.appendChild( select );
-        select.setName( name );
+    private HTMLSelectElement addSelect(String name) {
+        HTMLSelectElement select = (HTMLSelectElement) _htmlDocument.createElement("select");
+        _form.appendChild(select);
+        select.setName(name);
         return select;
     }
 
 
-    private HTMLOptionElement addOption( HTMLSelectElement select, String value, String label ) {
-        HTMLOptionElement option = (HTMLOptionElement) _htmlDocument.createElement( "option" );
-        select.appendChild( option );
-        if (value != null) option.setValue( value );
-        if (label != null) select.appendChild( _htmlDocument.createTextNode( label ) );
+    private HTMLOptionElement addOption(HTMLSelectElement select, String value, String label) {
+        HTMLOptionElement option = (HTMLOptionElement) _htmlDocument.createElement("option");
+        select.appendChild(option);
+        if (value != null) option.setValue(value);
+        if (label != null) select.appendChild(_htmlDocument.createTextNode(label));
         return option;
     }
 
 
-    private HTMLInputElement addInput( String type, String name ) {
-        HTMLInputElement element = (HTMLInputElement) _htmlDocument.createElement( "input" );
-        element.setAttribute( "type", type );
-        element.setAttribute( "name", name );
-        _form.appendChild( element );
+    private HTMLInputElement addInput(String type, String name) {
+        HTMLInputElement element = (HTMLInputElement) _htmlDocument.createElement("input");
+        element.setAttribute("type", type);
+        element.setAttribute("name", name);
+        _form.appendChild(element);
         return element;
     }
 
 
-    private HTMLInputElement addInput( String type, String name, String value ) {
-        HTMLInputElement element = addInput( type, name );
-        element.setValue( value );
+    private HTMLInputElement addInput(String type, String name, String value) {
+        HTMLInputElement element = addInput(type, name);
+        element.setValue(value);
         return element;
     }
 
