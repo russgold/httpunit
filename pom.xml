@@ -11,7 +11,7 @@
     <groupId>org.httpunit</groupId>
     <artifactId>httpunit</artifactId>
     <name>HttpUnit</name>
-    <version>1.7.1</version>
+    <version>1.7.2-SNAPSHOT</version>
     <description>A library for testing websites programmatically</description>
 
     <url>http://www.httpunit.org</url>
@@ -25,9 +25,9 @@
 
 
     <scm>
-        <url>http://httpunit.svn.sourceforge.net/viewvc/httpunit/tags/httpunit-1.7.1</url>
-        <developerConnection>scm:svn:https://httpunit.svn.sourceforge.net/svnroot/httpunit/tags/httpunit-1.7.1</developerConnection>
-        <connection>scm:svn:http://httpunit.svn.sourceforge.net/svnroot/httpunit/tags/httpunit-1.7.1</connection>
+        <url>http://httpunit.svn.sourceforge.net/viewvc/httpunit</url>
+        <developerConnection>scm:svn:https://httpunit.svn.sourceforge.net/svnroot/httpunit</developerConnection>
+        <connection>scm:svn:http://httpunit.svn.sourceforge.net/svnroot/httpunit</connection>
     </scm>
 
 
