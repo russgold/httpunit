@@ -247,7 +247,7 @@
 	</reporting>
 -->
 
-		<!--- Jetty libraries needed for Testing BR [ 2264431 ] form.submit() sends multiple HTTP POSTS
+		<!-- Jetty libraries needed for Testing BR [ 2264431 ] form.submit() sends multiple HTTP POSTS
 	  <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jetty</artifactId>
