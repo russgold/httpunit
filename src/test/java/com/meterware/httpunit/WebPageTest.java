@@ -26,10 +26,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.html.HTMLDocument;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import static org.junit.Assert.*;
 
@@ -173,10 +175,10 @@ public class WebPageTest extends HttpUnitTest {
         assertEquals("", text);
     }
 
-
+    //@Ignore 
     @Test
     public void testTitle() throws Exception {
-        defineResource("SimpleTitlePage.html",
+        defineResource("/SimpleTitlePage.html",
                 "<html><head><title>A Sample Page</title></head>\n" +
                         "<body>This has no forms but it does\n" +
                         "have <a href=\"/other.html\">an <b>active</b> link</A>\n" +
@@ -190,7 +192,6 @@ public class WebPageTest extends HttpUnitTest {
         assertEquals("Character set", "iso-8859-1", simplePage.getCharacterSet());
         assertNull("No refresh request should have been found", simplePage.getRefreshRequest());
     }
-
 
     @Test
     public void testLocalFile() throws Exception {
@@ -590,6 +591,20 @@ public class WebPageTest extends HttpUnitTest {
 
         //check the response
         assertTrue(resp.getText().indexOf("Success") >= 0);
+    }
+    
+    /**
+     * test case for BR 2883515
+     * @throws SAXException 
+     * @throws IOException 
+     */
+    @Test
+    public void testInvalidNoScriptHandling() throws IOException, SAXException {
+    	defineResource("/InvalidNoScriptPage.html","<html><body></body></html><noscript>t</noscript>");
+    	WebConversation wc = new WebConversation();
+      WebResponse resp = wc.getResponse(getHostPath() + "/InvalidNoScriptPage.html");
+      // indirectly invoke readTags
+      resp.replaceText("dummy", "dummy"); 
     }
 
     /**

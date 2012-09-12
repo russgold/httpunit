@@ -1031,6 +1031,11 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     }
 
 
+    /**
+     * replace the given text
+     * @param text - the text to replace
+     * @param contentType - the contenttype
+     */
     public boolean replaceText( String text, String contentType ) {
         if (_parsingPage) return false;
         _responseText = text;
@@ -1174,18 +1179,24 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
         return available;
     }
 
-
+    /**
+     * read the tags from the given message
+     * @param rawMessage
+     * @throws UnsupportedEncodingException
+     * @throws MalformedURLException
+     */
     private void readTags( byte[] rawMessage ) throws UnsupportedEncodingException, MalformedURLException {
         ByteTagParser parser = new ByteTagParser( rawMessage );
         ByteTag tag = parser.getNextTag();
         while (tag != null ) {
             if (tag.getName().equalsIgnoreCase( "meta" )) processMetaTag( tag );
             if (tag.getName().equalsIgnoreCase( "base" )) processBaseTag( tag );
+            // loop over a noscript region
             if (tag.getName().equalsIgnoreCase( "noscript") && HttpUnitOptions.isScriptingEnabled()) {
                 do { 
                 	tag = parser.getNextTag(); 
                 } 
-                while (tag.getName().equalsIgnoreCase( "/noscript") );
+                while (!tag.getName().equalsIgnoreCase( "/noscript") );
             }
             tag = parser.getNextTag();
         }
