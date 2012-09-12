@@ -85,9 +85,16 @@ class JTidyHTMLParser implements HTMLParser {
     final private static String UTF_ENCODING = "UTF-8";
 
 
+    /**
+     * get the parser of the given url
+     * @param url
+     * @return the parser
+     */
     private static Tidy getParser( URL url ) {
         Tidy tidy = new Tidy();
-        tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
+        // BR 2880636 httpunit 1.7 does not work with latest Tidy release  r918
+        // tidy.setCharEncoding( org.w3c.tidy.Configuration.UTF8 );
+        tidy.setInputEncoding("UTF8");
         tidy.setQuiet( true );
         tidy.setShowWarnings( HTMLParserFactory.isParserWarningsEnabled() );
         if (!HTMLParserFactory.getHTMLParserListeners().isEmpty()) {
