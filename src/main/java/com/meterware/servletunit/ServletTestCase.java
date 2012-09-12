@@ -30,20 +30,31 @@ import junit.framework.TestCase;
 abstract
 public class ServletTestCase extends TestCase {
 
+	/**
+	 * construct a ServletTestCase with the given name
+	 * @param name
+	 */
     protected ServletTestCase( String name ) {
         super( name );
     }
-
 
     /**
      * Returns a client object which can access the servlet context in which this test is running.
      */
     final protected ServletUnitClient newClient() {
+    	if (_invocationContextFactory==null)
+    		throw new RuntimeException("ServletTestCase.newClient called before setInvocationContextFactory was called");
         return ServletUnitClient.newClient( _invocationContextFactory );
     }
 
 
+    /**
+     * set the invocation context factory to be used
+     * @param invocationContextFactory
+     */
     static void setInvocationContextFactory( InvocationContextFactory invocationContextFactory ) {
+    	if (invocationContextFactory==null)
+    		throw new RuntimeException("setInvocationContextFactory called with null invocationContextFactory parameter");
         _invocationContextFactory = invocationContextFactory;
     }
 

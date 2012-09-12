@@ -247,7 +247,7 @@ public class JUnitServletTest {
     }
 
 
-    static class MyFactory implements InvocationContextFactory {
+    protected static class MyFactory implements InvocationContextFactory {
         private static ServletRunner _runner;
 
         public InvocationContext newInvocation(ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody) throws IOException, MalformedURLException {

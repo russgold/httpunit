@@ -20,6 +20,7 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 
+import com.meterware.httpunit.FrameSelector;
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.HttpUnitOptions;
 import com.meterware.httpunit.HttpUnitUtils;
@@ -38,9 +39,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -788,7 +791,16 @@ public class HttpServletRequestTest extends ServletUnitTest {
         assertEquals("param1 value", "red", request.getParameter("param1"));
         assertEquals("param2 value", hebrewValue, request.getParameter("param2"));
     }
+    
+    private InvocationContextFactory _dummyfactory = new InvocationContextFactory() {
+        public InvocationContext newInvocation( ServletUnitClient client, FrameSelector targetFrame, WebRequest request, Dictionary clientHeaders, byte[] messageBody ) throws IOException, MalformedURLException {
+            return new InvocationContextImpl( client, null, targetFrame, request, clientHeaders, messageBody );
+        }
 
+        public HttpSession getSession( String sessionId, boolean create ) {
+            return _context.getValidSession( sessionId, null, create );
+        }
+    };
 
     @Test
     public void testSpecifiedCharEncoding2() throws Exception {
@@ -798,7 +810,7 @@ public class HttpServletRequestTest extends ServletUnitTest {
         wr.setParameter("param1", "red");
         wr.setParameter("param2", hebrewValue);
         wr.setHeaderField("Content-Type", "application/x-www-form-urlencoded; charset=ISO-8859-8");
-        ServletUnitClient client = ServletUnitClient.newClient(null);
+        ServletUnitClient client = ServletUnitClient.newClient(_dummyfactory);
         ByteArrayOutputStream messageBody = client.getMessageBody(wr);
         ServletUnitHttpRequest request = new ServletUnitHttpRequest(NULL_SERVLET_REQUEST, wr, _context, new Hashtable(), messageBody.toByteArray());
         String parameter = request.getParameter("param2");

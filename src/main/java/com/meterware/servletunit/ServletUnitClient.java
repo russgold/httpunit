@@ -45,6 +45,10 @@ import org.xml.sax.SAXException;
 public class ServletUnitClient extends WebClient {
 
 
+	private ServletUnitClient() {	
+		throw new RuntimeException("ServletUnitClient constructor needs InvocationContextFactory parameter");
+	}
+	
     /**
      * Creates and returns a new servlet unit client instance.
      **/
@@ -77,8 +81,18 @@ public class ServletUnitClient extends WebClient {
     }
 
 
+    /**
+     * get a new Invocation Context based on a request and a frame
+     * @param request
+     * @param frame
+     * @return
+     * @throws IOException
+     * @throws MalformedURLException
+     */
     InvocationContext newInvocation( WebRequest request, FrameSelector frame ) throws IOException, MalformedURLException {
         ByteArrayOutputStream baos = getMessageBody( request );
+        if (_invocationContextFactory==null)
+        	throw new RuntimeException("newInvocation called with null _invocationContextFactory");
         return _invocationContextFactory.newInvocation( this, frame, request, getHeaderFields( request.getURL() ), baos.toByteArray() );
     }
 
@@ -141,6 +155,8 @@ public class ServletUnitClient extends WebClient {
 
 
     private ServletUnitClient( InvocationContextFactory factory ) {
+    	if (factory==null)
+    		throw new RuntimeException("constructor for ServletUnitClient called with null factory parameter");
         _invocationContextFactory = factory;
     }
 }

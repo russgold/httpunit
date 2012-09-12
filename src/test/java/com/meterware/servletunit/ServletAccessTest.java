@@ -31,6 +31,10 @@ import javax.servlet.http.HttpServlet;
  */
 public class ServletAccessTest extends ServletTestCase {
 
+	/**
+	 * construct a ServletAccessTest
+	 * @param name
+	 */
     public ServletAccessTest(String name) {
         super(name);
     }
