@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="src" path="pending-tests"/>
-	<classpathentry kind="src" path="examples"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="jars/quicksite.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/jtidy/jtidy/4aug2000r7-dev/jtidy-4aug2000r7-dev.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/junit/junit/3.8.1/junit-3.8.1.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/nekohtml/nekohtml/0.9.5/nekohtml-0.9.5.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/rhino/js/1.6R5/js-1.6R5.jar" sourcepath="/pub/2008/rhino1_6R5.zip"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/xerces/xmlParserAPIs/2.6.1/xmlParserAPIs-2.6.1.jar" sourcepath="/pub/2008/Xerces-J-src.2.6.1.zip"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/xerces/xercesImpl/2.6.1/xercesImpl-2.6.1.jar"/>
-	<classpathentry kind="lib" path="META-INF"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/activation/activation/1.1/activation-1.1.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY/javax/mail/mail/1.4/mail-1.4.jar"/>
-	<classpathentry kind="lib" path="jars/maven-ant-tasks-2.0.9.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPOSITORY"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="target/test-classes" path="META-INF"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
