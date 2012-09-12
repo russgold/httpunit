@@ -160,6 +160,22 @@ public class ClientProperties {
         _acceptGzip = acceptGzip;
     }
 
+    /**                                                           
+     * get Maximum number of redirect requests        
+     * @return it                
+     */                                                           
+    public int getMaxRedirects() {                                
+    	return _maxRedirects;                                        
+    }                                                             
+
+    /**
+     * set the maximum number of redirects
+     * @param maxRedirects
+     */
+    public void setMaxRedirects( int maxRedirects ) {             
+    	_maxRedirects = maxRedirects;                                
+    }                                                             
+
 
     /**
      * Returns true if the client should automatically follow page redirect requests (status 3xx).
@@ -294,6 +310,7 @@ public class ClientProperties {
     private String _overrideContentType = null;
     private int    _availWidth          = 800;
     private int    _availHeight         = 600;
+    private int    _maxRedirects        = 5;
 
     private boolean _iframeSupported = true;
     private boolean _acceptCookies = true;
@@ -333,6 +350,7 @@ public class ClientProperties {
         _autoRedirect        = source._autoRedirect;
         _autoRefresh         = source._autoRefresh;
         _sendReferer         = source._sendReferer;
+        _maxRedirects		 = source._maxRedirects;
     }
 
 

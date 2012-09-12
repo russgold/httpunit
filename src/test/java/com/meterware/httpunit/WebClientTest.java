@@ -3,7 +3,7 @@ package com.meterware.httpunit;
  * $Id$
  * $URL$*
  *
- * Copyright (c) 2002-2009, Russell Gold
+ * Copyright (c) 2002-2009,2012 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -740,6 +740,76 @@ public class WebClientTest extends HttpUnitTest {
         response = wc.getResponse(response.getLinks()[0].getRequest());
         assertEquals("Link Referer header", getHostPath() + '/' + linkSource, response.getText().trim());
     }
+    
+    /**
+     * test for BR 2834933 
+     * https://sourceforge.net/tracker/?func=detail&aid=2834933&group_id=6550&atid=106550
+     * by aptivate
+     * @throws Exception
+     */
+    @Test
+    public void testMaxRedirectsNotExceeded() throws Exception {	                              
+    	 String resourceAName = "something/resourceA";                                             
+    	    String resourceBName = "something/resourceB";                                          
+    	    String resourceCName = "something/resourceC";                                          
+    	                                                                                           
+    	    // Should test the following :                                                         
+    	    // loads resource A                                                                    
+    	    // loads resource B                                                                    
+    	    // redirects to resource A                                                             
+    	    // loads resource B                                                                    
+    	    // redirects to resource A                                                             
+    	    // loads resource C                                                                    
+    	                                                                                           
+    	    String resourceAContent =                                                              
+    	  	  "<HTML>" +                                                                            
+    	  	  "<BODY onload='redirect();'>" +                                                       
+    	  	  "<script type='text/javascript'>" +                                                   
+    	        "function redirect()" +                                                            
+    	        "{" +                                                                              
+    	        "	if (document.cookie == '')" +                                                   
+    	        "	{" +                                                                            
+    	        "     document.cookie = 'test=1;';\n" +                                            
+    	        "		window.location.replace('/" + resourceBName + "');\n" +                       
+    	        "	}" +                                                                            
+    	        " else if (document.cookie == 'test=1')" +                                         
+    	        " {" +                                                                             
+    	        "		document.cookie = 'test=2;';\n" +                                             
+    	        "		window.location.replace('/" + resourceBName + "');\n" +                       
+    	        " }" +                                                                             
+    	        " else" +                                                                          
+    	        " {" +                                                                             
+    	        " 	window.location.replace('/" + resourceCName + "');\n" +                         
+    	        " }" +                                                                             
+    	        "}" +                                                                              
+    	        "</script>" +                                                                      
+    	        "</BODY>" +                                                                        
+    	        "</HTML>";                                                                         
+    	                                                                                           
+    	    defineResource(resourceAName, resourceAContent,                                        
+    	            HttpURLConnection.HTTP_OK);                                                    
+    	                                                                                           
+    	    defineResource(resourceBName, "ignored content",                                       
+    	            HttpURLConnection.HTTP_MOVED_TEMP);                                            
+    	    addResourceHeader(resourceBName, "Location: " + getHostPath() + "/"                    
+    	            + resourceAName);                                                              
+    	                                                                                           
+    	    defineResource(resourceCName, "ignored content",                                       
+    	            HttpURLConnection.HTTP_OK);                                                    
+    	                                                                                           
+    	    WebConversation wc = new WebConversation();                                            
+    	    wc.getClientProperties().setMaxRedirects(2);                                           
+    	                                                                                           
+    	    try {                                                                                  
+    	  	  wc.getResponse(getHostPath() + '/' + resourceAName);                                  
+    	    } catch (RecursiveRedirectionException e) {                                            
+    	  	  fail("Not expecting a RecursiveRedirectionException - " +                             
+    	  	  		"max redirects not exceeded");                                                    
+    	    }                                                                                      
+    	}                                                                                          
+    	                                                                                           
+    	/**                                                                                        
+
 
     /**
      * test for patch [ 1155415 ] Handle redirect instructions which can lead to a loop
