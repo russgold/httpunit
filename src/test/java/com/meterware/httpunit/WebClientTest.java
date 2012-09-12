@@ -520,23 +520,23 @@ public class WebClientTest extends HttpUnitTest {
         WebResponse wr = wc.getResponse("http://someserver.com/sample");
         assertEquals("authorization", "Basic dXNlcjpwYXNzd29yZA==", wr.getText());
     }
-
-
+ 
     /**
-     * Verifies one-time digest authentication with no Quality of Protection (qop).
-     *
-     * @throws Exception if an unexpected exception is thrown during the test.
+     * test Rfc2069 optionally with or without opaque parameter 
+     * @param withOpaque
+     * @throws Exception
      */
-    @Test
-    public void testRfc2069DigestAuthentication() throws Exception {
+    public void testRfc2069DigestAuthentication(final boolean withOpaque) throws Exception {
         defineResource("/dir/index.html", new PseudoServlet() {
             public WebResource getGetResponse() {
                 String header = getHeader("Authorization");
                 if (header == null) {
                     WebResource resource = new WebResource("not authorized", HttpURLConnection.HTTP_UNAUTHORIZED);
-                    resource.addHeader("WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
-                            " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
-                            " opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"");
+                    String headerStr="WWW-Authenticate: Digest realm=\"testrealm@host.com\"," +
+                        " nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\";";
+                        if (withOpaque)
+                        	headerStr+=", opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
+                    resource.addHeader(headerStr);
                     return resource;
                 } else {
                     return new WebResource(getHeader("Authorization"), "text/plain");
@@ -546,18 +546,38 @@ public class WebClientTest extends HttpUnitTest {
         WebConversation wc = new WebConversation();
         wc.setAuthentication("testrealm@host.com", "Mufasa", "CircleOfLife");
         WebResponse wr = wc.getResponse(getHostPath() + "/dir/index.html");
+        String expectedHeaderStr="Digest username=\"Mufasa\"," +
+            "       realm=\"testrealm@host.com\"," +
+            "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
+            "       uri=\"/dir/index.html\"," +
+            "       response=\"1949323746fe6a43ef61f9606e7febea\"";
+        if (withOpaque)
+            expectedHeaderStr+=", opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
         HttpHeader expectedHeader
-                = new HttpHeader("Digest username=\"Mufasa\"," +
-                "       realm=\"testrealm@host.com\"," +
-                "       nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\"," +
-                "       uri=\"/dir/index.html\"," +
-                "       response=\"1949323746fe6a43ef61f9606e7febea\"," +
-                "       opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"");
+                = new HttpHeader(expectedHeaderStr);
         HttpHeader actualHeader = new HttpHeader(wr.getText());
         assertHeadersEquals(expectedHeader, actualHeader);
     }
 
-
+    /**
+     * Verifies one-time digest authentication with no Quality of Protection (qop).
+     *
+     * @throws Exception if an unexpected exception is thrown during the test.
+     */
+    @Test
+    public void testRfc2069DigestAuthentication() throws Exception {
+    	testRfc2069DigestAuthentication(true);
+    }
+    
+    /**
+     * test for BR 2957505
+     * No 'opaque' causes NPE when attempting DigestAuthentication
+     */
+    @Test
+    public void testRfc2069DigestAuthenticationNoOpaque() throws Exception {
+    	testRfc2069DigestAuthentication(false);
+    }
+    
     /**
      * Verifies one-time digest authentication with Quality of Protection (qop).
      *
@@ -597,6 +617,15 @@ public class WebClientTest extends HttpUnitTest {
         assertHeadersEquals(expectedHeader, actualHeader);
     }
 
+    /**
+     * get page contents
+     * @param pageAddress
+     * @param protectionDomain
+     * @param userName
+     * @param password
+     * @return the page content
+     * @throws Exception
+     */
     private static String getPageContents(String pageAddress, String protectionDomain, String userName, String password) throws Exception {
         WebConversation wc = new WebConversation();
         wc.setAuthentication(protectionDomain, userName, password);

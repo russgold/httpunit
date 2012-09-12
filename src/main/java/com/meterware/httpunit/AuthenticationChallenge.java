@@ -144,7 +144,8 @@ class AuthenticationChallenge extends HttpHeader {
                 append( sb, "nonce", nonce );
                 append( sb, "uri", uri );
                 append( sb, "response", getResponse( userName, realm, password, nonce, uri, method ) );
-                append( sb, "opaque", opaque );
+                if (opaque!=null)
+                	append( sb, "opaque", opaque );
             }
 
 
