@@ -30,7 +30,7 @@ import java.util.Iterator;
  **/
 public class DocumentImpl extends NodeImpl implements Document {
 
-    private Element _documentElement;
+    protected Element _documentElement;
 
 
     static DocumentImpl createDocument() {
@@ -176,6 +176,11 @@ public class DocumentImpl extends NodeImpl implements Document {
     }
 
 
+    /**
+     * import the children
+     * @param original
+     * @param copy
+     */
     void importChildren( Node original, Node copy ) {
         NodeList children = original.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {

@@ -258,7 +258,11 @@ public class HTMLDocumentImpl extends DocumentImpl implements HTMLDocument, HTML
 
     public Node cloneNode( boolean deep ) {
         HTMLDocumentImpl copy = new HTMLDocumentImpl();
-        if (deep) copy.importChildren( this, copy );
+        
+        if (deep) {
+        	copy.importChildren( this, copy );
+        	copy._documentElement=copy.getHtmlElement();
+        }
         return copy;
     }
 

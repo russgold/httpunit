@@ -20,11 +20,15 @@ package com.meterware.httpunit;
  *
  *******************************************************************************************************************/
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.junit.Test;
+import org.junit.Ignore;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import static org.junit.Assert.*;
 
@@ -52,7 +56,8 @@ public class XMLPageTest extends HttpUnitTest {
      *
      * @throws Exception
      */
-    public void xtestXMLisHTML() throws Exception {
+    @Ignore
+    public void testXMLisHTML() throws Exception {
         String originalXml = "<?xml version=\"1.0\" ?><main><title>See me now</title></main>";
         defineResource("SimplePage.xml", originalXml, "text/xml");
         WebConversation wc = new WebConversation();
@@ -63,6 +68,24 @@ public class XMLPageTest extends HttpUnitTest {
         // get the main element as root
         assertNotNull("we do have an root-element", simplePage.getDOM().getDocumentElement());
         assertEquals("the actual root must be the root of our test-xml", simplePage.getDOM().getDocumentElement().getTagName(), "main");
+    }
+    
+    /**
+     * test for BR 2946821
+     * @throws SAXException 
+     * @throws IOException 
+     */
+    @Test
+    public void testGetDocumentElement() throws IOException, SAXException {
+    	String html="<html><body></body></html>";
+    	defineResource("BR2946821.html",html,"text/html");
+    	WebConversation wc = new WebConversation();
+      WebRequest request = new GetMethodWebRequest(getHostPath() + "/BR2946821.html");
+      WebResponse page = wc.getResponse(request);
+      assertTrue(page.isHTML());
+      Document doc = page.getDOM();
+      Element docElement = doc.getDocumentElement();
+      assertNotNull("There should be a root element",docElement);
     }
 
 
