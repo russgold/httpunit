@@ -141,10 +141,17 @@ public class CookieTest {
 
     private void checkAcceptance(int index, boolean shouldAccept, String urlString,
                                  String specifiedDomain, String specifiedPath) throws MalformedURLException {
+    	
         CookieJar jar = newJar(urlString, specifiedDomain, specifiedPath);
 
         if (shouldAccept) {
-            assertNotNull("Rejected cookie " + index + "( " + specifiedDomain + " from " + urlString + ") should have been accepted", jar.getCookie("name"));
+        	// modified for Bugreport 2825872 Cookie domains not stored correctly - ID: 2825872
+        	// http://sourceforge.net/tracker/?func=detail&aid=2825872&group_id=6550&atid=106550
+        	Cookie cookie = jar.getCookie( "name" );
+        	assertNotNull( "Rejected cookie " + index + "( " + specifiedDomain + " from " + urlString + ") should have been accepted", cookie );
+        	URL url = new URL( "http://" + urlString );
+        	assertTrue( "Cookie " + index + " should be sent to the url ", cookie.mayBeSentTo(url));
+
         } else {
             assertNull("Cookie " + index + " should have been rejected", jar.getCookie("name"));
         }
