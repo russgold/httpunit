@@ -2,7 +2,7 @@ package com.meterware.httpunit;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2000-2002, 2007, Russell Gold
+ * Copyright (c) 2000-2002, 2007, 2012 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -147,6 +147,34 @@ public class FileUploadTest extends HttpUnitTest {
         file.delete();
     }
 
+    /**
+     * new test for BR 2822957
+     * https://sourceforge.net/tracker/?func=detail&aid=2822957&group_id=6550&atid=106550
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveFileParameter() throws Exception {                                                                 
+        File file = new File( "temp.txt" );                                                                                  
+        FileWriter fw = new FileWriter( file );                                                                              
+        PrintWriter pw = new PrintWriter( fw );                                                                              
+        pw.println( "Not much text" );                                                                                       
+        pw.println( "But two lines" );                                                                                       
+        pw.close();                                                                                                          
+                                                                                                                             
+        defineWebPage( "Default", "<form method=POST action = \"ListParams\" enctype=\"multipart/form-data\"> " +            
+                                  "<Input type=file name=message>" +                                                         
+                                  "<Input type=submit name=update value=age>" +                                              
+                                  "</form>" );                                                                               
+        WebConversation wc = new WebConversation();                                                                          
+        WebRequest request = new GetMethodWebRequest( getHostPath() + "/Default.html" );                                     
+        WebResponse simplePage = wc.getResponse( request );                                                                  
+        WebForm formSubmit = simplePage.getForms()[0];                                                                       
+        formSubmit.setParameter( "message", file );                                                                          
+        formSubmit.removeParameter("message");                                                                               
+                                                                                                                             
+        file.delete();                                                                                                       
+    }                                                                                                                        
+                                                                                                                             
 
     @Test
     public void testMultiFileSubmit() throws Exception {
