@@ -3,7 +3,7 @@ package com.meterware.httpunit.cookies;
  * $Id$
  * $URL$
  *
- * Copyright (c) 2002-2004,2008 Russell Gold
+ * Copyright (c) 2002-2004,2008, 2012 Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -318,7 +318,9 @@ public class CookieTest {
     }
 
     /**
-     * test for bug report [ 2076028 ] Cookies are handeled incorrectly
+     * test for bug report [ 2076028 ] Cookies are handled incorrectly
+     * should also fit duplicate bug report 2871999
+     * https://sourceforge.net/tracker/?func=detail&aid=2871999&group_id=6550&atid=106550
      */
     @Test
     public void testHttpOnlyCookiePath() throws Exception {
