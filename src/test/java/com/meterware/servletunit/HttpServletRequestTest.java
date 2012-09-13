@@ -579,21 +579,47 @@ public class HttpServletRequestTest extends ServletUnitTest {
     }
 
 
-    @Test
-    public void testGetRequestURI() throws Exception {
+   
+    /**
+     * test getting the uri
+     * @param uri
+     * @param path
+     */
+    public void testGetRequestURI(String uri,String path) throws Exception {
+    	/*
+    	 http://de.wikipedia.org/wiki/Uniform_Resource_Identifier
+    	 
+      foo://example.com:8042/over/there?name=ferret#nose
+        \_/   \______________/\_________/ \_________/ \__/
+         |           |            |            |        |
+      scheme     authority       path        query   fragment
+      */
         ServletUnitContext context = _context;
-        WebRequest wr = new GetMethodWebRequest("http://localhost/simple");
+        WebRequest wr = new GetMethodWebRequest(uri);
 
         ServletUnitHttpRequest request = new ServletUnitHttpRequest(NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY);
-        assertEquals("/simple", request.getRequestURI());
-        assertEquals("http://localhost/simple", request.getRequestURL().toString());
+        assertEquals(path, request.getRequestURI());
+        assertEquals(uri, request.getRequestURL().toString());
 
-        wr = new GetMethodWebRequest("http://localhost/simple?foo=bar");
+        wr = new GetMethodWebRequest(uri+"?foo=bar");
         request = new ServletUnitHttpRequest(NULL_SERVLET_REQUEST, wr, context, new Hashtable(), NO_MESSAGE_BODY);
-        assertEquals("/simple", request.getRequestURI());
-        assertEquals("http://localhost/simple", request.getRequestURL().toString());
+        assertEquals(path, request.getRequestURI());
+        assertEquals(uri, request.getRequestURL().toString());
+    }
+    
+    @Test
+    public void testGetRequestURI() throws Exception {
+    	testGetRequestURI("http://localhost/simple","/simple");
     }
 
+    /**
+     * test for BR 3076917 Missing port number in URL from ServletUnitHttpRequest
+     * @throws Exception
+     */
+    @Test
+    public void testGetRequestURIWithPort() throws Exception {
+    	testGetRequestURI("http://localhost:8042/simple8042","/simple8042");
+    }
 
     @Test
     public void testDefaultLocale() throws Exception {

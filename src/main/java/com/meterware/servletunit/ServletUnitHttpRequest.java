@@ -735,6 +735,8 @@ class ServletUnitHttpRequest implements HttpServletRequest {
         try {
             url.append( _request.getURL().getProtocol() ).append( "://" );
             url.append( _request.getURL().getHost() );
+            String portPortion = _request.getURL().getPort() == -1 ? "" : (":" + _request.getURL().getPort());
+            url.append(portPortion);
             url.append( _request.getURL().getPath() );
         } catch (MalformedURLException e) {
             throw new RuntimeException( "unable to read URL from request: " + _request );
