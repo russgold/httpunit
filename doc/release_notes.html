@@ -1,5 +1,5 @@
 <html>
-<head><title>httpunit 1.7 release notes</title></head>
+<head><title>httpunit 1.7.2 release notes</title></head>
 <body>
 <h1>HttpUnit release notes</h1>
 <pre>
@@ -15,7 +15,8 @@ $URL$
 </ol>
 <h3>Limitations:</h3>
 <ol>
-	<li>JDK 1.4.2 or higher is required</li>
+	<li>JDK 1.5 or higher is required</li>
+	<li>JDK 1.4.2 or higher may be used by slightly modifying the source code</li>
 	<li>JavaScript support does not include some DOM properties</li>
   <li>The JavaScript assignment Document.cookie= does not restrict the cookie by path and domain</li>
   <li>Only table cells and explicit paragraphs are recognized as text blocks</li>
@@ -23,7 +24,7 @@ $URL$
 
 <h2>Revision History:</h2>
 
-<h3>Version 1.7.x to be Released some time in the future after 2009-08-20</h3>
+<h3>Version 1.7.2 Release 2012-10</h3>
 <h4>Acknowledgements:</h4>
 <ul>
 	<li>Marc Guillemot for his change request to add the response to a HttpException</li>
@@ -48,6 +49,163 @@ $URL$
     <li>redsonic and Adam Heath for proposing a patch to solve problems with getFormWithId()</li>
     <li>Oliver Wahlen for asking for a solution to get the bytes for a download result - WebResponse.getBytes() is now available for this purpose</li>
 </ul>
+Please find more references to helpful people in the subversion history below.
+<h4>Recent subversion history</h4>
+<ol>
+  <li>2009-08-20: svn keywords set
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1045">r1045</a>)
+  </li>
+  <li>2009-08-20: test case for double quoted cookie problem pointed out by Mario V
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1046">r1046</a>)
+  </li>
+  <li>2009-08-20: Patch by Antoine Vernois: it implements getServerName() and getServerPort of ServletUnitHttpRequest. ServerName and ServerPort are extracted from request's URL instead of always returning localhost and 0.
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1047">r1047</a>)
+  </li>
+  <li>2009-08-20: 2009-08-20: 2009-08-20: Patch by Rick Huff: to implement the <br />getElementsWithClassName() method.  This method returns those nodes <br />where there are more than one class name on the element.
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1048">r1048</a>)
+  </li>
+  <li>2009-08-21: Patch by Matthew Boedicker: post with authentication using inputstream
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1049">r1049</a>)
+  </li>
+  <li>2009-08-21: Patch by Dan Lipofsky - reset Listeners and allow switching off parsing. Switch off parsing for Head method.
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1050">r1050</a>)
+  </li>
+  <li>2009-08-21: fix for BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2534057&group_id=6550&atid=106550">2534057</a> by Igor Kanshin
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1051">r1051</a>)
+  </li>
+  <li>2009-08-21: add getSocketFactory convenience method as proposed by Florian Weimar
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1053">r1053</a>)
+  </li>
+  <li>2009-08-21: fixed examples (e.g. for changed behaviour of target web sites)
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1054">r1054</a>)
+  </li>
+  <li>2009-08-21: 2009-08-21: [ <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1163753&group_id=6550&atid=306550">1163753</a> ] partial patch for bug 771335 (DOM2 Events support) by <br />Rafal Krzewski
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1055">r1055</a>)
+  </li>
+  <li>2009-08-21: Svn Keywords set
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1056">r1056</a>)
+  </li>
+  <li>2009-08-21: Testcase for patch
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1057">r1057</a>)
+  </li>
+  <li>2009-08-21: Svn Keywords set
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1058">r1058</a>)
+  </li>
+  <li>2009-09-10: This patch adds support for creating and testing HTTP DELETE requests. - by Matthew M. Boedicker
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1061">r1061</a>)
+  </li>
+  <li>2009-12-22: 2009-12-22: Patch for issue when server returns empty content type value + workaround for regression<br />problem - do not try to redefine resources
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1062">r1062</a>)
+  </li>
+  <li>2010-05-06: comment for BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1672385&group_id=6550&atid=106550">1672385</a> of 2010-04-22
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1063">r1063</a>)
+  </li>
+  <li>2010-05-06: type fixed as outlined in BR<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2595566&group_id=6550&atid=106550">2595566</a> by Sebastian Lisken
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1064">r1064</a>)
+  </li>
+  <li>2010-05-07: comment typo fixed
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1065">r1065</a>)
+  </li>
+  <li>2010-05-07: patch by Izzy Alanis - but test not working yet
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1066">r1066</a>)
+  </li>
+  <li>2010-05-07: patch for parseContentTypeHeader by Serge Maslyukov
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1067">r1067</a>)
+  </li>
+  <li>2010-05-07: patch by Serge Maslyukov for Triple dotted path handling
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1068">r1068</a>)
+  </li>
+  <li>2011-01-10: improved documentation and changed proxy settings to constants. Added System.out message to explain how to modify this example
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1069">r1069</a>)
+  </li>
+  <li>2011-01-10: fixed according to changes on simple.wiktionary.org
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1070">r1070</a>)
+  </li>
+  <li>2011-01-10: add suport for getDesktop if available
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1071">r1071</a>)
+  </li>
+  <li>2011-01-10: fixed to use Google Maps direction API
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1072">r1072</a>)
+  </li>
+  <li>2011-01-10: leave xml output untouched
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1073">r1073</a>)
+  </li>
+  <li>2011-01-11: You Tube Visitor example
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1074">r1074</a>)
+  </li>
+  <li>2011-01-11: new example
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1075">r1075</a>)
+  </li>
+  <li>2011-01-29: removed superfluous call - added comment
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1076">r1076</a>)
+  </li>
+  <li>2011-01-29: fix of BR<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2822484&group_id=6550&atid=306550">2822484</a> by gcc with supplied patch file httpunit-textarea-090923.patch 
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1077">r1077</a>)
+  </li>
+  <li>2011-04-07: removed unused import
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1078">r1078</a>)
+  </li>
+  <li>2011-12-19: modified version number to 1.7.1 for maven builds
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1079">r1079</a>)
+  </li>
+  <li>2012-09-07: switch to full maven build to prepare for sync to maven central
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1080">r1080</a>)
+  </li>
+  <li>2012-09-09: switch to JUnit4
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1081">r1081</a>)
+  </li>
+  <li>2012-09-10: fix jetty comment
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1082">r1082</a>)
+  </li>
+  <li>2012-09-10: [maven-release-plugin] prepare release httpunit-1.7.1
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1083">r1083</a>)
+  </li>
+  <li>2012-09-10: [maven-release-plugin]  copy for tag httpunit-1.7.1
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1084">r1084</a>)
+  </li>
+  <li>2012-09-10: [maven-release-plugin] prepare for next development iteration
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1085">r1085</a>)
+  </li>
+  <li>2012-09-12: converted to m2eclipse project
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1086">r1086</a>)
+  </li>
+  <li>2012-09-12: add checks for InvocationContextFactory - clearly ServletAccessTest can not be run on it's own with this change
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1087">r1087</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: modified for BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2825872&group_id=6550&atid=106550">2825872</a> Cookie domains not stored correctly - ID: 2825872<br />by aptivate
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1088">r1088</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: adds fix for BR BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2822957&group_id=6550&atid=106550">2822957</a> Cannot remove file upload parameter once set in WebForm<br />by Chris Wilson
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1089">r1089</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: Fixes BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2834933&group_id=6550&atid=106550">2834933</a> There is no facility to allow recursive redirects<br />by Aptivate
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1090">r1090</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: switch to latest jtidy release as asked for by BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2880636&group_id=6550&atid=106550">2880636</a><br />by Chuck Betts
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1092">r1092</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: fixes BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2883515&group_id=6550&atid=106550">2883515</a> noscript tag parsing incorrect<br />by Matthias Hanisch
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1093">r1093</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: fix BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2946821&group_id=6550&atid=106550">2946821</a> getDOM changes since 1.5.4<br />by max
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1094">r1094</a>)
+  </li>
+  <li>2012-09-12: 2012-09-12: fixes BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2957505&group_id=6550&atid=106550">2957505</a> No 'opaque' causes NPE when attempting DigestAuthentication<br />by Jason McSwain 
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1095">r1095</a>)
+  </li>
+  <li>2012-09-13: 2012-09-13: fixes BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3076917&group_id=6550&atid=106550">3076917</a> Missing port number in URL from ServletUnitHtt<br />by bbogg
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1096">r1096</a>)
+  </li>
+  <li>2012-09-13: 2012-09-13: mostly fixes BR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3301056&group_id=6550&atid=106550">3301056</a> ServletUnit handling Content-Type incorrectly<br />by Kevin Hunter - the default Content-Type can not be set to null or any other value at this time
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1097">r1097</a>)
+  </li>
+  <li>2012-09-13: 2012-09-13: 2012-09-13: fixes FR <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2836664&group_id=6550&atid=356550">2836664</a> make WebRequestSource.getDestination() public<br />by Dan Lipofsky<br />and makes sure FR records will show up in release notes
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1098">r1098</a>)
+  </li>
+   <li>2012-09-13: added svn log results from 2009-09 to 2012-09
+    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=1044">r1099</a>)
+  </li>
+</ol>
 <h4>Problems fixed:</h4>
     <li>BR [<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1055450&group_id=6550&atid=106550">1055450</a> ] Error loading included script aborts entire request</li>
 	<li>BR [<a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2034998&group_id=6550&atid=106550">2034998</a> ] by Tiago Luchini + fix of another bug    (<a href="http://httpunit.svn.sourceforge.net/viewvc/httpunit?view=rev&revision=991">r991</a>)  </li>

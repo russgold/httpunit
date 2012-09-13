@@ -1,6 +1,9 @@
+#!/bin/bash
 #
 # script for httpunit release notes formatting
 # WF 2008-04-19
+# WF 2012-09-13 modified to use gawk and sort
+#
 # $Header$
 #
 
@@ -9,10 +12,10 @@
 # show usage
 # 
 usage() {
-	echo "usage: svnlog2releasenotes [fromdate]"
-	echo "  get the subversion repository notes and reformat to release notes"
-	echo "	example: rnotes 2007-12 > recent.html"
-	exit 1
+  echo "usage: svnlog2releasenotes [fromdate]"
+  echo "  get the subversion repository notes and reformat to release notes"
+  echo "	example: svnlog2releasenotes 2007-12 > recent.html"
+  exit 1
 }
 
 
@@ -27,7 +30,7 @@ getsvnlog() {
 # reformat the subversion log to release notes format
 #
 reformat() {
-  cat svnlog.txt  | awk  -v fromdate="$fromdate" -v todate="$todate" '
+  cat svnlog.txt  | gawk  -v fromdate="$fromdate" -v todate="$todate" '
 BEGIN { 
 	FS="|" 
 	quote="\x22"
@@ -54,6 +57,8 @@ BEGIN {
 /^r[0-9]+/ { 
 	match($0,"^r[0-9]+")
 	rev=substr($0,RSTART+1,RLENGTH-1);
+	# format revision to 0000 format
+	frev=sprintf("%04d",rev);
 	author=$2
 	date=gsub(" ","",$3)
 	date=substr($3,1,10)	
@@ -79,9 +84,9 @@ BEGIN {
 	  # encode html tags
 	  gsub("<","\\&lt;",current);
 	  gsub(">","\\&gt;",current);
-	  if (text[rev]!="")
-	  	text[rev]=text[rev]"<br />"
-		text[rev]=text[rev]current
+	  if (text[frev]!="")
+	  	text[frev]=text[frev]"<br />"
+		text[frev]=date": "text[frev]current
 	}	
 	next
 }	
@@ -93,8 +98,13 @@ END {
   supportlink="&group_id=6550&atid=206550"
   patchlink  ="&group_id=6550&atid=306550"
   featurelink  ="&group_id=6550&atid=356550"
-	for (rev in text) {
-	  current=text[rev]
+	# sort
+	count=asorti(text,stext)
+	for (i=1;i<=count;i++) {
+	  frev=stext[i]
+	  current=text[frev]
+		# unformat revision from 0000 format
+		rev=sprintf("%d",frev)
 	  # look for bug report or patch number - must have 6 digits +
 	  if (match(current,"[0-9][0-9][0-9][0-9][0-9][0-9]+")) {
 	    rs=RSTART
