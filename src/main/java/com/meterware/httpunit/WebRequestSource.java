@@ -199,7 +199,13 @@ abstract public class WebRequestSource extends ParameterHolder implements
 		return _baseURL;
 	}
 
-	protected String getDestination() {
+	/**
+	 * get the Destination
+	 * made public per FR 2836664 make WebRequestSource.getDestination() public
+	 * by Dan Lipofsky
+	 * @return
+	 */
+	public String getDestination() {
 		return getElement().getAttribute(_destinationAttribute);
 	}
 

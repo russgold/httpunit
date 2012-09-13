@@ -92,6 +92,7 @@ END {
   buglink    ="&group_id=6550&atid=106550"
   supportlink="&group_id=6550&atid=206550"
   patchlink  ="&group_id=6550&atid=306550"
+  featurelink  ="&group_id=6550&atid=356550"
 	for (rev in text) {
 	  current=text[rev]
 	  # look for bug report or patch number - must have 6 digits +
@@ -105,6 +106,8 @@ END {
 		    postfix=patchlink
 		  } else if (match(current,"SR")) {
 		    postfix=supportlink
+		  } else if (match(current,"FR")) {
+		    postfix=featurelink
 		  } else {
 		  	postfix=buglink
 		  }
