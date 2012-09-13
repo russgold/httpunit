@@ -487,19 +487,26 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         return result;
     }
 
-
     /**
      * Returns the headers defined for this response.
+     * @param name - the name of the field to get
+     **/
+    String getHeaderFieldDirect( String name ) {
+      ArrayList values;
+      synchronized (_headers) {
+          values = (ArrayList) _headers.get( name.toUpperCase() );
+      }
+
+      return values == null ? null : (String) values.get( 0 );
+    }
+    
+    /**
+     * Returns the headers defined for this response.
+     * @param name
      **/
     String getHeaderField( String name ) {
         if (!_headersComplete) completeHeaders();
-
-        ArrayList values;
-        synchronized (_headers) {
-            values = (ArrayList) _headers.get( name.toUpperCase() );
-        }
-
-        return values == null ? null : (String) values.get( 0 );
+        return getHeaderFieldDirect(name);
      }
 
 
@@ -564,7 +571,10 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     private void completeHeaders() {
         if (_headersComplete) return;
         addCookieHeader();
-        setHeader( "Content-Type", _contentType + "; charset=" + getCharacterEncoding() );
+        // BR 3301056 ServletUnit handling Content-Type incorrectly
+        if (getHeaderFieldDirect("Content-Type")==null) {
+        	setHeader( "Content-Type", _contentType + "; charset=" + getCharacterEncoding() );
+        }
         _headersComplete = true;
     }
 

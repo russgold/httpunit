@@ -1325,8 +1325,8 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
             _contentHeader = _contentType + ";charset=" + _characterSet;
         } else {
             String[] parts = HttpUnitUtils.parseContentTypeHeader( contentHeader );
-            if (null != _client && null != _client.getClientProperties().getOverrideContextType()) {
-                _contentType = _client.getClientProperties().getOverrideContextType();
+            if (null != _client && null != _client.getClientProperties().getOverrideContentType()) {
+                _contentType = _client.getClientProperties().getOverrideContentType();
             } else {
                 _contentType = parts[0];
             }
