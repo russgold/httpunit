@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2007, Russell Gold
+ * Copyright (c) 2007-2012, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -20,6 +20,7 @@ package com.meterware.httpunit.dom;
  *
  *******************************************************************************************************************/
 import org.junit.Assert;
+import org.junit.Ignore;
 
 import java.util.Stack;
 import java.net.URL;
@@ -32,6 +33,7 @@ import org.xml.sax.SAXException;
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
 */
+@Ignore
 class TestWindowProxy implements DomWindowProxy {
 
     private static Stack _proxyCalls = new Stack();
