@@ -40,7 +40,7 @@ public class PseudoServer {
 	 */
 	public static final boolean useFactory=false;
 	
-    private static final int DEFAULT_SOCKET_TIMEOUT = 1000;
+    static final int DEFAULT_SOCKET_TIMEOUT = 1000;
 
     private static final int INPUT_POLL_INTERVAL = 10;
 
@@ -610,8 +610,6 @@ class HttpResponseStream {
  */
 class ServerSocketFactory {
 
-	// the default timeout in millisecs
-	static public int DEFAULT_TIMEOUT=1000;
 	
 	// the list of sockets that have been created by the factory
 	static private ArrayList _sockets = new ArrayList();
@@ -628,7 +626,7 @@ class ServerSocketFactory {
 	 */
 	static synchronized ServerSocket createNewServerSocket() throws IOException {
 		ServerSocket serverSocket = new ServerSocket(0);
-		serverSocket.setSoTimeout(DEFAULT_TIMEOUT);
+		serverSocket.setSoTimeout(PseudoServer.DEFAULT_SOCKET_TIMEOUT);
 		return serverSocket;
 	}
 	
