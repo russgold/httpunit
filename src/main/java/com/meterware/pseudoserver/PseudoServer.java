@@ -34,6 +34,12 @@ import com.meterware.httpunit.HttpUnitUtils;
  **/
 public class PseudoServer {
 
+	/**
+	 * allow factory use to be switched on and off
+	 * by default the factory is not used any more since there were problems with the test cases as of 2012-10-09
+	 */
+	public static final boolean useFactory=false;
+	
     private static final int DEFAULT_SOCKET_TIMEOUT = 1000;
 
     private static final int INPUT_POLL_INTERVAL = 10;
@@ -467,7 +473,15 @@ public class PseudoServer {
 
     private ServerSocket getServerSocket() throws IOException {
         synchronized (this) {
-            if (_serverSocket == null) _serverSocket = ServerSocketFactory.newServerSocket();
+        	// if the socket has not been initialized yet
+            if (_serverSocket == null) {
+            	// create one - either using the factory (reusing sockets)
+            	// or with no factory - getting a new socket each time
+            	if (useFactory)
+            		_serverSocket = ServerSocketFactory.newServerSocket();
+            	else
+            		_serverSocket = ServerSocketFactory.createNewServerSocket();
+            }
         }
         return _serverSocket;
     }
@@ -591,40 +605,78 @@ class HttpResponseStream {
 }
 
 
-
+/**
+ * Factory for Server sockets
+ */
 class ServerSocketFactory {
 
-    static private ArrayList _sockets = new ArrayList();
+	// the default timeout in millisecs
+	static public int DEFAULT_TIMEOUT=1000;
+	
+	// the list of sockets that have been created by the factory
+	static private ArrayList _sockets = new ArrayList();
 
-    static private int _outstandingSockets;
+	static private int _outstandingSockets;
 
-    static private Object _releaseSemaphore = new Object();
+	// synchronization object
+	static private Object _releaseSemaphore = new Object();
 
-    static synchronized ServerSocket newServerSocket() throws IOException {
-        if (_sockets.isEmpty() && _outstandingSockets > PseudoServer.getWaitThreshhold()) {
-            try { synchronized( _releaseSemaphore) {_releaseSemaphore.wait( PseudoServer.getSocketReleaseWaitTime() ); } } catch (InterruptedException e) {};
-        }
-        _outstandingSockets++;
-        if (!_sockets.isEmpty()) {
-            return (ServerSocket) _sockets.remove(0);
-        } else {
-            ServerSocket serverSocket = new ServerSocket(0);
-            serverSocket.setSoTimeout( 1000 );
-            return serverSocket;
-        }
-    }
+	/**
+	 * create a new ServerSocket
+	 * @return a new ServerSocket
+	 * @throws IOException
+	 */
+	static synchronized ServerSocket createNewServerSocket() throws IOException {
+		ServerSocket serverSocket = new ServerSocket(0);
+		serverSocket.setSoTimeout(DEFAULT_TIMEOUT);
+		return serverSocket;
+	}
+	
+	/**
+	 * create a new Server Socket
+	 * @return a Server Socket
+	 * @throws IOException
+	 */
+	static synchronized ServerSocket newServerSocket() throws IOException {
+		
+		if (_sockets.isEmpty()
+				&& _outstandingSockets > PseudoServer.getWaitThreshhold()) {
+			try {
+				synchronized (_releaseSemaphore) {
+					_releaseSemaphore.wait(PseudoServer
+							.getSocketReleaseWaitTime());
+				}
+			} catch (InterruptedException e) {
+			}
+			;
+		}
+		_outstandingSockets++;
+		if (!_sockets.isEmpty()) {
+			return (ServerSocket) _sockets.remove(0);
+		} else {
+			ServerSocket serverSocket=createNewServerSocket();
+			return serverSocket;
+		}
+	}
 
-    static synchronized void release( ServerSocket serverSocket ) throws IOException {
-        if (_sockets.size() >= 2 * PseudoServer.getWaitThreshhold()) {
-            serverSocket.close();
-        } else {
-            _sockets.add( serverSocket );
-            _outstandingSockets--;
-            synchronized (_releaseSemaphore) { _releaseSemaphore.notify(); }
-        }
-    }
-}
-
+	/**
+	 * release the given server Socket
+	 * @param serverSocket
+	 * @throws IOException
+	 */
+	static synchronized void release(ServerSocket serverSocket)
+			throws IOException {
+		if (_sockets.size() >= 2 * PseudoServer.getWaitThreshhold()) {
+			serverSocket.close();
+		} else {
+			_sockets.add(serverSocket);
+			_outstandingSockets--;
+			synchronized (_releaseSemaphore) {
+				_releaseSemaphore.notify();
+			}
+		}
+	}
+} // ServerSocketFactory
 
 class RecordingOutputStream extends OutputStream {
 
