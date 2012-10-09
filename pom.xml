@@ -45,7 +45,7 @@
 		<developer>
 			<id>wolfgang_fahl</id>
 			<name>Wolfgang Fahl</name>
-			<organization>BitPlan</organization>
+			<organization>BITPlan GmbH http://www.bitplan.com</organization>
 			<roles>
 				<role>lead</role>
 				<role>developer</role>
@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.7</version>
+			<version>4.10</version>
 		</dependency>
 		<dependency>
 			<groupId>nekohtml</groupId>

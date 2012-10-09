@@ -2,7 +2,7 @@ package com.meterware.pseudoserver;
 /********************************************************************************************************************
  * $Id$
  *
- * Copyright (c) 2002-2004, Russell Gold
+ * Copyright (c) 2002-2012, Russell Gold
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
  * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
@@ -37,20 +38,7 @@ import static org.junit.Assert.assertEquals;
  **/
 public class HttpUserAgentTest {
 
-    private static final PseudoServerTestSupport testSupport = new PseudoServerTestSupport();
-
-
-    @BeforeClass
-    static public void setUpHttpUserAgentTest() throws Exception {
-        testSupport.setUpServer();
-    }
-
-
-    @AfterClass
-    static public void tearDownHttpUserAgentTest() throws Exception {
-        testSupport.tearDownServer();
-    }
-
+    @Rule public PseudoServerTestSupport testSupport = new PseudoServerTestSupport();
 
     protected void defineResource( String resourceName, PseudoServlet servlet ) {
         testSupport.defineResource(resourceName, servlet);
