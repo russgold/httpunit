@@ -33,7 +33,7 @@
 	<groupId>org.httpunit</groupId>
 	<artifactId>httpunit</artifactId>
 	<name>HttpUnit</name>
-	<version>1.7.2</version>
+	<version>1.7.3-SNAPSHOT</version>
 	<description>A library for testing websites programmatically</description>
 
 	<url>http://www.httpunit.org</url>
@@ -47,9 +47,9 @@
 
 
 	<scm>
-		<url>http://httpunit.svn.sourceforge.net/viewvc/httpunit/tags/httpunit-1.7.2</url>
-		<developerConnection>scm:svn:https://httpunit.svn.sourceforge.net/svnroot/httpunit/tags/httpunit-1.7.2</developerConnection>
-		<connection>scm:svn:http://httpunit.svn.sourceforge.net/svnroot/httpunit/tags/httpunit-1.7.2</connection>
+		<url>http://httpunit.svn.sourceforge.net/viewvc/httpunit</url>
+		<developerConnection>scm:svn:https://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit</developerConnection>
+		<connection>scm:svn:http://httpunit.svn.sourceforge.net/svnroot/httpunit/trunk/httpunit</connection>
 	</scm>
 
 
