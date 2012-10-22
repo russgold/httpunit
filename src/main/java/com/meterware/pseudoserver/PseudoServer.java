@@ -113,11 +113,19 @@ public class PseudoServer {
     public PseudoServer( int socketTimeout ) {
         _socketTimeout = socketTimeout;
         _serverNum = ++_numServers;
+
+        try {
+            _serverSocket = new ServerSocket(0);
+            _serverSocket.setSoTimeout(1000);
+        } catch( IOException e ) {
+            System.out.println("Error while creating socket: " + e);
+            throw new RuntimeException(e);
+        }
         Thread t = new Thread( "PseudoServer " + _serverNum ) {
             public void run() {
                 while (_active) {
                     try {
-                        handleNewConnection( getServerSocket().accept() );
+                        handleNewConnection( _serverSocket.accept() );
                         Thread.sleep( 20 );
                     } catch (InterruptedIOException e) {
                     } catch (IOException e) {
@@ -129,9 +137,9 @@ public class PseudoServer {
                     }
                 }
         		try {
-                    if (_serverSocket != null) ServerSocketFactory.release( _serverSocket );
-                    _serverSocket = null;
+                    _serverSocket.close();
                 } catch (IOException e) {
+                    System.out.println("Error while closing socket: " + e);
                 }
                 debug( "Pseudoserver shutting down" );
             }
@@ -156,7 +164,7 @@ public class PseudoServer {
 
 
     private static String replaceDebugToken( String message, String token, String replacement ) {
-        return message.indexOf( token ) < 0 ? message : message.replaceFirst( token, replacement );
+        return !message.contains(token) ? message : message.replaceFirst( token, replacement );
     }
 
 
@@ -169,7 +177,7 @@ public class PseudoServer {
      * Returns the port on which this server is listening.
      **/
     public int getConnectedPort() throws IOException {
-        return getServerSocket().getLocalPort();
+        return _serverSocket.getLocalPort();
     }
 
 
@@ -471,22 +479,6 @@ public class PseudoServer {
     }
 
 
-    private ServerSocket getServerSocket() throws IOException {
-        synchronized (this) {
-        	// if the socket has not been initialized yet
-            if (_serverSocket == null) {
-            	// create one - either using the factory (reusing sockets)
-            	// or with no factory - getting a new socket each time
-            	if (useFactory)
-            		_serverSocket = ServerSocketFactory.newServerSocket();
-            	else
-            		_serverSocket = ServerSocketFactory.createNewServerSocket();
-            }
-        }
-        return _serverSocket;
-    }
-
-
     private ServerSocket _serverSocket;
 
 }
@@ -604,77 +596,6 @@ class HttpResponseStream {
 
 }
 
-
-/**
- * Factory for Server sockets
- */
-class ServerSocketFactory {
-
-	
-	// the list of sockets that have been created by the factory
-	static private ArrayList _sockets = new ArrayList();
-
-	static private int _outstandingSockets;
-
-	// synchronization object
-	static private Object _releaseSemaphore = new Object();
-
-	/**
-	 * create a new ServerSocket
-	 * @return a new ServerSocket
-	 * @throws IOException
-	 */
-	static synchronized ServerSocket createNewServerSocket() throws IOException {
-		ServerSocket serverSocket = new ServerSocket(0);
-		serverSocket.setSoTimeout(PseudoServer.DEFAULT_SOCKET_TIMEOUT);
-		return serverSocket;
-	}
-	
-	/**
-	 * create a new Server Socket
-	 * @return a Server Socket
-	 * @throws IOException
-	 */
-	static synchronized ServerSocket newServerSocket() throws IOException {
-		
-		if (_sockets.isEmpty()
-				&& _outstandingSockets > PseudoServer.getWaitThreshhold()) {
-			try {
-				synchronized (_releaseSemaphore) {
-					_releaseSemaphore.wait(PseudoServer
-							.getSocketReleaseWaitTime());
-				}
-			} catch (InterruptedException e) {
-			}
-			;
-		}
-		_outstandingSockets++;
-		if (!_sockets.isEmpty()) {
-			return (ServerSocket) _sockets.remove(0);
-		} else {
-			ServerSocket serverSocket=createNewServerSocket();
-			return serverSocket;
-		}
-	}
-
-	/**
-	 * release the given server Socket
-	 * @param serverSocket
-	 * @throws IOException
-	 */
-	static synchronized void release(ServerSocket serverSocket)
-			throws IOException {
-		if (_sockets.size() >= 2 * PseudoServer.getWaitThreshhold()) {
-			serverSocket.close();
-		} else {
-			_sockets.add(serverSocket);
-			_outstandingSockets--;
-			synchronized (_releaseSemaphore) {
-				_releaseSemaphore.notify();
-			}
-		}
-	}
-} // ServerSocketFactory
 
 class RecordingOutputStream extends OutputStream {
 
