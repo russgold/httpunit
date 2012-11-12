@@ -20,9 +20,11 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 
+import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.WebClient;
 import com.meterware.httpunit.WebResponse;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -51,6 +53,29 @@ public class ConfigTest {
         assertNotNull("No response received", response);
         assertEquals("content type", "text/plain", response.getContentType());
         assertEquals("servlet name is " + ConfigServlet.class.getName(), response.getText());
+    }
+    
+    @Test
+    /**
+     * Test added by WF 2012-11-12 to answer question on developers mailing list
+     * @throws Exception
+     */
+    public void testInvalidConfig() throws Exception {
+      final String resourceName = "something/interesting";
+
+      ServletRunner sr = new ServletRunner();
+      sr.registerServlet(resourceName, ConfigServlet.class.getName());
+      WebClient wc = sr.newClient();
+      try {
+      	WebResponse response = wc.getResponse("http://localhost/" + "ISB/"+ resourceName);
+      	fail("No Exception thrown");
+      } catch (Throwable th) {
+      	// com.meterware.httpunit.HttpNotFoundException: 
+      	// Error on HTTP request: 404 No servlet mapping defined [http://localhost/ISB/something/interesting]
+      	String expected="Error on HTTP request: 404 No servlet mapping defined [http://localhost/ISB/something/interesting]";
+      	assertTrue("HttpNotFoundException expected",th instanceof HttpNotFoundException);
+      	assertEquals("wrong exception message",expected,th.getMessage());
+      }
     }
 
 

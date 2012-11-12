@@ -787,6 +787,11 @@ class WebApplication implements SessionListenerDispatcher {
         }
 
 
+        /**
+         * get the Servlet
+         * @return the Servlet from the configuration
+         * @throws ServletException - e.g. if no configuration is available
+         */
         public Servlet getServlet() throws ServletException {
             if (getConfiguration() == null) throw new HttpNotFoundException( "No servlet mapping defined", _url );
 
