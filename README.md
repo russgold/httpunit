@@ -7,5 +7,5 @@ A library for testing websites
 * Open Source hosted at https://github.com/russgold/httpunit
 * Maven based Java project including Unit tests
 
-### Stack Overlow Questions & Answers
+### Stack Overflow Questions & Answers
 http://stackoverflow.com/questions/tagged/http-unit
