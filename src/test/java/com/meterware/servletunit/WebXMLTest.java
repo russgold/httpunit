@@ -56,7 +56,8 @@ import static org.junit.Assert.*;
  * Tests for Web xml access
  */
 public class WebXMLTest {
-
+    private static final String TEST_TARGET_PATH = "target/build";
+    
     /**
      * if the dtd file is not on the CLASSPATH there will be nasty java.net.MalformedURLException problems
      * for the Eclipse environment we'll give advice what to do
@@ -99,15 +100,15 @@ public class WebXMLTest {
 
         WebXMLString wxs = new WebXMLString();
         wxs.addServlet("/SimpleServlet", SimpleGetServlet.class);
-        File webXml = createWebXml(new File("build/base"), wxs);
+        File webXml = createWebXml(new File(TEST_TARGET_PATH + "/base"), wxs);
 
         assertRealPath("path with no context", new ServletRunner(webXml), new File("something.txt"), "/something.txt");
-        assertRealPath("path with context", new ServletRunner(webXml, "/testing"), new File("build/base/something.txt"), "/something.txt");
+        assertRealPath("path with context", new ServletRunner(webXml, "/testing"), new File(TEST_TARGET_PATH + "/base/something.txt"), "/something.txt");
         // attempt for an assertion a long the line of bug report [ 1113728 ] getRealPath throws IndexOutOfBoundsException on empty string
         // TODO check what was meant by Adrian Baker
         // assertRealPath( "empty path with context", new ServletRunner( webXml, "/testing" ), new File( "" ), "/testing" );
         assertRealPath("path with no context, no slash", new ServletRunner(webXml), new File("something.txt"), "something.txt");
-        assertRealPath("path with context, no slash", new ServletRunner(webXml, "/testing"), new File("build/base/something.txt"), "something.txt");
+        assertRealPath("path with context, no slash", new ServletRunner(webXml, "/testing"), new File(TEST_TARGET_PATH + "/base/something.txt"), "something.txt");
     }
 
     private void assertRealPath(String comment, ServletRunner sr, File expectedFile, String relativePath) {
@@ -117,7 +118,7 @@ public class WebXMLTest {
 
 
     private File createWebXml(WebXMLString wxs) throws IOException {
-        return createWebXml(new File("build"), wxs);
+        return createWebXml(new File(TEST_TARGET_PATH), wxs);
     }
 
     private File createWebXml(File parent, WebXMLString wxs) throws IOException {
