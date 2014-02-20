@@ -123,6 +123,14 @@ public class ServletUnitServletContext implements ServletContext {
 	public java.net.URL getResource(String path) {
 		try {
 			File resourceFile = _application.getResourceFile(path);
+			// PATCH proposal [ 1592532 ] Invalid
+			// ServletUnitServletContext#getResource(String path)
+			// by Timo Westkemper
+			// return !resourceFile.exists() ? null : resourceFile.toURL();
+			// 
+			// state of code until 2014-02 - before proposal of Aki Yoshida
+			// return resourceFile == null ? null : resourceFile.toURL();
+
 			return resourceFile == null || !resourceFile.exists() ? null : resourceFile.toURL();
 		} catch (MalformedURLException e) {
 			return null;
