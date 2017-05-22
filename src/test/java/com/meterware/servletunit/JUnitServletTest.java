@@ -206,7 +206,7 @@ public class JUnitServletTest {
 
         MyFactory._runner = _runner = new ServletRunner(wxs.asInputStream());
         ServletUnitClient client = _runner.newClient();
-        WebResponse wr = client.getResponse("http://localhost/JUnit?test=" + ServletAccessTest.class.getName());
+        WebResponse wr = client.getResponse("http://localhost/JUnit?test=" + ServletAccessTestClass.class.getName());
 
         final WebTable resultsTable = wr.getTableWithID("results");
         assertNotNull("Did not find results table", resultsTable);

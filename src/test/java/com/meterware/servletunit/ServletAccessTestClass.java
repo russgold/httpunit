@@ -29,13 +29,13 @@ import javax.servlet.http.HttpServlet;
 /**
  * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
  */
-public class ServletAccessTest extends ServletTestCase {
+public class ServletAccessTestClass extends ServletTestCase {
 
 	/**
 	 * construct a ServletAccessTest
 	 * @param name
 	 */
-    public ServletAccessTest(String name) {
+    public ServletAccessTestClass( String name) {
         super(name);
     }
 
