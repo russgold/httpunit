@@ -68,6 +68,7 @@ public class StatelessTest {
 
     @Test
     public void testServletCaching() throws Exception {
+        AccessCountServlet._numInstances = 0;
         final String resourceName = "something/interesting";
 
         assertEquals("Initial instances of servlet class", 0, AccessCountServlet.getNumInstances());
