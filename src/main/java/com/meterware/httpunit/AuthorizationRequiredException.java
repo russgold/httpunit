@@ -1,5 +1,5 @@
 package com.meterware.httpunit;
-/********************************************************************************************************************
+/* *******************************************************************************************************************
 * $Id$
 *
 * Copyright (c) 2000-2002,2006, Russell Gold
@@ -54,6 +54,7 @@ public class AuthorizationRequiredException extends RuntimeException {
 
     /**
      * Returns the name of the <a href="http://www.freesoft.org/CIE/RFC/Orig/rfc2617.txt">authentication scheme</a>.
+     * @return the scheme
      **/
     public String getAuthenticationScheme() {
         return _scheme;
@@ -62,6 +63,8 @@ public class AuthorizationRequiredException extends RuntimeException {
 
     /**
      * Returns the named authentication parameter. For Basic authentication, the only parameter is "realm".
+     * @param parameterName the name of the parameter to fetch
+     * @return the parameter, without quotes
      **/
     public String getAuthenticationParameter( String parameterName ) {
         return unQuote( (String) _properties.get( parameterName ) );

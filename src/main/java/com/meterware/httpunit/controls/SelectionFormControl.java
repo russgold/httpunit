@@ -20,16 +20,6 @@ package com.meterware.httpunit.controls;
 *
 *******************************************************************************************************************/
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.meterware.httpunit.FormControl;
 import com.meterware.httpunit.NodeUtils;
 import com.meterware.httpunit.WebForm;
@@ -38,6 +28,15 @@ import com.meterware.httpunit.protocol.ParameterProcessor;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
 import com.meterware.httpunit.scripting.SelectionOption;
 import com.meterware.httpunit.scripting.SelectionOptions;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * FormControl for "Select"
@@ -428,14 +427,14 @@ public class SelectionFormControl extends FormControl {
             _options = newArray;
         }
 
-				/**
-				 * get the Object at the given index
-				 * check that the index is not out of bounds 
-				 * @param index - the index of the object to get
-				 * @throw RuntimeException if index is out of bounds
-				 * @since [ 1124057 ] Out of Bounds Exception should be avoided
-				 * 
-				 */
+        /**
+         * get the Object at the given index
+         * check that the index is not out of bounds
+         *
+         * @param index - the index of the object to get
+         * @throws RuntimeException if index is out of bounds
+         * @since [ 1124057 ] Out of Bounds Exception should be avoided
+         */
         public Object get( int index ) {
         		// if the index is out of bounds
             if (index < 0 || index >= _options.length) {

@@ -19,31 +19,29 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
-import com.meterware.httpunit.scripting.ScriptableDelegate;
-import com.meterware.httpunit.scripting.NamedDelegate;
-import com.meterware.httpunit.scripting.ScriptingHandler;
 import com.meterware.httpunit.cookies.CookieJar;
 import com.meterware.httpunit.cookies.CookieSource;
-import com.meterware.httpunit.dom.HTMLDocumentImpl;
 import com.meterware.httpunit.dom.DomWindow;
 import com.meterware.httpunit.dom.DomWindowProxy;
+import com.meterware.httpunit.dom.HTMLDocumentImpl;
 import com.meterware.httpunit.dom.HTMLElementImpl;
 import com.meterware.httpunit.protocol.MessageBody;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.MalformedURLException;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.zip.GZIPInputStream;
-
+import com.meterware.httpunit.scripting.NamedDelegate;
+import com.meterware.httpunit.scripting.ScriptableDelegate;
+import com.meterware.httpunit.scripting.ScriptingHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.mozilla.javascript.Scriptable;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.zip.GZIPInputStream;
 
 /**
  * A response to a web request from a web server.
@@ -83,7 +81,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * is parsing on?
-     * @return
+     * @return true if parsing is enabled
      */
     public boolean isWithParse() {
     	return _withParse;
@@ -92,7 +90,6 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
     /**
      * set the parsing switch
      * @param doParse
-     * @return
      */
     public void setWithParse(boolean doParse) {
     	_withParse=doParse;
@@ -142,9 +139,9 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Returns the stylesheet linked in the head of the page.
-     * <code>
-     * <link type="text/css" rel="stylesheet" href="/mystyle.css" />
-     * </code>
+     * &lt;code&gt;
+     * &lt;link type="text/css" rel="stylesheet" href="/mystyle.css" /&gt;
+     * &lt;/code&gt;
      * will return "/mystyle.css".
      * @exception SAXException thrown if there is an error parsing this response
      **/
@@ -154,16 +151,16 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Retrieves the "content" of the meta tags for a key pair attribute-attributeValue.
-     * <code>
-     *  <meta name="robots" content="index" />
-     *  <meta name="robots" content="follow" />
-     *  <meta http-equiv="Expires" content="now" />
-     * </code>
+     * &lt;code&gt;
+     *  &lt;meta name="robots" content="index" /&gt;
+     *  &lt;meta name="robots" content="follow" /&gt;
+     *  &lt;meta http-equiv="Expires" content="now" /&gt;
+     * &lt;/code&gt;
      * this can be used like this
-     * <code>
+     * &lt;code&gt;
      *      getMetaTagContent("name","robots") will return { "index","follow" }
      *      getMetaTagContent("http-equiv","Expires") will return { "now" }
-     * </code>
+     * &lt;/code&gt;
      * @exception SAXException thrown if there is an error parsing this response
      **/
     public String[] getMetaTagContent(String attribute, String attributeValue) throws SAXException {
@@ -195,7 +192,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Returns a request to refresh this page, if any. This request will be defined
-     * by a <meta> tag in the header.  If no tag exists, will return null.
+     * by a meta tag in the header.  If no tag exists, will return null.
      **/
     public WebRequest getRefreshRequest() {
         readRefreshRequest();
@@ -205,7 +202,7 @@ public class WebResponse implements HTMLSegment, CookieSource, DomWindowProxy {
 
     /**
      * Returns the delay before normally following the request to refresh this page, if any.
-     * This request will be defined by a <meta> tag in the header.  If no tag exists,
+     * This request will be defined by a meta tag in the header.  If no tag exists,
      * will return zero.
      **/
     public int getRefreshDelay() {

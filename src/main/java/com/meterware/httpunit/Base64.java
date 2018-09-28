@@ -1,5 +1,5 @@
 package com.meterware.httpunit;
-/********************************************************************************************************************
+/* *******************************************************************************************************************
 * $Id$
 *
 * Copyright (c) 2000-2002 by Russell Gold
@@ -27,12 +27,13 @@ package com.meterware.httpunit;
  **/
 public class Base64 {
 
-    final static String encodingChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    private final static String encodingChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
     /**
      * Returns the base 64 encoded equivalent of a supplied string.
      * @param source the string to encode
+     * @return the encoded string
      */
     public static String encode( String source ) {
         char[] sourceBytes = getPaddedBytes( source );
@@ -74,6 +75,7 @@ public class Base64 {
     /**
      * Returns the plaintext equivalent of a base 64-encoded string.
      * @param source a base 64 string (which must have a multiple of 4 characters)
+     * @return the decoded strong
      */
     public static String decode( String source ) {
         if (source.length()%4 != 0) throw new RuntimeException( "valid Base64 codes have a multiple of 4 characters" );

@@ -80,9 +80,9 @@ public class HTMLPage extends ParsedHTML {
 
     /**
      * Returns the location of the linked stylesheet in the head
-     * <code>
-     * <link type="text/css" rel="stylesheet" href="/mystyle.css" />
-     * </code>
+     * &lt;code&gt;
+     * &lt;link type="text/css" rel="stylesheet" href="/mystyle.css" /&gt;
+     * &lt;/code&gt;
      **/
     public String getExternalStyleSheet() throws SAXException {
         NodeList nl = ((Document) getOriginalDOM()).getElementsByTagName( "link" );
@@ -99,16 +99,16 @@ public class HTMLPage extends ParsedHTML {
 
     /**
      * Retrieves the "content" of the meta tags for a key pair attribute-attributeValue.
-     * <code>
-     *  <meta name="robots" content="index" />
-     *  <meta name="robots" content="follow" />
-     *  <meta http-equiv="Expires" content="now" />
-     * </code>
+     * &lt;code&gt;
+     *  &lt;meta name="robots" content="index" /&gt;
+     *  &lt;meta name="robots" content="follow" /&gt;
+     *  &lt;meta http-equiv="Expires" content="now" /&gt;
+     * &lt;/code&gt;
      * this can be used like this
-     * <code>
+     * &lt;code&gt;
      *      getMetaTagContent("name","robots") will return { "index","follow" }
      *      getMetaTagContent("http-equiv","Expires") will return { "now" }
-     * </code>
+     * &lt;/code&gt;
      **/
     public String[] getMetaTagContent(String attribute, String attributeValue) {
         Vector matches = new Vector();

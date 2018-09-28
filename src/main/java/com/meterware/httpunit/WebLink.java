@@ -19,24 +19,23 @@ package com.meterware.httpunit;
 * DEALINGS IN THE SOFTWARE.
 *
 *******************************************************************************************************************/
+import com.meterware.httpunit.dom.HTMLElementImpl;
 import com.meterware.httpunit.scripting.NamedDelegate;
 import com.meterware.httpunit.scripting.ScriptableDelegate;
-import com.meterware.httpunit.dom.HTMLElementImpl;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * This class represents a link in an HTML page. Users of this class may examine the
  * structure of the link (as a DOM), or create a {@link WebRequest} to simulate clicking
  * on the link.
  *
- * @author <a href="mailto:russgold@httpunit.org">Russell Gold</a>
- * @author <a href="mailto:benoit.xhenseval@avondi.com>Benoit Xhenseval</a>
+ * @author Russell Gold russgold@httpunit.org
+ * @author Benoit Xhenseval benoit.xhenseval@avondi.com
  **/
 public class WebLink extends FixedURLWebRequestSource {
 

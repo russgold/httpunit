@@ -21,11 +21,8 @@ package com.meterware.servletunit;
  *
  *******************************************************************************************************************/
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
+import javax.servlet.*;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -33,12 +30,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Vector;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 /**
  * This class is a private implementation of the ServletContext class.
@@ -423,19 +414,19 @@ public class ServletUnitServletContext implements ServletContext {
 	 * Paths indicating subdirectory paths end with a '/'. The returned paths are
 	 * all relative to the root of the web application and have a leading '/'. For
 	 * example, for a web application containing
-	 * <p>
-	 * /welcome.html<br />
-	 * /catalog/index.html<br />
-	 * <br />
-	 * /catalog/products.html<br />
-	 * /catalog/offers/books.html<br />
-	 * /catalog/offers/music.html<br />
-	 * /customer/login.jsp<br />
-	 * /WEB-INF/web.xml<br />
-	 * /WEB-INF/classes/com.acme.OrderServlet.class,<br />
-	 * <br />
+	 * &lt;p&gt;
+	 * /welcome.html&lt;br /&gt;
+	 * /catalog/index.html&lt;br /&gt;
+	 * &lt;br /&gt;
+	 * /catalog/products.html&lt;br /&gt;
+	 * /catalog/offers/books.html&lt;br /&gt;
+	 * /catalog/offers/music.html&lt;br /&gt;
+	 * /customer/login.jsp&lt;br /&gt;
+	 * /WEB-INF/web.xml&lt;br /&gt;
+	 * /WEB-INF/classes/com.acme.OrderServlet.class,&lt;br /&gt;
+	 * &lt;br /&gt;
 	 * getResourcePaths("/") returns {"/welcome.html", "/catalog/", "/customer/",
-	 * "/WEB-INF/"}<br />
+	 * "/WEB-INF/"}&lt;br /&gt;
 	 * getResourcePaths("/catalog/") returns {"/catalog/index.html",
 	 * "/catalog/products.html", "/catalog/offers/"}.
 	 * 
