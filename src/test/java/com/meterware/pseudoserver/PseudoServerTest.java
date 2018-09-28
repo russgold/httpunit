@@ -21,23 +21,15 @@ package com.meterware.pseudoserver;
  *******************************************************************************************************************/
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.BufferedOutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 
 import static java.lang.String.valueOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class PseudoServerTest {
@@ -241,6 +233,26 @@ public class PseudoServerTest {
 
         SocketConnection conn = new SocketConnection("localhost", getHostPort());
         SocketConnection.SocketResponse response = conn.getResponse("GET", '/' + resourceName + "?name=" + name);
+        assertEquals("Response code", 200, response.getResponseCode());
+        assertEquals("Content type", "text/plain", response.getHeader("Content-Type"));
+        assertEquals("Response", expectedResponse, new String(response.getBody()));
+    }
+
+    @Test
+    public void whenParameterStringContainsEmptyValue_readLaterParameters() throws Exception {
+        String resourceName = "tellMe";
+        String name = "Charlie";
+        final String prefix = "Hello there, ";
+        String expectedResponse = prefix + name;
+
+        support.defineResource(resourceName, new PseudoServlet() {
+            public WebResource getGetResponse() {
+                return new WebResource(prefix + getParameter("name")[0], "text/plain");
+            }
+        });
+
+        SocketConnection conn = new SocketConnection("localhost", getHostPort());
+        SocketConnection.SocketResponse response = conn.getResponse("GET", '/' + resourceName + "?junk=&name=" + name);
         assertEquals("Response code", 200, response.getResponseCode());
         assertEquals("Content type", "text/plain", response.getHeader("Content-Type"));
         assertEquals("Response", expectedResponse, new String(response.getBody()));

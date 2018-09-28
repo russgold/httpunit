@@ -119,12 +119,9 @@ public class HttpRequest extends ReceivedHttpMessage {
         Hashtable parameters = new Hashtable();
 	    if (content == null || content.trim().length() == 0) return parameters;
 
-        StringTokenizer st = new StringTokenizer( content, "&=" );
-        while (st.hasMoreTokens()) {
-            String name = st.nextToken();
-            if (st.hasMoreTokens()) {
-                addParameter( parameters, HttpUnitUtils.decode( name ), HttpUnitUtils.decode( st.nextToken() ) );
-            }
+        for (String spec : content.split( "&" )) {
+	        String[] split = spec.split( "=" );
+	        addParameter( parameters, HttpUnitUtils.decode( split[0] ), split.length < 2 ? null : HttpUnitUtils.decode( split[1] ));
         }
         return parameters;
     }
