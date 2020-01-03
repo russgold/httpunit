@@ -463,7 +463,7 @@ class ServletUnitHttpResponse implements HttpServletResponse {
     /**
      * Returns the status of this response.
      **/
-    int getStatus() {
+    public int getStatus() {
         return _status;
     }
 
@@ -610,6 +610,25 @@ class ServletUnitHttpResponse implements HttpServletResponse {
         ENCODING_MAP.put("TIS-620",   "th ");
         ENCODING_MAP.put("GB2312",    "zh " );
         ENCODING_MAP.put("Big5",      "zh_TW zh_HK " );
+    }
+
+
+
+    public String getHeader(String name) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+
+    public Collection<String> getHeaders(String name) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+
+    public Collection<String> getHeaderNames() {
+      // TODO Auto-generated method stub
+      return null;
     }
 
 }
