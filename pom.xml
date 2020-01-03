@@ -112,8 +112,6 @@
 			<artifactId>jtidy</artifactId>
 			<version>r938</version>
 		</dependency>
-		<!-- <dependency> <groupId>jtidy</groupId> <artifactId>jtidy</artifactId>
-			<version>4aug2000r7-dev</version> </dependency> -->
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
